@@ -31,7 +31,7 @@ class OrderedDictWithParams(OrderedDict):
     if string in self:
       return
     else:
-      self[string] = len(self)
+      self[string] = len(self) + 1
       exec("{0}.{1} = property(lambda self: self['{1}'])".format(self.__class__.__name__,string))
 
 class StateReturns(OrderedDictWithParams):
@@ -55,20 +55,24 @@ class StateReturns(OrderedDictWithParams):
     self['RET_SUPER']     = 1
     self['RET_SUPER_SUB'] = 2
     self['RET_UNHANDLED'] = 3
+    
+    # handled and do not need to be bubbled up
+    self['RET_HANDLED']   = 4
+    self['RET_IGNORED']   = 5
 
-    # handled and do not need to bubble up
-    self['RET_ENTRY']     = 4
-    self['RET_EXIT']      = 5
+    # entry/exit
+    self['RET_ENTRY']     = 6
+    self['RET_EXIT']      = 7
 
     # no side effects 
-    self['RET_NULL']      = 6
+    self['RET_NULL']      = 8
 
     #transitions need to execute
-    self['RET_TRAN']      = 7
-    self['RET_TRAN_INIT'] = 8
-    self['RET_TRAN_HIST'] = 9
-    self['RET_TRAN_EP']   = 10
-    self['RET_TRAN_XP']   = 11
+    self['RET_TRAN']      = 9
+    self['RET_TRAN_INIT'] = 10
+    self['RET_TRAN_HIST'] = 11
+    self['RET_TRAN_EP']   = 12
+    self['RET_TRAN_XP']   = 13
 
     self.write_keys_to_attributes()
     
@@ -77,7 +81,7 @@ class Signal(OrderedDictWithParams):
   A class which contains all of the state signal types
 
   To get the basic system signals:
-    signals = Signal.append()
+    signals = Signal()
 
   To append a new signal
     signals = Signal.append('OVEN_OFF')
@@ -95,6 +99,8 @@ class Signal(OrderedDictWithParams):
     self['INIT_SIGNAL']       = 3
     self['REFLECTION_SIGNAL'] = 4
 
+    self.write_keys_to_attributes()
+
 signals_exist = 'signals' in locals()
 if signals_exist == False:
   signals = Signal()
@@ -102,28 +108,34 @@ if signals_exist == False:
 class Event(OrderedDictWithParams):
   """
     An event should be constructed, used, then garbage collected.  An event is a
-    temporary thing.
-
-    # Events use signals, signals persist in the system since they will be used
-    # over and over again.
-    signals = Signals()
-
-    # Make an event, which will construct a signal internally:
-      Event(signal  = 'OVEN_OFF', payload = 'any object can go here')
+    temporary thing.  However if an event uses a signal that hasn't been seen
+    before, that signal will be added to the list of global signals as a new
+    enumerated value.
 
     # Make an event (this should happen internally):
-      Event(signal  = signals.ENTRY_SIGNAL)
-            
+      e = Event(signal  = signals.ENTRY_SIGNAL) # existing signal
+      assert( e.signal == signals.ENTRY_SIGNAL)
+      assert( e.signal_name == 'ENTRY_SIGNAL')
+
+    # Make an event, which will construct a signal internally:
+      e = Event(signal  = 'OVEN_OFF', payload = 'any object can go here') # new signal
+      assert(e.signal == 5) # if it is the first unseen signal in the system
+      assert(e.signal_name == 'OVEN_OFF')
+      assert(signals.OVER_OFF == 5)
 
   """
   def __init__(self, signal, payload=None):
     global signals
-    if isinstance(signal,Signal):
+    if signal in signals.values():
       self.signal = signal
-
+      for key, value in signals.items():
+        if value == signal:
+          self.signal_name = key
     elif isinstance(signal,str):
-      self.signal = signals.append(signal)
-
+      signals.append(signal)
+      self.signal_name = signal
+      # over-write the signal string as the signal name 
+      self.signal      = signals[signal]
     else:
       raise("signal must be of type string or Signal")
 
