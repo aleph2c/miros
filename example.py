@@ -1,18 +1,18 @@
-from miros.event import Ret, Signal, Event
+from miros.event import ReturnStatus, signals, Event
 
 def state_example(chart, e):
   '''A very simple example state'''
 
-  r = Ret.UNHANDLED
+  status = ReturnStatus.UNHANDLED
 
-  if(e.signal == Signal.ENTRY_SIGNAL):
-    r = Ret.HANDLED
+  if(e.signal == signals.ENTRY_SIGNAL):
+    status = ReturnStatus.HANDLED
 
-  elif(e.signal == Signal.INIT_SIGNAL):
-    r = Ret.HANDLED
+  elif(e.signal == signals.INIT_SIGNAL):
+    status = ReturnStatus.HANDLED
 
   else:
-    r = Ret.SUPER
+    status = ReturnStatus.SUPER
 
-  return r
+  return status
 

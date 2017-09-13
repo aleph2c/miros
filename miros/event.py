@@ -1,28 +1,31 @@
 from collections import OrderedDict
 
+# Not intended for export
 class OrderedDictWithParams(OrderedDict):
   """
-  If your subclass has the following init:
+  If your subclass <name_of_subclass> has the following init:
     def __init__(self,*args,**kwargs):
 
       self['RET_SUPER']     = 1
       self['RET_SUPER_SUB'] = 2
-      self['UNHANDLED'] = 3
+      self['UNHANDLED']     = 3
       selfwrite_keys_to_attributes()
 
     Any object constructed from it will have to following attributes:
       obj = <name_of_subclass>
       obj.RET_SUPER     => 1
       obj.RET_SUPER_SUB => 2
-      obj.UNHANDLED => 3
+      obj.UNHANDLED     => 3
   
     To post-pend an item to the object which will also have a named parameter:
       obj = <name_of_subclass>
       obj.append("NEW_NAMED_ATTRIBUTE")
       ob.NEW_NAMED_ATTRIBUTE => 4
 
+  This of this class as being an extensible ENUM which isn't immutable.  All of
+  the enums are wrapped up within an OrderedDict, so you get all of it's methods
+  as well as the clean interface to the attribute.
   """
-
   def write_keys_to_attributes(self):
     for key in self.keys():
       exec("{0}.{1} = property(lambda self: self['{1}'])".format(self.__class__.__name__,key))
@@ -34,10 +37,11 @@ class OrderedDictWithParams(OrderedDict):
       self[string] = len(self) + 1
       exec("{0}.{1} = property(lambda self: self['{1}'])".format(self.__class__.__name__,string))
 
-class ReturnCodes(OrderedDictWithParams):
+# Intended for export
+class ReturnStatus(OrderedDictWithParams):
 
   """
-  A class which contains all of the state returns type
+  A class which contains all of the state returns codes
 
   To append a return type
     state_returns = ReturnCodes()
@@ -45,7 +49,7 @@ class ReturnCodes(OrderedDictWithParams):
   To get the number:
     state_returns.RET_SUPER => 1
 
-  To add a return:
+  To add a return code:
     state_returns.append('RET_ZZ')
     state_returns.RET_ZZ => 12
 
@@ -54,7 +58,7 @@ class ReturnCodes(OrderedDictWithParams):
 
     self['RET_SUPER']     = 1
     self['RET_SUPER_SUB'] = 2
-    self['UNHANDLED'] = 3
+    self['UNHANDLED']     = 3
     
     # handled and do not need to be bubbled up
     self['RET_HANDLED']   = 4
@@ -75,7 +79,8 @@ class ReturnCodes(OrderedDictWithParams):
     self['RET_TRAN_XP']   = 13
 
     self.write_keys_to_attributes()
-    
+
+# Not intended for export
 class Signal(OrderedDictWithParams):
   """
   A class which contains all of the state signal types
@@ -101,6 +106,10 @@ class Signal(OrderedDictWithParams):
 
     self.write_keys_to_attributes()
 
+"""
+Defining the signals used by this package and all of the packages that reference
+it.  Think of this as a singleton or a growing enumeration.
+"""
 signals_exist = 'signals' in locals()
 if signals_exist == False:
   signals = Signal()
