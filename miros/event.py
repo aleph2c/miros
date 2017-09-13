@@ -1,4 +1,3 @@
-
 from collections import OrderedDict
 class OrderedDictWithParams(OrderedDict):
   """
