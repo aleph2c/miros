@@ -15,17 +15,29 @@ def state_example(chart, e):
   elif(e.signal == signals.REFLECTION_SIGNAL):
     # We are no longer going to return a ReturnStatus object
     # instead we write the function name as a string
-    status = reflect()
-    
+    status = reflect(chart,e)
+
   else:
     status = ReturnStatus.SUPER
 
   return status
 
-ReturnStatus()
+def test_reflection():
+  '''
+  Confirm that you can extract the function name from any function calling
+  reflect.
+  '''
+  # Test the function
+  def example_function():
+    return reflect()
+  assert(example_function() == 'example_function')
 
-class Nothing():
-  pass
+  # Test how to function would be called in an hsm
+  class Nothing(): # could be the Hsm class
+    pass
 
-print(state_example(Nothing(), Event(signals.REFLECTION_SIGNAL)))
+  hsm = Nothing()
+  e   = Event(signals.REFLECTION_SIGNAL)
+  hsm.reflect = reflect
+  assert(state_example(hsm, e) == 'state_example')
 

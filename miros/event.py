@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 # Not intended for export
 class OrderedDictWithParams(OrderedDict):
-  """
+  '''
   If your subclass <name_of_subclass> has the following init:
     def __init__(self,*args,**kwargs):
 
@@ -25,7 +25,7 @@ class OrderedDictWithParams(OrderedDict):
   This of this class as being an extensible ENUM which isn't immutable.  All of
   the enums are wrapped up within an OrderedDict, so you get all of it's methods
   as well as the clean interface to the attribute.
-  """
+  '''
   def write_keys_to_attributes(self):
     for key in self.keys():
       exec("{0}.{1} = property(lambda self: self['{1}'])".format(self.__class__.__name__,key))
@@ -40,7 +40,7 @@ class OrderedDictWithParams(OrderedDict):
 # Intended for export
 class ReturnStatus(OrderedDictWithParams):
 
-  """
+  '''
   A class which contains all of the state returns codes
 
   To append a return type
@@ -53,7 +53,7 @@ class ReturnStatus(OrderedDictWithParams):
     state_returns.append('RET_ZZ')
     state_returns.RET_ZZ => 12
 
-  """
+  '''
   def __init__(self,*args,**kwargs):
 
     self['RET_SUPER']     = 1
@@ -82,7 +82,7 @@ class ReturnStatus(OrderedDictWithParams):
 
 # Not intended for export
 class Signal(OrderedDictWithParams):
-  """
+  '''
   A class which contains all of the state signal types
 
   To get the basic system signals:
@@ -96,7 +96,7 @@ class Signal(OrderedDictWithParams):
     signal['OVEN_OFF']  => 12
     signal.OVER_OFF     => 12
 
-  """
+  '''
   def __init__(self,*args,**kwargs):
 
     self['ENTRY_SIGNAL']      = 1
@@ -106,33 +106,33 @@ class Signal(OrderedDictWithParams):
 
     self.write_keys_to_attributes()
 
-"""
+'''
 Defining the signals used by this package and all of the packages that reference
 it.  Think of this as a singleton or a growing enumeration.
-"""
+'''
 signals_exist = 'signals' in locals()
 if signals_exist == False:
   signals = Signal()
 
 class Event(OrderedDictWithParams):
-  """
-    An event should be constructed, used, then garbage collected.  An event is a
-    temporary thing.  However if an event uses a signal that hasn't been seen
-    before, that signal will be added to the list of global signals as a new
-    enumerated value.
-
-    # Make an event (this should happen internally):
-      e = Event(signal  = signals.ENTRY_SIGNAL) # existing signal
-      assert( e.signal == signals.ENTRY_SIGNAL)
-      assert( e.signal_name == 'ENTRY_SIGNAL')
-
-    # Make an event, which will construct a signal internally:
-      e = Event(signal  = 'OVEN_OFF', payload = 'any object can go here') # new signal
-      assert(e.signal == 5) # if it is the first unseen signal in the system
-      assert(e.signal_name == 'OVEN_OFF')
-      assert(signals.OVER_OFF == 5)
-
-  """
+  '''
+  An event should be constructed, used, then garbage collected.  An event is a
+  temporary thing.  However if an event uses a signal that hasn't been seen
+  before, that signal will be added to the list of global signals as a new
+  enumerated value.
+ 
+  # Make an event (this should happen internally):
+    e = Event(signal  = signals.ENTRY_SIGNAL) # existing signal
+    assert( e.signal == signals.ENTRY_SIGNAL)
+    assert( e.signal_name == 'ENTRY_SIGNAL')
+ 
+  # Make an event, which will construct a signal internally:
+    e = Event(signal  = 'OVEN_OFF', payload = 'any object can go here') # new signal
+    assert(e.signal == 5) # if it is the first unseen signal in the system
+    assert(e.signal_name == 'OVEN_OFF')
+    assert(signals.OVER_OFF == 5)
+ 
+  '''
   def __init__(self, signal, payload=None):
     global signals
     if signal in signals.values():
@@ -150,5 +150,4 @@ class Event(OrderedDictWithParams):
 
   def __del__(self):
     print("delete event")
-
 
