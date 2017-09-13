@@ -1,6 +1,7 @@
 from miros.event import StateReturns, Signal, Event
 
 def state_example(chart, e):
+  '''A very simple example state'''
 
   status = StateReturns.RET_UNHANDLED
 
