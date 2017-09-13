@@ -37,7 +37,7 @@ class OrderedDictWithParams(OrderedDict):
       self[string] = len(self) + 1
       exec("{0}.{1} = property(lambda self: self['{1}'])".format(self.__class__.__name__,string))
 
-# Intended for export
+# Not intended for export
 class ReturnStatus(OrderedDictWithParams):
 
   '''
@@ -103,6 +103,7 @@ class Signal(OrderedDictWithParams):
     self['EXIT_SIGNAL']       = 2
     self['INIT_SIGNAL']       = 3
     self['REFLECTION_SIGNAL'] = 4
+    self['SEARCH_SIGNAL']     = 5
 
     self.write_keys_to_attributes()
 
@@ -114,6 +115,10 @@ signals_exist = 'signals' in locals()
 if signals_exist == False:
   signals = Signal()
 
+return_status_exist = 'return_status' in locals()
+if return_status_exist == False:
+  return_status = ReturnStatus()
+
 class Event(OrderedDictWithParams):
   '''
   An event should be constructed, used, then garbage collected.  An event is a
@@ -122,7 +127,7 @@ class Event(OrderedDictWithParams):
   enumerated value.
  
   # Make an event (this should happen internally):
-    e = Event(signal  = signals.ENTRY_SIGNAL) # existing signal
+    e = Event(signal = signals.ENTRY_SIGNAL) # existing signal
     assert( e.signal == signals.ENTRY_SIGNAL)
     assert( e.signal_name == 'ENTRY_SIGNAL')
  

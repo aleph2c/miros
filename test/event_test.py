@@ -17,8 +17,8 @@ def test_signal():
   assert(signals.ENTRY_SIGNAL == 1)
   assert(signals.REFLECTION_SIGNAL == 4)
   signals.append('BAKE')
-  assert(signals.BAKE == 5)
-  assert(signals['BAKE'] == 5)
+  assert(signals.BAKE == 6)
+  assert(signals['BAKE'] == 6)
 
 def test_event():
   signals = Signal()
@@ -26,7 +26,7 @@ def test_event():
   assert(event.signal == 1)
   assert(event.signal_name == "ENTRY_SIGNAL")
   event = Event(signal="BOB")
-  assert(event.signal == 5)
+  assert(event.signal == 6)
   assert(event.signal_name == "BOB")
 
 def test_signal_singletons():
