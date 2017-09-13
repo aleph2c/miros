@@ -65,7 +65,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=find_packages(exclude=['docs', 'test', 'protoyping', 'investigations']),
+    packages=find_packages(exclude=['docs', 'test', 'plan', 'investigations']),
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
