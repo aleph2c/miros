@@ -1,4 +1,5 @@
 from collections import OrderedDict
+
 class OrderedDictWithParams(OrderedDict):
   """
   If your subclass has the following init:
@@ -6,14 +7,14 @@ class OrderedDictWithParams(OrderedDict):
 
       self['RET_SUPER']     = 1
       self['RET_SUPER_SUB'] = 2
-      self['RET_UNHANDLED'] = 3
+      self['UNHANDLED'] = 3
       selfwrite_keys_to_attributes()
 
     Any object constructed from it will have to following attributes:
       obj = <name_of_subclass>
       obj.RET_SUPER     => 1
       obj.RET_SUPER_SUB => 2
-      obj.RET_UNHANDLED => 3
+      obj.UNHANDLED => 3
   
     To post-pend an item to the object which will also have a named parameter:
       obj = <name_of_subclass>
@@ -33,13 +34,13 @@ class OrderedDictWithParams(OrderedDict):
       self[string] = len(self) + 1
       exec("{0}.{1} = property(lambda self: self['{1}'])".format(self.__class__.__name__,string))
 
-class StateReturns(OrderedDictWithParams):
+class ReturnCodes(OrderedDictWithParams):
 
   """
   A class which contains all of the state returns type
 
   To append a return type
-    state_returns = StateReturns()
+    state_returns = ReturnCodes()
 
   To get the number:
     state_returns.RET_SUPER => 1
@@ -53,7 +54,7 @@ class StateReturns(OrderedDictWithParams):
 
     self['RET_SUPER']     = 1
     self['RET_SUPER_SUB'] = 2
-    self['RET_UNHANDLED'] = 3
+    self['UNHANDLED'] = 3
     
     # handled and do not need to be bubbled up
     self['RET_HANDLED']   = 4

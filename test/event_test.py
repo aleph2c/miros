@@ -1,12 +1,12 @@
 import pytest
-from miros.event import OrderedDictWithParams, StateReturns, Signal, Event
+from miros.event import OrderedDictWithParams, ReturnCodes, Signal, Event
 
 def test_ordered_dict_with_params():
   od = OrderedDictWithParams()
   assert(od!=None)
 
 def test_state_returns():
-  state_returns = StateReturns()
+  state_returns = ReturnCodes()
   assert(state_returns.RET_SUPER == 1)
   assert(state_returns.RET_TRAN_XP == 13)
   state_returns.append('RET_ZZ')

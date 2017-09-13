@@ -1,7 +1,7 @@
-from event import Event, signals, StateReturns
+from event import Event, signals, ReturnCodes
 
 if '__main__' == __name__:
-  state_returns = StateReturns()
+  state_returns = ReturnCodes()
   state_returns.append("MARY")
   state_returns.append("BOB")
   print(state_returns["MARY"])
@@ -9,5 +9,5 @@ if '__main__' == __name__:
 
   event = Event("MARY", payload="nothing")
 
-  #StateReturns = StateReturns.append("MARY")
+  #ReturnCodes = ReturnCodes.append("MARY")
 
