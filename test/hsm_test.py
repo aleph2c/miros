@@ -9,8 +9,8 @@ def state_example(chart, e):
   if(e.signal == signals.ENTRY_SIGNAL):
     status = ReturnStatus.HANDLED
 
-  elif(e.signal == signals.INIT_SIGNAL):
-    status = ReturnStatus.HANDLED
+  if(e.signal == signals.INIT_SIGNAL):
+    pass
 
   elif(e.signal == signals.REFLECTION_SIGNAL):
     # We are no longer going to return a ReturnStatus object
@@ -22,53 +22,233 @@ def state_example(chart, e):
 
   return status
 
-def init_test_d1(chart, e):
+################################################################################
+#                                 Init test 1                                  #
+################################################################################
+def init_test_1_d1(chart, e):
   status = return_status.UNHANDLED
 
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
+    print( "entering {}".format(reflect(chart,e)))
+  if(e.signal == signals.INIT_SIGNAL):
+    pass
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+  else:
+    chart.temp.fun = chart.top
+    status = return_status.SUPER
 
-  return (chart.top, return_status.RET_TRAN)
+  return status
 
-def init_test_d2(chart, e):
+def init_test_1_d2(chart, e):
+  status = return_status.UNHANDLED
+
+  if(e.signal == signals.ENTRY_SIGNAL):
+    print( "entering {}".format(reflect(chart,e)))
+    status = return_status.HANDLED
+  if(e.signal == signals.INIT_SIGNAL):
+    pass
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+  else:
+    chart.temp.fun = init_test_1_d1
+    status = return_status.SUPER
+
+  return status
+
+def init_test_1_d3(chart, e):
+  status = return_status.UNHANDLED
+
+  if(e.signal == signals.ENTRY_SIGNAL):
+    print( "entering {}".format(reflect(chart,e)))
+    status = return_status.HANDLED
+  if(e.signal == signals.INIT_SIGNAL):
+    pass
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+  else:
+    chart.temp.fun = init_test_1_d2
+    status = return_status.SUPER
+
+  return status
+
+def init_test_1_d31(chart, e):
+  status = return_status.UNHANDLED
+
+  if(e.signal == signals.ENTRY_SIGNAL):
+    print( "entering {}".format(reflect(chart,e)))
+    status = return_status.HANDLED
+
+  if(e.signal == signals.INIT_SIGNAL):
+    status = chart.trans(init_test_1_d311)
+
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+
+  else:
+    chart.temp.fun = init_test_1_d3
+    status = return_status.SUPER
+
+  return status
+
+def init_test_1_d32(chart, e):
+  status = return_status.UNHANDLED
+
+  if(e.signal == signals.ENTRY_SIGNAL):
+    print( "entering {}".format(reflect(chart,e)))
+    status = return_status.HANDLED
+  if(e.signal == signals.INIT_SIGNAL):
+    pass
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+  else:
+    chart.temp.fun = init_test_1_d3
+    status = return_status.SUPER
+
+  return status
+
+def init_test_1_d311(chart, e):
+  status = return_status.UNHANDLED
+
+  if(e.signal == signals.ENTRY_SIGNAL):
+    print( "entering {}".format(reflect(chart,e)))
+    status = return_status.HANDLED
+
+  if(e.signal == signals.INIT_SIGNAL):
+    pass
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+  else:
+    chart.temp.fun = init_test_1_d31
+    status = return_status.SUPER
+
+  return status
+
+################################################################################
+#                                 INIT TEST 2                                  #
+################################################################################
+def init_test_2_d1(chart, e):
   status = return_status.UNHANDLED
 
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
+    print( "entering {}".format(reflect(chart,e)))
+  if(e.signal == signals.INIT_SIGNAL):
+    pass
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+  else:
+    chart.temp.fun = chart.top
+    status = return_status.SUPER
 
-  return (init_test_d1, return_status.RET_TRAN)
+  return status
 
-def init_test_d3(chart, e):
+def init_test_2_d2(chart, e):
   status = return_status.UNHANDLED
 
   if(e.signal == signals.ENTRY_SIGNAL):
+    print( "entering {}".format(reflect(chart,e)))
     status = return_status.HANDLED
+  if(e.signal == signals.INIT_SIGNAL):
+    pass
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+  else:
+    chart.temp.fun = init_test_2_d1
+    status = return_status.SUPER
 
-  return (init_test_d2, return_status.RET_TRAN)
+  return status
 
-def init_test_d31(chart, e):
+def init_test_2_d3(chart, e):
   status = return_status.UNHANDLED
 
   if(e.signal == signals.ENTRY_SIGNAL):
+    print( "entering {}".format(reflect(chart,e)))
     status = return_status.HANDLED
+  if(e.signal == signals.INIT_SIGNAL):
+    pass
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+  else:
+    chart.temp.fun = init_test_2_d2
+    status = return_status.SUPER
 
-  return (init_test_d3, return_status.RET_TRAN)
+  return status
 
-def init_test_d32(chart, e):
+def init_test_2_d31(chart, e):
   status = return_status.UNHANDLED
 
   if(e.signal == signals.ENTRY_SIGNAL):
+    print( "entering {}".format(reflect(chart,e)))
     status = return_status.HANDLED
 
-  return (init_test_d3, return_status.RET_TRAN)
+  if(e.signal == signals.INIT_SIGNAL):
+    status = chart.trans(init_test_2_d312)
 
-def init_test_d311(chart, e):
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+  else:
+    chart.temp.fun = init_test_2_d3
+    status = return_status.SUPER
+
+  return status
+
+def init_test_2_d32(chart, e):
   status = return_status.UNHANDLED
 
   if(e.signal == signals.ENTRY_SIGNAL):
+    print( "entering {}".format(reflect(chart,e)))
     status = return_status.HANDLED
+  if(e.signal == signals.INIT_SIGNAL):
+    pass
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+  else:
+    chart.temp.fun = init_test_2_d3
+    status = return_status.SUPER
 
-  return (init_test_d31, return_status.RET_TRAN)
+  return status
+
+def init_test_2_d311(chart, e):
+  status = return_status.UNHANDLED
+
+  if(e.signal == signals.ENTRY_SIGNAL):
+    print( "entering {}".format(reflect(chart,e)))
+    status = return_status.HANDLED
+  if(e.signal == signals.INIT_SIGNAL):
+    pass
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+  else:
+    chart.temp.fun = init_test_2_d31
+    status = return_status.SUPER
+
+  return status
 
 def test_reflection():
   '''
@@ -89,6 +269,12 @@ def test_reflection():
   hsm.reflect = reflect
   assert(state_example(hsm, e) == 'state_example')
 
-def test_init():
+def test_init_test_1():
   chart = Hsm()
-  chart.start_at(init_test_d311)
+  print()
+  chart.start_at(init_test_1_d311)
+
+def test_init_test_2():
+  chart = Hsm()
+  print()
+  chart.start_at(init_test_2_d311)
