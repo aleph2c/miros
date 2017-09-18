@@ -1,5 +1,5 @@
 import pytest
-from miros.event import OrderedDictWithParams, ReturnStatus, Signal, Event, signals
+from miros.event import *
 
 def test_ordered_dict_with_params():
   od = OrderedDictWithParams()
@@ -7,8 +7,8 @@ def test_ordered_dict_with_params():
 
 def test_state_returns():
   state_returns = ReturnStatus()
-  assert(state_returns.RET_SUPER == 1)
-  assert(state_returns.RET_TRAN_XP == 13)
+  assert(state_returns.SUPER == 1)
+  assert(state_returns.TRAN_XP == 13)
   state_returns.append('RET_ZZ')
   assert(state_returns.RET_ZZ == 14)
 
@@ -42,3 +42,16 @@ def test_signal_singletons():
   # we expect the local_signals class not to have to MANY enum
   with pytest.raises(KeyError) as excinfo:
     local_signals.MARY
+
+@pytest.mark.test
+def test_enum_2():
+  ee = Signal2()
+  assert( ee.ENTRY_SIGNAL == 1 )
+  Signal2.BOB = Signal2.__next__()
+  Signal2.append("MARY")
+  assert( ee.BOB == 6 )
+  assert(Signal2.MARY == 7)
+  Signal3.Mary = Signal3.__next__()
+  Signal3.Bob = Signal3.__next__()
+  ef = Signal3()
+  assert(ef.Bob == 7)

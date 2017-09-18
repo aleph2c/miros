@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 
 # Not intended for export
 class OrderedDictWithParams(OrderedDict):
@@ -27,6 +27,9 @@ class OrderedDictWithParams(OrderedDict):
   as well as the clean interface to the attribute.
   '''
   def write_keys_to_attributes(self):
+    #for dictionary in initial_data:
+    #  for key in dictionary:
+    #    setattr(self, key, dictionary[key])
     for key in self.keys():
       exec("{0}.{1} = property(lambda self: self['{1}'])".format(self.__class__.__name__,key))
 
@@ -43,7 +46,7 @@ class ReturnStatus(OrderedDictWithParams):
   '''
   A class which contains all of the state returns codes
 
-  To append a return type
+  To construct the object
     state_returns = ReturnCodes()
 
   To get the number:
@@ -56,27 +59,27 @@ class ReturnStatus(OrderedDictWithParams):
   '''
   def __init__(self,*args,**kwargs):
 
-    self['RET_SUPER']     = 1
-    self['RET_SUPER_SUB'] = 2
-    self['UNHANDLED']     = 3
+    self['SUPER']     = 1
+    self['SUPER_SUB'] = 2
+    self['UNHANDLED'] = 3
     
     # handled and do not need to be bubbled up
-    self['RET_HANDLED']   = 4
-    self['RET_IGNORED']   = 5
+    self['HANDLED']   = 4
+    self['IGNORED']   = 5
 
     # entry/exit
-    self['RET_ENTRY']     = 6
-    self['RET_EXIT']      = 7
+    self['ENTRY']     = 6
+    self['EXIT']      = 7
 
     # no side effects 
-    self['RET_NULL']      = 8
+    self['NULL']      = 8
 
     #transitions need to execute
-    self['RET_TRAN']      = 9
-    self['RET_TRAN_INIT'] = 10
-    self['RET_TRAN_HIST'] = 11
-    self['RET_TRAN_EP']   = 12
-    self['RET_TRAN_XP']   = 13
+    self['TRAN']      = 9
+    self['TRAN_INIT'] = 10
+    self['TRAN_HIST'] = 11
+    self['TRAN_EP']   = 12
+    self['TRAN_XP']   = 13
 
     self.write_keys_to_attributes()
 
@@ -103,7 +106,7 @@ class Signal(OrderedDictWithParams):
     self['EXIT_SIGNAL']       = 2
     self['INIT_SIGNAL']       = 3
     self['REFLECTION_SIGNAL'] = 4
-    self['SEARCH_SIGNAL']     = 5
+    self['SEARCH_FOR_SUPER_SIGNAL']     = 5
 
     self.write_keys_to_attributes()
 
@@ -154,5 +157,36 @@ class Event(OrderedDictWithParams):
       raise("signal must be of type string or Signal")
 
   def __del__(self):
-    print("delete event")
+    #print("delete event")
+    pass
 
+class EnumWrapper():
+  slots = []
+
+  @classmethod
+  def __next__(cls):
+    cls.TOTAL += 1
+    return cls.TOTAL
+
+  @classmethod
+  def append(cls, name):
+    exec("cls.{} = cls.__next__()".format(name))
+
+class Signal2(EnumWrapper):
+  TOTAL=5
+
+  ENTRY_SIGNAL,      \
+  EXIT_SIGNAL,       \
+  INIT_SIGNAL,       \
+  REFLECTION_SIGNAL, \
+  SEARCH_FOR_SUPER_SIGNAL = range(1,TOTAL+1)
+
+class Signal3(EnumWrapper):
+  TOTAL=5
+
+  ENTRY_SIGNAL,      \
+  EXIT_SIGNAL,       \
+  INIT_SIGNAL,       \
+  REFLECTION_SIGNAL, \
+  SEARCH_FOR_SUPER_SIGNAL = range(1,TOTAL+1)
+ 
