@@ -86,6 +86,7 @@ class Hsm():
           max_index = index
         else:
           path[index] = self.temp.fun
+
       self.temp.fun = path[0]
       # Now that we know what the paths are, starting for the outermost state,
       # enter each state until we reach our target state
@@ -93,8 +94,9 @@ class Hsm():
 
       self.temp.fun = path[0]
       while(True): # inner while
-        entery_fn = path[index]
+        # pre-decrement to remove outermost from our entry list
         index -= 1
+        entery_fn = path[index]
         r = entery_fn(self,e)
         if(index < 0):
           break # inner while break condition

@@ -1,3 +1,4 @@
+import pytest
 from miros.event import ReturnStatus, signals, Event, return_status
 from miros.hsm   import reflect, Hsm
 
@@ -161,6 +162,7 @@ def test_init_test_1():
   print()
   chart.start_at(init_test_1_d311)
 
+@pytest.mark.now
 def test_init_test_2():
   chart = Hsm()
   print()
