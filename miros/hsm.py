@@ -29,6 +29,9 @@ class HsmAttr():
 
     self.act = None # action-handler function
                     # signature (chart, event)
+class HsmTopologyException(Exception):
+  pass
+
 class Hsm():
 
   def __init__(self):
@@ -68,7 +71,6 @@ class Hsm():
     the chart, they can not climb out.  If they do, this search routine will
     fail.
 
-    TODO: Write about this limitation in the README.txt
     '''
     e = Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL)
     path, outermost, max_index = [None], self.state.fun, 0
@@ -77,15 +79,18 @@ class Hsm():
     # We will continue searching the chart until it stops requesting transitions
     while(True): # outer while
       path[0], e, index = self.temp.fun, Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL), 0
-
+      previous_super = None
       while(self.temp.fun != outermost):
         index      += 1
         r           = self.temp.fun(self, e)
+        if( previous_super == self.temp.fun ):
+          raise(HsmTopologyException("impossible chart topology for init, see Hsm.init doc string for details"))
         if index > max_index:
           path.append(self.temp.fun)
           max_index = index
         else:
           path[index] = self.temp.fun
+        previous_super = self.temp.fun
 
       self.temp.fun = path[0]
       # Now that we know what the paths are, starting for the outermost state,
