@@ -91,14 +91,13 @@ class Hsm():
       # Now that we know what the paths are, starting for the outermost state,
       # enter each state until we reach our target state
       e = Event(signal=signals.ENTRY_SIGNAL)
-
       self.temp.fun = path[0]
       while(True): # inner while
         # pre-decrement to remove outermost from our entry list
         index -= 1
         entery_fn = path[index]
         r = entery_fn(self,e)
-        if(index < 0):
+        if(index == 0):
           break # inner while break condition
 
       # Now send it the init event, the init event could change our
