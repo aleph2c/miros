@@ -135,8 +135,50 @@ class Hsm():
     '''finds the child state of a given parent'''
     pass
 
-def ctor(hsm,e):
-  pass
+  def augment(self, **kwargs):
+    """Used to add attributes to an hsm object
+
+    Args:
+      kwargs['other'](Mandatory other object): An another object for which you would
+      like to add as an attribute of this object.
+
+      kwargs['name'](Mandatory): The name that you would like to call this
+      attribute, this argument must be a string
+
+      kwargs['relationship'](Optional): Indicates if you want to also add this
+      object as an attribute to the other class, using this object's name.  This
+      option will only work if the other object also has an augment method that
+      acts exactly the same as this one.
+
+      ``Examples``
+      alarm       = Hsm(); alarm.name       = "alarm"
+      time_keeper = Hsm(); time_keeper.name = "time_keeper"
+      alarm.augment(other=time_keeper, name="time_keeper")
+
+      assert(alarm.time_keeper == time_keeper) # will be true
+
+      inverter  = Hsm(); inverter.name = "inverter"
+      networker = Hsm(); networker.name = "networker"
+      inverter.augment(other=networker, name="net", relationship="mutual")
+
+      assert(inverter.net == networker) # will be true
+      assert(networker.inverter == inverter ) # will be true
+    """
+
+    relationship = None
+    if("other" in kwargs ):
+      other = kwargs['other']
+    if("name" in kwargs ):
+      name = kwargs['name']
+    if("relationship" in kwargs ):
+      relationship = kwargs['relationship']
+
+    if hasattr(self, name ) is not True:
+      setattr(self, name, other)
+    else:
+      pass
+    if( relationship != None and relationship == "mutual"):
+      other.augment( other=self, name=self.name, relationship=None )
 
 
 
