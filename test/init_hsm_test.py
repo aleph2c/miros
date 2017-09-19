@@ -371,8 +371,7 @@ def test_init_test_3(spy_chart):
 @pytest.mark.init
 def test_impossible_transition_init_test_4(spy_chart):
   chart = spy_chart
-  with pytest.raises(HsmTopologyException, \
-    message="impossible chart topology, see Hsm.init doc string for details"):
+  with pytest.raises(HsmTopologyException):
     chart.start_at(init_graph_1_d32)
 
 @pytest.mark.init
@@ -393,6 +392,5 @@ def test_impossible_transition_init_test_4(spy_chart):
    'ENTRY_SIGNAL:init_graph_2_d311',
    'INIT_SIGNAL:init_graph_2_d311']
   chart.start_at(init_graph_2_d1)
-  pp(chart.spy)
-  #assert(chart.spy == expected_behavior)
+  assert(chart.spy == expected_behavior)
 

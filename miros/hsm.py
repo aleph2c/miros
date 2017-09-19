@@ -72,6 +72,9 @@ class Hsm():
     fail.
 
     '''
+    topological_error = "impossible chart topology for Hsm.init, "
+    topological_error += "see Hsm.init doc string for details"
+
     e = Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL)
     path, outermost, max_index = [None], self.state.fun, 0
     assert(self.temp.fun != None and outermost == self.top)
@@ -84,7 +87,7 @@ class Hsm():
         index      += 1
         r           = self.temp.fun(self, e)
         if( previous_super == self.temp.fun ):
-          raise(HsmTopologyException("impossible chart topology for init, see Hsm.init doc string for details"))
+          raise(HsmTopologyException(topological_error))
         if index > max_index:
           path.append(self.temp.fun)
           max_index = index
