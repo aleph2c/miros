@@ -122,17 +122,129 @@ class Hsm():
     self.state.fun = outermost
     self.temp.fun  = outermost
 
-  def dispatch(self, hsm, e):
+  def dispatch(self,e):
     '''dispatches an event to a HSM.
 
-     Processing an event represents one run-to-completion (RTC) step
-     '''
-    pass
+    Processing an event represents one run-to-completion (RTC) step
+    '''
+    t,s,v,ip     = None,None,None, 0
+    path         = [None,None,None]
+    max_index    = 0
 
-  def trans(self, fn):
+    entry_e, exit_e, search_e, init_e =                      \
+              Event(signal=signals.ENTRY_SIGNAL),            \
+              Event(signal=signals.EXIT_SIGNAL),             \
+              Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL), \
+              Event(signal=signals.INIT_SIGNAL)
+
+    t = self.state.fun # saving the current state function into our temporary
+                       # variable
+
+    assert(t != None)
+    assert(t == self.state.fun)
+
+    while(True):
+      s = self.temp.fun
+      # Event e was provided by the client, so we need to search outward in our
+      # chart until we find a state that handles it, a state that handles it
+      # will not return a return_state.SUPER status
+      r = s(self, e)
+      if(r != return_status.SUPER):
+        break;
+
+    # If we found a state that indicates that some action is required, we
+    # process that action, by digging into the chart.
+    if(r >= return_status.TRAN):
+      path[0], path[1], path[2] = self.temp.fun, t, s
+      t = self.temp.fun
+      while(t != s):
+        r = t(self, exit_e)
+        if(r == return_status.HANDLED):
+          t(self, search_e)
+
+      # This hasn't been written yet (provides the lca - more will be written
+      # shortly)
+      ip = self.trans_(path,max_index)
+
+      # transition to history spy stuff placed here
+
+      # If our trans indicated that we need to enter our path information
+      # we did it now.  The path lower indexes contain inner states while the
+      # higher indexes contain outer states.  We enter our outer states to get
+      # toward the desired inner state.
+      while(ip >= 0):
+        path[ip](self, entry_e)
+        ip -= 1
+
+      # We reset our temporary memory and target state method pointer will what
+      # we are trying to get to (prior to running all of the init signals).  If
+      # there are no handled init events in our target state, we are done our
+      # work here.
+      t, self.temp.fun = path[0], path[0]
+
+      # Now that we have entered our target state, we have to see it has an init
+      # signal that will take us deeper into the hsm.  If it does, continue to
+      # transition until we settle to where we need to be
+      while(t(self, init_e) == return_status.TRAN):
+        path[0], ip = self.temp.fun, 0
+        self.temp.fun(self, search_e)
+
+        while(self.temp.fun != t):
+          ip += 1
+          if ip > max_index:
+            path.append(self.temp.fun)
+            max_index = ip
+          else:
+            path[ip] = self.temp.fun
+          self.temp.fun(self, search_e)
+
+        self.temp.fun = path[0]
+
+        while(True):
+          path[ip](self, entry_e)
+          ip -= 1
+          if(ip == 0):
+            break
+        t = path[0]
+
+    elif(r == return_status.HANDLED): # trans handled
+      pass
+    else:
+      pass
+      # ignored
+
+    self.state.fun = t
+    self.temp.fun  = t
+
+  def trans(self,fn):
     '''sets a new function target and returns that transition required by engine'''
     self.temp.fun = fn
     return return_status.TRAN
+
+  def trans_(self, path, max_index):
+    '''sets a new function target and returns that transition required by engine'''
+    ip, iq = -1, 0
+    t, s   = path[0], path[2]
+
+    entry_e, exit_e, search_e, init_e =                      \
+              Event(signal=signals.ENTRY_SIGNAL),            \
+              Event(signal=signals.EXIT_SIGNAL),             \
+              Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL), \
+              Event(signal=signals.INIT_SIGNAL)
+
+    # +------+
+    # |      +----+
+    # |      |    |
+    # |      <----+
+    # +------+
+    if(s == t):
+      s(self, exit_e)
+      ip = 0
+    else:
+      # fill this in later
+      pass
+
+    return ip
 
   def is_in(self,hsm,e):
     '''tests if a hsm is in a given state'''

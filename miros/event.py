@@ -148,6 +148,7 @@ class Event(OrderedDictWithParams):
       for key, value in signals.items():
         if value == signal:
           self.signal_name = key
+          break
     elif isinstance(signal,str):
       signals.append(signal)
       self.signal_name = signal
