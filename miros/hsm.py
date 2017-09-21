@@ -127,11 +127,11 @@ class Hsm():
 
     Processing an event represents one run-to-completion (RTC) step
     '''
-    t,s,v,ip     = None,None,None, 0
     path         = [None,None,None]
+    t,s,v,ip     =  None,None,None, 0
     max_index    = 0
 
-    entry_e, exit_e, search_e, init_e =                      \
+    entry_e, exit_e, super_e, init_e =                       \
               Event(signal=signals.ENTRY_SIGNAL),            \
               Event(signal=signals.EXIT_SIGNAL),             \
               Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL), \
@@ -153,14 +153,14 @@ class Hsm():
         break;
 
     # If we found a state that indicates that some action is required, we
-    # process that action, by digging into the chart.
+    # process that action by digging into the chart.
     if(r >= return_status.TRAN):
       path[0], path[1], path[2] = self.temp.fun, t, s
       t = self.temp.fun
       while(t != s):
         r = t(self, exit_e)
         if(r == return_status.HANDLED):
-          t(self, search_e)
+          t(self, super_e)
 
       # This hasn't been written yet (provides the lca - more will be written
       # shortly)
@@ -185,27 +185,27 @@ class Hsm():
       # Now that we have entered our target state, we have to see it has an init
       # signal that will take us deeper into the hsm.  If it does, continue to
       # transition until we settle to where we need to be
-      while(t(self, init_e) == return_status.TRAN):
-        path[0], ip = self.temp.fun, 0
-        self.temp.fun(self, search_e)
+      #while(t(self, init_e) == return_status.TRAN):
+      #  path[0], ip = self.temp.fun, 0
+      #  self.temp.fun(self, super_e)
 
-        while(self.temp.fun != t):
-          ip += 1
-          if ip > max_index:
-            path.append(self.temp.fun)
-            max_index = ip
-          else:
-            path[ip] = self.temp.fun
-          self.temp.fun(self, search_e)
+      #  while(self.temp.fun != t):
+      #    ip += 1
+      #    if ip > max_index:
+      #      path.append(self.temp.fun)
+      #      max_index = ip
+      #    else:
+      #      path[ip] = self.temp.fun
+      #    self.temp.fun(self, super_e)
 
-        self.temp.fun = path[0]
+      #  self.temp.fun = path[0]
 
-        while(True):
-          path[ip](self, entry_e)
-          ip -= 1
-          if(ip == 0):
-            break
-        t = path[0]
+      #  while(True):
+      #    path[ip](self, entry_e)
+      #    ip -= 1
+      #    if(ip == 0):
+      #      break
+      #  t = path[0]
 
     elif(r == return_status.HANDLED): # trans handled
       pass
@@ -226,23 +226,34 @@ class Hsm():
     ip, iq = -1, 0
     t, s   = path[0], path[2]
 
-    entry_e, exit_e, search_e, init_e =                      \
+    entry_e, exit_e, super_e, init_e =                       \
               Event(signal=signals.ENTRY_SIGNAL),            \
               Event(signal=signals.EXIT_SIGNAL),             \
               Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL), \
               Event(signal=signals.INIT_SIGNAL)
 
-    # +------+
-    # |      +----+
-    # |      |    |
-    # |      <----+
-    # +------+
+    # +-------+
+    # |       +----+
+    # |       |    |
+    # |       <----+
+    # +-------+
     if(s == t):
       s(self, exit_e)
       ip = 0
     else:
+      s(self,super_e)
+      # +--------+
+      # | +----+ |
+      # | |    <-+
+      # | +----+ |
+      # +--------+
+      if (self.fun.state == t):
+        s(self, exit_e)
+        ip = 0
+
       # fill this in later
-      pass
+      else:
+        pass
 
     return ip
 
