@@ -154,13 +154,16 @@ class Hsm():
 
     # If we found a state that indicates that some action is required, we
     # process that action by digging into the chart.
+
     if(r >= return_status.TRAN):
+      # self.temp.fun is the target, where do we want to go?
+      # s is the source, where are we coming from?
       path[0], path[1], path[2] = self.temp.fun, t, s
-      t = self.temp.fun
       while(t != s):
         r = t(self, exit_e)
         if(r == return_status.HANDLED):
           t(self, super_e)
+        t = self.temp.fun
 
       # This hasn't been written yet (provides the lca - more will be written
       # shortly)
@@ -185,27 +188,27 @@ class Hsm():
       # Now that we have entered our target state, we have to see it has an init
       # signal that will take us deeper into the hsm.  If it does, continue to
       # transition until we settle to where we need to be
-      #while(t(self, init_e) == return_status.TRAN):
-      #  path[0], ip = self.temp.fun, 0
-      #  self.temp.fun(self, super_e)
+      while(t(self, init_e) == return_status.TRAN):
+        path[0], ip = self.temp.fun, 0
+        self.temp.fun(self, super_e)
 
-      #  while(self.temp.fun != t):
-      #    ip += 1
-      #    if ip > max_index:
-      #      path.append(self.temp.fun)
-      #      max_index = ip
-      #    else:
-      #      path[ip] = self.temp.fun
-      #    self.temp.fun(self, super_e)
+        while(self.temp.fun != t):
+          ip += 1
+          if ip > max_index:
+            path.append(self.temp.fun)
+            max_index = ip
+          else:
+            path[ip] = self.temp.fun
+          self.temp.fun(self, super_e)
 
-      #  self.temp.fun = path[0]
+        self.temp.fun = path[0]
 
-      #  while(True):
-      #    path[ip](self, entry_e)
-      #    ip -= 1
-      #    if(ip == 0):
-      #      break
-      #  t = path[0]
+        while(True):
+          path[ip](self, entry_e)
+          ip -= 1
+          if(ip == 0):
+            break
+        t = path[0]
 
     elif(r == return_status.HANDLED): # trans handled
       pass
@@ -224,6 +227,8 @@ class Hsm():
   def trans_(self, path, max_index):
     '''sets a new function target and returns that transition required by engine'''
     ip, iq = -1, 0
+    # t is the target, where do we want to go?
+    # s is the source, where are we coming from?
     t, s   = path[0], path[2]
 
     entry_e, exit_e, super_e, init_e =                       \
@@ -231,26 +236,27 @@ class Hsm():
               Event(signal=signals.EXIT_SIGNAL),             \
               Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL), \
               Event(signal=signals.INIT_SIGNAL)
-
-    # +-------+
-    # |       +----+
-    # |       |    |
-    # |       <----+
-    # +-------+
+    # +-s-t-+
+    # |     +-+
+    # |     | |
+    # |     <-+
+    # +-----+
+    # check soure==target (transition to self)
     if(s == t):
-      s(self, exit_e)
-      ip = 0
+      s(self, exit_e) # exit the source
+      ip = 0          # enter the target
     else:
       s(self,super_e)
-      # +--------+
-      # | +----+ |
+      t  = self.temp.fun
+      ip = 0
+      # +---s----+
+      # | +-t--+ |
       # | |    <-+
       # | +----+ |
       # +--------+
-      if (self.fun.state == t):
-        s(self, exit_e)
-        ip = 0
-
+      # check source == target->super
+      if (self.state.fun == t):
+        ip = 0 # enter the target
       # fill this in later
       else:
         pass
