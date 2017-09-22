@@ -1,6 +1,10 @@
 import sys
 import traceback
 from miros.event import signals, return_status, Event
+import pprint
+def pp(item):
+  print()
+  pprint.pprint(item)
 # this_function_name = sys._getframe().f_code.co_name
 
 def reflect(hsm=None,e=None):
@@ -126,10 +130,27 @@ class Hsm():
     '''dispatches an event to a HSM.
 
     Processing an event represents one run-to-completion (RTC) step
+
+    Useful mnemonics:
+    s -> spiderman  -> who is waiting to take the shot with his web grappling hook?
+                       (probably existing in an outer state)
+
+    t -> target     -> what is spiderman aiming at, where does he want the chart
+                       to go?
+
+    self.state.fun  -> the current state (does not have to be s)
+
+    self.temp.fun   -> before the work begins, this is the target, but gets
+                       overwritten with each super call.
+
+    temp            -> just a variable for holding information so we do not have
+                       to reuse s and t (make code reading easier)
     '''
     path         = [None,None,None]
     t,s,v,ip     =  None,None,None, 0
     max_index    = 0
+
+    temp        = None
 
     entry_e, exit_e, super_e, init_e =                       \
               Event(signal=signals.ENTRY_SIGNAL),            \
@@ -155,18 +176,24 @@ class Hsm():
     # If we found a state that indicates that some action is required, we
     # process that action by digging into the chart.
 
+    # topology_b and beyond
     if(r >= return_status.TRAN):
       # self.temp.fun is the target, where do we want to go?
       # s is the source, where are we coming from?
       path[0], path[1], path[2] = self.temp.fun, t, s
-      while(t != s):
-        r = t(self, exit_e)
-        if(r == return_status.HANDLED):
-          t(self, super_e)
-        t = self.temp.fun
 
-      # This hasn't been written yet (provides the lca - more will be written
-      # shortly)
+      # Starting at our current state, move out to
+      # the source state, eventually setting
+      # self.temp.fun to the source, run all of
+      # the exit handlers in the process
+      temp = t
+      while(temp != s):
+        r = temp(self, exit_e)
+        if(r == return_status.HANDLED):
+          temp(self, super_e)
+        temp = self.temp.fun
+      
+      # navigate the topologies
       ip = self.trans_(path,max_index)
 
       # transition to history spy stuff placed here
@@ -227,39 +254,62 @@ class Hsm():
   def trans_(self, path, max_index):
     '''sets a new function target and returns that transition required by engine'''
     ip, iq = -1, 0
-    # t is the target, where do we want to go?
-    # s is the source, where are we coming from?
+    # S (path[2]) is taking the shot (probably starting in an outer state)
+    # T (path[0]) is the target, where does s want to go?
+
+    # When the method begins t == T and s == S
+    # these variable are then clobbered in the search and
+    # over-written with new meaning.  There new meanings
+    # will be described in the comments where they are used
     t, s   = path[0], path[2]
+    
 
     entry_e, exit_e, super_e, init_e =                       \
               Event(signal=signals.ENTRY_SIGNAL),            \
               Event(signal=signals.EXIT_SIGNAL),             \
               Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL), \
               Event(signal=signals.INIT_SIGNAL)
-    # +-s-t-+
+    # +-S-T-+
     # |     +-+
     # |     | |
     # |     <-+
     # +-----+
-    # check soure==target (transition to self)
+    # (a) check soure==target (transition to self)
+    # pytest -m topology_a -s
     if(s == t):
       s(self, exit_e) # exit the source
       ip = 0          # enter the target
     else:
-      s(self,super_e)
-      t  = self.temp.fun
-      ip = 0
-      # +---s----+
-      # | +-t--+ |
+      t(self,super_e)
+      t = self.temp.fun
+      # +---S----+
+      # | +-T--+ |
       # | |    <-+
       # | +----+ |
       # +--------+
-      # check source == target->super
-      if (self.state.fun == t):
+      # t now contains T->super
+      # s contains S
+      # (b) check S == T->super
+      # pytest -m topology_b -s
+      if (s == t):
         ip = 0 # enter the target
-      # fill this in later
       else:
-        pass
+        # find the super state of the source
+        s(self, super_e)
+        # +-S-+ +-T-+
+        # |   | |   |
+        # |   +->   |
+        # |   | |   |
+        # +---+ +---+
+        # t now contains T->super
+        # self.temp.fun contains S->super
+        # (c) check S->super == T->super
+        # pytest -m topology_c -s
+        if(self.temp.fun == t):
+          s(self, exit_e)
+          ip = 0
+        else:
+          pass
 
     return ip
 
