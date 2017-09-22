@@ -337,7 +337,7 @@ class Hsm():
             #  ||       .       | |
             #  |+---------------+ |
             #  +------------------+
-            # (d) check S = T->super->super..
+            # (e) check S = T->super->super..
             # pytest -m topology_e -s
             iq, ip = 0,1     # LCA not found yet, enter T and T->super
             path[1] = t      # path[1] contains T->super
