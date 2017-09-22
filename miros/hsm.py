@@ -148,7 +148,7 @@ class Hsm():
     '''
     path         = [None,None,None]
     t,s,v,ip     =  None,None,None, 0
-    max_index    = 0
+    max_index    = 2
 
     temp        = None
 
@@ -165,6 +165,7 @@ class Hsm():
     assert(t == self.state.fun)
 
     while(True):
+      # if looped, place the super state into the s
       s = self.temp.fun
       # Event e was provided by the client, so we need to search outward in our
       # chart until we find a state that handles it, a state that handles it
@@ -180,12 +181,15 @@ class Hsm():
     if(r >= return_status.TRAN):
       # self.temp.fun is the target, where do we want to go?
       # s is the source, where are we coming from?
+
+      # path[0] contains T
+      # s contains S
+      # path[1] contains were we started
       path[0], path[1], path[2] = self.temp.fun, t, s
 
-      # Starting at our current state, move out to
-      # the source state, eventually setting
-      # self.temp.fun to the source, run all of
-      # the exit handlers in the process
+      # Starting at our current state, move out to the source state, eventually
+      # setting self.temp.fun on the source, run all of the exit handlers we
+      # recurse out to S
       temp = t
       while(temp != s):
         r = temp(self, exit_e)
@@ -322,6 +326,58 @@ class Hsm():
             # leave ip as -1, that way no entry will occur
             s(self,exit_e)
           else:
+            #  +--------S---------+
+            #  |+---------------+ |
+            #  ||       .       | |
+            #  ||   +-------+   | |
+            #  ||   | +-T-+ |   | |
+            #  || . | |   <-- . --+
+            #  ||   | +---+ |   | |
+            #  ||   +-------+   | |
+            #  ||       .       | |
+            #  |+---------------+ |
+            #  +------------------+
+            # (d) check S = T->super->super..
+            # pytest -m topology_e -s
+            iq, ip = 0,1     # LCA not found yet, enter T and T->super
+            path[1] = t      # path[1] contains T->super
+            t = self.temp.fun  # t contains S->super
+            r = path[1](self, super_e)
+            while(r == return_status.SUPER):
+              ip += 1
+              # store our entry path
+              if ip > max_index:
+                path.append(self.temp.fun)
+                max_index = ip
+              else:
+                path[ip] = self.temp.fun
+
+              if(self.temp.fun == s): # if we have found S
+                iq =  1
+                ip -= 1 # don't enter S since we are coming at it from the
+                        # inside
+                r = return_status.HANDLED # terminate the loop
+              else:
+                r = self.temp.fun(self,super_e)
+            
+            if(iq==0):
+              s(self, exit_e)
+              pass
+              
+
+          
+            # pytest -m topology_h -s
+            #  +--------T---------+
+            #  |+---------------+ |
+            #  ||       .       | |
+            #  ||   +-------+   | |
+            #  || . | +-S-+ | . +->
+            #  ||   | +---+ |   | |
+            #  ||   +-------+   | |
+            #  ||       .       | |
+            #  |+---------------+ |
+            #  +------------------+
+            # pytest -m topology_h -s
             pass
 
     return ip
