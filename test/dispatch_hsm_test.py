@@ -56,7 +56,7 @@ def dispatch_graph_a1_s1(chart, e):
                        |  +------------------------+   |       
                        +-------------------------------+     
 
-This is used for testing the type A topology in the trans_ method of the Hsm
+This is used for testing the type B topology in the trans_ method of the Hsm
 class.
   * test_trans_topology_b1_1 - start in graph_b1_s2 (diagram)
   * test_trans_topology_b1_2 - start in graph_b1_s3 (diagram)
@@ -258,6 +258,85 @@ def dispatch_graph_c2_s3(chart, e):
   else:
     chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status, chart.temp.fun = return_status.SUPER, dispatch_graph_c2_s1
+  return status
+################################################################################
+#                             Dispatch Graph D1                                #
+################################################################################
+'''           The following state chart is used to test topology D 
+
+                       +------- graph_d1_s1 -----s-----+
+                       |  +---- graph_d1_s2 -----t-+   |       
+                       |  |  +- graph_d1_s3 -+     |   |       
+                       |  |  |               |   +->   |       
+                       |  |  |               +-b-+ +-a->       
+                       |  |  +---------------+     |   |       
+                       |  +------------------------+   |       
+                       +-------------------------------+     
+
+This is used for testing the type D topology in the trans_ method of the Hsm
+class.
+  * test_trans_topology_d1_1 - start in graph_d1_s2 (diagram)
+  * test_trans_topology_d1_2 - start in graph_d1_s3 (diagram)
+'''
+def dispatch_graph_d1_s1(chart, e):
+  status = return_status.UNHANDLED
+  if(e.signal == signals.ENTRY_SIGNAL):
+    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    status = return_status.HANDLED
+  elif(e.signal == signals.EXIT_SIGNAL):
+    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    status = return_status.HANDLED
+  elif(e.signal == signals.INIT_SIGNAL):
+    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+  else:
+    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    status, chart.temp.fun = return_status.SUPER, chart.top
+  return status
+
+def dispatch_graph_d1_s2(chart, e):
+  status = return_status.UNHANDLED
+  if(e.signal == signals.ENTRY_SIGNAL):
+    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    status = return_status.HANDLED
+  elif(e.signal == signals.EXIT_SIGNAL):
+    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    status = return_status.HANDLED
+  elif(e.signal == signals.INIT_SIGNAL):
+    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+  elif(e.signal == signals.A):
+    status = chart.trans(dispatch_graph_d1_s1)
+  else:
+    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    status, chart.temp.fun = return_status.SUPER, dispatch_graph_d1_s1
+  return status
+
+def dispatch_graph_d1_s3(chart, e):
+  status = return_status.UNHANDLED
+  if(e.signal == signals.ENTRY_SIGNAL):
+    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    status = return_status.HANDLED
+  elif(e.signal == signals.EXIT_SIGNAL):
+    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    status = return_status.HANDLED
+  elif(e.signal == signals.INIT_SIGNAL):
+    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+  elif(e.signal == signals.REFLECTION_SIGNAL):
+    # We are no longer going to return a ReturnStatus object
+    # instead we write the function name as a string
+    status = reflect(chart,e)
+  elif(e.signal == signals.B):
+    status = chart.trans(dispatch_graph_d1_s2)
+  else:
+    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    status, chart.temp.fun = return_status.SUPER, dispatch_graph_d1_s2
   return status
 ################################################################################
 #                               Dispatch Graph n                               #
@@ -489,7 +568,6 @@ def test_trans_topology_c2_1(spy_chart):
 
 @pytest.mark.dispatch
 @pytest.mark.topology_c
-@pytest.mark.now
 def test_trans_topology_c2_2(spy_chart):
   chart   = spy_chart
   expected_behavior = \
@@ -506,5 +584,47 @@ def test_trans_topology_c2_2(spy_chart):
   event_a = Event(signal = signals.A)
   chart.start_at(dispatch_graph_c2_s3)
   chart.dispatch(e = event_a)
+  assert(chart.spy == expected_behavior)
+
+@pytest.mark.dispatch
+@pytest.mark.topology_d
+def test_trans_topology_d1_1(spy_chart):
+  chart = spy_chart
+  expected_behavior = \
+    ['SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_d1_s2',
+     'SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_d1_s1',
+     'ENTRY_SIGNAL:dispatch_graph_d1_s1',
+     'ENTRY_SIGNAL:dispatch_graph_d1_s2',
+     'INIT_SIGNAL:dispatch_graph_d1_s2',
+     'SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_d1_s1',
+     'SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_d1_s2',
+     'EXIT_SIGNAL:dispatch_graph_d1_s2',
+     'INIT_SIGNAL:dispatch_graph_d1_s1']
+  chart.start_at(dispatch_graph_d1_s2)
+  event_a  = Event(signal=signals.A)
+  chart.dispatch(e=event_a)
+  #pp(chart.spy)
+  assert(chart.spy == expected_behavior)
+
+@pytest.mark.dispatch
+@pytest.mark.topology_d
+def test_trans_topology_d1_2(spy_chart):
+  chart = spy_chart
+  expected_behavior = \
+    ['SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_d1_s3',
+     'SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_d1_s2',
+     'SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_d1_s1',
+     'ENTRY_SIGNAL:dispatch_graph_d1_s1',
+     'ENTRY_SIGNAL:dispatch_graph_d1_s2',
+     'ENTRY_SIGNAL:dispatch_graph_d1_s3',
+     'INIT_SIGNAL:dispatch_graph_d1_s3',
+     'SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_d1_s2',
+     'SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_d1_s3',
+     'EXIT_SIGNAL:dispatch_graph_d1_s3',
+     'INIT_SIGNAL:dispatch_graph_d1_s2']
+  chart.start_at(dispatch_graph_d1_s3)
+  event_a  = Event(signal=signals.B)
+  chart.dispatch(e=event_a)
+  #pp(chart.spy)
   assert(chart.spy == expected_behavior)
 

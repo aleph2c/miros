@@ -309,7 +309,20 @@ class Hsm():
           s(self, exit_e)
           ip = 0
         else:
-          pass
+          # +---T----+
+          # | +-S--+ |
+          # | |    +->
+          # | +----+ |
+          # +--------+
+          # self.temp.fun contains S->super
+          # path[0] contains T
+          # (d) check S->super = T
+          # pytest -m topology_d -s
+          if(self.temp.fun == path[0]):
+            # leave ip as -1, that way no entry will occur
+            s(self,exit_e)
+          else:
+            pass
 
     return ip
 
