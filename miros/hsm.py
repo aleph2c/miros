@@ -132,16 +132,24 @@ class Hsm():
     Processing an event represents one run-to-completion (RTC) step
 
     Useful mnemonics:
-    s -> spiderman  -> who is waiting to take the shot with his web grappling hook?
-                       (probably existing in an outer state)
+    S -> spiderman  -> Who is waiting to take the shot with his web grappling hook?
+                       (probably existing in an outer state)  This variable is
+                       not actually defined, but it is referenced in the
+                       comments.
 
-    t -> target     -> what is spiderman aiming at, where does he want the chart
-                       to go?
+    T -> target     -> what is spiderman aiming at, where does he want the chart
+                       to go? This variable is not actually defined, but it is
+                       referenced in the comments.
 
-    self.state.fun  -> the current state (does not have to be s)
+    self.state.fun  -> the current state before the dispatch occurred
 
-    self.temp.fun   -> before the work begins, this is the target, but gets
-                       overwritten with each super call.
+    self.temp.fun   -> before the search begins, this is T, but gets overwritten
+                       during the search process: * any call to trans within
+                       state function will change this * any call with a super
+                       signal will change this.
+
+    lca             -> least common ancestor.  The most outward state that S and
+                       T have in common.
 
     temp            -> just a variable for holding information so we do not have
                        to reuse s and t (make code reading easier)
@@ -197,28 +205,27 @@ class Hsm():
           temp(self, super_e)
         temp = self.temp.fun
       
-      # navigate the topologies
+      # navigate all supported topologies
+      # path will be over-written with entry values
+      # ip will indicate if we need to use them
       ip = self.trans_(path,max_index)
 
       # transition to history spy stuff placed here
 
-      # If our trans indicated that we need to enter our path information
-      # we did it now.  The path lower indexes contain inner states while the
+      # If our trans_ method indicated that we need to enter into a state(s) 
+      # we do so now.  The path lower indexes contain inner states while the
       # higher indexes contain outer states.  We enter our outer states to get
       # toward the desired inner state.
       while(ip >= 0):
         path[ip](self, entry_e)
         ip -= 1
 
-      # We reset our temporary memory and target state method pointer will what
-      # we are trying to get to (prior to running all of the init signals).  If
-      # there are no handled init events in our target state, we are done our
-      # work here.
+      # path[0] contains T
+      # t is now set to T
+      # self.temp.fun is set to T
       t, self.temp.fun = path[0], path[0]
 
-      # Now that we have entered our target state, we have to see it has an init
-      # signal that will take us deeper into the hsm.  If it does, continue to
-      # transition until we settle to where we need to be
+      # We have entered T, now we need to work with its 'init' signal
       while(t(self, init_e) == return_status.TRAN):
         path[0], ip = self.temp.fun, 0
         self.temp.fun(self, super_e)
@@ -259,15 +266,14 @@ class Hsm():
     '''sets a new function target and returns that transition required by engine'''
     ip, iq = -1, 0
     # S (path[2]) is taking the shot (probably starting in an outer state)
-    # T (path[0]) is the target, where does s want to go?
+    # T (path[0]) is the target, where does S want to go?
 
-    # When the method begins t == T and s == S
-    # these variable are then clobbered in the search and
-    # over-written with new meaning.  There new meanings
-    # will be described in the comments where they are used
-    t, s   = path[0], path[2]
+    # When the method begins t == T and s == S but these variable are then clobbered
+    # in the search and over-written with new meanings.  Their new meanings will
+    # be described in the comments where they are used, we will always draw our
+    # attention back to S and T and how the relate to a diagram.
+    t, s = path[0], path[2]
     
-
     entry_e, exit_e, super_e, init_e =                       \
               Event(signal=signals.ENTRY_SIGNAL),            \
               Event(signal=signals.EXIT_SIGNAL),             \
@@ -278,7 +284,7 @@ class Hsm():
     # |     | |
     # |     <-+
     # +-----+
-    # (a) check soure==target (transition to self)
+    # (a) check source==target (transition to self)
     # pytest -m topology_a -s
     if(s == t):
       s(self, exit_e) # exit the source
