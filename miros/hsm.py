@@ -179,6 +179,9 @@ class Hsm():
       # chart until we find a state that handles it, a state that handles it
       # will not return a return_state.SUPER status
       r = s(self, e)
+      if r == None:
+        raise(HsmTopologyException( \
+            "state handler {} is not returning a valid status".format(s)))
       if(r != return_status.SUPER):
         break;
 
@@ -198,13 +201,15 @@ class Hsm():
       # Starting at our current state, move out to the source state, eventually
       # setting self.temp.fun on the source, run all of the exit handlers we
       # recurse out to S
-      temp = t
-      while(temp != s):
-        r = temp(self, exit_e)
+      while(t != s):
+        r = t(self, exit_e)
+        if r == None:
+          raise(HsmTopologyException( \
+              "state handler {} is not returning a valid status".format(t)))
         if(r == return_status.HANDLED):
-          temp(self, super_e)
-        temp = self.temp.fun
-      
+          t(self, super_e)
+        t = self.temp.fun
+
       # navigate all supported topologies
       # path will be over-written with entry values
       # ip will indicate if we need to use them
@@ -212,7 +217,7 @@ class Hsm():
 
       # transition to history spy stuff placed here
 
-      # If our trans_ method indicated that we need to enter into a state(s) 
+      # If our trans_ method indicated that we need to enter into a state(s)
       # we do so now.  The path lower indexes contain inner states while the
       # higher indexes contain outer states.  We enter our outer states to get
       # toward the desired inner state.
@@ -264,16 +269,55 @@ class Hsm():
 
   def trans_(self, path, max_index):
     '''sets a new function target and returns that transition required by engine'''
-    ip, iq = -1, 0
-    # S (path[2]) is taking the shot (probably starting in an outer state)
-    # T (path[0]) is the target, where does S want to go?
+
+    # To understand beyond this point you must first know what happens with
+    # the path, ip and iq. Look at an example:
+    #
+    #  +-------- s1---------+
+    #  | +-------s2-------+ |
+    #  | | +-----s3-----+ | |
+    #  | | | +---s4---+ | | |
+    #  | | | | +-s5-+ | | | |
+    #  | | | | T    | | | | |
+    #  | | | | +----+ | | | |
+    #  | | | +--------+ | | |
+    #  | | +------------+ | |
+    #  | +-+--------------+ |
+    #  ++------------------++
+    #
+    # As trans_ searches, it will place state handlers into the path array
+    #
+    #             useful data <-+-> garbage data
+    #                           |   collected in search
+    #       +----+----+----+---+----+-----+-----+
+    # path: | s5 | s4 | s3 |s2 | s1 | top | s21 |
+    #       +----+----+----+---+-/--+-----+-----+
+    #                            |
+    #                            +-- ip == 4
+    #
+    # The method that called trans_ already has a reference to the path so it
+    # doesn't need to be returned.  However, ip does need to be returned at it
+    # represents which state handlers will be entered.
+    #
+    # Returning the above from this method will tell dispatch to
+    # enter s1, enter s2, enter s3, enter s4, enter s5.
+    #
+    # iq is a bool, it represents if we have found the lca
+    # of S and T.  It is only used later in the method and it is not used
+    # outside of the method, so we only it when needed by the search.  It leave
+    # comments in the code describing its state, so you can understand what is
+    # going on.
 
     # When the method begins t == T and s == S but these variable are then clobbered
     # in the search and over-written with new meanings.  Their new meanings will
     # be described in the comments where they are used, we will always draw our
-    # attention back to S and T and how the relate to a diagram.
+    # attention back to S and T and how they relate to a diagram.
+  
+    ip, iq = -1, 0 # no entry, no lca found
+    # S (path[2]) is taking the shot (probably starting in an outer state) T
+    # (path[0]) is the target, where does S want to go?
     t, s = path[0], path[2]
-    
+
     entry_e, exit_e, super_e, init_e =                       \
               Event(signal=signals.ENTRY_SIGNAL),            \
               Event(signal=signals.EXIT_SIGNAL),             \
@@ -283,16 +327,17 @@ class Hsm():
     # |     +-+
     # |     | |
     # |     <-+
-    # +-----+
-    # (a) check source==target (transition to self)
+    # +-lca-+
+    # (a) check source == target
     # pytest -m topology_a -s
     if(s == t):
       s(self, exit_e) # exit the source
       ip = 0          # enter the target
+      # iq = 1
     else:
       t(self,super_e)
       t = self.temp.fun
-      # +---S----+
+      # +--S-lca-+
       # | +-T--+ |
       # | |    <-+
       # | +----+ |
@@ -303,14 +348,17 @@ class Hsm():
       # pytest -m topology_b -s
       if (s == t):
         ip = 0 # enter the target
+        # iq = 1
       else:
         # find the super state of the source
         s(self, super_e)
-        # +-S-+ +-T-+
-        # |   | |   |
-        # |   +->   |
-        # |   | |   |
-        # +---+ +---+
+        #  +-----lca-----+
+        #  | +-S-+ +-T-+ |
+        #  | |   | |   | |
+        #  | |   +->   | |
+        #  | |   | |   | |
+        #  | +---+ +---+ |
+        #  +-------------+
         # t now contains T->super
         # self.temp.fun contains S->super
         # (c) check S->super == T->super
@@ -318,21 +366,23 @@ class Hsm():
         if(self.temp.fun == t):
           s(self, exit_e)
           ip = 0
+          # iq = 1
         else:
-          # +---T----+
+          # +--T-lca-+
           # | +-S--+ |
           # | |    +->
           # | +----+ |
           # +--------+
           # self.temp.fun contains S->super
           # path[0] contains T
-          # (d) check S->super = T
+          # (d) check S->super == T
           # pytest -m topology_d -s
           if(self.temp.fun == path[0]):
             # leave ip as -1, that way no entry will occur
             s(self,exit_e)
+            # iq = 1
           else:
-            #  +--------S---------+
+            #  +--------S-lca-----+
             #  |+---------------+ |
             #  ||       .       | |
             #  ||   +-------+   | |
@@ -343,12 +393,17 @@ class Hsm():
             #  ||       .       | |
             #  |+---------------+ |
             #  +------------------+
-            # (e) check S = T->super->super..
+            # (e) check S == T->super->super..
             # pytest -m topology_e -s
             iq, ip = 0,1     # LCA not found yet, enter T and T->super
             path[1] = t      # path[1] contains T->super
             t = self.temp.fun  # t contains S->super
             r = path[1](self, super_e)
+
+            if r == None:
+              raise(HsmTopologyException( \
+                  "state handler {} is not returning a valid status".format(path[1])))
+
             while(r == return_status.SUPER):
               ip += 1
               # store our entry path
@@ -365,25 +420,53 @@ class Hsm():
                 r = return_status.HANDLED # terminate the loop
               else:
                 r = self.temp.fun(self,super_e)
-            
-            if(iq==0):
-              s(self, exit_e)
-              pass
-              
 
-          
-            # pytest -m topology_h -s
-            #  +--------T---------+
-            #  |+---------------+ |
-            #  ||       .       | |
-            #  ||   +-------+   | |
-            #  || . | +-S-+ | . +->
-            #  ||   | +---+ |   | |
-            #  ||   +-------+   | |
-            #  ||       .       | |
-            #  |+---------------+ |
-            #  +------------------+
-            # pytest -m topology_h -s
+            if(iq==0):
+              # s contains S
+              # set self.temp.fun to S->super
+              s(self, exit_e)
+              # If our previous search failed, the path is filled
+              # with the entire state hierarchy.  So, we start on the
+              # outside of the graph, and work our way in, checking if
+              # S->super is the same as T->super->super..
+              #
+              # At this point of the search, the path has been filled
+              # with the super states of our target and iq is a bool. If
+              # it is 0 we must consider topology f:
+              #    +---------------------------+
+              #    |+-----------lca-----------+|
+              #    ||      +--S--+            ||
+              #    ||      |     +----------+ ||
+              #    ||      +-----+          | ||
+              #    ||+------------------+   | ||
+              #    |||+---------------+ |   | ||
+              #    ||||       .       | |   | ||
+              #    ||||   +-------+   | |   | ||
+              #    ||||   | +-T-+ |   | |   | ||
+              #    |||| . | |   <-- . ------+ ||
+              #    ||||   | +---+ |   | |     ||
+              #    ||||   +-------+   | |     ||
+              #    ||||       .       | |     ||
+              #    |||+---------------+ |     ||
+              #    ||+------------------+     ||
+              #    |+-------------------------+|
+              #    +---------------------------+
+              # pytest -m topology_f -s
+              # (f) check is S->super == T->super->super..
+              # t contains S->super
+              # path[ip] contains T->super->super..
+              iq = ip
+              r  = return_status.IGNORED
+              while(True):
+                if(t==path[iq]): # is this the lca?
+                  r = return_status.HANDLED
+                  ip = iq-1 # do not enter the lca
+                  iq = -1
+                else:
+                  iq -= 1
+                if(iq < 0):
+                  break
+
             pass
 
     return ip
@@ -440,6 +523,4 @@ class Hsm():
       pass
     if( relationship != None and relationship == "mutual"):
       other.augment( other=self, name=self.name, relationship=None )
-
-
 
