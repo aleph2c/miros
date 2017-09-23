@@ -26,7 +26,7 @@ def test_event():
   assert(event.signal == 1)
   assert(event.signal_name == "ENTRY_SIGNAL")
   event = Event(signal="BOB")
-  assert(event.signal == 6)
+  assert(event.signal >= 6)
   assert(event.signal_name == "BOB")
 
 def test_signal_singletons():
