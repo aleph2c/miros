@@ -129,9 +129,25 @@ class Hsm():
   def dispatch(self,e):
     '''dispatches an event to a HSM.
 
-    Processing an event represents one run-to-completion (RTC) step
+    Processing an event represents one run-to-completion (RTC) step.
+
+    Args:
+      e (Event): The event to be dispatched to the hsm object
+
+    Returns:
+      None
+
+    Example:
+      chart = Hsm()
+      signals.append("A")
+      chart.start_at(dispatch_graph_a1_s1)
+      chart.dispatch(Event(signal=signals.A)
+
+    Raises:
+      HsmTopologyException: if a state function handler is malformed
 
     Useful mnemonics:
+
     S (source)           Which state is the source of the arrow in the diagram?
                          This variable is not actually defined, but it is
                          referenced in the comments with adjacent diagrams to keep
@@ -164,22 +180,22 @@ class Hsm():
 
     S->super             The super state of S, the state in which S is wrapped
                          within.
-    S->super->super..    The super..super state of S 
+    S->super->super..    The super..super state of S
 
     T->super             The super state of T, the state in which T is wrapped
                          within.
-    T->super->super..    The super..super state of T 
+    T->super->super..    The super..super state of T
 
     self.state.fun       The current state before the dispatch occurred
 
     self.temp.fun        Before the search begins, this is T, but gets overwritten
-                         during the search process by: 
+                         during the search process by:
                            * any call to trans within state function will change
                              this.
                            * any call with a super signal will change this.
 
     lca                  least common ancestor.  The most outward state that S and
-                         T have in common.  It is used to determine when we have 
+                         T have in common.  It is used to determine when we have
                          constructed the correct entry path to the target, called
                          the tpath.
 
@@ -204,7 +220,6 @@ class Hsm():
                          would like to know more about them, reference the tests
                          directory where they are drawn or the trans_ method which
                          also has them described as diagrams in the comments.
-
     '''
     tpath     = [None,None,None]
     t,s,v,ip  = None,None,None, 0
@@ -216,12 +231,19 @@ class Hsm():
               Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL), \
               Event(signal=signals.INIT_SIGNAL)
 
-    t = self.state.fun # saving the current state function into our temporary
-                       # variable
 
+    # To begin with we assume that no action will occur and the T state is just
+    # our current state.
+    #
+    # t contains T
+    t = self.state.fun
+
+    # Our contract
     assert(t != None)
     assert(t == self.state.fun)
 
+    # Determine if the chart can take action based on the event provided as
+    # an argument to the method
     while(True):
       # if looped, place the super state into the s
       s = self.temp.fun
@@ -233,22 +255,29 @@ class Hsm():
         raise(HsmTopologyException( \
             "state handler {} is not returning a valid status".format(s)))
       if(r != return_status.SUPER):
+        # S in now stored in s
         break;
 
-    # If we found a state that indicates that some action is required, we
-    # process that action by digging into the chart.
+    # If we found a state that indicates that some action is required we
+    # can now take action
     if(r >= return_status.TRAN):
-      # self.temp.fun is the target, where do we want to go?
-      # s is the source, where are we coming from?
-
       # tpath[0] contains T
-      # s contains S
-      # tpath[1] contains were we started
+      # tpath[1] contains t, self.state.fun (starting state)
+      # tpath[2] contains S
       tpath[0], tpath[1], tpath[2] = self.temp.fun, t, s
 
-      # Starting at our current state, move out to the source state, eventually
-      # setting self.temp.fun on the source, run all of the exit handlers we
-      # recurse out to S
+      # Starting at our current state, move out to the S state, eventually
+      # settling self.temp.fun on S, run all of the exit handlers we recurse
+      # outward.
+      #
+      # t contains our current state at the start of the loop, then it is given
+      # the self.state.fun->super.. Upon each iteration as it is passed the value
+      # of self.temp.fun
+      #
+      # s contains S
+      #
+      # Note: This code and the topology_d code in trans_ allow provide the
+      #       topology_h algorithm
       while(t != s):
         r = t(self, exit_e)
         if r == None:
@@ -260,15 +289,15 @@ class Hsm():
 
       # navigate all supported topologies
       # tpath will be over-written with entry values
-      # ip will indicate if we need to use them
+      # ip will indicate at which point we should begin an entry path
       ip = self.trans_(tpath,max_index)
 
       # transition to history spy stuff placed here
 
-      # If our trans_ method indicated that we need to enter into a state(s)
-      # we do so now.  The tpath lower indexes contain inner states while the
-      # higher indexes contain outer states.  We enter our outer states to get
-      # toward the desired inner state.
+      # If our trans_ method indicated that we need to enter into a state(s) we
+      # do so now.  The tpath lower indexes contain inner states while the
+      # higher indexes contain outer states.  So, we enter our outer states to
+      # get toward the desired inner state.
       while(ip >= 0):
         tpath[ip](self, entry_e)
         ip -= 1
@@ -302,11 +331,13 @@ class Hsm():
         t = tpath[0]
 
     elif(r == return_status.HANDLED): # trans handled
+      # This is the ultimate hook pattern
       pass
     else:
       pass
-      # ignored
+      # ignore the event since our chart doesn't handle it
 
+    # t contains T
     self.state.fun = t
     self.temp.fun  = t
 
@@ -320,7 +351,7 @@ class Hsm():
 
     To understand beyond this point you must first know what happens with
     the tpath, ip and iq. Look at an example:
-    
+
      +-------- s1---------+
      | +-------s2-------+ |
      | | +-----s3-----+ | |
@@ -332,11 +363,11 @@ class Hsm():
      | | +------------+ | |
      | +-+--------------+ |
      ++------------------++
-    
+
     As trans_ searches, it will place state handlers into the tpath array
     These state handlers will be used to enter toward the target state once
     the lca has been found.
-    
+
                 useful data <-+-> garbage data
                               |   collected in search
            +----+----+----+---+----+-----+-----+
@@ -344,14 +375,14 @@ class Hsm():
            +----+----+----+---+-/--+-----+-----+
                                 |
                                 +-- ip == 4
-    
+
     The method that called trans_ already has a reference to the tpath so it
     doesn't need to be returned.  However, ip does need to be returned at it
     represents which state handlers will be entered.
-    
+
     Returning the above from this method will tell dispatch to
     enter s1, enter s2, enter s3, enter s4, enter s5.
-    
+
     iq is a bool, it represents if we have found the lca
     of S and T.  It is only used later in the method and it is not used
     outside of the method, so we only it when needed by the search.  It leave
@@ -363,12 +394,12 @@ class Hsm():
     be described in the comments where they are used, we will always draw our
     attention back to S and T and how they relate to a diagram.
     '''
-  
-    ip, iq = -1, 0 # no entry, no lca found
-    # S (tpath[2]) is taking the shot (probably starting in an outer state) T
-    # (tpath[0]) is the target, where does S want to go?
-    t, s = tpath[0], tpath[2]
 
+    ip, iq = -1, 0 # no entry, no lca found
+    # S is in tpath[2]
+    # T is in tpath[0]
+    t, s = tpath[0], tpath[2]
+    import pdb; pdb.set_trace()
     entry_e, exit_e, super_e, init_e =                       \
               Event(signal=signals.ENTRY_SIGNAL),            \
               Event(signal=signals.EXIT_SIGNAL),             \
@@ -552,7 +583,7 @@ class Hsm():
               # ip initially will have the index equal to the maximum depth of
               # the chart relative to T, minus 1.
               r = return_status.IGNORED
-              while(True):     
+              while(True):
                 if(t(self, exit_e)==return_status.HANDLED):
                   t(self, super_e)
                 # t contains S->super->super..
