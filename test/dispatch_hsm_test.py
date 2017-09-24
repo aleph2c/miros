@@ -1304,7 +1304,6 @@ def test_trans_topology_f1_1(spy_chart):
   chart.start_at(dispatch_graph_f1_s31)
 
   event  = Event(signal=signals.A)
-  print("dispatching")
   chart.dispatch(e=event)
   assert(chart.spy == expected_behavior)
 

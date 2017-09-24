@@ -420,7 +420,6 @@ class Hsm():
     # S is in tpath[2]
     # T is in tpath[0]
     t, s = tpath[0], tpath[2]
-    import pdb; pdb.set_trace()
     entry_e, exit_e, super_e, init_e =                       \
               Event(signal=signals.ENTRY_SIGNAL),            \
               Event(signal=signals.EXIT_SIGNAL),             \
@@ -624,13 +623,71 @@ class Hsm():
 
     return ip
 
-  def is_in(self,hsm,e):
+  def is_in(self,fn_state_handler):
     '''tests if a hsm is in a given state'''
-    pass
+    result = False
+    super_e = Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL)
+    while(True):
+      if(self.temp.fun == fn_state_handler):
+        result = True
+        r = return_status.IGNORED
+      else:
+        r = self.temp.fun(self, super_e)
+      if(r == return_status.IGNORED):
+        break
+    self.temp.fun = self.state.fun # set our temp back to what it should be
+    return result
 
-  def child_state(hsm,e):
-    '''finds the child state of a given parent'''
-    pass
+
+  def child_state(self,fn_parent_state_handler):
+    '''finds the child state of a given parent
+    
+    This method will only return a child state of a given handler, if the system
+    is in a substate of the state being called.
+    
+                     +---------- graph_e1_s1 -----------+
+                     | +-------- graph_e1_s2 -------+   |
+                     | | +------ graph_e1_s3 -----+ |   |
+                     | | | +---- graph_e1_s4 ---+ | |   |
+                     | | | |  +- graph_e1_s5 -+ | | |   |
+                     | | | |  |               | | | |   |
+                     | +-b->  |               <-----a---+
+                     | | | |  |               | | | |   |
+                     | | +c>  +---------------+ | | |   |
+                     +d> | +--------------------+ | |   |
+                     | | +------------------------+ |   |
+                     | +----------------------------+   |
+                     +----------------------------------+
+    
+    chart = Hsm()
+    chart.start_at(child_state_graph_e1_s5)
+    chart.child_state(graph_e1_s5) #=> graph_e1_s5
+    chart.child_state(graph_e1_s4) #=> graph_e1_s5
+    chart.child_state(graph_e1_s3) #=> graph_e1_s4
+    chart.dispatch(event=Event(signal=signals.D) 
+
+    # chart now in state graph_e1_s2
+    chart.child_state(graph_e1_s5) #=> <CRASH!>
+    chart.child_state(graph_e1_s2) #=> graph_e1_s2
+    chart.child_state(graph_e1_s1) #=> graph_e1_s2 # which is wrong
+
+    '''
+    super_e   = Event(signal = signals.SEARCH_FOR_SUPER_SIGNAL)
+    confirmed = False
+    child     = self.state.fun
+    self.temp.fun = self.state.fun
+    while(True):
+      if(self.temp.fun == fn_parent_state_handler):
+        confirmed = True
+        r = return_status.IGNORED
+      else:
+        child = self.temp.fun
+        r = self.temp.fun(self, super_e)
+      if(r == return_status.IGNORED):
+        break;
+    self.temp.fun = self.state.fun
+    assert(confirmed == True)
+    return child
 
   def augment(self, **kwargs):
     """Used to add attributes to an hsm object
