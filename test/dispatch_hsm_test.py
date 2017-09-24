@@ -16,7 +16,7 @@ def pp(item):
                             |               |     a
                             |               |     |
                             |               <-----+
-                            +---------------+     
+                            +---------------+
 
 This is used for testing the type A topology in the trans_ method of the Hsm
 class.
@@ -45,16 +45,16 @@ def dispatch_graph_a1_s1(chart, e):
 ################################################################################
 #                             Dispatch Graph B1                                #
 ################################################################################
-'''           The following state chart is used to test topology B 
+'''           The following state chart is used to test topology B
 
                        +------- graph_b1_s1 -----s-----+
-                       |  +---- graph_b1_s2 -----t-+   |       
-                       |  |  +- graph_b1_s3 -+     |   |       
-                       |  |  |               |   +-+   |       
-                       |  |  |               <-b-+ <-a-+       
-                       |  |  +---------------+     |   |       
-                       |  +------------------------+   |       
-                       +-------------------------------+     
+                       |  +---- graph_b1_s2 -----t-+   |
+                       |  |  +- graph_b1_s3 -+     |   |
+                       |  |  |               |   +-+   |
+                       |  |  |               <-b-+ <-a-+
+                       |  |  +---------------+     |   |
+                       |  +------------------------+   |
+                       +-------------------------------+
 
 This is used for testing the type B topology in the trans_ method of the Hsm
 class.
@@ -124,7 +124,7 @@ def dispatch_graph_b1_s3(chart, e):
 ################################################################################
 #                             Dispatch Graph C1                                #
 ################################################################################
-'''           The following state chart is used to test topology C 
+'''           The following state chart is used to test topology C
 
                        +-graph_c1_s1-+   +-graph_c1_s2-+
                        |             |   |             |
@@ -184,7 +184,7 @@ def dispatch_graph_c1_s2(chart, e):
 ################################################################################
 #                             Dispatch Graph C2                                #
 ################################################################################
-'''           The following state chart is used to test topology C 
+'''           The following state chart is used to test topology C
 
                     +------------- graph_c2_s1 -----------+
                     |   +-graph_c2_s2-+   +-graph_c2_s3-+ |
@@ -266,16 +266,16 @@ def dispatch_graph_c2_s3(chart, e):
 ################################################################################
 #                             Dispatch Graph D1                                #
 ################################################################################
-'''           The following state chart is used to test topology D 
+'''           The following state chart is used to test topology D
 
                        +------- graph_d1_s1 -----s-----+
-                       |  +---- graph_d1_s2 -----t-+   |       
-                       |  |  +- graph_d1_s3 -+     |   |       
-                       |  |  |               |   +->   |       
-                       |  |  |               +-b-+ +-a->       
-                       |  |  +---------------+     |   |       
-                       |  +------------------------+   |       
-                       +-------------------------------+     
+                       |  +---- graph_d1_s2 -----t-+   |
+                       |  |  +- graph_d1_s3 -+     |   |
+                       |  |  |               |   +->   |
+                       |  |  |               +-b-+ +-a->
+                       |  |  +---------------+     |   |
+                       |  +------------------------+   |
+                       +-------------------------------+
 
 This is used for testing the type D topology in the trans_ method of the Hsm
 class.
@@ -347,14 +347,14 @@ def dispatch_graph_d1_s3(chart, e):
 ################################################################################
 #                             Dispatch Graph E1                                #
 ################################################################################
-'''           The following state chart is used to test topology E 
+'''           The following state chart is used to test topology E
 
                      +---------- graph_e1_s1 -----------+
                      | +-------- graph_e1_s2 -------+   |
                      | | +------ graph_e1_s3 -----+ |   |
                      | | | +---- graph_e1_s4 ---+ | |   |
                      | | | |  +- graph_e1_s5 -+ | | |   |
-                     | | | |  |               | | | |   | 
+                     | | | |  |               | | | |   |
                      | +-b->  |               <-----a---+
                      | | | |  |               | | | |   |
                      | | +c>  +---------------+ | | |   |
@@ -368,6 +368,7 @@ class.
   * test_trans_topology_e1_2 - start in graph_e1_s5 (diagram - b)
   * test_trans_topology_e1_3 - start in graph_e1_s5 (diagram - c)
   * test_trans_topology_e1_3 - start in graph_e1_s5 (diagram - d)
+  * test_trans_topology_e1_4 - start in graph_e1_s5 (diagram - d)
 '''
 def dispatch_graph_e1_s1(chart, e):
   status = return_status.UNHANDLED
@@ -479,7 +480,7 @@ def dispatch_graph_e1_s5(chart, e):
 ################################################################################
 #                             Dispatch Graph F1                                #
 ################################################################################
-'''           The following state chart is used to test topology F 
+'''           The following state chart is used to test topology F
 
                    +------------------------------------- f1_s1 --------------+
    +-f1_s0-+       |                                                          |
@@ -668,37 +669,38 @@ def dispatch_graph_f1_s321(chart, e):
 ################################################################################
 #                             Dispatch Graph G1                                #
 ################################################################################
-'''           The following state chart is used to test topology G 
+'''           The following state chart is used to test topology G
 
-                       +---------------------------------------------- g1_s1 --------------+
-   +---g1_s0---+       |                                                                   |
-   |+-g1_s01--+|       |                       +----------------------g1_s22 ----------+   |
-   ||         ++----------c-------------------->                                       |   |
-   ||         ||       |                       | +--------------------g1_s3 ---------+ |   |
-   |+---------+|       |  +-------g1_s21----+  | |                 +----g1_s32-----+ | |   |
-   +-----------+       |  | +--g1_s211-----+|  | |                 |  +-g1_s321--+ | | |   |
-                       |  | |+-g1_s2111+   ||  | |                 |  |          | | | |   |
-                       |  | ||         |   ||  | |                 |  |          | | | |   |
-                       |  | ||         |   |+-----------b------------->          | | | |   |
-                       |  | ||         |   ||  | |                 |  |          | | | |   |
-                       |  | ||         |   ||  | |                 |  |          | | | |   |
-                       |  | ||         |   ||  | |      +------------->          | | | |   |
-                       |  | ||         |   ||  | |      |          |  |          | | | |   |
-                       |  | |++--------+   ||  | |      |          |  |          | | | +-d->
-                       |  | +-|------------+|  | |      |          |  +----------+ | | |   |
-                       |  +---|-------------+  | |      |          +---------------+ | |   |
-                       |      |                | +------|----------------------------+ |   |
-                       |      +------------a------------+                              |   |
-                       |                       +---------------------------------------+   |
-                       |                                                                   |
-                       +-------------------------------------------------------------------+
+                  +-------------------------------- g1_s1 --------------+
+   +---g1_s0---+  |                                                     |
+   |+-g1_s01--+|  |                      +---------g1_s22 ----------+   |
+   ||         ++-----c------------------->                          |   |
+   ||         ||  |                      | +-------g1_s3 ---------+ |   |
+   |+---------+|  | +-------g1_s21----+  | |    +----g1_s32-----+ | |   |
+   +-----------+  | | +--g1_s211-----+|  | |    |  +-g1_s321--+ | | |   |
+                  | | |+-g1_s2111+   ||  | |    |  |          | | | |   |
+                  | | ||         |   ||  | |    |  |          | | | |   |
+                  | | ||         |   |+-------b---->          | | | |   |
+                  | | ||         |   ||  | |    |  |          | | | |   |
+                  | | ||         |   ||  | |    |  |          | | | |   |
+                  | | ||         |   ||  | |  +---->          | | | |   |
+                  | | ||         |   ||  | |  | |  |          | | | |   |
+                  | | |++--------+   ||  | |  | |  |          | | | +-d->
+                  | | +-|------------+|  | |  | |  +----------+ | | |   |
+                  | +---|-------------+  | |  | +---------------+ | |   |
+                  |     |                | +--|-------------------+ |   |
+                  |     +------------a--------+                     |   |
+                  |                      +--------------------------+   |
+                  |                                                     |
+                  +-----------------------------------------------------+
 
 
-This is used gor testing the type E topology in the trans_ method of the Hsm
+This is used for testing the type E topology in the trans_ method of the Hsm
 class.
   * test_trans_topology_g1_1 - start in graph_g1_s211 (diagram -> a)
   * test_trans_topology_g1_2 - start in graph_g1_s211 (diagram -> b)
   * test_trans_topology_g1_3 - start in graph_g1_s01  (diagram -> a)
+  * test_trans_topology_g1_4 - start in graph_g1_s321 (diagram -> d)
 '''
 def dispatch_graph_g1_s0(chart, e):
   status = return_status.UNHANDLED
@@ -1274,7 +1276,7 @@ def test_trans_topology_e1_4(spy_chart):
   event  = Event(signal=signals.D)
   chart.dispatch(e=event)
   assert(chart.spy == expected_behavior)
- 
+
 @pytest.mark.dispatch
 @pytest.mark.topology_f
 def test_trans_topology_f1_1(spy_chart):
@@ -1308,7 +1310,7 @@ def test_trans_topology_f1_1(spy_chart):
 
 @pytest.mark.dispatch
 @pytest.mark.topology_f
-def test_trans_topology_f1_2(spy_chart): 
+def test_trans_topology_f1_2(spy_chart):
   chart = spy_chart
   expected_behavior = \
     ['SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_f1_s21',
@@ -1333,7 +1335,7 @@ def test_trans_topology_f1_2(spy_chart):
 
 @pytest.mark.dispatch
 @pytest.mark.topology_f
-def test_trans_topology_f1_3(spy_chart): 
+def test_trans_topology_f1_3(spy_chart):
   chart = spy_chart
   expected_behavior = \
     ['SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_f1_s0',
@@ -1353,7 +1355,7 @@ def test_trans_topology_f1_3(spy_chart):
 
 @pytest.mark.dispatch
 @pytest.mark.topology_g
-def test_trans_topology_g1_1(spy_chart): 
+def test_trans_topology_g1_1(spy_chart):
   chart = spy_chart
   expected_behavior = \
     ['SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_g1_s2111',
@@ -1389,7 +1391,7 @@ def test_trans_topology_g1_1(spy_chart):
 
 @pytest.mark.dispatch
 @pytest.mark.topology_g
-def test_trans_topology_g1_2(spy_chart): 
+def test_trans_topology_g1_2(spy_chart):
   chart = spy_chart
   expected_behavior = \
     ['SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_g1_s2111',
@@ -1427,7 +1429,7 @@ def test_trans_topology_g1_2(spy_chart):
 
 @pytest.mark.dispatch
 @pytest.mark.topology_g
-def test_trans_topology_g1_3(spy_chart): 
+def test_trans_topology_g1_3(spy_chart):
   chart = spy_chart
   expected_behavior = \
     ['SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_g1_s01',
@@ -1451,7 +1453,7 @@ def test_trans_topology_g1_3(spy_chart):
 
 @pytest.mark.dispatch
 @pytest.mark.topology_h
-def test_trans_topology_g1_3(spy_chart): 
+def test_trans_topology_g1_4(spy_chart):
   chart = spy_chart
   expected_behavior = \
     ['SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_g1_s321',
