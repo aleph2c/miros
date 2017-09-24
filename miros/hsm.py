@@ -347,18 +347,40 @@ class Hsm():
     return return_status.TRAN
 
   def trans_(self, tpath, max_index):
-    '''sets a new function target and returns that transition required by engine
+    '''execute a transition sequence in a hsm
+    
+    A helper function for the ```dispatch```.  It navigates through the possible
+    supported topologies, navigating the chart just up to the point of entering
+    the target hierarchy.  The target entry path is placed into the provided
+    tpath list, and the depth of the entry path is provided as an output of the
+    method.
+
+    Args:
+      tpath:      a list which will be populated with the entry path required
+                  for the dispatch method to enter the T (target) state.
+
+      max_index:  The maximum index used within the tpath list up until this
+                  point.  If more space is required, an append is used to extend
+                  the length of the tpath list, otherwise an element is assigned
+                  to a given index location.
+
+    Returns:
+      ip:         An index into the tpath.  All elements between 0 and ip in the
+                  tpath are valid entry handlers which will be used to approach T.
+
+    If you don't understand what S/T are, read all of the mnemonics described in
+    the ```dispatch``` docstring.
 
     To understand beyond this point you must first know what happens with
-    the tpath, ip and iq. Look at an example:
+    the tpath, ip and iq. Consider this example:
 
      +-------- s1---------+
      | +-------s2-------+ |
      | | +-----s3-----+ | |
      | | | +---s4---+ | | |
      | | | | +-s5-+ | | | |
-     | | | | T    | | | | |
-     | | | | +----+ | | | |
+     | | | | T    | | | | | S
+     | | | | +----+ | | | | top is the lca
      | | | +--------+ | | |
      | | +------------+ | |
      | +-+--------------+ |
@@ -380,14 +402,13 @@ class Hsm():
     doesn't need to be returned.  However, ip does need to be returned at it
     represents which state handlers will be entered.
 
-    Returning the above from this method will tell dispatch to
+    Returning the above from this method will tell ```dispatch``` to
     enter s1, enter s2, enter s3, enter s4, enter s5.
 
-    iq is a bool, it represents if we have found the lca
-    of S and T.  It is only used later in the method and it is not used
-    outside of the method, so we only it when needed by the search.  It leave
-    comments in the code describing its state, so you can understand what is
-    going on.
+    iq is a bool, it represents if we have found the lca of S and T.  It is only
+    used later in the method and it is not used outside of the method, so we
+    only it when needed by the search.  It leave comments in the code describing
+    its state, so you can understand what is going on.
 
     When the method begins t == T and s == S but these variable are then clobbered
     in the search and over-written with new meanings.  Their new meanings will
