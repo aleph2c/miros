@@ -7,6 +7,31 @@ def pp(item):
   pprint.pprint(item)
 # this_function_name = sys._getframe().f_code.co_name
 
+def spy_on(fn):
+  def spy_wrapped(chart, e):
+    # Add the spy object if it doesn't exist already
+    if hasattr(chart, 'spy') == False:
+      chart.augment(name='spy', other=chart.spy_log)
+    name = fn.__name__
+
+    # Place what is happening within the spy
+    if(e.signal == signals.ENTRY_SIGNAL):
+      chart.spy.append("{}:{}".format(e.signal_name, name))
+    elif(e.signal == signals.EXIT_SIGNAL):
+      chart.spy.append("{}:{}".format(e.signal_name, name))
+    elif(e.signal == signals.INIT_SIGNAL):
+      chart.spy.append("{}:{}".format(e.signal_name, name))
+    elif(e.signal == signals.REFLECTION_SIGNAL):
+      # We are no longer going to return a ReturnStatus object
+      # instead we write the function name as a string
+      status = name
+    else:
+      chart.spy.append("{}:{}".format(e.signal_name, name))
+    # now call the original handler
+    status = fn(chart, e)
+    return status
+  return spy_wrapped
+
 def reflect(hsm=None,e=None):
   '''
   This will return the callers function name as a string:
@@ -40,8 +65,9 @@ class Hsm():
 
   def __init__(self):
     '''set initial state of the hsm'''
-    self.state = HsmAttr()
-    self.temp  = HsmAttr()
+    self.state   = HsmAttr()
+    self.temp    = HsmAttr()
+    self.spy_log = []
 
   def start_at(self, initial_state):
     '''
@@ -126,7 +152,7 @@ class Hsm():
     self.state.fun = outermost
     self.temp.fun  = outermost
 
-  def dispatch(self,e):
+  def dispatch(self,e,spy=None,trace=None):
     '''dispatches an event to a HSM.
 
     Processing an event represents one run-to-completion (RTC) step.
@@ -348,7 +374,7 @@ class Hsm():
 
   def trans_(self, tpath, max_index):
     '''execute a transition sequence in a hsm
-    
+
     A helper function for the ```dispatch```.  It navigates through the possible
     supported topologies, navigating the chart just up to the point of entering
     the target hierarchy.  The target entry path is placed into the provided
@@ -641,30 +667,30 @@ class Hsm():
 
   def child_state(self,fn_parent_state_handler):
     '''finds the child state of a given parent
-    
+
     This method will only return a child state of a given handler, if the system
     is in a substate of the state being called.
-    
-                     +---------- graph_e1_s1 -----------+
-                     | +-------- graph_e1_s2 -------+   |
-                     | | +------ graph_e1_s3 -----+ |   |
-                     | | | +---- graph_e1_s4 ---+ | |   |
-                     | | | |  +- graph_e1_s5 -+ | | |   |
-                     | | | |  |               | | | |   |
-                     | +-b->  |               <-----a---+
-                     | | | |  |               | | | |   |
-                     | | +c>  +---------------+ | | |   |
-                     +d> | +--------------------+ | |   |
-                     | | +------------------------+ |   |
-                     | +----------------------------+   |
-                     +----------------------------------+
-    
+
+    +---------- graph_e1_s1 -----------+
+    | +-------- graph_e1_s2 -------+   |
+    | | +------ graph_e1_s3 -----+ |   |
+    | | | +---- graph_e1_s4 ---+ | |   |
+    | | | |  +- graph_e1_s5 -+ | | |   |
+    | | | |  |               | | | |   |
+    | +-b->  |               <-----a---+
+    | | | |  |               | | | |   |
+    | | +c>  +---------------+ | | |   |
+    +d> | +--------------------+ | |   |
+    | | +------------------------+ |   |
+    | +----------------------------+   |
+    +----------------------------------+
+
     chart = Hsm()
     chart.start_at(child_state_graph_e1_s5)
     chart.child_state(graph_e1_s5) #=> graph_e1_s5
     chart.child_state(graph_e1_s4) #=> graph_e1_s5
     chart.child_state(graph_e1_s3) #=> graph_e1_s4
-    chart.dispatch(event=Event(signal=signals.D) 
+    chart.dispatch(event=Event(signal=signals.D)
 
     # chart now in state graph_e1_s2
     chart.child_state(graph_e1_s5) #=> <CRASH!>
