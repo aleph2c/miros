@@ -1,4 +1,5 @@
 import sys
+from datetime import datetime
 import traceback
 from miros.event import signals, return_status, Event
 import pprint
@@ -9,26 +10,32 @@ def pp(item):
 
 def spy_on(fn):
   def spy_wrapped(chart, e):
-    # Add the spy object if it doesn't exist already
-    if hasattr(chart, 'spy') == False:
-      chart.augment(name='spy', other=chart.spy_log)
+    # Add the '_spy' object if it doesn't exist already
+    if hasattr(chart, '_spy') == False:
+      chart.augment(name='_spy', other=chart.full.spy)
     name = fn.__name__
 
     # Place what is happening within the spy
     if(e.signal == signals.ENTRY_SIGNAL):
-      chart.spy.append("{}:{}".format(e.signal_name, name))
+      chart._spy.append("{}:{}".format(e.signal_name, name))
     elif(e.signal == signals.EXIT_SIGNAL):
-      chart.spy.append("{}:{}".format(e.signal_name, name))
+      chart._spy.append("{}:{}".format(e.signal_name, name))
     elif(e.signal == signals.INIT_SIGNAL):
-      chart.spy.append("{}:{}".format(e.signal_name, name))
+      chart._spy.append("{}:{}".format(e.signal_name, name))
     elif(e.signal == signals.REFLECTION_SIGNAL):
       # We are no longer going to return a ReturnStatus object
       # instead we write the function name as a string
       status = name
     else:
-      chart.spy.append("{}:{}".format(e.signal_name, name))
+      chart._spy.append("{}:{}".format(e.signal_name, name))
     # now call the original handler
     status = fn(chart, e)
+    after  = chart.state.fun
+
+    if(signals.is_inner_signal(e.signal_name) != True and status == return_status.HANDLED):
+      chart._spy.pop()
+      chart._spy.append("{}:{}:HANDLED".format(e.signal_name, name)) 
+
     return status
   return spy_wrapped
 
@@ -58,6 +65,9 @@ class HsmAttr():
 
     self.act = None # action-handler function
                     # signature (chart, event)
+
+    self.full     = None
+    self.filtered = None
 class HsmTopologyException(Exception):
   pass
 
@@ -65,9 +75,20 @@ class Hsm():
 
   def __init__(self):
     '''set initial state of the hsm'''
-    self.state   = HsmAttr()
-    self.temp    = HsmAttr()
-    self.spy_log = []
+    self.state        = HsmAttr()
+    self.temp         = HsmAttr()
+    self.full         = HsmAttr()
+    self.filtered     = HsmAttr()
+
+    # full spy log for debugging this package
+    self.full_spy_log     = []
+    self.filtered_spy_log = []
+    self.full.spy         = []
+    self.filtered.spy     = []
+    self.full.trace       = []
+
+    # trace log for tracing transitions
+    self.trace_log = []
 
   def start_at(self, initial_state):
     '''
@@ -714,6 +735,63 @@ class Hsm():
     self.temp.fun = self.state.fun
     assert(confirmed == True)
     return child
+
+  def remove_search_from_spy(fn):
+    def _remove_search_from_spy(self):
+      new_spy = []
+      self.filtered.spy = fn(self)
+      for spy_result in self.filtered.spy:
+        if spy_result.split(":")[0] == 'SEARCH_FOR_SUPER_SIGNAL':
+          pass
+        else:
+          new_spy.append(spy_result)
+      self.filtered.spy = new_spy
+      return self.filtered.spy
+    return _remove_search_from_spy
+
+  def keep_last_unique_signal_spy_result(fn):
+    def _keep_last_unique_signal_spy_result(self):
+      new_spy,signal_dict = [], {}
+      index,start_index,end_index = 0,0,0
+      self.filtered.spy = fn(self)
+      for spy_result in self.filtered.spy:
+        signal_name = spy_result.split(":")[0]
+        if signals.is_inner_signal(signal_name) == True:
+          new_spy.append(spy_result)
+        else:
+          if signal_name not in signal_dict:
+            start_index = index
+          signal_dict[signal_name] = index
+          end_index = index
+        index += 1
+      new_spy = new_spy[0:start_index]   + \
+          [self.filtered.spy[end_index]] + \
+           self.filtered.spy[end_index+1:]
+      self.filtered.spy = new_spy
+      return self.filtered.spy
+    return _keep_last_unique_signal_spy_result
+
+  def render_trace_from_spy(fn):
+    def _render_trace_from_spy(self):
+      time        = datetime.now()
+      #signal_name = e.signal_name
+      #before      = chart.state.fun
+      #after       = chart.state.fun
+      if hasattr(self, '_trace') == False:
+        self.augment(name='_trace', other=self.full.trace)
+      fn(self)
+      return self.filtered.spy
+    return _render_trace_from_spy
+
+  @remove_search_from_spy
+  @keep_last_unique_signal_spy_result
+  @render_trace_from_spy
+  def spy(self):
+    if len(self.full.spy) == 0:
+      return self.full.spy
+    if len(self.filtered.spy) == 0:
+      self.filtered.spy = self.full.spy
+    return self.filtered.spy
 
   def augment(self, **kwargs):
     """Used to add attributes to an hsm object

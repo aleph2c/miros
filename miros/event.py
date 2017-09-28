@@ -102,13 +102,34 @@ class Signal(OrderedDictWithParams):
   '''
   def __init__(self,*args,**kwargs):
 
-    self['ENTRY_SIGNAL']      = 1
-    self['EXIT_SIGNAL']       = 2
-    self['INIT_SIGNAL']       = 3
-    self['REFLECTION_SIGNAL'] = 4
+    self['ENTRY_SIGNAL']                = 1
+    self['EXIT_SIGNAL']                 = 2
+    self['INIT_SIGNAL']                 = 3
+    self['REFLECTION_SIGNAL']           = 4
     self['SEARCH_FOR_SUPER_SIGNAL']     = 5
 
     self.write_keys_to_attributes()
+
+  def is_inner_signal(self, other):
+    def is_number_an_internal_signal(number):
+      result = False
+      if number in list(self.values())[0:self.SEARCH_FOR_SUPER_SIGNAL]:
+        result = True
+      return result
+
+    result = False
+    if(type(other) == type("")):
+      try:
+        other = self[other]
+        result = is_number_an_internal_signal(other)
+      except:
+        pass
+    elif(type(other) == type(1)):
+      try:
+        result = is_number_an_internal_signal(other)
+      except:
+        pass
+    return result
 
 '''
 Defining the signals used by this package and all of the packages that reference

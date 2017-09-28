@@ -32,107 +32,107 @@ def pp(item):
 def child_state_graph_e1_s1(chart, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status = return_status.HANDLED
   elif(e.signal == signals.INIT_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
   elif(e.signal == signals.REFLECTION_SIGNAL):
     # We are no longer going to return a ReturnStatus object
     # instead we write the function name as a string
     status = reflect(chart,e)
   elif(e.signal == signals.A):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status = chart.trans(child_state_graph_e1_s5)
   elif(e.signal == signals.D):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status = chart.trans(child_state_graph_e1_s2)
   else:
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status, chart.temp.fun = return_status.SUPER, chart.top
   return status
 
 def child_state_graph_e1_s2(chart, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status = return_status.HANDLED
   elif(e.signal == signals.INIT_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
   elif(e.signal == signals.REFLECTION_SIGNAL):
     # We are no longer going to return a ReturnStatus object
     # instead we write the function name as a string
     status = reflect(chart,e)
   elif(e.signal == signals.B):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status = chart.trans(child_state_graph_e1_s4)
   else:
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status, chart.temp.fun = return_status.SUPER, child_state_graph_e1_s1
   return status
 
 def child_state_graph_e1_s3(chart, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status = return_status.HANDLED
   elif(e.signal == signals.INIT_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
   elif(e.signal == signals.REFLECTION_SIGNAL):
     # We are no longer going to return a ReturnStatus object
     # instead we write the function name as a string
     status = reflect(chart,e)
   elif(e.signal == signals.C):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status = chart.trans(child_state_graph_e1_s4)
   else:
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status, chart.temp.fun = return_status.SUPER, child_state_graph_e1_s2
   return status
 
 def child_state_graph_e1_s4(chart, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status = return_status.HANDLED
   elif(e.signal == signals.INIT_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
   elif(e.signal == signals.REFLECTION_SIGNAL):
     # We are no longer going to return a ReturnStatus object
     # instead we write the function name as a string
     status = reflect(chart,e)
   else:
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status, chart.temp.fun = return_status.SUPER, child_state_graph_e1_s3
   return status
 
 def child_state_graph_e1_s5(chart, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status = return_status.HANDLED
   elif(e.signal == signals.INIT_SIGNAL):
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
   elif(e.signal == signals.REFLECTION_SIGNAL):
     # We are no longer going to return a ReturnStatus object
     # instead we write the function name as a string
     status = reflect(chart,e)
   else:
-    chart.spy.append("{}:{}".format(e.signal_name, reflect(chart,e)))
+    chart.spy_log.append("{}:{}".format(e.signal_name, reflect(chart,e)))
     status, chart.temp.fun = return_status.SUPER, child_state_graph_e1_s4
   return status
 
@@ -140,7 +140,7 @@ def child_state_graph_e1_s5(chart, e):
 def spy_chart(request):
   chart = Hsm()
   spy   = []
-  chart.augment(other=spy, name="spy")
+  chart.augment(other=spy, name="spy_log")
   signals.append("A")
   signals.append("B")
   signals.append("C")

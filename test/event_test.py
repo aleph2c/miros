@@ -20,6 +20,20 @@ def test_signal():
   assert(signals.BAKE == 6)
   assert(signals['BAKE'] == 6)
 
+def test_signal():
+  signals = Signal()
+  assert(signals.ENTRY_SIGNAL == 1)
+  assert(signals.REFLECTION_SIGNAL == 4)
+  signals.append('BAKE')
+  assert(signals.BAKE == 6)
+  assert(signals.is_inner_signal(1) == True)
+  assert(signals.is_inner_signal(5) == True)
+  assert(signals.is_inner_signal(6) == False)
+  assert(signals.is_inner_signal('ENTRY_SIGNAL') == True)
+  assert(signals.is_inner_signal('SEARCH_FOR_SUPER_SIGNAL') == True)
+  assert(signals.is_inner_signal('BAKE') == False)
+  assert(signals.is_inner_signal('NOT_THERE') == False)
+
 def test_event():
   signals = Signal()
   event   = Event(signal=signals.ENTRY_SIGNAL)
