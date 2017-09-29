@@ -834,6 +834,7 @@ def test_spy_topology_g1_4():
      'ENTRY_SIGNAL:spy_graph_g1_s321',
      'INIT_SIGNAL:spy_graph_g1_s321']
   assert(
+
    chart.spy() == \
     [
      'ENTRY_SIGNAL:spy_graph_g1_s21',
