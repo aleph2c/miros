@@ -1,10 +1,27 @@
 import pytest
+import traceback
 from miros.event import ReturnStatus, signals, Event, return_status
-from miros.hsm   import reflect, Hsm, HsmTopologyException
+from miros.hsm   import HsmEventProcessor, HsmTopologyException
 import pprint
 def pp(item):
   print("")
   pprint.pprint(item)
+
+def reflect(hsm=None,e=None):
+  '''
+  This will return the callers function name as a string:
+  Example:
+
+    def example_function():
+      return reflect()
+
+    print(example_function) #=> "example_function"
+
+  '''
+  fnt  = traceback.extract_stack(None,2)
+  fnt1 = fnt[0]
+  fnt2 = fnt1[2]
+  return fnt2
 ################################################################################
 #                             Dispatch Graph A1                                #
 ################################################################################
@@ -18,7 +35,7 @@ def pp(item):
                             |               <-----+
                             +---------------+
 
-This is used for testing the type A topology in the trans_ method of the Hsm
+This is used for testing the type A topology in the trans_ method of the HsmEventProcessor
 class.
   * test_trans_topology_a_1 (diagram)
 '''
@@ -56,7 +73,7 @@ def dispatch_graph_a1_s1(chart, e):
                        |  +------------------------+   |
                        +-------------------------------+
 
-This is used for testing the type B topology in the trans_ method of the Hsm
+This is used for testing the type B topology in the trans_ method of the HsmEventProcessor
 class.
   * test_trans_topology_b1_1 - start in graph_b1_s2 (diagram)
   * test_trans_topology_b1_2 - start in graph_b1_s3 (diagram)
@@ -133,7 +150,7 @@ def dispatch_graph_b1_s3(chart, e):
                        |             |   |             |
                        +-------------+   +-------------+
 
-This is used for testing the type C topology in the trans_ method of the Hsm
+This is used for testing the type C topology in the trans_ method of the HsmEventProcessor
 class.
   * test_trans_topology_c1_1 (diagram)
   * test_trans_topology_c1_2 (diagram)
@@ -196,7 +213,7 @@ def dispatch_graph_c1_s2(chart, e):
                     +-------------------------------------+
 
 This is used for testing the type C topology within another state, in the trans_
-method of the Hsm class.
+method of the HsmEventProcessor class.
   * test_trans_topology_c2_1 (diagram)
   * test_trans_topology_c2_2 (diagram)
 '''
@@ -277,7 +294,7 @@ def dispatch_graph_c2_s3(chart, e):
                        |  +------------------------+   |
                        +-------------------------------+
 
-This is used for testing the type D topology in the trans_ method of the Hsm
+This is used for testing the type D topology in the trans_ method of the HsmEventProcessor
 class.
   * test_trans_topology_d1_1 - start in graph_d1_s2 (diagram)
   * test_trans_topology_d1_2 - start in graph_d1_s3 (diagram)
@@ -363,7 +380,7 @@ def dispatch_graph_d1_s3(chart, e):
                      | | +------------------------+ |   |
                      | +----------------------------+   |
                      +----------------------------------+
-This is used for testing the type E topology in the tran|_ m|thod of the Hsm
+This is used for testing the type E topology in the tran|_ m|thod of the HsmEventProcessor
 class.
   * test_trans_topology_e1_1 - start in graph_e1_s5 (diagram - a)
   * test_trans_topology_e1_2 - start in graph_e1_s5 (diagram - b)
@@ -508,7 +525,7 @@ def dispatch_graph_e1_s5(chart, e):
                    +----------------------------------------------------------+
 
 
-This is used for testing the type E topology in the trans_ method of the Hsm
+This is used for testing the type E topology in the trans_ method of the HsmEventProcessor
 class.
   * test_trans_topology_f1_1 - start in graph_f1_s31 (diagram -> a)
   * test_trans_topology_f1_2 - start in graph_f1_s21 (diagram -> b)
@@ -701,7 +718,7 @@ def dispatch_graph_f1_s321(chart, e):
                   +-----------------------------------------------------+
 
 
-This is used for testing the type E topology in the trans_ method of the Hsm
+This is used for testing the type E topology in the trans_ method of the HsmEventProcessor
 class.
   * test_trans_topology_g1_1 - start in graph_g1_s211 (diagram -> a)
   * test_trans_topology_g1_2 - start in graph_g1_s211 (diagram -> b)
@@ -907,7 +924,7 @@ def dispatch_graph_g1_s321(chart, e):
 
 @pytest.fixture
 def spy_chart(request):
-  chart = Hsm()
+  chart = HsmEventProcessor()
   spy   = []
   chart.augment(other=spy, name="spy_log")
   signals.append("A")

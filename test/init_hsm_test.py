@@ -1,9 +1,26 @@
 import pytest
+import traceback
 from miros.event import ReturnStatus, signals, Event, return_status
-from miros.hsm   import reflect, Hsm, HsmTopologyException
+from miros.hsm   import HsmEventProcessor, HsmTopologyException
 import pprint
 def pp(item):
   pprint.pprint(item)
+
+def reflect(hsm=None,e=None):
+  '''
+  This will return the callers function name as a string:
+  Example:
+
+    def example_function():
+      return reflect()
+
+    print(example_function) #=> "example_function"
+
+  '''
+  fnt  = traceback.extract_stack(None,2)
+  fnt1 = fnt[0]
+  fnt2 = fnt1[2]
+  return fnt2
 ################################################################################
 #                                Init graph 1                                  #
 ################################################################################
@@ -300,7 +317,7 @@ def init_graph_2_d311(chart, e):
   return status
 @pytest.fixture
 def spy_chart(request):
-  chart = Hsm()
+  chart = HsmEventProcessor()
   spy   = []
   chart.augment(other=spy, name="spy_log")
   yield chart

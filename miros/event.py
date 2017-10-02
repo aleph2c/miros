@@ -102,11 +102,11 @@ class Signal(OrderedDictWithParams):
   '''
   def __init__(self,*args,**kwargs):
 
-    self['ENTRY_SIGNAL']                = 1
-    self['EXIT_SIGNAL']                 = 2
-    self['INIT_SIGNAL']                 = 3
-    self['REFLECTION_SIGNAL']           = 4
-    self['SEARCH_FOR_SUPER_SIGNAL']     = 5
+    self['ENTRY_SIGNAL']            = 1
+    self['EXIT_SIGNAL']             = 2
+    self['INIT_SIGNAL']             = 3
+    self['REFLECTION_SIGNAL']       = 4
+    self['SEARCH_FOR_SUPER_SIGNAL'] = 5
 
     self.write_keys_to_attributes()
 

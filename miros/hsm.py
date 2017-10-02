@@ -1,98 +1,178 @@
+# -*- coding: utf-8 -*-
+"""
+This module provides a heirarchical state machine event class (HsmEventProcessor), and an
+instrumented heirarchical state machine class (InstrumentedHsmEventProcessor).  The
+InstrumentedHsmEventProcessor is inherited from the HsmEventProcessor, and it provides two different views
+into the workings of your state machine:
+
+  * spy   -> complete record of all search, transitions and hooks
+  * trace -> only provides information about state transition (no hook
+             information)
+
+To define an HsmEventProcessor, you would create a number of methods outside of this class,
+then inject them into the HsmEventProcessor, by calling the 'start_at' method.
+
+Example:
+    
+
+                       +------- graph_b1_s1 -----s-----+
+                       |  +---- graph_b1_s2 -----t-+   |
+                       |  |  +- graph_b1_s3 -+     |   |
+                       |  |  |               |   +-+   |
+                       |  |  |               <-b-+ <-a-+
+                       |  |  +---------------+     |   |
+                       |  +------------------------+   |
+                       +-------------------------------+
+
+  # To create this cart, we
+  # 1) import the required items from miros:
+  from miros.event import ReturnStatus, signals, Event, return_status
+  from miros.hsm   import InstrumentedHsmEventProcessor, HsmTopologyException, spy_on
+
+  # 2) create the three different states:
+  @spy_on
+  def graph_b1_s1(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.A):
+      status = chart.trans(graph_b1_s2)
+    else:
+      status, chart.temp.fun = return_status.SUPER, chart.top
+    return status
+
+  # define an inner state who's super state is graph_b1_s1
+  @spy_on
+  def graph_b1_s2(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.B):
+      status = chart.trans(graph_b1_s3)
+    else:
+      status, chart.temp.fun = return_status.SUPER, graph_b1_s1
+    return status
+
+  # define an inner state who's super state is graph_b1_s2
+  @spy_on
+  def graph_b1_s3(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    else:
+      status, chart.temp.fun = return_status.SUPER, graph_b1_s2
+    return status
+  
+  # 3) Create an HsmEventProcessor, in this case we make one that is instrumented (a bit
+  # slower than a plain HsmEventProcessor, but we can use it to see what happened)
+  chart = InstrumentedHsmEventProcessor()
+
+  # 4) Start the chart in the state we desire
+  chart.start_at(graph_b1_s1)
+
+  # 5) Send an Event(s) to the chart:
+  chart.dispatch(Event(signal=signals.A)
+
+  # 6) Look at what happened
+  import pprint
+  def pp(item):
+    pprint.pprint(item)
+  pp(chart.full.spy) 
+                     # ['START',
+                     #  'SEARCH_FOR_SUPER_SIGNAL:graph_b1_s2',
+                     #  'SEARCH_FOR_SUPER_SIGNAL:graph_b1_s1',
+                     #  'ENTRY_SIGNAL:graph_b1_s1',
+                     #  'ENTRY_SIGNAL:graph_b1_s2',
+                     #  'INIT_SIGNAL:graph_b1_s2',
+                     #  'A:graph_b1_s2',
+                     #  'A:graph_b1_s1',
+                     #  'EXIT_SIGNAL:graph_b1_s2',
+                     #  'SEARCH_FOR_SUPER_SIGNAL:graph_b1_s2',
+                     #  'SEARCH_FOR_SUPER_SIGNAL:graph_b1_s2',
+                     #  'ENTRY_SIGNAL:graph_b1_s2',
+                     #  'INIT_SIGNAL:graph_b1_s2']
+
+  # 7) If you need these transitions to happen very quickly, create a chart
+  # using the HsmEventProcessor class instead of the InstrumentedHsmEventProcessor class
+  chart = InstrumentedHsmEventProcessor()
+  chart.start_at(graph_b1_s1)
+  chart.dispatch(Event(signal=signals.A) # same transitions with no trace or spy
+                                         # features
+
+"""
 import sys
-from datetime import datetime
-import traceback
-from miros.event import signals, return_status, Event
-import pprint
-def pp(item):
-  print()
-  pprint.pprint(item)
-# this_function_name = sys._getframe().f_code.co_name
+from   datetime    import datetime
+from   miros.event import signals, return_status, Event
+from   collections import namedtuple, deque
+
+SpyTuple = namedtuple('SpyTuple', ['signal', 'state', 'hook', 'start', 'internal'])
 
 def spy_on(fn):
-  def spy_wrapped(chart, e):
-    # Add the '_spy' object if it doesn't exist already
-    if hasattr(chart, '_spy') == False:
-      chart.augment(name='_spy', other=chart.full.spy)
+  '''
+
+  '''
+  def _spy_on(chart, e):
     name = fn.__name__
 
-    # Place what is happening within the spy
-    if(e.signal == signals.ENTRY_SIGNAL):
-      chart._spy.append("{}:{}".format(e.signal_name, name))
-    elif(e.signal == signals.EXIT_SIGNAL):
-      chart._spy.append("{}:{}".format(e.signal_name, name))
-    elif(e.signal == signals.INIT_SIGNAL):
-      chart._spy.append("{}:{}".format(e.signal_name, name))
-    elif(e.signal == signals.REFLECTION_SIGNAL):
+    # if the chart is not instrumented, don't try to wrap it
+    if hasattr(chart, 'rtc') == False:
+      # call the original handler and exit
+      status = fn(chart, e)
+      return status
+
+    if(e.signal == signals.REFLECTION_SIGNAL):
       # We are no longer going to return a ReturnStatus object
       # instead we write the function name as a string
       status = name
+      return status
     else:
-      chart._spy.append("{}:{}".format(e.signal_name, name))
-    # now call the original handler
+      chart.rtc.spy.append("{}:{}".format(e.signal_name, name))
+
+    # call the original handler
     status = fn(chart, e)
-    after  = chart.state.fun
 
-    if(signals.is_inner_signal(e.signal_name) != True and status == return_status.HANDLED):
-      chart._spy.pop()
-      chart._spy.append("{}:{}:HANDLED".format(e.signal_name, name)) 
+    if(signals.is_inner_signal(e.signal_name) != True):
+        # We have found a hook
+        if( status == return_status.HANDLED):
+          chart.rtc.spy.pop()
+          chart.rtc.spy.append("{}:{}:ULTIMATE_HOOK".format(e.signal_name, name))
+          sr=SpyTuple(signal=e.signal_name, state=name, start=False, hook=True, internal=False)
+        else:
+          sr=SpyTuple(signal=e.signal_name, state=name, start=False, hook=False, internal=False)
+    else:
+      sr=SpyTuple(signal=e.signal_name, state=name, start=False, hook=True, internal=True)
 
+    chart.rtc.tuples.append(sr)
     return status
-  return spy_wrapped
+  return _spy_on
 
-def reflect(hsm=None,e=None):
-  '''
-  This will return the callers function name as a string:
-  Example:
-
-    def example_function():
-      return reflect()
-
-    print(example_function) #=> "example_function"
-
-  '''
-  fnt  = traceback.extract_stack(None,2)
-  fnt1 = fnt[0]
-  fnt2 = fnt1[2]
-  return fnt2
-
-class HsmAttr():
-  '''
-  No clue yet
-  '''
+class Attribute():
   def __init__(self):
-    self.fun = None # state-handler function ?
-                    # signature (chart, event)
+    pass
 
-    self.act = None # action-handler function
-                    # signature (chart, event)
-
-    self.full     = None
-    self.filtered = None
 class HsmTopologyException(Exception):
   pass
 
-class Hsm():
+class HsmEventProcessor():
+  SPY_RING_BUFFER_SIZE = 500
+  TRC_RING_BUFFER_SIZE = 150
+  RTC_RING_BUFFER_SIZE = 150
 
   def __init__(self):
-    '''set initial state of the hsm'''
-    self.state        = HsmAttr()
-    self.temp         = HsmAttr()
-    self.full         = HsmAttr()
-    self.filtered     = HsmAttr()
-
-    # full spy log for debugging this package
-    self.full_spy_log     = []
-    self.filtered_spy_log = []
-    self.full.spy         = []
-    self.filtered.spy     = []
-    self.full.trace       = []
-
-    # trace log for tracing transitions
-    self.trace_log = []
+    '''set initial state of the '''
+    # used by the event processor
+    self.state = Attribute()
+    self.temp  = Attribute()
 
   def start_at(self, initial_state):
     '''
-    hsm = Hsm()
+    hsm = HsmEventProcessor()
     # build it
     hsm.start(starting_state_function)
     '''
@@ -100,8 +180,7 @@ class Hsm():
     self.temp.fun  = initial_state
     self.init()
 
-
-  def top(self,hsm, e):
+  def top(self, chart, e):
     '''top most state given to all HSM; treat it as an outside function'''
     status = return_status.IGNORED
     return status
@@ -123,8 +202,8 @@ class Hsm():
     fail.
 
     '''
-    topological_error = "impossible chart topology for Hsm.init, "
-    topological_error += "see Hsm.init doc string for details"
+    topological_error = "impossible chart topology for HsmEventProcessor.init, "
+    topological_error += "see HsmEventProcessor.init doc string for details"
 
     e = Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL)
     tpath, outermost, max_index = [None], self.state.fun, 0
@@ -173,7 +252,7 @@ class Hsm():
     self.state.fun = outermost
     self.temp.fun  = outermost
 
-  def dispatch(self,e,spy=None,trace=None):
+  def dispatch(self,e):
     '''dispatches an event to a HSM.
 
     Processing an event represents one run-to-completion (RTC) step.
@@ -185,7 +264,7 @@ class Hsm():
       None
 
     Example:
-      chart = Hsm()
+      chart = HsmEventProcessor()
       signals.append("A")
       chart.start_at(dispatch_graph_a1_s1)
       chart.dispatch(Event(signal=signals.A)
@@ -277,7 +356,6 @@ class Hsm():
               Event(signal=signals.EXIT_SIGNAL),             \
               Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL), \
               Event(signal=signals.INIT_SIGNAL)
-
 
     # To begin with we assume that no action will occur and the T state is just
     # our current state.
@@ -706,7 +784,7 @@ class Hsm():
     | +----------------------------+   |
     +----------------------------------+
 
-    chart = Hsm()
+    chart = HsmEventProcessor()
     chart.start_at(child_state_graph_e1_s5)
     chart.child_state(graph_e1_s5) #=> graph_e1_s5
     chart.child_state(graph_e1_s4) #=> graph_e1_s5
@@ -736,63 +814,6 @@ class Hsm():
     assert(confirmed == True)
     return child
 
-  def remove_search_from_spy(fn):
-    def _remove_search_from_spy(self):
-      new_spy = []
-      self.filtered.spy = fn(self)
-      for spy_result in self.filtered.spy:
-        if spy_result.split(":")[0] == 'SEARCH_FOR_SUPER_SIGNAL':
-          pass
-        else:
-          new_spy.append(spy_result)
-      self.filtered.spy = new_spy
-      return self.filtered.spy
-    return _remove_search_from_spy
-
-  def keep_last_unique_signal_spy_result(fn):
-    def _keep_last_unique_signal_spy_result(self):
-      new_spy,signal_dict = [], {}
-      index,start_index,end_index = 0,0,0
-      self.filtered.spy = fn(self)
-      for spy_result in self.filtered.spy:
-        signal_name = spy_result.split(":")[0]
-        if signals.is_inner_signal(signal_name) == True:
-          new_spy.append(spy_result)
-        else:
-          if signal_name not in signal_dict:
-            start_index = index
-          signal_dict[signal_name] = index
-          end_index = index
-        index += 1
-      new_spy = new_spy[0:start_index]   + \
-          [self.filtered.spy[end_index]] + \
-           self.filtered.spy[end_index+1:]
-      self.filtered.spy = new_spy
-      return self.filtered.spy
-    return _keep_last_unique_signal_spy_result
-
-  def render_trace_from_spy(fn):
-    def _render_trace_from_spy(self):
-      time        = datetime.now()
-      #signal_name = e.signal_name
-      #before      = chart.state.fun
-      #after       = chart.state.fun
-      if hasattr(self, '_trace') == False:
-        self.augment(name='_trace', other=self.full.trace)
-      fn(self)
-      return self.filtered.spy
-    return _render_trace_from_spy
-
-  @remove_search_from_spy
-  @keep_last_unique_signal_spy_result
-  @render_trace_from_spy
-  def spy(self):
-    if len(self.full.spy) == 0:
-      return self.full.spy
-    if len(self.filtered.spy) == 0:
-      self.filtered.spy = self.full.spy
-    return self.filtered.spy
-
   def augment(self, **kwargs):
     """Used to add attributes to an hsm object
 
@@ -809,14 +830,14 @@ class Hsm():
       acts exactly the same as this one.
 
       ``Examples``
-      alarm       = Hsm(); alarm.name       = "alarm"
-      time_keeper = Hsm(); time_keeper.name = "time_keeper"
+      alarm       = HsmEventProcessor(); alarm.name       = "alarm"
+      time_keeper = HsmEventProcessor(); time_keeper.name = "time_keeper"
       alarm.augment(other=time_keeper, name="time_keeper")
 
       assert(alarm.time_keeper == time_keeper) # will be true
 
-      inverter  = Hsm(); inverter.name = "inverter"
-      networker = Hsm(); networker.name = "networker"
+      inverter  = HsmEventProcessor(); inverter.name = "inverter"
+      networker = HsmEventProcessor(); networker.name = "networker"
       inverter.augment(other=networker, name="net", relationship="mutual")
 
       assert(inverter.net == networker) # will be true
@@ -837,4 +858,112 @@ class Hsm():
       pass
     if( relationship != None and relationship == "mutual"):
       other.augment( other=self, name=self.name, relationship=None )
+
+class InstrumentedHsmEventProcessor(HsmEventProcessor):
+  SPY_RING_BUFFER_SIZE = 500
+  TRC_RING_BUFFER_SIZE = 150
+  RTC_RING_BUFFER_SIZE = 150
+
+  def __init__(self):
+    super().__init__()
+
+    # used by spy/trace
+    self.full  = Attribute()
+    self.rtc   = Attribute()
+
+    # used to build spy
+    self.full.spy = deque(maxlen=HsmEventProcessor.SPY_RING_BUFFER_SIZE)
+
+    # used to build trace
+    self.full.trace = deque(maxlen=HsmEventProcessor.TRC_RING_BUFFER_SIZE)
+    self.init_rtc()
+    self.TraceTuple = namedtuple('TraceTuple',
+                            [ 'datetime',
+                              'start_state',
+                              'signal',
+                              'payload',
+                              'end_state'])
+  def init_rtc(self):
+    self.rtc.spy    = deque(maxlen=HsmEventProcessor.RTC_RING_BUFFER_SIZE)
+    self.rtc.tuples = deque(maxlen=HsmEventProcessor.RTC_RING_BUFFER_SIZE)
+
+  def trace_on_start(fn):
+    def _trace_on_start(self, initial_state):
+      # fn is _spy_on_start
+      status = fn(self, initial_state)
+      if self.rtc.tuples[0].start:
+        t = self.TraceTuple(datetime=datetime.now(),
+             start_state = 'top',
+             signal      = None,
+             payload     = None,
+             end_state   =
+               initial_state(self,
+                 Event(signal=signals.REFLECTION_SIGNAL))
+             )
+        self.full.trace.append(t)
+      return status
+    return _trace_on_start
+
+  def spy_on_start(fn):
+    def _spy_on_start(self, initial_state):
+      self.init_rtc()
+      self.rtc.spy.append("START")
+      sr=SpyTuple(signal="", state="", start=True, hook=False, internal=None)
+      self.rtc.tuples.append(sr)
+      # fn is start_at
+      status = fn(self, initial_state)
+      self.full.spy.extend(self.rtc.spy)
+      return status
+    return _spy_on_start
+
+  @trace_on_start
+  @spy_on_start
+  def start_at(self, initial_state):
+    super().start_at(initial_state)
+
+  def append_to_full_spy(fn):
+    def _append_to_full_spy(self, e):
+      self.rtc.spy = []
+      # fn is dispatch
+      fn(self,e)
+      self.full.spy.extend(self.rtc.spy)
+    return _append_to_full_spy
+
+  def append_to_full_trace(fn):
+    def is_signal_hooked(self):
+      signal_name, hooked = "", False
+      for sr in self.rtc.tuples:
+        if sr.internal == False:
+          signal_name = sr.signal
+          if sr.hook:
+            hooked = True
+            break
+      return (signal_name, hooked)
+
+    def _append_to_full_trace(self, e):
+      start_state = self.state.fun(self,Event(signal=signals.REFLECTION_SIGNAL))
+      # fn is append_to_full_spy
+      fn(self,e)
+      signal, hooked = is_signal_hooked(self)
+      if hooked == False:
+        t = self.TraceTuple(
+              datetime    = datetime.now(),
+              start_state = start_state,
+              signal      = signal,
+              payload     = '',
+              end_state   =
+                self.state.fun(
+                  self,Event(signal=signals.REFLECTION_SIGNAL))
+            )
+        self.full.trace.append(t)
+    return _append_to_full_trace
+
+  @append_to_full_trace
+  @append_to_full_spy
+  def dispatch(self,e):
+    super().dispatch(e)
+
+class Hsm:
+  def __init__(self, *args, **kwargs):
+    pass
 
