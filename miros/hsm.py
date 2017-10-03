@@ -159,12 +159,14 @@ class Attribute():
 class HsmTopologyException(Exception):
   pass
 
+
 class HsmEventProcessor():
   SPY_RING_BUFFER_SIZE = 500
   TRC_RING_BUFFER_SIZE = 150
   RTC_RING_BUFFER_SIZE = 150
 
   def __init__(self):
+    # making the name space common
     '''set initial state of the '''
     # used by the event processor
     self.state = Attribute()
@@ -860,13 +862,15 @@ class HsmEventProcessor():
       other.augment( other=self, name=self.name, relationship=None )
 
 class InstrumentedHsmEventProcessor(HsmEventProcessor):
+  '''
+  
+  '''
   SPY_RING_BUFFER_SIZE = 500
   TRC_RING_BUFFER_SIZE = 150
   RTC_RING_BUFFER_SIZE = 150
 
   def __init__(self):
     super().__init__()
-
     # used by spy/trace
     self.full  = Attribute()
     self.rtc   = Attribute()
@@ -963,7 +967,49 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
   def dispatch(self,e):
     super().dispatch(e)
 
-class Hsm:
-  def __init__(self, *args, **kwargs):
-    pass
+class Hsm(InstrumentedHsmEventProcessor):
+  QUEUE_SIZE = 50
+  def __init__(self,maxlen=QUEUE_SIZE,instrumented=True,priority=1):
+    super().__init__()
+
+    if instrumented:
+      # see what is going on
+      self.instrumented = True
+    else:
+      # run as fast as possible
+      self.instrumented = False
+
+    self.queue       = deque(maxlen = Hsm.QUEUE_SIZE)
+    self.defer_queue = deque(maxlen = Hsm.QUEUE_SIZE)
+
+  def start_at(self, initial_state):
+    if self.instrumented:
+      super().start_at(initial_state)
+    else:
+      HsmEventProcessor.start_at(self, initial_state)
+
+  def dispatch(self,e):
+    if self.instrumented:
+      super().dispatch(e)
+    else:
+      HsmEventProcessor.dispatch(self, e)
+
+  def post_fifo(self, e):
+    self.queue.append(e)
+
+  def post_lifo(self, e):
+    self.queue.appendleft(e)
+
+  def defer(self,e):
+    self.defer_queue.appendleft()
+
+  def recall(self):
+    if(len(self.defer_queue) != 0):
+      e = self.defer_queue.popleft()
+      self.post_fifo(e)
+
+  def next_rtc(self):
+    if(len(self.queue) != 0):
+      event = self.queue.popleft()
+      self.dispatch(self, e=event)
 

@@ -325,7 +325,7 @@ def spy_chart(request):
   del chart
 
 @pytest.mark.init
-def test_init_test_1(spy_chart):
+def test_start_at_test_1(spy_chart):
   chart = spy_chart
   expected_behavior = \
   ['SEARCH_FOR_SUPER_SIGNAL:init_graph_1_d311',
@@ -344,7 +344,7 @@ def test_init_test_1(spy_chart):
   assert(chart.spy_log == expected_behavior)
 
 @pytest.mark.init
-def test_init_test_2(spy_chart):
+def test_start_at_test_2(spy_chart):
   chart = spy_chart
   expected_behavior = \
   ['SEARCH_FOR_SUPER_SIGNAL:init_graph_1_d31',
@@ -364,7 +364,7 @@ def test_init_test_2(spy_chart):
   assert(chart.spy_log == expected_behavior)
 
 @pytest.mark.init
-def test_init_test_3(spy_chart):
+def test_start_at_test_3(spy_chart):
   chart = spy_chart
   expected_behavior = \
   ['SEARCH_FOR_SUPER_SIGNAL:init_graph_1_d1',
@@ -386,13 +386,13 @@ def test_init_test_3(spy_chart):
   assert(chart.spy_log == expected_behavior)
 
 @pytest.mark.init
-def test_impossible_transition_init_test_4(spy_chart):
+def test_impossible_transition_start_at_test_4(spy_chart):
   chart = spy_chart
   with pytest.raises(HsmTopologyException):
     chart.start_at(init_graph_1_d32)
 
 @pytest.mark.init
-def test_impossible_transition_init_test_4(spy_chart):
+def test_impossible_transition_start_at_test_4(spy_chart):
   chart = spy_chart
   expected_behavior = \
   ['SEARCH_FOR_SUPER_SIGNAL:init_graph_2_d1',
