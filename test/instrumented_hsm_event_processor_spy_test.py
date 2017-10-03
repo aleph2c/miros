@@ -1,6 +1,6 @@
 import pytest
 from miros.event import ReturnStatus, signals, Event, return_status
-from miros.hsm   import Hsm, HsmTopologyException, spy_on
+from miros.hsm   import InstrumentedHsmEventProcessor, HsmTopologyException, spy_on
 import pprint
 def pp(item):
   print("")
@@ -26,8 +26,8 @@ signals.append("G")
 
 This is used for testing the type A topology in the trans_ method of the HsmEventProcessor
 class.
-  * test__spy_topology_a_1 (diagram)
-  * test__spy_topology_a_2 (diagram)
+  * test_spy_topology_a_1 (diagram)
+  * test_spy_topology_a_2 (diagram)
 '''
 @spy_on # => ignored by HsmEventProcessor, used by Hsm
 def spy_graph_a1_s1(chart, e):
@@ -58,8 +58,8 @@ def spy_graph_a1_s1(chart, e):
 
 This is used for testing the type B topology in the trans_ method of the HsmEventProcessor
 class.
-  * test__spy_topology_b1_1 - start in graph_b1_s2 (diagram)
-  * test__spy_topology_b1_2 - start in graph_b1_s3 (diagram)
+  * test_spy_topology_b1_1 - start in graph_b1_s2 (diagram)
+  * test_spy_topology_b1_2 - start in graph_b1_s3 (diagram)
 '''
 @spy_on
 def spy_graph_b1_s1(chart, e):
@@ -111,8 +111,8 @@ def spy_graph_b1_s3(chart, e):
 
 This is used for testing the type C topology in the trans_ method of the HsmEventProcessor
 class.
-  * test__spy_topology_c1_1 (diagram - start in graph_c1_s1 )
-  * test__spy_topology_c1_2 (diagram - start in graph_c1_s1 )
+  * test_spy_topology_c1_1 (diagram - start in graph_c1_s1 )
+  * test_spy_topology_c1_2 (diagram - start in graph_c1_s1 )
 '''
 @spy_on
 def spy_graph_c1_s1(chart, e):
@@ -155,8 +155,8 @@ def spy_graph_c1_s2(chart, e):
 
 This is used for testing the type C topology within another state, in the trans_
 method of the HsmEventProcessor class.
-  * test__spy_topology_c2_1 (diagram - start in graph_c2_s2)
-  * test__spy_topology_c2_2 (diagram - start in graph_c2_s3)
+  * test_spy_topology_c2_1 (diagram - start in graph_c2_s2)
+  * test_spy_topology_c2_2 (diagram - start in graph_c2_s3)
 '''
 @spy_on
 def spy_graph_c2_s1(chart, e):
@@ -212,8 +212,8 @@ def spy_graph_c2_s3(chart, e):
 
 This is used for testing the type D topology in the trans_ method of the HsmEventProcessor
 class.
-  * test__spy_topology_d1_1 - start in graph_d1_s2 (diagram)
-  * test__spy_topology_d1_2 - start in graph_d1_s3 (diagram)
+  * test_spy_topology_d1_1 - start in graph_d1_s2 (diagram)
+  * test_spy_topology_d1_2 - start in graph_d1_s3 (diagram)
 '''
 @spy_on
 def spy_graph_d1_s1(chart, e):
@@ -272,12 +272,12 @@ def spy_graph_d1_s3(chart, e):
                      +----------------------------------+
 This is used for testing the type E topology in the tran|_ m|thod of the HsmEventProcessor
 class.
-  * test__spy_topology_e1_1 - start in graph_e1_s5 (diagram - a)
-  * test__spy_topology_e1_2 - start in graph_e1_s5 (diagram - b)
-  * test__spy_topology_e1_3 - start in graph_e1_s5 (diagram - c)
-  * test__spy_topology_e1_3 - start in graph_e1_s5 (diagram - d)
-  * test__spy_topology_e1_4 - start in graph_e1_s5 (diagram - d)
-  * test__spy_topology_e1_5 - start in graph_e1_s5 (diagram - e)
+  * test_spy_topology_e1_1 - start in graph_e1_s5 (diagram - a)
+  * test_spy_topology_e1_2 - start in graph_e1_s5 (diagram - b)
+  * test_spy_topology_e1_3 - start in graph_e1_s5 (diagram - c)
+  * test_spy_topology_e1_3 - start in graph_e1_s5 (diagram - d)
+  * test_spy_topology_e1_4 - start in graph_e1_s5 (diagram - d)
+  * test_spy_topology_e1_5 - start in graph_e1_s5 (diagram - e)
 '''
 @spy_on
 def spy_graph_e1_s1(chart, e):
@@ -372,9 +372,9 @@ def spy_graph_e1_s5(chart, e):
 
 This is used for testing the type E topology in the trans_ method of the HsmEventProcessor
 class.
-  * test__spy_topology_f1_1 - start in graph_f1_s31 (diagram -> a)
-  * test__spy_topology_f1_2 - start in graph_f1_s21 (diagram -> b)
-  * test__spy_topology_f1_3 - start in graph_f1_s0  (diagram -> c)
+  * test_spy_topology_f1_1 - start in graph_f1_s31 (diagram -> a)
+  * test_spy_topology_f1_2 - start in graph_f1_s21 (diagram -> b)
+  * test_spy_topology_f1_3 - start in graph_f1_s0  (diagram -> c)
 '''
 @spy_on
 def spy_graph_f1_s0(chart, e):
@@ -501,10 +501,10 @@ def spy_graph_f1_s321(chart, e):
 
 This is used for testing the type E topology in the trans_ method of the HsmEventProcessor
 class.
-  * test__spy_topology_g1_1 - start in graph_g1_s211 (diagram -> a)
-  * test__spy_topology_g1_2 - start in graph_g1_s211 (diagram -> b)
-  * test__spy_topology_g1_3 - start in graph_g1_s01  (diagram -> a)
-  * test__spy_topology_g1_4 - start in graph_g1_s321 (diagram -> d)
+  * test_spy_topology_g1_1 - start in graph_g1_s211 (diagram -> a)
+  * test_spy_topology_g1_2 - start in graph_g1_s211 (diagram -> b)
+  * test_spy_topology_g1_3 - start in graph_g1_s01  (diagram -> a)
+  * test_spy_topology_g1_4 - start in graph_g1_s321 (diagram -> d)
 '''
 @spy_on
 def spy_graph_g1_s0(chart, e):
@@ -625,7 +625,7 @@ def spy_graph_g1_s321(chart, e):
 
 @pytest.fixture
 def spy_chart(request):
-  chart = Hsm()
+  chart = InstrumentedHsmEventProcessor()
   spy   = []
   chart.augment(other=spy, name="spy")
   signals.append("A")
@@ -641,8 +641,8 @@ def spy_chart(request):
 # grep test name to view diagram
 @pytest.mark.internalspy
 @pytest.mark.topology_a
-def test__spy_topology_a_1():
-  chart = Hsm()
+def test_spy_topology_a_1():
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     [
      'START',
@@ -663,8 +663,8 @@ def test__spy_topology_a_1():
 # grep test name to view diagram
 @pytest.mark.internalspy
 @pytest.mark.topology_a
-def test__spy_topology_a_2():
-  chart = Hsm()
+def test_spy_topology_a_2():
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     [
     'START',
@@ -683,8 +683,8 @@ def test__spy_topology_a_2():
 
 @pytest.mark.internalspy
 @pytest.mark.topology_b
-def test__spy_topology_b1_1(spy_chart):
-  chart = Hsm()
+def test_spy_topology_b1_1(spy_chart):
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_b1_s2',
@@ -706,8 +706,8 @@ def test__spy_topology_b1_1(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.dispatch
-def test__spy_topology_b1_2(spy_chart):
-  chart = Hsm()
+def test_spy_topology_b1_2(spy_chart):
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
    [
    'START',
@@ -733,8 +733,8 @@ def test__spy_topology_b1_2(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_c
-def test__spy_topology_c1_1(spy_chart):
-  chart   = Hsm()
+def test_spy_topology_c1_1(spy_chart):
+  chart   = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_c1_s1',
@@ -753,8 +753,8 @@ def test__spy_topology_c1_1(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_c
-def test__spy_topology_c1_3(spy_chart):
-  chart = Hsm()
+def test_spy_topology_c1_3(spy_chart):
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_c1_s2',
@@ -774,8 +774,8 @@ def test__spy_topology_c1_3(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_c
-def test__spy_topology_c2_1():
-  chart = Hsm()
+def test_spy_topology_c2_1():
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_c2_s2',
@@ -798,8 +798,8 @@ def test__spy_topology_c2_1():
 
 @pytest.mark.internalspy
 @pytest.mark.topology_c
-def test__spy_topology_c2_2(spy_chart):
-  chart   = Hsm()
+def test_spy_topology_c2_2(spy_chart):
+  chart   = InstrumentedHsmEventProcessor()
   expected_behavior = \
   ['START',
    'SEARCH_FOR_SUPER_SIGNAL:spy_graph_c2_s3',
@@ -821,8 +821,8 @@ def test__spy_topology_c2_2(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_d
-def test__spy_topology_d1_1(spy_chart):
-  chart = Hsm()
+def test_spy_topology_d1_1(spy_chart):
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_d1_s2',
@@ -842,8 +842,8 @@ def test__spy_topology_d1_1(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_d
-def test__spy_topology_d1_2(spy_chart):
-  chart = Hsm()
+def test_spy_topology_d1_2(spy_chart):
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_d1_s3',
@@ -866,8 +866,8 @@ def test__spy_topology_d1_2(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_e
-def test__spy_topology_e1_1(spy_chart):
-  chart = Hsm()
+def test_spy_topology_e1_1(spy_chart):
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_e1_s5',
@@ -912,8 +912,8 @@ def test__spy_topology_e1_1(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_e
-def test__spy_topology_e1_2(spy_chart):
-  chart = Hsm()
+def test_spy_topology_e1_2(spy_chart):
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_e1_s5',
@@ -951,8 +951,8 @@ def test__spy_topology_e1_2(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_e
-def test__spy_topology_e1_3(spy_chart):
-  chart = Hsm()
+def test_spy_topology_e1_3(spy_chart):
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_e1_s5',
@@ -984,8 +984,8 @@ def test__spy_topology_e1_3(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_e
-def test__spy_topology_e1_4(spy_chart):
-  chart = Hsm()
+def test_spy_topology_e1_4(spy_chart):
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_e1_s5',
@@ -1020,8 +1020,8 @@ def test__spy_topology_e1_4(spy_chart):
   chart.dispatch(e=event)
   assert(list(chart.full.spy) == expected_behavior)
 
-def test__spy_topology_e1_5(spy_chart):
-  chart = Hsm()
+def test_spy_topology_e1_5(spy_chart):
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_e1_s5',
@@ -1047,8 +1047,8 @@ def test__spy_topology_e1_5(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_f
-def test__spy_topology_f1_1(spy_chart):
-  chart = Hsm()
+def test_spy_topology_f1_1(spy_chart):
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_f1_s31',
@@ -1079,8 +1079,8 @@ def test__spy_topology_f1_1(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_f
-def test__spy_topology_f1_2(spy_chart):
-  chart = Hsm()
+def test_spy_topology_f1_2(spy_chart):
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
    ['START',
    'SEARCH_FOR_SUPER_SIGNAL:spy_graph_f1_s21',
@@ -1107,8 +1107,8 @@ def test__spy_topology_f1_2(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_f
-def test__spy_topology_f1_3(spy_chart):
-  chart = Hsm()
+def test_spy_topology_f1_3(spy_chart):
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_f1_s0',
@@ -1130,7 +1130,7 @@ def test__spy_topology_f1_3(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_g
-def test__spy_topology_g1_1(spy_chart):
+def test_spy_topology_g1_1(spy_chart):
   chart = spy_chart
   expected_behavior = \
     ['START',
@@ -1165,8 +1165,8 @@ def test__spy_topology_g1_1(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_g
-def test__spy_topology_g1_2():
-  chart = Hsm()
+def test_spy_topology_g1_2():
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_g1_s2111',
@@ -1202,8 +1202,8 @@ def test__spy_topology_g1_2():
 
 @pytest.mark.internalspy
 @pytest.mark.topology_g
-def test__spy_topology_g1_3(spy_chart):
-  chart = Hsm()
+def test_spy_topology_g1_3(spy_chart):
+  chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_g1_s01',
@@ -1227,7 +1227,7 @@ def test__spy_topology_g1_3(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_h
-def test__spy_topology_g1_4(spy_chart):
+def test_spy_topology_g1_4(spy_chart):
   chart = spy_chart
   expected_behavior = \
     ['START',

@@ -131,6 +131,7 @@ def spy_on(fn):
       # instead we write the function name as a string
       status = name
       return status
+
     else:
       chart.rtc.spy.append("{}:{}".format(e.signal_name, name))
 
@@ -927,7 +928,7 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
 
   def append_to_full_spy(fn):
     def _append_to_full_spy(self, e):
-      self.rtc.spy = []
+      self.rtc.spy.clear()
       # fn is dispatch
       fn(self,e)
       self.full.spy.extend(self.rtc.spy)
@@ -967,7 +968,7 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
   def dispatch(self,e):
     super().dispatch(e)
 
-class Hsm(InstrumentedHsmEventProcessor):
+class HsmWithQueues(InstrumentedHsmEventProcessor):
   QUEUE_SIZE = 50
   def __init__(self,maxlen=QUEUE_SIZE,instrumented=True,priority=1):
     super().__init__()
@@ -979,14 +980,19 @@ class Hsm(InstrumentedHsmEventProcessor):
       # run as fast as possible
       self.instrumented = False
 
-    self.queue       = deque(maxlen = Hsm.QUEUE_SIZE)
-    self.defer_queue = deque(maxlen = Hsm.QUEUE_SIZE)
+    self.queue       = deque(maxlen = self.__class__.QUEUE_SIZE)
+    self.defer_queue = deque(maxlen = self.__class__.QUEUE_SIZE)
 
   def start_at(self, initial_state):
     if self.instrumented:
       super().start_at(initial_state)
     else:
       HsmEventProcessor.start_at(self, initial_state)
+
+  def current_state(self):
+    if self.instrumented:
+      cs = self.state.fun(self,Event(signals.REFLECTION_SIGNAL))
+      return cs
 
   def dispatch(self,e):
     if self.instrumented:
@@ -1009,7 +1015,28 @@ class Hsm(InstrumentedHsmEventProcessor):
       self.post_fifo(e)
 
   def next_rtc(self):
+    action_taken = True
     if(len(self.queue) != 0):
       event = self.queue.popleft()
-      self.dispatch(self, e=event)
+      self.dispatch(e=event)
+    else:
+      action_taken = False
+    return action_taken
+
+  def complete_circuit(self):
+    action_taken = False
+    while(self.next_rtc()):
+      action_taken = True
+    return action_taken
+
+  def clear_spy(self):
+    if self.instrumented:
+      self.rtc.spy.clear()
+      self.full.spy.clear()
+
+  def clear_trace(self):
+    if self.instrumented:
+      self.full.trace.clear()
+
+
 
