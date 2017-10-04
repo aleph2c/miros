@@ -111,12 +111,31 @@ from   datetime    import datetime
 from   miros.event import signals, return_status, Event
 from   collections import namedtuple, deque
 
-SpyTuple = namedtuple('SpyTuple', ['signal', 'state', 'hook', 'start', 'internal'])
+SpyTuple = namedtuple('SpyTuple', ['signal', 'state', 
+  'hook', 'start', 'internal','post_lifo','post_fifo',
+  'post_defer', 'recall'])
 
+def spy_tuple(signal     = None,
+              state      = None,
+              hook       = False,
+              start      = False,
+              internal   = False,
+              post_lifo  = False,
+              post_fifo  = False,
+              post_defer = False,
+              recall     = False
+              ):
+  return SpyTuple(signal=signal,
+                  state=state,
+                  start=start,
+                  hook=hook,
+                  internal=internal,
+                  post_lifo=post_lifo,
+                  post_fifo=post_fifo,
+                  post_defer=post_defer,
+                  recall=recall)
 def spy_on(fn):
-  '''
-
-  '''
+  '''Instrument a state handling method'''
   def _spy_on(chart, e):
     name = fn.__name__
 
@@ -143,12 +162,11 @@ def spy_on(fn):
         if( status == return_status.HANDLED):
           chart.rtc.spy.pop()
           chart.rtc.spy.append("{}:{}:ULTIMATE_HOOK".format(e.signal_name, name))
-          sr=SpyTuple(signal=e.signal_name, state=name, start=False, hook=True, internal=False)
+          sr=spy_tuple(signal=e.signal_name, state=name, hook=True)
         else:
-          sr=SpyTuple(signal=e.signal_name, state=name, start=False, hook=False, internal=False)
+          sr=spy_tuple(signal=e.signal_name, state=name)
     else:
-      sr=SpyTuple(signal=e.signal_name, state=name, start=False, hook=True, internal=True)
-
+      sr=spy_tuple(signal=e.signal_name, state=name, hook=True, internal=True)
     chart.rtc.tuples.append(sr)
     return status
   return _spy_on
@@ -913,7 +931,8 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
     def _spy_on_start(self, initial_state):
       self.init_rtc()
       self.rtc.spy.append("START")
-      sr=SpyTuple(signal="", state="", start=True, hook=False, internal=None)
+      sr=SpyTuple(signal="", state="", start=True, hook=False, internal=None, \
+          post_lifo=True, post_fifo=False,post_defer=False,recall=False)
       self.rtc.tuples.append(sr)
       # fn is start_at
       status = fn(self, initial_state)
@@ -1031,12 +1050,29 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
 
   def clear_spy(self):
     if self.instrumented:
-      self.rtc.spy.clear()
       self.full.spy.clear()
 
   def clear_trace(self):
     if self.instrumented:
       self.full.trace.clear()
 
+  def trace(self):
+    '''Output state transition information only:
 
+    Example:
+    print(chart.trace())
+      05:23:25.314420 [c] None: top->hsm_queues_graph_g1_s22
+      05:23:25.314420 [c] D: hsm_queues_graph_g1_s22->hsm_queues_graph_g1_s1
+      05:23:25.314420 [c] E: hsm_queues_graph_g1_s1->hsm_queues_graph_g1_s01
+      05:23:25.314420 [c] F: hsm_queues_graph_g1_s01->hsm_queues_graph_g1_s2111
+      05:23:25.314420 [c] A: hsm_queues_graph_g1_s2111->hsm_queues_graph_g1_s321
+    '''
+    strace = "\n"
+    for tr in self.full.trace:
+      strace += "{} [c] {}: {}->{}\n".format(
+        datetime.strftime(tr.datetime, "%H:%M:%S.%f"), 
+        tr.signal, 
+        tr.start_state,
+        tr.end_state)
+    return strace
 

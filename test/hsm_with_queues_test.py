@@ -309,3 +309,15 @@ def test_hsm_complete_circuit():
      'ENTRY_SIGNAL:hsm_queues_graph_g1_s32',                         
      'ENTRY_SIGNAL:hsm_queues_graph_g1_s321',                        
      'INIT_SIGNAL:hsm_queues_graph_g1_s321'] )
+
+
+@pytest.mark.topology_g
+@pytest.mark.topology_h
+@pytest.mark.rtc
+def test_hsm_trace_output():
+  chart = HsmWithQueues(instrumented=True)
+  chart.start_at(hsm_queues_graph_g1_s22)
+  chart.complete_circuit()
+  print(chart.trace())
+  
+
