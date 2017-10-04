@@ -13,7 +13,7 @@ To define an HsmEventProcessor, you would create a number of methods outside of 
 then inject them into the HsmEventProcessor, by calling the 'start_at' method.
 
 Example:
-    
+
 
                        +------- graph_b1_s1 -----s-----+
                        |  +---- graph_b1_s2 -----t-+   |
@@ -68,7 +68,7 @@ Example:
     else:
       status, chart.temp.fun = return_status.SUPER, graph_b1_s2
     return status
-  
+
   # 3) Create an HsmEventProcessor, in this case we make one that is instrumented (a bit
   # slower than a plain HsmEventProcessor, but we can use it to see what happened)
   chart = InstrumentedHsmEventProcessor()
@@ -83,7 +83,7 @@ Example:
   import pprint
   def pp(item):
     pprint.pprint(item)
-  pp(chart.full.spy) 
+  pp(chart.full.spy)
                      # ['START',
                      #  'SEARCH_FOR_SUPER_SIGNAL:graph_b1_s2',
                      #  'SEARCH_FOR_SUPER_SIGNAL:graph_b1_s1',
@@ -111,7 +111,7 @@ from   datetime    import datetime
 from   miros.event import signals, return_status, Event
 from   collections import namedtuple, deque
 
-SpyTuple = namedtuple('SpyTuple', ['signal', 'state', 
+SpyTuple = namedtuple('SpyTuple', ['signal', 'state',
   'hook', 'start', 'internal','post_lifo','post_fifo',
   'post_defer', 'recall'])
 
@@ -882,7 +882,7 @@ class HsmEventProcessor():
 
 class InstrumentedHsmEventProcessor(HsmEventProcessor):
   '''
-  
+
   '''
   SPY_RING_BUFFER_SIZE = 500
   TRC_RING_BUFFER_SIZE = 150
@@ -1056,8 +1056,8 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     return _append_defer_to_spy
 
   def append_recall_to_spy(fn):
-    def _append_recall_to_spy(self, e):
-      e = fn(self,e)
+    def _append_recall_to_spy(self):
+      e = fn(self)
       if e is not None and self.instrumented:
         self.rtc.tuples.append(spy_tuple(signal=e.signal,recall=True))
         self.rtc.spy.append("RECALL:{}".format(e.signal_name))
@@ -1082,7 +1082,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
 
   @append_defer_to_spy
   def defer(self,e):
-    self.defer_queue.appendleft()
+    self.defer_queue.append(e)
 
   @append_recall_to_spy
   def recall(self):
@@ -1094,19 +1094,19 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
 
   @append_queue_reflection_to_spy
   def next_rtc(self):
+    self.rtc.spy.clear()
     action_taken = True
     if(len(self.queue) != 0):
       event = self.queue.popleft()
       self.dispatch(e=event)
     else:
       action_taken = False
-      self.rtc.spy.clear()
     return action_taken
 
   def complete_circuit(self):
     action_taken = False
-    while(self.next_rtc()):
-      action_taken = True
+    while(len(self.queue)!= 0):
+      action_taken = self.next_rtc()
     return action_taken
 
   def clear_spy(self):
@@ -1131,8 +1131,8 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     strace = "\n"
     for tr in self.full.trace:
       strace += "{} [c] {}: {}->{}\n".format(
-        datetime.strftime(tr.datetime, "%H:%M:%S.%f"), 
-        tr.signal, 
+        datetime.strftime(tr.datetime, "%H:%M:%S.%f"),
+        tr.signal,
         tr.start_state,
         tr.end_state)
     return strace
