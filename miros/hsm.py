@@ -182,7 +182,7 @@ class HsmTopologyException(Exception):
 class HsmEventProcessor():
   SPY_RING_BUFFER_SIZE = 500
   TRC_RING_BUFFER_SIZE = 150
-  RTC_RING_BUFFER_SIZE = 150
+  RTC_RING_BUFFER_SIZE = 250
 
   def __init__(self):
     # making the name space common
@@ -886,7 +886,7 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
   '''
   SPY_RING_BUFFER_SIZE = 500
   TRC_RING_BUFFER_SIZE = 150
-  RTC_RING_BUFFER_SIZE = 150
+  RTC_RING_BUFFER_SIZE = 250
 
   def __init__(self):
     super().__init__()
@@ -1002,6 +1002,15 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     self.queue       = deque(maxlen = self.__class__.QUEUE_SIZE)
     self.defer_queue = deque(maxlen = self.__class__.QUEUE_SIZE)
 
+  def append_queue_reflection_after_start(fn):
+    def _append_queue_reflection_after_start(self,initial_state):
+      result = fn(self,initial_state)
+      self.rtc.spy.append(self.queue_reflection())
+      self.full.spy.append(self.queue_reflection())
+      return result
+    return _append_queue_reflection_after_start
+
+  @append_queue_reflection_after_start
   def start_at(self, initial_state):
     if self.instrumented:
       super().start_at(initial_state)
@@ -1019,20 +1028,71 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     else:
       HsmEventProcessor.dispatch(self, e)
 
+  def queue_reflection(self):
+    return "<- Queued:({}) Deferred:({})".format(len(self.queue),len(self.defer_queue))
+
+  def append_fifo_to_spy(fn):
+    def _append_fifo_to_spy(self, e):
+      fn(self,e)
+      if self.instrumented:
+        self.rtc.tuples.append(spy_tuple(signal=e.signal,post_fifo=True))
+        self.rtc.spy.append("POST_FIFO:{}".format(e.signal_name))
+    return _append_fifo_to_spy
+
+  def append_lifo_to_spy(fn):
+    def _append_lifo_to_spy(self, e):
+      fn(self,e)
+      if self.instrumented:
+        self.rtc.tuples.append(spy_tuple(signal=e.signal,post_lifo=True))
+        self.rtc.spy.append("POST_LIFO:{}".format(e.signal_name))
+    return _append_lifo_to_spy
+
+  def append_defer_to_spy(fn):
+    def _append_defer_to_spy(self, e):
+      fn(self,e)
+      if self.instrumented:
+        self.rtc.tuples.append(spy_tuple(signal=e.signal,post_defer=True))
+        self.rtc.spy.append("POST_DEFER:{}".format(e.signal_name))
+    return _append_defer_to_spy
+
+  def append_recall_to_spy(fn):
+    def _append_recall_to_spy(self, e):
+      e = fn(self,e)
+      if e is not None and self.instrumented:
+        self.rtc.tuples.append(spy_tuple(signal=e.signal,recall=True))
+        self.rtc.spy.append("RECALL:{}".format(e.signal_name))
+    return _append_recall_to_spy
+
+  def append_queue_reflection_to_spy(fn):
+    def _append_queue_reflection_to_spy(self):
+      result = fn(self)
+      if self.instrumented:
+        self.rtc.spy.append(self.queue_reflection())
+        self.full.spy.append(self.queue_reflection())
+      return result
+    return _append_queue_reflection_to_spy
+
+  @append_fifo_to_spy
   def post_fifo(self, e):
     self.queue.append(e)
 
+  @append_lifo_to_spy
   def post_lifo(self, e):
     self.queue.appendleft(e)
 
+  @append_defer_to_spy
   def defer(self,e):
     self.defer_queue.appendleft()
 
+  @append_recall_to_spy
   def recall(self):
+    e = None
     if(len(self.defer_queue) != 0):
       e = self.defer_queue.popleft()
       self.post_fifo(e)
+    return e
 
+  @append_queue_reflection_to_spy
   def next_rtc(self):
     action_taken = True
     if(len(self.queue) != 0):
@@ -1040,6 +1100,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       self.dispatch(e=event)
     else:
       action_taken = False
+      self.rtc.spy.clear()
     return action_taken
 
   def complete_circuit(self):
@@ -1076,3 +1137,8 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
         tr.end_state)
     return strace
 
+  def spy_rtc(self):
+    return list(self.rtc.spy)
+
+  def spy_full(self):
+    return list(self.full.spy)
