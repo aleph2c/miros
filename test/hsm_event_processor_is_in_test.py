@@ -1,6 +1,6 @@
 import pytest
 import traceback
-from miros.event import ReturnStatus, signals, Event, return_status
+from miros.event import ReturnStatus, Signal, signals, Event, return_status
 from miros.hsm   import HsmEventProcessor, HsmTopologyException
 import pprint
 def pp(item):
@@ -157,12 +157,12 @@ def spy_chart(request):
   chart = HsmEventProcessor()
   spy   = []
   chart.augment(other=spy, name="spy_log")
-  signals.append("A")
-  signals.append("B")
-  signals.append("C")
-  signals.append("D")
-  signals.append("E")
-  signals.append("F")
+  Signal().append("A")
+  Signal().append("B")
+  Signal().append("C")
+  Signal().append("D")
+  Signal().append("E")
+  Signal().append("F")
   yield chart
   del spy
   del chart

@@ -21,11 +21,11 @@ def test_signal():
   assert(signals['BAKE'] == 6)
 
 def test_signal():
-  signals = Signal()
+  signals = SignalSource()
   assert(signals.ENTRY_SIGNAL == 1)
   assert(signals.REFLECTION_SIGNAL == 4)
   signals.append('BAKE')
-  assert(signals.BAKE == 6)
+  assert(signals.BAKE >= 6)
   assert(signals.is_inner_signal(1) == True)
   assert(signals.is_inner_signal(5) == True)
   assert(signals.is_inner_signal(6) == False)
@@ -35,7 +35,7 @@ def test_signal():
   assert(signals.is_inner_signal('NOT_THERE') == False)
 
 def test_event():
-  signals = Signal()
+  signals = SignalSource()
   event   = Event(signal=signals.ENTRY_SIGNAL)
   assert(event.signal == 1)
   assert(event.signal_name == "ENTRY_SIGNAL")
@@ -45,7 +45,7 @@ def test_event():
 
 def test_signal_singletons():
   '''The signals object from the event.py class is the growing signals enumeration'''
-  local_signals = Signal()
+  local_signals = SignalSource()
   e = Event(signal = "MARY")
   assert(e.signal_name == "MARY")
   assert(signals.MARY > local_signals.REFLECTION_SIGNAL)

@@ -1,6 +1,6 @@
 import pytest
 import traceback
-from miros.event import ReturnStatus, signals, Event, return_status
+from miros.event import ReturnStatus, Signal, signals, Event, return_status
 from miros.hsm   import HsmEventProcessor, HsmTopologyException
 import pprint
 def pp(item):

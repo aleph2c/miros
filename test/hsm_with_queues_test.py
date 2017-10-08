@@ -1,18 +1,18 @@
 import pytest
 import traceback
-from miros.event import ReturnStatus, signals, Event, return_status
+from miros.event import ReturnStatus, Signal, signals, Event, return_status
 from miros.hsm   import HsmWithQueues, HsmTopologyException, spy_on
 import pprint
 def pp(item):
   print("")
   pprint.pprint(item)
 
-signals.append("A")
-signals.append("B")
-signals.append("C")
-signals.append("D")
-signals.append("E")
-signals.append("F")
+Signal().append("A")
+Signal().append("B")
+Signal().append("C")
+Signal().append("D")
+Signal().append("E")
+Signal().append("F")
 
 ################################################################################
 #                            HsmQueues Graph G1                                #
