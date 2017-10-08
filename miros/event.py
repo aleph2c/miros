@@ -1,4 +1,5 @@
 from collections import OrderedDict, namedtuple
+from miros.singletlon import SingletonDecorator
 
 # Not intended for export
 class OrderedDictWithParams(OrderedDict):
@@ -41,7 +42,7 @@ class OrderedDictWithParams(OrderedDict):
       exec("{0}.{1} = property(lambda self: self['{1}'])".format(self.__class__.__name__,string))
 
 # Not intended for export
-class ReturnStatus(OrderedDictWithParams):
+class ReturnStatusSource(OrderedDictWithParams):
 
   '''
   A class which contains all of the state returns codes
@@ -84,7 +85,7 @@ class ReturnStatus(OrderedDictWithParams):
     self.write_keys_to_attributes()
 
 # Not intended for export
-class Signal(OrderedDictWithParams):
+class SignalSource(OrderedDictWithParams):
   '''
   A class which contains all of the state signal types
 
@@ -135,10 +136,14 @@ class Signal(OrderedDictWithParams):
 Defining the signals used by this package and all of the packages that reference
 it.  Think of this as a singleton or a growing enumeration.
 '''
+# Signal is a singleton
+Signal = SingletonDecorator(SignalSource)
 signals_exist = 'signals' in locals()
 if signals_exist == False:
   signals = Signal()
 
+# ReturnStatus is a singleton
+ReturnStatus = SingletonDecorator(ReturnStatusSource)
 return_status_exist = 'return_status' in locals()
 if return_status_exist == False:
   return_status = ReturnStatus()
