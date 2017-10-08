@@ -136,7 +136,13 @@ def spy_tuple(signal     = None,
                   recall=recall)
 def spy_on(fn):
   '''Instrument a state handling method'''
-  def _spy_on(chart, e):
+  def _spy_on(chart, *args):
+
+    if len(args) == 1:
+      e = args[0]
+    else:
+      e = args[-1]
+
     name = fn.__name__
 
     # if the chart is not instrumented, don't try to wrap it
@@ -201,7 +207,7 @@ class HsmEventProcessor():
     self.temp.fun  = initial_state
     self.init()
 
-  def top(self, chart, e):
+  def top(self, *args):
     '''top most state given to all HSM; treat it as an outside function'''
     status = return_status.IGNORED
     return status
@@ -228,7 +234,6 @@ class HsmEventProcessor():
 
     e = Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL)
     tpath, outermost, max_index = [None], self.state.fun, 0
-    assert(self.temp.fun != None and outermost == self.top)
 
     # We will continue searching the chart until it stops requesting transitions
     while(True): # outer while
@@ -988,6 +993,7 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
     super().dispatch(e)
 
 class HsmWithQueues(InstrumentedHsmEventProcessor):
+  '''An Hsm that can post to itself and run to complete on each all of next_rtc.'''
   QUEUE_SIZE = 50
   def __init__(self,maxlen=QUEUE_SIZE,instrumented=True,priority=1):
     super().__init__()
@@ -1142,3 +1148,31 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
 
   def spy_full(self):
     return list(self.full.spy)
+
+class Hsm(HsmWithQueues):
+  '''A HsmWithQueues with a stolen top state'''
+  def __init__(self,instrumented=True):
+    super().__init__(instrumented)
+
+  def start_at(self, initial_state):
+    '''
+    hsm = Hsm()
+    # build it
+    hsm.start(<starting_state_function>)
+    '''
+    self.state.fun = self.__top__
+    self.temp.fun  = initial_state
+    self.init()
+
+  @spy_on
+  def top(self, *args):
+    '''we steal the top state so that we can add things to it'''
+    status, self.temp.fun = return_status.SUPER, self.__top__
+    return status
+
+  # don't spy on this
+  def __top__(self, *args):
+    '''top most state given to all HSM; treat it as an outside function'''
+    status = return_status.IGNORED
+    return status
+
