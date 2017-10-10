@@ -15,45 +15,115 @@ Signal().append("E")
 Signal().append("F")
 Signal().append("G")
 
+@pytest.mark.pubsub
 def test_active_fabric_singleton():
   af1 = ActiveFabric()
   af2 = ActiveFabric()
-  assert(id(af1)== id(af2)) 
+  assert(id(af1)== id(af2))
 
+# Confirm that we can start and stop the active fabric, otherwise we can't test
+# this system
 @pytest.mark.pubsub
-def test_turn_off_and_on_fabric(): 
+def test_turn_off_and_on_fabric():
   af1 = ActiveFabric()
   af1.start()
-  assert(af1.thread.is_alive() == True)
+  assert(af1.fifo_thread.is_alive() == True)
+  assert(af1.lifo_thread.is_alive() == True)
   af1.stop()
-  assert(af1.thread.is_alive() == False)
+  assert(af1.fifo_thread.is_alive() == False)
+  assert(af1.lifo_thread.is_alive() == False)
   af1.start()
-  assert(af1.thread.is_alive() == True)
+  assert(af1.fifo_thread.is_alive() == True)
+  assert(af1.lifo_thread.is_alive() == True)
   af1.stop()
-  assert(af1.thread.is_alive() == False)
+  assert(af1.fifo_thread.is_alive() == False)
+  assert(af1.lifo_thread.is_alive() == False)
+
+# Confirm that we can clear the active fabric, otherwise we can't test the
+# system
+@pytest.mark.pubsub
+def test_clear_feature():
+  af1 = ActiveFabric()
+  event_a = Event(signal=signals.A)
+  event_b = Event(signal=signals.B)
+  event_c = Event(signal=signals.C)
+  input_queue_1 = deque(maxlen=5)
+  input_queue_2 = deque(maxlen=5)
+  af1.subscribe(input_queue_1, event_a)
+  af1.subscribe(input_queue_1, event_b)
+  af1.subscribe(input_queue_1, event_a)
+  af1.subscribe(input_queue_1, event_b)
+  af1.subscribe(input_queue_1, event_c)
+  af1.subscribe(input_queue_1, event_c)
+  af1.start()
+  af1.stop()
+  af1.clear()
+  assert(af1.fifo_fabric_queue.empty() == True)
+  assert(af1.lifo_fabric_queue.empty() == True)
+  assert(af1.lifo_subscriptions == {})
+  assert(af1.fifo_subscriptions == {})
+
+# Ensure that all tests stop the active fabric when they are done, otherwise it
+# could hang all of our tests
+@pytest.fixture
+def fabric_fixture(request):
+  yield
+  ActiveFabric().stop()
+  ActiveFabric().clear()
 
 @pytest.mark.pubsub
-def test_publish_subscribe():
+def test_simple_publish_subscribe(fabric_fixture):
   input_queue_1 = deque(maxlen=5)
-  print(id(input_queue_1))
   event_a = Event(signal=signals.A)
   af = ActiveFabric()
   af.subscribe(input_queue_1, event_a)
   af.start()
   af.publish(event_a)
-  time.sleep(0.01)
-  af.stop()
+  time.sleep(0.10)
   assert(len(input_queue_1) == 1)
-  assert(input_queue_1.pop().signal_name == 'A')
-  #assert(af.fifo_fabric_queue.qsize() == 2)
-  #af.start()
-  #assert(af.fifo_fabric_queue.qsize() == 0)
-  #assert(len(input_queue_1) == 2)
-  #assert(len(input_queue_2) == 1)
-  af.stop()
-#def test_subscribe():
-#  af = ActiveFabric()
-#  dq = deque(maxlen = 150)
-#
-#  af.subscribe(queue=dq,event=Event(signal=signals.A),type='fifo')
-#  af.subscribe(queue=dq,event=Event(signal=signals.A),type='lifo')
+
+@pytest.mark.pubsub
+def test_multi_subscribe(fabric_fixture):
+  input_queue_1 = deque(maxlen=5)
+  input_queue_2 = deque(maxlen=5)
+  event_a = Event(signal=signals.A)
+
+  af = ActiveFabric()
+  af.subscribe(input_queue_1, event_a)
+  af.subscribe(input_queue_2, event_a)
+
+  af.start()
+  af.publish(event_a)
+  assert(af.fifo_thread.is_alive() == True )
+  assert(af.lifo_thread.is_alive() == True )
+  time.sleep(0.50)
+  assert(len(input_queue_1) == 1)
+  assert(len(input_queue_2) == 1)
+
+@pytest.mark.pubsub
+def test_repeat_publish_subscribe(fabric_fixture):
+  input_queue_1 = deque(maxlen=5)
+  event_a = Event(signal=signals.A)
+  af = ActiveFabric()
+  af.subscribe(input_queue_1, event_a)
+  af.subscribe(input_queue_1, event_a)
+  af.start()
+  af.publish(event_a)
+  time.sleep(0.50)
+  assert(len(input_queue_1) == 1)
+
+
+@pytest.mark.pubsub
+def test_subscribe_lilo(fabric_fixture):
+  input_queue_1 = deque(maxlen=5)
+  input_queue_2 = deque(maxlen=5)
+  event_a = Event(signal=signals.A)
+  event_b = Event(signal=signals.B)
+  #input_queue_1.append(event_b)
+
+  af = ActiveFabric()
+  af.subscribe(input_queue_1, event_a, queue_type='lifo')
+  af.start()
+  af.publish(event_a)
+  time.sleep(0.11)
+  assert(len(input_queue_1) == 1)

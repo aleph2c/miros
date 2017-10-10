@@ -184,7 +184,6 @@ class Attribute():
 class HsmTopologyException(Exception):
   pass
 
-
 class HsmEventProcessor():
   SPY_RING_BUFFER_SIZE = 500
   TRC_RING_BUFFER_SIZE = 150
