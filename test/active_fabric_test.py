@@ -63,23 +63,24 @@ def test_clear_feature():
   assert(af1.lifo_subscriptions == {})
   assert(af1.fifo_subscriptions == {})
 
-# Ensure that all tests stop the active fabric when they are done, otherwise it
-# could hang all of our tests
 @pytest.fixture
 def fabric_fixture(request):
   yield
+  # shut down the active fabric for the next test
   ActiveFabric().stop()
   ActiveFabric().clear()
 
 @pytest.mark.pubsub
 def test_simple_publish_subscribe(fabric_fixture):
   input_queue_1 = deque(maxlen=5)
-  event_a = Event(signal=signals.A)
-  af = ActiveFabric()
+  event_a       = Event(signal=signals.A)
+  af            = ActiveFabric()
+
   af.subscribe(input_queue_1, event_a)
   af.start()
   af.publish(event_a)
   time.sleep(0.10)
+
   assert(len(input_queue_1) == 1)
 
 @pytest.mark.pubsub
@@ -88,15 +89,14 @@ def test_multi_subscribe(fabric_fixture):
   input_queue_2 = deque(maxlen=5)
   event_a = Event(signal=signals.A)
 
+  # set two different queues to subscribe to one event
   af = ActiveFabric()
   af.subscribe(input_queue_1, event_a)
   af.subscribe(input_queue_2, event_a)
 
   af.start()
   af.publish(event_a)
-  assert(af.fifo_thread.is_alive() == True )
-  assert(af.lifo_thread.is_alive() == True )
-  time.sleep(0.50)
+  time.sleep(0.10)
   assert(len(input_queue_1) == 1)
   assert(len(input_queue_2) == 1)
 
@@ -104,26 +104,42 @@ def test_multi_subscribe(fabric_fixture):
 def test_repeat_publish_subscribe(fabric_fixture):
   input_queue_1 = deque(maxlen=5)
   event_a = Event(signal=signals.A)
+
   af = ActiveFabric()
   af.subscribe(input_queue_1, event_a)
   af.subscribe(input_queue_1, event_a)
+
+  # If you subscribe twice using the same queue with the same event signal_name
+  # then we should.
   af.start()
   af.publish(event_a)
-  time.sleep(0.50)
+  time.sleep(0.10)
   assert(len(input_queue_1) == 1)
-
 
 @pytest.mark.pubsub
 def test_subscribe_lilo(fabric_fixture):
   input_queue_1 = deque(maxlen=5)
-  input_queue_2 = deque(maxlen=5)
-  event_a = Event(signal=signals.A)
-  event_b = Event(signal=signals.B)
-  #input_queue_1.append(event_b)
-
+  event_a       = Event(signal=signals.A)
+  event_b       = Event(signal=signals.B)
+  input_queue_1.append(event_b)
   af = ActiveFabric()
   af.subscribe(input_queue_1, event_a, queue_type='lifo')
+  af.subscribe(input_queue_1, event_b, queue_type='lifo')
   af.start()
   af.publish(event_a)
   time.sleep(0.11)
+  assert(len(input_queue_1) == 2)
+  popped_event = input_queue_1.pop()
+  assert(popped_event.signal_name == 'A')
   assert(len(input_queue_1) == 1)
+  popped_event = input_queue_1.pop()
+  assert(popped_event.signal_name == 'B')
+  af.publish(event_a)
+  af.publish(event_b)
+  time.sleep(0.11)
+  popped_event = input_queue_1.pop()
+  assert(popped_event.signal_name == 'B')
+  assert(len(input_queue_1) == 1)
+  popped_event = input_queue_1.pop()
+  assert(popped_event.signal_name == 'A')
+  assert(len(input_queue_1) == 0)
