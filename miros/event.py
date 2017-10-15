@@ -27,6 +27,7 @@ class OrderedDictWithParams(OrderedDict):
   the enums are wrapped up within an OrderedDict, so you get all of it's methods
   as well as the clean interface to the attribute.
   '''
+
   def write_keys_to_attributes(self):
     #for dictionary in initial_data:
     #  for key in dictionary:

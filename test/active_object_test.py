@@ -1,6 +1,7 @@
 import pytest
 from miros.event import ReturnStatus, Signal, signals, Event, return_status
 from miros.activeobject import ActiveObject, spy_on, HsmTopologyException, ActiveFabric
+from miros.activeobject import LockingDeque
 
 import pprint
 def pp(item):
@@ -13,6 +14,7 @@ Signal().append("C")
 Signal().append("D")
 Signal().append("E")
 Signal().append("F")
+
 ################################################################################
 #                          ActiveObject Graph G1                               #
 ################################################################################
@@ -57,7 +59,7 @@ def g1_s0_active_objects_graph(chart, e):
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.F):
-    status = chart.trans(active_objects_graph_g1_s2111)
+    status = chart.trans(g1_s2111_active_objects_graph)
   else:
     status, chart.temp.fun = return_status.SUPER, chart.top
   return status
@@ -73,9 +75,9 @@ def g1_s01_active_objects_graph(chart, e):
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.C):
-    status = chart.trans(active_objects_graph_g1_s22)
+    status = chart.trans(g1_s22_active_objects_graph)
   else:
-    status, chart.temp.fun = return_status.SUPER, active_objects_graph_g1_s0
+    status, chart.temp.fun = return_status.SUPER, g1_s0_active_objects_graph
   return status
 
 @spy_on
@@ -89,9 +91,9 @@ def g1_s1_active_objects_graph(chart, e):
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.F):
-    status = chart.trans(active_objects_graph_g1_s321)
+    status = chart.trans(g1_s321_active_objects_graph)
   elif(e.signal == signals.E):
-    status = chart.trans(active_objects_graph_g1_s01)
+    status = chart.trans(g1_s01_active_objects_graph)
   else:
     status, chart.temp.fun = return_status.SUPER, chart.top
   return status
@@ -104,9 +106,9 @@ def g1_s21_active_objects_graph(chart, e):
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.B):
-    status = chart.trans(active_objects_graph_g1_s321)
+    status = chart.trans(g1_s321_active_objects_graph)
   else:
-    status, chart.temp.fun = return_status.SUPER, active_objects_graph_g1_s1
+    status, chart.temp.fun = return_status.SUPER, g1_s1_active_objects_graph
   return status
 
 @spy_on
@@ -117,7 +119,7 @@ def g1_s211_active_objects_graph(chart, e):
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   else:
-    status, chart.temp.fun = return_status.SUPER, active_objects_graph_g1_s21
+    status, chart.temp.fun = return_status.SUPER, g1_s21_active_objects_graph
   return status
 
 @spy_on
@@ -128,9 +130,9 @@ def g1_s2111_active_objects_graph(chart, e):
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.A):
-    status = chart.trans(active_objects_graph_g1_s321)
+    status = chart.trans(g1_s321_active_objects_graph)
   else:
-    status, chart.temp.fun = return_status.SUPER, active_objects_graph_g1_s211
+    status, chart.temp.fun = return_status.SUPER, g1_s211_active_objects_graph
   return status
 
 @spy_on
@@ -143,9 +145,9 @@ def g1_s22_active_objects_graph(chart, e):
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.D):
-    status = chart.trans(active_objects_graph_g1_s1)
+    status = chart.trans(g1_s1_active_objects_graph)
   else:
-    status, chart.temp.fun = return_status.SUPER, active_objects_graph_g1_s1
+    status, chart.temp.fun = return_status.SUPER, g1_s1_active_objects_graph
   return status
 
 @spy_on
@@ -159,7 +161,7 @@ def g1_s3_active_objects_graph(chart, e):
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   else:
-    status, chart.temp.fun = return_status.SUPER, active_objects_graph_g1_s22
+    status, chart.temp.fun = return_status.SUPER, g1_s22_active_objects_graph
   return status
 
 @spy_on
@@ -170,7 +172,7 @@ def g1_s32_active_objects_graph(chart, e):
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   else:
-    status, chart.temp.fun = return_status.SUPER, active_objects_graph_g1_s3
+    status, chart.temp.fun = return_status.SUPER, g1_s3_active_objects_graph
   return status
 
 @spy_on
@@ -181,26 +183,108 @@ def g1_s321_active_objects_graph(chart, e):
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   else:
-    status, chart.temp.fun = return_status.SUPER, active_objects_graph_g1_s32
+    status, chart.temp.fun = return_status.SUPER, g1_s32_active_objects_graph
   return status
 
 @pytest.fixture
-def fabric(request):
-  yield None
-  print("turning off test")
-  #af = ActiveFabric()
-  #af.clear()
+def fabric_fixture(request):
+  yield
+  # shut down the active fabric for the next test
+  ActiveFabric().stop()
+  ActiveFabric().clear()
 
 @pytest.mark.ao
-def test_import(fabric):
-  pass
-  #ao = ActiveObject()
-  #assert(ao != None)
+def test_import(fabric_fixture):
+  ao = ActiveObject()
+  assert(ao != None)
 
 @pytest.mark.ao
-def test_start_state(fabric):
-  pass
-  #ao = ActiveObject()
-  #ao.start_at(g1_s1_active_objects_graph)
-  #pp(ao.spy_rtc())
+def test_start_stop(fabric_fixture):
+  ao = ActiveObject()
+  ao.start_at(g1_s22_active_objects_graph)
+  assert(ao.thread.is_alive() == True)
+  ao.stop()
+  assert( ao.spy_full() == \
+    ['START',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s22_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s1_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:top',
+     'ENTRY_SIGNAL:top',
+     'ENTRY_SIGNAL:g1_s1_active_objects_graph',
+     'ENTRY_SIGNAL:g1_s22_active_objects_graph',
+     'INIT_SIGNAL:g1_s22_active_objects_graph',
+     'POST_FIFO:D',
+     'D:g1_s22_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s1_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s22_active_objects_graph',
+     'EXIT_SIGNAL:g1_s22_active_objects_graph',
+     'INIT_SIGNAL:g1_s1_active_objects_graph',
+     'POST_FIFO:E',
+     '<- Queued:(1) Deferred:(0)',
+     'E:g1_s1_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s01_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s1_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s0_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:top',
+     'EXIT_SIGNAL:g1_s1_active_objects_graph',
+     'ENTRY_SIGNAL:g1_s0_active_objects_graph',
+     'ENTRY_SIGNAL:g1_s01_active_objects_graph',
+     'POST_FIFO:A',
+     'POST_LIFO:F',
+     'INIT_SIGNAL:g1_s01_active_objects_graph',
+     '<- Queued:(2) Deferred:(0)',
+     'F:g1_s01_active_objects_graph',
+     'F:g1_s0_active_objects_graph',
+     'EXIT_SIGNAL:g1_s01_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s01_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s2111_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s0_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s211_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s21_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s1_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:top',
+     'EXIT_SIGNAL:g1_s0_active_objects_graph',
+     'ENTRY_SIGNAL:g1_s1_active_objects_graph',
+     'ENTRY_SIGNAL:g1_s21_active_objects_graph',
+     'ENTRY_SIGNAL:g1_s211_active_objects_graph',
+     'ENTRY_SIGNAL:g1_s2111_active_objects_graph',
+     'INIT_SIGNAL:g1_s2111_active_objects_graph',
+     '<- Queued:(1) Deferred:(0)',
+     'A:g1_s2111_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s321_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s2111_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s32_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s3_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s22_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s1_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:top',
+     'EXIT_SIGNAL:g1_s2111_active_objects_graph',
+     'EXIT_SIGNAL:g1_s211_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s211_active_objects_graph',
+     'EXIT_SIGNAL:g1_s21_active_objects_graph',
+     'SEARCH_FOR_SUPER_SIGNAL:g1_s21_active_objects_graph',
+     'ENTRY_SIGNAL:g1_s22_active_objects_graph',
+     'ENTRY_SIGNAL:g1_s3_active_objects_graph',
+     'ENTRY_SIGNAL:g1_s32_active_objects_graph',
+     'ENTRY_SIGNAL:g1_s321_active_objects_graph',
+     'INIT_SIGNAL:g1_s321_active_objects_graph',
+     '<- Queued:(0) Deferred:(0)',
+     'stop_active_object:g1_s321_active_objects_graph',
+     'stop_active_object:g1_s32_active_objects_graph',
+     'stop_active_object:g1_s3_active_objects_graph',
+     'stop_active_object:g1_s22_active_objects_graph',
+     'stop_active_object:g1_s1_active_objects_graph',
+     'stop_active_object:top',
+     '<- Queued:(0) Deferred:(0)']
+     )
+  ao.clear_spy()
+  assert(ao.spy_full() == [])
 
+@pytest.mark.ao
+def test_start_stop(fabric_fixture):
+  ao = ActiveObject()
+  ao.start_at(g1_s22_active_objects_graph)
+  assert(ao.thread.is_alive() == True)
+  ao.stop()
+  print(ao.trace())
+  #pp(ao.spy_full())
