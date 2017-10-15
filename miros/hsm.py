@@ -134,6 +134,7 @@ def spy_tuple(signal     = None,
                   post_fifo=post_fifo,
                   post_defer=post_defer,
                   recall=recall)
+
 def spy_on(fn):
   '''Instrument a state handling method'''
   def _spy_on(chart, *args):
@@ -176,6 +177,42 @@ def spy_on(fn):
     chart.rtc.tuples.append(sr)
     return status
   return _spy_on
+
+# This is defined in the module name space so that inherited classes can access
+# it
+def spy_on_start(fn):
+  '''instrument the on_start method into the spy log'''
+  def _spy_on_start(self, initial_state):
+    self.init_rtc()
+    self.rtc.spy.append("START")
+    sr=SpyTuple(signal="", state="", start=True, hook=False, internal=None, \
+        post_lifo=True, post_fifo=False,post_defer=False,recall=False)
+    self.rtc.tuples.append(sr)
+    # fn is start_at
+    status = fn(self, initial_state)
+    self.full.spy.extend(self.rtc.spy)
+    return status
+  return _spy_on_start
+
+# This is defined in the module name space so that inherited classes can access
+# it
+def trace_on_start(fn):
+  '''instrument the on_start method into the trace log'''
+  def _trace_on_start(self, initial_state):
+    # fn is _spy_on_start
+    status = fn(self, initial_state)
+    if self.rtc.tuples[0].start:
+      t = self.TraceTuple(datetime=datetime.now(),
+           start_state = 'top',
+           signal      = None,
+           payload     = None,
+           end_state   =
+             initial_state(self,
+               Event(signal=signals.REFLECTION_SIGNAL))
+           )
+      self.full.trace.append(t)
+    return status
+  return _trace_on_start
 
 class Attribute():
   def __init__(self):
@@ -914,36 +951,6 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
     self.rtc.spy    = deque(maxlen=HsmEventProcessor.RTC_RING_BUFFER_SIZE)
     self.rtc.tuples = deque(maxlen=HsmEventProcessor.RTC_RING_BUFFER_SIZE)
 
-  def trace_on_start(fn):
-    def _trace_on_start(self, initial_state):
-      # fn is _spy_on_start
-      status = fn(self, initial_state)
-      if self.rtc.tuples[0].start:
-        t = self.TraceTuple(datetime=datetime.now(),
-             start_state = 'top',
-             signal      = None,
-             payload     = None,
-             end_state   =
-               initial_state(self,
-                 Event(signal=signals.REFLECTION_SIGNAL))
-             )
-        self.full.trace.append(t)
-      return status
-    return _trace_on_start
-
-  def spy_on_start(fn):
-    def _spy_on_start(self, initial_state):
-      self.init_rtc()
-      self.rtc.spy.append("START")
-      sr=SpyTuple(signal="", state="", start=True, hook=False, internal=None, \
-          post_lifo=True, post_fifo=False,post_defer=False,recall=False)
-      self.rtc.tuples.append(sr)
-      # fn is start_at
-      status = fn(self, initial_state)
-      self.full.spy.extend(self.rtc.spy)
-      return status
-    return _spy_on_start
-
   @trace_on_start
   @spy_on_start
   def start_at(self, initial_state):
@@ -1040,7 +1047,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     def _append_fifo_to_spy(self, e):
       fn(self,e)
       if self.instrumented:
-        self.rtc.tuples.append(spy_tuple(signal=e.signal,post_fifo=True))
+        self.rtc.tuples.append(spy_tuple(signal=e.signal_name,post_fifo=True))
         self.rtc.spy.append("POST_FIFO:{}".format(e.signal_name))
     return _append_fifo_to_spy
 
@@ -1048,7 +1055,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     def _append_lifo_to_spy(self, e):
       fn(self,e)
       if self.instrumented:
-        self.rtc.tuples.append(spy_tuple(signal=e.signal,post_lifo=True))
+        self.rtc.tuples.append(spy_tuple(signal=e.signal_name,post_lifo=True))
         self.rtc.spy.append("POST_LIFO:{}".format(e.signal_name))
     return _append_lifo_to_spy
 
@@ -1153,6 +1160,8 @@ class Hsm(HsmWithQueues):
   def __init__(self,instrumented=True):
     super().__init__(instrumented)
 
+  @trace_on_start
+  @spy_on_start
   def start_at(self, initial_state):
     '''
     hsm = Hsm()
