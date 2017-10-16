@@ -1,0 +1,500 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Hsm &#8212; miros 2.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Active Object" href="activeobject.html" />
+    <link rel="prev" title="Events" href="event.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="hsm">
+<h1>Hsm<a class="headerlink" href="#hsm" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<span class="target" id="module-hsm"></span><p>This module provides a heirarchical state machine event class (HsmEventProcessor), and an
+instrumented heirarchical state machine class (InstrumentedHsmEventProcessor).  The
+InstrumentedHsmEventProcessor is inherited from the HsmEventProcessor, and it provides two different views
+into the workings of your state machine:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">spy   -&gt; complete record of all search, transitions and hooks</p>
+</li>
+<li><dl class="first docutils">
+<dt>trace -&gt; only provides information about state transition (no hook</dt>
+<dd><p class="first last">information)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>To define an HsmEventProcessor, you would create a number of methods outside of this class,
+then inject them into the HsmEventProcessor, by calling the ‘start_at’ method.</p>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>                     <span class="o">+-------</span> <span class="n">graph_b1_s1</span> <span class="o">-----</span><span class="n">s</span><span class="o">-----+</span>
+                     <span class="o">|</span>  <span class="o">+----</span> <span class="n">graph_b1_s2</span> <span class="o">-----</span><span class="n">t</span><span class="o">-+</span>   <span class="o">|</span>
+                     <span class="o">|</span>  <span class="o">|</span>  <span class="o">+-</span> <span class="n">graph_b1_s3</span> <span class="o">-+</span>     <span class="o">|</span>   <span class="o">|</span>
+                     <span class="o">|</span>  <span class="o">|</span>  <span class="o">|</span>               <span class="o">|</span>   <span class="o">+-+</span>   <span class="o">|</span>
+                     <span class="o">|</span>  <span class="o">|</span>  <span class="o">|</span>               <span class="o">&lt;-</span><span class="n">b</span><span class="o">-+</span> <span class="o">&lt;-</span><span class="n">a</span><span class="o">-+</span>
+                     <span class="o">|</span>  <span class="o">|</span>  <span class="o">+---------------+</span>     <span class="o">|</span>   <span class="o">|</span>
+                     <span class="o">|</span>  <span class="o">+------------------------+</span>   <span class="o">|</span>
+                     <span class="o">+-------------------------------+</span>
+
+<span class="c1"># To create this cart, we</span>
+<span class="c1"># 1) import the required items from miros:</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="k">import</span> <span class="n">ReturnStatus</span><span class="p">,</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+<span class="kn">from</span> <span class="nn">miros.hsm</span>   <span class="k">import</span> <span class="n">InstrumentedHsmEventProcessor</span><span class="p">,</span> <span class="n">HsmTopologyException</span><span class="p">,</span> <span class="n">spy_on</span>
+
+<span class="c1"># 2) create the three different states:</span>
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">graph_b1_s1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">graph_b1_s2</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="c1"># define an inner state who&#39;s super state is graph_b1_s1</span>
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">graph_b1_s2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">graph_b1_s3</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">graph_b1_s1</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="c1"># define an inner state who&#39;s super state is graph_b1_s2</span>
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">graph_b1_s3</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">graph_b1_s2</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="c1"># 3) Create an HsmEventProcessor, in this case we make one that is instrumented (a bit</span>
+<span class="c1"># slower than a plain HsmEventProcessor, but we can use it to see what happened)</span>
+<span class="n">chart</span> <span class="o">=</span> <span class="n">InstrumentedHsmEventProcessor</span><span class="p">()</span>
+
+<span class="c1"># 4) Start the chart in the state we desire</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">graph_b1_s1</span><span class="p">)</span>
+
+<span class="c1"># 5) Send an Event(s) to the chart:</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1"># 6) Look at what happened</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+<span class="k">def</span> <span class="nf">pp</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+  <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">full</span><span class="o">.</span><span class="n">spy</span><span class="p">)</span>
+                   <span class="c1"># [&#39;START&#39;,</span>
+                   <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:graph_b1_s2&#39;,</span>
+                   <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:graph_b1_s1&#39;,</span>
+                   <span class="c1">#  &#39;ENTRY_SIGNAL:graph_b1_s1&#39;,</span>
+                   <span class="c1">#  &#39;ENTRY_SIGNAL:graph_b1_s2&#39;,</span>
+                   <span class="c1">#  &#39;INIT_SIGNAL:graph_b1_s2&#39;,</span>
+                   <span class="c1">#  &#39;A:graph_b1_s2&#39;,</span>
+                   <span class="c1">#  &#39;A:graph_b1_s1&#39;,</span>
+                   <span class="c1">#  &#39;EXIT_SIGNAL:graph_b1_s2&#39;,</span>
+                   <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:graph_b1_s2&#39;,</span>
+                   <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:graph_b1_s2&#39;,</span>
+                   <span class="c1">#  &#39;ENTRY_SIGNAL:graph_b1_s2&#39;,</span>
+                   <span class="c1">#  &#39;INIT_SIGNAL:graph_b1_s2&#39;]</span>
+
+<span class="c1"># 7) If you need these transitions to happen very quickly, create a chart</span>
+<span class="c1"># using the HsmEventProcessor class instead of the InstrumentedHsmEventProcessor class</span>
+<span class="n">chart</span> <span class="o">=</span> <span class="n">InstrumentedHsmEventProcessor</span><span class="p">()</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">graph_b1_s1</span><span class="p">)</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">)</span> <span class="c1"># same transitions with no trace or spy</span>
+                                       <span class="c1"># features</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="hsm.HsmEventProcessor">
+<em class="property">class </em><code class="descclassname">hsm.</code><code class="descname">HsmEventProcessor</code><a class="headerlink" href="#hsm.HsmEventProcessor" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="hsm.HsmEventProcessor.augment">
+<code class="descname">augment</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#hsm.HsmEventProcessor.augment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to add attributes to an hsm object</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">kwargs[‘other’](Mandatory other object): An another object for which you would
+like to add as an attribute of this object.</p>
+<p>kwargs[‘name’](Mandatory): The name that you would like to call this
+attribute, this argument must be a string</p>
+<p>kwargs[‘relationship’](Optional): Indicates if you want to also add this
+object as an attribute to the other class, using this object’s name.  This
+option will only work if the other object also has an augment method that
+acts exactly the same as this one.</p>
+<p><code class="docutils literal"><span class="pre">Examples</span></code>
+alarm       = HsmEventProcessor(); alarm.name       = “alarm”
+time_keeper = HsmEventProcessor(); time_keeper.name = “time_keeper”
+alarm.augment(other=time_keeper, name=”time_keeper”)</p>
+<p>assert(alarm.time_keeper == time_keeper) # will be true</p>
+<p>inverter  = HsmEventProcessor(); inverter.name = “inverter”
+networker = HsmEventProcessor(); networker.name = “networker”
+inverter.augment(other=networker, name=”net”, relationship=”mutual”)</p>
+<p class="last">assert(inverter.net == networker) # will be true
+assert(networker.inverter == inverter ) # will be true</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hsm.HsmEventProcessor.child_state">
+<code class="descname">child_state</code><span class="sig-paren">(</span><em>fn_parent_state_handler</em><span class="sig-paren">)</span><a class="headerlink" href="#hsm.HsmEventProcessor.child_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>finds the child state of a given parent</p>
+<p>This method will only return a child state of a given handler, if the system
+is in a substate of the state being called:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+----------</span> <span class="n">graph_e1_s1</span> <span class="o">-----------+</span>
+<span class="o">|</span> <span class="o">+--------</span> <span class="n">graph_e1_s2</span> <span class="o">-------+</span>   <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="o">+------</span> <span class="n">graph_e1_s3</span> <span class="o">-----+</span> <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">+----</span> <span class="n">graph_e1_s4</span> <span class="o">---+</span> <span class="o">|</span> <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span>  <span class="o">+-</span> <span class="n">graph_e1_s5</span> <span class="o">-+</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span>  <span class="o">|</span>               <span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span> <span class="o">+-</span><span class="n">b</span><span class="o">-&gt;</span>  <span class="o">|</span>               <span class="o">&lt;-----</span><span class="n">a</span><span class="o">---+</span>
+<span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span>  <span class="o">|</span>               <span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="o">+</span><span class="n">c</span><span class="o">&gt;</span>  <span class="o">+---------------+</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span>   <span class="o">|</span>
+<span class="o">+</span><span class="n">d</span><span class="o">&gt;</span> <span class="o">|</span> <span class="o">+--------------------+</span> <span class="o">|</span> <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="o">+------------------------+</span> <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span> <span class="o">+----------------------------+</span>   <span class="o">|</span>
+<span class="o">+----------------------------------+</span>
+
+<span class="n">chart</span> <span class="o">=</span> <span class="n">HsmEventProcessor</span><span class="p">()</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">child_state_graph_e1_s5</span><span class="p">)</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">child_state</span><span class="p">(</span><span class="n">graph_e1_s5</span><span class="p">)</span> <span class="c1">#=&gt; graph_e1_s5</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">child_state</span><span class="p">(</span><span class="n">graph_e1_s4</span><span class="p">)</span> <span class="c1">#=&gt; graph_e1_s5</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">child_state</span><span class="p">(</span><span class="n">graph_e1_s3</span><span class="p">)</span> <span class="c1">#=&gt; graph_e1_s4</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">D</span><span class="p">)</span>
+
+<span class="c1"># chart now in state graph_e1_s2</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">child_state</span><span class="p">(</span><span class="n">graph_e1_s5</span><span class="p">)</span> <span class="c1">#=&gt; &lt;CRASH!&gt;</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">child_state</span><span class="p">(</span><span class="n">graph_e1_s2</span><span class="p">)</span> <span class="c1">#=&gt; graph_e1_s2</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">child_state</span><span class="p">(</span><span class="n">graph_e1_s1</span><span class="p">)</span> <span class="c1">#=&gt; graph_e1_s2 # which is wrong</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="hsm.HsmEventProcessor.dispatch">
+<code class="descname">dispatch</code><span class="sig-paren">(</span><em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#hsm.HsmEventProcessor.dispatch" title="Permalink to this definition">¶</a></dt>
+<dd><p>dispatches an event to a HSM.</p>
+<p>Processing an event represents one run-to-completion (RTC) step.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>e (Event): The event to be dispatched to the hsm object</dd>
+<dt>Returns:</dt>
+<dd>None</dd>
+<dt>Example::</dt>
+<dd>chart = HsmEventProcessor()
+signals.append(“A”)
+chart.start_at(dispatch_graph_a1_s1)
+chart.dispatch(Event(signal=signals.A)</dd>
+<dt>Raises:</dt>
+<dd>HsmTopologyException: if a state function handler is malformed</dd>
+</dl>
+<p>Useful mnemonics:</p>
+<dl class="docutils">
+<dt>S (source)           Which state is the source of the arrow in the diagram?</dt>
+<dd><p class="first">This variable is not actually defined, but it is
+referenced in the comments with adjacent diagrams to keep
+things clear.</p>
+<dl class="last docutils">
+<dt>Example::</dt>
+<dd><p class="first">S == dispatch_graph_f1_s0
+# in the follow state function
+def dispatch_graph_f1_s0(chart, e):</p>
+<blockquote class="last">
+<div><p>.
+elif(e.signal == signals.C):</p>
+<blockquote>
+<div>chart.trans(dispatch_graph_f1_s22)</div></blockquote>
+<p>.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd>
+<dt>T (target)           What is the source aiming at?  Which state is pointed</dt>
+<dd><p class="first">to by the arrow in the diagram?  This variable is not
+actually defined, but it is referenced in the comments.</p>
+<p>This will be state handler that was an argument of the
+trans call:</p>
+<dl class="last docutils">
+<dt>Example::</dt>
+<dd><p class="first">T == dispatch_graph_f1_s22
+# in the follow state function
+def dispatch_graph_f1_s0(chart, e):</p>
+<blockquote class="last">
+<div><p>.
+elif(e.signal == signals.C):</p>
+<blockquote>
+<div>chart.trans(dispatch_graph_f1_s22)</div></blockquote>
+<p>.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd>
+<dt>S-&gt;super             The super state of S, the state in which S is wrapped</dt>
+<dd>within.</dd>
+</dl>
+<p>S-&gt;super-&gt;super..    The super..super state of S</p>
+<dl class="docutils">
+<dt>T-&gt;super             The super state of T, the state in which T is wrapped</dt>
+<dd>within.</dd>
+</dl>
+<p>T-&gt;super-&gt;super..    The super..super state of T</p>
+<p>self.state.fun       The current state before the dispatch occurred</p>
+<dl class="docutils">
+<dt>self.temp.fun        Before the search begins, this is T, but gets overwritten</dt>
+<dd><dl class="first last docutils">
+<dt>during the search process by:</dt>
+<dd><ul class="first last simple">
+<li>any call to trans within state function will change
+this.</li>
+<li>any call with a super signal will change this.</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt>lca                  least common ancestor.  The most outward state that S and</dt>
+<dd>T have in common.  It is used to determine when we have
+constructed the correct entry path to the target, called
+the tpath.</dd>
+<dt>tpath                A list of state functions that are found during the</dt>
+<dd><a href="#id1"><span class="problematic" id="id2">trans_</span></a> process.  If you call this list backwards,
+starting from ip you will correctly enter toward T for
+a given state chart topology.</dd>
+<dt>ip                   An index into the tpath.  All elements between 0 and ip</dt>
+<dd>in the tpath are valid entry handlers which will be used
+to approach T.</dd>
+<dt>iq                   Sometimes a bool indicating if the lac has been found,</dt>
+<dd>sometimes a shadow of the ip index used to discover
+which topology the statechart is configured in.  Only
+used in more advanced topologies.</dd>
+<dt>topology             A graph characteristic that is shared well enough across</dt>
+<dd>a set of graphs that part of this search algorithm can be
+used to move from the S to the T.  There are 8 different
+topologies, labeled topology_a..topology_h.  If you
+would like to know more about them, reference the tests
+directory where they are drawn or the <a href="#id3"><span class="problematic" id="id4">trans_</span></a> method which
+also has them described as diagrams in the comments.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hsm.HsmEventProcessor.init">
+<code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hsm.HsmEventProcessor.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>triggers the top-most initial transition into a HSM</p>
+<p>This method is used at the beginning of an interaction with a statechart.
+It jumps into the initial state, then places all of the super state
+functions into a tpath variable.  Once this tpath is discovered, it calls the
+entry actions on each of the tpath items. Then it calls the init actions on
+the target, and if this init call requires a transition, it will perform all
+of the above actions again until the chart settles into its final initial
+state.</p>
+<p>This algorithm limits the design topology of your chart.  ‘init’ signals
+that are going to be followed on the chart ‘start_at’ can only climb into
+the chart, they can not climb out.  If they do, this search routine will
+fail.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hsm.HsmEventProcessor.is_in">
+<code class="descname">is_in</code><span class="sig-paren">(</span><em>fn_state_handler</em><span class="sig-paren">)</span><a class="headerlink" href="#hsm.HsmEventProcessor.is_in" title="Permalink to this definition">¶</a></dt>
+<dd><p>tests if a hsm is in a given state</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hsm.HsmEventProcessor.start_at">
+<code class="descname">start_at</code><span class="sig-paren">(</span><em>initial_state</em><span class="sig-paren">)</span><a class="headerlink" href="#hsm.HsmEventProcessor.start_at" title="Permalink to this definition">¶</a></dt>
+<dd><p>hsm = HsmEventProcessor()
+# build it
+hsm.start(starting_state_function)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hsm.HsmEventProcessor.top">
+<code class="descname">top</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#hsm.HsmEventProcessor.top" title="Permalink to this definition">¶</a></dt>
+<dd><p>top most state given to all HSM; treat it as an outside function</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hsm.HsmEventProcessor.trans">
+<code class="descname">trans</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="headerlink" href="#hsm.HsmEventProcessor.trans" title="Permalink to this definition">¶</a></dt>
+<dd><p>sets a new function target and returns that transition required by engine</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hsm.HsmEventProcessor.trans_">
+<code class="descname">trans_</code><span class="sig-paren">(</span><em>tpath</em>, <em>max_index</em><span class="sig-paren">)</span><a class="headerlink" href="#hsm.HsmEventProcessor.trans_" title="Permalink to this definition">¶</a></dt>
+<dd><p>execute a transition sequence in a hsm</p>
+<p>A helper function for the <code class="docutils literal"><span class="pre">`dispatch`</span></code>.  It navigates through the possible
+supported topologies, navigating the chart just up to the point of entering
+the target hierarchy.  The target entry path is placed into the provided
+tpath list, and the depth of the entry path is provided as an output of the
+method.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>tpath:      a list which will be populated with the entry path required</dt>
+<dd>for the dispatch method to enter the T (target) state.</dd>
+<dt>max_index:  The maximum index used within the tpath list up until this</dt>
+<dd>point.  If more space is required, an append is used to extend
+the length of the tpath list, otherwise an element is assigned
+to a given index location.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>ip:         An index into the tpath.  All elements between 0 and ip in the</dt>
+<dd>tpath are valid entry handlers which will be used to approach T.</dd>
+</dl>
+</dd>
+</dl>
+<p>If you don’t understand what S/T are, read all of the mnemonics described in
+the <code class="docutils literal"><span class="pre">`dispatch`</span></code> docstring.</p>
+<p>To understand beyond this point you must first know what happens with
+the tpath, ip and iq. Consider this example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+--------</span> <span class="n">s1</span><span class="o">---------+</span>
+<span class="o">|</span> <span class="o">+-------</span><span class="n">s2</span><span class="o">-------+</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="o">+-----</span><span class="n">s3</span><span class="o">-----+</span> <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">+---</span><span class="n">s4</span><span class="o">---+</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">+-</span><span class="n">s5</span><span class="o">-+</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="n">T</span>    <span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="n">S</span>
+<span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">+----+</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="n">top</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">lca</span>
+<span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">+--------+</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="o">+------------+</span> <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">+-+--------------+</span> <span class="o">|</span>
+<span class="o">++------------------++</span>
+</pre></div>
+</div>
+<p>As <a href="#id5"><span class="problematic" id="id6">trans_</span></a> searches, it will place state handlers into the tpath array
+These state handlers will be used to enter toward the target state once
+the lca has been found:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>            <span class="n">useful</span> <span class="n">data</span> <span class="o">&lt;-+-&gt;</span> <span class="n">garbage</span> <span class="n">data</span>
+                          <span class="o">|</span>   <span class="n">collected</span> <span class="ow">in</span> <span class="n">search</span>
+       <span class="o">+----+----+----+---+----+-----+-----+</span>
+<span class="n">tpath</span><span class="p">:</span> <span class="o">|</span> <span class="n">s5</span> <span class="o">|</span> <span class="n">s4</span> <span class="o">|</span> <span class="n">s3</span> <span class="o">|</span><span class="n">s2</span> <span class="o">|</span> <span class="n">s1</span> <span class="o">|</span> <span class="n">top</span> <span class="o">|</span> <span class="n">s21</span> <span class="o">|</span>
+       <span class="o">+----+----+----+---+-/--+-----+-----+</span>
+                            <span class="o">|</span>
+                            <span class="o">+--</span> <span class="n">ip</span> <span class="o">==</span> <span class="mi">4</span>
+</pre></div>
+</div>
+<p>The method that called <a href="#id7"><span class="problematic" id="id8">trans_</span></a> already has a reference to the tpath so it
+doesn’t need to be returned.  However, ip does need to be returned at it
+represents which state handlers will be entered.</p>
+<p>Returning the above from this method will tell <code class="docutils literal"><span class="pre">`dispatch`</span></code> to
+enter s1, enter s2, enter s3, enter s4, enter s5.</p>
+<p>iq is a bool, it represents if we have found the lca of S and T.  It is only
+used later in the method and it is not used outside of the method, so we
+only it when needed by the search.  It leave comments in the code describing
+its state, so you can understand what is going on.</p>
+<p>When the method begins t == T and s == S but these variable are then clobbered
+in the search and over-written with new meanings.  Their new meanings will
+be described in the comments where they are used, we will always draw our
+attention back to S and T and how they relate to a diagram.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
+  <img class="logo" src="_static/click-small@2x.png" width="120" height="50" alt="Logo">
+</a></p><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="event.html" title="previous chapter">Events</a></li>
+      <li>Next: <a href="activeobject.html" title="next chapter">Active Object</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/hsm.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Scott Volk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/hsm.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
