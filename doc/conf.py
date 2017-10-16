@@ -20,6 +20,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('C:\\github\\hsm\\miros'))
+#sys.path.insert(0, os.path.abspath('C:\\github\\hsm\\miros'))
 
 
 # -- General configuration ------------------------------------------------

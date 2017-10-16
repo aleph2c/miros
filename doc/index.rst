@@ -10,8 +10,11 @@ Welcome to miros's documentation!
    :maxdepth: 2
    :caption: Contents:
   
-   installation.rst
-   hsm.rst
+   installation
+   singleton
+   event
+   hsm
+   activeobject
 
 Indices and tables
 ==================
