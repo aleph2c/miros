@@ -21,11 +21,13 @@ SignalSource
 ------------------
 .. autoclass:: SignalSource
     :members:
+
 Signal
 ------------------
 .. autoclass:: Signal
     :members:
-Signal
+
+Event
 ------------------
 .. autoclass:: Event
     :members:
