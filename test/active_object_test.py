@@ -200,11 +200,12 @@ def test_import(fabric_fixture):
 
 @pytest.mark.ao
 def test_start_stop(fabric_fixture):
-  ao = ActiveObject()
+  ao = ActiveObject(name="bob")
   ao.start_at(g1_s22_active_objects_graph)
   assert(ao.thread.is_alive() == True)
+  time.sleep(0.2)
   ao.stop()
-  assert( ao.spy_full() == \
+  assert(ao.spy_full() == \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:g1_s22_active_objects_graph',
      'SEARCH_FOR_SUPER_SIGNAL:g1_s1_active_objects_graph',
@@ -282,9 +283,10 @@ def test_start_stop(fabric_fixture):
 
 @pytest.mark.ao
 def test_start_stop(fabric_fixture):
+  '''inspect with your eyes'''
   ao = ActiveObject()
   ao.start_at(g1_s22_active_objects_graph)
   assert(ao.thread.is_alive() == True)
   ao.stop()
   print(ao.trace())
-  #pp(ao.spy_full())
+

@@ -113,7 +113,7 @@ from   collections import namedtuple, deque
 
 SpyTuple = namedtuple('SpyTuple', ['signal', 'state',
   'hook', 'start', 'internal','post_lifo','post_fifo',
-  'post_defer', 'recall'])
+  'post_defer', 'recall', 'ignored'])
 
 def spy_tuple(signal     = None,
               state      = None,
@@ -123,7 +123,8 @@ def spy_tuple(signal     = None,
               post_lifo  = False,
               post_fifo  = False,
               post_defer = False,
-              recall     = False
+              recall     = False,
+              ignored    = False
               ):
   return SpyTuple(signal=signal,
                   state=state,
@@ -133,7 +134,9 @@ def spy_tuple(signal     = None,
                   post_lifo=post_lifo,
                   post_fifo=post_fifo,
                   post_defer=post_defer,
-                  recall=recall)
+                  recall=recall,
+                  ignored=ignored
+                  )
 
 def spy_on(fn):
   '''Instrument a state handling method'''
@@ -171,7 +174,11 @@ def spy_on(fn):
           chart.rtc.spy.append("{}:{}:ULTIMATE_HOOK".format(e.signal_name, name))
           sr=spy_tuple(signal=e.signal_name, state=name, hook=True)
         else:
-          sr=spy_tuple(signal=e.signal_name, state=name)
+          if status == return_status.IGNORED:
+            sr=spy_tuple(signal=e.signal_name, state=name, ignored=True)
+          else:
+            sr=spy_tuple(signal=e.signal_name, state=name)
+
     else:
       sr=spy_tuple(signal=e.signal_name, state=name, hook=True, internal=True)
     chart.rtc.tuples.append(sr)
@@ -186,7 +193,8 @@ def spy_on_start(fn):
     self.init_rtc()
     self.rtc.spy.append("START")
     sr=SpyTuple(signal="", state="", start=True, hook=False, internal=None, \
-        post_lifo=True, post_fifo=False,post_defer=False,recall=False)
+        post_lifo=True, post_fifo=False,post_defer=False,recall=False,
+        ignored=False)
     self.rtc.tuples.append(sr)
     # fn is start_at
     status = fn(self, initial_state)
@@ -194,6 +202,13 @@ def spy_on_start(fn):
     return status
   return _spy_on_start
 
+def append_fifo_to_spy(fn):
+  def _append_fifo_to_spy(self, e):
+    fn(self,e)
+    if self.instrumented:
+      self.rtc.tuples.append(spy_tuple(signal=e.signal_name,post_fifo=True))
+      self.rtc.spy.append("POST_FIFO:{}".format(e.signal_name))
+  return _append_fifo_to_spy
 # This is defined in the module name space so that inherited classes can access
 # it
 def trace_on_start(fn):
@@ -213,6 +228,15 @@ def trace_on_start(fn):
       self.full.trace.append(t)
     return status
   return _trace_on_start
+
+
+def append_queue_reflection_after_start(fn):
+  def _append_queue_reflection_after_start(self,initial_state):
+    result = fn(self,initial_state)
+    self.rtc.spy.append(self.queue_reflection())
+    self.full.spy.append(self.queue_reflection())
+    return result
+  return _append_queue_reflection_after_start
 
 class Attribute():
   def __init__(self):
@@ -965,22 +989,24 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
     return _append_to_full_spy
 
   def append_to_full_trace(fn):
-    def is_signal_hooked(self):
-      signal_name, hooked = "", False
+    def is_signal_hooked_or_ignored(self):
+      signal_name, hooked, ignored = "", False, True
       for sr in self.rtc.tuples:
         if sr.internal == False:
           signal_name = sr.signal
           if sr.hook:
-            hooked = True
+            hooked  = True
+            ignored = False
             break
-      return (signal_name, hooked)
+          ignored = sr.ignored
+      return (signal_name, hooked, ignored)
 
     def _append_to_full_trace(self, e):
       start_state = self.state.fun(self,Event(signal=signals.REFLECTION_SIGNAL))
       # fn is append_to_full_spy
       fn(self,e)
-      signal, hooked = is_signal_hooked(self)
-      if hooked == False:
+      signal, hooked, ignored = is_signal_hooked_or_ignored(self)
+      if hooked == False and ignored == False:
         t = self.TraceTuple(
               datetime    = datetime.now(),
               start_state = start_state,
@@ -1014,13 +1040,6 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     self.queue       = deque(maxlen = self.__class__.QUEUE_SIZE)
     self.defer_queue = deque(maxlen = self.__class__.QUEUE_SIZE)
 
-  def append_queue_reflection_after_start(fn):
-    def _append_queue_reflection_after_start(self,initial_state):
-      result = fn(self,initial_state)
-      self.rtc.spy.append(self.queue_reflection())
-      self.full.spy.append(self.queue_reflection())
-      return result
-    return _append_queue_reflection_after_start
 
   @append_queue_reflection_after_start
   def start_at(self, initial_state):
@@ -1043,13 +1062,6 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def queue_reflection(self):
     return "<- Queued:({}) Deferred:({})".format(len(self.queue),len(self.defer_queue))
 
-  def append_fifo_to_spy(fn):
-    def _append_fifo_to_spy(self, e):
-      fn(self,e)
-      if self.instrumented:
-        self.rtc.tuples.append(spy_tuple(signal=e.signal_name,post_fifo=True))
-        self.rtc.spy.append("POST_FIFO:{}".format(e.signal_name))
-    return _append_fifo_to_spy
 
   def append_lifo_to_spy(fn):
     def _append_lifo_to_spy(self, e):
@@ -1160,6 +1172,7 @@ class Hsm(HsmWithQueues):
   def __init__(self,instrumented=True):
     super().__init__(instrumented)
 
+  @append_queue_reflection_after_start
   @trace_on_start
   @spy_on_start
   def start_at(self, initial_state):
@@ -1178,7 +1191,11 @@ class Hsm(HsmWithQueues):
     status, self.temp.fun = return_status.SUPER, self.__top__
     return status
 
+  def next_rtc(self):
+    super().next_rtc()
+
   # don't spy on this
+  @spy_on
   def __top__(self, *args):
     '''top most state given to all HSM; treat it as an outside function'''
     status = return_status.IGNORED

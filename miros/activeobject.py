@@ -4,11 +4,17 @@ from threading   import Thread
 from queue       import PriorityQueue, Queue
 from collections import deque
 import time
+from datetime import datetime
+import uuid
+
+import pprint
+def pp(item):
+  pprint.pprint(item)
 
 # from this package
 from miros.event import ReturnStatus, signals, return_status, Signal
 from miros.event import Event as HsmEvent
-from miros.hsm   import Hsm, HsmTopologyException, spy_on, spy_tuple
+from miros.hsm   import *
 from miros.singletlon import SingletonDecorator
 
 
@@ -37,7 +43,7 @@ class ActiveFabricSource():
   To create it:
     af = ActiveFabric()  # it is a singleton
 
-  To subscrbe (do this before starting it):
+  To subscribe (do this before starting it):
     client_deque = deque(maxlen=10)
     event_a      = HsmEvent(signal=signals.A)
     af.subscribe(client_deque, event_a, queue_type='fifo')
@@ -399,7 +405,7 @@ class LockingDeque():
     return len(self.deque)
 
 class ActiveObject(Hsm):
-  def __init__(self,instrumented=True,name=None):
+  def __init__(self,name=None,instrumented=True):
     super().__init__(instrumented)
     self.locking_deque = LockingDeque()
     # Over-write the deque in the Hsm with Queues with the one managed by the
@@ -426,33 +432,72 @@ class ActiveObject(Hsm):
     return result
 
   def start_thread_if_not_running(fn):
+    '''start the active object thread if it is not currently running'''
     def _start_thread_if_not_running(self,*args,**kwargs):
       if self.__thread_running == False:
         self.__start()
       fn(self,*args,**kwargs)
     return _start_thread_if_not_running
 
-  @start_thread_if_not_running
-  def subscribe(self,event,queue_type='fifo'):
-    self.fabric.subscription(self.queue, event, queue_type)
+  def append_subscribe_to_spy(fn):
+    '''instrument the full spy with our subscription request'''
+    def _append_subscribe_to_spy(self, e, queue_type='fifo'):
+      if self.instrumented:
+        self.full.spy.append("SUBSCRIBING TO:({}, TYPE:{})".format(e.signal_name, queue_type))
+        fn(self,e,queue_type)
+    return _append_subscribe_to_spy
 
   @start_thread_if_not_running
-  def publish(self, event, priority):
+  @append_subscribe_to_spy
+  def subscribe(self,event,queue_type='fifo'):
+    self.fabric.subscribe(self.queue, event, queue_type)
+
+  def append_publish_to_spy(fn):
+    '''instrument the rtc spy with our publish event'''
+    def _append_publish_to_spy(self, e, priority=1000):
+      if self.instrumented:
+        self.rtc.spy.append("PUBLISH:({}, PRIORITY:{})".format(e.signal_name, priority))
+        fn(self,e,priority)
+    return _append_publish_to_spy
+
+  @append_publish_to_spy
+  @start_thread_if_not_running
+  def publish(self, event, priority=1000):
+    '''publish an event at a given priority to the active fabric'''
     self.fabric.publish(event,priority)
 
   @start_thread_if_not_running
   def post_fifo(self,e):
+    '''post to the fifo of the hsm locking deque'''
     super().post_fifo(e)
 
   @start_thread_if_not_running
   def post_lifo(self,e):
+    '''post to the lifo of the hsm locking deque'''
     super().post_lifo(e)
 
+  def make_unique_name_based_on_start_at_function(fn):
+    '''
+    If the user has not specified a name for their active object, we assign one
+    based on the starting function and the first 5 characters created from a
+    uuid5 using the starting state name.
+
+    '''
+    def _make_unique_name_based_on_start_at_function(self, initial_state):
+      if self.name is None:
+        function_name = initial_state(self,HsmEvent(signal=signals.REFLECTION_SIGNAL))
+        self.name = str(uuid.uuid5(uuid.NAMESPACE_DNS,function_name))[0:5]
+      fn(self,initial_state)
+    return _make_unique_name_based_on_start_at_function
+
+  @make_unique_name_based_on_start_at_function
   def start_at(self, initial_state):
+    '''start the active object at a given state and begin its task'''
     super().start_at(initial_state)
     self.__start()
 
   def __start(self):
+    '''Starts an active object thread, and the active fabric if it is not running'''
     # Get the ThreadEvent (singleton), set it so that the threads will try and
     # run forever
     task_off_event = ThreadEvent()
@@ -464,6 +509,10 @@ class ActiveObject(Hsm):
       self.fabric.start()
 
     def start_thread(self):
+      '''Starts an active object -- called within __start
+
+      This will start an active object and the task fabric
+      '''
       thread        = Thread(target = self.run_event, args=(task_off_event,self.queue))
       thread.name   = self.name
       thread.daemon = True
@@ -477,6 +526,10 @@ class ActiveObject(Hsm):
     assert(self.thread.is_alive())
 
   def stop(self,stop_fabric=False):
+    '''Stops the active object
+
+    Calling this method will stop all active objects.
+    '''
     task_off_event = ThreadEvent()
     task_off_event.clear()
     self.queue.append(HsmEvent(signal=signals.stop_active_object))
@@ -485,6 +538,13 @@ class ActiveObject(Hsm):
       self.fabric.stop()
 
   def run_event(self, task_off_event, queue):
+    '''The active object task function
+
+    This task method waits on the locking-deque.  If the signal is not a
+    stop_active_object signal it calls the hsm next_rtc method, which will pop
+    the leftmost item out of the deque part of the locking-deque and dispatch it
+    into the hsm.
+    '''
     ready = None
     while task_off_event.is_set():
       queue.wait()      # wait for an event we have subcribed to
@@ -492,3 +552,23 @@ class ActiveObject(Hsm):
         self.next_rtc()
       queue.task_done() # write this so that 'join' will work
 
+  def trace(self):
+    '''Output state transition information only:
+
+    Example:
+    print(chart.trace())
+      05:23:25.314420 [<state_name>] None: top->hsm_queues_graph_g1_s22
+      05:23:25.314420 [<state_name>] D: hsm_queues_graph_g1_s22->hsm_queues_graph_g1_s1
+      05:23:25.314420 [<state_name>] E: hsm_queues_graph_g1_s1->hsm_queues_graph_g1_s01
+      05:23:25.314420 [<state_name>] F: hsm_queues_graph_g1_s01->hsm_queues_graph_g1_s2111
+      05:23:25.314420 [<state_name>] A: hsm_queues_graph_g1_s2111->hsm_queues_graph_g1_s321
+    '''
+    strace = "\n"
+    for tr in self.full.trace:
+      strace += "{} [{}] {}: {}->{}\n".format(
+        datetime.strftime(tr.datetime, "%H:%M:%S.%f"),
+        self.name,
+        tr.signal,
+        tr.start_state,
+        tr.end_state)
+    return strace
