@@ -32,5 +32,11 @@ goto end
 :help
 %SPHINXBUILD% -M help %SOURCEDIR% %BUILDDIR% %SPHINXOPTS%
 
+
 :end
 popd
+
+REM Added this to make this repo with with github pages on windows
+RMDIR .\..\docs /S /Q
+MKDIR .\..\docs
+XCOPY .\_build\html .\..\docs /s /e
