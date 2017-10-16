@@ -12,7 +12,7 @@ into the workings of your state machine:
 To define an HsmEventProcessor, you would create a number of methods outside of this class,
 then inject them into the HsmEventProcessor, by calling the 'start_at' method.
 
-Example:
+Example::
 
 
                        +------- graph_b1_s1 -----s-----+
@@ -349,7 +349,7 @@ class HsmEventProcessor():
     Returns:
       None
 
-    Example:
+    Example::
       chart = HsmEventProcessor()
       signals.append("A")
       chart.start_at(dispatch_graph_a1_s1)
@@ -365,7 +365,7 @@ class HsmEventProcessor():
                          referenced in the comments with adjacent diagrams to keep
                          things clear.
 
-                         Example:
+                         Example::
                            S == dispatch_graph_f1_s0
                            # in the follow state function
                            def dispatch_graph_f1_s0(chart, e):
@@ -381,7 +381,7 @@ class HsmEventProcessor():
                          This will be state handler that was an argument of the
                          trans call:
 
-                         Example:
+                         Example::
                            T == dispatch_graph_f1_s22
                            # in the follow state function
                            def dispatch_graph_f1_s0(chart, e):
@@ -583,7 +583,7 @@ class HsmEventProcessor():
     the ```dispatch``` docstring.
 
     To understand beyond this point you must first know what happens with
-    the tpath, ip and iq. Consider this example:
+    the tpath, ip and iq. Consider this example::
 
      +-------- s1---------+
      | +-------s2-------+ |
@@ -599,15 +599,15 @@ class HsmEventProcessor():
 
     As trans_ searches, it will place state handlers into the tpath array
     These state handlers will be used to enter toward the target state once
-    the lca has been found.
+    the lca has been found::
 
-                useful data <-+-> garbage data
-                              |   collected in search
-           +----+----+----+---+----+-----+-----+
-    tpath: | s5 | s4 | s3 |s2 | s1 | top | s21 |
-           +----+----+----+---+-/--+-----+-----+
-                                |
-                                +-- ip == 4
+                  useful data <-+-> garbage data
+                                |   collected in search
+             +----+----+----+---+----+-----+-----+
+      tpath: | s5 | s4 | s3 |s2 | s1 | top | s21 |
+             +----+----+----+---+-/--+-----+-----+
+                                  |
+                                  +-- ip == 4
 
     The method that called trans_ already has a reference to the tpath so it
     doesn't need to be returned.  However, ip does need to be returned at it
@@ -854,33 +854,33 @@ class HsmEventProcessor():
     '''finds the child state of a given parent
 
     This method will only return a child state of a given handler, if the system
-    is in a substate of the state being called.
+    is in a substate of the state being called::
 
-    +---------- graph_e1_s1 -----------+
-    | +-------- graph_e1_s2 -------+   |
-    | | +------ graph_e1_s3 -----+ |   |
-    | | | +---- graph_e1_s4 ---+ | |   |
-    | | | |  +- graph_e1_s5 -+ | | |   |
-    | | | |  |               | | | |   |
-    | +-b->  |               <-----a---+
-    | | | |  |               | | | |   |
-    | | +c>  +---------------+ | | |   |
-    +d> | +--------------------+ | |   |
-    | | +------------------------+ |   |
-    | +----------------------------+   |
-    +----------------------------------+
+      +---------- graph_e1_s1 -----------+
+      | +-------- graph_e1_s2 -------+   |
+      | | +------ graph_e1_s3 -----+ |   |
+      | | | +---- graph_e1_s4 ---+ | |   |
+      | | | |  +- graph_e1_s5 -+ | | |   |
+      | | | |  |               | | | |   |
+      | +-b->  |               <-----a---+
+      | | | |  |               | | | |   |
+      | | +c>  +---------------+ | | |   |
+      +d> | +--------------------+ | |   |
+      | | +------------------------+ |   |
+      | +----------------------------+   |
+      +----------------------------------+
 
-    chart = HsmEventProcessor()
-    chart.start_at(child_state_graph_e1_s5)
-    chart.child_state(graph_e1_s5) #=> graph_e1_s5
-    chart.child_state(graph_e1_s4) #=> graph_e1_s5
-    chart.child_state(graph_e1_s3) #=> graph_e1_s4
-    chart.dispatch(event=Event(signal=signals.D)
+      chart = HsmEventProcessor()
+      chart.start_at(child_state_graph_e1_s5)
+      chart.child_state(graph_e1_s5) #=> graph_e1_s5
+      chart.child_state(graph_e1_s4) #=> graph_e1_s5
+      chart.child_state(graph_e1_s3) #=> graph_e1_s4
+      chart.dispatch(event=Event(signal=signals.D)
 
-    # chart now in state graph_e1_s2
-    chart.child_state(graph_e1_s5) #=> <CRASH!>
-    chart.child_state(graph_e1_s2) #=> graph_e1_s2
-    chart.child_state(graph_e1_s1) #=> graph_e1_s2 # which is wrong
+      # chart now in state graph_e1_s2
+      chart.child_state(graph_e1_s5) #=> <CRASH!>
+      chart.child_state(graph_e1_s2) #=> graph_e1_s2
+      chart.child_state(graph_e1_s1) #=> graph_e1_s2 # which is wrong
 
     '''
     super_e   = Event(signal = signals.SEARCH_FOR_SUPER_SIGNAL)
@@ -1144,13 +1144,13 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def trace(self):
     '''Output state transition information only:
 
-    Example:
-    print(chart.trace())
-      05:23:25.314420 [c] None: top->hsm_queues_graph_g1_s22
-      05:23:25.314420 [c] D: hsm_queues_graph_g1_s22->hsm_queues_graph_g1_s1
-      05:23:25.314420 [c] E: hsm_queues_graph_g1_s1->hsm_queues_graph_g1_s01
-      05:23:25.314420 [c] F: hsm_queues_graph_g1_s01->hsm_queues_graph_g1_s2111
-      05:23:25.314420 [c] A: hsm_queues_graph_g1_s2111->hsm_queues_graph_g1_s321
+    Example::
+      print(chart.trace())
+        05:23:25.314420 [c] None: top->hsm_queues_graph_g1_s22
+        05:23:25.314420 [c] D: hsm_queues_graph_g1_s22->hsm_queues_graph_g1_s1
+        05:23:25.314420 [c] E: hsm_queues_graph_g1_s1->hsm_queues_graph_g1_s01
+        05:23:25.314420 [c] F: hsm_queues_graph_g1_s01->hsm_queues_graph_g1_s2111
+        05:23:25.314420 [c] A: hsm_queues_graph_g1_s2111->hsm_queues_graph_g1_s321
     '''
     strace = "\n"
     for tr in self.full.trace:
@@ -1177,9 +1177,10 @@ class Hsm(HsmWithQueues):
   @spy_on_start
   def start_at(self, initial_state):
     '''
-    hsm = Hsm()
-    # build it
-    hsm.start(<starting_state_function>)
+    Example::
+      hsm = Hsm()
+      # build it
+      hsm.start(<starting_state_function>)
     '''
     self.state.fun = self.__top__
     self.temp.fun  = initial_state

@@ -1,10 +1,12 @@
-Hsm
+Library Architecture
 =================================
+How the package is put together
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-.. automodule:: hsm
-.. autoclass:: HsmEventProcessor
-    :members:
+   event
+   hsm
+   activeobject
+

@@ -19,9 +19,13 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('C:\\github\\hsm\\miros'))
+import datetime
 #sys.path.insert(0, os.path.abspath('C:\\github\\hsm\\miros'))
+sys.path.insert(0, os.path.abspath('C:\\github\\hsm\\miros'))
 
+sys.path.append(os.path.abspath('..\..'))
+sys.path.append(os.path.abspath('..\.'))
+sys.path.append(os.path.abspath('.'))
 
 # -- General configuration ------------------------------------------------
 
@@ -49,7 +53,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'miros'
-copyright = '2017, Scott Volk'
+copyright = u'%d, Scott Volk' % datetime.datetime.utcnow().year
 author = 'Scott Volk'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -103,16 +107,12 @@ html_static_path = ['_static']
 #
 # This is required for the alabaster theme
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
-html_sidebars = {
-    '**': [
-        'about.html',
-        'navigation.html',
-        'relations.html',  # needs 'show_related': True theme option to display
-        'searchbox.html',
-        'donate.html',
-    ]
-}
 
+html_sidebars = {
+    'index':    ['sidebarintro.html', 'sourcelink.html', 'searchbox.html'],
+    '**':       ['sidebarlogo.html', 'localtoc.html', 'relations.html',
+                 'sourcelink.html', 'searchbox.html']
+}
 
 # -- Options for HTMLHelp output ------------------------------------------
 
