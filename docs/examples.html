@@ -298,14 +298,15 @@ received.  If we look at the diagram we see that the <cite>inner</cite> state do
 handle this signal so it passes control to the <cite>middle</cite> state.  The <cite>middle</cite>
 state does not handle the <cite>WaitComplete</cite> either so it passes control to the
 <cite>outer</cite> state.  The <cite>outer</cite> state knows what to do with the <cite>WaitComplete</cite>
-signal, it must transition to the <cite>middle</cite> state.  This is what is meant by
-behavioral inheritance.  All of the child states of the <cite>outer</cite> state will all
-behave the same as <cite>outer</cite> state does the <cite>WaitComplete</cite> event, they inherit the
-behavior of the <cite>outer</cite> state.  Now lets get back to the story.  The middle
-state has an <cite>init</cite> signal, the big black dot, which requires a transition to
-the <cite>inner</cite> state, so it does this.  Ultimately the statechart rests in the
-<cite>inner</cite> state just in time for the active object thread to send the next event
-at it, the event containing the <cite>ResetChart</cite> signal.</p>
+signal, it must transition to the <cite>middle</cite> state.</p>
+<p>This is what is meant by behavioral inheritance.  All of the child states of the
+<cite>outer</cite> state will all behave the same as the <cite>outer</cite> state does the
+<cite>WaitComplete</cite> event; they inherit the behavior of the <cite>outer</cite> state.</p>
+<p>Now lets get back to the story.  The middle state has an <cite>init</cite> signal, the big
+black dot, which requires a transition to the <cite>inner</cite> state, so it does this.
+Ultimately the statechart rests in the <cite>inner</cite> state just in time for the active
+object thread to send the next event at it, the event containing the
+<cite>ResetChart</cite> signal.</p>
 <p>The <cite>trace</cite> output summarizes the last paragraph as:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># 11:35:20.469870 [01352] WaitComplete: inner-&gt;inner</span>
 </pre></div>
@@ -380,6 +381,23 @@ actually doing by viewing the spy instrumentation:</p>
   <span class="c1"># &#39;&lt;- Queued:(0) Deferred:(0)&#39;]</span>
 </pre></div>
 </div>
+<p>You can split this output into chunks, based on the Queued lines:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># All actions before this belong to one rtc</span>
+<span class="c1"># &#39;&lt;- Queued:(0) Deferred:(0)&#39;]</span>
+</pre></div>
+</div>
+<p>Each event was dispatched to the chart by the active object, and let to run to
+completion prior to the next event being engaged.  This is called a run to
+completion step (rct), and it is a mandatory behavior of an active object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">Thou</span> <span class="n">shalt</span> <span class="n">NOT</span> <span class="n">interrupt</span> <span class="n">a</span> <span class="n">statechart</span> <span class="n">part</span>
+<span class="n">way</span> <span class="n">through</span> <span class="n">its</span> <span class="n">reaction</span> <span class="n">to</span> <span class="n">an</span> <span class="n">old</span> <span class="n">event</span><span class="p">,</span>
+<span class="k">with</span> <span class="n">a</span> <span class="n">new</span> <span class="n">event</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Don’t worry about this rule, the active object takes care of it for you.  This
+is why it has queues.  A new event is just placed in the queue until the
+previous reaction is complete.  Only then will the active object force the
+statechart to react to it.</p>
 </div>
 <div class="section" id="hsm-example">
 <h2>Hsm Example<a class="headerlink" href="#hsm-example" title="Permalink to this headline">¶</a></h2>

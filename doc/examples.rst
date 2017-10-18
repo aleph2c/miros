@@ -304,14 +304,17 @@ received.  If we look at the diagram we see that the `inner` state does not
 handle this signal so it passes control to the `middle` state.  The `middle`
 state does not handle the `WaitComplete` either so it passes control to the
 `outer` state.  The `outer` state knows what to do with the `WaitComplete`
-signal, it must transition to the `middle` state.  This is what is meant by
-behavioral inheritance.  All of the child states of the `outer` state will all
-behave the same as `outer` state does the `WaitComplete` event, they inherit the
-behavior of the `outer` state.  Now lets get back to the story.  The middle
-state has an `init` signal, the big black dot, which requires a transition to
-the `inner` state, so it does this.  Ultimately the statechart rests in the
-`inner` state just in time for the active object thread to send the next event
-at it, the event containing the `ResetChart` signal.
+signal, it must transition to the `middle` state.  
+
+This is what is meant by behavioral inheritance.  All of the child states of the
+`outer` state will all behave the same as the `outer` state does the
+`WaitComplete` event; they inherit the behavior of the `outer` state.
+
+Now lets get back to the story.  The middle state has an `init` signal, the big
+black dot, which requires a transition to the `inner` state, so it does this.
+Ultimately the statechart rests in the `inner` state just in time for the active
+object thread to send the next event at it, the event containing the
+`ResetChart` signal.
 
 The `trace` output summarizes the last paragraph as:
 
@@ -397,6 +400,27 @@ actually doing by viewing the spy instrumentation:
     # 'INIT_SIGNAL:outer',
     # '<- Queued:(0) Deferred:(0)']
 
+You can split this output into chunks, based on the Queued lines:
+
+.. code-block:: python
+    
+    # All actions before this belong to one rtc
+    # '<- Queued:(0) Deferred:(0)']
+
+Each event was dispatched to the chart by the active object, and let to run to
+completion prior to the next event being engaged.  This is called a run to
+completion step (rct), and it is a mandatory behavior of an active object.
+
+.. code-block:: python
+
+  Thou shalt NOT interrupt a statechart part
+  way through its reaction to an old event,
+  with a new event.
+
+Don't worry about this rule, the active object takes care of it for you.  This
+is why it has queues.  A new event is just placed in the queue until the
+previous reaction is complete.  Only then will the active object force the
+statechart to react to it.
 
 
 
