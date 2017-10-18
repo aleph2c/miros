@@ -4,12 +4,12 @@
    contain the root `toctree` directive.
 
 Installation
-=================================
+============
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-To install:
+To install::
 
-  pip install miros
+   > pip3 install miros

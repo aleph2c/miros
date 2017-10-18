@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Miros
-=================================
+.. image:: _static/miros_a_lg.svg
+   :align: left
 
 .. toctree::
    :maxdepth: 2
@@ -12,11 +12,15 @@ Miros
    :titlesonly:
 
    installation
+   introduction
    quickstart
-   seeing_what_is_going_on
+   reflection
+   examples
    recipes
    patterns
    architecture
+
+
 
 Indices and tables
 ------------------

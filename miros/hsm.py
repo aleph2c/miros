@@ -321,7 +321,7 @@ class HsmEventProcessor():
         index -= 1
         entery_fn = tpath[index]
         r = entery_fn(self,e)
-        if(index == 0):
+        if(index <= 0):
           break # inner while break condition
 
       # Now send it the init event, the init event could change our
@@ -537,7 +537,7 @@ class HsmEventProcessor():
         while(True):
           tpath[ip](self, entry_e)
           ip -= 1
-          if(ip == 0):
+          if(ip <= 0):
             break
         t = tpath[0]
 
@@ -1019,8 +1019,8 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
         self.full.trace.append(t)
     return _append_to_full_trace
 
-  @append_to_full_trace
   @append_to_full_spy
+  @append_to_full_trace
   def dispatch(self,e):
     super().dispatch(e)
 

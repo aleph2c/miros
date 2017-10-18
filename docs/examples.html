@@ -1,0 +1,323 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Examples &#8212; miros 2.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Recipes" href="recipes.html" />
+    <link rel="prev" title="Seeing What is Going On" href="reflection.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<img alt="_images/simple_example_1.svg" src="_images/simple_example_1.svg" /><div class="section" id="activeobject-example">
+<h2>ActiveObject Example<a class="headerlink" href="#activeobject-example" title="Permalink to this headline">¶</a></h2>
+<p>Suppose you have designed the above behavioral diagram and you would like to
+implement it using this library.  The easiest way to do this is to use the
+<cite>ActiveObject</cite> class provided within the <cite>active object</cite> module.</p>
+<p>To begin our example we import some items from the miros library:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span><span class="p">,</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span><span class="p">,</span> <span class="n">spy_on</span>
+</pre></div>
+</div>
+<p>Then we define the <abbr title="the arrow labels in the diagram">signals</abbr> which our
+<abbr title="the arrows">events</abbr> will use:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;WaitComplete&quot;</span><span class="p">)</span>
+<span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;ResetChart&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The signals object is derived from a <abbr title="all objects instantiated from this class refer to the same object">singleton class</abbr>, so once our signals are
+defined they can be accessed by any other module in our python project.</p>
+<p>Now we write our state methods.  The state methods are not really states, but
+just simple methods that are called by the HSM event processor when it is trying
+to figure out what to do in response to an event.</p>
+<p>Let start by writing the outer state method.  This method can be thought of as
+representing the rectangle labeled <cite>outer</cite> of the above diagram.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">outer</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># outer state custom entry code would go here</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># outer state custom exit code would go here</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">WaitComplete</span><span class="p">):</span>
+    <span class="c1"># we could write code which runs on the WaitComplete signal here</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">middle</span><span class="p">)</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ResetChart</span><span class="p">):</span>
+    <span class="c1"># we could write code which runs on the ResetChart signal here</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="c1"># this signal wasn&#39;t managed, pass a reference to the</span>
+    <span class="c1"># method that is outside of us</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>We see that our method is basically a big if-else structure, which reads the
+signal attribute of the <cite>e</cite> (Event) variable and decides what to do about it. We
+see that this state reacts to the <cite>WaitComplete</cite> by calling the <code class="docutils literal"><span class="pre">trans</span></code> method
+with the <cite>middle</cite> state as an argument.  This will represent the arrow labeled
+<cite>WaitComplete</cite> on the above diagram connecting the <cite>outer</cite> state with the
+<cite>middle</cite> state.</p>
+<p>Likewise we see that this method calls the <code class="docutils literal"><span class="pre">trans</span></code> method with the <cite>outer</cite>
+method as an argument when it receives an event with the signal named
+<cite>ResetChart</cite>.  This represents the arrow which loops from-and-to the <cite>outer</cite>
+rectangle in the above diagram.</p>
+<p>We see that the</p>
+<p><cite>ActiveObjects</cite> are very dynamic and can be hard to debug if we can’t see what
+they are doing while we build and test them.  So, we instrument the <cite>outer</cite>
+method with a <code class="docutils literal"><span class="pre">&#64;spy_on</span></code> decorator.  This adds logging to the method, more will
+be said about this as the example continues.</p>
+<p>Now lets write the middle state:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">outer</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>The inner state:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">middle</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>Now that our states are defined, we create an <cite>active object</cite> and tell it where
+to start in our diagram:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The call to the <code class="docutils literal"><span class="pre">start_at</span></code> <cite>active object</cite> method will create two different <abbr title="threads that stop when the main program stops running">daemonic
+threads</abbr>, one is for
+managing the <cite>active object</cite> and the other is for managing the <cite>active fabric</cite>.
+Then the <code class="docutils literal"><span class="pre">start_at</span></code> call tries to climb into the chart.</p>
+<p>We can see what happened by reading the <cite>spy</cite> instrumentation results:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span> <span class="c1">#=&gt;</span>
+  <span class="c1"># [&#39;START&#39;,</span>
+  <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:outer&#39;,</span>
+  <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:top&#39;,</span>
+  <span class="c1">#  &#39;ENTRY_SIGNAL:top&#39;,</span>
+  <span class="c1">#  &#39;ENTRY_SIGNAL:outer&#39;,</span>
+  <span class="c1">#  &#39;INIT_SIGNAL:outer&#39;,</span>
+  <span class="c1">#  &#39;&lt;- Queued:(0) Deferred:(0)&#39;]</span>
+</pre></div>
+</div>
+<p>This is very detailed but we can view a summary of what happened using the
+<cite>trace</cite> instrumentation instead of the <cite>spy</cite> instrumentation:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="c1">#=&gt;</span>
+  <span class="c1"># 09:53:38.941445 [01352] None: top-&gt;outer</span>
+</pre></div>
+</div>
+<p>The <cite>trace</cite> is different from our <cite>spy</cite> in that it does not show all of the activity
+resulting from our event processor, but instead just shows information about
+state transitions and the signal which caused the transition to occur.  In this
+case there was <abbr title="the transition was caused by a start_at">no signal</abbr> so the
+<cite>trace</cite> displays <code class="docutils literal"><span class="pre">None</span></code> for the signal name.  The <cite>trace</cite> does give us some new
+information though: it outputs a timestamp of when the transition took place.</p>
+<p>Now that our state is in <code class="docutils literal"><span class="pre">outer</span></code> state, we can send an event at it.  After
+this reaction we can see what happened by viewing our instrumentation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># clear our spy and trace logs</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">clear_trace</span><span class="p">()</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">clear_spy</span><span class="p">()</span>
+
+<span class="c1"># Send an event with signal &#39;W&#39; so we can watch the reaction</span>
+<span class="n">event_w</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">W</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_w</span><span class="p">)</span> <span class="c1">#=&gt; &quot;hello world&quot;</span>
+
+<span class="c1"># Look at the reaction of our chart in great detail</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span> <span class="c1">#=&gt;</span>
+  <span class="c1"># [&#39;W:outer&#39;,</span>
+  <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+  <span class="c1">#  &#39;ENTRY_SIGNAL:middle&#39;,</span>
+  <span class="c1">#  &#39;INIT_SIGNAL:middle&#39;,</span>
+  <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+  <span class="c1">#  &#39;ENTRY_SIGNAL:inner&#39;,</span>
+  <span class="c1">#  &#39;INIT_SIGNAL:inner&#39;,</span>
+  <span class="c1">#  &#39;&lt;- Queued:(0) Deferred:(0)&#39;]</span>
+
+<span class="c1"># Look at the reaction of our chart with less detail</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="c1">#=&gt;</span>
+  <span class="c1"># 10:34:47.344218 [01352] W: outer-&gt;inner</span>
+</pre></div>
+</div>
+<p>From the trace output we see that we were in the <cite>outer</cite> state and an event with
+the <cite>W</cite> signal caused us to transition into the <cite>inner</cite> state.  This is true,
+but it doesn’t really describe what happened.</p>
+<p>If we want the full story we need to look at the results of our spy.  We see
+that the system was in the <cite>outer</cite> state and it reacted to an event with the
+signal <cite>W</cite>.  It saw that it needed to transition into the <cite>middle</cite> state, so it
+issued an event with the <cite>entry</cite> signal to the middle state.  If you had code
+linked to this event in the <cite>middle</cite> state method it would have been run.  Once
+it is in the <cite>middle</cite> state it sees that there is an <cite>init</cite> handler, so it fires
+another event with the signal <cite>init</cite> which causes a transition into the <cite>inner</cite>
+state.  Since the <cite>inner</cite> state required entry, the event processor created an
+event with the <cite>entry</cite> signal and sent it to the <cite>inner</cite> state.  Any entry code
+within the <cite>inner</cite> state event handler would have been run at this point and
+time.  Finally, the event processor issued an other <cite>init</cite> event to the inner
+state.  The inner state does not handle this event, so it is ignored and our
+system settles into the <cite>inner</cite> state.  It will remain here until it has to
+react to events provided by the user.</p>
+<p>As mentioned previously, their are two different threads running in the
+background since we created our <cite>active object</cite>.  They are both pending on
+queues.  The number of items in the active object queue can be seen in our <cite>spy</cite>
+instrumentation.  We see that at the end of this reaction to the event with the
+<cite>W</cite> signal, there was nothing in the queue so the <cite>active object</cite> thread has
+nothing to do.</p>
+<p>Lets stop the thread, and place a number of events into the queue managed by the
+active object.</p>
+</div>
+<div class="section" id="hsm-example">
+<h2>Hsm Example<a class="headerlink" href="#hsm-example" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="hsmwithqueues-example">
+<h2>HsmWithQueues Example<a class="headerlink" href="#hsmwithqueues-example" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="instrumentedhsmeventprocessor-example">
+<h2>InstrumentedHsmEventProcessor Example<a class="headerlink" href="#instrumentedhsmeventprocessor-example" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="hsmeventprocessor-example">
+<h2>HsmEventProcessor Example<a class="headerlink" href="#hsmeventprocessor-example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">reflect</span><span class="p">(</span><span class="n">hsm</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">e</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  This will return the callers function name as a string:</span>
+<span class="sd">  Example:</span>
+
+<span class="sd">    def example_function():</span>
+<span class="sd">      return reflect()</span>
+
+<span class="sd">    print(example_function) #=&gt; &quot;example_function&quot;</span>
+
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">fnt</span>  <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">extract_stack</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+  <span class="n">fnt1</span> <span class="o">=</span> <span class="n">fnt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">fnt2</span> <span class="o">=</span> <span class="n">fnt1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+  <span class="k">return</span> <span class="n">fnt2</span>
+</pre></div>
+</div>
+<div class="figure" id="deferred-event-state-pattern">
+<img alt="the deferred event state pattern" src="_images/DeferredEventStatePattern.gif" />
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
+  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
+</a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Examples</a><ul>
+<li><a class="reference internal" href="#activeobject-example">ActiveObject Example</a></li>
+<li><a class="reference internal" href="#hsm-example">Hsm Example</a></li>
+<li><a class="reference internal" href="#hsmwithqueues-example">HsmWithQueues Example</a></li>
+<li><a class="reference internal" href="#instrumentedhsmeventprocessor-example">InstrumentedHsmEventProcessor Example</a></li>
+<li><a class="reference internal" href="#hsmeventprocessor-example">HsmEventProcessor Example</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="reflection.html" title="previous chapter">Seeing What is Going On</a></li>
+      <li>Next: <a href="recipes.html" title="next chapter">Recipes</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/examples.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Scott Volk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/examples.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
