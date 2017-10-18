@@ -29,8 +29,12 @@ First we import some items from the miros library:
 
 .. code-block:: python
 
-  from miros.event import Signal, Event, return_status, signals
-  from miros.activeobject import ActiveObject, spy_on
+  from miros.event import Event
+  from miros.event import signals
+  from miros.event import return_status
+
+  from miros.activeobject import spy_on
+  from miros.activeobject import ActiveObject
 
 Then we define the :abbr:`signals(the arrow labels in the diagram)` which our
 :abbr:`events(the arrows)` will use:
@@ -119,8 +123,6 @@ Now lets write the middle state:
     elif(e.signal == signals.INIT_SIGNAL):
       # middle init code here
       status = chart.trans(inner)
-      return return_status.HANDLED
-
     else:
       status, chart.temp.fun = \
         return_status.SUPER, outer
@@ -193,7 +195,7 @@ happened you can use the `trace` instrumentation instead.
       # 09:53:38.941445 [01352] None: top->outer
 
 The `trace` is different from our `spy` in that it does not show all of the
-activity resulting from our internal event processoring, but instead just shows
+activity resulting from our internal event processing, but instead just shows
 information about state transitions and the signal which caused the transition
 to occur.  In this case there was :abbr:`no signal(the transition was caused by
 a start_at)` so the `trace` displays ``None`` for the signal name.  The `trace`
@@ -253,7 +255,7 @@ background since we created our `active object`.  They are both pending on
 queues.  The number of items in the active object queue can be seen in our `spy`
 instrumentation.  We see that at the end of this reaction to the event with the
 `WaitComplete` signal, there was nothing in the queue so the `active object`
-thread has nothing to do.  It is just waiting.
+thread had nothing to do.  It is just waiting.
 
 Lets stop both threads, and place a number of events into the queue managed by the
 active object.
@@ -261,6 +263,7 @@ active object.
 .. _label:
 .. code-block:: python
 
+    import time
     # stop the threads
     ao.stop()
 
@@ -275,9 +278,128 @@ active object.
     ao.post_fifo(event_reset_chart)   
     ao.post_fifo(event_wait_complete)
     ao.post_fifo(event_reset_chart)
+    time.sleep(0.3)
 
 We would expect that nothing should happens since the task which is pending on
-an event has been shut down.
+an event has been shut down.  Let's look at the results, first with the trace:
+
+.. code-block:: python
+
+    print(ao.trace)
+     # 11:35:20.469870 [01352] WaitComplete: inner->inner
+     # 11:35:20.470871 [01352] ResetChart: inner->outer
+     # 11:35:20.470871 [01352] WaitComplete: outer->inner
+     # 11:35:20.470871 [01352] ResetChart: inner->outer
+
+It seems that our active object woke up even though we killed the thread.  This
+is true, because the active object has a phoenix thread; if it has been killed,
+and something has been placed in the queue it will resurrect itself and get back
+to work.
+
+We see from the high level state summary that all 4 post of our events caused
+state transitions in our statechart.  
+
+To begin with we were in the `inner` state and the `WaitComplete` signal was
+received.  If we look at the diagram we see that the `inner` state does not
+handle this signal so it passes control to the `middle` state.  The `middle`
+state does not handle the `WaitComplete` either so it passes control to the
+`outer` state.  The `outer` state knows what to do with the `WaitComplete`
+signal, it must transition to the `middle` state.  This is what is meant by
+behavioral inheritance.  All of the child states of the `outer` state will all
+behave the same to the `WaitComplete` event, they inherit the behavior of the
+`outer` state.  Now lets get back to the story.  The middle state has an
+`init` signal, the big black dot, which requires a transition to the `inner`
+state, so it does this.  Ultimately the statechart rests in the `inner` state
+just in time for the active object thread to send the next event at it, the
+event containing the `ResetChart` signal.
+
+The `trace` output summarizes the last paragraph as:
+
+.. code-block:: python
+
+  # 11:35:20.469870 [01352] WaitComplete: inner->inner
+
+The `inner` state doesn't know what to do with the `ResetChart` signal, so it
+passes control to the `middle` state.  The `middle` state doesn't know what do
+to with it so it passes control out to the `outer` state.  It sees that it knows
+what to do, which is to leave and re-enter itself.  More will be said about this
+in a bit when we look at the spy.  Skipping some details, we see that when it is
+completed, the statechart rests in the `outer` state, because it does not
+respond to the `init` signal (it does not have a black dot).  Then the active
+object dispatches a `WaitComplete` signal to the `outer` state.
+
+The `trace` output summarizes the last paragraph as:
+
+.. code-block:: python
+
+  # 11:35:20.470871 [01352] ResetChart: inner->outer
+
+The `outer` state knows what to do with this, it needs to transition to the `middle`
+state, which in turn will transition into the `inner` state.  At this point the
+chart rests, just in time to be sent an event with the `ResetChart` signal.
+Which repeats a behavior we have already described.
+
+The `trace` output summarizes the last paragraph as:
+
+.. code-block:: python
+
+  # 11:35:20.470871 [01352] WaitComplete: outer->inner
+  # 11:35:20.469870 [01352] WaitComplete: inner->inner
+
+If that isn't enough detail for you, let's look at what the active object is
+actually doing by viewing the spy instrumentation:
+
+.. code-block:: python
+
+  print(ao.spy_full())
+    #['WaitComplete:inner',
+    # 'WaitComplete:middle',
+    # 'WaitComplete:outer',
+    # 'EXIT_SIGNAL:inner',
+    # 'SEARCH_FOR_SUPER_SIGNAL:inner',
+    # 'EXIT_SIGNAL:middle',
+    # 'SEARCH_FOR_SUPER_SIGNAL:middle',
+    # 'SEARCH_FOR_SUPER_SIGNAL:middle',
+    # 'ENTRY_SIGNAL:middle',
+    # 'INIT_SIGNAL:middle',
+    # 'SEARCH_FOR_SUPER_SIGNAL:inner',
+    # 'ENTRY_SIGNAL:inner',
+    # 'INIT_SIGNAL:inner',
+    # '<- Queued:(3) Deferred:(0)',
+    # 'ResetChart:inner',
+    # 'ResetChart:middle',
+    # 'ResetChart:outer',
+    # 'EXIT_SIGNAL:inner',
+    # 'SEARCH_FOR_SUPER_SIGNAL:inner',
+    # 'EXIT_SIGNAL:middle',
+    # 'SEARCH_FOR_SUPER_SIGNAL:middle',
+    # 'EXIT_SIGNAL:outer',
+    # 'ENTRY_SIGNAL:outer',
+    # 'INIT_SIGNAL:outer',
+    # '<- Queued:(2) Deferred:(0)',
+    # 'WaitComplete:outer',
+    # 'SEARCH_FOR_SUPER_SIGNAL:middle',
+    # 'ENTRY_SIGNAL:middle',
+    # 'INIT_SIGNAL:middle',
+    # 'SEARCH_FOR_SUPER_SIGNAL:inner',
+    # 'ENTRY_SIGNAL:inner',
+    # 'INIT_SIGNAL:inner',
+    # '<- Queued:(1) Deferred:(0)',
+    # 'ResetChart:inner',
+    # 'ResetChart:middle',
+    # 'ResetChart:outer',
+    # 'EXIT_SIGNAL:inner',
+    # 'SEARCH_FOR_SUPER_SIGNAL:inner',
+    # 'EXIT_SIGNAL:middle',
+    # 'SEARCH_FOR_SUPER_SIGNAL:middle',
+    # 'EXIT_SIGNAL:outer',
+    # 'ENTRY_SIGNAL:outer',
+    # 'INIT_SIGNAL:outer',
+    # '<- Queued:(0) Deferred:(0)']
+
+
+
+
 
 Hsm Example
 -----------

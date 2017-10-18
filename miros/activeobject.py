@@ -428,13 +428,13 @@ class ActiveObject(Hsm):
     if self.thread is None:
       result = False
     else:
-      result = True if self.thread_is_alive() else False
+      result = True if self.thread.is_alive() else False
     return result
 
   def start_thread_if_not_running(fn):
     '''start the active object thread if it is not currently running'''
     def _start_thread_if_not_running(self,*args,**kwargs):
-      if self.__thread_running == False:
+      if self.__thread_running() == False:
         self.__start()
       fn(self,*args,**kwargs)
     return _start_thread_if_not_running

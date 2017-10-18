@@ -59,8 +59,12 @@ the <cite>inner</cite> state the diagram would like us to print “hello world�
 happen without stimulation of the chart and we will see how to do that within the
 example.</p>
 <p>First we import some items from the miros library:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span><span class="p">,</span> <span class="n">signals</span>
-<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span><span class="p">,</span> <span class="n">spy_on</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
 </pre></div>
 </div>
 <p>Then we define the <abbr title="the arrow labels in the diagram">signals</abbr> which our
@@ -136,8 +140,6 @@ example continues.</p>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
     <span class="c1"># middle init code here</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-
   <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> \
       <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">outer</span>
@@ -201,7 +203,7 @@ happened you can use the <cite>trace</cite> instrumentation instead.</p>
 </pre></div>
 </div>
 <p>The <cite>trace</cite> is different from our <cite>spy</cite> in that it does not show all of the
-activity resulting from our internal event processoring, but instead just shows
+activity resulting from our internal event processing, but instead just shows
 information about state transitions and the signal which caused the transition
 to occur.  In this case there was <abbr title="the transition was caused by a start_at">no signal</abbr> so the <cite>trace</cite> displays <code class="docutils literal"><span class="pre">None</span></code> for the signal name.  The <cite>trace</cite>
 does give us some new information though: it outputs a timestamp of when the
@@ -255,10 +257,11 @@ background since we created our <cite>active object</cite>.  They are both pendi
 queues.  The number of items in the active object queue can be seen in our <cite>spy</cite>
 instrumentation.  We see that at the end of this reaction to the event with the
 <cite>WaitComplete</cite> signal, there was nothing in the queue so the <cite>active object</cite>
-thread has nothing to do.  It is just waiting.</p>
+thread had nothing to do.  It is just waiting.</p>
 <p>Lets stop both threads, and place a number of events into the queue managed by the
 active object.</p>
-<div class="highlight-python" id="label"><div class="highlight"><pre><span></span><span class="c1"># stop the threads</span>
+<div class="highlight-python" id="label"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="c1"># stop the threads</span>
 <span class="n">ao</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 
 <span class="c1"># clear the spy and the trace</span>
@@ -272,10 +275,111 @@ active object.</p>
 <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_reset_chart</span><span class="p">)</span>
 <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_wait_complete</span><span class="p">)</span>
 <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_reset_chart</span><span class="p">)</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We would expect that nothing should happens since the task which is pending on
-an event has been shut down.</p>
+an event has been shut down.  Let’s look at the results, first with the trace:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">)</span>
+ <span class="c1"># 11:35:20.469870 [01352] WaitComplete: inner-&gt;inner</span>
+ <span class="c1"># 11:35:20.470871 [01352] ResetChart: inner-&gt;outer</span>
+ <span class="c1"># 11:35:20.470871 [01352] WaitComplete: outer-&gt;inner</span>
+ <span class="c1"># 11:35:20.470871 [01352] ResetChart: inner-&gt;outer</span>
+</pre></div>
+</div>
+<p>It seems that our active object woke up even though we killed the thread.  This
+is true, because the active object has a phoenix thread; if it has been killed,
+and something has been placed in the queue it will resurrect itself and get back
+to work.</p>
+<p>We see from the high level state summary that all 4 post of our events caused
+state transitions in our statechart.</p>
+<p>To begin with we were in the <cite>inner</cite> state and the <cite>WaitComplete</cite> signal was
+received.  If we look at the diagram we see that the <cite>inner</cite> state does not
+handle this signal so it passes control to the <cite>middle</cite> state.  The <cite>middle</cite>
+state does not handle the <cite>WaitComplete</cite> either so it passes control to the
+<cite>outer</cite> state.  The <cite>outer</cite> state knows what to do with the <cite>WaitComplete</cite>
+signal, it must transition to the <cite>middle</cite> state.  This is what is meant by
+behavioral inheritance.  All of the child states of the <cite>outer</cite> state will all
+behave the same to the <cite>WaitComplete</cite> event, they inherit the behavior of the
+<cite>outer</cite> state.  Now lets get back to the story.  The middle state has an
+<cite>init</cite> signal, the big black dot, which requires a transition to the <cite>inner</cite>
+state, so it does this.  Ultimately the statechart rests in the <cite>inner</cite> state
+just in time for the active object thread to send the next event at it, the
+event containing the <cite>ResetChart</cite> signal.</p>
+<p>The <cite>trace</cite> output summarizes the last paragraph as:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># 11:35:20.469870 [01352] WaitComplete: inner-&gt;inner</span>
+</pre></div>
+</div>
+<p>The <cite>inner</cite> state doesn’t know what to do with the <cite>ResetChart</cite> signal, so it
+passes control to the <cite>middle</cite> state.  The <cite>middle</cite> state doesn’t know what do
+to with it so it passes control out to the <cite>outer</cite> state.  It sees that it knows
+what to do, which is to leave and re-enter itself.  More will be said about this
+in a bit when we look at the spy.  Skipping some details, we see that when it is
+completed, the statechart rests in the <cite>outer</cite> state, because it does not
+respond to the <cite>init</cite> signal (it does not have a black dot).  Then the active
+object dispatches a <cite>WaitComplete</cite> signal to the <cite>outer</cite> state.</p>
+<p>The <cite>trace</cite> output summarizes the last paragraph as:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># 11:35:20.470871 [01352] ResetChart: inner-&gt;outer</span>
+</pre></div>
+</div>
+<p>The <cite>outer</cite> state knows what to do with this, it needs to transition to the <cite>middle</cite>
+state, which in turn will transition into the <cite>inner</cite> state.  At this point the
+chart rests, just in time to be sent an event with the <cite>ResetChart</cite> signal.
+Which repeats a behavior we have already described.</p>
+<p>The <cite>trace</cite> output summarizes the last paragraph as:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># 11:35:20.470871 [01352] WaitComplete: outer-&gt;inner</span>
+<span class="c1"># 11:35:20.469870 [01352] WaitComplete: inner-&gt;inner</span>
+</pre></div>
+</div>
+<p>If that isn’t enough detail for you, let’s look at what the active object is
+actually doing by viewing the spy instrumentation:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
+  <span class="c1">#[&#39;WaitComplete:inner&#39;,</span>
+  <span class="c1"># &#39;WaitComplete:middle&#39;,</span>
+  <span class="c1"># &#39;WaitComplete:outer&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;ENTRY_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;INIT_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;ENTRY_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;INIT_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;&lt;- Queued:(3) Deferred:(0)&#39;,</span>
+  <span class="c1"># &#39;ResetChart:inner&#39;,</span>
+  <span class="c1"># &#39;ResetChart:middle&#39;,</span>
+  <span class="c1"># &#39;ResetChart:outer&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:outer&#39;,</span>
+  <span class="c1"># &#39;ENTRY_SIGNAL:outer&#39;,</span>
+  <span class="c1"># &#39;INIT_SIGNAL:outer&#39;,</span>
+  <span class="c1"># &#39;&lt;- Queued:(2) Deferred:(0)&#39;,</span>
+  <span class="c1"># &#39;WaitComplete:outer&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;ENTRY_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;INIT_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;ENTRY_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;INIT_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;&lt;- Queued:(1) Deferred:(0)&#39;,</span>
+  <span class="c1"># &#39;ResetChart:inner&#39;,</span>
+  <span class="c1"># &#39;ResetChart:middle&#39;,</span>
+  <span class="c1"># &#39;ResetChart:outer&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:outer&#39;,</span>
+  <span class="c1"># &#39;ENTRY_SIGNAL:outer&#39;,</span>
+  <span class="c1"># &#39;INIT_SIGNAL:outer&#39;,</span>
+  <span class="c1"># &#39;&lt;- Queued:(0) Deferred:(0)&#39;]</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="hsm-example">
 <h2>Hsm Example<a class="headerlink" href="#hsm-example" title="Permalink to this headline">¶</a></h2>

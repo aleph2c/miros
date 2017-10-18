@@ -1,5 +1,5 @@
 import pytest
-from miros.event import ReturnStatus, Signal, signals, Event, return_status
+from miros.event import signals, Event, return_status
 from miros.activeobject import ActiveObject, spy_on, HsmTopologyException, ActiveFabric
 from miros.activeobject import LockingDeque
 import pprint
@@ -64,8 +64,6 @@ def middle(chart, e):
   elif(e.signal == signals.INIT_SIGNAL):
     # middle state custom init code would go here
     status = chart.trans(inner)
-    return return_status.HANDLED
-
   else:
     status, chart.temp.fun = return_status.SUPER, outer
   return status
@@ -108,6 +106,24 @@ def test1_trans_topology_a():
   time.sleep(0.1)
   pp(ao.spy_rtc())
   print(ao.trace())
+
+  # stop the threads
+  ao.stop()
+
+  # clear the spy and the trace
+  ao.clear_spy()
+  ao.clear_trace()
+
+  # post a number of events and see what happens
+  event_wait_complete = Event(signal=signals.WaitComplete)
+  event_reset_chart = Event(signal=signals.ResetChart)
+  ao.post_fifo(event_wait_complete)
+  ao.post_fifo(event_reset_chart)   
+  ao.post_fifo(event_wait_complete)
+  ao.post_fifo(event_reset_chart)
+  time.sleep(0.3)
+  print(ao.trace())
+  pp(ao.spy_full())
 
   # chart = spy_chart
   # expected_behavior = \
