@@ -300,12 +300,12 @@ state does not handle the <cite>WaitComplete</cite> either so it passes control 
 <cite>outer</cite> state.  The <cite>outer</cite> state knows what to do with the <cite>WaitComplete</cite>
 signal, it must transition to the <cite>middle</cite> state.  This is what is meant by
 behavioral inheritance.  All of the child states of the <cite>outer</cite> state will all
-behave the same to the <cite>WaitComplete</cite> event, they inherit the behavior of the
-<cite>outer</cite> state.  Now lets get back to the story.  The middle state has an
-<cite>init</cite> signal, the big black dot, which requires a transition to the <cite>inner</cite>
-state, so it does this.  Ultimately the statechart rests in the <cite>inner</cite> state
-just in time for the active object thread to send the next event at it, the
-event containing the <cite>ResetChart</cite> signal.</p>
+behave the same as <cite>outer</cite> state does the <cite>WaitComplete</cite> event, they inherit the
+behavior of the <cite>outer</cite> state.  Now lets get back to the story.  The middle
+state has an <cite>init</cite> signal, the big black dot, which requires a transition to
+the <cite>inner</cite> state, so it does this.  Ultimately the statechart rests in the
+<cite>inner</cite> state just in time for the active object thread to send the next event
+at it, the event containing the <cite>ResetChart</cite> signal.</p>
 <p>The <cite>trace</cite> output summarizes the last paragraph as:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># 11:35:20.469870 [01352] WaitComplete: inner-&gt;inner</span>
 </pre></div>

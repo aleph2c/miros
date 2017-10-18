@@ -306,12 +306,12 @@ state does not handle the `WaitComplete` either so it passes control to the
 `outer` state.  The `outer` state knows what to do with the `WaitComplete`
 signal, it must transition to the `middle` state.  This is what is meant by
 behavioral inheritance.  All of the child states of the `outer` state will all
-behave the same to the `WaitComplete` event, they inherit the behavior of the
-`outer` state.  Now lets get back to the story.  The middle state has an
-`init` signal, the big black dot, which requires a transition to the `inner`
-state, so it does this.  Ultimately the statechart rests in the `inner` state
-just in time for the active object thread to send the next event at it, the
-event containing the `ResetChart` signal.
+behave the same as `outer` state does the `WaitComplete` event, they inherit the
+behavior of the `outer` state.  Now lets get back to the story.  The middle
+state has an `init` signal, the big black dot, which requires a transition to
+the `inner` state, so it does this.  Ultimately the statechart rests in the
+`inner` state just in time for the active object thread to send the next event
+at it, the event containing the `ResetChart` signal.
 
 The `trace` output summarizes the last paragraph as:
 
