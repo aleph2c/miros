@@ -57,25 +57,27 @@ rectangle labeled `outer` in the above diagram.
   def outer(chart, e):
     status = return_status.UNHANDLED
     if(e.signal == signals.ENTRY_SIGNAL):
-      # outer state custom entry code would go here
+      # outer state custom entry-code here
       status = return_status.HANDLED
 
     elif(e.signal == signals.EXIT_SIGNAL):
-      # outer state custom exit code would go here
+      # outer state custom exit-code here
       status = return_status.HANDLED
 
     elif(e.signal == signals.WaitComplete):
-      # we could write code which runs on the WaitComplete signal here
+      # WaitComplete signal code here
       status = chart.trans(middle)
 
     elif(e.signal == signals.ResetChart):
-      # we could write code which runs on the ResetChart signal here
+      # ResetChart signal code here
       status = chart.trans(outer)
 
     else:
-      # this signal wasn't managed, pass a reference to the 
-      # method that is outside of us
-      status, chart.temp.fun = return_status.SUPER, chart.top
+      # This signal wasn't managed, pass a
+      # reference to the # method that is
+      outside of us
+      status, chart.temp.fun = \
+        return_status.SUPER, chart.top
     return status
 
 We see that our method is basically a big if-else structure, which reads the
@@ -107,20 +109,21 @@ Now lets write the middle state:
   def middle(chart, e):
     status = return_status.UNHANDLED
     if(e.signal == signals.ENTRY_SIGNAL):
-      # middle state custom entry code would go here
+      # middle entry code here
       status = return_status.HANDLED
 
     elif(e.signal == signals.EXIT_SIGNAL):
-      # middle state custom exit code would go here
+      # middle exit code here
       status = return_status.HANDLED
 
     elif(e.signal == signals.INIT_SIGNAL):
-      # middle state custom init code would go here
+      # middle init code here
       status = chart.trans(inner)
       return return_status.HANDLED
 
     else:
-      status, chart.temp.fun = return_status.SUPER, outer
+      status, chart.temp.fun = \
+        return_status.SUPER, outer
     return status
 
 Now lets write the inner state:
@@ -131,15 +134,16 @@ Now lets write the inner state:
   def inner(chart, e):
     status = return_status.UNHANDLED
     if(e.signal == signals.ENTRY_SIGNAL):
-      # inner state custom entry code would go here
+      print("hello world")
       status = return_status.HANDLED
 
     elif(e.signal == signals.EXIT_SIGNAL):
-      # inner state custom exit code would go here
+      # inner exit code here
       status = return_status.HANDLED
 
     else:
-      status, chart.temp.fun = return_status.SUPER, middle
+      status, chart.temp.fun = \
+        return_status.SUPER, middle
     return status
 
 Now that our states are defined, we create an `active object` and tell it where
