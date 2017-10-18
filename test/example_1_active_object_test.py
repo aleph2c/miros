@@ -6,8 +6,9 @@ import pprint
 def pp(item):
   pprint.pprint(item)
 
-signals.append("W")
-signals.append("R")
+
+signals.append("WaitComplete")
+signals.append("ResetChart")
 ################################################################################
 #                             simple_example_1                                 #
 ################################################################################
@@ -28,14 +29,24 @@ class.
 def outer(chart, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
+    # outer state custom entry code would go here
     status = return_status.HANDLED
+
   elif(e.signal == signals.EXIT_SIGNAL):
+    # outer state custom exit code would go here
     status = return_status.HANDLED
-  elif(e.signal == signals.W):
+
+  elif(e.signal == signals.WaitComplete):
+    # we could write code which runs on the WaitComplete signal here
     status = chart.trans(middle)
-  elif(e.signal == signals.R):
+
+  elif(e.signal == signals.ResetChart):
+    # we could write code which runs on the ResetChart signal here
     status = chart.trans(outer)
+
   else:
+    # this signal wasn't managed, pass a reference to the 
+    # method that is outside of us
     status, chart.temp.fun = return_status.SUPER, chart.top
   return status
 
@@ -43,11 +54,18 @@ def outer(chart, e):
 def middle(chart, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
+    # middle state custom entry code would go here
     status = return_status.HANDLED
+
   elif(e.signal == signals.EXIT_SIGNAL):
+    # middle state custom exit code would go here
     status = return_status.HANDLED
+
   elif(e.signal == signals.INIT_SIGNAL):
+    # middle state custom init code would go here
     status = chart.trans(inner)
+    return return_status.HANDLED
+
   else:
     status, chart.temp.fun = return_status.SUPER, outer
   return status
@@ -56,13 +74,16 @@ def middle(chart, e):
 def inner(chart, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
+    # inner state custom entry code would go here
     status = return_status.HANDLED
+
   elif(e.signal == signals.EXIT_SIGNAL):
+    # inner state custom exit code would go here
     status = return_status.HANDLED
+
   else:
     status, chart.temp.fun = return_status.SUPER, middle
   return status
-
 # grep test name to view diagram
 @pytest.mark.example
 def test1_trans_topology_a():
@@ -80,7 +101,7 @@ def test1_trans_topology_a():
   )
   pp(ao.spy_full())
   print(ao.trace())
-  event_w = Event(signal=signals.W)
+  event_w = Event(signal=signals.WaitComplete)
   ao.clear_trace()
   ao.post_fifo(event_w)
   import time

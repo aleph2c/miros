@@ -46,10 +46,19 @@
 </div>
 <img alt="_images/simple_example_1.svg" src="_images/simple_example_1.svg" /><div class="section" id="activeobject-example">
 <h2>ActiveObject Example<a class="headerlink" href="#activeobject-example" title="Permalink to this headline">¶</a></h2>
-<p>Suppose you have designed the above behavioral diagram and you would like to
-implement it using this library.  The easiest way to do this is to use the
-<cite>ActiveObject</cite> class provided within the <cite>active object</cite> module.</p>
-<p>To begin our example we import some items from the miros library:</p>
+<p>In this example we will show how to build the statechart structure described
+above using an <cite>ActiveObject</cite>.</p>
+<p>But this diagram is only describing how we want to react to events.  What is
+missing from the picture is the action itself; what events are happening and
+when.  The <cite>ActiveObject</cite> allows you to control this action, and watch what
+happens as a result.  It provides the facilities to reflect upon the action that
+the statechart took as a response to your programmed stimulation.</p>
+<p>This reaction could be a change of state, or just a running of custom code upon
+a signal detection.  In the above diagram we see that in response to entering
+the <cite>inner</cite> state the diagram would like us to print “hello world”.  This can’t
+happen without stimulation of the chart and we will see how to do that within the
+example.</p>
+<p>First we import some items from the miros library:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span><span class="p">,</span> <span class="n">signals</span>
 <span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span><span class="p">,</span> <span class="n">spy_on</span>
 </pre></div>
@@ -61,12 +70,12 @@ implement it using this library.  The easiest way to do this is to use the
 </pre></div>
 </div>
 <p>The signals object is derived from a <abbr title="all objects instantiated from this class refer to the same object">singleton class</abbr>, so once our signals are
-defined they can be accessed by any other module in our python project.</p>
-<p>Now we write our state methods.  The state methods are not really states, but
-just simple methods that are called by the HSM event processor when it is trying
-to figure out what to do in response to an event.</p>
-<p>Let start by writing the outer state method.  This method can be thought of as
-representing the rectangle labeled <cite>outer</cite> of the above diagram.</p>
+defined they can be accessed by any other module in our python project.  For
+now, think about the signal as being the name of an event.</p>
+<p>Now we write our state methods.  Each of these methods will represent a specific
+state in our diagram.</p>
+<p>Let start by writing the <cite>outer</cite> state method.  This method will represent the
+rectangle labeled <cite>outer</cite> in the above diagram.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">outer</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
@@ -85,6 +94,7 @@ representing the rectangle labeled <cite>outer</cite> of the above diagram.</p>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ResetChart</span><span class="p">):</span>
     <span class="c1"># we could write code which runs on the ResetChart signal here</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
+
   <span class="k">else</span><span class="p">:</span>
     <span class="c1"># this signal wasn&#39;t managed, pass a reference to the</span>
     <span class="c1"># method that is outside of us</span>
@@ -98,39 +108,51 @@ see that this state reacts to the <cite>WaitComplete</cite> by calling the <code
 with the <cite>middle</cite> state as an argument.  This will represent the arrow labeled
 <cite>WaitComplete</cite> on the above diagram connecting the <cite>outer</cite> state with the
 <cite>middle</cite> state.</p>
-<p>Likewise we see that this method calls the <code class="docutils literal"><span class="pre">trans</span></code> method with the <cite>outer</cite>
-method as an argument when it receives an event with the signal named
-<cite>ResetChart</cite>.  This represents the arrow which loops from-and-to the <cite>outer</cite>
-rectangle in the above diagram.</p>
-<p>We see that the</p>
-<p><cite>ActiveObjects</cite> are very dynamic and can be hard to debug if we can’t see what
-they are doing while we build and test them.  So, we instrument the <cite>outer</cite>
-method with a <code class="docutils literal"><span class="pre">&#64;spy_on</span></code> decorator.  This adds logging to the method, more will
-be said about this as the example continues.</p>
+<p>Likewise, we see that this method calls <code class="docutils literal"><span class="pre">trans</span></code> with the <cite>outer</cite> method as an
+argument when it receives an event with the signal named <cite>ResetChart</cite>.  This
+represents the arrow which loops from-and-to the <cite>outer</cite> rectangle in the above
+diagram.</p>
+<p>You can pack a lot of complexity into an <cite>ActiveObject</cite>.  They are very dynamic
+and as a result they can be very difficult to debug.  For this reason the miros
+library allows you to instrument your state methods so that you can see how they
+have responded to the different types of events you send at them.</p>
+<p>This instrumentation is done with the <code class="docutils literal"><span class="pre">&#64;spy_on</span></code> decorator.  This adds a
+special kind of logging to the method, more will be said about this as our
+example continues.</p>
 <p>Now lets write the middle state:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># middle state custom entry code would go here</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># middle state custom exit code would go here</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># middle state custom init code would go here</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
   <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">outer</span>
   <span class="k">return</span> <span class="n">status</span>
 </pre></div>
 </div>
-<p>The inner state:</p>
+<p>Now lets write the inner state:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># inner state custom entry code would go here</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># inner state custom exit code would go here</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
   <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">middle</span>
   <span class="k">return</span> <span class="n">status</span>
@@ -142,12 +164,16 @@ to start in our diagram:</p>
 <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The call to the <code class="docutils literal"><span class="pre">start_at</span></code> <cite>active object</cite> method will create two different <abbr title="threads that stop when the main program stops running">daemonic
-threads</abbr>, one is for
-managing the <cite>active object</cite> and the other is for managing the <cite>active fabric</cite>.
-Then the <code class="docutils literal"><span class="pre">start_at</span></code> call tries to climb into the chart.</p>
-<p>We can see what happened by reading the <cite>spy</cite> instrumentation results:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span> <span class="c1">#=&gt;</span>
+<p>The call to the <code class="docutils literal"><span class="pre">start_at</span></code> active object method will create two different
+<abbr title="threads that stop when the main program stops running">daemonic threads</abbr>,
+one is for managing the active object itself and the other is for managing the
+<cite>ActiveFabric</cite>.  The active fabric is just a process that dispatches methods
+between all of the active objects in your system.  Then <code class="docutils literal"><span class="pre">start_at</span></code> causes the
+active object to change state by climbing into the statechart to the state which
+was provided as an argument; <cite>outer</cite>.</p>
+<p>We can see what happened by reading some of the results of our instrumentation,
+through the <cite>spy</cite> api:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
   <span class="c1"># [&#39;START&#39;,</span>
   <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:outer&#39;,</span>
   <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:top&#39;,</span>
@@ -157,31 +183,39 @@ Then the <code class="docutils literal"><span class="pre">start_at</span></code>
   <span class="c1">#  &#39;&lt;- Queued:(0) Deferred:(0)&#39;]</span>
 </pre></div>
 </div>
-<p>This is very detailed but we can view a summary of what happened using the
-<cite>trace</cite> instrumentation instead of the <cite>spy</cite> instrumentation:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="c1">#=&gt;</span>
+<p>Here we see something about the interplay between the active object and the
+states which it interacts with.  Before it can climb into the <cite>outer</cite> state, it
+needs to <cite>search</cite> the chart so it can know what to do.  Once it knows what to
+do, it takes action by sending a series of signals at our state methods:  It
+sends the entry signal to <cite>top</cite> (and internal state method), then the entry
+signal to the <cite>outer</cite> state, then the <cite>init</cite> signal (the big black dot in our
+picture) to the <cite>outer</cite> state.</p>
+<p>The spy api is very detailed.  If you would like to just see a summary of what
+happened you can use the <cite>trace</cite> instrumentation instead.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
   <span class="c1"># 09:53:38.941445 [01352] None: top-&gt;outer</span>
 </pre></div>
 </div>
-<p>The <cite>trace</cite> is different from our <cite>spy</cite> in that it does not show all of the activity
-resulting from our event processor, but instead just shows information about
-state transitions and the signal which caused the transition to occur.  In this
-case there was <abbr title="the transition was caused by a start_at">no signal</abbr> so the
-<cite>trace</cite> displays <code class="docutils literal"><span class="pre">None</span></code> for the signal name.  The <cite>trace</cite> does give us some new
-information though: it outputs a timestamp of when the transition took place.</p>
+<p>The <cite>trace</cite> is different from our <cite>spy</cite> in that it does not show all of the
+activity resulting from our internal event processoring, but instead just shows
+information about state transitions and the signal which caused the transition
+to occur.  In this case there was <abbr title="the transition was caused by a start_at">no signal</abbr> so the <cite>trace</cite> displays <code class="docutils literal"><span class="pre">None</span></code> for the signal name.  The <cite>trace</cite>
+does give us some new information though: it outputs a timestamp of when the
+transition took place.</p>
 <p>Now that our state is in <code class="docutils literal"><span class="pre">outer</span></code> state, we can send an event at it.  After
-this reaction we can see what happened by viewing our instrumentation.</p>
+the statechart reacts we can see what happened by viewing our instrumentation:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># clear our spy and trace logs</span>
 <span class="n">ao</span><span class="o">.</span><span class="n">clear_trace</span><span class="p">()</span>
 <span class="n">ao</span><span class="o">.</span><span class="n">clear_spy</span><span class="p">()</span>
 
-<span class="c1"># Send an event with signal &#39;W&#39; so we can watch the reaction</span>
-<span class="n">event_w</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">W</span><span class="p">)</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_w</span><span class="p">)</span> <span class="c1">#=&gt; &quot;hello world&quot;</span>
+<span class="c1"># Send an event with signal &#39;WaitComplete&#39; so we can</span>
+<span class="c1"># watch the reaction</span>
+<span class="n">event_wait_complete</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">WaitComplete</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_wait_complete</span><span class="p">)</span> <span class="c1">#=&gt; &quot;hello world&quot;</span>
 
-<span class="c1"># Look at the reaction of our chart in great detail</span>
-<span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span> <span class="c1">#=&gt;</span>
-  <span class="c1"># [&#39;W:outer&#39;,</span>
+<span class="c1"># Look at the reaction of our statechart in greater detail</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
+  <span class="c1"># [&#39;WaitComplete:outer&#39;,</span>
   <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
   <span class="c1">#  &#39;ENTRY_SIGNAL:middle&#39;,</span>
   <span class="c1">#  &#39;INIT_SIGNAL:middle&#39;,</span>
@@ -196,30 +230,48 @@ this reaction we can see what happened by viewing our instrumentation.</p>
 </pre></div>
 </div>
 <p>From the trace output we see that we were in the <cite>outer</cite> state and an event with
-the <cite>W</cite> signal caused us to transition into the <cite>inner</cite> state.  This is true,
-but it doesn’t really describe what happened.</p>
+the <cite>WaitComplete</cite> signal caused us to transition into the <cite>inner</cite> state.  This
+is true, but it doesn’t really describe what happened.</p>
 <p>If we want the full story we need to look at the results of our spy.  We see
 that the system was in the <cite>outer</cite> state and it reacted to an event with the
-signal <cite>W</cite>.  It saw that it needed to transition into the <cite>middle</cite> state, so it
-issued an event with the <cite>entry</cite> signal to the middle state.  If you had code
-linked to this event in the <cite>middle</cite> state method it would have been run.  Once
-it is in the <cite>middle</cite> state it sees that there is an <cite>init</cite> handler, so it fires
-another event with the signal <cite>init</cite> which causes a transition into the <cite>inner</cite>
-state.  Since the <cite>inner</cite> state required entry, the event processor created an
-event with the <cite>entry</cite> signal and sent it to the <cite>inner</cite> state.  Any entry code
-within the <cite>inner</cite> state event handler would have been run at this point and
-time.  Finally, the event processor issued an other <cite>init</cite> event to the inner
-state.  The inner state does not handle this event, so it is ignored and our
-system settles into the <cite>inner</cite> state.  It will remain here until it has to
-react to events provided by the user.</p>
+signal <cite>WaitComplete</cite>.  It saw that it needed to transition into the <cite>middle</cite>
+state, so it issued an event with the <cite>entry</cite> signal to the middle state.  If
+you had code linked to this event in the <cite>middle</cite> state method it would have
+been run.  Once it is in the <cite>middle</cite> state it sees that there is an <cite>init</cite>
+handler, so it fires another event with the signal <cite>init</cite> which causes a
+transition into the <cite>inner</cite> state.  Since the <cite>inner</cite> state required entry, the
+event processor created an event with the <cite>entry</cite> signal and sent it to the
+<cite>inner</cite> state.  Any entry code within the <cite>inner</cite> state event handler would have
+been run at this point and time.  Finally, the event processor issued an other
+<cite>init</cite> event to the inner state.  The inner state does not handle this event, so
+it is ignored and our system settles into the <cite>inner</cite> state.  It will remain
+here until it has to react to events provided by the user.</p>
 <p>As mentioned previously, their are two different threads running in the
 background since we created our <cite>active object</cite>.  They are both pending on
 queues.  The number of items in the active object queue can be seen in our <cite>spy</cite>
 instrumentation.  We see that at the end of this reaction to the event with the
-<cite>W</cite> signal, there was nothing in the queue so the <cite>active object</cite> thread has
-nothing to do.</p>
-<p>Lets stop the thread, and place a number of events into the queue managed by the
+<cite>WaitComplete</cite> signal, there was nothing in the queue so the <cite>active object</cite>
+thread has nothing to do.  It is just waiting.</p>
+<p>Lets stop both threads, and place a number of events into the queue managed by the
 active object.</p>
+<div class="highlight-python" id="label"><div class="highlight"><pre><span></span><span class="c1"># stop the threads</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+<span class="c1"># clear the spy and the trace</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">clear_spy</span><span class="p">()</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">clear_trace</span><span class="p">()</span>
+
+<span class="c1"># post a number of events and see what happens</span>
+<span class="n">event_wait_complete</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">WaitComplete</span><span class="p">)</span>
+<span class="n">event_reset_chart</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ResetChart</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_wait_complete</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_reset_chart</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_wait_complete</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_reset_chart</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We would expect that nothing should happens since the task which is pending on
+an event has been shut down.</p>
 </div>
 <div class="section" id="hsm-example">
 <h2>Hsm Example<a class="headerlink" href="#hsm-example" title="Permalink to this headline">¶</a></h2>
