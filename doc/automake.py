@@ -49,8 +49,10 @@ class Handler(watchdog.events.PatternMatchingEventHandler):
 
         try:
           shutil.copytree('./_build/html/','./../docs')
+          open('./../docs/.nojekyll', 'a').close()
         except:
           print("could not copy build results into the docs directory")
+
 
       except:
         print("Screw you human! I'm not going to change anything")
