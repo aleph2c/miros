@@ -47,17 +47,23 @@
 <img alt="_images/simple_example_1.svg" src="_images/simple_example_1.svg" /><div class="section" id="activeobject-example">
 <h2>ActiveObject Example<a class="headerlink" href="#activeobject-example" title="Permalink to this headline">¶</a></h2>
 <p>In this example we will show how to build the statechart structure described
-above using an <cite>ActiveObject</cite>.</p>
-<p>But this diagram is only describing how we want to react to events.  What is
-missing from the picture is the action itself; what events are happening and
-when.  The <cite>ActiveObject</cite> allows you to control this action, and watch what
-happens as a result.  It provides the facilities to reflect upon the action that
-the statechart took as a response to your programmed stimulation.</p>
+above using an <cite>ActiveObject</cite>.  If you are new to statecharts and if you
+haven’t heard of an active object before but would like to learn about them, I
+would recommend that you draw the above design on a piece of paper, and
+scribble on it as we move through the example.</p>
+<p>The code blocks in this section are specific to this library, but the
+principals apply to any other system using the active object design pattern.</p>
+<p>The above diagram describes how we would like our code to react to events.
+What is missing from the picture is the action itself; what events are
+happening and when.  The <cite>ActiveObject</cite> allows you to control this action, and
+watch what happens as a result.  It provides the facilities to reflect upon the
+action that the statechart took as a response to your programmed stimulation.</p>
 <p>This reaction could be a change of state, or just a running of custom code upon
 a signal detection.  In the above diagram we see that in response to entering
-the <cite>inner</cite> state the diagram would like us to print “hello world”.  This can’t
-happen without stimulation of the chart and we will see how to do that within the
-example.</p>
+the <cite>inner</cite> state the diagram would like us to print “hello world”.</p>
+<p>Before we get there, we need to build up the statechart structure, then we need
+to take action by firing a bunch of signals at it and see how it responds.</p>
+<p>Let’s begin by building the structure.</p>
 <p>First we import some items from the miros library:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">Event</span>
 <span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span>
@@ -381,23 +387,163 @@ actually doing by viewing the spy instrumentation:</p>
   <span class="c1"># &#39;&lt;- Queued:(0) Deferred:(0)&#39;]</span>
 </pre></div>
 </div>
-<p>You can split this output into chunks, based on the Queued lines:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># All actions before this belong to one rtc</span>
-<span class="c1"># &#39;&lt;- Queued:(0) Deferred:(0)&#39;]</span>
-</pre></div>
-</div>
-<p>Each event was dispatched to the chart by the active object, and let to run to
-completion prior to the next event being engaged.  This is called a run to
-completion step (rct), and it is a mandatory behavior of an active object.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">Thou</span> <span class="n">shalt</span> <span class="n">NOT</span> <span class="n">interrupt</span> <span class="n">a</span> <span class="n">statechart</span> <span class="n">part</span>
-<span class="n">way</span> <span class="n">through</span> <span class="n">its</span> <span class="n">reaction</span> <span class="n">to</span> <span class="n">an</span> <span class="n">old</span> <span class="n">event</span><span class="p">,</span>
-<span class="k">with</span> <span class="n">a</span> <span class="n">new</span> <span class="n">event</span><span class="o">.</span>
+<p>When you scan such output with your eyes, you can split it into
+behavioral chunks, based on the <code class="docutils literal"><span class="pre">&lt;-</span> <span class="pre">Queued:(n)</span> <span class="pre">Deferred:(m)</span></code> lines.  The <cite>n</cite>
+stands for the number of events that are waiting to be processed by the active
+object when it is completed processing the one it is currently working on.  The
+<cite>m</cite> stands for the number of events that have been squirreled away by the
+statechart as a part of a design pattern that is not used in this example.</p>
+<p>The information between the <code class="docutils literal"><span class="pre">&lt;-</span> <span class="pre">Queued:(n)</span> <span class="pre">Deferred:(m)</span></code> statements represent
+what the active objects event processor actually did with the previous event,
+and how the chart reacted to it.  This phase of operation is called a <cite>run to
+completion</cite>: rtc.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Thou shalt NOT interrupt a statechart part way through its</span>
+<span class="c1"># reaction to an old event, with a new event.</span>
 </pre></div>
 </div>
 <p>Don’t worry about this rule, the active object takes care of it for you.  This
-is why it has queues.  A new event is just placed in the queue until the
-previous reaction is complete.  Only then will the active object force the
+is why it has queues.  Any new event is just placed in the queue until the
+previous reaction is completed.  Only then will the active object force the
 statechart to react to it.</p>
+<p>So, lets use the <code class="docutils literal"><span class="pre">&lt;-</span> <span class="pre">Queued:</span> <span class="pre">(n)</span> <span class="pre">Deferred:(m)</span></code> statements to break out the
+first rtc reaction of our statechart:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1">#[&#39;WaitComplete:inner&#39;,</span>
+<span class="c1"># &#39;WaitComplete:middle&#39;,</span>
+<span class="c1"># &#39;WaitComplete:outer&#39;,</span>
+<span class="c1"># &#39;EXIT_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;EXIT_SIGNAL:middle&#39;,</span>
+<span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+<span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+<span class="c1"># &#39;ENTRY_SIGNAL:middle&#39;,</span>
+<span class="c1"># &#39;INIT_SIGNAL:middle&#39;,</span>
+<span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;ENTRY_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;INIT_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;&lt;- Queued:(3) Deferred:(0)&#39;,</span>
+</pre></div>
+</div>
+<p>The statechart was in the state <cite>inner</cite>, it received the event with the signal
+name <cite>WaitComplete</cite>.  At the end of the spy log we see that the <cite>Queued</cite> item
+has 3 items in it.  This makes sense since we sent 4 events to the statechart,
+and this part of the spy represents how the first event was processed.</p>
+<p>Before we break down this spy log in detail, lets look back at the <code class="docutils literal"><span class="pre">Queued:(n)</span>
+<span class="pre">Deferred:(m)</span></code> items that followed in the log:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># ... the 1st rtc (1st event processed)</span>
+<span class="c1"># &#39;&lt;- Queued:(3) Deferred:(0)&#39;]</span>
+<span class="c1">#</span>
+<span class="c1"># ... the 2nd rtc (2nd event processed)</span>
+<span class="c1"># &#39;&lt;- Queued:(2) Deferred:(0)&#39;]</span>
+<span class="c1">#</span>
+<span class="c1"># ... the 3nd rtc (3th event processed)</span>
+<span class="c1"># &#39;&lt;- Queued:(1) Deferred:(0)&#39;]</span>
+<span class="c1">#</span>
+<span class="c1"># ... the 4nd rtc (4th event processed)</span>
+<span class="c1"># &#39;&lt;- Queued:(0) Deferred:(0)&#39;]</span>
+<span class="c1">#</span>
+<span class="c1"># .. the queue is empty so our active object threads wait</span>
+</pre></div>
+</div>
+<p>Now that we know how to break a large spy log into behavioral chunks, lets look
+at the first chunk again in detail and it to the trace output.  Remember that
+that this represents the statechart’s reaction to the event with the
+<cite>WaitComplete</cite> signal while it was in the <cite>inner</cite> state.</p>
+<p>Trace for this reaction:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># 11:35:20.469870 [01352] WaitComplete: inner-&gt;inner</span>
+</pre></div>
+</div>
+<p>Spy for this reaction:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1">#[&#39;WaitComplete:inner&#39;,</span>
+<span class="c1"># &#39;WaitComplete:middle&#39;,</span>
+<span class="c1"># &#39;WaitComplete:outer&#39;,</span>
+<span class="c1"># &#39;EXIT_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;EXIT_SIGNAL:middle&#39;,</span>
+<span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+<span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+<span class="c1"># &#39;ENTRY_SIGNAL:middle&#39;,</span>
+<span class="c1"># &#39;INIT_SIGNAL:middle&#39;,</span>
+<span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;ENTRY_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;INIT_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;&lt;- Queued:(3) Deferred:(0)&#39;,</span>
+</pre></div>
+</div>
+<p>The trace says “we were in <cite>inner</cite> we got a signal named <cite>WaitComplete</cite> and then
+we transitioned into <cite>inner</cite>”.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1">#[&#39;WaitComplete:inner&#39;,</span>
+<span class="c1"># &#39;WaitComplete:middle&#39;,</span>
+<span class="c1"># &#39;WaitComplete:outer&#39;,</span>
+<span class="c1"># &#39;EXIT_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+</pre></div>
+</div>
+<p>The spy says, <cite>inner</cite> reacted to <cite>WaitComplete</cite>, it didn’t know how to handle
+this signal so it passed it out to it’s parent state, <cite>middle</cite>.  <cite>middle</cite>
+didn’t know how to handle <cite>WaitComplete</cite> so it passed it out to it’s parent
+state, <cite>outer</cite>.  <cite>outer</cite> did know how to handle this event, because there is
+something happening on the next line of the spy log.  This is the search phase
+of the event processor, it is determining how to specifically follow its
+instruction. It is determining the actions required to get from the
+<cite>inner</cite> state to the <cite>outer</cite> state where the <cite>WaitComplete</cite> arrow is on the
+diagram.  Now that it knows what to do, it starts to take action:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># &#39;EXIT_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;EXIT_SIGNAL:middle&#39;,</span>
+<span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+</pre></div>
+</div>
+<p>To get from the <cite>inner</cite> state to the <cite>outer</cite> state, the statechart needs to
+exit the inner state, then exit the middle state.  When a state is exited, the
+<cite>EXIT_SIGNAL</cite> event is sent to that state, this is what we see in this part of
+the spy log.  We see these <cite>EXIT_SIGNAL</cite> events happening in the states where
+they are needed, and we see some <cite>SEARCH_FOR_SUPER_SIGNAL</cite> events being sent at
+the various states, so that the event processor can figure out what to do next.
+If you are just debugging your design, you can ignore these
+<cite>SEARCH_FOR_SUPER_SIGNAL</cite> items in your spy log, but if you are debugging the
+event processor itself, these lines are very important.</p>
+<p>At this point, we are at the tail end of the <cite>WaitComplete</cite> complete arrow in
+our diagram.  The tip of the arrow is asking us to enter the <cite>middle</cite> state,
+this is what happens in the next part of the spy log:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+<span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+<span class="c1"># &#39;ENTRY_SIGNAL:middle&#39;,</span>
+</pre></div>
+</div>
+<p>We need to move from the <cite>outer</cite> state into the <cite>inner</cite> state, but to do that
+the event processor needs to figure out how to do it first.  This is why we see
+the <cite>SEARCH_FOR_SUPER_SIGNAL</cite> events here.  Once it knows how to do this, it
+enters the <cite>middle</cite> state by sending the <cite>ENTRY_SIGNAL</cite> event to the middle
+state.</p>
+<p>We are now in the <cite>middle</cite> state. On our diagram we in the <cite>middle</cite> state there
+is a big black dot with the arrow attached to it.  Anytime you see a black dot
+in a state it means that there is some initialization code that it would to
+run.  The arrow attached to this dot represents what this initialization code
+would like to do, it would like us to leave the <cite>middle</cite> state and enter the
+<cite>inner</cite> state.</p>
+<p>From the spy log we see a bit more about how the active object event processor
+works, it needs to search to determine specifically how to enter the next
+state.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># &#39;INIT_SIGNAL:middle&#39;,</span>
+<span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+</pre></div>
+</div>
+<p>Now that the event processor knows what to do, it takes action.  The statechart
+needs to specifically enter the <cite>inner</cite> state, so it needs to trigger an
+<cite>ENTRY</cite> signal against that state.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># &#39;ENTRY_SIGNAL:inner&#39;,</span>
+</pre></div>
+</div>
+<p>Now that the statechart has found itself in the <cite>inner</cite> state, it needs to run
+the <cite>inner</cite> states initialization code.  When we look at the diagram we don’t
+see any big black dots in the inner state so we would expect the chart to come
+to rest here.  Another way of saying that is that we expect it’s run to
+completion phase to be completed, and we see this is the case because the next
+line is about the status of the <cite>Queued</cite> objects.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># &#39;INIT_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;&lt;- Queued:(3) Deferred:(0)&#39;,</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="hsm-example">
 <h2>Hsm Example<a class="headerlink" href="#hsm-example" title="Permalink to this headline">¶</a></h2>

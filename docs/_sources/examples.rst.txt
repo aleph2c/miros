@@ -11,19 +11,28 @@ Examples
 ActiveObject Example
 --------------------
 In this example we will show how to build the statechart structure described
-above using an `ActiveObject`.
+above using an `ActiveObject`.  If you are new to statecharts and if you
+haven't heard of an active object before but would like to learn about them, I
+would recommend that you draw the above design on a piece of paper, and
+scribble on it as we move through the example.  
 
-But this diagram is only describing how we want to react to events.  What is
-missing from the picture is the action itself; what events are happening and
-when.  The `ActiveObject` allows you to control this action, and watch what
-happens as a result.  It provides the facilities to reflect upon the action that
-the statechart took as a response to your programmed stimulation.  
+The code blocks in this section are specific to this library, but the
+principals apply to any other system using the active object design pattern.
+
+The above diagram describes how we would like our code to react to events.
+What is missing from the picture is the action itself; what events are
+happening and when.  The `ActiveObject` allows you to control this action, and
+watch what happens as a result.  It provides the facilities to reflect upon the
+action that the statechart took as a response to your programmed stimulation.
 
 This reaction could be a change of state, or just a running of custom code upon
 a signal detection.  In the above diagram we see that in response to entering
-the `inner` state the diagram would like us to print "hello world".  This can't
-happen without stimulation of the chart and we will see how to do that within the
-example.
+the `inner` state the diagram would like us to print "hello world".
+
+Before we get there, we need to build up the statechart structure, then we need
+to take action by firing a bunch of signals at it and see how it responds.
+
+Let's begin by building the structure.
 
 First we import some items from the miros library:
 
@@ -400,28 +409,191 @@ actually doing by viewing the spy instrumentation:
     # 'INIT_SIGNAL:outer',
     # '<- Queued:(0) Deferred:(0)']
 
-You can split this output into chunks, based on the Queued lines:
+When you scan such output with your eyes, you can split it into
+behavioral chunks, based on the ``<- Queued:(n) Deferred:(m)`` lines.  The `n`
+stands for the number of events that are waiting to be processed by the active
+object when it is completed processing the one it is currently working on.  The
+`m` stands for the number of events that have been squirreled away by the
+statechart as a part of a design pattern that is not used in this example.
+
+The information between the ``<- Queued:(n) Deferred:(m)`` statements represent
+what the active objects event processor actually did with the previous event,
+and how the chart reacted to it.  This phase of operation is called a `run to
+completion`: rtc.
 
 .. code-block:: python
-    
-    # All actions before this belong to one rtc
-    # '<- Queued:(0) Deferred:(0)']
 
-Each event was dispatched to the chart by the active object, and let to run to
-completion prior to the next event being engaged.  This is called a run to
-completion step (rct), and it is a mandatory behavior of an active object.
-
-.. code-block:: python
-
-  Thou shalt NOT interrupt a statechart part
-  way through its reaction to an old event,
-  with a new event.
+  # Thou shalt NOT interrupt a statechart part way through its
+  # reaction to an old event, with a new event.
 
 Don't worry about this rule, the active object takes care of it for you.  This
-is why it has queues.  A new event is just placed in the queue until the
-previous reaction is complete.  Only then will the active object force the
-statechart to react to it.
+is why it has queues.  Any new event is just placed in the queue until the
+previous reaction is completed.  Only then will the active object force the
+statechart to react to it.  
 
+So, lets use the ``<- Queued: (n) Deferred:(m)`` statements to break out the
+first rtc reaction of our statechart:
+
+.. code-block:: python
+
+    #['WaitComplete:inner',
+    # 'WaitComplete:middle',
+    # 'WaitComplete:outer',
+    # 'EXIT_SIGNAL:inner',
+    # 'SEARCH_FOR_SUPER_SIGNAL:inner',
+    # 'EXIT_SIGNAL:middle',
+    # 'SEARCH_FOR_SUPER_SIGNAL:middle',
+    # 'SEARCH_FOR_SUPER_SIGNAL:middle',
+    # 'ENTRY_SIGNAL:middle',
+    # 'INIT_SIGNAL:middle',
+    # 'SEARCH_FOR_SUPER_SIGNAL:inner',
+    # 'ENTRY_SIGNAL:inner',
+    # 'INIT_SIGNAL:inner',
+    # '<- Queued:(3) Deferred:(0)',
+
+The statechart was in the state `inner`, it received the event with the signal
+name `WaitComplete`.  At the end of the spy log we see that the `Queued` item
+has 3 items in it.  This makes sense since we sent 4 events to the statechart,
+and this part of the spy represents how the first event was processed.
+
+Before we break down this spy log in detail, lets look back at the ``Queued:(n)
+Deferred:(m)`` items that followed in the log:
+
+.. code-block:: python
+
+  # ... the 1st rtc (1st event processed)
+  # '<- Queued:(3) Deferred:(0)']
+  #
+  # ... the 2nd rtc (2nd event processed)
+  # '<- Queued:(2) Deferred:(0)']
+  # 
+  # ... the 3nd rtc (3th event processed)
+  # '<- Queued:(1) Deferred:(0)']
+  #
+  # ... the 4nd rtc (4th event processed)
+  # '<- Queued:(0) Deferred:(0)']
+  # 
+  # .. the queue is empty so our active object threads wait
+
+Now that we know how to break a large spy log into behavioral chunks, lets look
+at the first chunk again in detail and it to the trace output.  Remember that
+that this represents the statechart's reaction to the event with the
+`WaitComplete` signal while it was in the `inner` state.
+
+Trace for this reaction:
+
+.. code-block:: python
+
+  # 11:35:20.469870 [01352] WaitComplete: inner->inner
+
+Spy for this reaction:
+
+.. code-block:: python
+
+    #['WaitComplete:inner',
+    # 'WaitComplete:middle',
+    # 'WaitComplete:outer',
+    # 'EXIT_SIGNAL:inner',
+    # 'SEARCH_FOR_SUPER_SIGNAL:inner',
+    # 'EXIT_SIGNAL:middle',
+    # 'SEARCH_FOR_SUPER_SIGNAL:middle',
+    # 'SEARCH_FOR_SUPER_SIGNAL:middle',
+    # 'ENTRY_SIGNAL:middle',
+    # 'INIT_SIGNAL:middle',
+    # 'SEARCH_FOR_SUPER_SIGNAL:inner',
+    # 'ENTRY_SIGNAL:inner',
+    # 'INIT_SIGNAL:inner',
+    # '<- Queued:(3) Deferred:(0)',
+
+The trace says "we were in `inner` we got a signal named `WaitComplete` and then
+we transitioned into `inner`".  
+
+.. code-block:: python
+
+    #['WaitComplete:inner',
+    # 'WaitComplete:middle',
+    # 'WaitComplete:outer',
+    # 'EXIT_SIGNAL:inner',
+    # 'SEARCH_FOR_SUPER_SIGNAL:inner',
+
+The spy says, `inner` reacted to `WaitComplete`, it didn't know how to handle
+this signal so it passed it out to it's parent state, `middle`.  `middle`
+didn't know how to handle `WaitComplete` so it passed it out to it's parent
+state, `outer`.  `outer` did know how to handle this event, because there is
+something happening on the next line of the spy log.  This is the search phase
+of the event processor, it is determining how to specifically follow its 
+instruction. It is determining the actions required to get from the
+`inner` state to the `outer` state where the `WaitComplete` arrow is on the
+diagram.  Now that it knows what to do, it starts to take action:
+
+.. code-block:: python
+
+    # 'EXIT_SIGNAL:inner',
+    # 'SEARCH_FOR_SUPER_SIGNAL:inner',
+    # 'EXIT_SIGNAL:middle',
+    # 'SEARCH_FOR_SUPER_SIGNAL:middle',
+
+To get from the `inner` state to the `outer` state, the statechart needs to
+exit the inner state, then exit the middle state.  When a state is exited, the
+`EXIT_SIGNAL` event is sent to that state, this is what we see in this part of
+the spy log.  We see these `EXIT_SIGNAL` events happening in the states where
+they are needed, and we see some `SEARCH_FOR_SUPER_SIGNAL` events being sent at
+the various states, so that the event processor can figure out what to do next.
+If you are just debugging your design, you can ignore these
+`SEARCH_FOR_SUPER_SIGNAL` items in your spy log, but if you are debugging the
+event processor itself, these lines are very important.
+
+At this point, we are at the tail end of the `WaitComplete` complete arrow in
+our diagram.  The tip of the arrow is asking us to enter the `middle` state,
+this is what happens in the next part of the spy log:
+
+.. code-block:: python
+
+  # 'SEARCH_FOR_SUPER_SIGNAL:middle',
+  # 'SEARCH_FOR_SUPER_SIGNAL:middle',
+  # 'ENTRY_SIGNAL:middle',
+
+We need to move from the `outer` state into the `inner` state, but to do that
+the event processor needs to figure out how to do it first.  This is why we see
+the `SEARCH_FOR_SUPER_SIGNAL` events here.  Once it knows how to do this, it
+enters the `middle` state by sending the `ENTRY_SIGNAL` event to the middle
+state.
+
+We are now in the `middle` state. On our diagram we in the `middle` state there
+is a big black dot with the arrow attached to it.  Anytime you see a black dot
+in a state it means that there is some initialization code that it would to
+run.  The arrow attached to this dot represents what this initialization code
+would like to do, it would like us to leave the `middle` state and enter the
+`inner` state.
+
+From the spy log we see a bit more about how the active object event processor
+works, it needs to search to determine specifically how to enter the next
+state.
+
+.. code-block:: python
+
+  # 'INIT_SIGNAL:middle',
+  # 'SEARCH_FOR_SUPER_SIGNAL:inner',
+
+Now that the event processor knows what to do, it takes action.  The statechart
+needs to specifically enter the `inner` state, so it needs to trigger an
+`ENTRY` signal against that state.  
+
+.. code-block:: python
+
+  # 'ENTRY_SIGNAL:inner',
+
+Now that the statechart has found itself in the `inner` state, it needs to run
+the `inner` states initialization code.  When we look at the diagram we don't
+see any big black dots in the inner state so we would expect the chart to come
+to rest here.  Another way of saying that is that we expect it's run to
+completion phase to be completed, and we see this is the case because the next
+line is about the status of the `Queued` objects.
+
+.. code-block:: python
+
+  # 'INIT_SIGNAL:inner',
+  # '<- Queued:(3) Deferred:(0)',
 
 
 
