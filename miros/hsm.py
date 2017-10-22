@@ -110,13 +110,11 @@ from datetime    import datetime
 from miros.event import signals, return_status, Event
 from collections import namedtuple, deque
 
-SpyTuple = namedtuple('SpyTuple', [
-  'signal', 'state',
-  'hook', 'start',
-  'internal', 'post_lifo',
-  'post_fifo', 'post_defer',
-  'recall', 'ignored'
-])
+SpyTuple = namedtuple('SpyTuple', ['signal',    'state',
+                                   'hook',      'start',
+                                   'internal',  'post_lifo',
+                                   'post_fifo', 'post_defer',
+                                   'recall',    'ignored'])
 
 
 def spy_tuple(signal     = None,
@@ -130,6 +128,9 @@ def spy_tuple(signal     = None,
               recall     = False,
               ignored    = False
               ):
+  '''This is making it possible to have default settings in the SpyTuple,
+     any attribute you need to over-write you can over-write by calling this
+     function with it's name filled in with what you would like.'''
   return SpyTuple(signal=signal,
                   state=state,
                   start=start,

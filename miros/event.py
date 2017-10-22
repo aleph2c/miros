@@ -1,5 +1,6 @@
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict
 from miros.singletlon import SingletonDecorator
+
 
 # Not intended for export
 class OrderedDictWithParams(OrderedDict):
@@ -17,7 +18,7 @@ class OrderedDictWithParams(OrderedDict):
       obj.RET_SUPER     => 1
       obj.RET_SUPER_SUB => 2
       obj.UNHANDLED     => 3
-  
+
     To post-pend an item to the object which will also have a named parameter:
       obj = <name_of_subclass>
       obj.append("NEW_NAMED_ATTRIBUTE")
@@ -29,18 +30,18 @@ class OrderedDictWithParams(OrderedDict):
   '''
 
   def write_keys_to_attributes(self):
-    #for dictionary in initial_data:
-    #  for key in dictionary:
-    #    setattr(self, key, dictionary[key])
     for key in self.keys():
-      exec("{0}.{1} = property(lambda self: self['{1}'])".format(self.__class__.__name__,key))
+      exec("{0}.{1} = property(lambda self: self['{1}'])"
+        .format(self.__class__.__name__, key))
 
-  def append(self,string):
+  def append(self, string):
     if string in self:
       return
     else:
       self[string] = len(self) + 1
-      exec("{0}.{1} = property(lambda self: self['{1}'])".format(self.__class__.__name__,string))
+      exec("{0}.{1} = property(lambda self: self['{1}'])"
+        .format(self.__class__.__name__, string))
+
 
 # Not intended for export
 class ReturnStatusSource(OrderedDictWithParams):
@@ -59,12 +60,12 @@ class ReturnStatusSource(OrderedDictWithParams):
     state_returns.RET_ZZ => 12
 
   '''
-  def __init__(self,*args,**kwargs):
+  def __init__(self, *args, **kwargs):
 
     self['SUPER']     = 1
     self['SUPER_SUB'] = 2
     self['UNHANDLED'] = 3
-    
+
     # handled and do not need to be bubbled up
     self['HANDLED']   = 4
     self['IGNORED']   = 5
@@ -73,10 +74,10 @@ class ReturnStatusSource(OrderedDictWithParams):
     self['ENTRY']     = 6
     self['EXIT']      = 7
 
-    # no side effects 
+    # no side effects
     self['NULL']      = 8
 
-    #transitions need to execute
+    # transitions need to execute
     self['TRAN']      = 9
     self['TRAN_INIT'] = 10
     self['TRAN_HIST'] = 11
@@ -84,6 +85,7 @@ class ReturnStatusSource(OrderedDictWithParams):
     self['TRAN_XP']   = 13
 
     self.write_keys_to_attributes()
+
 
 # Not intended for export
 class SignalSource(OrderedDictWithParams):
@@ -102,7 +104,7 @@ class SignalSource(OrderedDictWithParams):
     signal.OVER_OFF     => 12
 
   '''
-  def __init__(self,*args,**kwargs):
+  def __init__(self, *args, **kwargs):
 
     self['ENTRY_SIGNAL']            = 1
     self['EXIT_SIGNAL']             = 2
@@ -120,34 +122,36 @@ class SignalSource(OrderedDictWithParams):
       return result
 
     result = False
-    if(type(other) == type("")):
+    if(isinstance(other, str)):
       try:
         other = self[other]
         result = is_number_an_internal_signal(other)
       except:
         pass
-    elif(type(other) == type(1)):
+    elif(isinstance(other, int)):
       try:
         result = is_number_an_internal_signal(other)
       except:
         pass
     return result
 
+
 '''
-Defining the signals used by this package and all of the packages that reference
-it.  Think of this as a singleton or a growing enumeration.
+Defining the signals used by this package and all of the packages that
+reference it.  Think of this as a singleton or a growing enumeration.
 '''
 # Signal is a singleton
 Signal = SingletonDecorator(SignalSource)
 signals_exist = 'signals' in locals()
-if signals_exist == False:
+if signals_exist is False:
   signals = Signal()
 
 # ReturnStatus is a singleton
 ReturnStatus = SingletonDecorator(ReturnStatusSource)
 return_status_exist = 'return_status' in locals()
-if return_status_exist == False:
+if return_status_exist is False:
   return_status = ReturnStatus()
+
 
 class Event(OrderedDictWithParams):
   '''
@@ -155,18 +159,18 @@ class Event(OrderedDictWithParams):
   temporary thing.  However if an event uses a signal that hasn't been seen
   before, that signal will be added to the list of global signals as a new
   enumerated value.
- 
+
   # Make an event (this should happen internally):
     e = Event(signal = signals.ENTRY_SIGNAL) # existing signal
     assert( e.signal == signals.ENTRY_SIGNAL)
     assert( e.signal_name == 'ENTRY_SIGNAL')
- 
+
   # Make an event, which will construct a signal internally:
     e = Event(signal  = 'OVEN_OFF', payload = 'any object can go here') # new signal
     assert(e.signal == 5) # if it is the first unseen signal in the system
     assert(e.signal_name == 'OVEN_OFF')
     assert(signals.OVER_OFF == 5)
- 
+
   '''
   def __init__(self, signal, payload=None):
     global signals
@@ -176,17 +180,14 @@ class Event(OrderedDictWithParams):
         if value == signal:
           self.signal_name = key
           break
-    elif isinstance(signal,str):
+    elif isinstance(signal, str):
       signals.append(signal)
       self.signal_name = signal
-      # over-write the signal string as the signal name 
+      # over-write the signal string as the signal name
       self.signal      = signals[signal]
     else:
       raise("signal must be of type string or Signal")
 
-  def __del__(self):
-    #print("delete event")
-    pass
 
 class EnumWrapper():
   slots = []
@@ -200,21 +201,23 @@ class EnumWrapper():
   def append(cls, name):
     exec("cls.{} = cls.__next__()".format(name))
 
+
 class Signal2(EnumWrapper):
-  TOTAL=5
+  TOTAL = 5
 
   ENTRY_SIGNAL,      \
   EXIT_SIGNAL,       \
   INIT_SIGNAL,       \
   REFLECTION_SIGNAL, \
-  SEARCH_FOR_SUPER_SIGNAL = range(1,TOTAL+1)
+  SEARCH_FOR_SUPER_SIGNAL = range(1, TOTAL + 1)
+
 
 class Signal3(EnumWrapper):
-  TOTAL=5
+  TOTAL = 5
 
   ENTRY_SIGNAL,      \
   EXIT_SIGNAL,       \
   INIT_SIGNAL,       \
   REFLECTION_SIGNAL, \
-  SEARCH_FOR_SUPER_SIGNAL = range(1,TOTAL+1)
- 
+  SEARCH_FOR_SUPER_SIGNAL = range(1, TOTAL + 1)
+
