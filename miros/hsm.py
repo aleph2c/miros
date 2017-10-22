@@ -106,14 +106,18 @@ Example::
                                          # features
 
 """
-import sys
-from   datetime    import datetime
-from   miros.event import signals, return_status, Event
-from   collections import namedtuple, deque
+from datetime    import datetime
+from miros.event import signals, return_status, Event
+from collections import namedtuple, deque
 
-SpyTuple = namedtuple('SpyTuple', ['signal', 'state',
-  'hook', 'start', 'internal','post_lifo','post_fifo',
-  'post_defer', 'recall', 'ignored'])
+SpyTuple = namedtuple('SpyTuple', [
+  'signal', 'state',
+  'hook', 'start',
+  'internal', 'post_lifo',
+  'post_fifo', 'post_defer',
+  'recall', 'ignored'
+])
+
 
 def spy_tuple(signal     = None,
               state      = None,
@@ -138,6 +142,7 @@ def spy_tuple(signal     = None,
                   ignored=ignored
                   )
 
+
 def spy_on(fn):
   '''Instrument a state handling method'''
   def _spy_on(chart, *args):
@@ -150,7 +155,7 @@ def spy_on(fn):
     name = fn.__name__
 
     # if the chart is not instrumented, don't try to wrap it
-    if hasattr(chart, 'rtc') == False:
+    if hasattr(chart, 'rtc') is False:
       # call the original handler and exit
       status = fn(chart, e)
       return status
@@ -167,23 +172,24 @@ def spy_on(fn):
     # call the original handler
     status = fn(chart, e)
 
-    if(signals.is_inner_signal(e.signal_name) != True):
+    if(signals.is_inner_signal(e.signal_name) is not True):
         # We have found a hook
-        if( status == return_status.HANDLED):
+        if(status is return_status.HANDLED):
           chart.rtc.spy.pop()
           chart.rtc.spy.append("{}:{}:ULTIMATE_HOOK".format(e.signal_name, name))
-          sr=spy_tuple(signal=e.signal_name, state=name, hook=True)
+          sr = spy_tuple(signal=e.signal_name, state=name, hook=True)
         else:
-          if status == return_status.IGNORED:
-            sr=spy_tuple(signal=e.signal_name, state=name, ignored=True)
+          if status is return_status.IGNORED:
+            sr = spy_tuple(signal=e.signal_name, state=name, ignored=True)
           else:
-            sr=spy_tuple(signal=e.signal_name, state=name)
+            sr = spy_tuple(signal=e.signal_name, state=name)
 
     else:
-      sr=spy_tuple(signal=e.signal_name, state=name, hook=True, internal=True)
+      sr = spy_tuple(signal=e.signal_name, state=name, hook=True, internal=True)
     chart.rtc.tuples.append(sr)
     return status
   return _spy_on
+
 
 # This is defined in the module name space so that inherited classes can access
 # it
@@ -192,9 +198,13 @@ def spy_on_start(fn):
   def _spy_on_start(self, initial_state):
     self.init_rtc()
     self.rtc.spy.append("START")
-    sr=SpyTuple(signal="", state="", start=True, hook=False, internal=None, \
-        post_lifo=True, post_fifo=False,post_defer=False,recall=False,
-        ignored=False)
+    sr = SpyTuple(
+        signal="",       state="",
+        start=True,      hook=False,
+        internal=None,   post_lifo=True,
+        post_fifo=False, post_defer=False,
+        recall=False,    ignored=False
+    )
     self.rtc.tuples.append(sr)
     # fn is start_at
     status = fn(self, initial_state)
@@ -202,13 +212,16 @@ def spy_on_start(fn):
     return status
   return _spy_on_start
 
+
 def append_fifo_to_spy(fn):
   def _append_fifo_to_spy(self, e):
-    fn(self,e)
+    fn(self, e)
     if self.instrumented:
-      self.rtc.tuples.append(spy_tuple(signal=e.signal_name,post_fifo=True))
+      self.rtc.tuples.append(spy_tuple(signal=e.signal_name, post_fifo=True))
       self.rtc.spy.append("POST_FIFO:{}".format(e.signal_name))
   return _append_fifo_to_spy
+
+
 # This is defined in the module name space so that inherited classes can access
 # it
 def trace_on_start(fn):
@@ -217,33 +230,37 @@ def trace_on_start(fn):
     # fn is _spy_on_start
     status = fn(self, initial_state)
     if self.rtc.tuples[0].start:
-      t = self.TraceTuple(datetime=datetime.now(),
+      t = self.TraceTuple(
+          datetime=datetime.now(),
            start_state = 'top',
            signal      = None,
            payload     = None,
            end_state   =
              initial_state(self,
                Event(signal=signals.REFLECTION_SIGNAL))
-           )
+         )
       self.full.trace.append(t)
     return status
   return _trace_on_start
 
 
 def append_queue_reflection_after_start(fn):
-  def _append_queue_reflection_after_start(self,initial_state):
-    result = fn(self,initial_state)
+  def _append_queue_reflection_after_start(self, initial_state):
+    result = fn(self, initial_state)
     self.rtc.spy.append(self.queue_reflection())
     self.full.spy.append(self.queue_reflection())
     return result
   return _append_queue_reflection_after_start
 
+
 class Attribute():
   def __init__(self):
     pass
 
+
 class HsmTopologyException(Exception):
   pass
+
 
 class HsmEventProcessor():
   SPY_RING_BUFFER_SIZE = 500
@@ -296,13 +313,13 @@ class HsmEventProcessor():
     tpath, outermost, max_index = [None], self.state.fun, 0
 
     # We will continue searching the chart until it stops requesting transitions
-    while(True): # outer while
+    while(True):  # outer while
       tpath[0], e, index = self.temp.fun, Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL), 0
       previous_super = None
       while(self.temp.fun != outermost):
         index      += 1
         r           = self.temp.fun(self, e)
-        if( previous_super == self.temp.fun ):
+        if(previous_super == self.temp.fun):
           raise(HsmTopologyException(topological_error))
         if index > max_index:
           tpath.append(self.temp.fun)
@@ -316,13 +333,13 @@ class HsmEventProcessor():
       # enter each state until we reach our target state
       e = Event(signal=signals.ENTRY_SIGNAL)
       self.temp.fun = tpath[0]
-      while(True): # inner while
+      while(True):  # inner while
         # pre-decrement to remove outermost from our entry list
         index -= 1
         entery_fn = tpath[index]
-        r = entery_fn(self,e)
+        r = entery_fn(self, e)
         if(index <= 0):
-          break # inner while break condition
+          break  # inner while break condition
 
       # Now send it the init event, the init event could change our
       # self.temp.fun if it needs to transition. This means that we might have to
@@ -330,18 +347,23 @@ class HsmEventProcessor():
       # continue to delve into the chart
       outermost = tpath[0]
       e = Event(signal=signals.INIT_SIGNAL)
-      r = outermost(self,e)
+      r = outermost(self, e)
 
       if r != return_status.TRAN:
-        break # outer while break condition
+        break  # outer while break condition
 
     self.state.fun = outermost
     self.temp.fun  = outermost
 
-  def dispatch(self,e):
+  def dispatch(self, e):
     '''dispatches an event to a HSM.
 
-    Processing an event represents one run-to-completion (RTC) step.
+    Processing an event represents one run-to-completion (RTC) step.  This code
+    is largely based on the same processor which was written by Miro Samek in
+    his book titled, "Practical Statecharts in C/C++: Event Driven Programming
+    for Embedded Systems."  If you need to add features or functions add them as
+    wrappers in inherited classes.  Try not to change this code too much since
+    it is beautifully documentated within the sited book.
 
     Args:
       e (Event): The event to be dispatched to the hsm object
@@ -433,9 +455,9 @@ class HsmEventProcessor():
                          directory where they are drawn or the trans_ method which
                          also has them described as diagrams in the comments.
     '''
-    tpath     = [None,None,None]
-    t,s,v,ip  = None,None,None, 0
-    max_index = 2
+    tpath       = [None, None, None]
+    t, s, ip    = None, None, 0
+    max_index   = 2
 
     entry_e, exit_e, super_e, init_e =                       \
               Event(signal=signals.ENTRY_SIGNAL),            \
@@ -450,7 +472,7 @@ class HsmEventProcessor():
     t = self.state.fun
 
     # Our contract
-    assert(t != None)
+    assert(t is not None)
     assert(t == self.state.fun)
 
     # Determine if the chart can take action based on the event provided as
@@ -462,12 +484,12 @@ class HsmEventProcessor():
       # chart until we find a state that handles it, a state that handles it
       # will not return a return_state.SUPER status
       r = s(self, e)
-      if r == None:
-        raise(HsmTopologyException( \
+      if r is None:
+        raise(HsmTopologyException(
             "state handler {} is not returning a valid status".format(s)))
       if(r != return_status.SUPER):
         # S in now stored in s
-        break;
+        break
 
     # If we found a state that indicates that some action is required we
     # can now take action
@@ -491,8 +513,8 @@ class HsmEventProcessor():
       #       topology_h algorithm
       while(t != s):
         r = t(self, exit_e)
-        if r == None:
-          raise(HsmTopologyException( \
+        if r is None:
+          raise(HsmTopologyException(
               "state handler {} is not returning a valid status".format(t)))
         if(r == return_status.HANDLED):
           t(self, super_e)
@@ -501,7 +523,7 @@ class HsmEventProcessor():
       # navigate all supported topologies
       # tpath will be over-written with entry values
       # ip will indicate at which point we should begin an entry path
-      ip = self.trans_(tpath,max_index)
+      ip = self.trans_(tpath, max_index)
 
       # transition to history spy stuff placed here
 
@@ -541,7 +563,7 @@ class HsmEventProcessor():
             break
         t = tpath[0]
 
-    elif(r == return_status.HANDLED): # trans handled
+    elif(r is return_status.HANDLED):  # trans handled
       # This is the ultimate hook pattern
       pass
     else:
@@ -552,7 +574,7 @@ class HsmEventProcessor():
     self.state.fun = t
     self.temp.fun  = t
 
-  def trans(self,fn):
+  def trans(self, fn):
     '''sets a new function target and returns that transition required by engine'''
     self.temp.fun = fn
     return return_status.TRAN
@@ -627,15 +649,15 @@ class HsmEventProcessor():
     attention back to S and T and how they relate to a diagram.
     '''
 
-    ip, iq = -1, 0 # no entry, no lca found
+    ip, iq = -1, 0  # no entry, no lca found
     # S is in tpath[2]
     # T is in tpath[0]
     t, s = tpath[0], tpath[2]
-    entry_e, exit_e, super_e, init_e =                       \
-              Event(signal=signals.ENTRY_SIGNAL),            \
+
+    exit_e, super_e =                                        \
               Event(signal=signals.EXIT_SIGNAL),             \
-              Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL), \
-              Event(signal=signals.INIT_SIGNAL)
+              Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL)
+
     # +-S-T-+
     # |     +-+
     # |     | |
@@ -643,12 +665,12 @@ class HsmEventProcessor():
     # +-lca-+
     # (a) check source == target
     # pytest -m topology_a -s
-    if(s == t):
-      s(self, exit_e) # exit the source
-      ip = 0          # enter the target
+    if(s is t):
+      s(self, exit_e)  # exit the source
+      ip = 0           # enter the target
       # iq = 1
     else:
-      t(self,super_e)
+      t(self, super_e)
       t = self.temp.fun
       # +--S-lca-+
       # | +-T--+ |
@@ -659,8 +681,8 @@ class HsmEventProcessor():
       # s contains S
       # (b) check S == T->super
       # pytest -m topology_b -s
-      if (s == t):
-        ip = 0 # enter the target
+      if (s is t):
+        ip = 0  # enter the target
         # iq = 1
       else:
         # find the super state of the source
@@ -692,7 +714,7 @@ class HsmEventProcessor():
           # pytest -m topology_d -s
           if(self.temp.fun == tpath[0]):
             # leave ip as -1, that way no entry will occur
-            s(self,exit_e)
+            s(self, exit_e)
             # iq = 1
           else:
             #  +--------S-lca-----+
@@ -708,13 +730,13 @@ class HsmEventProcessor():
             #  +------------------+
             # (e) check S == T->super->super..
             # pytest -m topology_e -s
-            iq, ip = 0,1     # LCA not found yet, enter T and T->super
+            iq, ip = 0, 1    # LCA not found yet, enter T and T->super
             tpath[1] = t     # tpath[1] contains T->super
             t = self.temp.fun  # t contains S->super
             r = tpath[1](self, super_e)
 
-            if r == None:
-              raise(HsmTopologyException( \
+            if r is None:
+              raise(HsmTopologyException(
                   "state handler {} is not returning a valid status".format(tpath[1])))
 
             while(r == return_status.SUPER):
@@ -726,15 +748,15 @@ class HsmEventProcessor():
               else:
                 tpath[ip] = self.temp.fun
 
-              if(self.temp.fun == s): # if we have found S
+              if(self.temp.fun is s):  # if we have found S
                 iq =  1
-                ip -= 1 # don't enter S since we are coming at it from the
-                        # inside
-                r = return_status.HANDLED # terminate the loop
+                ip -= 1  # don't enter S since we are coming at it from the
+                         # inside
+                r = return_status.HANDLED  # terminate the loop
               else:
-                r = self.temp.fun(self,super_e)
+                r = self.temp.fun(self, super_e)
 
-            if(iq==0):
+            if(iq is 0):
               # s contains S
               # set self.temp.fun to S->super
               s(self, exit_e)
@@ -772,9 +794,9 @@ class HsmEventProcessor():
               iq = ip
               r  = return_status.IGNORED
               while(True):
-                if(t==tpath[iq]): # is this the lca?
+                if(t is tpath[iq]):  # is this the lca?
                   r = return_status.HANDLED
-                  ip = iq-1 # do not enter the lca
+                  ip = iq - 1  # do not enter the lca
                   iq = -1
                 else:
                   iq -= 1
@@ -815,26 +837,25 @@ class HsmEventProcessor():
               # the chart relative to T, minus 1.
               r = return_status.IGNORED
               while(True):
-                if(t(self, exit_e)==return_status.HANDLED):
+                if(t(self, exit_e) == return_status.HANDLED):
                   t(self, super_e)
                 # t contains S->super->super..
                 t = self.temp.fun
                 iq = ip
                 while(True):
-                  if(t==tpath[iq]): # is this the lca?
+                  if(t == tpath[iq]):  # is this the lca?
                     r = return_status.HANDLED
-                    ip = iq-1 # do not enter the lca
+                    ip = iq - 1  # do not enter the lca
                     iq = -1
                   else:
                     iq -= 1
-                  if(iq <0):
+                  if(iq < 0):
                     break
                 if(r == return_status.HANDLED):
-                  break;
-
+                  break
     return ip
 
-  def is_in(self,fn_state_handler):
+  def is_in(self, fn_state_handler):
     '''tests if a hsm is in a given state'''
     result = False
     super_e = Event(signal=signals.SEARCH_FOR_SUPER_SIGNAL)
@@ -846,11 +867,10 @@ class HsmEventProcessor():
         r = self.temp.fun(self, super_e)
       if(r == return_status.IGNORED):
         break
-    self.temp.fun = self.state.fun # set our temp back to what it should be
+    self.temp.fun = self.state.fun  # set our temp back to what it should be
     return result
 
-
-  def child_state(self,fn_parent_state_handler):
+  def child_state(self, fn_parent_state_handler):
     '''finds the child state of a given parent
 
     This method will only return a child state of a given handler, if the system
@@ -895,9 +915,9 @@ class HsmEventProcessor():
         child = self.temp.fun
         r = self.temp.fun(self, super_e)
       if(r == return_status.IGNORED):
-        break;
+        break
     self.temp.fun = self.state.fun
-    assert(confirmed == True)
+    assert(confirmed is True)
     return child
 
   def augment(self, **kwargs):
@@ -931,19 +951,20 @@ class HsmEventProcessor():
     """
 
     relationship = None
-    if("other" in kwargs ):
+    if("other" in kwargs):
       other = kwargs['other']
-    if("name" in kwargs ):
+    if("name" in kwargs):
       name = kwargs['name']
-    if("relationship" in kwargs ):
+    if("relationship" in kwargs):
       relationship = kwargs['relationship']
 
-    if hasattr(self, name ) is not True:
+    if hasattr(self, name) is not True:
       setattr(self, name, other)
     else:
       pass
-    if( relationship != None and relationship == "mutual"):
-      other.augment( other=self, name=self.name, relationship=None )
+    if(relationship is not None and relationship is "mutual"):
+      other.augment(other=self, name=self.name, relationship=None)
+
 
 class InstrumentedHsmEventProcessor(HsmEventProcessor):
   '''
@@ -966,11 +987,12 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
     self.full.trace = deque(maxlen=HsmEventProcessor.TRC_RING_BUFFER_SIZE)
     self.init_rtc()
     self.TraceTuple = namedtuple('TraceTuple',
-                            [ 'datetime',
-                              'start_state',
-                              'signal',
-                              'payload',
-                              'end_state'])
+                                            ['datetime',
+                                             'start_state',
+                                             'signal',
+                                             'payload',
+                                             'end_state'])
+
   def init_rtc(self):
     self.rtc.spy    = deque(maxlen=HsmEventProcessor.RTC_RING_BUFFER_SIZE)
     self.rtc.tuples = deque(maxlen=HsmEventProcessor.RTC_RING_BUFFER_SIZE)
@@ -984,7 +1006,7 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
     def _append_to_full_spy(self, e):
       self.rtc.spy.clear()
       # fn is dispatch
-      fn(self,e)
+      fn(self, e)
       self.full.spy.extend(self.rtc.spy)
     return _append_to_full_spy
 
@@ -992,7 +1014,7 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
     def is_signal_hooked_or_ignored(self):
       signal_name, hooked, ignored = "", False, True
       for sr in self.rtc.tuples:
-        if sr.internal == False:
+        if sr.internal is False:
           signal_name = sr.signal
           if sr.hook:
             hooked  = True
@@ -1002,11 +1024,11 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
       return (signal_name, hooked, ignored)
 
     def _append_to_full_trace(self, e):
-      start_state = self.state.fun(self,Event(signal=signals.REFLECTION_SIGNAL))
+      start_state = self.state.fun(self, Event(signal=signals.REFLECTION_SIGNAL))
       # fn is append_to_full_spy
-      fn(self,e)
+      fn(self, e)
       signal, hooked, ignored = is_signal_hooked_or_ignored(self)
-      if hooked == False and ignored == False:
+      if hooked is False and ignored is False:
         t = self.TraceTuple(
               datetime    = datetime.now(),
               start_state = start_state,
@@ -1014,20 +1036,22 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
               payload     = '',
               end_state   =
                 self.state.fun(
-                  self,Event(signal=signals.REFLECTION_SIGNAL))
-            )
+                  self, Event(signal=signals.REFLECTION_SIGNAL)))
+
         self.full.trace.append(t)
     return _append_to_full_trace
 
   @append_to_full_spy
   @append_to_full_trace
-  def dispatch(self,e):
+  def dispatch(self, e):
     super().dispatch(e)
+
 
 class HsmWithQueues(InstrumentedHsmEventProcessor):
   '''An Hsm that can post to itself and run to complete on each all of next_rtc.'''
   QUEUE_SIZE = 50
-  def __init__(self,maxlen=QUEUE_SIZE,instrumented=True,priority=1):
+
+  def __init__(self, maxlen=QUEUE_SIZE, instrumented=True, priority=1):
     super().__init__()
 
     if instrumented:
@@ -1040,7 +1064,6 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     self.queue       = deque(maxlen = self.__class__.QUEUE_SIZE)
     self.defer_queue = deque(maxlen = self.__class__.QUEUE_SIZE)
 
-
   @append_queue_reflection_after_start
   def start_at(self, initial_state):
     if self.instrumented:
@@ -1050,32 +1073,31 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
 
   def current_state(self):
     if self.instrumented:
-      cs = self.state.fun(self,Event(signals.REFLECTION_SIGNAL))
+      cs = self.state.fun(self, Event(signals.REFLECTION_SIGNAL))
       return cs
 
-  def dispatch(self,e):
+  def dispatch(self, e):
     if self.instrumented:
       super().dispatch(e)
     else:
       HsmEventProcessor.dispatch(self, e)
 
   def queue_reflection(self):
-    return "<- Queued:({}) Deferred:({})".format(len(self.queue),len(self.defer_queue))
-
+    return "<- Queued:({}) Deferred:({})".format(len(self.queue), len(self.defer_queue))
 
   def append_lifo_to_spy(fn):
     def _append_lifo_to_spy(self, e):
-      fn(self,e)
+      fn(self, e)
       if self.instrumented:
-        self.rtc.tuples.append(spy_tuple(signal=e.signal_name,post_lifo=True))
+        self.rtc.tuples.append(spy_tuple(signal=e.signal_name, post_lifo=True))
         self.rtc.spy.append("POST_LIFO:{}".format(e.signal_name))
     return _append_lifo_to_spy
 
   def append_defer_to_spy(fn):
     def _append_defer_to_spy(self, e):
-      fn(self,e)
+      fn(self, e)
       if self.instrumented:
-        self.rtc.tuples.append(spy_tuple(signal=e.signal,post_defer=True))
+        self.rtc.tuples.append(spy_tuple(signal=e.signal, post_defer=True))
         self.rtc.spy.append("POST_DEFER:{}".format(e.signal_name))
     return _append_defer_to_spy
 
@@ -1083,7 +1105,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     def _append_recall_to_spy(self):
       e = fn(self)
       if e is not None and self.instrumented:
-        self.rtc.tuples.append(spy_tuple(signal=e.signal,recall=True))
+        self.rtc.tuples.append(spy_tuple(signal=e.signal, recall=True))
         self.rtc.spy.append("RECALL:{}".format(e.signal_name))
     return _append_recall_to_spy
 
@@ -1105,7 +1127,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     self.queue.appendleft(e)
 
   @append_defer_to_spy
-  def defer(self,e):
+  def defer(self, e):
     self.defer_queue.append(e)
 
   @append_recall_to_spy
@@ -1129,7 +1151,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
 
   def complete_circuit(self):
     action_taken = False
-    while(len(self.queue)!= 0):
+    while(len(self.queue) != 0):
       action_taken = self.next_rtc()
     return action_taken
 
@@ -1167,9 +1189,10 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def spy_full(self):
     return list(self.full.spy)
 
+
 class Hsm(HsmWithQueues):
   '''A HsmWithQueues with a stolen top state'''
-  def __init__(self,instrumented=True):
+  def __init__(self, instrumented=True):
     super().__init__(instrumented)
 
   @append_queue_reflection_after_start
