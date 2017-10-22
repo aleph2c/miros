@@ -179,32 +179,35 @@ def test_publish_subscribe(fabric_fixture):
   c1.start_at(c2_s2)
   c2.start_at(c2_s2)
   b.start_at(b1_s2)
+  time.sleep(0.2)
   c1.post_fifo(Event(signal=signals.CC))
   time.sleep(0.1)
-  assert(c1.spy_full() == \
-    ['SUBSCRIBING TO:(BB, TYPE:fifo)',
-     'SUBSCRIBING TO:(CC, TYPE:fifo)',
-     'START',
-     'SEARCH_FOR_SUPER_SIGNAL:c2_s2',
-     'SEARCH_FOR_SUPER_SIGNAL:c2_s1',
-     'SEARCH_FOR_SUPER_SIGNAL:top',
-     'ENTRY_SIGNAL:top',
-     'ENTRY_SIGNAL:c2_s1',
-     'ENTRY_SIGNAL:c2_s2',
-     'INIT_SIGNAL:c2_s2',
-     '<- Queued:(0) Deferred:(0)',
-     'BB:c2_s2',
-     'BB:c2_s1',
-     'EXIT_SIGNAL:c2_s2',
-     'SEARCH_FOR_SUPER_SIGNAL:c2_s2',
-     'EXIT_SIGNAL:c2_s1',
-     'ENTRY_SIGNAL:c2_s1',
-     'INIT_SIGNAL:c2_s1',
-     '<- Queued:(0) Deferred:(0)',
-     'CC:c2_s1',
-     'CC:top',
-     'CC:__top__',
-     '<- Queued:(0) Deferred:(0)'] 
+  assert(c1.spy_full() == 
+     [
+         'SUBSCRIBING TO:(BB, TYPE:fifo)',
+         'SUBSCRIBING TO:(CC, TYPE:fifo)',
+         'START',
+         'SEARCH_FOR_SUPER_SIGNAL:c2_s2',
+         'SEARCH_FOR_SUPER_SIGNAL:c2_s1',
+         'SEARCH_FOR_SUPER_SIGNAL:top',
+         'ENTRY_SIGNAL:top',
+         'ENTRY_SIGNAL:c2_s1',
+         'ENTRY_SIGNAL:c2_s2',
+         'INIT_SIGNAL:c2_s2',
+         '<- Queued:(0) Deferred:(0)',
+         'BB:c2_s2',
+         'BB:c2_s1',
+         'EXIT_SIGNAL:c2_s2',
+         'SEARCH_FOR_SUPER_SIGNAL:c2_s2',
+         'EXIT_SIGNAL:c2_s1',
+         'ENTRY_SIGNAL:c2_s1',
+         'INIT_SIGNAL:c2_s1',
+         '<- Queued:(0) Deferred:(0)',
+         'CC:c2_s1',
+         'CC:top',
+         'CC:__top__',
+         '<- Queued:(0) Deferred:(0)'
+     ] 
   )
 
   assert(b.spy_full() == \
