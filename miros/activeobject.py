@@ -1,7 +1,8 @@
 # from standard library
 import uuid
+import time
 
-from collections import deque
+from collections import deque, namedtuple
 from pprint      import pprint
 from threading   import Thread
 from datetime    import datetime
@@ -413,6 +414,10 @@ class LockingDeque():
     return len(self.deque)
 
 
+class ActiveObjectOutOfPostedEventResources(Exception):
+  pass
+
+
 class ActiveObject(Hsm):
   def __init__(self, name=None, instrumented=True):
     super().__init__(instrumented)
@@ -432,6 +437,26 @@ class ActiveObject(Hsm):
     self.fabric = ActiveFabric()
     self.thread = None
     self.name   = name
+
+    # the QUEUE_SIZE is defined in HsmWithQueues
+    self.posted_events_queue = deque(maxlen = self.__class__.QUEUE_SIZE)
+    self.PostedEventThreadSpec = namedtuple('PostedEventThreadSpec',
+      [
+        'event',
+        'queue_type',
+        'total_times',
+        'deferred',
+        'period',
+        'times_activated',
+      ]
+    )
+    self.PostedEvent = namedtuple('PostedEvents',
+      [
+        'signal_name',
+        'runner_event_for_task',
+        'uuid',
+      ]
+    )
 
   def __thread_running(self):
     if self.thread is None:
@@ -580,3 +605,231 @@ class ActiveObject(Hsm):
         tr.start_state,
         tr.end_state)
     return strace
+
+  def post_event(self, e, times=1, period=None, deferred=True, queue_type='fifo'):
+    '''
+    The post_event method is used to post one-shots or periodic events to the
+    active object.
+
+    It constructs a task_event and a task, then starts the task.  The task will
+    run periodically posting events into either the fifo or the life of the
+    active object.
+
+    Examples:
+      # Post an 'A' signal event into the lifo every 1.0 seconds, 5 times.  
+      
+      # On the first time, wait one second prior to posting.  This should take
+      # about 6 seconds to complete
+      ao.post_event(Event(signal=signals.A),
+                      time=5,
+                      period=1.0,
+                      deferred=True,
+                      queue_type='lifo')
+
+      # Now to cancel it, you can to cancel all events with the same
+      # signal_name
+      time.sleep(2.0)
+      ao.cancel_events(Event(signal=signals.A))
+
+    Example:
+      # Post an event, without a time or periodic constraint
+      ao.post_event(Event(signal=signals.B))  # same as ao.post_fifo(Event(signal=signals.B)
+
+    Example of posting an event with the same signal name several times:
+
+      # construct a thread which will post signal A, 15 times every 1 second to
+      # the lifo of the active object
+      post_id_1 = ao.post_event(Event(signal=signals.A),
+                      time=15,
+                      period=1.0,
+                      deferred=True,
+                      queue_type='lifo')
+
+      # construct a thread which will post signal A, 15 times every 10 seconds to
+      # the fifo of the active object
+      post_id_2 = ao.post_event(Event(signal=signals.A),
+                      time=15,
+                      period=10.0,
+                      queue_type='fifo')
+
+      # To cancel the first event posting thread and leave the second event
+      # posting thread to run:
+      ao.cancel_event(uuid=uuid1)
+
+    Example of linking a posted event to a state function handler:
+
+        @spy_on
+        def some_state_function(chart, e):
+          status = return_status.UNHANDLED
+
+          if(e.signal == signals.ENTRY_SIGNAL):
+            # This will cause us to transition into the other_state_function
+            # once every three seconds, starting at the next rtc event
+            one_shot_uuid = chart.post_event(Event(Signal=signal.TIME_OUT,
+                                                   period=3.0,
+                                                   queue_type='lifo'))
+
+            # Now we graffiti this chart with the 'one_shot_uuid' attribute so
+            # that we can cancel it upon exiting the state
+            chart.augment(other=one_shot_uuid, name='one_shot_uuid')
+            status = return_status.HANDLED
+
+          elif(e.signal == signals.EXIT_SIGNAL):
+            chart.cancel_event(uuid=chart.one_shot_uuid)
+            del(chart.one_shot_uuid)
+            status = return_status.HANDLED
+
+          elif(e.signal == signals.TIME_OUT):
+            status = chart.trans(other_state_function)
+
+          else:
+            status, chart.temp.fun = return_status.SUPER, chart.top
+
+          return status
+
+    '''
+    # if our times are set to 1 and there is no period then just post our event
+    # to the fifo/lifo
+    if times is 1 and period is None:
+      if queue_type is 'fifo':
+        self.post_fifo(e)
+      else:
+        self.post_lifo(e)
+    else:
+      # create an exit event for the task, it will be shared with the
+      # cancel_event method, so that the task can be stopped by someone using
+      # the ActiveObject api
+      runner_event_for_task = ThreadEventLib()
+      runner_event_for_task.set()
+
+      # set up the specification for this task
+      posted_event_thread_spec = \
+        self.PostedEventThreadSpec(
+          event=e,
+          queue_type=queue_type,
+          deferred=deferred,
+          period=period,
+          total_times=times,
+          times_activated=0,
+        )
+
+      def post_event_thread_runner(spec):
+        # We have a Event object here that can be controlled by something
+        # outside of our task.  If it is cleared, then this thread will just
+        # exit and disappear from the system.
+        while spec.runner_event_for_task.is_set():
+          if spec.deferred:
+            time.sleep(spec.period)
+          else:
+            # Pretend that we waited the first time we entered this function
+            # this way we can access the time.sleep on every pass through from
+            # now on.
+            spec.deferred = True
+
+          spec.times_activated += 1
+          if spec.queue_type is 'fifo':
+            self.post_fifo(spec.event)
+          else:
+            self.post_lifo(spec.event)
+
+          # If we don't want to run forever we can clear our own Event
+          if spec.total_times is not 0:
+            if(spec.times_activated >= self.total_times):
+              spec.runner_event_for_task.clear()
+
+      thread = Thread(target=post_event_thread_runner,
+                      args=(posted_event_thread_spec))
+      thread.daemon = True  # we want this thread to stop on program exit
+      thread.start()
+
+      # If we have run out of spots in our queue we should issue an
+      # ActiveObjectOutOfPostedEventResources since it indicates a MAJOR design
+      # problem
+      if(len(self.posted_events_queue) < self.__class__.QUEUE_SIZE):
+        # track this thread in our posted_events deque
+        self.posted_events_queue.append(
+          self.PostedEvent(
+            e.signal_name,
+            runner_event_for_task,
+            uuid.uuid4(),
+          )
+        )
+      else:
+        # Have the timer thread that we just constructed shut down (we
+        # can't manage it in our posted_events deque)
+
+        # This could easily happen if the user creates posted_event items on
+        # entry and doesn't cancel them upon exiting the same state (see
+        # comment in this function's docstring)
+        runner_event_for_task.clear()
+        raise(ActiveObjectOutOfPostedEventResources(
+          "posted_events_queue size is too small for what you have asked for"))
+
+  def cancel_event(self, uuid=None):
+    '''
+    This will cancel an event thread that was created using the post_event api.
+    The original call to the post_event api would have returned the uuid needed
+    to cancel it with this call.
+
+    If there are no threads managing the uuid provided, this method will do
+    nothing.
+
+    Example:
+
+      post_id_1 = ao.post_event(Event(signal=signals.A),
+                      time=15,
+                      period=1.0,
+                      deferred=True,
+                      queue_type='lifo')
+
+      ao.cancel_event(post_id_1)
+
+
+    '''
+    for i in reversed(range(len(self.posted_events_queue) - 1)):
+      posted_event_task_meta_data = self.posted_events_queue[-1]
+      if posted_event_task_meta_data.uuid is uuid:
+        # let this task's infinite loop finish and the task will exit
+        posted_event_task_meta_data.clear()
+        # we aren't managing this thread anymore, remove it from out list
+        posted_event_task_meta_data.pop()
+        break
+      else:
+        self.posted_events_queue.rotate(1)
+
+  def cancel_events(self, e):
+    '''
+    This will cancel all events that have the same signal name as e, that were
+    posted using the post_event.
+
+    This will cancel all event threads which have the same signal name as 'e',
+    that were created using the post_event api.
+
+    If there are no threads managing the signals name within the event
+    provided, this method will do nothing.
+
+    Example:
+
+      post_id_1 = ao.post_event(Event(signal=signals.A),
+                      time=15,
+                      period=1.0,
+                      deferred=True,
+                      queue_type='lifo')
+
+      post_id_2 = ao.post_event(Event(signal=signals.A),
+                      time=15,
+                      period=1.0,
+                      deferred=True,
+                      queue_type='lifo')
+
+      ao.cancel_events(Event(signal=signals.A))
+    '''
+    for i in reversed(range(len(self.posted_events_queue) - 1)):
+      posted_event_task_meta_data = self.posted_events_queue[-1]
+      if posted_event_task_meta_data.signal_name is e.signal_name:
+        # let this task's infinite loop finish and the task will exit
+        posted_event_task_meta_data.clear()
+        # we aren't managing this thread anymore, remove it from out list
+        posted_event_task_meta_data.pop()
+      else:
+        self.posted_events_queue.rotate(1)
