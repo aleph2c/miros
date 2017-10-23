@@ -1,10 +1,10 @@
 # from standard library
 import uuid
-import pprint
 
 from collections import deque
-from datetime    import datetime
+from pprint      import pprint
 from threading   import Thread
+from datetime    import datetime
 from queue       import PriorityQueue, Queue
 from threading   import Event as ThreadEventLib
 
@@ -16,7 +16,7 @@ from miros.singletlon import SingletonDecorator
 
 
 def pp(item):
-  pprint.pprint(item)
+  pprint(item)
 
 
 # Add to different signals to signal if they aren't there already
@@ -346,7 +346,7 @@ class LockingDeque():
                      # thread finished
     time.sleep(0.1)
     assert(thread.is_alive() == False)
-  
+
   '''
 
   def __init__(self, *args, **kwargs):
