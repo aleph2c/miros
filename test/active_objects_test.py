@@ -1,13 +1,16 @@
-import pytest
-from miros.event import ReturnStatus, Signal, signals, Event, return_status
-from miros.activeobject import ActiveObject, spy_on, HsmTopologyException, ActiveFabric
-from miros.activeobject import LockingDeque
 import time
-
+import pytest
 import pprint
+
+from miros.hsm import spy_on
+from miros.activeobject import ActiveObject, ActiveFabric
+from miros.event import Signal, signals, Event, return_status
+
+
 def pp(item):
   print("")
   pprint.pprint(item)
+
 
 Signal().append("A")
 Signal().append("B")
@@ -18,9 +21,6 @@ Signal().append("D")
 Signal().append("E")
 Signal().append("F")
 
-################################################################################
-#                             _Spy Graph C2                                #
-################################################################################
 '''           The following state chart is used to test topology C
 
                     +------------------- c2_s1 -----------+
@@ -51,6 +51,7 @@ def c2_s1(chart, e):
     status, chart.temp.fun = return_status.SUPER, chart.top
   return status
 
+
 @spy_on
 def c2_s2(chart, e):
   status = return_status.UNHANDLED
@@ -76,10 +77,8 @@ def c2_s3(chart, e):
   else:
     status, chart.temp.fun = return_status.SUPER, c2_s1
   return status
-################################################################################
-#                             Dispatch Graph B1                                #
-################################################################################
-'''           The following state chart is used to test topology B
+'''
+              The following state chart is used to test topology B
 
                        +------- b1_s1 -----------s-----+
                        |  +---- b1_s2 -----t-------+   |

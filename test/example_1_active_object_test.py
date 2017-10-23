@@ -1,8 +1,10 @@
 import pytest
+from miros.hsm import spy_on
 from miros.event import signals, Event, return_status
-from miros.activeobject import ActiveObject, spy_on, HsmTopologyException, ActiveFabric
-from miros.activeobject import LockingDeque
+from miros.activeobject import ActiveObject
 import pprint
+
+
 def pp(item):
   pprint.pprint(item)
 

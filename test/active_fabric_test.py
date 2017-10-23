@@ -1,6 +1,7 @@
 import pytest
 from miros.event import ReturnStatus, Signal, signals, Event, return_status
-from miros.activeobject import ActiveObject, FabricEvent, ActiveFabric, spy_on, HsmTopologyException
+from miros.activeobject import ActiveObject, FabricEvent, ActiveFabric
+from miros.hsm import spy_on, HsmTopologyException
 from collections import deque
 import time
 import pprint

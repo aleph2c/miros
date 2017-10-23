@@ -1,30 +1,35 @@
 # from standard library
-from threading   import Event as ThreadEventLib
+import uuid
+import pprint
+
+from collections import deque
+from datetime    import datetime
 from threading   import Thread
 from queue       import PriorityQueue, Queue
-from collections import deque
-import time
-from datetime import datetime
-import uuid
-
-import pprint
-def pp(item):
-  pprint.pprint(item)
+from threading   import Event as ThreadEventLib
 
 # from this package
-from miros.event import ReturnStatus, signals, return_status, Signal
+from miros.hsm   import Hsm
+from miros.event import signals, Signal
 from miros.event import Event as HsmEvent
-from miros.hsm   import *
 from miros.singletlon import SingletonDecorator
+
+
+def pp(item):
+  pprint.pprint(item)
 
 
 # Add to different signals to signal if they aren't there already
 Signal().append("stop_fabric")
 Signal().append("stop_active_object")
 
+
 class SourceThreadEvent(ThreadEventLib):
   pass
+
+
 ThreadEvent = SingletonDecorator(SourceThreadEvent)
+
 
 class FabricEvent():
   def __init__(self, event, priority):
@@ -36,6 +41,7 @@ class FabricEvent():
 
   def __eq__(self, other):
     return self.priority == other.priority
+
 
 class ActiveFabricSource():
   '''A (pub-sub) event dispatcher for active objects.
@@ -115,28 +121,28 @@ class ActiveFabricSource():
         thread_obj.daemon = True
         thread_obj.start()
         # if we haven't done what we promised, crash the program
-        assert(thread_obj.is_alive() == True)
+        assert(thread_obj.is_alive() is True)
         return thread_obj
 
     # Create a thread to wake up on fifo priority queue events
     self.fifo_thread = \
-      initiate_thread( thread_obj     = self.fifo_thread,
-                       name           = "fifo active fabric",
-                       thread_runner  = self.thread_runner_fifo,
-                       queue          = self.fifo_fabric_queue,
-                       subscriptions  = self.fifo_subscriptions)
+      initiate_thread(thread_obj     = self.fifo_thread,
+                      name           = "fifo active fabric",
+                      thread_runner  = self.thread_runner_fifo,
+                      queue          = self.fifo_fabric_queue,
+                      subscriptions  = self.fifo_subscriptions)
 
     # Create a thread to wake up on lifo priority queue events
     self.lifo_thread = \
-      initiate_thread( thread_obj     = self.lifo_thread,
-                       name           = "lifo active fabric",
-                       thread_runner  = self.thread_runner_lifo,
-                       queue          = self.lifo_fabric_queue,
-                       subscriptions  = self.lifo_subscriptions)
+      initiate_thread(thread_obj     = self.lifo_thread,
+                      name           = "lifo active fabric",
+                      thread_runner  = self.thread_runner_lifo,
+                      queue          = self.lifo_fabric_queue,
+                      subscriptions  = self.lifo_subscriptions)
 
   def is_alive(self):
     result = True
-    if( self.fifo_thread != None and self.lifo_thread != None):
+    if(self.fifo_thread is not None and self.lifo_thread is not None):
       result &= self.fifo_thread.is_alive()
       result &= self.lifo_thread.is_alive()
     else:
@@ -154,9 +160,9 @@ class ActiveFabricSource():
     # Post an item to the queue to wake up the thread then join on it until it
     # completes its last run and exits
     def stop_thread(thread_obj, queue):
-      if thread_obj != None:
+      if thread_obj is not None:
         if thread_obj.is_alive() is True:
-          stop_fe = FabricEvent(HsmEvent(signal=signals.stop_fabric),priority=1)
+          stop_fe = FabricEvent(HsmEvent(signal=signals.stop_fabric), priority=1)
           # The tasks are pending on items in their queue, wake them up with a
           # queue item, so that they can see that they need to stop running by
           # looking at their task_off_event thread-event
@@ -166,10 +172,10 @@ class ActiveFabricSource():
     stop_thread(self.fifo_thread, self.fifo_fabric_queue)
     stop_thread(self.lifo_thread, self.lifo_fabric_queue)
 
-    if self.fifo_thread != None:
-      assert(self.fifo_thread.is_alive() == False)
-    if self.lifo_thread != None:
-      assert(self.lifo_thread.is_alive() == False)
+    if self.fifo_thread is not None:
+      assert(self.fifo_thread.is_alive() is False)
+    if self.lifo_thread is not None:
+      assert(self.lifo_thread.is_alive() is False)
 
   def thread_runner_fifo(self,
                      task_off_event,
@@ -195,7 +201,7 @@ class ActiveFabricSource():
             q.append(fifo_item.event)
 
       fifo_item = None
-      fifo_queue.task_done() # so that join can work
+      fifo_queue.task_done()  # so that join can work
 
   def thread_runner_lifo(self,
                      task_off_event,
@@ -221,9 +227,9 @@ class ActiveFabricSource():
             q.append(lifo_item.event)
 
       lifo_item = None
-      lifo_queue.task_done() # so that join can work
+      lifo_queue.task_done()  # so that join can work
 
-  def subscribe(self,queue,event,queue_type='fifo'):
+  def subscribe(self, queue, event, queue_type='fifo'):
     '''subscribe a queue to an event in a 'fifo' or 'lifo' way
 
     There are two different ways to subscribe to an event:
@@ -279,7 +285,7 @@ class ActiveFabricSource():
       assert(active_object_input_queue.pop().signal_name == 'A')
 
     '''
-    def _subscribe(internal_queue,event):
+    def _subscribe(internal_queue, event):
       if event.signal_name in internal_queue:
         registry = internal_queue[event.signal_name]
         # make a list of queue ids in queue_ids
@@ -293,18 +299,18 @@ class ActiveFabricSource():
         internal_queue[event.signal_name] = [queue]
 
     if queue_type is 'lifo':
-      _subscribe(self.lifo_subscriptions,event)
+      _subscribe(self.lifo_subscriptions, event)
     else:
-      _subscribe(self.fifo_subscriptions,event)
+      _subscribe(self.fifo_subscriptions, event)
 
   def publish(self, event, priority=1000):
     '''publish an event with a given priority to all subscribed queues
 
     Priority of 1 is the highest priority
     '''
-    fefifo = FabricEvent(event,priority)
+    fefifo = FabricEvent(event, priority)
     self.lifo_fabric_queue.put(fefifo)
-    felifo = FabricEvent(event,priority)
+    felifo = FabricEvent(event, priority)
     self.fifo_fabric_queue.put(felifo)
 
   def clear(self):
@@ -314,12 +320,14 @@ class ActiveFabricSource():
     self.fifo_subscriptions = {}
     self.lifo_subscriptions = {}
 
+
 # ActiveFabric is a singleton class
 ActiveFabric = SingletonDecorator(ActiveFabricSource)
 
+
 class LockingDeque():
   '''merge of some deque and Queue object features
-  
+
   This provides the locking interface of the Queue and pop, popleft, append,
   appendleft and clear features of the deque.
 
@@ -341,17 +349,17 @@ class LockingDeque():
   
   '''
 
-  def __init__(self,*args,**kwargs):
+  def __init__(self, *args, **kwargs):
     self.deque         = deque(maxlen=Hsm.QUEUE_SIZE)
     self.locking_queue = Queue(maxsize=Hsm.QUEUE_SIZE)
 
   def get(self, block=True, timeout=None):
     '''block on the locking queue, popleft from deque'''
-    return self.locking_queue.get(block,timeout)
+    return self.locking_queue.get(block, timeout)
 
   def wait(self, block=True, timeout=None):
     '''wait for an append/appendleft event'''
-    return self.get(block,timeout)
+    return self.get(block, timeout)
 
   def popleft(self):
     return self.deque.popleft()
@@ -360,7 +368,7 @@ class LockingDeque():
     return self.deque.pop()
 
   def append(self, item):
-    if self.locking_queue.full() == False:
+    if self.locking_queue.full() is False:
       # we don't care about storing items in the locking_queue, our information
       # is in the deque, the locking_queue provides the 'get' unlocking feature
       self.locking_queue.put("ready")
@@ -373,8 +381,8 @@ class LockingDeque():
       while self.locking_queue.qsize() != len(self.deque):
         self.locking_queue.put("ready")
 
-  def appendleft(self,item):
-    if self.locking_queue.full() == False:
+  def appendleft(self, item):
+    if self.locking_queue.full() is False:
       # we don't care about storing items in the locking_queue, our information
       # is in the deque, the locking_queue provides the 'get' locking feature
       self.locking_queue.put("ready")
@@ -393,7 +401,7 @@ class LockingDeque():
       self.locking_queue.task_done()
 
   def task_done(self):
-    self.locking_queue.task_done() # so that join can work
+    self.locking_queue.task_done()  # so that join can work
 
   def qsize(self):
     return self.locking_queue.qsize()
@@ -404,8 +412,9 @@ class LockingDeque():
   def len(self):
     return len(self.deque)
 
+
 class ActiveObject(Hsm):
-  def __init__(self,name=None,instrumented=True):
+  def __init__(self, name=None, instrumented=True):
     super().__init__(instrumented)
     self.locking_deque = LockingDeque()
     # Over-write the deque in the Hsm with Queues with the one managed by the
@@ -433,10 +442,10 @@ class ActiveObject(Hsm):
 
   def start_thread_if_not_running(fn):
     '''start the active object thread if it is not currently running'''
-    def _start_thread_if_not_running(self,*args,**kwargs):
-      if self.__thread_running() == False:
+    def _start_thread_if_not_running(self, *args, **kwargs):
+      if self.__thread_running() is False:
         self.__start()
-      fn(self,*args,**kwargs)
+      fn(self, *args, **kwargs)
     return _start_thread_if_not_running
 
   def append_subscribe_to_spy(fn):
@@ -444,12 +453,12 @@ class ActiveObject(Hsm):
     def _append_subscribe_to_spy(self, e, queue_type='fifo'):
       if self.instrumented:
         self.full.spy.append("SUBSCRIBING TO:({}, TYPE:{})".format(e.signal_name, queue_type))
-        fn(self,e,queue_type)
+        fn(self, e, queue_type)
     return _append_subscribe_to_spy
 
   @start_thread_if_not_running
   @append_subscribe_to_spy
-  def subscribe(self,event,queue_type='fifo'):
+  def subscribe(self, event, queue_type='fifo'):
     self.fabric.subscribe(self.queue, event, queue_type)
 
   def append_publish_to_spy(fn):
@@ -457,22 +466,22 @@ class ActiveObject(Hsm):
     def _append_publish_to_spy(self, e, priority=1000):
       if self.instrumented:
         self.rtc.spy.append("PUBLISH:({}, PRIORITY:{})".format(e.signal_name, priority))
-        fn(self,e,priority)
+        fn(self, e, priority)
     return _append_publish_to_spy
 
   @append_publish_to_spy
   @start_thread_if_not_running
   def publish(self, event, priority=1000):
     '''publish an event at a given priority to the active fabric'''
-    self.fabric.publish(event,priority)
+    self.fabric.publish(event, priority)
 
   @start_thread_if_not_running
-  def post_fifo(self,e):
+  def post_fifo(self, e):
     '''post to the fifo of the hsm locking deque'''
     super().post_fifo(e)
 
   @start_thread_if_not_running
-  def post_lifo(self,e):
+  def post_lifo(self, e):
     '''post to the lifo of the hsm locking deque'''
     super().post_lifo(e)
 
@@ -485,9 +494,9 @@ class ActiveObject(Hsm):
     '''
     def _make_unique_name_based_on_start_at_function(self, initial_state):
       if self.name is None:
-        function_name = initial_state(self,HsmEvent(signal=signals.REFLECTION_SIGNAL))
-        self.name = str(uuid.uuid5(uuid.NAMESPACE_DNS,function_name))[0:5]
-      fn(self,initial_state)
+        function_name = initial_state(self, HsmEvent(signal=signals.REFLECTION_SIGNAL))
+        self.name = str(uuid.uuid5(uuid.NAMESPACE_DNS, function_name))[0:5]
+      fn(self, initial_state)
     return _make_unique_name_based_on_start_at_function
 
   @make_unique_name_based_on_start_at_function
@@ -513,19 +522,19 @@ class ActiveObject(Hsm):
 
       This will start an active object and the task fabric
       '''
-      thread        = Thread(target = self.run_event, args=(task_off_event,self.queue))
+      thread        = Thread(target = self.run_event, args=(task_off_event, self.queue))
       thread.name   = self.name
       thread.daemon = True
       thread.start()
       return thread
 
-    if self.__thread_running() == False:
+    if self.__thread_running() is False:
       self.thread = start_thread(self)
 
     # crash if we can't start our thread
     assert(self.thread.is_alive())
 
-  def stop(self,stop_fabric=False):
+  def stop(self, stop_fabric=False):
     '''Stops the active object
 
     Calling this method will stop all active objects.
@@ -545,12 +554,11 @@ class ActiveObject(Hsm):
     the leftmost item out of the deque part of the locking-deque and dispatch it
     into the hsm.
     '''
-    ready = None
     while task_off_event.is_set():
-      queue.wait()      # wait for an event we have subcribed to
+      queue.wait()       # wait for an event we have subcribed to
       if self.queue.deque[0].signal_name != signals.stop_active_object:
         self.next_rtc()
-      queue.task_done() # write this so that 'join' will work
+      queue.task_done()  # write this so that 'join' will work
 
   def trace(self):
     '''Output state transition information only:
