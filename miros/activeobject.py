@@ -447,13 +447,13 @@ class ActiveObject(Hsm):
         'total_times',
         'deferred',
         'period',
-        'times_activated',
+        'task_run_event',
       ]
     )
     self.PostedEvent = namedtuple('PostedEvents',
       [
         'signal_name',
-        'runner_event_for_task',
+        'task_run_event',
         'uuid',
       ]
     )
@@ -616,8 +616,8 @@ class ActiveObject(Hsm):
     active object.
 
     Examples:
-      # Post an 'A' signal event into the lifo every 1.0 seconds, 5 times.  
-      
+      # Post an 'A' signal event into the lifo every 1.0 seconds, 5 times.
+
       # On the first time, wait one second prior to posting.  This should take
       # about 6 seconds to complete
       ao.post_event(Event(signal=signals.A),
@@ -697,10 +697,10 @@ class ActiveObject(Hsm):
         self.post_lifo(e)
     else:
       # create an exit event for the task, it will be shared with the
-      # cancel_event method, so that the task can be stopped by someone using
-      # the ActiveObject api
-      runner_event_for_task = ThreadEventLib()
-      runner_event_for_task.set()
+      # cancel_event/cancel_events methods, so that the task can be stopped by
+      # someone using the ActiveObject api
+      task_run_event = ThreadEventLib()
+      task_run_event.set()
 
       # set up the specification for this task
       posted_event_thread_spec = \
@@ -710,23 +710,28 @@ class ActiveObject(Hsm):
           deferred=deferred,
           period=period,
           total_times=times,
-          times_activated=0,
+          task_run_event=task_run_event,
         )
 
-      def post_event_thread_runner(spec):
+      # task memory
+      tm                    = {}
+      tm['deferring']       = posted_event_thread_spec.deferred
+      tm['times_activated'] = 0
+
+      def post_event_thread_runner(spec, task_memory):
         # We have a Event object here that can be controlled by something
         # outside of our task.  If it is cleared, then this thread will just
         # exit and disappear from the system.
-        while spec.runner_event_for_task.is_set():
-          if spec.deferred:
+        while spec.task_run_event.is_set():
+          if task_memory['deferring']:
             time.sleep(spec.period)
           else:
             # Pretend that we waited the first time we entered this function
             # this way we can access the time.sleep on every pass through from
             # now on.
-            spec.deferred = True
+            task_memory['deferring'] = True
 
-          spec.times_activated += 1
+          tm['times_activated'] += 1
           if spec.queue_type is 'fifo':
             self.post_fifo(spec.event)
           else:
@@ -734,12 +739,12 @@ class ActiveObject(Hsm):
 
           # If we don't want to run forever we can clear our own Event
           if spec.total_times is not 0:
-            if(spec.times_activated >= self.total_times):
-              spec.runner_event_for_task.clear()
+            if(tm['times_activated'] >= spec.total_times):
+              spec.task_run_event.clear()
 
       thread = Thread(target=post_event_thread_runner,
-                      args=(posted_event_thread_spec))
-      thread.daemon = True  # we want this thread to stop on program exit
+                      args=(posted_event_thread_spec, tm, ),
+                      daemon=False)
       thread.start()
 
       # If we have run out of spots in our queue we should issue an
@@ -750,7 +755,7 @@ class ActiveObject(Hsm):
         self.posted_events_queue.append(
           self.PostedEvent(
             e.signal_name,
-            runner_event_for_task,
+            task_run_event,
             uuid.uuid4(),
           )
         )
@@ -761,7 +766,7 @@ class ActiveObject(Hsm):
         # This could easily happen if the user creates posted_event items on
         # entry and doesn't cancel them upon exiting the same state (see
         # comment in this function's docstring)
-        runner_event_for_task.clear()
+        task_run_event.clear()
         raise(ActiveObjectOutOfPostedEventResources(
           "posted_events_queue size is too small for what you have asked for"))
 

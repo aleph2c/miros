@@ -1,3 +1,4 @@
+import time
 import pytest
 import pprint
 from miros.hsm import spy_on
@@ -282,12 +283,54 @@ def test_start_stop(fabric_fixture):
   ao.clear_spy()
   assert(ao.spy_full() == [])
 
+
+@spy_on
+def posted_event_snitch(chart, e):
+  status = return_status.UNHANDLED
+
+  if(e.signal == signals.ENTRY_SIGNAL):
+    chart.augment(other=0, name='f_signal')
+    status = return_status.HANDLED
+
+  elif(e.signal == signals.EXIT_SIGNAL):
+    del(chart.f_signal)
+    status = return_status.HANDLED
+
+  # set up a hook for testing
+  elif(e.signal == signals.F):
+    print("saw f signal")
+    chart.f_signal += 1
+    status = return_status.HANDLED
+  # set up a hook for testing
+
+  elif(e.signal == signals.G):
+    print("saw g signal")
+    chart.f_signal += 1
+    status = return_status.HANDLED
+
+  else:
+    status, chart.temp.fun = return_status.SUPER, chart.top
+
+  return status
+
+
 @pytest.mark.ao
-def test_start_stop(fabric_fixture):
+@pytest.mark.post_event
+def test_post_event(fabric_fixture):
   '''inspect with your eyes'''
   ao = ActiveObject()
-  ao.start_at(g1_s22_active_objects_graph)
-  assert(ao.thread.is_alive() == True)
-  ao.stop()
-  print(ao.trace())
+  ao.start_at(posted_event_snitch)
+  assert(ao.thread.is_alive() is True)
+  ao.post_event(Event(signal=signals.F),
+                  times=5,
+                  period=0.2,
+                  deferred=True,
+                  queue_type='lifo')
+  ao.post_event(Event(signal=signals.G),
+                  times=15,
+                  period=0.01,
+                  deferred=True,
+                  queue_type='lifo')
+  time.sleep(4)
+  pp(ao.spy_full())
 

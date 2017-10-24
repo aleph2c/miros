@@ -1020,6 +1020,7 @@ def test_spy_topology_e1_4(spy_chart):
   chart.dispatch(e=event)
   assert(list(chart.full.spy) == expected_behavior)
 
+
 def test_spy_topology_e1_5(spy_chart):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
@@ -1044,6 +1045,7 @@ def test_spy_topology_e1_5(spy_chart):
   event  = Event(signal=signals.E)
   chart.dispatch(e=event)
   assert(list(chart.full.spy) == expected_behavior)
+
 
 @pytest.mark.internalspy
 @pytest.mark.topology_f
