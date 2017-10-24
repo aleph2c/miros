@@ -478,7 +478,7 @@ class ActiveObject(Hsm):
     def _append_subscribe_to_spy(self, e, queue_type='fifo'):
       if self.instrumented:
         self.full.spy.append("SUBSCRIBING TO:({}, TYPE:{})".format(e.signal_name, queue_type))
-        fn(self, e, queue_type)
+        return fn(self, e, queue_type)
     return _append_subscribe_to_spy
 
   @start_thread_if_not_running
@@ -491,7 +491,7 @@ class ActiveObject(Hsm):
     def _append_publish_to_spy(self, e, priority=1000):
       if self.instrumented:
         self.rtc.spy.append("PUBLISH:({}, PRIORITY:{})".format(e.signal_name, priority))
-        fn(self, e, priority)
+        return fn(self, e, priority)
     return _append_publish_to_spy
 
   @append_publish_to_spy
