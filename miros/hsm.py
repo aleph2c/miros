@@ -177,7 +177,7 @@ def spy_on(fn):
         # We have found a hook
         if(status is return_status.HANDLED):
           chart.rtc.spy.pop()
-          chart.rtc.spy.append("{}:{}:ULTIMATE_HOOK".format(e.signal_name, name))
+          chart.rtc.spy.append("{}:{}:HOOK".format(e.signal_name, name))
           sr = spy_tuple(signal=e.signal_name, state=name, hook=True)
         else:
           if status is return_status.IGNORED:
