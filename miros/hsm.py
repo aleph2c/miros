@@ -1206,23 +1206,9 @@ class Hsm(HsmWithQueues):
       # build it
       hsm.start(<starting_state_function>)
     '''
-    self.state.fun = self.__top__
+    self.state.fun = self.top
     self.temp.fun  = initial_state
     self.init()
 
-  @spy_on
-  def top(self, *args):
-    '''we steal the top state so that we can add things to it'''
-    status, self.temp.fun = return_status.SUPER, self.__top__
-    return status
-
   def next_rtc(self):
     super().next_rtc()
-
-  # don't spy on this
-  @spy_on
-  def __top__(self, *args):
-    '''top most state given to all HSM; treat it as an outside function'''
-    status = return_status.IGNORED
-    return status
-
