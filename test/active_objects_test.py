@@ -188,8 +188,6 @@ def test_publish_subscribe(fabric_fixture):
          'START',
          'SEARCH_FOR_SUPER_SIGNAL:c2_s2',
          'SEARCH_FOR_SUPER_SIGNAL:c2_s1',
-         'SEARCH_FOR_SUPER_SIGNAL:top',
-         'ENTRY_SIGNAL:top',
          'ENTRY_SIGNAL:c2_s1',
          'ENTRY_SIGNAL:c2_s2',
          'INIT_SIGNAL:c2_s2',
@@ -203,8 +201,6 @@ def test_publish_subscribe(fabric_fixture):
          'INIT_SIGNAL:c2_s1',
          '<- Queued:(0) Deferred:(0)',
          'CC:c2_s1',
-         'CC:top',
-         'CC:__top__',
          '<- Queued:(0) Deferred:(0)'
      ] 
   )
@@ -213,8 +209,6 @@ def test_publish_subscribe(fabric_fixture):
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:b1_s2',
      'SEARCH_FOR_SUPER_SIGNAL:b1_s1',
-     'SEARCH_FOR_SUPER_SIGNAL:top',
-     'ENTRY_SIGNAL:top',
      'ENTRY_SIGNAL:b1_s1',
      'ENTRY_SIGNAL:b1_s2',
      'INIT_SIGNAL:b1_s2',
@@ -228,8 +222,6 @@ def test_publish_subscribe(fabric_fixture):
      'START',
      'SEARCH_FOR_SUPER_SIGNAL:c2_s2',
      'SEARCH_FOR_SUPER_SIGNAL:c2_s1',
-     'SEARCH_FOR_SUPER_SIGNAL:top',
-     'ENTRY_SIGNAL:top',
      'ENTRY_SIGNAL:c2_s1',
      'ENTRY_SIGNAL:c2_s2',
      'INIT_SIGNAL:c2_s2',

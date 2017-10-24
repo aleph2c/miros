@@ -470,7 +470,7 @@ class ActiveObject(Hsm):
     def _start_thread_if_not_running(self, *args, **kwargs):
       if self.__thread_running() is False:
         self.__start()
-      fn(self, *args, **kwargs)
+      return fn(self, *args, **kwargs)
     return _start_thread_if_not_running
 
   def append_subscribe_to_spy(fn):
@@ -501,14 +501,62 @@ class ActiveObject(Hsm):
     self.fabric.publish(event, priority)
 
   @start_thread_if_not_running
-  def post_fifo(self, e):
+  def post_fifo(self, e, period=None, times=0, deferred=True):
+    '''post an event, or events to the fifo queue
+
+    Example of posting a single event into the fifo queue:
+      ao.post_fifo(Event(signal=signals.A))
+
+    Example create a short lived thread to post a one-shot event in one second:
+      thread_id = ao.post_fifo(Event(signal=signals.A), period=1.0, time=1, deferred=True)
+
+      # to cancel this one shot
+      ao.cancel_event(thread_id)
+
+    Example to create a heart beat of 0.7 seconds starting in 0.7 seconds:
+      thread_id = ao.post_fifo(Event(signal=signals.A), period=0.7, deferred=True)
+
+      # to kill this thread:
+      ao.cancel_event(thread_id)
+
+    '''
+    thread_id = None
     '''post to the fifo of the hsm locking deque'''
-    super().post_fifo(e)
+    if period is None:
+      super().post_fifo(e)
+    else:
+      # this will make another thread to post this event into our fifo
+      thread_id = self.__post_event(e, times, period, deferred, queue_type='fifo')
+    return thread_id
 
   @start_thread_if_not_running
-  def post_lifo(self, e):
+  def post_lifo(self, e, period=None, times=0, deferred=True):
+    '''post an event, or events to the lifo queue
+
+    Example of posting a single event into the lifo queue:
+      ao.post_lifo(Event(signal=signals.A))
+
+    Example create a short lived thread to post a one-shot event in one second:
+      thread_id = ao.post_lifo(Event(signal=signals.A), period=1.0, time=1, deferred=True)
+
+      # to cancel this one shot
+      ao.cancel_event(thread_id)
+
+    Example to create a heart beat of 0.7 seconds starting in 0.7 seconds:
+      thread_id = ao.post_lifo(Event(signal=signals.A), period=0.7, deferred=True)
+
+      # to kill this thread:
+      ao.cancel_event(thread_id)
+
+    '''
+    thread_id = None
     '''post to the lifo of the hsm locking deque'''
-    super().post_lifo(e)
+    if period is None:
+      super().post_lifo(e)
+    else:
+      # this will make another thread to post this event into our lifo
+      thread_id = self.__post_event(e, times, period, deferred, queue_type='lifo')
+    return thread_id
 
   def make_unique_name_based_on_start_at_function(fn):
     '''
@@ -606,7 +654,7 @@ class ActiveObject(Hsm):
         tr.end_state)
     return strace
 
-  def post_event(self, e, times=1, period=None, deferred=True, queue_type='fifo'):
+  def __post_event(self, e, times=1, period=None, deferred=True, queue_type='fifo'):
     '''
     The post_event method is used to post one-shots or periodic events to the
     active object.
@@ -692,9 +740,9 @@ class ActiveObject(Hsm):
     # to the fifo/lifo
     if times is 1 and period is None:
       if queue_type is 'fifo':
-        self.post_fifo(e)
+        self.post_fifo(e, period=None)
       else:
-        self.post_lifo(e)
+        self.post_lifo(e, period=None)
     else:
       # create an exit event for the task, it will be shared with the
       # cancel_event/cancel_events methods, so that the task can be stopped by
@@ -713,25 +761,24 @@ class ActiveObject(Hsm):
           task_run_event=task_run_event,
         )
 
-      # task memory
-      tm                    = {}
-      tm['deferring']       = posted_event_thread_spec.deferred
-      tm['times_activated'] = 0
-
-      def post_event_thread_runner(spec, task_memory):
+      def post_event_thread_runner(spec, deferred, times_activated):
         # We have a Event object here that can be controlled by something
         # outside of our task.  If it is cleared, then this thread will just
         # exit and disappear from the system.
         while spec.task_run_event.is_set():
-          if task_memory['deferring']:
+          if deferred:
             time.sleep(spec.period)
           else:
             # Pretend that we waited the first time we entered this function
             # this way we can access the time.sleep on every pass through from
             # now on.
-            task_memory['deferring'] = True
+            deferred = True
 
-          tm['times_activated'] += 1
+          # we might have been cancelled while we were sleeping
+          if spec.task_run_event.is_set() is not True:
+            break
+
+          times_activated += 1
           if spec.queue_type is 'fifo':
             self.post_fifo(spec.event)
           else:
@@ -739,12 +786,17 @@ class ActiveObject(Hsm):
 
           # If we don't want to run forever we can clear our own Event
           if spec.total_times is not 0:
-            if(tm['times_activated'] >= spec.total_times):
+            if(times_activated >= spec.total_times):
               spec.task_run_event.clear()
 
-      thread = Thread(target=post_event_thread_runner,
-                      args=(posted_event_thread_spec, tm, ),
-                      daemon=False)
+      thread = Thread(
+        target=post_event_thread_runner,
+        args=(posted_event_thread_spec,
+              posted_event_thread_spec.deferred,
+              0),
+        daemon=True
+      )
+      thread.name = uuid.uuid4()
       thread.start()
 
       # If we have run out of spots in our queue we should issue an
@@ -756,7 +808,7 @@ class ActiveObject(Hsm):
           self.PostedEvent(
             e.signal_name,
             task_run_event,
-            uuid.uuid4(),
+            thread.name,
           )
         )
       else:
@@ -770,10 +822,12 @@ class ActiveObject(Hsm):
         raise(ActiveObjectOutOfPostedEventResources(
           "posted_events_queue size is too small for what you have asked for"))
 
+    return thread.name
+
   def cancel_event(self, uuid=None):
     '''
-    This will cancel an event thread that was created using the post_event api.
-    The original call to the post_event api would have returned the uuid needed
+    This will cancel an event thread that was created using the __post_event api.
+    The original call to the __post_event api would have returned the uuid needed
     to cancel it with this call.
 
     If there are no threads managing the uuid provided, this method will do
@@ -781,7 +835,7 @@ class ActiveObject(Hsm):
 
     Example:
 
-      post_id_1 = ao.post_event(Event(signal=signals.A),
+      post_id_1 = ao.post_fifo(Event(signal=signals.A),
                       time=15,
                       period=1.0,
                       deferred=True,
@@ -791,13 +845,14 @@ class ActiveObject(Hsm):
 
 
     '''
-    for i in reversed(range(len(self.posted_events_queue) - 1)):
+    print("cancel uuid: {}".format(uuid))
+    for i in reversed(range(len(self.posted_events_queue))):
       posted_event_task_meta_data = self.posted_events_queue[-1]
       if posted_event_task_meta_data.uuid is uuid:
-        # let this task's infinite loop finish and the task will exit
-        posted_event_task_meta_data.clear()
-        # we aren't managing this thread anymore, remove it from out list
-        posted_event_task_meta_data.pop()
+        # If this thread hasn't already finished, ask it to stop
+        posted_event_task_meta_data.task_run_event.clear()
+        # we aren't managing this thread anymore, remove it from our list
+        self.posted_events_queue.pop()
         break
       else:
         self.posted_events_queue.rotate(1)
@@ -805,23 +860,23 @@ class ActiveObject(Hsm):
   def cancel_events(self, e):
     '''
     This will cancel all events that have the same signal name as e, that were
-    posted using the post_event.
+    posted using the __post_event.
 
     This will cancel all event threads which have the same signal name as 'e',
-    that were created using the post_event api.
+    that were created using the __post_event api.
 
     If there are no threads managing the signals name within the event
     provided, this method will do nothing.
 
     Example:
 
-      post_id_1 = ao.post_event(Event(signal=signals.A),
+      post_id_1 = ao.post_fifo(Event(signal=signals.A),
                       time=15,
                       period=1.0,
                       deferred=True,
                       queue_type='lifo')
 
-      post_id_2 = ao.post_event(Event(signal=signals.A),
+      post_id_2 = ao.post_fifo(Event(signal=signals.A),
                       time=15,
                       period=1.0,
                       deferred=True,
@@ -829,12 +884,13 @@ class ActiveObject(Hsm):
 
       ao.cancel_events(Event(signal=signals.A))
     '''
-    for i in reversed(range(len(self.posted_events_queue) - 1)):
+    # cancel all threads which could cause this event to take place
+    for i in reversed(range(len(self.posted_events_queue))):
       posted_event_task_meta_data = self.posted_events_queue[-1]
       if posted_event_task_meta_data.signal_name is e.signal_name:
-        # let this task's infinite loop finish and the task will exit
-        posted_event_task_meta_data.clear()
-        # we aren't managing this thread anymore, remove it from out list
-        posted_event_task_meta_data.pop()
+        # If this thread hasn't already finished, ask it to stop
+        posted_event_task_meta_data.task_run_event.clear()
+        # we aren't managing this thread anymore, remove it from our list
+        self.posted_events_queue.pop()
       else:
         self.posted_events_queue.rotate(1)

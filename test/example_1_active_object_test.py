@@ -93,8 +93,6 @@ def test1_trans_topology_a():
   assert( ao.spy_full() == \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:outer',
-     'SEARCH_FOR_SUPER_SIGNAL:top',
-     'ENTRY_SIGNAL:top',
      'ENTRY_SIGNAL:outer',
      'INIT_SIGNAL:outer',
      '<- Queued:(0) Deferred:(0)']
