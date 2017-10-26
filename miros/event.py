@@ -105,8 +105,6 @@ class SignalSource(OrderedDictWithParams):
     self['REFLECTION_SIGNAL']       = 4
     self['SEARCH_FOR_SUPER_SIGNAL'] = 5
 
-    #self.write_keys_to_attributes()
-
   def append(self, string):
     if string in self:
       return
@@ -196,37 +194,4 @@ class Event(OrderedDictWithParams):
       self.signal      = signals[signal]
     else:
       raise("signal must be of type string or Signal")
-
-
-class EnumWrapper():
-  slots = []
-
-  @classmethod
-  def __next__(cls):
-    cls.TOTAL += 1
-    return cls.TOTAL
-
-  @classmethod
-  def append(cls, name):
-    exec("cls.{} = cls.__next__()".format(name))
-
-
-class Signal2(EnumWrapper):
-  TOTAL = 5
-
-  ENTRY_SIGNAL,      \
-  EXIT_SIGNAL,       \
-  INIT_SIGNAL,       \
-  REFLECTION_SIGNAL, \
-  SEARCH_FOR_SUPER_SIGNAL = range(1, TOTAL + 1)
-
-
-class Signal3(EnumWrapper):
-  TOTAL = 5
-
-  ENTRY_SIGNAL,      \
-  EXIT_SIGNAL,       \
-  INIT_SIGNAL,       \
-  REFLECTION_SIGNAL, \
-  SEARCH_FOR_SUPER_SIGNAL = range(1, TOTAL + 1)
 
