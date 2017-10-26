@@ -11,7 +11,6 @@ class OrderedDictWithParams(OrderedDict):
       self['RET_SUPER']     = 1
       self['RET_SUPER_SUB'] = 2
       self['UNHANDLED']     = 3
-      selfwrite_keys_to_attributes()
 
     Any object constructed from it will have to following attributes:
       obj = <name_of_subclass>
@@ -29,18 +28,14 @@ class OrderedDictWithParams(OrderedDict):
   as well as the clean interface to the attribute.
   '''
 
-  def write_keys_to_attributes(self):
-    for key in self.keys():
-      exec("{0}.{1} = property(lambda self: self['{1}'])"
-        .format(self.__class__.__name__, key))
-
   def append(self, string):
     if string in self:
       return
     else:
       self[string] = len(self) + 1
-      exec("{0}.{1} = property(lambda self: self['{1}'])"
-        .format(self.__class__.__name__, string))
+
+  def __getattr__(self, item):
+    return self[str(item)]
 
 
 # Not intended for export
@@ -84,8 +79,6 @@ class ReturnStatusSource(OrderedDictWithParams):
     self['TRAN_EP']   = 12
     self['TRAN_XP']   = 13
 
-    self.write_keys_to_attributes()
-
 
 # Not intended for export
 class SignalSource(OrderedDictWithParams):
@@ -112,7 +105,13 @@ class SignalSource(OrderedDictWithParams):
     self['REFLECTION_SIGNAL']       = 4
     self['SEARCH_FOR_SUPER_SIGNAL'] = 5
 
-    self.write_keys_to_attributes()
+    #self.write_keys_to_attributes()
+
+  def append(self, string):
+    if string in self:
+      return
+    else:
+      self[string] = len(self) + 1
 
   def is_inner_signal(self, other):
     def is_number_an_internal_signal(number):
@@ -135,6 +134,16 @@ class SignalSource(OrderedDictWithParams):
         pass
     return result
 
+  def __getattr__(self, item):
+    value = None
+    try:
+      value = self[str(item)]
+    except:
+      self.append(item)
+      value = self[str(item)]
+
+    return value
+
 
 '''
 Defining the signals used by this package and all of the packages that
@@ -148,8 +157,8 @@ if signals_exist is False:
 
 # ReturnStatus is a singleton
 ReturnStatus = SingletonDecorator(ReturnStatusSource)
-return_status_exist = 'return_status' in locals()
-if return_status_exist is False:
+status_exist = 'return_status' in locals()
+if status_exist is False:
   return_status = ReturnStatus()
 
 
@@ -161,12 +170,12 @@ class Event(OrderedDictWithParams):
   enumerated value.
 
   # Make an event (this should happen internally):
-    e = Event(signal = signals.ENTRY_SIGNAL) # existing signal
-    assert( e.signal == signals.ENTRY_SIGNAL)
-    assert( e.signal_name == 'ENTRY_SIGNAL')
+    e = Event(signal=signals.ENTRY_SIGNAL) # existing signal
+    assert(e.signal == signals.ENTRY_SIGNAL)
+    assert(e.signal_name == 'ENTRY_SIGNAL')
 
   # Make an event, which will construct a signal internally:
-    e = Event(signal  = 'OVEN_OFF', payload = 'any object can go here') # new signal
+    e = Event(signal ='OVEN_OFF', payload='any object can go here') # new signal
     assert(e.signal == 5) # if it is the first unseen signal in the system
     assert(e.signal_name == 'OVEN_OFF')
     assert(signals.OVER_OFF == 5)

@@ -53,10 +53,6 @@ def test_signal_singletons():
   assert(e.signal_name == "JANE")
   assert(signals.JANE > signals.REFLECTION_SIGNAL)
 
-  # we expect the local_signals class not to have to MANY enum
-  with pytest.raises(KeyError) as excinfo:
-    local_signals.MARY
-
 @pytest.mark.test
 def test_enum_2():
   ee = Signal2()
