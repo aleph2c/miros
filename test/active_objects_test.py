@@ -4,7 +4,7 @@ import pprint
 
 from miros.hsm import spy_on
 from miros.activeobject import ActiveObject, ActiveFabric
-from miros.event import Signal, signals, Event, return_status
+from miros.event import signals, Event, return_status
 
 
 def pp(item):
@@ -12,30 +12,22 @@ def pp(item):
   pprint.pprint(item)
 
 
-Signal().append("A")
-Signal().append("B")
-Signal().append("BB")
-Signal().append("C")
-Signal().append("CC")
-Signal().append("D")
-Signal().append("E")
-Signal().append("F")
-
-'''           The following state chart is used to test topology C
-
-                    +------------------- c2_s1 -----------+
-                    |   +------ c2_s2-+   +------ c2_s3-+ |
-                    | * |             |   |             | +----+
-                    | | |             +-a->             | |    |
-                    | +->             <-a-+             | |    bb
-                    |   |             |   |             | |    |
-                    |   |             |   |             | <----+
-                    |   +-------------+   +-------------+ |
-                    +-------------------------------------+
-
-This is used for testing the type C topology within another state, in the trans_
-method of the HsmEventProcessor class.
-'''
+# diagram for next set of state functions
+#
+#  The following state chart is used to test topology C
+#
+#        +------------------- c2_s1 -----------+
+#        |   +------ c2_s2-+   +------ c2_s3-+ |
+#        | * |             |   |             | +----+
+#        | | |             +-a->             | |    |
+#        | +->             <-a-+             | |    bb
+#        |   |             |   |             | |    |
+#        |   |             |   |             | <----+
+#        |   +-------------+   +-------------+ |
+#        +-------------------------------------+
+#
+# This is used for testing the type C topology within another state, in the trans_
+# method of the HsmEventProcessor class.
 @spy_on
 def c2_s1(chart, e):
   status = return_status.UNHANDLED
@@ -65,6 +57,7 @@ def c2_s2(chart, e):
     status, chart.temp.fun = return_status.SUPER, c2_s1
   return status
 
+
 @spy_on
 def c2_s3(chart, e):
   status = return_status.UNHANDLED
@@ -77,24 +70,24 @@ def c2_s3(chart, e):
   else:
     status, chart.temp.fun = return_status.SUPER, c2_s1
   return status
-'''
-              The following state chart is used to test topology B
 
-                       +------- b1_s1 -----------s-----+
-                       |  +---- b1_s2 -----t-------+   |
-                       |  | i/pub(bb)              |   | --> bb
-                       |  |  +- b1_s3 -------+     |   |
-                       |  |  |               |     |   |
-                       |  |  |               <-b-+ <-a-+
-                       |  |  +---------------+   +-+   |
-                       |  +------------------------+   |
-                       +-------------------------------+
 
-This is used for testing the type B topology in the trans_ method of the Hsm
-class.
-  * test_trans_topology_b1_1 - start in graph_b1_s2 (diagram)
-  * test_trans_topology_b1_2 - start in graph_b1_s3 (diagram)
-'''
+#  The following state chart is used to test topology B
+#
+#           +------- b1_s1 -----------s-----+
+#           |  +---- b1_s2 -----t-------+   |
+#           |  | i/pub(bb)              |   | --> bb
+#           |  |  +- b1_s3 -------+     |   |
+#           |  |  |               |     |   |
+#           |  |  |               <-b-+ <-a-+
+#           |  |  +---------------+   +-+   |
+#           |  +------------------------+   |
+#           +-------------------------------+
+#
+# This is used for testing the type B topology in the trans_ method of the Hsm
+# class.
+#   * test_trans_topology_b1_1 - start in graph_b1_s2 (diagram)
+#   * test_trans_topology_b1_2 - start in graph_b1_s3 (diagram)
 @spy_on
 def b1_s1(chart, e):
   status = return_status.UNHANDLED
@@ -108,6 +101,7 @@ def b1_s1(chart, e):
   else:
     status, chart.temp.fun = return_status.SUPER, chart.top
   return status
+
 
 @spy_on
 def b1_s2(chart, e):
@@ -124,6 +118,7 @@ def b1_s2(chart, e):
     status, chart.temp.fun = return_status.SUPER, b1_s1
   return status
 
+
 @spy_on
 def b1_s3(chart, e):
   status = return_status.UNHANDLED
@@ -135,6 +130,7 @@ def b1_s3(chart, e):
     status, chart.temp.fun = return_status.SUPER, b1_s2
   return status
 
+
 @pytest.fixture
 def fabric_fixture(request):
   yield
@@ -142,10 +138,12 @@ def fabric_fixture(request):
   ActiveFabric().stop()
   ActiveFabric().clear()
 
+
 @pytest.mark.aos
 def test_import(fabric_fixture):
   ao = ActiveObject()
-  assert(ao != None)
+  assert(ao is not None)
+
 
 @pytest.mark.aos
 def test_start_stop_b(fabric_fixture):
@@ -156,6 +154,7 @@ def test_start_stop_b(fabric_fixture):
   time.sleep(0.2)
   pp(ao1.spy_full())
 
+
 @pytest.mark.aos
 def test_start_stop_c(fabric_fixture):
   ao1 = ActiveObject()
@@ -164,6 +163,7 @@ def test_start_stop_c(fabric_fixture):
   ao1.post_fifo(Event(signal=signals.A))
   time.sleep(0.2)
   pp(ao1.spy_full())
+
 
 @pytest.mark.aos
 @pytest.mark.here
@@ -181,7 +181,7 @@ def test_publish_subscribe(fabric_fixture):
   time.sleep(0.2)
   c1.post_fifo(Event(signal=signals.CC))
   time.sleep(0.1)
-  assert(c1.spy_full() == 
+  assert(c1.spy_full() ==
      [
          'SUBSCRIBING TO:(BB, TYPE:fifo)',
          'SUBSCRIBING TO:(CC, TYPE:fifo)',
@@ -202,10 +202,10 @@ def test_publish_subscribe(fabric_fixture):
          '<- Queued:(0) Deferred:(0)',
          'CC:c2_s1',
          '<- Queued:(0) Deferred:(0)'
-     ] 
+     ]
   )
 
-  assert(b.spy_full() == \
+  assert(b.spy_full() ==
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:b1_s2',
      'SEARCH_FOR_SUPER_SIGNAL:b1_s1',
@@ -216,7 +216,7 @@ def test_publish_subscribe(fabric_fixture):
      '<- Queued:(0) Deferred:(0)']
   )
 
-  assert(c2.spy_full() == \
+  assert(c2.spy_full() ==
     ['SUBSCRIBING TO:(BB, TYPE:fifo)',
      'SUBSCRIBING TO:(CC, TYPE:fifo)',
      'START',
