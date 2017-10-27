@@ -9,24 +9,21 @@ def pp(item):
   pprint.pprint(item)
 
 
-signals.append("WaitComplete")
-signals.append("ResetChart")
 ################################################################################
 #                             simple_example_1                                 #
 ################################################################################
-'''           The following state chart is used to test an example
-
-                     +------- outer -----------+
-                     |  +---- middle ------+   +----+
-                     |  |  +- inner ---+   |   |    |
-                     |  |  |           <-* <-W-+    R
-                     |  |  +-----------+   |   |    |
-                     |  +------------------+   <----+
-                     +-------------------------+    
-
-This is used for testing the type B topology in the trans_ method of the Hsm
-class.
-'''
+# The following state chart is used to test an example
+#
+#        +------- outer -----------+
+#        |  +---- middle ------+   +----+
+#        |  |  +- inner ---+   |   |    |
+#        |  |  |           <-* <-W-+    R
+#        |  |  +-----------+   |   |    |
+#        |  +------------------+   <----+
+#        +-------------------------+
+#
+# This is used for testing the type B topology in the trans_ method of the Hsm
+# class.
 @spy_on
 def outer(chart, e):
   status = return_status.UNHANDLED
@@ -47,10 +44,11 @@ def outer(chart, e):
     status = chart.trans(outer)
 
   else:
-    # this signal wasn't managed, pass a reference to the 
+    # this signal wasn't managed, pass a reference to the
     # method that is outside of us
     status, chart.temp.fun = return_status.SUPER, chart.top
   return status
+
 
 @spy_on
 def middle(chart, e):
@@ -70,6 +68,7 @@ def middle(chart, e):
     status, chart.temp.fun = return_status.SUPER, outer
   return status
 
+
 @spy_on
 def inner(chart, e):
   status = return_status.UNHANDLED
@@ -84,13 +83,15 @@ def inner(chart, e):
   else:
     status, chart.temp.fun = return_status.SUPER, middle
   return status
+
+
 # grep test name to view diagram
 @pytest.mark.example
 def test1_trans_topology_a():
   ao = ActiveObject()
   ao.start_at(outer)
   pp(ao.spy_full())
-  assert( ao.spy_full() == \
+  assert(ao.spy_full() ==
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:outer',
      'ENTRY_SIGNAL:outer',
@@ -118,24 +119,9 @@ def test1_trans_topology_a():
   event_wait_complete = Event(signal=signals.WaitComplete)
   event_reset_chart = Event(signal=signals.ResetChart)
   ao.post_fifo(event_wait_complete)
-  ao.post_fifo(event_reset_chart)   
+  ao.post_fifo(event_reset_chart)
   ao.post_fifo(event_wait_complete)
   ao.post_fifo(event_reset_chart)
   time.sleep(0.3)
   print(ao.trace())
   pp(ao.spy_full())
-
-  # chart = spy_chart
-  # expected_behavior = \
-  #['SEARCH_FOR_SUPER_SIGNAL:dispatch_graph_a1_s1',
-  # 'ENTRY_SIGNAL:dispatch_graph_a1_s1',
-  # 'INIT_SIGNAL:dispatch_graph_a1_s1',
-  # 'EXIT_SIGNAL:dispatch_graph_a1_s1',
-  # 'ENTRY_SIGNAL:dispatch_graph_a1_s1',
-  # 'INIT_SIGNAL:dispatch_graph_a1_s1']
-
-  # chart.start_at(dispatch_graph_a1_s1)
-  # event  = Event(signal=signals.A)
-  # chart.dispatch(e=event)
-  # assert(chart.spy_log == expected_behavior)
-

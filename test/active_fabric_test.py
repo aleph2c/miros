@@ -56,8 +56,8 @@ def test_clear_feature():
   af1.clear()
   assert(af1.fifo_fabric_queue.empty() is True)
   assert(af1.lifo_fabric_queue.empty() is True)
-  assert(af1.lifo_subscriptions is {})
-  assert(af1.fifo_subscriptions is {})
+  assert(af1.lifo_subscriptions == {})
+  assert(af1.fifo_subscriptions == {})
 
 
 @pytest.fixture
