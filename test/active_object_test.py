@@ -2,20 +2,14 @@ import time
 import pytest
 import pprint
 from miros.hsm import spy_on
-from miros.activeobject import LockingDeque
 from miros.activeobject import ActiveObject, ActiveFabric, ActiveObjectOutOfPostedEventResources
-from miros.event import ReturnStatus, Signal, signals, Event, return_status
+from miros.event import signals, Event, return_status
+
 
 def pp(item):
   print("")
   pprint.pprint(item)
 
-Signal().append("A")
-Signal().append("B")
-Signal().append("C")
-Signal().append("D")
-Signal().append("E")
-Signal().append("F")
 
 ################################################################################
 #                          ActiveObject Graph G1                               #
@@ -53,6 +47,8 @@ This is used for testing the type E topology in the trans_ method of the HsmEven
 class.
   * test_hsm_next_rtc - start in active_objects_graph_g1_s22
 '''
+
+
 @spy_on
 def g1_s0_active_objects_graph(chart, e):
   status = return_status.UNHANDLED
@@ -65,6 +61,7 @@ def g1_s0_active_objects_graph(chart, e):
   else:
     status, chart.temp.fun = return_status.SUPER, chart.top
   return status
+
 
 @spy_on
 def g1_s01_active_objects_graph(chart, e):
@@ -81,6 +78,7 @@ def g1_s01_active_objects_graph(chart, e):
   else:
     status, chart.temp.fun = return_status.SUPER, g1_s0_active_objects_graph
   return status
+
 
 @spy_on
 def g1_s1_active_objects_graph(chart, e):
@@ -100,6 +98,7 @@ def g1_s1_active_objects_graph(chart, e):
     status, chart.temp.fun = return_status.SUPER, chart.top
   return status
 
+
 @spy_on
 def g1_s21_active_objects_graph(chart, e):
   status = return_status.UNHANDLED
@@ -113,6 +112,7 @@ def g1_s21_active_objects_graph(chart, e):
     status, chart.temp.fun = return_status.SUPER, g1_s1_active_objects_graph
   return status
 
+
 @spy_on
 def g1_s211_active_objects_graph(chart, e):
   status = return_status.UNHANDLED
@@ -123,6 +123,7 @@ def g1_s211_active_objects_graph(chart, e):
   else:
     status, chart.temp.fun = return_status.SUPER, g1_s21_active_objects_graph
   return status
+
 
 @spy_on
 def g1_s2111_active_objects_graph(chart, e):
@@ -136,6 +137,7 @@ def g1_s2111_active_objects_graph(chart, e):
   else:
     status, chart.temp.fun = return_status.SUPER, g1_s211_active_objects_graph
   return status
+
 
 @spy_on
 def g1_s22_active_objects_graph(chart, e):
@@ -152,6 +154,7 @@ def g1_s22_active_objects_graph(chart, e):
     status, chart.temp.fun = return_status.SUPER, g1_s1_active_objects_graph
   return status
 
+
 @spy_on
 def g1_s3_active_objects_graph(chart, e):
   status = return_status.UNHANDLED
@@ -166,6 +169,7 @@ def g1_s3_active_objects_graph(chart, e):
     status, chart.temp.fun = return_status.SUPER, g1_s22_active_objects_graph
   return status
 
+
 @spy_on
 def g1_s32_active_objects_graph(chart, e):
   status = return_status.UNHANDLED
@@ -176,6 +180,7 @@ def g1_s32_active_objects_graph(chart, e):
   else:
     status, chart.temp.fun = return_status.SUPER, g1_s3_active_objects_graph
   return status
+
 
 @spy_on
 def g1_s321_active_objects_graph(chart, e):
@@ -188,6 +193,7 @@ def g1_s321_active_objects_graph(chart, e):
     status, chart.temp.fun = return_status.SUPER, g1_s32_active_objects_graph
   return status
 
+
 @pytest.fixture
 def fabric_fixture(request):
   yield
@@ -195,16 +201,18 @@ def fabric_fixture(request):
   ActiveFabric().stop()
   ActiveFabric().clear()
 
+
 @pytest.mark.ao
 def test_import(fabric_fixture):
   ao = ActiveObject()
-  assert(ao != None)
+  assert(ao is not None)
+
 
 @pytest.mark.ao
 def test_start_stop(fabric_fixture):
   ao = ActiveObject(name="bob")
   ao.start_at(g1_s22_active_objects_graph)
-  assert(ao.thread.is_alive() == True)
+  assert(ao.thread.is_alive() is True)
   time.sleep(0.2)
   ao.stop()
   assert(ao.spy_full() ==
@@ -298,26 +306,21 @@ def posted_event_snitch(chart, e):
 
   # set up a hook for testing
   elif(e.signal == signals.A):
-    #print("saw a signal")
     chart.a_signal += 1
     status = return_status.HANDLED
-  # set up a hook for testing
 
   # set up a hook for testing
   elif(e.signal == signals.B):
-    #print("saw a signal")
     chart.b_signal += 1
     status = return_status.HANDLED
-  
+
   # set up a hook for testing
   elif(e.signal == signals.F):
-    #print("saw f signal")
     chart.f_signal += 1
     status = return_status.HANDLED
-  # set up a hook for testing
 
+  # set up a hook for testing
   elif(e.signal == signals.G):
-    #print("saw g signal")
     chart.g_signal += 1
     status = return_status.HANDLED
 
@@ -334,13 +337,14 @@ def test_that_it_can_post_events(fabric_fixture):
   ao = ActiveObject()
   ao.start_at(posted_event_snitch)
   assert(ao.thread.is_alive() is True)
-  ao.post_lifo(Event(signal=signals.F),
-                  times=5,
-                  period=0.1,
-                  deferred=False,
-                  )
+  ao.post_lifo(
+      Event(signal=signals.F),
+      times=5,
+      period=0.1,
+      deferred=False,
+  )
   time.sleep(1)
-  assert(ao.spy_full() == \
+  assert(ao.spy_full() ==
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:posted_event_snitch',
      'ENTRY_SIGNAL:posted_event_snitch',
@@ -359,6 +363,7 @@ def test_that_it_can_post_events(fabric_fixture):
   )
   assert(ao.f_signal == 5)
 
+
 @pytest.mark.ao
 @pytest.mark.post_event
 def test_that_it_defer(fabric_fixture):
@@ -373,7 +378,7 @@ def test_that_it_defer(fabric_fixture):
                )
 
   time.sleep(0.2)
-  assert(ao.spy_full() == \
+  assert(ao.spy_full() ==
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:posted_event_snitch',
      'ENTRY_SIGNAL:posted_event_snitch',
@@ -448,6 +453,7 @@ def test_you_can_cancel_an_event_thread(fabric_fixture):
   assert(ao.a_signal >= 1)
   assert(ao.b_signal >= 1)
 
+
 @pytest.mark.ao
 @pytest.mark.post_event
 def test_you_can_cancel_all_events_of_the_same_name(fabric_fixture):
@@ -459,7 +465,7 @@ def test_you_can_cancel_all_events_of_the_same_name(fabric_fixture):
       deferred=True,
       times=200,
       period=0.3)
-
+  assert(thread_id_a is not None)
   # run forever with a period of 1 second
   thread_id_f = ao.post_lifo(Event(signal=signals.A),
       deferred=True,
@@ -471,17 +477,20 @@ def test_you_can_cancel_all_events_of_the_same_name(fabric_fixture):
       deferred=False,
       times=200,
       period=0.3)
+  assert(thread_id_f is not None)
 
   # run forever with a period of 1 second
   thread_id_g = ao.post_lifo(Event(signal=signals.G),
       deferred=True,
       period=1.0)
+  assert(thread_id_g is not None)
 
   # run 2 times fast
   thread_id_b = ao.post_fifo(Event(signal=signals.B),
       deferred=False,
       times=200,
       period=0.1)
+  assert(thread_id_b is not None)
 
   assert(len(ao.posted_events_queue) == 5)
   ao.cancel_events(Event(signal=signals.A))
@@ -489,12 +498,14 @@ def test_you_can_cancel_all_events_of_the_same_name(fabric_fixture):
   time.sleep(0.1)
   assert(ao.a_signal == 1)
 
+
 @pytest.mark.ao
 @pytest.mark.post_event
 def test_posting_too_many_events_will_raise_exception(fabric_fixture):
   ao = ActiveObject()
   ao.start_at(posted_event_snitch)
   with pytest.raises(ActiveObjectOutOfPostedEventResources) as execinfo:
+    assert(execinfo is not None)
     for i in range(1000):
       ao.post_fifo(Event(signal=signals.A),
           times=300,
@@ -502,7 +513,7 @@ def test_posting_too_many_events_will_raise_exception(fabric_fixture):
   time.sleep(0.2)
   # we issue an exception, but we still run as well as we can
   # the existing threads will work
-  assert(len(ao.posted_events_queue)==ao.__class__.QUEUE_SIZE)
+  assert(len(ao.posted_events_queue) is ao.__class__.QUEUE_SIZE)
   assert(ao.a_signal > 0)
   ao.cancel_events(Event(signal=signals.A))
-  assert(len(ao.posted_events_queue)==0)
+  assert(len(ao.posted_events_queue) is 0)
