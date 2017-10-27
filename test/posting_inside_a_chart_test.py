@@ -12,38 +12,35 @@ def pp(item):
 ################################################################################
 #                          Posting Inside of a chart                           #
 ################################################################################
-'''
-  
-  +--------------------------- outer -----------------------------+
-  | entry/ recall()                                               |
-  | D/ recall()                                                   |
-  |      +-------------------- middle -------------------------+  +--+
-  |      | entry/ multishot_id = \                             |  |  |
-  |      |          chart.post_fifo(Event(signal=signals.A,    |  |  |
-  |      |                          times=3,                   |  |  |
-  |      |                          period=1.0,                |  |  |
-  |      |                          deffered=True)             |  |  B (print("flash B!"))
-  |      |          chart.augment(other=multishot_id,          |  |  | 
-  +--C--->                        name='multishot_id')         |  |  |
-  |      | exit/ chart.cancel_event(chart.multishot_id)        |  |  |
-  |      |                                                     |  |  |
-  |      |         +---------- inner ------------------------+ |  <--+
-  |      |         | entry/ chart.defer(                     | |  |
-  |      |         |          Event(signal=signals.B))       | |  |
-  |      |         |                                         | |  |
-  |      |         | *----->                                 | |  |
-  |      -----A---->   print("inner state init")             | |  |
-  |      |         +-----------------------------------------+ |  |
-  |      +-----------------------------------------------------+  |
-  +---------------------------------------------------------------+
-
-
-This is used for testing the type E topology in the trans_ method of the HsmEventProcessor
-class.
-  * test_hsm_next_rtc - start in active_objects_graph_g1_s22
-'''
-
-
+#
+#
+#   +--------------------------- outer -----------------------------+
+#   | entry/ recall()                                               |
+#   | D/ recall()                                                   |
+#   |      +-------------------- middle -------------------------+  +--+
+#   |      | entry/ multishot_id = \                             |  |  |
+#   |      |          chart.post_fifo(Event(signal=signals.A,    |  |  |
+#   |      |                          times=3,                   |  |  |
+#   |      |                          period=1.0,                |  |  |
+#   |      |                          deffered=True)             |  |  B (print("flash B!"))
+#   |      |          chart.augment(other=multishot_id,          |  |  |
+#   +--C--->                        name='multishot_id')         |  |  |
+#   |      | exit/ chart.cancel_event(chart.multishot_id)        |  |  |
+#   |      |                                                     |  |  |
+#   |      |         +---------- inner ------------------------+ |  <--+
+#   |      |         | entry/ chart.defer(                     | |  |
+#   |      |         |          Event(signal=signals.B))       | |  |
+#   |      |         |                                         | |  |
+#   |      |         | *----->                                 | |  |
+#   |      -----A---->   print("inner state init")             | |  |
+#   |      |         +-----------------------------------------+ |  |
+#   |      +-----------------------------------------------------+  |
+#   +---------------------------------------------------------------+
+#
+#
+# This is used for testing the type E topology in the trans_ method of the HsmEventProcessor
+# class.
+#   * test_hsm_next_rtc - start in active_objects_graph_g1_s22
 @spy_on
 def outer(chart, e):
   status = return_status.UNHANDLED
@@ -100,7 +97,7 @@ def inner(chart, e):
     status = return_status.HANDLED
   if(e.signal == signals.INIT_SIGNAL):
     print("inner state init")
-    status = return_statusHANDLED
+    status = return_status.HANDLED
   else:
     status, chart.temp.fun = return_status.SUPER, chart.outer
   return status
@@ -120,6 +117,6 @@ def test_onslaught(fabric_fixture):
   ao.start_at(outer)
   pp(ao.spy_full())
   ao.post_fifo(Event(signal=signals.ABECWD))
-  
+
 
 
