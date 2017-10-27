@@ -1,6 +1,8 @@
+import time
 import pytest
 from miros.hsm import spy_on
-from miros.event import signals, Event, return_status
+from miros.event import signals, Event
+from miros.event import return_status as r
 from miros.activeobject import ActiveObject, ActiveFabric
 import pprint
 
@@ -32,7 +34,7 @@ def pp(item):
 #   |      |         |          Event(signal=signals.B))       | |  |
 #   |      |         |                                         | |  |
 #   |      |         | *----->                                 | |  |
-#   |      -----A---->   print("inner state init")             | |  |
+#   |      -----A---->   print("inner r init")                 | |  |
 #   |      |         +-----------------------------------------+ |  |
 #   |      +-----------------------------------------------------+  |
 #   +---------------------------------------------------------------+
@@ -43,63 +45,63 @@ def pp(item):
 #   * test_hsm_next_rtc - start in active_objects_graph_g1_s22
 @spy_on
 def outer(chart, e):
-  status = return_status.UNHANDLED
+  status = r.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    chart.recall()
-    status = return_status.HANDLED
+    #chart.recall()
+    status = r.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
-    status = return_status.HANDLED
+    status = r.HANDLED
   if(e.signal == signals.INIT_SIGNAL):
-    status = return_status.HANDLED
+    status = r.HANDLED
   elif(e.signal == signals.D):
     chart.recall()
-    status = return_status.HANDLED
+    status = r.HANDLED
   elif(e.signal == signals.B):
     status = chart.trans(outer)
   else:
-    status, chart.temp.fun = return_status.SUPER, chart.top
+    status, chart.temp.fun = r.SUPER, chart.top
   return status
 
 
 @spy_on
 def middle(chart, e):
-  status = return_status.UNHANDLED
+  status = r.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
     multi_shot_thread = \
       chart.post_fifo(Event(signal=signals.A),
                       times=3,
-                      period=1,
-                      deffered=True)
+                      period=0.1,
+                      deferred=True)
     chart.augment(other=multi_shot_thread,
                   name='multi_shot_thread')
-    status = return_status.HANDLED
+    status = r.HANDLED
 
   elif(e.signal == signals.EXIT_SIGNAL):
     chart.cancel_event(chart.multi_shot_thread)
-    status = return_status.HANDLED
+    status = r.HANDLED
 
   if(e.signal == signals.INIT_SIGNAL):
-    status = return_status.HANDLED
+    status = r.HANDLED
   elif(e.signal == signals.A):
     status = chart.trans(inner)
   else:
-    status, chart.temp.fun = return_status.SUPER, chart.outer
+    status, chart.temp.fun = r.SUPER, outer
   return status
 
 
 @spy_on
 def inner(chart, e):
-  status = return_status.UNHANDLED
+  status = r.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
     chart.defer(Event(signal=signals.B))
-    status = return_status.HANDLED
+    status = r.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
-    status = return_status.HANDLED
+    status = r.HANDLED
   if(e.signal == signals.INIT_SIGNAL):
-    print("inner state init")
-    status = return_status.HANDLED
+    print("charging with B")
+    status = r.HANDLED
   else:
-    status, chart.temp.fun = return_status.SUPER, chart.outer
+    status, chart.temp.fun = r.SUPER, middle
   return status
 
 
@@ -114,9 +116,13 @@ def fabric_fixture(request):
 @pytest.mark.onslaught
 def test_onslaught(fabric_fixture):
   ao = ActiveObject()
-  ao.start_at(outer)
+  ao.start_at(middle)
   pp(ao.spy_full())
-  ao.post_fifo(Event(signal=signals.ABECWD))
-
-
+  time.sleep(5)
+  ao.post_fifo(Event(signal=signals.D))
+  ao.post_fifo(Event(signal=signals.D))
+  ao.post_fifo(Event(signal=signals.D))
+  ao.post_fifo(Event(signal=signals.D))
+  pp(ao.spy_full())
+  time.sleep(50)
 
