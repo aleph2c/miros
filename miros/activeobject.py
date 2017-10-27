@@ -421,7 +421,7 @@ class ActiveObjectOutOfPostedEventResources(Exception):
 class ActiveObject(Hsm):
   def __init__(self, name=None, instrumented=True):
     super().__init__(instrumented)
-    self.locking_deque       = LockingDeque()
+    self.locking_deque = LockingDeque()
     # Over-write the deque in the Hsm with Queues with the one managed by the
     # LockingDeque object. This is the 'magic' in this object.  Any time a
     # post_fifo or post_lifo method within the Hsm is touched, it unknowingly uses

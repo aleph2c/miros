@@ -12,6 +12,8 @@
   and run.
 
   *Evidence that contradicts Assumptions:*
+    The run event is getting past the 'wait' queue api, with the recalled events
+  
   
 = Orient =
   
@@ -28,16 +30,19 @@
 
 = Decide =
   *Idea/Hypotheses for Recall Is Not Working In Active Fabric: >=5*
+  * [ ] The run_event thread is not waking up to do the work [falsified]
   * [ ] The spy log is not accessible from the main thread
-  * [ ] The fifo thread is not waking up to do the work
   * [ ] More information is needed
   * [ ] The test chart is broken
   * [ ] The feature never worked, the design just wasn't completed
   
   *Chosen Idea/Hypothesis*
-    The fifo thread is not working up to do the work
+    The run_event thread is not working up to do the work
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
-
+    * [X] in the run_event method of the ActiveObect class print the signal
+          names and confirm you see the signal name you aren't expecting
+    * [X] on the other side of the wait call, write the signal names and see if
+          the recalled signal is there
 = Act =
 
