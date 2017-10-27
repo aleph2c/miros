@@ -1,26 +1,21 @@
 import pytest
-from miros.event import ReturnStatus, Signal, signals, Event, return_status
-from miros.activeobject import ActiveObject, FabricEvent, ActiveFabric
-from miros.hsm import spy_on, HsmTopologyException
+from miros.event import signals, Event
+from miros.activeobject import ActiveFabric
 from collections import deque
 import time
 import pprint
+
+
 def pp(item):
   pprint.pprint(item)
 
-Signal().append("A")
-Signal().append("B")
-Signal().append("C")
-Signal().append("D")
-Signal().append("E")
-Signal().append("F")
-Signal().append("G")
 
 @pytest.mark.pubsub
 def test_active_fabric_singleton():
   af1 = ActiveFabric()
   af2 = ActiveFabric()
-  assert(id(af1)== id(af2))
+  assert(id(af1) == id(af2))
+
 
 # Confirm that we can start and stop the active fabric, otherwise we can't test
 # this system
@@ -28,17 +23,18 @@ def test_active_fabric_singleton():
 def test_turn_off_and_on_fabric():
   af1 = ActiveFabric()
   af1.start()
-  assert(af1.fifo_thread.is_alive() == True)
-  assert(af1.lifo_thread.is_alive() == True)
+  assert(af1.fifo_thread.is_alive() is True)
+  assert(af1.lifo_thread.is_alive() is True)
   af1.stop()
-  assert(af1.fifo_thread.is_alive() == False)
-  assert(af1.lifo_thread.is_alive() == False)
+  assert(af1.fifo_thread.is_alive() is False)
+  assert(af1.lifo_thread.is_alive() is False)
   af1.start()
-  assert(af1.fifo_thread.is_alive() == True)
-  assert(af1.lifo_thread.is_alive() == True)
+  assert(af1.fifo_thread.is_alive() is True)
+  assert(af1.lifo_thread.is_alive() is True)
   af1.stop()
-  assert(af1.fifo_thread.is_alive() == False)
-  assert(af1.lifo_thread.is_alive() == False)
+  assert(af1.fifo_thread.is_alive() is False)
+  assert(af1.lifo_thread.is_alive() is False)
+
 
 # Confirm that we can clear the active fabric, otherwise we can't test the
 # system
@@ -49,7 +45,6 @@ def test_clear_feature():
   event_b = Event(signal=signals.B)
   event_c = Event(signal=signals.C)
   input_queue_1 = deque(maxlen=5)
-  input_queue_2 = deque(maxlen=5)
   af1.subscribe(input_queue_1, event_a)
   af1.subscribe(input_queue_1, event_b)
   af1.subscribe(input_queue_1, event_a)
@@ -59,10 +54,11 @@ def test_clear_feature():
   af1.start()
   af1.stop()
   af1.clear()
-  assert(af1.fifo_fabric_queue.empty() == True)
-  assert(af1.lifo_fabric_queue.empty() == True)
-  assert(af1.lifo_subscriptions == {})
-  assert(af1.fifo_subscriptions == {})
+  assert(af1.fifo_fabric_queue.empty() is True)
+  assert(af1.lifo_fabric_queue.empty() is True)
+  assert(af1.lifo_subscriptions is {})
+  assert(af1.fifo_subscriptions is {})
+
 
 @pytest.fixture
 def fabric_fixture(request):
@@ -70,6 +66,7 @@ def fabric_fixture(request):
   # shut down the active fabric for the next test
   ActiveFabric().stop()
   ActiveFabric().clear()
+
 
 @pytest.mark.pubsub
 def test_simple_publish_subscribe(fabric_fixture):
@@ -83,6 +80,7 @@ def test_simple_publish_subscribe(fabric_fixture):
   time.sleep(0.10)
 
   assert(len(input_queue_1) == 1)
+
 
 @pytest.mark.pubsub
 def test_multi_subscribe(fabric_fixture):
@@ -101,6 +99,7 @@ def test_multi_subscribe(fabric_fixture):
   assert(len(input_queue_1) == 1)
   assert(len(input_queue_2) == 1)
 
+
 @pytest.mark.pubsub
 def test_repeat_publish_subscribe(fabric_fixture):
   input_queue_1 = deque(maxlen=5)
@@ -116,6 +115,7 @@ def test_repeat_publish_subscribe(fabric_fixture):
   af.publish(event_a)
   time.sleep(0.10)
   assert(len(input_queue_1) == 1)
+
 
 @pytest.mark.pubsub
 def test_subscribe_lilo(fabric_fixture):
