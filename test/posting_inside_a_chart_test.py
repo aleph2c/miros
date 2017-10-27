@@ -118,12 +118,11 @@ def test_onslaught(fabric_fixture):
   ao = ActiveObject()
   ao.start_at(middle)
   pp(ao.spy_full())
-  time.sleep(1)
+  time.sleep(0.5)
   ao.post_fifo(Event(signal=signals.D))
   ao.post_fifo(Event(signal=signals.D))
   ao.post_fifo(Event(signal=signals.D))
   ao.post_fifo(Event(signal=signals.D))
-  time.sleep(1)
+  time.sleep(0.1)  # if you don't wait it won't look like it is working
   pp(ao.spy_full())
-  time.sleep(3)
 
