@@ -1,57 +1,51 @@
 import pytest
-import traceback
-from miros.event import ReturnStatus, Signal, signals, Event, return_status
-from miros.hsm   import HsmWithQueues, HsmTopologyException, spy_on
+from miros.event import signals, Event, return_status
+from miros.hsm   import HsmWithQueues, spy_on
 import pprint
+
+
 def pp(item):
   print("")
   pprint.pprint(item)
 
-Signal().append("A")
-Signal().append("B")
-Signal().append("C")
-Signal().append("D")
-Signal().append("E")
-Signal().append("F")
 
 ################################################################################
 #                            HsmQueues Graph G1                                #
 ################################################################################
-'''           The following state chart is used to test topology G
-
-                     +-------------------------------- g1_s1 --------------+
-   +---g1_s0------+  | *i/fifo(e)                                          |
-   |+-g1_s01-----+|  |                      +---------g1_s22 ----------+   |
-   ||e/fifo(a)   |+------c------------------>  *i/fifo(d)              |   |
-   ||e/lifo(f)   ||  |                      |                          |   |
-   ||e/recall()  <-e-+                      | +-------g1_s3 ---------+ |   |
-   |+------------+|  |                      | | *i/defer(f)          | |   |
-   |+------------+|  | +-------g1_s21----+  | |    +----g1_s32-----+ | |   |
-   +-+------------+  | | +--g1_s211-----+|  | |    |  +-g1_s321--+ | | |   |
-     |               | | |+-g1_s2111+   ||  | |    |  |          | | | |   |
-     |               | | ||         |   ||  | |    |  |          | | | |   |
-     |               | | ||         |   ||  | |    |  |          | | | |   |
-     |               | | ||         |   ||  | |    |  |          | | | |   |
-     |               | | ||         |   |+-------b---->          <----f----+
-     |               | | ||         |   ||  | |    |  |          | | | |   |
-     |               | | ||         |   ||  | |    |  |          | | | |   |
-     +----------f--------->         |   ||  | |  +---->          | | | |   |
-                     | | ||         |   ||  | |  | |  |          | | | |   |
-                     | | |++--------+   ||  | |  | |  |          | | | +-d->
-                     | | +-|------------+|  | |  | |  +----------+ | | |   |
-                     | +---|-------------+  | |  | +---------------+ | |   |
-                     |     |                | +--|-------------------+ |   |
-                     |     +------------a--------+                     |   |
-                     |                      +--------------------------+   |
-                     |                                                     |
-                     +-----------------------------------------------------+
-
-
-This is used for testing the type E topology in the trans_ method of the HsmEventProcessor
-class.
-  * test_hsm_next_rtc         - start in hsm_queues_graph_g1_s22
-  * test_hsm_complete_circuit - start in hsm_queues_graph_g1_s22
-'''
+# The following state chart is used to test topology G
+#
+#                   +-------------------------------- g1_s1 --------------+
+# +---g1_s0------+  | *i/fifo(e)                                          |
+# |+-g1_s01-----+|  |                      +---------g1_s22 ----------+   |
+# ||e/fifo(a)   |+------c------------------>  *i/fifo(d)              |   |
+# ||e/lifo(f)   ||  |                      |                          |   |
+# ||e/recall()  <-e-+                      | +-------g1_s3 ---------+ |   |
+# |+------------+|  |                      | | *i/defer(f)          | |   |
+# |+------------+|  | +-------g1_s21----+  | |    +----g1_s32-----+ | |   |
+# +-+------------+  | | +--g1_s211-----+|  | |    |  +-g1_s321--+ | | |   |
+#   |               | | |+-g1_s2111+   ||  | |    |  |          | | | |   |
+#   |               | | ||         |   ||  | |    |  |          | | | |   |
+#   |               | | ||         |   ||  | |    |  |          | | | |   |
+#   |               | | ||         |   ||  | |    |  |          | | | |   |
+#   |               | | ||         |   |+-------b---->          <----f----+
+#   |               | | ||         |   ||  | |    |  |          | | | |   |
+#   |               | | ||         |   ||  | |    |  |          | | | |   |
+#   +----------f--------->         |   ||  | |  +---->          | | | |   |
+#                   | | ||         |   ||  | |  | |  |          | | | |   |
+#                   | | |++--------+   ||  | |  | |  |          | | | +-d->
+#                   | | +-|------------+|  | |  | |  +----------+ | | |   |
+#                   | +---|-------------+  | |  | +---------------+ | |   |
+#                   |     |                | +--|-------------------+ |   |
+#                   |     +------------a--------+                     |   |
+#                   |                      +--------------------------+   |
+#                   |                                                     |
+#                   +-----------------------------------------------------+
+#
+# This is used for testing the type E topology in the trans_ method of the HsmEventProcessor
+# class.
+#   * test_hsm_next_rtc         - start in hsm_queues_graph_g1_s22
+#   * test_hsm_complete_circuit - start in hsm_queues_graph_g1_s22
+# '''
 @spy_on
 def hsm_queues_graph_g1_s0(chart, e):
   status = return_status.UNHANDLED
@@ -64,6 +58,7 @@ def hsm_queues_graph_g1_s0(chart, e):
   else:
     status, chart.temp.fun = return_status.SUPER, chart.top
   return status
+
 
 @spy_on
 def hsm_queues_graph_g1_s01(chart, e):
@@ -80,6 +75,7 @@ def hsm_queues_graph_g1_s01(chart, e):
   else:
     status, chart.temp.fun = return_status.SUPER, hsm_queues_graph_g1_s0
   return status
+
 
 @spy_on
 def hsm_queues_graph_g1_s1(chart, e):
@@ -99,6 +95,7 @@ def hsm_queues_graph_g1_s1(chart, e):
     status, chart.temp.fun = return_status.SUPER, chart.top
   return status
 
+
 @spy_on
 def hsm_queues_graph_g1_s21(chart, e):
   status = return_status.UNHANDLED
@@ -112,6 +109,7 @@ def hsm_queues_graph_g1_s21(chart, e):
     status, chart.temp.fun = return_status.SUPER, hsm_queues_graph_g1_s1
   return status
 
+
 @spy_on
 def hsm_queues_graph_g1_s211(chart, e):
   status = return_status.UNHANDLED
@@ -122,6 +120,7 @@ def hsm_queues_graph_g1_s211(chart, e):
   else:
     status, chart.temp.fun = return_status.SUPER, hsm_queues_graph_g1_s21
   return status
+
 
 @spy_on
 def hsm_queues_graph_g1_s2111(chart, e):
@@ -135,6 +134,7 @@ def hsm_queues_graph_g1_s2111(chart, e):
   else:
     status, chart.temp.fun = return_status.SUPER, hsm_queues_graph_g1_s211
   return status
+
 
 @spy_on
 def hsm_queues_graph_g1_s22(chart, e):
@@ -151,6 +151,7 @@ def hsm_queues_graph_g1_s22(chart, e):
     status, chart.temp.fun = return_status.SUPER, hsm_queues_graph_g1_s1
   return status
 
+
 @spy_on
 def hsm_queues_graph_g1_s3(chart, e):
   status = return_status.UNHANDLED
@@ -165,6 +166,7 @@ def hsm_queues_graph_g1_s3(chart, e):
     status, chart.temp.fun = return_status.SUPER, hsm_queues_graph_g1_s22
   return status
 
+
 @spy_on
 def hsm_queues_graph_g1_s32(chart, e):
   status = return_status.UNHANDLED
@@ -175,6 +177,7 @@ def hsm_queues_graph_g1_s32(chart, e):
   else:
     status, chart.temp.fun = return_status.SUPER, hsm_queues_graph_g1_s3
   return status
+
 
 @spy_on
 def hsm_queues_graph_g1_s321(chart, e):
@@ -194,7 +197,7 @@ def hsm_queues_graph_g1_s321(chart, e):
 def test_hsm_spy_rtc():
   chart = HsmWithQueues(instrumented=True)
   chart.start_at(hsm_queues_graph_g1_s22)
-  assert( chart.spy_rtc() ==
+  assert(chart.spy_rtc() ==
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:hsm_queues_graph_g1_s22',
      'SEARCH_FOR_SUPER_SIGNAL:hsm_queues_graph_g1_s1',
@@ -206,7 +209,7 @@ def test_hsm_spy_rtc():
      ]
   )
   chart.next_rtc()
-  assert( chart.spy_rtc() ==
+  assert(chart.spy_rtc() ==
     [
      'D:hsm_queues_graph_g1_s22',
      'SEARCH_FOR_SUPER_SIGNAL:hsm_queues_graph_g1_s1',
@@ -215,10 +218,10 @@ def test_hsm_spy_rtc():
      'INIT_SIGNAL:hsm_queues_graph_g1_s1',
      'POST_FIFO:E',
      '<- Queued:(1) Deferred:(0)'
-     ]
+    ]
   )
   chart.next_rtc()
-  assert( chart.spy_rtc() ==
+  assert(chart.spy_rtc() ==
     ['E:hsm_queues_graph_g1_s1',
      'SEARCH_FOR_SUPER_SIGNAL:hsm_queues_graph_g1_s01',
      'SEARCH_FOR_SUPER_SIGNAL:hsm_queues_graph_g1_s1',
@@ -233,7 +236,7 @@ def test_hsm_spy_rtc():
      ]
   )
   chart.next_rtc()
-  assert( chart.spy_rtc() ==
+  assert(chart.spy_rtc() ==
     ['F:hsm_queues_graph_g1_s01',
      'F:hsm_queues_graph_g1_s0',
      'EXIT_SIGNAL:hsm_queues_graph_g1_s01',
@@ -251,10 +254,9 @@ def test_hsm_spy_rtc():
      'INIT_SIGNAL:hsm_queues_graph_g1_s2111',
      '<- Queued:(1) Deferred:(0)'
      ]
-
   )
   chart.next_rtc()
-  assert( chart.spy_rtc() ==
+  assert(chart.spy_rtc() ==
     ['A:hsm_queues_graph_g1_s2111',
      'SEARCH_FOR_SUPER_SIGNAL:hsm_queues_graph_g1_s321',
      'SEARCH_FOR_SUPER_SIGNAL:hsm_queues_graph_g1_s2111',
@@ -276,7 +278,8 @@ def test_hsm_spy_rtc():
      ]
   )
   chart.next_rtc()
-  assert( chart.spy_rtc() == ['<- Queued:(0) Deferred:(0)'])
+  assert(chart.spy_rtc() == ['<- Queued:(0) Deferred:(0)'])
+
 
 @pytest.mark.topology_g
 @pytest.mark.topology_h
@@ -349,6 +352,7 @@ def test_hsm_complete_circuit():
        '<- Queued:(0) Deferred:(0)']
   )
 
+
 @pytest.mark.topology_g
 @pytest.mark.topology_h
 @pytest.mark.defer
@@ -358,7 +362,7 @@ def test_hsm_trace_output():
   chart.start_at(hsm_queues_graph_g1_s3)
   chart.dispatch(Event(signals.E))
   chart.complete_circuit()
-  assert( 
+  assert(
       chart.spy_full() ==
       ['START',
        'SEARCH_FOR_SUPER_SIGNAL:hsm_queues_graph_g1_s3',
@@ -445,6 +449,6 @@ def test_hsm_trace_output():
        'ENTRY_SIGNAL:hsm_queues_graph_g1_s32',
        'ENTRY_SIGNAL:hsm_queues_graph_g1_s321',
        'INIT_SIGNAL:hsm_queues_graph_g1_s321',
-       '<- Queued:(0) Deferred:(0)'] )
+       '<- Queued:(0) Deferred:(0)'])
 
 
