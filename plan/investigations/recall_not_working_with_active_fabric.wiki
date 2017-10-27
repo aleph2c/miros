@@ -1,0 +1,43 @@
+*Recall Is Not Working In Active Fabric*
+
+= Observe =
+  
+  *What defines Success?*
+  A recall would take an event out of the defer queue and place it into the
+  fifo queu, then wake up the managing thread which would cause the chart to
+  run to completion.
+
+  *What is the problem?*
+  It seems to post the item into the fifo queue, but the chart does not wake up
+  and run.
+
+  *Evidence that contradicts Assumptions:*
+  
+= Orient =
+  
+  *Symptoms:*
+  Recalls are posting
+  The chart hangs like nothing happened, like nothing is in its fifo queue
+  
+  *Questions for Recall Is Not Working In Active Fabric:*
+    Can you simplify your test?
+    Do you have enough information?
+    What recently changed?
+
+  *Assumptions:*
+
+= Decide =
+  *Idea/Hypotheses for Recall Is Not Working In Active Fabric: >=5*
+  * [ ] The spy log is not accessible from the main thread
+  * [ ] The fifo thread is not waking up to do the work
+  * [ ] More information is needed
+  * [ ] The test chart is broken
+  * [ ] The feature never worked, the design just wasn't completed
+  
+  *Chosen Idea/Hypothesis*
+    The fifo thread is not working up to do the work
+
+  *Plan to Expand-on-Idea/Disprove-Hypothesis*
+
+= Act =
+
