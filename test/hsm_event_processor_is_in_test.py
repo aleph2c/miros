@@ -1,6 +1,6 @@
 import pytest
 import traceback
-from miros.event import signals, Event, return_status
+from miros.event import signals, return_status
 from miros.hsm   import HsmEventProcessor
 import pprint
 
@@ -48,8 +48,6 @@ def reflect(hsm=None, e=None):
 #  * test1_is_in_1 - start in graph_e1_s5 (diagram)
 #  * test1_is_in_2 - start in graph_e1_s4 (diagram)
 #  * test1_is_in_3 - start at graph_e1_s1 (diagram)
-#
-#
 def is_in_graph_e1_s1(chart, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
@@ -183,23 +181,26 @@ def test1_is_in_1(spy_chart):
   assert(chart.is_in(is_in_graph_e1_s2) is True)
   assert(chart.is_in(is_in_graph_e1_s1) is True)
 
+
+# grep test name to view diagram
 @pytest.mark.is_in
 def test1_is_in_2(spy_chart):
   chart = spy_chart
   chart.start_at(is_in_graph_e1_s4)
-  assert(chart.is_in(is_in_graph_e1_s5) == False)
-  assert(chart.is_in(is_in_graph_e1_s4) == True)
-  assert(chart.is_in(is_in_graph_e1_s3) == True)
-  assert(chart.is_in(is_in_graph_e1_s2) == True)
-  assert(chart.is_in(is_in_graph_e1_s1) == True)
+  assert(chart.is_in(is_in_graph_e1_s5) is False)
+  assert(chart.is_in(is_in_graph_e1_s4) is True)
+  assert(chart.is_in(is_in_graph_e1_s3) is True)
+  assert(chart.is_in(is_in_graph_e1_s2) is True)
+  assert(chart.is_in(is_in_graph_e1_s1) is True)
 
+
+# grep test name to view diagram
 @pytest.mark.is_in
-def test1_is_in_2(spy_chart):
+def test1_is_in_3(spy_chart):
   chart = spy_chart
-  expected_behavior = []
   chart.start_at(is_in_graph_e1_s1)
-  assert(chart.is_in(is_in_graph_e1_s5) == False)
-  assert(chart.is_in(is_in_graph_e1_s4) == False)
-  assert(chart.is_in(is_in_graph_e1_s3) == False)
-  assert(chart.is_in(is_in_graph_e1_s2) == False)
-  assert(chart.is_in(is_in_graph_e1_s1) == True)
+  assert(chart.is_in(is_in_graph_e1_s5) is False)
+  assert(chart.is_in(is_in_graph_e1_s4) is False)
+  assert(chart.is_in(is_in_graph_e1_s3) is False)
+  assert(chart.is_in(is_in_graph_e1_s2) is False)
+  assert(chart.is_in(is_in_graph_e1_s1) is True)
