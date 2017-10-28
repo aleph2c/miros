@@ -2,7 +2,7 @@ import time
 import pytest
 from miros.hsm import spy_on
 from miros.event import signals, Event
-from miros.event import return_status as r
+from miros.event import return_status as state
 from miros.activeobject import ActiveObject, ActiveFabric
 import pprint
 
@@ -14,7 +14,6 @@ def pp(item):
 ################################################################################
 #                          Posting Inside of a chart                           #
 ################################################################################
-#
 #
 #   +--------------------------- outer -----------------------------+
 #   | entry/ recall()                                               |
@@ -34,74 +33,74 @@ def pp(item):
 #   |      |         |          Event(signal=signals.B))       | |  |
 #   |      |         |                                         | |  |
 #   |      |         | *----->                                 | |  |
-#   |      -----A---->   print("inner r init")                 | |  |
+#   |      -----A---->   print("charging with B")              | |  |
 #   |      |         +-----------------------------------------+ |  |
 #   |      +-----------------------------------------------------+  |
 #   +---------------------------------------------------------------+
 #
-#
-# This is used for testing the type E topology in the trans_ method of the HsmEventProcessor
-# class.
-#   * test_hsm_next_rtc - start in active_objects_graph_g1_s22
+# Here we are testing a charge that can post to itself
 @spy_on
-def outer(chart, e):
-  status = r.UNHANDLED
+def outer(ao, e):
+  status = state.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    #chart.recall()
-    status = r.HANDLED
+    ao.recall()
+    status = state.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
-    status = r.HANDLED
+    status = state.HANDLED
   if(e.signal == signals.INIT_SIGNAL):
-    status = r.HANDLED
+    status = state.HANDLED
   elif(e.signal == signals.D):
-    chart.recall()
-    status = r.HANDLED
+    ao.recall()
+    status = state.HANDLED
   elif(e.signal == signals.B):
-    status = chart.trans(outer)
+    print("flash B!")
+    status = ao.trans(outer)
   else:
-    status, chart.temp.fun = r.SUPER, chart.top
+    status, ao.temp.fun = state.SUPER, ao.top
   return status
 
 
 @spy_on
-def middle(chart, e):
-  status = r.UNHANDLED
+def middle(ao, e):
+  status = state.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
     multi_shot_thread = \
-      chart.post_fifo(Event(signal=signals.A),
+      ao.post_fifo(Event(signal=signals.A),
                       times=3,
-                      period=0.1,
+                      period=1.0,
                       deferred=True)
-    chart.augment(other=multi_shot_thread,
+    # We mark up the ao with this id, so that
+    # state function can be used by many different aos
+    ao.augment(other=multi_shot_thread,
                   name='multi_shot_thread')
-    status = r.HANDLED
+    status = state.HANDLED
 
   elif(e.signal == signals.EXIT_SIGNAL):
-    chart.cancel_event(chart.multi_shot_thread)
-    status = r.HANDLED
+    ao.cancel_event(ao.multi_shot_thread)
+    status = state.HANDLED
 
   if(e.signal == signals.INIT_SIGNAL):
-    status = r.HANDLED
+    status = state.HANDLED
   elif(e.signal == signals.A):
-    status = chart.trans(inner)
+    status = ao.trans(inner)
   else:
-    status, chart.temp.fun = r.SUPER, outer
+    status, ao.temp.fun = state.SUPER, outer
   return status
 
 
 @spy_on
-def inner(chart, e):
-  status = r.UNHANDLED
+def inner(ao, e):
+  status = state.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    chart.defer(Event(signal=signals.B))
-    status = r.HANDLED
+    ao.defer(Event(signal=signals.B))
+    status = state.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
-    status = r.HANDLED
+    status = state.HANDLED
   if(e.signal == signals.INIT_SIGNAL):
     print("charging with B")
-    status = r.HANDLED
+    status = state.HANDLED
   else:
-    status, chart.temp.fun = r.SUPER, middle
+    status, ao.temp.fun = state.SUPER, middle
   return status
 
 
@@ -117,12 +116,7 @@ def fabric_fixture(request):
 def test_onslaught(fabric_fixture):
   ao = ActiveObject()
   ao.start_at(middle)
-  pp(ao.spy_full())
-  time.sleep(0.5)
-  ao.post_fifo(Event(signal=signals.D))
-  ao.post_fifo(Event(signal=signals.D))
-  ao.post_fifo(Event(signal=signals.D))
+  time.sleep(3.5)
   ao.post_fifo(Event(signal=signals.D))
   time.sleep(0.1)  # if you don't wait it won't look like it is working
   pp(ao.spy_full())
-

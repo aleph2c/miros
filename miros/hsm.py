@@ -1099,7 +1099,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       fn(self, e)
       if self.instrumented:
         self.rtc.tuples.append(spy_tuple(signal=e.signal, post_defer=True))
-        self.rtc.spy.append("POST_DEFER:{}".format(e.signal_name))
+        self.rtc.spy.append("POST_DEFERRED:{}".format(e.signal_name))
     return _append_defer_to_spy
 
   def append_recall_to_spy(fn):

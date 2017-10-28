@@ -372,7 +372,7 @@ def test_hsm_trace_output():
        'ENTRY_SIGNAL:hsm_queues_graph_g1_s22',
        'ENTRY_SIGNAL:hsm_queues_graph_g1_s3',
        'INIT_SIGNAL:hsm_queues_graph_g1_s3',
-       'POST_DEFER:F',
+       'POST_DEFERRED:F',
        '<- Queued:(0) Deferred:(1)',
        'E:hsm_queues_graph_g1_s3',
        'E:hsm_queues_graph_g1_s22',

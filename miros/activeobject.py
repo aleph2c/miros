@@ -845,7 +845,7 @@ class ActiveObject(Hsm):
 
 
     '''
-    print("cancel uuid: {}".format(uuid))
+    # print("cancel uuid: {}".format(uuid))
     for i in reversed(range(len(self.posted_events_queue))):
       posted_event_task_meta_data = self.posted_events_queue[-1]
       if posted_event_task_meta_data.uuid is uuid:
