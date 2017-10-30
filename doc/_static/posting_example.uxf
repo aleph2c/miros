@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>20</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>300</x>
+      <y>160</y>
+      <w>600</w>
+      <h>680</h>
+    </coordinates>
+    <panel_attributes>*middle*
+--
+  entry/ multishot_id = \
+         ao.post_fifo(Event(signal=signals.A,
+                                 times=3,
+                                 period=1,
+                                 deferred=True)
+         ao.augment(other=multishot_id,
+                       name='multishot_id')
+                       
+  exit/ ao.cancel_event(chart.multishod_id)
+  
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>320</x>
+      <y>520</y>
+      <w>500</w>
+      <h>260</h>
+    </coordinates>
+    <panel_attributes>*inner*
+--
+  entry/ ao.defer(
+                 Event(signal=signals.B))
+  exit/
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>700</x>
+      <y>820</y>
+      <w>80</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+ C</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>100</x>
+      <y>80</y>
+      <w>860</w>
+      <h>820</h>
+    </coordinates>
+    <panel_attributes>*outer*
+--
+  entry/
+  exit/
+  D/ ao.recall()
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>940</x>
+      <y>280</y>
+      <w>340</w>
+      <h>360</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+ B (print("flash b!"))</panel_attributes>
+    <additional_attributes>10.0;160.0;40.0;160.0;40.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>460</x>
+      <y>760</y>
+      <w>80</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+ A</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>400</x>
+      <y>680</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>400</x>
+      <y>660</y>
+      <w>380</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+print("hello world")</panel_attributes>
+    <additional_attributes>10.0;20.0;170.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSyncBarVertical</id>
+    <coordinates>
+      <x>720</x>
+      <y>660</y>
+      <w>40</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>template=txt
+title=titletext
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
