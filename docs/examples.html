@@ -24,7 +24,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Recipes" href="recipes.html" />
-    <link rel="prev" title="Seeing What is Going On" href="reflection.html" />
+    <link rel="prev" title="Reflection" href="reflection.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -44,16 +44,16 @@
 <span id="id1"></span><h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<img alt="_images/simple_example_1.svg" src="_images/simple_example_1.svg" /><div class="section" id="activeobject-example">
-<h2>ActiveObject Example<a class="headerlink" href="#activeobject-example" title="Permalink to this headline">¶</a></h2>
-<p>In this example we will show how to build the statechart structure described
-above using an <cite>ActiveObject</cite>.  We will then learn how to send a bunch of
-events at this statechart and see what happens, that too is managed by the
-<cite>ActiveObject</cite> <abbr title="Application Programming Interface">api</abbr>.</p>
+<div class="section" id="single-chart-examples">
+<span id="examples-single-chart-examples"></span><h2>Single Chart Examples<a class="headerlink" href="#single-chart-examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="active-object-example">
+<span id="examples-active-object-example"></span><h3>Active Object Example<a class="headerlink" href="#active-object-example" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/simple_example_1.svg" src="_images/simple_example_1.svg" /><p>In this example we will show how to build the statechart structure described
+above using an <cite>ActiveObject</cite>.  We will then learn how to create some events
+and present them to the chart so we can see how it reacts.</p>
 <p>If you are new to statecharts and if you haven’t heard of an active object
-before but would like to learn about them, I would recommend that you draw the
-above design on a piece of paper, and scribble on it as we move through the
-example.</p>
+before, I would recommend that you draw the above design on a piece of paper,
+and scribble on it as we move through the example.</p>
 <p>The code blocks in this section are specific to this library, but the
 principals apply to any other system using the active object design pattern.</p>
 <p>The above diagram describes the structure of how we would like our code to
@@ -64,13 +64,11 @@ happening and when.  The <cite>ActiveObject</cite> allows you to control this ac
 watch what happens, in that it provides the facilities to reflect upon the
 action that the statechart took as a response to your programmed stimulation.</p>
 <p>This reaction could be a change of state, or just a running of custom code upon
-a signal.  When I write custom code, I mean code that is not needed to describe
-the structure itself.  It is placed into the structure that that it can when
-when a state has something happen to it.  For instance, the inner state has
-<code class="docutils literal"><span class="pre">print(&quot;hello</span> <span class="pre">world&quot;)</span></code> linked to it’s response to an entry event.</p>
+a signal.  By “custom code”, I mean code that is not needed to describe the
+reactive structure itself. For instance, the inner state has <code class="docutils literal"><span class="pre">print(&quot;hello</span>
+<span class="pre">world&quot;)</span></code> linked to it’s response to an entry event.</p>
 <p>Before we print our <cite>hello world</cite>, we need to build up the statechart
-structure, then we need to take action by firing a bunch of signals at it and
-see how it responds.</p>
+structure, then we send events to the chart.</p>
 <p>Let’s begin by building the structure.</p>
 <p>First we import some items from the miros library:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">Event</span>
@@ -81,15 +79,6 @@ see how it responds.</p>
 <span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
 </pre></div>
 </div>
-<p>Then we define the <abbr title="the arrow labels in the diagram">signals</abbr> which our
-<abbr title="the arrows">events</abbr> will use:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;WaitComplete&quot;</span><span class="p">)</span>
-<span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;ResetChart&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The signals object is derived from a <abbr title="all objects instantiated from this class refer to the same object">singleton class</abbr>, so once our signals are
-defined they can be accessed by any other module in our python project.  For
-now, think about the signal as being the name of an event.</p>
 <p>Now we write our state methods.  Each of these methods will represent a specific
 state in our diagram.</p>
 <p>Let start by writing the <cite>outer</cite> state method.  This method will represent the
@@ -557,36 +546,144 @@ how many events are waiting for our <cite>ActiveObject</cite> thread’s attenti
 <cite>ActiveObject</cite> thread will pull the next item, run to completion, then do it
 again and again.</p>
 </div>
-<div class="section" id="hsm-example">
-<h2>Hsm Example<a class="headerlink" href="#hsm-example" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="hsmwithqueues-example">
-<h2>HsmWithQueues Example<a class="headerlink" href="#hsmwithqueues-example" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="instrumentedhsmeventprocessor-example">
-<h2>InstrumentedHsmEventProcessor Example<a class="headerlink" href="#instrumentedhsmeventprocessor-example" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="hsmeventprocessor-example">
-<h2>HsmEventProcessor Example<a class="headerlink" href="#hsmeventprocessor-example" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">reflect</span><span class="p">(</span><span class="n">hsm</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">e</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">  This will return the callers function name as a string:</span>
-<span class="sd">  Example:</span>
-
-<span class="sd">    def example_function():</span>
-<span class="sd">      return reflect()</span>
-
-<span class="sd">    print(example_function) #=&gt; &quot;example_function&quot;</span>
-
-<span class="sd">  &#39;&#39;&#39;</span>
-  <span class="n">fnt</span>  <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">extract_stack</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
-  <span class="n">fnt1</span> <span class="o">=</span> <span class="n">fnt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-  <span class="n">fnt2</span> <span class="o">=</span> <span class="n">fnt1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-  <span class="k">return</span> <span class="n">fnt2</span>
+<div class="section" id="simple-posting-example">
+<span id="examples-simple-posting-example"></span><h3>Simple Posting Example<a class="headerlink" href="#simple-posting-example" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/posting_example.svg" src="_images/posting_example.svg" /><p>Here we see an active object.  To understand it, lets take the following steps:</p>
+<ol class="arabic simple">
+<li>Look at the states and see how they are related to one another in a hierarchy.</li>
+<li>What external events exist and how the relate to the states.</li>
+<li>What custom code has been placed within the hierarchy.</li>
+</ol>
+<p>In the above example we see three different states interacting with 4 different
+user defined events.  The outer state contains a middle state which contains an
+inner state.</p>
+<p>The event with signal name <em>A</em> will cause a transition from the
+middle state to the inner state.  The event with signal name <em>B</em> will cause the
+outer event to exit, print “flash b!” then enter back into the outer state.
+The event with the signal name <em>C</em> will cause the outer state to transition
+into the middle state.  Finally, the event with the signal name <em>D</em> will cause
+the <code class="docutils literal"><span class="pre">recall</span></code> method to be triggered in the outer state.</p>
+<p>Now that we have a feeling for how the states relate and how they react to
+events, lets look at the custom code that has been placed within the
+hierarchical structure.</p>
+<p>We see that, as previously mentioned, the outer state contains some signal
+handling for the <em>D</em> named event.</p>
+<p>The middle state has some code that is run upon entering the state.  It looks
+like we are posting an event to the chart named <em>A</em>, that we want it to happen
+3 times, with a period of 1 [second] and that we would like it to be deferred. The
+entry condition also contains code which <em>augments</em> the chart with something.</p>
+<p>The middle state has some exit code, where we are canceling an event.</p>
+<p>Upon entering, the inner state, calls the defer method with an Event named <em>B</em>.
+When the innner state is initialized, it prints hello world to the terminal,
+then stops processing.</p>
+<p>Generally speaking we have an idea about what is going on with the chart, now
+let’s look how to implement this design using the miros library, then start it
+up in the <code class="docutils literal"><span class="pre">outer</span></code> state.  We will do this in three steps:</p>
+<ol class="arabic simple">
+<li>We will define the state methods and fill them with the custom code in the
+diagram.</li>
+<li>We will create an active object</li>
+<li>We will tie our active object to the state methods, by starting it within
+the <code class="docutils literal"><span class="pre">outer</span></code> state.</li>
+<li>We will trigger an event and watch the chart react.</li>
+</ol>
+<p>The outer state method would look like this:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">outer</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">ao</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">D</span><span class="p">):</span>
+    <span class="n">ao</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;flash B!&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">top</span>
+  <span class="k">return</span> <span class="n">status</span>
 </pre></div>
-</div>
-<div class="figure" id="deferred-event-state-pattern">
-<img alt="the deferred event state pattern" src="_images/DeferredEventStatePattern.gif" />
+</td></tr></table></div>
+<p>On line <strong>1</strong> we see we are using the <code class="docutils literal"><span class="pre">&#64;spy_on</span></code> decorator.  This will allow us to
+look at how the chart behaves in a log once we start sending events to
+it.</p>
+<p>Line <strong>2</strong> has the state name, and the method signature.  The <code class="docutils literal"><span class="pre">ao</span></code> object will be
+overwritten with <code class="docutils literal"><span class="pre">self</span></code> when this method is used by an active object.
+However, it can be used by other active objects as well, in that it is a kind
+of slide that can be shared between objects.  So long as we don’t mark the
+function’s name space directly we could share this method between as many
+active objects as we construct in our system.  In this example we only use this
+method within one active object.  The second argument in the method signature
+contains the event that is being sent to this state method.</p>
+<p>On line <strong>3</strong> we see the <code class="docutils literal"><span class="pre">status</span></code> variable defined.  Pay special attention to
+this status variable, because it is used by the event processor to determine
+what to do as it searches the chart hierarchy while responding to various
+events.  We will talk about this in greater detail as we move through the
+example.</p>
+<p>On lines <strong>4-6</strong>, we see the entry handling for this state.  If we are entering the
+state (line <strong>4</strong>), then call the <code class="docutils literal"><span class="pre">recall</span></code> method of the active object (line <strong>5</strong>)
+and finally set the <code class="docutils literal"><span class="pre">status</span></code> to <code class="docutils literal"><span class="pre">HANDLED</span></code>, or tell the event processor that
+we know what to do with this event and it does not have to recurse the chart
+to respond to the event anymore (line <strong>6</strong>).</p>
+<p>On line <em>7-8</em> we are saying, run no custom code upon exiting the state.  One
+line <em>9-10</em> we are saying, no custom code needs to be run to initialize this
+state.</p>
+<p>Lines <strong>11-13</strong> describe this state’s reaction to an event with the <strong>D</strong>
+signal.  It runs the <code class="docutils literal"><span class="pre">recall</span></code> method of the active object (line <strong>12</strong>) then
+sets the status variable to <code class="docutils literal"><span class="pre">HANDLED</span></code>.  If there is an event in the deferred
+queue of the active object it will be placed into the fifo for the next run to
+completion event.  This probably won’t make sense to you yet, don’t worry when
+we move through the dynamics of the chart, we will see what this means.  Line
+<strong>13</strong> tells the event processor that the <strong>D</strong> signal was handled.  This means
+that if the <strong>D</strong> signal was received by the chart while it was in another
+state, that the code on line 12 was run, then control was passed back to the
+state which received the event.  This behavior is an example of the ultimate
+hook pattern which you can read about in the section titled
+<a class="reference internal" href="patterns.html#patterns-ultimate-hook"><span class="std std-ref">Ultimate Hook</span></a>.</p>
+<p>Lines <strong>14-16</strong> describe the <strong>B</strong> arrow on the diagram.  If any state within
+our state chart receives an event called <strong>B</strong> we would like it to pass control
+to the outer state (line 14,16), then exit the outer state, run <code class="docutils literal"><span class="pre">print(flash</span>
+<span class="pre">B)</span></code> (line 15) then re-enter the outer state (line 16).  Pay special attention
+to line 16.  Here we are using the <code class="docutils literal"><span class="pre">trans</span></code> method, which will return the
+status.  Unlike the other parts of this method, we are not saying that the
+status is HANDLED, here we let the trans method decide how to set this
+variable.  This is important since it allows the event processor to perform the
+work required by our hierarchical topology.</p>
+<p>On lines <strong>17-18</strong> we are telling the event processor that if we haven’t
+managed this signal pass it onto our outer state, in this case it is the top
+state which means that it is unhandled.</p>
+<p>Finally on line <strong>19</strong> we return the status.</p>
+<p>Anyone familiar with the event processors described in the Miro Samek
+tradition of dealing with hierarchical state machines will recognize the
+structure of this method.  This is because the event processor used by the
+miros library is a port of his work which has been written about in papers in
+embedded journals and books.  I think it is important to keep the same
+structure and semantics since many in our industry have become familiar with
+them.  It will also ensure that if you port your work into the quantum
+framework, the code will look about the same there as it does here.</p>
 </div>
 </div>
 </div>
@@ -602,11 +699,11 @@ again and again.</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Examples</a><ul>
-<li><a class="reference internal" href="#activeobject-example">ActiveObject Example</a></li>
-<li><a class="reference internal" href="#hsm-example">Hsm Example</a></li>
-<li><a class="reference internal" href="#hsmwithqueues-example">HsmWithQueues Example</a></li>
-<li><a class="reference internal" href="#instrumentedhsmeventprocessor-example">InstrumentedHsmEventProcessor Example</a></li>
-<li><a class="reference internal" href="#hsmeventprocessor-example">HsmEventProcessor Example</a></li>
+<li><a class="reference internal" href="#single-chart-examples">Single Chart Examples</a><ul>
+<li><a class="reference internal" href="#active-object-example">Active Object Example</a></li>
+<li><a class="reference internal" href="#simple-posting-example">Simple Posting Example</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -614,7 +711,7 @@ again and again.</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="reflection.html" title="previous chapter">Seeing What is Going On</a></li>
+      <li>Previous: <a href="reflection.html" title="previous chapter">Reflection</a></li>
       <li>Next: <a href="recipes.html" title="next chapter">Recipes</a></li>
   </ul></li>
 </ul>

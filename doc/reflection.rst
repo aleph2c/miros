@@ -1,4 +1,6 @@
-Seeing What is Going On
+.. _reflection
+
+Reflection
 =======================
 How to instrument your state charts to you can see what is going on
 

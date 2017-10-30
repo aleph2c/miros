@@ -8,19 +8,26 @@ Examples
    :caption: Contents:
 
 
+.. _examples-single-chart-examples:
+
+Single Chart Examples
+---------------------
+
+
+.. _examples-active-object-example:
+
+Active Object Example
+^^^^^^^^^^^^^^^^^^^^^
+
 .. image:: _static/simple_example_1.svg
 
-ActiveObject Example
---------------------
 In this example we will show how to build the statechart structure described
-above using an `ActiveObject`.  We will then learn how to send a bunch of
-events at this statechart and see what happens, that too is managed by the
-`ActiveObject` :abbr:`api(Application Programming Interface)`.
+above using an `ActiveObject`.  We will then learn how to create some events
+and present them to the chart so we can see how it reacts.
 
 If you are new to statecharts and if you haven't heard of an active object
-before but would like to learn about them, I would recommend that you draw the
-above design on a piece of paper, and scribble on it as we move through the
-example.
+before, I would recommend that you draw the above design on a piece of paper,
+and scribble on it as we move through the example.
 
 The code blocks in this section are specific to this library, but the
 principals apply to any other system using the active object design pattern.
@@ -35,14 +42,12 @@ watch what happens, in that it provides the facilities to reflect upon the
 action that the statechart took as a response to your programmed stimulation.
 
 This reaction could be a change of state, or just a running of custom code upon
-a signal.  When I write custom code, I mean code that is not needed to describe
-the structure itself.  It is placed into the structure that that it can when
-when a state has something happen to it.  For instance, the inner state has
-``print("hello world")`` linked to it's response to an entry event.
+a signal.  By "custom code", I mean code that is not needed to describe the
+reactive structure itself. For instance, the inner state has ``print("hello
+world")`` linked to it's response to an entry event.
 
 Before we print our `hello world`, we need to build up the statechart
-structure, then we need to take action by firing a bunch of signals at it and
-see how it responds.
+structure, then we send events to the chart.
 
 Let's begin by building the structure.
 
@@ -56,19 +61,6 @@ First we import some items from the miros library:
 
   from miros.activeobject import spy_on
   from miros.activeobject import ActiveObject
-
-Then we define the :abbr:`signals(the arrow labels in the diagram)` which our
-:abbr:`events(the arrows)` will use:
-
-.. code-block:: python
-
-  signals.append("WaitComplete")
-  signals.append("ResetChart")
-
-The signals object is derived from a :abbr:`singleton class (all objects
-instantiated from this class refer to the same object)`, so once our signals are
-defined they can be accessed by any other module in our python project.  For
-now, think about the signal as being the name of an event.
 
 Now we write our state methods.  Each of these methods will represent a specific
 state in our diagram.
@@ -614,40 +606,149 @@ We see that three events were waiting in the Queue, which means that the
 `ActiveObject` thread will pull the next item, run to completion, then do it
 again and again.
 
-Hsm Example
------------
 
-HsmWithQueues Example
----------------------
 
-InstrumentedHsmEventProcessor Example
--------------------------------------
+.. _examples-simple-posting-example:
 
-HsmEventProcessor Example
--------------------------
+Simple Posting Example
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. image:: _static/posting_example.svg
+
+Here we see an active object.  To understand it, lets take the following steps:
+
+1. Look at the states and see how they are related to one another in a hierarchy.
+2. What external events exist and how the relate to the states.
+3. What custom code has been placed within the hierarchy.
+
+In the above example we see three different states interacting with 4 different
+user defined events.  The outer state contains a middle state which contains an
+inner state.  
+
+The event with signal name *A* will cause a transition from the
+middle state to the inner state.  The event with signal name *B* will cause the
+outer event to exit, print "flash b!" then enter back into the outer state.
+The event with the signal name *C* will cause the outer state to transition
+into the middle state.  Finally, the event with the signal name *D* will cause
+the ``recall`` method to be triggered in the outer state.
+
+Now that we have a feeling for how the states relate and how they react to
+events, lets look at the custom code that has been placed within the
+hierarchical structure.
+
+We see that, as previously mentioned, the outer state contains some signal
+handling for the *D* named event.
+
+The middle state has some code that is run upon entering the state.  It looks
+like we are posting an event to the chart named *A*, that we want it to happen
+3 times, with a period of 1 [second] and that we would like it to be deferred. The
+entry condition also contains code which *augments* the chart with something.
+
+The middle state has some exit code, where we are canceling an event.
+
+Upon entering, the inner state, calls the defer method with an Event named *B*.
+When the innner state is initialized, it prints hello world to the terminal,
+then stops processing.
+
+Generally speaking we have an idea about what is going on with the chart, now
+let's look how to implement this design using the miros library, then start it
+up in the ``outer`` state.  We will do this in three steps:
+
+1. We will define the state methods and fill them with the custom code in the
+   diagram.
+2. We will create an active object
+3. We will tie our active object to the state methods, by starting it within
+   the ``outer`` state.
+4. We will trigger an event and watch the chart react.
+
+The outer state method would look like this:
+
 .. code-block:: python
+  :linenos:
 
-    def reflect(hsm=None,e=None):
-      '''
-      This will return the callers function name as a string:
-      Example:
+  @spy_on
+  def outer(ao, e):
+    status = state.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      ao.recall()
+      status = state.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = state.HANDLED
+    if(e.signal == signals.INIT_SIGNAL):
+      status = state.HANDLED
+    elif(e.signal == signals.D):
+      ao.recall()
+      status = state.HANDLED
+    elif(e.signal == signals.B):
+      print("flash B!")
+      status = ao.trans(outer)
+    else:
+      status, ao.temp.fun = state.SUPER, ao.top
+    return status
 
-        def example_function():
-          return reflect()
+On line **1** we see we are using the ``@spy_on`` decorator.  This will allow us to
+look at how the chart behaves in a log once we start sending events to
+it.
 
-        print(example_function) #=> "example_function"
+Line **2** has the state name, and the method signature.  The ``ao`` object will be
+overwritten with ``self`` when this method is used by an active object.
+However, it can be used by other active objects as well, in that it is a kind
+of slide that can be shared between objects.  So long as we don't mark the
+function's name space directly we could share this method between as many
+active objects as we construct in our system.  In this example we only use this
+method within one active object.  The second argument in the method signature
+contains the event that is being sent to this state method.
 
-      '''
-      fnt  = traceback.extract_stack(None,2)
-      fnt1 = fnt[0]
-      fnt2 = fnt1[2]
-      return fnt2
+On line **3** we see the ``status`` variable defined.  Pay special attention to
+this status variable, because it is used by the event processor to determine
+what to do as it searches the chart hierarchy while responding to various
+events.  We will talk about this in greater detail as we move through the
+example.
 
-.. To link to this figure: :ref:`deferred-event-state-pattern`
-.. _deferred-event-state-pattern:
+On lines **4-6**, we see the entry handling for this state.  If we are entering the
+state (line **4**), then call the ``recall`` method of the active object (line **5**)
+and finally set the ``status`` to ``HANDLED``, or tell the event processor that
+we know what to do with this event and it does not have to recurse the chart
+to respond to the event anymore (line **6**).
 
+On line *7-8* we are saying, run no custom code upon exiting the state.  One
+line *9-10* we are saying, no custom code needs to be run to initialize this
+state.
 
-.. figure:: _static/DeferredEventStatePattern.gif
-   :alt: the deferred event state pattern
+Lines **11-13** describe this state's reaction to an event with the **D**
+signal.  It runs the ``recall`` method of the active object (line **12**) then
+sets the status variable to ``HANDLED``.  If there is an event in the deferred
+queue of the active object it will be placed into the fifo for the next run to
+completion event.  This probably won't make sense to you yet, don't worry when
+we move through the dynamics of the chart, we will see what this means.  Line
+**13** tells the event processor that the **D** signal was handled.  This means
+that if the **D** signal was received by the chart while it was in another
+state, that the code on line 12 was run, then control was passed back to the
+state which received the event.  This behavior is an example of the ultimate
+hook pattern which you can read about in the section titled
+:ref:`patterns-ultimate-hook`.
 
+Lines **14-16** describe the **B** arrow on the diagram.  If any state within
+our state chart receives an event called **B** we would like it to pass control
+to the outer state (line 14,16), then exit the outer state, run ``print(flash
+B)`` (line 15) then re-enter the outer state (line 16).  Pay special attention
+to line 16.  Here we are using the ``trans`` method, which will return the
+status.  Unlike the other parts of this method, we are not saying that the
+status is HANDLED, here we let the trans method decide how to set this
+variable.  This is important since it allows the event processor to perform the
+work required by our hierarchical topology.
 
+On lines **17-18** we are telling the event processor that if we haven't
+managed this signal pass it onto our outer state, in this case it is the top
+state which means that it is unhandled.
+
+Finally on line **19** we return the status.  
+
+Anyone familiar with the event processors described in the Miro Samek
+tradition of dealing with hierarchical state machines will recognize the
+structure of this method.  This is because the event processor used by the
+miros library is a port of his work which has been written about in papers in
+embedded journals and books.  I think it is important to keep the same
+structure and semantics since many in our industry have become familiar with
+them.  It will also ensure that if you port your work into the quantum
+framework, the code will look about the same there as it does here.
