@@ -44,105 +44,20 @@
 <h1>Events<a class="headerlink" href="#events" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<div class="section" id="module-event">
-<span id="event-module"></span><h2>Event Module<a class="headerlink" href="#module-event" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="event.OrderedDictWithParams">
-<em class="property">class </em><code class="descclassname">event.</code><code class="descname">OrderedDictWithParams</code><a class="headerlink" href="#event.OrderedDictWithParams" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>If your subclass &lt;name_of_subclass&gt; has the following init:</dt>
-<dd><p class="first">def __init__(self,*args,**kwargs):</p>
-<blockquote>
-<div>self[‘RET_SUPER’]     = 1
-self[‘RET_SUPER_SUB’] = 2
-self[‘UNHANDLED’]     = 3
-selfwrite_keys_to_attributes()</div></blockquote>
-<dl class="last docutils">
-<dt>Any object constructed from it will have to following attributes:</dt>
-<dd>obj = &lt;name_of_subclass&gt;
-obj.RET_SUPER     =&gt; 1
-obj.RET_SUPER_SUB =&gt; 2
-obj.UNHANDLED     =&gt; 3</dd>
-<dt>To post-pend an item to the object which will also have a named parameter:</dt>
-<dd>obj = &lt;name_of_subclass&gt;
-obj.append(“NEW_NAMED_ATTRIBUTE”)
-ob.NEW_NAMED_ATTRIBUTE =&gt; 4</dd>
-</dl>
-</dd>
-</dl>
-<p>This of this class as being an extensible ENUM which isn’t immutable.  All of
-the enums are wrapped up within an OrderedDict, so you get all of it’s methods
-as well as the clean interface to the attribute.</p>
-</dd></dl>
-
+<div class="section" id="event-module">
+<h2>Event Module<a class="headerlink" href="#event-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="returnstatussource">
 <h2>ReturnStatusSource<a class="headerlink" href="#returnstatussource" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="event.ReturnStatusSource">
-<em class="property">class </em><code class="descclassname">event.</code><code class="descname">ReturnStatusSource</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#event.ReturnStatusSource" title="Permalink to this definition">¶</a></dt>
-<dd><p>A class which contains all of the state returns codes</p>
-<dl class="docutils">
-<dt>To construct the object</dt>
-<dd>state_returns = ReturnCodes()</dd>
-<dt>To get the number:</dt>
-<dd>state_returns.RET_SUPER =&gt; 1</dd>
-<dt>To add a return code:</dt>
-<dd>state_returns.append(‘RET_ZZ’)
-state_returns.RET_ZZ =&gt; 12</dd>
-</dl>
-</dd></dl>
-
 </div>
 <div class="section" id="signalsource">
 <h2>SignalSource<a class="headerlink" href="#signalsource" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="event.SignalSource">
-<em class="property">class </em><code class="descclassname">event.</code><code class="descname">SignalSource</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#event.SignalSource" title="Permalink to this definition">¶</a></dt>
-<dd><p>A class which contains all of the state signal types</p>
-<dl class="docutils">
-<dt>To get the basic system signals:</dt>
-<dd>signals = Signal()</dd>
-<dt>To append a new signal</dt>
-<dd>signals = Signal.append(‘OVEN_OFF’)</dd>
-<dt>To get the number:</dt>
-<dd>signal.ENTRY_SIGNAL =&gt; 1
-signal[‘OVEN_OFF’]  =&gt; 12
-signal.OVER_OFF     =&gt; 12</dd>
-</dl>
-</dd></dl>
-
 </div>
 <div class="section" id="signal">
 <h2>Signal<a class="headerlink" href="#signal" title="Permalink to this headline">¶</a></h2>
-<dl class="attribute">
-<dt id="event.Signal">
-<code class="descclassname">event.</code><code class="descname">Signal</code><a class="headerlink" href="#event.Signal" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </div>
 <div class="section" id="event">
 <h2>Event<a class="headerlink" href="#event" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="event.Event">
-<em class="property">class </em><code class="descclassname">event.</code><code class="descname">Event</code><span class="sig-paren">(</span><em>signal</em>, <em>payload=None</em><span class="sig-paren">)</span><a class="headerlink" href="#event.Event" title="Permalink to this definition">¶</a></dt>
-<dd><p>An event should be constructed, used, then garbage collected.  An event is a
-temporary thing.  However if an event uses a signal that hasn’t been seen
-before, that signal will be added to the list of global signals as a new
-enumerated value.</p>
-<dl class="docutils">
-<dt># Make an event (this should happen internally):</dt>
-<dd>e = Event(signal = signals.ENTRY_SIGNAL) # existing signal
-assert( e.signal == signals.ENTRY_SIGNAL)
-assert( e.signal_name == ‘ENTRY_SIGNAL’)</dd>
-<dt># Make an event, which will construct a signal internally:</dt>
-<dd>e = Event(signal  = ‘OVEN_OFF’, payload = ‘any object can go here’) # new signal
-assert(e.signal == 5) # if it is the first unseen signal in the system
-assert(e.signal_name == ‘OVEN_OFF’)
-assert(signals.OVER_OFF == 5)</dd>
-</dl>
-</dd></dl>
-
 </div>
 </div>
 
@@ -157,7 +72,7 @@ assert(signals.OVER_OFF == 5)</dd>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Events</a><ul>
-<li><a class="reference internal" href="#module-event">Event Module</a></li>
+<li><a class="reference internal" href="#event-module">Event Module</a></li>
 <li><a class="reference internal" href="#returnstatussource">ReturnStatusSource</a></li>
 <li><a class="reference internal" href="#signalsource">SignalSource</a></li>
 <li><a class="reference internal" href="#signal">Signal</a></li>

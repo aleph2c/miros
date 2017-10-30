@@ -2,7 +2,29 @@
 
 = Observe =
   *What defines Success?*
-  Send Delano your pyrc file
+  
+  *Notes:*
+  statecharts = state-diagrams + depth + orthogonality +
+                broadcast-communications + time 
+ 
+  1) "in all airborne state, when yellow handle is pulled seat will be ejected"
+  2) "gearbox change state is independent of breaking system"
+  3) "when selection button is pressed enter selected mode"
+  4) "dispay-mode consists of time-display, data-display and stopwatch-display"
+
+  1 calls for ability to cluster events into super states
+  2 introduces the idea of independence or orthogonality
+  3 more general transition than a signel event-labelled arrow[?]
+  4 captures the refinement of states[?]
+  
+  The idea of zooming ... focusing into the detail of an aspect of the system.
+  Event though I know what they are talking about, the paper is hard to read.
+  
+  By using this library you are in better shape to use the quantum programming
+  library, since it is using the same concepts and similar event processor.
+  
+  In the writing talk about congnitive load
+  
   
   An understandable heart to the miros python package
   * [ ]Immediate Actions
@@ -16,15 +38,14 @@
     * [ ] Create a working chart with posting threads
     * [ ] Write docs in documentation (recipes)
 
-
-  * [ ] High Level Project List
+  * [.] High Level Project List
     * [ ] refactor signals to simplify the design
-    * [ ] Active Object
+    * [O] Active Object
       * [ ] Heart Beat demonstration
-      * [ ] one-shot
-      * [ ] instrument one-shot
-      * [ ] multi-shot
-      * [ ] instrument multi-shot shot
+      * [X] one-shot
+      * [X] instrument one-shot
+      * [X] multi-shot
+      * [X] instrument multi-shot shot
     * [o] Basic Examples
       * [X] Simple HSM in an active object
       * [ ] Simple Set of Hsms in active objects communicating with the task
@@ -39,10 +60,13 @@
       * [ ] Multi-Chart Pend
     * [ ] Recipes
       * [ ] Working table of contents in sphinx
+      * [ ] State boiler code
       * [ ] Creating an active object
       * [ ] Starting an active object
       * [ ] Using the post_fifo
       * [ ] Using the post_lifo
+      * [ ] Creating a signal guard
+      * [ ] Creating a schedule of posted events within the chart
       * [ ] sub/pub model with two different charts
     * [ ] Add outside ultimate hook feature
     * [ ] Add statistics
