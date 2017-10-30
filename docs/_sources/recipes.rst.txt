@@ -14,6 +14,28 @@ How to do the small things you need to do with coding examples.
 
 Posting Events
 --------------
+The Active Object ``post_fifo``, ``post_lifo``, ``defer`` and ``recall``
+methods are use to feed events to the statechart.  An Event can be thought of
+as a kind of named marble that is placed onto a topological map.  If a
+particular elevation doesn't know what to do with the marble, it rolls the
+marble to the next lower elevation, or state.  If the lowest elevation is
+reached and the program doesn't know what to do, it just ignores the event, or
+lets the marble fall out of play.
+
+The name of the marble is the signal name. An event can have a payload, but it
+doesn't have to.  An event can only be posted to a chart after the chart has
+started.  Otherwise the behavior of the active object is undefined.
+
+The state methods typically react to the names of a event, or the signal names.
+This means that the if-else structures that you write will use the signal names
+in their logic.
+
+If you use the chart's post event methods within the chart, the chart will not
+concern itself with *where* you initiated that event.  It will post its events
+into its queue as if they were provided by the outside world.  In this way
+these events are called *artificial*; instead of the world creating the event,
+the chart does.  There are a number of situations where it makes sense to do
+this, they will be described in the patterns section.
 
 .. _recipes-posting-an-event-to-the-fifo:
 
@@ -54,7 +76,7 @@ must have first started your statechart.  Here is a simple example:
 
 You would post to the 'lifo' buffer if you needed your event to be moved to the
 front of the active object's collection of unprocessed events.  You might want
-to do this with a timing heart beat or for a events that needs to be processed
+to do this with a timing heart beat or for any event that needs to be processed
 with a greater priority than over events.
 
 
@@ -63,14 +85,19 @@ with a greater priority than over events.
 Creating a One-Shot Event
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 A one-shot event can be used to add some delay between state transitions.  You
-can think of them as delayed 'init' signals.  You might want to use a one-shot if
+can think of them as delayed **init** signals.  You might want to use a one-shot if
 you need a system to settle down a bit before transitioning into an inner
 state.
 
 Generally speaking, you should cancel your one-shot events as your chart passes
 control to outer states.  You don't need to do this, but if you don't your
 outer states will be hit with one-shot messages that they don't care about
-and your chart will needlessly search in reaction to these events.
+and your chart will needlessly search as it reacts to these events.
+
+It is important to know that if your chart changes state, the event posted to
+it will look like it come from the outside, even through it has been generated
+within a given state.  The construction of any event with the  ``fifo`` or
+``lifo`` api behaves like this.
 
 .. code-block:: python
 
@@ -103,7 +130,7 @@ and your chart will needlessly search in reaction to these events.
         status = state.HANDLED
 
       # our one-shot has fired, one second has passed since
-      # we transitioned into this state, now transition 
+      # we transitioned into this state, now transition
       # to our desired target; 'inner'
       elif(e.signal == signals.delay_one_second):
         status = ao.trans(inner)
@@ -242,7 +269,7 @@ simpler api: the ``cancel_event``.
 .. _recipes-cancelling-event-source-by-signal-name:
 
 Cancelling Event Source By Signal Name
---------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 If you would like to re-use your event source signal names through your chart,
 then you can use the :ref:`recipes-cancelling-a-specific-event-source` recipe
 to cancel a specific source and leave your other event sources running.
@@ -283,3 +310,28 @@ Active Object:
 There is no need to keep a thread id for the event source, since the Active
 Object can just look at all of the event source threads and kill any of them
 that have this signal name provided to the ``cancel_events`` call.
+
+.. _recipes-deferring-an-event:
+
+Deferring and Recalling An Event
+^^^^^^^^^^^^^^^^^^
+There will be situations where you want to post a kind of artificial
+event into a queue which won't immediately be acted upon by your chart.  It is
+an `artificial` event, because your chart is making it up, it isn't being given
+to it by the outside world.  It is a way for your chart to build up a kind of
+processing pressure that can be relieved when you have the cycles to work on
+things.
+
+This is a two stage process, one, deferring the event, and two, recalling the
+event.  It is called a deferment of an event because we are holding off our
+reaction to it.
+
+.. code-block:: python
+
+    # code to place in the state that is deferring the event:
+    chart.defer(Event(signal=signals.signal_that_is_deferred)
+
+    # code to place in the state where you would like the event reposted into
+    # the chart's first in first out queue
+    chart.recall() # posts our deferred event to the chart.
+

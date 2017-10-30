@@ -47,6 +47,25 @@
 <p>How to do the small things you need to do with coding examples.</p>
 <div class="section" id="posting-events">
 <span id="id2"></span><h2>Posting Events<a class="headerlink" href="#posting-events" title="Permalink to this headline">¶</a></h2>
+<p>The Active Object <code class="docutils literal"><span class="pre">post_fifo</span></code>, <code class="docutils literal"><span class="pre">post_lifo</span></code>, <code class="docutils literal"><span class="pre">defer</span></code> and <code class="docutils literal"><span class="pre">recall</span></code>
+methods are use to feed events to the statechart.  An Event can be thought of
+as a kind of named marble that is placed onto a topological map.  If a
+particular elevation doesn’t know what to do with the marble, it rolls the
+marble to the next lower elevation, or state.  If the lowest elevation is
+reached and the program doesn’t know what to do, it just ignores the event, or
+lets the marble fall out of play.</p>
+<p>The name of the marble is the signal name. An event can have a payload, but it
+doesn’t have to.  An event can only be posted to a chart after the chart has
+started.  Otherwise the behavior of the active object is undefined.</p>
+<p>The state methods typically react to the names of a event, or the signal names.
+This means that the if-else structures that you write will use the signal names
+in their logic.</p>
+<p>If you use the chart’s post event methods within the chart, the chart will not
+concern itself with <em>where</em> you initiated that event.  It will post its events
+into its queue as if they were provided by the outside world.  In this way
+these events are called <em>artificial</em>; instead of the world creating the event,
+the chart does.  There are a number of situations where it makes sense to do
+this, they will be described in the patterns section.</p>
 <div class="section" id="posting-an-event-to-the-fifo">
 <span id="recipes-posting-an-event-to-the-fifo"></span><h3>Posting an Event to the Fifo<a class="headerlink" href="#posting-an-event-to-the-fifo" title="Permalink to this headline">¶</a></h3>
 <p>To post an event to the active object first-in-first-out (fifo) buffer, you
@@ -79,19 +98,23 @@ must have first started your statechart.  Here is a simple example:</p>
 </div>
 <p>You would post to the ‘lifo’ buffer if you needed your event to be moved to the
 front of the active object’s collection of unprocessed events.  You might want
-to do this with a timing heart beat or for a events that needs to be processed
+to do this with a timing heart beat or for any event that needs to be processed
 with a greater priority than over events.</p>
 </div>
 <div class="section" id="creating-a-one-shot-event">
 <span id="recipes-creating-a-one-shot-event"></span><h3>Creating a One-Shot Event<a class="headerlink" href="#creating-a-one-shot-event" title="Permalink to this headline">¶</a></h3>
 <p>A one-shot event can be used to add some delay between state transitions.  You
-can think of them as delayed ‘init’ signals.  You might want to use a one-shot if
+can think of them as delayed <strong>init</strong> signals.  You might want to use a one-shot if
 you need a system to settle down a bit before transitioning into an inner
 state.</p>
 <p>Generally speaking, you should cancel your one-shot events as your chart passes
 control to outer states.  You don’t need to do this, but if you don’t your
 outer states will be hit with one-shot messages that they don’t care about
-and your chart will needlessly search in reaction to these events.</p>
+and your chart will needlessly search as it reacts to these events.</p>
+<p>It is important to know that if your chart changes state, the event posted to
+it will look like it come from the outside, even through it has been generated
+within a given state.  The construction of any event with the  <code class="docutils literal"><span class="pre">fifo</span></code> or
+<code class="docutils literal"><span class="pre">lifo</span></code> api behaves like this.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Here define a middle state the creates a one-shot event called</span>
 <span class="c1"># delayed_one_second.  The same delayed_one_second signal is captured</span>
 <span class="c1"># by the middle state and used to transition into the inner state</span>
@@ -244,9 +267,8 @@ three_pulse signal name elsewhere in your statechart.  If you do not intend on
 re-using this signal name you can just cancel event sources using a much
 simpler api: the <code class="docutils literal"><span class="pre">cancel_event</span></code>.</p>
 </div>
-</div>
 <div class="section" id="cancelling-event-source-by-signal-name">
-<span id="recipes-cancelling-event-source-by-signal-name"></span><h2>Cancelling Event Source By Signal Name<a class="headerlink" href="#cancelling-event-source-by-signal-name" title="Permalink to this headline">¶</a></h2>
+<span id="recipes-cancelling-event-source-by-signal-name"></span><h3>Cancelling Event Source By Signal Name<a class="headerlink" href="#cancelling-event-source-by-signal-name" title="Permalink to this headline">¶</a></h3>
 <p>If you would like to re-use your event source signal names through your chart,
 then you can use the <a class="reference internal" href="#recipes-cancelling-a-specific-event-source"><span class="std std-ref">Cancelling a Specific Event Source</span></a> recipe
 to cancel a specific source and leave your other event sources running.
@@ -286,6 +308,27 @@ Active Object:</p>
 Object can just look at all of the event source threads and kill any of them
 that have this signal name provided to the <code class="docutils literal"><span class="pre">cancel_events</span></code> call.</p>
 </div>
+<div class="section" id="deferring-and-recalling-an-event">
+<span id="recipes-deferring-an-event"></span><h3>Deferring and Recalling An Event<a class="headerlink" href="#deferring-and-recalling-an-event" title="Permalink to this headline">¶</a></h3>
+<p>There will be situations where you want to post a kind of artificial
+event into a queue which won’t immediately be acted upon by your chart.  It is
+an <cite>artificial</cite> event, because your chart is making it up, it isn’t being given
+to it by the outside world.  It is a way for your chart to build up a kind of
+processing pressure that can be relieved when you have the cycles to work on
+things.</p>
+<p>This is a two stage process, one, deferring the event, and two, recalling the
+event.  It is called a deferment of an event because we are holding off our
+reaction to it.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># code to place in the state that is deferring the event:</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">signal_that_is_deferred</span><span class="p">)</span>
+
+<span class="c1"># code to place in the state where you would like the event reposted into</span>
+<span class="c1"># the chart&#39;s first in first out queue</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span> <span class="c1"># posts our deferred event to the chart.</span>
+</pre></div>
+</div>
+</div>
+</div>
 </div>
 
 
@@ -305,9 +348,10 @@ that have this signal name provided to the <code class="docutils literal"><span 
 <li><a class="reference internal" href="#creating-a-one-shot-event">Creating a One-Shot Event</a></li>
 <li><a class="reference internal" href="#creating-a-multishot-event">Creating a Multishot Event</a></li>
 <li><a class="reference internal" href="#cancelling-a-specific-event-source">Cancelling a Specific Event Source</a></li>
+<li><a class="reference internal" href="#cancelling-event-source-by-signal-name">Cancelling Event Source By Signal Name</a></li>
+<li><a class="reference internal" href="#deferring-and-recalling-an-event">Deferring and Recalling An Event</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#cancelling-event-source-by-signal-name">Cancelling Event Source By Signal Name</a></li>
 </ul>
 </li>
 </ul>
