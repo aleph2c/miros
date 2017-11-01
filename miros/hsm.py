@@ -219,7 +219,8 @@ def append_fifo_to_spy(fn):
   def _append_fifo_to_spy(self, e):
     fn(self, e)
     if self.instrumented:
-      self.rtc.tuples.append(spy_tuple(signal=e.signal_name, post_fifo=True))
+      sr = spy_tuple(signal=e.signal_name, post_fifo=True)
+      self.rtc.tuples.append(sr)
       self.rtc.spy.append("POST_FIFO:{}".format(e.signal_name))
   return _append_fifo_to_spy
 
@@ -1028,6 +1029,7 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
     def _append_to_full_trace(self, e):
       start_state = self.state.fun(self, Event(signal=signals.REFLECTION_SIGNAL))
       # fn is append_to_full_spy
+      self.rtc.tuples.clear()
       fn(self, e)
       signal, hooked, ignored = is_signal_hooked_or_ignored(self)
       if hooked is False and ignored is False:
@@ -1091,7 +1093,8 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     def _append_lifo_to_spy(self, e):
       fn(self, e)
       if self.instrumented:
-        self.rtc.tuples.append(spy_tuple(signal=e.signal_name, post_lifo=True))
+        sr = spy_tuple(signal=e.signal_name, post_lifo=True)
+        self.rtc.tuples.append(sr)
         self.rtc.spy.append("POST_LIFO:{}".format(e.signal_name))
     return _append_lifo_to_spy
 
@@ -1099,7 +1102,6 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     def _append_defer_to_spy(self, e):
       fn(self, e)
       if self.instrumented:
-        self.rtc.tuples.append(spy_tuple(signal=e.signal_name, post_defer=True))
         self.rtc.spy.append("POST_DEFERRED:{}".format(e.signal_name))
     return _append_defer_to_spy
 
@@ -1107,7 +1109,8 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     def _append_recall_to_spy(self):
       e = fn(self)
       if e is not None and self.instrumented:
-        self.rtc.tuples.append(spy_tuple(signal=e.signal_name, recall=True))
+        sr = spy_tuple(signal=e.signal_name, recall=True)
+        self.rtc.tuples.append(sr)
         self.rtc.spy.append("RECALL:{}".format(e.signal_name))
     return _append_recall_to_spy
 
