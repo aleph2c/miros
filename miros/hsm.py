@@ -109,6 +109,7 @@ Example::
 from datetime    import datetime
 from miros.event import signals, return_status, Event
 from collections import namedtuple, deque
+from copy import deepcopy
 
 SpyTuple = namedtuple('SpyTuple', ['signal',    'state',
                                    'hook',      'start',
@@ -1098,7 +1099,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     def _append_defer_to_spy(self, e):
       fn(self, e)
       if self.instrumented:
-        self.rtc.tuples.append(spy_tuple(signal=e.signal, post_defer=True))
+        self.rtc.tuples.append(spy_tuple(signal=e.signal_name, post_defer=True))
         self.rtc.spy.append("POST_DEFERRED:{}".format(e.signal_name))
     return _append_defer_to_spy
 
@@ -1106,7 +1107,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     def _append_recall_to_spy(self):
       e = fn(self)
       if e is not None and self.instrumented:
-        self.rtc.tuples.append(spy_tuple(signal=e.signal, recall=True))
+        self.rtc.tuples.append(spy_tuple(signal=e.signal_name, recall=True))
         self.rtc.spy.append("RECALL:{}".format(e.signal_name))
     return _append_recall_to_spy
 
