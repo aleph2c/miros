@@ -1,13 +1,19 @@
 *Trace Heisenbug*
 = Observe =
   *What defines Success?*
-  My trace outputs would display the signal names as strings
+  My trace outputs would display the signal name which caused the transition as
+  a string.
 
   *What is the problem?*
-  My trace outputs are writing numbers instead of strings.
-  If I use a print statement in the code, the bug disappears.
+  * My trace outputs are writing numbers instead of strings.
+  * If I use a print statement in the code, the bug disappears.
+  * The number that it writes does not even belong to the signal that we are
+    trying to track, it belongs to the last signal experienced by the system
 
   *Evidence that contradicts Assumptions:*
+  * the 12 signal seen in the buggy output is the CAPACITOR_CHARGE signal
+  * the output should be BATTERY_CHARGE
+  * the spy output is correct
   
 = Orient =
   *Symptoms:*
@@ -22,6 +28,7 @@
     Who else has seen a heisenbug from python print?
 
   *Assumptions:*
+  Number 12 is the right signal number.
 
 = Decide =
   *Idea/Hypotheses for Trace Heisenbug: >=5*
@@ -29,15 +36,17 @@
   * [ ] Add asserts, if the code asserts, bisect the problem
   * [ ] It has something to do with closures
   * [ ] It is weirder than you can imagine
+  * [ ] Number 12 is the right signal number
   * [ ] Add a pdb break point and trouble shoot from within the code, land and
         start and see if the heisenbug happens upon a break too.
         
   *Chosen Idea/Hypothesis*
-  * Add a pdb break point and trouble shoot from within the code, land and
-    start and see if the heisenbug happens upon a break too.
-    
+  * Number 12 is the right signal number
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
+  * break in the code and demonstrate the 12 is the wrong number
+  * we are specifically looking for the BATTERY_CHARGE signal
 
 = Act =
-
+  * number 12 is the CAPITOR_CHARGE signal not the BATTERY_CHARGE signal
+  * so now we have two bugs
