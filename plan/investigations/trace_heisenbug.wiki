@@ -42,17 +42,17 @@
         start and see if the heisenbug happens upon a break too.
   * [ ] The code that writes the string isn't being run
   * [ ] The self.rtc.tuples looks like it is corrupted
-    * [ ] The spy_on is corrupting the self.rtc
+    * [ ] The spy_on is corrupting the self.rtc [false]
+    * [ ] The append_fifo_to_spy is corrupting the self.rtc.tuples
         
   *Chosen Idea/Hypothesis*
   * The spy_on is corrupting the self.rtc
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
-  * Confirm that tuples corrupted
-  * Chase code back to source of write 
-    * append_to_full_trace:
-       print(sr.signal.__class__.__name__) => int somethimes
-    * spy_on:
-       print(sr.signal.__class__.__name__) => int somethimes
+  * Confirm that tuples corrupted[confirmed]
+  * print self.rtc.tuples to screen in append_fifo_to_spy, confirm that corruption not
+    there[confirmed]
+    
 
 = Act =
+  [theory disproven]
