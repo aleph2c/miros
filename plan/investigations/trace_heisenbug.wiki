@@ -14,6 +14,8 @@
   * the 12 signal seen in the buggy output is the CAPACITOR_CHARGE signal
   * the output should be BATTERY_CHARGE
   * the spy output is correct
+  * adding time between events and the viewing of the events had no affect on
+    the bug
   
 = Orient =
   *Symptoms:*
@@ -35,15 +37,14 @@
   * [ ] Add asserts, if the code asserts, bisect the problem
   * [ ] It has something to do with closures
   * [ ] It is weirder than you can imagine
-  * [ ] Number 12 is the right signal number
-  * [ ] The process is being reflected upon before it is finished
   * [ ] Add a pdb break point and trouble shoot from within the code, land and
         start and see if the heisenbug happens upon a break too.
         
   *Chosen Idea/Hypothesis*
-  * Research and find some tricks
+  * The process is being reflected upon before it is finished
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
-  * researched, and the suggestions were very weak (stackoverflow)
+  * Add more delay before writing trace
+  * Confirm bug still present
 
 = Act =
