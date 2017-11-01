@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>20</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>300</x>
+      <y>160</y>
+      <w>600</w>
+      <h>780</h>
+    </coordinates>
+    <panel_attributes>*arming*
+--
+  entry/ multishot_id = \
+         ao.post_fifo(Event(
+           signal=signals.BATTERY_CHARGE,
+           times=3, period=1, deferred=True)
+           
+         ao.augment(other=multishot_id,
+                       name='multishot_id')
+  exit/ ao.cancel_event(chart.multishod_id)
+  
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>340</x>
+      <y>520</y>
+      <w>500</w>
+      <h>340</h>
+    </coordinates>
+    <panel_attributes>*armed*
+--
+  entry/ ao.defer(
+   Event(signal=
+     signals.CAPACITOR_CHARGE))
+  exit/
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>100</x>
+      <y>0</y>
+      <w>840</w>
+      <h>980</h>
+    </coordinates>
+    <panel_attributes>*tazor operating*
+--
+  entry/ ao.recall()
+  exit/ 
+  TRIGGER_PULLED/ ao.recall()
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>200</x>
+      <y>960</y>
+      <w>580</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+ CAPACITOR_CHARGE (print("zap!"))</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0;270.0;30.0;270.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>460</x>
+      <y>840</y>
+      <w>320</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+ BATTERY_CHARGE</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>400</x>
+      <y>760</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>400</x>
+      <y>740</y>
+      <w>380</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+print("charging tazor")</panel_attributes>
+    <additional_attributes>10.0;20.0;170.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSyncBarVertical</id>
+    <coordinates>
+      <x>720</x>
+      <y>740</y>
+      <w>40</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>template=txt
+title=titletext
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

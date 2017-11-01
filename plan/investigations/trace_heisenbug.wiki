@@ -1,0 +1,43 @@
+*Trace Heisenbug*
+= Observe =
+  *What defines Success?*
+  My trace outputs would display the signal names as strings
+
+  *What is the problem?*
+  My trace outputs are writing numbers instead of strings.
+  If I use a print statement in the code, the bug disappears.
+
+  *Evidence that contradicts Assumptions:*
+  
+= Orient =
+  *Symptoms:*
+  - printing the trace will output a number instead of a signal name
+  - adding a print statement within the append_fifo_to_spy method makes the bug
+    go away.
+  
+  *Questions for Trace Heisenbug:*
+    Can you simplify your test?
+    Do you have enough information?
+    What recently changed?
+    Who else has seen a heisenbug from python print?
+
+  *Assumptions:*
+
+= Decide =
+  *Idea/Hypotheses for Trace Heisenbug: >=5*
+  * [ ] Research and find some tricks
+  * [ ] Add asserts, if the code asserts, bisect the problem
+  * [ ] It has something to do with closures
+  * [ ] It is weirder than you can imagine
+  * [ ] Add a pdb break point and trouble shoot from within the code, land and
+        start and see if the heisenbug happens upon a break too.
+        
+  *Chosen Idea/Hypothesis*
+  * Add a pdb break point and trouble shoot from within the code, land and
+    start and see if the heisenbug happens upon a break too.
+    
+
+  *Plan to Expand-on-Idea/Disprove-Hypothesis*
+
+= Act =
+
