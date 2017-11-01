@@ -9,6 +9,7 @@
   * If I use a print statement in the code, the bug disappears.
   * The number that it writes does not even belong to the signal that we are
     trying to track, it belongs to the last signal experienced by the system
+  * self.rtc.tuples has garbage in it
 
   *Evidence that contradicts Assumptions:*
   * the 12 signal seen in the buggy output is the CAPACITOR_CHARGE signal
@@ -39,12 +40,19 @@
   * [ ] It is weirder than you can imagine
   * [ ] Add a pdb break point and trouble shoot from within the code, land and
         start and see if the heisenbug happens upon a break too.
+  * [ ] The code that writes the string isn't being run
+  * [ ] The self.rtc.tuples looks like it is corrupted
+    * [ ] The spy_on is corrupting the self.rtc
         
   *Chosen Idea/Hypothesis*
-  * The process is being reflected upon before it is finished
+  * The spy_on is corrupting the self.rtc
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
-  * Add more delay before writing trace
-  * Confirm bug still present
+  * Confirm that tuples corrupted
+  * Chase code back to source of write 
+    * append_to_full_trace:
+       print(sr.signal.__class__.__name__) => int somethimes
+    * spy_on:
+       print(sr.signal.__class__.__name__) => int somethimes
 
 = Act =
