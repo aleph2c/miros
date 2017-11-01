@@ -1,14 +1,15 @@
 *Trace Heisenbug*
 = Observe =
   *What defines Success?*
-  My trace outputs would display the signal name which caused the transition as
-  a string.
+  The trace should work for recalled signals
 
   *What is the problem?*
-  * My trace outputs are writing numbers instead of strings.
-  * If I use a print statement in the code, the bug disappears.
+  * The recall feature doesn't seem to apply trace information
+  * My trace output was writing numbers instead of strings. [fixed]
+  * If I use a print statement in the code, the bug disappears. [?]
   * The number that it writes does not even belong to the signal that we are
-    trying to track, it belongs to the last signal experienced by the system
+    trying to track, it belongs to the last signal experienced by the system,
+    [this was wrong, and this is what cost you so much time]
   * self.rtc.tuples has garbage in it
 
   *Evidence that contradicts Assumptions:*
@@ -22,19 +23,25 @@
   *Symptoms:*
   - printing the trace will output a number instead of a signal name
   - adding a print statement within the append_fifo_to_spy method makes the bug
-    go away.
+    go away.[it didn't, you weren't looking hard enough]
   
   *Questions for Trace Heisenbug:*
     Can you simplify your test?
     Do you have enough information?
     What recently changed?
     Who else has seen a heisenbug from python print?
+    Is it over-working? Like is your design incorrect?
 
   *Assumptions:*
   Number 12 is the right signal number.
+  That I had a copy issue, because it smelled like one.
+  The CAPACITOR_CHARGE signal was being written into the queue because of a
+  copy issue rather than by me putting it there.  I WAS putting it there, when
+  I posted trace information in the defer wrapper.
 
 = Decide =
   *Idea/Hypotheses for Trace Heisenbug: >=5*
+  * [ ] array copy issue (fixated and wrong)
   * [ ] Add asserts, if the code asserts, bisect the problem
   * [ ] It has something to do with closures
   * [ ] It is weirder than you can imagine
@@ -43,16 +50,19 @@
   * [ ] The code that writes the string isn't being run
   * [ ] The self.rtc.tuples looks like it is corrupted
     * [ ] The spy_on is corrupting the self.rtc [false]
-    * [ ] The append_fifo_to_spy is corrupting the self.rtc.tuples
-        
+    * [ ] The append_fifo_to_spy is corrupting the self.rtc.tuples [false]
+    * [ ] The append_fifo_to_spy is corrupting the self.rtc.tuples [false]
+    * [ ] The append_defer_to_spy is corrupting the self.rtc.tuples
+  * [ ] The signal was being over posted into the self.rtc.tuples by the defer
+        call [this was the issue]
+
   *Chosen Idea/Hypothesis*
-  * The spy_on is corrupting the self.rtc
+  * The signal was being over posted into the self.rtc.tuples by the defer
+    call [this was the issue]
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
-  * Confirm that tuples corrupted[confirmed]
-  * print self.rtc.tuples to screen in append_fifo_to_spy, confirm that corruption not
-    there[confirmed]
-    
+  * Remove the salting of the spy tuple message in the defer wrapper and
+    confirm problem still exists
 
 = Act =
-  [theory disproven]
+  [could not disprove theory]
