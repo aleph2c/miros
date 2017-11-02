@@ -1111,5 +1111,187 @@ Your victim should be laying on the floor now.
 So, there you have it, a very simple rendition of a tazor, our statechart could
 have look like this:
 
+.. image:: _static/tazor.svg
 
+This diagram is topologically the same as the one described at the beginning of
+our :ref:`examples-simple-posting-example`.  Let's write's state methods first.
+
+.. code-block:: python
+
+  @spy_on
+  def tazor_operating(ao, e):
+    status = state.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      ao.recall()
+      status = state.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = state.HANDLED
+    if(e.signal == signals.INIT_SIGNAL):
+      status = state.HANDLED
+    elif(e.signal == signals.TRIGGER_PULLED):
+      ao.recall()
+      status = state.HANDLED
+    elif(e.signal == signals.CAPACITOR_CHARGE):
+      print("zapping")
+      status = ao.trans(tazor_operating)
+    else:
+      status, ao.temp.fun = state.SUPER, ao.top
+    return status
+
+  @spy_on
+  def arming(ao, e):
+    status = state.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      multi_shot_thread = \
+        ao.post_fifo(Event(signal=signals.BATTERY_CHARGE),
+                        times=3,
+                        period=1.0,
+                        deferred=True)
+      # We mark up the ao with this id, so that
+      # state function can be used by many different aos
+      ao.augment(other=multi_shot_thread,
+                    name='multi_shot_thread')
+      status = state.HANDLED
+
+    elif(e.signal == signals.EXIT_SIGNAL):
+      ao.cancel_event(ao.multi_shot_thread)
+      status = state.HANDLED
+
+    if(e.signal == signals.INIT_SIGNAL):
+      status = state.HANDLED
+    elif(e.signal == signals.BATTERY_CHARGE):
+      status = ao.trans(armed)
+    else:
+      status, ao.temp.fun = state.SUPER, tazor_operating
+    return status
+
+
+  @spy_on
+  def armed(ao, e):
+    status = state.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      ao.defer(Event(signal=signals.CAPACITOR_CHARGE))
+      status = state.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = state.HANDLED
+    if(e.signal == signals.INIT_SIGNAL):
+      print("charging tazor")
+      status = state.HANDLED
+    else:
+      status, ao.temp.fun = state.SUPER, arming
+    return status
+
+Now we will create an active object, link the above state methods into it by
+starting it in the arming state:
+
+.. code-block:: python
+  :emphasize-lines: 3
+
+  tazor = ActiveObject()
+  tazor.start_at(arming)
+  time.sleep(4.0)
+
+Notice that we wait 3 seconds to let it charge up.
+
+Now let's pull the trigger:
+
+.. code-block:: python
+  :emphasize-lines: 3
+
+  tazor.post_fifo(Event(signal=signals.TRIGGER_PULLED))
+  time.sleep(0.1)  # if you don't wait it won't look like it is working
+  print(tazor.trace())
+
+The highlighted code above shows that we used the trace to output a high level
+view of what happened when we pulled the trigger:
+
+.. code-block:: python
+  :emphasize-lines: 4,5
+  :linenos:
+
+  19:51:25.509209 [75c8c] None: top->arming
+  19:51:26.511506 [75c8c] BATTERY_CHARGE: arming->armed
+  19:51:27.512153 [75c8c] BATTERY_CHARGE: armed->armed
+  19:51:28.512604 [75c8c] BATTERY_CHARGE: armed->armed
+  19:51:29.512080 [75c8c] CAPACITOR_CHARGE: armed->tazor_operating
+  19:51:29.513081 [75c8c] CAPACITOR_CHARGE: tazor_operating->tazor_operating
+  19:51:29.514085 [75c8c] CAPACITOR_CHARGE: tazor_operating->tazor_operating
+
+Notice that our **TRIGGER_PULL** signal did not show up in our trace.  We would
+expect it to occur between lines *4* and *5*.  This is because the trace only
+shows signals that cause state transition.  The **TRIGGER_PULL** signal was
+handled by a HOOK and therefore didn't directly cause a transition.  Instead,
+it cause the ``recall`` method to post a **CAPACITOR_CHARGE** signal, which
+in turn causes two more state transitions.
+
+To see our full spy log, we would use the following code:
+
+.. code-block:: python
+
+  pp(tazor.spy_full())
+
+Which outputs the full story:
+
+.. code-block:: python
+  :emphasize-lines: 1,7,13,21,29,35,46,53,58
+  :linenos:
+
+  ['START',
+  'SEARCH_FOR_SUPER_SIGNAL:arming',
+  'SEARCH_FOR_SUPER_SIGNAL:tazor_operating',
+  'ENTRY_SIGNAL:tazor_operating',
+  'ENTRY_SIGNAL:arming',
+  'INIT_SIGNAL:arming',
+  '<- Queued:(0) Deferred:(0)',
+  'BATTERY_CHARGE:arming',
+  'SEARCH_FOR_SUPER_SIGNAL:armed',
+  'ENTRY_SIGNAL:armed',
+  'POST_DEFERRED:CAPACITOR_CHARGE',
+  'INIT_SIGNAL:armed',
+  '<- Queued:(0) Deferred:(1)',
+  'BATTERY_CHARGE:armed',
+  'BATTERY_CHARGE:arming',
+  'EXIT_SIGNAL:armed',
+  'SEARCH_FOR_SUPER_SIGNAL:armed',
+  'ENTRY_SIGNAL:armed',
+  'POST_DEFERRED:CAPACITOR_CHARGE',
+  'INIT_SIGNAL:armed',
+  '<- Queued:(0) Deferred:(2)',
+  'BATTERY_CHARGE:armed',
+  'BATTERY_CHARGE:arming',
+  'EXIT_SIGNAL:armed',
+  'SEARCH_FOR_SUPER_SIGNAL:armed',
+  'ENTRY_SIGNAL:armed',
+  'POST_DEFERRED:CAPACITOR_CHARGE',
+  'INIT_SIGNAL:armed',
+  '<- Queued:(0) Deferred:(3)',
+  'TRIGGER_PULLED:armed',
+  'TRIGGER_PULLED:arming',
+  'TRIGGER_PULLED:tazor_operating',
+  'POST_FIFO:CAPACITOR_CHARGE',
+  'TRIGGER_PULLED:tazor_operating:HOOK',
+  '<- Queued:(1) Deferred:(2)',
+  'CAPACITOR_CHARGE:armed',
+  'CAPACITOR_CHARGE:arming',
+  'CAPACITOR_CHARGE:tazor_operating',
+  'EXIT_SIGNAL:armed',
+  'EXIT_SIGNAL:arming',
+  'EXIT_SIGNAL:tazor_operating',
+  'ENTRY_SIGNAL:tazor_operating',
+  'POST_FIFO:CAPACITOR_CHARGE',
+  'RECALL:CAPACITOR_CHARGE',
+  'INIT_SIGNAL:tazor_operating',
+  '<- Queued:(1) Deferred:(1)',
+  'CAPACITOR_CHARGE:tazor_operating',
+  'EXIT_SIGNAL:tazor_operating',
+  'ENTRY_SIGNAL:tazor_operating',
+  'POST_FIFO:CAPACITOR_CHARGE',
+  'RECALL:CAPACITOR_CHARGE',
+  'INIT_SIGNAL:tazor_operating',
+  '<- Queued:(1) Deferred:(0)',
+  'CAPACITOR_CHARGE:tazor_operating',
+  'EXIT_SIGNAL:tazor_operating',
+  'ENTRY_SIGNAL:tazor_operating',
+  'INIT_SIGNAL:tazor_operating',
+  '<- Queued:(0) Deferred:(0)']
 

@@ -1086,6 +1086,231 @@ until all of the deferred <strong>B</strong> items in the active object queue ar
 Your victim should be laying on the floor now.</p>
 <p>So, there you have it, a very simple rendition of a tazor, our statechart could
 have look like this:</p>
+<img alt="_images/tazor.svg" src="_images/tazor.svg" /><p>This diagram is topologically the same as the one described at the beginning of
+our <a class="reference internal" href="#examples-simple-posting-example"><span class="std std-ref">Simple Posting Example</span></a>.  Let’s write’s state methods first.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">tazor_operating</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">ao</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TRIGGER_PULLED</span><span class="p">):</span>
+    <span class="n">ao</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">CAPACITOR_CHARGE</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;zapping&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">tazor_operating</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">top</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">arming</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">multi_shot_thread</span> <span class="o">=</span> \
+      <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BATTERY_CHARGE</span><span class="p">),</span>
+                      <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                      <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c1"># We mark up the ao with this id, so that</span>
+    <span class="c1"># state function can be used by many different aos</span>
+    <span class="n">ao</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="n">multi_shot_thread</span><span class="p">,</span>
+                  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;multi_shot_thread&#39;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">ao</span><span class="o">.</span><span class="n">cancel_event</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">multi_shot_thread</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BATTERY_CHARGE</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">armed</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">tazor_operating</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">armed</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">ao</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">CAPACITOR_CHARGE</span><span class="p">))</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;charging tazor&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">arming</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>Now we will create an active object, link the above state methods into it by
+starting it in the arming state:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">tazor</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="n">tazor</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">arming</span><span class="p">)</span>
+<span class="hll"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">4.0</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Notice that we wait 3 seconds to let it charge up.</p>
+<p>Now let’s pull the trigger:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">tazor</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">TRIGGER_PULLED</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># if you don&#39;t wait it won&#39;t look like it is working</span>
+<span class="hll"><span class="k">print</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+</span></pre></div>
+</div>
+<p>The highlighted code above shows that we used the trace to output a high level
+view of what happened when we pulled the trigger:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="mi">19</span><span class="p">:</span><span class="mi">51</span><span class="p">:</span><span class="mf">25.509209</span> <span class="p">[</span><span class="mi">75</span><span class="n">c8c</span><span class="p">]</span> <span class="bp">None</span><span class="p">:</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">arming</span>
+<span class="mi">19</span><span class="p">:</span><span class="mi">51</span><span class="p">:</span><span class="mf">26.511506</span> <span class="p">[</span><span class="mi">75</span><span class="n">c8c</span><span class="p">]</span> <span class="n">BATTERY_CHARGE</span><span class="p">:</span> <span class="n">arming</span><span class="o">-&gt;</span><span class="n">armed</span>
+<span class="mi">19</span><span class="p">:</span><span class="mi">51</span><span class="p">:</span><span class="mf">27.512153</span> <span class="p">[</span><span class="mi">75</span><span class="n">c8c</span><span class="p">]</span> <span class="n">BATTERY_CHARGE</span><span class="p">:</span> <span class="n">armed</span><span class="o">-&gt;</span><span class="n">armed</span>
+<span class="hll"><span class="mi">19</span><span class="p">:</span><span class="mi">51</span><span class="p">:</span><span class="mf">28.512604</span> <span class="p">[</span><span class="mi">75</span><span class="n">c8c</span><span class="p">]</span> <span class="n">BATTERY_CHARGE</span><span class="p">:</span> <span class="n">armed</span><span class="o">-&gt;</span><span class="n">armed</span>
+</span><span class="hll"><span class="mi">19</span><span class="p">:</span><span class="mi">51</span><span class="p">:</span><span class="mf">29.512080</span> <span class="p">[</span><span class="mi">75</span><span class="n">c8c</span><span class="p">]</span> <span class="n">CAPACITOR_CHARGE</span><span class="p">:</span> <span class="n">armed</span><span class="o">-&gt;</span><span class="n">tazor_operating</span>
+</span><span class="mi">19</span><span class="p">:</span><span class="mi">51</span><span class="p">:</span><span class="mf">29.513081</span> <span class="p">[</span><span class="mi">75</span><span class="n">c8c</span><span class="p">]</span> <span class="n">CAPACITOR_CHARGE</span><span class="p">:</span> <span class="n">tazor_operating</span><span class="o">-&gt;</span><span class="n">tazor_operating</span>
+<span class="mi">19</span><span class="p">:</span><span class="mi">51</span><span class="p">:</span><span class="mf">29.514085</span> <span class="p">[</span><span class="mi">75</span><span class="n">c8c</span><span class="p">]</span> <span class="n">CAPACITOR_CHARGE</span><span class="p">:</span> <span class="n">tazor_operating</span><span class="o">-&gt;</span><span class="n">tazor_operating</span>
+</pre></div>
+</td></tr></table></div>
+<p>Notice that our <strong>TRIGGER_PULL</strong> signal did not show up in our trace.  We would
+expect it to occur between lines <em>4</em> and <em>5</em>.  This is because the trace only
+shows signals that cause state transition.  The <strong>TRIGGER_PULL</strong> signal was
+handled by a HOOK and therefore didn’t directly cause a transition.  Instead,
+it cause the <code class="docutils literal"><span class="pre">recall</span></code> method to post a <strong>CAPACITOR_CHARGE</strong> signal, which
+in turn causes two more state transitions.</p>
+<p>To see our full spy log, we would use the following code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pp</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Which outputs the full story:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="hll"><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+</span><span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:arming&#39;</span><span class="p">,</span>
+<span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+<span class="s1">&#39;ENTRY_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+<span class="s1">&#39;ENTRY_SIGNAL:arming&#39;</span><span class="p">,</span>
+<span class="s1">&#39;INIT_SIGNAL:arming&#39;</span><span class="p">,</span>
+<span class="hll"><span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span>
+</span><span class="s1">&#39;BATTERY_CHARGE:arming&#39;</span><span class="p">,</span>
+<span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:armed&#39;</span><span class="p">,</span>
+<span class="s1">&#39;ENTRY_SIGNAL:armed&#39;</span><span class="p">,</span>
+<span class="s1">&#39;POST_DEFERRED:CAPACITOR_CHARGE&#39;</span><span class="p">,</span>
+<span class="s1">&#39;INIT_SIGNAL:armed&#39;</span><span class="p">,</span>
+<span class="hll"><span class="s1">&#39;&lt;- Queued:(0) Deferred:(1)&#39;</span><span class="p">,</span>
+</span><span class="s1">&#39;BATTERY_CHARGE:armed&#39;</span><span class="p">,</span>
+<span class="s1">&#39;BATTERY_CHARGE:arming&#39;</span><span class="p">,</span>
+<span class="s1">&#39;EXIT_SIGNAL:armed&#39;</span><span class="p">,</span>
+<span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:armed&#39;</span><span class="p">,</span>
+<span class="s1">&#39;ENTRY_SIGNAL:armed&#39;</span><span class="p">,</span>
+<span class="s1">&#39;POST_DEFERRED:CAPACITOR_CHARGE&#39;</span><span class="p">,</span>
+<span class="s1">&#39;INIT_SIGNAL:armed&#39;</span><span class="p">,</span>
+<span class="hll"><span class="s1">&#39;&lt;- Queued:(0) Deferred:(2)&#39;</span><span class="p">,</span>
+</span><span class="s1">&#39;BATTERY_CHARGE:armed&#39;</span><span class="p">,</span>
+<span class="s1">&#39;BATTERY_CHARGE:arming&#39;</span><span class="p">,</span>
+<span class="s1">&#39;EXIT_SIGNAL:armed&#39;</span><span class="p">,</span>
+<span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:armed&#39;</span><span class="p">,</span>
+<span class="s1">&#39;ENTRY_SIGNAL:armed&#39;</span><span class="p">,</span>
+<span class="s1">&#39;POST_DEFERRED:CAPACITOR_CHARGE&#39;</span><span class="p">,</span>
+<span class="s1">&#39;INIT_SIGNAL:armed&#39;</span><span class="p">,</span>
+<span class="hll"><span class="s1">&#39;&lt;- Queued:(0) Deferred:(3)&#39;</span><span class="p">,</span>
+</span><span class="s1">&#39;TRIGGER_PULLED:armed&#39;</span><span class="p">,</span>
+<span class="s1">&#39;TRIGGER_PULLED:arming&#39;</span><span class="p">,</span>
+<span class="s1">&#39;TRIGGER_PULLED:tazor_operating&#39;</span><span class="p">,</span>
+<span class="s1">&#39;POST_FIFO:CAPACITOR_CHARGE&#39;</span><span class="p">,</span>
+<span class="s1">&#39;TRIGGER_PULLED:tazor_operating:HOOK&#39;</span><span class="p">,</span>
+<span class="hll"><span class="s1">&#39;&lt;- Queued:(1) Deferred:(2)&#39;</span><span class="p">,</span>
+</span><span class="s1">&#39;CAPACITOR_CHARGE:armed&#39;</span><span class="p">,</span>
+<span class="s1">&#39;CAPACITOR_CHARGE:arming&#39;</span><span class="p">,</span>
+<span class="s1">&#39;CAPACITOR_CHARGE:tazor_operating&#39;</span><span class="p">,</span>
+<span class="s1">&#39;EXIT_SIGNAL:armed&#39;</span><span class="p">,</span>
+<span class="s1">&#39;EXIT_SIGNAL:arming&#39;</span><span class="p">,</span>
+<span class="s1">&#39;EXIT_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+<span class="s1">&#39;ENTRY_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+<span class="s1">&#39;POST_FIFO:CAPACITOR_CHARGE&#39;</span><span class="p">,</span>
+<span class="s1">&#39;RECALL:CAPACITOR_CHARGE&#39;</span><span class="p">,</span>
+<span class="s1">&#39;INIT_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+<span class="hll"><span class="s1">&#39;&lt;- Queued:(1) Deferred:(1)&#39;</span><span class="p">,</span>
+</span><span class="s1">&#39;CAPACITOR_CHARGE:tazor_operating&#39;</span><span class="p">,</span>
+<span class="s1">&#39;EXIT_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+<span class="s1">&#39;ENTRY_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+<span class="s1">&#39;POST_FIFO:CAPACITOR_CHARGE&#39;</span><span class="p">,</span>
+<span class="s1">&#39;RECALL:CAPACITOR_CHARGE&#39;</span><span class="p">,</span>
+<span class="s1">&#39;INIT_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+<span class="hll"><span class="s1">&#39;&lt;- Queued:(1) Deferred:(0)&#39;</span><span class="p">,</span>
+</span><span class="s1">&#39;CAPACITOR_CHARGE:tazor_operating&#39;</span><span class="p">,</span>
+<span class="s1">&#39;EXIT_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+<span class="s1">&#39;ENTRY_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+<span class="s1">&#39;INIT_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+<span class="hll"><span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
+</span></pre></div>
+</td></tr></table></div>
 </div>
 </div>
 </div>
