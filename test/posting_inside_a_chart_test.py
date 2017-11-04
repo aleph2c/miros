@@ -1,6 +1,7 @@
 import time
 import pytest
 from miros.hsm import spy_on
+from miros.hsm import HsmWithQueues
 from miros.event import signals, Event
 from miros.event import return_status as state
 from miros.activeobject import ActiveObject, ActiveFabric
@@ -169,6 +170,8 @@ def tazor_operating(ao, e):
   elif(e.signal == signals.TRIGGER_PULLED):
     ao.recall()
     status = state.HANDLED
+  elif(e.signal == signals.READY):
+    status = ao.trans(arming)
   elif(e.signal == signals.CAPACITOR_CHARGE):
     print("zapping")
     status = ao.trans(tazor_operating)
@@ -222,7 +225,6 @@ def armed(ao, e):
 
 
 @pytest.mark.postings
-@pytest.mark.tazor
 def test_tazoro_example(fabric_fixture):
   tazor = ActiveObject()
   tazor.start_at(arming)
@@ -231,3 +233,19 @@ def test_tazoro_example(fabric_fixture):
   time.sleep(2.1)  # if you don't wait it won't look like it is working
   pp(tazor.spy_full())
   print(tazor.trace())
+
+
+@pytest.mark.tazor
+def test_live_spys(fabric_fixture):
+  tazor = ActiveObject()
+  tazor.live_spy = True
+  tazor.live_trace = True
+  tazor.start_at(arming)
+  #pp(tazor.rtc.spy)
+  time.sleep(2.0)
+  # tazor.post_fifo(Event(signal=signals.READY))
+  # time.sleep(4.0)
+  # tazor.post_fifo(Event(signal=signals.TRIGGER_PULLED))
+  # time.sleep(3.0)
+
+
