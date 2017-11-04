@@ -1076,7 +1076,39 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     self.live_trace  = False
     self.name        = None
 
-  def print_spy_if_live(fn):
+  def print_spy_after_at_start_if_live(fn):
+    def _print_spy_if_live(self, initial_state):
+      # fn is _print_trace_if_live
+      result = fn(self, initial_state)
+      if self.instrumented and self.live_spy:
+        for line in self.rtc.spy:
+          print(line)
+      return result
+    return _print_spy_if_live
+
+  def print_trace_after_at_start_if_live(fn):
+    def _print_trace_if_live(self, initial_state):
+      # fn is next_rtc/start_at
+      result = fn(self, initial_state)
+      if self.name is None:
+        name = 'None'
+      else:
+        name = self.name
+
+      if self.instrumented and self.live_trace:
+        strace = "\n"
+        tr = self.full.trace[-1]
+        strace += "{} [{}] {}: {}->{}\n".format(
+            datetime.strftime(tr.datetime, "%H:%M:%S.%f"),
+            name,
+            tr.signal,
+            tr.start_state,
+            tr.end_state)
+        print(strace)
+      return result
+    return _print_trace_if_live
+
+  def print_spy_after_rtc_if_live(fn):
     def _print_spy_if_live(self):
       # fn is _print_trace_if_live
       result = fn(self)
@@ -1086,7 +1118,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       return result
     return _print_spy_if_live
 
-  def print_trace_if_live(fn):
+  def print_trace_after_rtc_if_live(fn):
     def _print_trace_if_live(self):
       # fn is next_rtc/start_at
       result = fn(self)
@@ -1108,13 +1140,15 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       return result
     return _print_trace_if_live
 
-  # print_spy_if_live calls print_trace_if_live which calls
-  # append_queue_reflection_to_spy which calls next_rtc.
+  # print_spy_after_at_start_if_live calls print_trace_after_at_start_if_live
+  # which calls append_queue_reflection_after_start which calls start_at.
 
-  # append_queue_reflection_to_spy does its work after start_at
-  # and returns control to print_trace_if_live, which prints the
-  # trace, then it returns control to print_spy_if_live which
+  # append_queue_reflection_after_start does its work after start_at and
+  # returns control to print_trace_after_at_start_if_live, which prints the
+  # trace, then it returns control to print_spy_after_at_start_if_live which
   # prints the spy.
+  @print_spy_after_at_start_if_live
+  @print_trace_after_at_start_if_live
   @append_queue_reflection_after_start
   def start_at(self, initial_state):
     if self.instrumented:
@@ -1191,15 +1225,14 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       self.post_fifo(e)
     return e
 
-  # print_spy_if_live calls print_trace_if_live which calls
+  # print_spy_after_rtc_if_live calls print_trace_after_rtc_if_live which calls
   # append_queue_reflection_to_spy which calls next_rtc.
 
-  # append_queue_reflection_to_spy does its work after next_rtc
-  # and returns control to print_trace_if_live, which prints the
-  # trace, then it returns control to print_spy_if_live which
-  # prints the spy.
-  @print_spy_if_live
-  @print_trace_if_live
+  # append_queue_reflection_to_spy does its work after next_rtc and returns
+  # control to print_trace_after_rtc_if_live, which prints the trace, then it
+  # returns control to print_spy_after_rtc_if_live which prints the spy.
+  @print_spy_after_rtc_if_live
+  @print_trace_after_rtc_if_live
   @append_queue_reflection_to_spy
   def next_rtc(self):
     self.rtc.spy.clear()

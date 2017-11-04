@@ -573,40 +573,6 @@ class ActiveObject(Hsm):
       fn(self, initial_state)
     return _make_unique_name_based_on_start_at_function
 
-  def print_spy_at_start_if_live(fn):
-    def _print_spy_if_live(self, initial_state):
-      # fn is _print_trace_if_live
-      result = fn(self, initial_state)
-      if self.instrumented and self.live_spy:
-        for line in self.rtc.spy:
-          print(line)
-      return result
-    return _print_spy_if_live
-
-  def print_trace_at_start_if_live(fn):
-    def _print_trace_if_live(self, initial_state):
-      # fn is next_rtc/start_at
-      result = fn(self, initial_state)
-      if self.name is None:
-        name = 'None'
-      else:
-        name = self.name
-
-      if self.instrumented and self.live_trace:
-        strace = "\n"
-        tr = self.full.trace[-1]
-        strace += "{} [{}] {}: {}->{}\n".format(
-            datetime.strftime(tr.datetime, "%H:%M:%S.%f"),
-            name,
-            tr.signal,
-            tr.start_state,
-            tr.end_state)
-        print(strace)
-      return result
-    return _print_trace_if_live
-
-  @print_spy_at_start_if_live
-  @print_trace_at_start_if_live
   @make_unique_name_based_on_start_at_function
   def start_at(self, initial_state):
     '''start the active object at a given state and begin its task'''
