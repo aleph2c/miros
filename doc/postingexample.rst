@@ -503,10 +503,14 @@ have look like this:
 
 .. image:: _static/tazor.svg
 
-This diagram is topologically the same as the one described at the beginning of
-our :ref:`examples-simple-posting-example`.  Let's write's state methods first.
+This diagram is almost topologically the same as the one described at the
+beginning of our :ref:`examples-simple-posting-example`.  The only adjustment
+was to add a new signal from re-arming our tazor (READY).
+
+Here are the state methods for the diagram:
 
 .. code-block:: python
+  :emphasize-lines: 15-16
 
   @spy_on
   def tazor_operating(ao, e):
@@ -521,6 +525,9 @@ our :ref:`examples-simple-posting-example`.  Let's write's state methods first.
     elif(e.signal == signals.TRIGGER_PULLED):
       ao.recall()
       status = state.HANDLED
+    # added this so we can rearm our tazor
+    elif(e.signal == signals.READY):
+      status = ao.trans(arming)
     elif(e.signal == signals.CAPACITOR_CHARGE):
       print("zapping")
       status = ao.trans(tazor_operating)

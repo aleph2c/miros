@@ -580,8 +580,10 @@ until all of the deferred <strong>B</strong> items in the active object queue ar
 Your victim should be laying on the floor now.</p>
 <p>So, there you have it, a very simple rendition of a tazor, our statechart could
 have look like this:</p>
-<img alt="_images/tazor.svg" src="_images/tazor.svg" /><p>This diagram is topologically the same as the one described at the beginning of
-our <a class="reference internal" href="#examples-simple-posting-example"><span class="std std-ref">Simple Posting Example</span></a>.  Let’s write’s state methods first.</p>
+<img alt="_images/tazor.svg" src="_images/tazor.svg" /><p>This diagram is almost topologically the same as the one described at the
+beginning of our <a class="reference internal" href="#examples-simple-posting-example"><span class="std std-ref">Simple Posting Example</span></a>.  The only adjustment
+was to add a new signal from re-arming our tazor (READY).</p>
+<p>Here are the state methods for the diagram:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">tazor_operating</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
@@ -595,7 +597,10 @@ our <a class="reference internal" href="#examples-simple-posting-example"><span 
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TRIGGER_PULLED</span><span class="p">):</span>
     <span class="n">ao</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">CAPACITOR_CHARGE</span><span class="p">):</span>
+  <span class="c1"># added this so we can rearm our tazor</span>
+<span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">READY</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">arming</span><span class="p">)</span>
+</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">CAPACITOR_CHARGE</span><span class="p">):</span>
     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;zapping&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">tazor_operating</span><span class="p">)</span>
   <span class="k">else</span><span class="p">:</span>
