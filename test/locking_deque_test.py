@@ -1,6 +1,6 @@
 import pytest
 from miros.activeobject import LockingDeque
-from miros.hsm import Hsm
+from miros.hsm import HsmWithQueues
 from threading import Thread, Event
 import time
 
@@ -108,8 +108,8 @@ def test_that_queues_match_on_appendleft(task_setup):
 
 @pytest.mark.locking_deque
 def test_that_deque_overflows_properly(task_setup):
-  total_deque_items = Hsm.QUEUE_SIZE
-  top_item = Hsm.QUEUE_SIZE - 1
+  total_deque_items = HsmWithQueues.QUEUE_SIZE
+  top_item = HsmWithQueues.QUEUE_SIZE - 1
   # locking_deque, shared_variable, fn to start a task
   ld, event, start_thread = task_setup
   thread = start_thread()
@@ -117,7 +117,7 @@ def test_that_deque_overflows_properly(task_setup):
   # place a bunch of things into the deque
   for i in range(0, total_deque_items):
     ld.append(i)
-  assert(len(ld.deque) == Hsm.QUEUE_SIZE)
+  assert(len(ld.deque) == HsmWithQueues.QUEUE_SIZE)
   assert(ld.deque.popleft() == 0)
   ld.deque.appendleft(0)
   ld.append(2000)
@@ -128,7 +128,7 @@ def test_that_deque_overflows_properly(task_setup):
 
 @pytest.mark.locking_deque
 def test_that_deque_can_clear_without_task(task_setup):
-  total_deque_items = Hsm.QUEUE_SIZE
+  total_deque_items = HsmWithQueues.QUEUE_SIZE
   ld, event, start_thread = task_setup
   # don't start our thread
   for i in range(0, total_deque_items):

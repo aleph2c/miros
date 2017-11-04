@@ -1113,7 +1113,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       # fn is _print_trace_if_live
       result = fn(self)
       if self.instrumented and self.live_spy:
-        for line in self.rtc.spy:
+        for line in list(self.rtc.spy):
           print(line)
       return result
     return _print_spy_if_live
@@ -1284,25 +1284,3 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def spy_full(self):
     return list(self.full.spy)
 
-
-class Hsm(HsmWithQueues):
-  '''A HsmWithQueues with a stolen top state'''
-  def __init__(self, instrumented=True):
-    super().__init__(instrumented)
-
-  @append_queue_reflection_after_start
-  @trace_on_start
-  @spy_on_start
-  def start_at(self, initial_state):
-    '''
-    Example::
-      hsm = Hsm()
-      # build it
-      hsm.start(<starting_state_function>)
-    '''
-    self.state.fun = self.top
-    self.temp.fun  = initial_state
-    self.init()
-
-  def next_rtc(self):
-    super().next_rtc()

@@ -10,7 +10,6 @@ from queue       import PriorityQueue, Queue
 from threading   import Event as ThreadEventLib
 
 # from this package
-from miros.hsm   import Hsm
 from miros.hsm   import HsmWithQueues
 from miros.event import signals, Signal
 from miros.event import Event as HsmEvent
@@ -352,8 +351,8 @@ class LockingDeque():
   '''
 
   def __init__(self, *args, **kwargs):
-    self.deque         = deque(maxlen=Hsm.QUEUE_SIZE)
-    self.locking_queue = Queue(maxsize=Hsm.QUEUE_SIZE)
+    self.deque         = deque(maxlen=HsmWithQueues.QUEUE_SIZE)
+    self.locking_queue = Queue(maxsize=HsmWithQueues.QUEUE_SIZE)
 
   def get(self, block=True, timeout=None):
     '''block on the locking queue, popleft from deque'''
@@ -419,7 +418,7 @@ class ActiveObjectOutOfPostedEventResources(Exception):
   pass
 
 
-class ActiveObject(Hsm):
+class ActiveObject(HsmWithQueues):
   def __init__(self, name=None, instrumented=True):
     super().__init__(instrumented)
     self.locking_deque = LockingDeque()
