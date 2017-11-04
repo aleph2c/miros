@@ -68,7 +68,7 @@ def middle(ao, e):
     multi_shot_thread = \
       ao.post_fifo(Event(signal=signals.A),
                       times=3,
-                      period=1.0,
+                      period=0.1,
                       deferred=True)
     # We mark up the ao with this id, so that
     # state function can be used by many different aos
@@ -113,14 +113,6 @@ def fabric_fixture(request):
   ActiveFabric().clear()
 
 
-@pytest.mark.postings
-def test_interior_postings_example(fabric_fixture):
-  ao = ActiveObject()
-  ao.start_at(middle)
-  time.sleep(4.0)
-  ao.post_fifo(Event(signal=signals.D))
-  time.sleep(0.1)  # if you don't wait it won't look like it is working
-  pp(ao.spy_full())
 
 
 ################################################################################
@@ -187,7 +179,7 @@ def arming(ao, e):
     multi_shot_thread = \
       ao.post_fifo(Event(signal=signals.BATTERY_CHARGE),
                       times=3,
-                      period=1.0,
+                      period=0.1,
                       deferred=True)
     # We mark up the ao with this id, so that
     # state function can be used by many different aos
@@ -225,27 +217,153 @@ def armed(ao, e):
 
 
 @pytest.mark.postings
-def test_tazoro_example(fabric_fixture):
+def test_interior_postings_example(fabric_fixture):
+  ao = ActiveObject()
+  ao.start_at(middle)
+  time.sleep(0.4)
+  ao.post_fifo(Event(signal=signals.D))
+  time.sleep(0.1)  # if you don't wait it won't look like it is working
+  assert( ao.spy_full() == \
+    ['START',
+     'SEARCH_FOR_SUPER_SIGNAL:middle',
+     'SEARCH_FOR_SUPER_SIGNAL:outer',
+     'ENTRY_SIGNAL:outer',
+     'ENTRY_SIGNAL:middle',
+     'INIT_SIGNAL:middle',
+     '<- Queued:(0) Deferred:(0)',
+     'A:middle',
+     'SEARCH_FOR_SUPER_SIGNAL:inner',
+     'ENTRY_SIGNAL:inner',
+     'POST_DEFERRED:B',
+     'INIT_SIGNAL:inner',
+     '<- Queued:(0) Deferred:(1)',
+     'A:inner',
+     'A:middle',
+     'EXIT_SIGNAL:inner',
+     'SEARCH_FOR_SUPER_SIGNAL:inner',
+     'ENTRY_SIGNAL:inner',
+     'POST_DEFERRED:B',
+     'INIT_SIGNAL:inner',
+     '<- Queued:(0) Deferred:(2)',
+     'A:inner',
+     'A:middle',
+     'EXIT_SIGNAL:inner',
+     'SEARCH_FOR_SUPER_SIGNAL:inner',
+     'ENTRY_SIGNAL:inner',
+     'POST_DEFERRED:B',
+     'INIT_SIGNAL:inner',
+     '<- Queued:(0) Deferred:(3)',
+     'D:inner',
+     'D:middle',
+     'D:outer',
+     'POST_FIFO:B',
+     'D:outer:HOOK',
+     '<- Queued:(1) Deferred:(2)',
+     'B:inner',
+     'B:middle',
+     'B:outer',
+     'EXIT_SIGNAL:inner',
+     'EXIT_SIGNAL:middle',
+     'EXIT_SIGNAL:outer',
+     'ENTRY_SIGNAL:outer',
+     'POST_FIFO:B',
+     'RECALL:B',
+     'INIT_SIGNAL:outer',
+     '<- Queued:(1) Deferred:(1)',
+     'B:outer',
+     'EXIT_SIGNAL:outer',
+     'ENTRY_SIGNAL:outer',
+     'POST_FIFO:B',
+     'RECALL:B',
+     'INIT_SIGNAL:outer',
+     '<- Queued:(1) Deferred:(0)',
+     'B:outer',
+     'EXIT_SIGNAL:outer',
+     'ENTRY_SIGNAL:outer',
+     'INIT_SIGNAL:outer',
+     '<- Queued:(0) Deferred:(0)'])
+
+
+@pytest.mark.tazor
+@pytest.mark.postings
+def test_tazor_example(fabric_fixture):
   tazor = ActiveObject()
   tazor.start_at(arming)
-  time.sleep(4.0)
+  time.sleep(0.4)
   tazor.post_fifo(Event(signal=signals.TRIGGER_PULLED))
-  time.sleep(2.1)  # if you don't wait it won't look like it is working
-  pp(tazor.spy_full())
+  time.sleep(0.1)  # if you don't wait it won't look like it is working
+  assert(tazor.spy_full() ==
+    ['START',
+     'SEARCH_FOR_SUPER_SIGNAL:arming',
+     'SEARCH_FOR_SUPER_SIGNAL:tazor_operating',
+     'ENTRY_SIGNAL:tazor_operating',
+     'ENTRY_SIGNAL:arming',
+     'INIT_SIGNAL:arming',
+     '<- Queued:(0) Deferred:(0)',
+     'BATTERY_CHARGE:arming',
+     'SEARCH_FOR_SUPER_SIGNAL:armed',
+     'ENTRY_SIGNAL:armed',
+     'POST_DEFERRED:CAPACITOR_CHARGE',
+     'INIT_SIGNAL:armed',
+     '<- Queued:(0) Deferred:(1)',
+     'BATTERY_CHARGE:armed',
+     'BATTERY_CHARGE:arming',
+     'EXIT_SIGNAL:armed',
+     'SEARCH_FOR_SUPER_SIGNAL:armed',
+     'ENTRY_SIGNAL:armed',
+     'POST_DEFERRED:CAPACITOR_CHARGE',
+     'INIT_SIGNAL:armed',
+     '<- Queued:(0) Deferred:(2)',
+     'BATTERY_CHARGE:armed',
+     'BATTERY_CHARGE:arming',
+     'EXIT_SIGNAL:armed',
+     'SEARCH_FOR_SUPER_SIGNAL:armed',
+     'ENTRY_SIGNAL:armed',
+     'POST_DEFERRED:CAPACITOR_CHARGE',
+     'INIT_SIGNAL:armed',
+     '<- Queued:(0) Deferred:(3)',
+     'TRIGGER_PULLED:armed',
+     'TRIGGER_PULLED:arming',
+     'TRIGGER_PULLED:tazor_operating',
+     'POST_FIFO:CAPACITOR_CHARGE',
+     'TRIGGER_PULLED:tazor_operating:HOOK',
+     '<- Queued:(1) Deferred:(2)',
+     'CAPACITOR_CHARGE:armed',
+     'CAPACITOR_CHARGE:arming',
+     'CAPACITOR_CHARGE:tazor_operating',
+     'EXIT_SIGNAL:armed',
+     'EXIT_SIGNAL:arming',
+     'EXIT_SIGNAL:tazor_operating',
+     'ENTRY_SIGNAL:tazor_operating',
+     'POST_FIFO:CAPACITOR_CHARGE',
+     'RECALL:CAPACITOR_CHARGE',
+     'INIT_SIGNAL:tazor_operating',
+     '<- Queued:(1) Deferred:(1)',
+     'CAPACITOR_CHARGE:tazor_operating',
+     'EXIT_SIGNAL:tazor_operating',
+     'ENTRY_SIGNAL:tazor_operating',
+     'POST_FIFO:CAPACITOR_CHARGE',
+     'RECALL:CAPACITOR_CHARGE',
+     'INIT_SIGNAL:tazor_operating',
+     '<- Queued:(1) Deferred:(0)',
+     'CAPACITOR_CHARGE:tazor_operating',
+     'EXIT_SIGNAL:tazor_operating',
+     'ENTRY_SIGNAL:tazor_operating',
+     'INIT_SIGNAL:tazor_operating',
+     '<- Queued:(0) Deferred:(0)'])
   print(tazor.trace())
 
 
 @pytest.mark.tazor
+@pytest.mark.postings
+@pytest.mark.live_spy
+@pytest.mark.live_trace
 def test_live_spys(fabric_fixture):
   tazor = ActiveObject()
   tazor.live_spy = True
   tazor.live_trace = True
   tazor.start_at(arming)
-  #pp(tazor.rtc.spy)
-  time.sleep(2.0)
-  # tazor.post_fifo(Event(signal=signals.READY))
-  # time.sleep(4.0)
-  # tazor.post_fifo(Event(signal=signals.TRIGGER_PULLED))
-  # time.sleep(3.0)
+  time.sleep(0.1)
+  tazor.post_fifo(Event(signal=signals.READY))
 
 
