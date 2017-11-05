@@ -4,7 +4,7 @@ from miros.hsm import spy_on
 from miros.event import signals, Event
 from miros.event import return_status as state
 from miros.activeobject import ActiveObject
-from test import pp
+from test import pp, stripped
 
 
 ################################################################################
@@ -339,10 +339,10 @@ def test_tazor_example(fabric_fixture):
   print(tazor.trace())
 
 
-@pytest.mark.tazor
 @pytest.mark.postings
 @pytest.mark.live_spy
 @pytest.mark.live_trace
+@pytest.mark.tazor
 def test_live_spys(fabric_fixture):
   tazor = ActiveObject()
   tazor.live_spy = True
@@ -353,5 +353,22 @@ def test_live_spys(fabric_fixture):
   time.sleep(0.1)
   # print(tazor.trace())
   pp(tazor.spy())
+
+
+@pytest.mark.tazor
+def test_trace_testing(fabric_fixture):
+  tazor = ActiveObject()
+  tazor.start_at(arming)
+  time.sleep(0.4)
+  target_with_timestamp = tazor.trace()
+  other_with_timestamp = tazor.trace()
+
+  with stripped(target_with_timestamp, other_with_timestamp) as (target_without_timestamp, other_without_timestamp):
+    for target_item, other_item in zip(target_without_timestamp,
+                                       other_without_timestamp):
+      assert(target_item == other_item)
+
+
+
 
 
