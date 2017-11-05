@@ -1086,24 +1086,32 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       return result
     return _print_spy_if_live
 
+  def trace_tuple_to_formatted_string(self, tr):
+    if self.name is None:
+      name = 'None'
+    else:
+      name = self.name
+    if tr.signal is None:
+      signal = 'start_at'
+    else:
+      signal = tr.signal
+
+    strace = "[{}] [{}] e->{}() {}->{}\n".format(
+        datetime.strftime(tr.datetime, "%Y-%m-%d %H:%M:%S.%f"),
+        name,
+        signal,
+        tr.start_state,
+        tr.end_state)
+    return strace
+
   def print_trace_after_at_start_if_live(fn):
     def _print_trace_if_live(self, initial_state):
       # fn is next_rtc/start_at
       result = fn(self, initial_state)
-      if self.name is None:
-        name = 'None'
-      else:
-        name = self.name
-
       if self.instrumented and self.live_trace:
         strace = "\n"
         tr = self.full.trace[-1]
-        strace += "{} [{}] {}: {}->{}\n".format(
-            datetime.strftime(tr.datetime, "%H:%M:%S.%f"),
-            name,
-            tr.signal,
-            tr.start_state,
-            tr.end_state)
+        strace  += self.trace_tuple_to_formatted_string(tr)
         print(strace)
       return result
     return _print_trace_if_live
@@ -1122,20 +1130,10 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     def _print_trace_if_live(self):
       # fn is next_rtc/start_at
       result = fn(self)
-      if self.name is None:
-        name = 'None'
-      else:
-        name = self.name
-
       if self.instrumented and self.live_trace:
         strace = "\n"
         tr = self.full.trace[-1]
-        strace += "{} [{}] {}: {}->{}\n".format(
-            datetime.strftime(tr.datetime, "%H:%M:%S.%f"),
-            name,
-            tr.signal,
-            tr.start_state,
-            tr.end_state)
+        strace += self.trace_tuple_to_formatted_string(tr)
         print(strace)
       return result
     return _print_trace_if_live
@@ -1263,19 +1261,15 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
 
     Example::
       print(chart.trace())
-        05:23:25.314420 [c] None: top->hsm_queues_graph_g1_s22
-        05:23:25.314420 [c] D: hsm_queues_graph_g1_s22->hsm_queues_graph_g1_s1
-        05:23:25.314420 [c] E: hsm_queues_graph_g1_s1->hsm_queues_graph_g1_s01
-        05:23:25.314420 [c] F: hsm_queues_graph_g1_s01->hsm_queues_graph_g1_s2111
-        05:23:25.314420 [c] A: hsm_queues_graph_g1_s2111->hsm_queues_graph_g1_s321
+        [05:23:25.314420] [c] None: top->hsm_queues_graph_g1_s22
+        [05:23:25.314420] [c] D: hsm_queues_graph_g1_s22->hsm_queues_graph_g1_s1
+        [05:23:25.314420] [c] E: hsm_queues_graph_g1_s1->hsm_queues_graph_g1_s01
+        [05:23:25.314420] [c] F: hsm_queues_graph_g1_s01->hsm_queues_graph_g1_s2111
+        [05:23:25.314420] [c] A: hsm_queues_graph_g1_s2111->hsm_queues_graph_g1_s321
     '''
     strace = "\n"
     for tr in self.full.trace:
-      strace += "{} [c] {}: {}->{}\n".format(
-        datetime.strftime(tr.datetime, "%H:%M:%S.%f"),
-        tr.signal,
-        tr.start_state,
-        tr.end_state)
+      strace += self.trace_tuple_to_formatted_string(tr)
     return strace
 
   def spy_rtc(self):

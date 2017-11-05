@@ -638,20 +638,15 @@ class ActiveObject(HsmWithQueues):
 
     Example:
     print(chart.trace())
-      05:23:25.314420 [<state_name>] None: top->hsm_queues_graph_g1_s22
-      05:23:25.314420 [<state_name>] D: hsm_queues_graph_g1_s22->hsm_queues_graph_g1_s1
-      05:23:25.314420 [<state_name>] E: hsm_queues_graph_g1_s1->hsm_queues_graph_g1_s01
-      05:23:25.314420 [<state_name>] F: hsm_queues_graph_g1_s01->hsm_queues_graph_g1_s2111
-      05:23:25.314420 [<state_name>] A: hsm_queues_graph_g1_s2111->hsm_queues_graph_g1_s321
+      [05:23:25.314420] [<state_name>] start_at(): top->hsm_queues_graph_g1_s22
+      [05:23:25.314420] [<state_name>] D->(): hsm_queues_graph_g1_s22->hsm_queues_graph_g1_s1
+      [05:23:25.314420] [<state_name>] E->(): hsm_queues_graph_g1_s1->hsm_queues_graph_g1_s01
+      [05:23:25.314420] [<state_name>] F->(): hsm_queues_graph_g1_s01->hsm_queues_graph_g1_s2111
+      [05:23:25.314420] [<state_name>] A->(): hsm_queues_graph_g1_s2111->hsm_queues_graph_g1_s321
     '''
     strace = "\n"
     for tr in self.full.trace:
-      strace += "{} [{}] {}: {}->{}\n".format(
-        datetime.strftime(tr.datetime, "%H:%M:%S.%f"),
-        self.name,
-        tr.signal,
-        tr.start_state,
-        tr.end_state)
+      strace += self.trace_tuple_to_formatted_string(tr)
     return strace
 
   def __post_event(self, e, times=1, period=None, deferred=True, queue_type='fifo'):

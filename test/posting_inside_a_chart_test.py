@@ -1,7 +1,6 @@
 import time
 import pytest
 from miros.hsm import spy_on
-from miros.hsm import HsmWithQueues
 from miros.event import signals, Event
 from miros.event import return_status as state
 from miros.activeobject import ActiveObject, ActiveFabric
@@ -365,5 +364,8 @@ def test_live_spys(fabric_fixture):
   tazor.start_at(arming)
   time.sleep(0.1)
   tazor.post_fifo(Event(signal=signals.READY))
+  time.sleep(0.1)
+  #print(tazor.trace())
+  # pp(tazor.spy())
 
 

@@ -60,7 +60,7 @@ If you know how to use the library and just need to know how to implement someth
 using a programming example, jump to the :ref:`recipes` section.  It contains
 examples of the small lego blocks you will need to build up your structure.
 
-If you would like to expand your architectural abilities, read the patterns
+If you would like to expand your architectural abilities, read the :ref:`patterns`
 section.
 
 The library is called miros in honor of `Dr. Miro Samek`_ who has written so much
