@@ -131,14 +131,6 @@ def b1_s3(chart, e):
   return status
 
 
-@pytest.fixture
-def fabric_fixture(request):
-  yield
-  # shut down the active fabric for the next test
-  ActiveFabric().stop()
-  ActiveFabric().clear()
-
-
 @pytest.mark.aos
 def test_import(fabric_fixture):
   ao = ActiveObject()

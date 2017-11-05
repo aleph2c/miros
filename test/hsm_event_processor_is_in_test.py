@@ -160,16 +160,6 @@ def is_in_graph_e1_s5(chart, e):
   return status
 
 
-@pytest.fixture
-def spy_chart(request):
-  chart = HsmEventProcessor()
-  spy   = []
-  chart.augment(other=spy, name="spy_log")
-  yield chart
-  del spy
-  del chart
-
-
 # grep test name to view diagram
 @pytest.mark.is_in
 def test1_is_in_1(spy_chart):

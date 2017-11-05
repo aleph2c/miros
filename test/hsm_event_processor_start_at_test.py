@@ -332,16 +332,6 @@ def init_graph_2_d311(chart, e):
   return status
 
 
-@pytest.fixture
-def spy_chart(request):
-  chart = HsmEventProcessor()
-  spy   = []
-  chart.augment(other=spy, name="spy_log")
-  yield chart
-  del spy
-  del chart
-
-
 @pytest.mark.init
 def test_start_at_test_1(spy_chart):
   chart = spy_chart

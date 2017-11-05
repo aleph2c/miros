@@ -3,12 +3,8 @@ import pytest
 from miros.hsm import spy_on
 from miros.event import signals, Event
 from miros.event import return_status as state
-from miros.activeobject import ActiveObject, ActiveFabric
-import pprint
-
-
-def pp(item):
-  pprint.pprint(item)
+from miros.activeobject import ActiveObject
+from test import pp
 
 
 ################################################################################
@@ -102,16 +98,6 @@ def inner(ao, e):
   else:
     status, ao.temp.fun = state.SUPER, middle
   return status
-
-
-@pytest.fixture
-def fabric_fixture(request):
-  yield
-  # shut down the active fabric for the next test
-  ActiveFabric().stop()
-  ActiveFabric().clear()
-
-
 
 
 ################################################################################
@@ -365,7 +351,7 @@ def test_live_spys(fabric_fixture):
   time.sleep(0.1)
   tazor.post_fifo(Event(signal=signals.READY))
   time.sleep(0.1)
-  #print(tazor.trace())
-  # pp(tazor.spy())
+  # print(tazor.trace())
+  pp(tazor.spy())
 
 

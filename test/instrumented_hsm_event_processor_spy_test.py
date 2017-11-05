@@ -676,7 +676,7 @@ def spy_graph_g1_s321(chart, e):
 
 
 @pytest.fixture
-def spy_chart(request):
+def spy_on_instrumented_hsm(request):
   chart = InstrumentedHsmEventProcessor()
   spy   = []
   chart.augment(other=spy, name="spy")
@@ -732,7 +732,7 @@ def test_spy_topology_a_2():
 
 @pytest.mark.internalspy
 @pytest.mark.topology_b
-def test_spy_topology_b1_1(spy_chart):
+def test_spy_topology_b1_1(spy_on_instrumented_hsm):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
@@ -756,7 +756,7 @@ def test_spy_topology_b1_1(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.dispatch
-def test_spy_topology_b1_2(spy_chart):
+def test_spy_topology_b1_2(spy_on_instrumented_hsm):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
    [
@@ -784,7 +784,7 @@ def test_spy_topology_b1_2(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_c
-def test_spy_topology_c1_1(spy_chart):
+def test_spy_topology_c1_1(spy_on_instrumented_hsm):
   chart   = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
@@ -805,7 +805,7 @@ def test_spy_topology_c1_1(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_c
-def test_spy_topology_c1_3(spy_chart):
+def test_spy_topology_c1_3(spy_on_instrumented_hsm):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
@@ -852,7 +852,7 @@ def test_spy_topology_c2_1():
 
 @pytest.mark.internalspy
 @pytest.mark.topology_c
-def test_spy_topology_c2_2(spy_chart):
+def test_spy_topology_c2_2(spy_on_instrumented_hsm):
   chart   = InstrumentedHsmEventProcessor()
   expected_behavior = \
   ['START',
@@ -876,7 +876,7 @@ def test_spy_topology_c2_2(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_d
-def test_spy_topology_d1_1(spy_chart):
+def test_spy_topology_d1_1(spy_on_instrumented_hsm):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
@@ -898,7 +898,7 @@ def test_spy_topology_d1_1(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_d
-def test_spy_topology_d1_2(spy_chart):
+def test_spy_topology_d1_2(spy_on_instrumented_hsm):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
@@ -923,7 +923,7 @@ def test_spy_topology_d1_2(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_e
-def test_spy_topology_e1_1(spy_chart):
+def test_spy_topology_e1_1(spy_on_instrumented_hsm):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
@@ -970,7 +970,7 @@ def test_spy_topology_e1_1(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_e
-def test_spy_topology_e1_2(spy_chart):
+def test_spy_topology_e1_2(spy_on_instrumented_hsm):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
@@ -1010,7 +1010,7 @@ def test_spy_topology_e1_2(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_e
-def test_spy_topology_e1_3(spy_chart):
+def test_spy_topology_e1_3(spy_on_instrumented_hsm):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
@@ -1044,7 +1044,7 @@ def test_spy_topology_e1_3(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_e
-def test_spy_topology_e1_4(spy_chart):
+def test_spy_topology_e1_4(spy_on_instrumented_hsm):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
@@ -1081,7 +1081,7 @@ def test_spy_topology_e1_4(spy_chart):
   assert(list(chart.full.spy) == expected_behavior)
 
 
-def test_spy_topology_e1_5(spy_chart):
+def test_spy_topology_e1_5(spy_on_instrumented_hsm):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
@@ -1109,7 +1109,7 @@ def test_spy_topology_e1_5(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_f
-def test_spy_topology_f1_1(spy_chart):
+def test_spy_topology_f1_1(spy_on_instrumented_hsm):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
@@ -1142,7 +1142,7 @@ def test_spy_topology_f1_1(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_f
-def test_spy_topology_f1_2(spy_chart):
+def test_spy_topology_f1_2(spy_on_instrumented_hsm):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
    ['START',
@@ -1171,7 +1171,7 @@ def test_spy_topology_f1_2(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_f
-def test_spy_topology_f1_3(spy_chart):
+def test_spy_topology_f1_3(spy_on_instrumented_hsm):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
@@ -1195,8 +1195,8 @@ def test_spy_topology_f1_3(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_g
-def test_spy_topology_g1_1(spy_chart):
-  chart = spy_chart
+def test_spy_topology_g1_1(spy_on_instrumented_hsm):
+  chart = spy_on_instrumented_hsm
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_g1_s2111',
@@ -1276,7 +1276,7 @@ def test_spy_topology_g1_2():
 
 @pytest.mark.internalspy
 @pytest.mark.topology_g
-def test_spy_topology_g1_3(spy_chart):
+def test_spy_topology_g1_3(spy_on_instrumented_hsm):
   chart = InstrumentedHsmEventProcessor()
   expected_behavior = \
     ['START',
@@ -1304,8 +1304,8 @@ def test_spy_topology_g1_3(spy_chart):
 
 @pytest.mark.internalspy
 @pytest.mark.topology_h
-def test_spy_topology_g1_4(spy_chart):
-  chart = spy_chart
+def test_spy_topology_g1_4(spy_on_instrumented_hsm):
+  chart = spy_on_instrumented_hsm
   expected_behavior = \
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:spy_graph_g1_s321',

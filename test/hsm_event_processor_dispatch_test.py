@@ -937,22 +937,6 @@ def dispatch_graph_g1_s321(chart, e):
   return status
 
 
-@pytest.fixture
-def spy_chart(request):
-  chart = HsmEventProcessor()
-  spy   = []
-  chart.augment(other=spy, name="spy_log")
-  Signal().append("A")
-  Signal().append("B")
-  Signal().append("C")
-  Signal().append("D")
-  Signal().append("E")
-  Signal().append("F")
-  yield chart
-  del spy
-  del chart
-
-
 # grep test name to view diagram
 @pytest.mark.dispatch
 @pytest.mark.topology_a

@@ -194,14 +194,6 @@ def g1_s321_active_objects_graph(chart, e):
   return status
 
 
-@pytest.fixture
-def fabric_fixture(request):
-  yield
-  # shut down the active fabric for the next test
-  ActiveFabric().stop()
-  ActiveFabric().clear()
-
-
 @pytest.mark.ao
 def test_import(fabric_fixture):
   ao = ActiveObject()

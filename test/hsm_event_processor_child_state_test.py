@@ -163,22 +163,6 @@ def child_state_graph_e1_s5(chart, e):
   return status
 
 
-@pytest.fixture
-def spy_chart(request):
-  chart = HsmEventProcessor()
-  spy   = []
-  chart.augment(other=spy, name="spy_log")
-  signals.append("A")
-  signals.append("B")
-  signals.append("C")
-  signals.append("D")
-  signals.append("E")
-  signals.append("F")
-  yield chart
-  del spy
-  del chart
-
-
 # grep test name to view diagram
 @pytest.mark.child_state
 def test1_child_state_1(spy_chart):

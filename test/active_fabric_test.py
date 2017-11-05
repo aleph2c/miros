@@ -9,7 +9,6 @@ import pprint
 def pp(item):
   pprint.pprint(item)
 
-
 @pytest.mark.pubsub
 def test_active_fabric_singleton():
   af1 = ActiveFabric()
@@ -58,14 +57,6 @@ def test_clear_feature():
   assert(af1.lifo_fabric_queue.empty() is True)
   assert(af1.lifo_subscriptions == {})
   assert(af1.fifo_subscriptions == {})
-
-
-@pytest.fixture
-def fabric_fixture(request):
-  yield
-  # shut down the active fabric for the next test
-  ActiveFabric().stop()
-  ActiveFabric().clear()
 
 
 @pytest.mark.pubsub
