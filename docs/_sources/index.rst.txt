@@ -18,9 +18,8 @@
    examples
    recipes
    patterns
+   testing
    architecture
-
-
 
 Indices and tables
 ------------------

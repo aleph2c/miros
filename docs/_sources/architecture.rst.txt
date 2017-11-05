@@ -1,6 +1,9 @@
-Library Architecture
-=================================
-How the package is put together
+.. _architecture-architecture:
+
+Architecture
+============
+
+How the miros library is structured.
 
 .. toctree::
    :maxdepth: 2
