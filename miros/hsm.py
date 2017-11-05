@@ -1284,3 +1284,6 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def spy_full(self):
     return list(self.full.spy)
 
+  def spy(self):
+    return self.spy_full()
+
