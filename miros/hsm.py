@@ -106,10 +106,12 @@ Example::
                                          # features
 
 """
+import re
 import pprint
 from datetime    import datetime
 from miros.event import signals, return_status, Event
 from collections import namedtuple, deque
+from contextlib  import contextmanager
 
 
 def pp(item):
@@ -1280,4 +1282,65 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
 
   def spy(self):
     return self.spy_full()
+
+@contextmanager
+def stripped(log):
+  '''Context manager used to compared trace/spy logs stripped of their timestamps
+
+  The timestamp and chart name are expected to be on the front end of the
+  trace/spy, between []:
+
+    [2017-11-05 15:17:39.424492] [75c8c] e->BATTERY_CHARGE() armed->armed
+
+  becomes:
+
+    [75c8c] e->BATTERY_CHARGE() armed->armed
+
+  We want to strip off the timestamp so that we can use the instrumented log as
+  a specification for our design, this should become clear in the examples.
+
+  Example 1:
+    timestamp_trace1 = ao.trace()
+    timestamp_trace2 = ao.trace()  # same to make a point
+
+    with stripped(timestamped_trace1) as twt, \
+         stripped(timestamped_trace2) as otw:
+
+      for target_item, other_item in zip(twt, owt):
+        assert(target_item, other_item)
+
+  Example 2:
+    with stripped('[2017-11-05 15:17:39.424492] [75c8c] e->BATTERY_CHARGE() armed->armed') /
+      as swt:
+      assert(swt == '[75c8c] e->BATTERY_CHARGE() armed->armed')
+
+  '''
+  def item_without_timestamp(item):
+    '''
+    [2017-11-05 15:17:39.424492] [75c8c] e->BATTERY_CHARGE() armed->armed
+    -------- removed -----------
+                                ------------ captured -------------------
+
+    '''
+    try:
+      without_time_stamp = re.findall(r"[ ]{0,}\[[0-9-:. ]+\] (.+)$", item)[0]
+    except:
+      import pdb; pdb.set_trace()
+    return without_time_stamp
+
+  targets = log.splitlines()
+  if len(targets) > 1:
+    stripped_target = []
+    for target_item in targets:
+      target_item = target_item.strip()
+      if len(target_item) != 0:
+        stripped_target_item = item_without_timestamp(target_item)
+        stripped_target.append(stripped_target_item)
+    yield(stripped_target)
+  else:
+    target = log
+    yield(item_without_timestamp(target))
+
+
+
 

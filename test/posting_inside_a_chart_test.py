@@ -1,10 +1,9 @@
 import time
 import pytest
-from miros.hsm import spy_on
+from miros.hsm import spy_on, stripped, pp
 from miros.event import signals, Event
 from miros.event import return_status as state
 from miros.activeobject import ActiveObject
-from test import pp, stripped
 
 
 ################################################################################
@@ -208,7 +207,7 @@ def test_interior_postings_example(fabric_fixture):
   time.sleep(0.4)
   ao.post_fifo(Event(signal=signals.D))
   time.sleep(0.1)  # if you don't wait it won't look like it is working
-  assert( ao.spy_full() == \
+  assert(ao.spy_full() ==
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:middle',
      'SEARCH_FOR_SUPER_SIGNAL:outer',
@@ -361,14 +360,18 @@ def test_trace_testing(fabric_fixture):
   tazor.start_at(arming)
   time.sleep(0.4)
   target_with_timestamp = tazor.trace()
+  print(target_with_timestamp)
   other_with_timestamp = tazor.trace()
 
-  with stripped(target_with_timestamp, other_with_timestamp) as (target_without_timestamp, other_without_timestamp):
-    for target_item, other_item in zip(target_without_timestamp,
-                                       other_without_timestamp):
+  with stripped(target_with_timestamp) as twt, \
+       stripped(other_with_timestamp) as owt:
+
+    for target_item, other_item in zip(twt, owt):
+      print(target_item)
       assert(target_item == other_item)
 
-
+  with stripped('[2017-11-05 15:17:39.424492] [75c8c] e->BATTERY_CHARGE() armed->armed') as swt:
+    assert(swt == '[75c8c] e->BATTERY_CHARGE() armed->armed')
 
 
 
