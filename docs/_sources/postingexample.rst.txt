@@ -501,6 +501,8 @@ Your victim should be laying on the floor now.
 So, there you have it, a very simple rendition of a tazor, our statechart could
 have look like this:
 
+.. _examples-tazor-example:
+
 .. image:: _static/tazor.svg
 
 This diagram is almost topologically the same as the one described at the

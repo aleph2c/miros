@@ -1202,6 +1202,7 @@ def test_trans_topology_e1_1(spy_chart):
   # pp(chart.spy_log)
   assert(chart.spy_log == expected_behavior)
 
+
 @pytest.mark.dispatch
 @pytest.mark.topology_e
 def test_trans_topology_e1_2(spy_chart):
@@ -1239,6 +1240,7 @@ def test_trans_topology_e1_2(spy_chart):
   chart.dispatch(e=event)
   # pp(chart.spy_log)
   assert(chart.spy_log == expected_behavior)
+
 
 @pytest.mark.dispatch
 @pytest.mark.topology_e

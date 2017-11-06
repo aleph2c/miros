@@ -121,6 +121,39 @@ of your design.</p>
 </div>
 <div class="section" id="a-high-level-description-of-the-behavior">
 <span id="reflection-a-high-level-description-of-the-behavior"></span><h2>A High Level Description of The Behavior<a class="headerlink" href="#a-high-level-description-of-the-behavior" title="Permalink to this headline">¶</a></h2>
+<p>If you would like to see what your active object is doing from a very high
+level, you can look at it’s <cite>trace</cite> instrumentation.  The trace will only
+create a log item if a state transition has occurred. Each line in the <cite>trace</cite>
+will contain:</p>
+<ol class="arabic simple">
+<li>A datetime stamp between square brackets</li>
+<li>The active object name, between square brackets</li>
+<li>The event that caused the transition, its signal number and its payload</li>
+<li>The starting state</li>
+<li>The ending state</li>
+</ol>
+<p>If you haven’t named your active object, a unique identifier is given to it,
+and the first 5 characters of this unique identifier will be used in the trace.
+The reason that an identifier is given to it is so that the trace outputs, from
+multiple active objects, can be distinguished from one another.</p>
+<p>Suppose you have built the tazor active object described in the <a class="reference internal" href="postingexample.html#examples-tazor-example"><span class="std std-ref">second
+example</span></a>. Suppose you named this active object <cite>tazor</cite>:
+To see the trace you would type:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">tazor</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This would output the following trace:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="hll"><span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mo">06</span> <span class="mi">08</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">28.268873</span><span class="p">]</span> <span class="p">[</span><span class="mi">75</span><span class="n">c8c</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">arming</span>
+</span><span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mo">06</span> <span class="mi">08</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">26.312241</span><span class="p">]</span> <span class="p">[</span><span class="mi">75</span><span class="n">c8c</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">BATTERY_CHARGE</span><span class="p">()</span> <span class="n">arming</span><span class="o">-&gt;</span><span class="n">armed</span>
+<span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mo">06</span> <span class="mi">08</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">26.312241</span><span class="p">]</span> <span class="p">[</span><span class="mi">75</span><span class="n">c8c</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">BATTERY_CHARGE</span><span class="p">()</span> <span class="n">armed</span><span class="o">-&gt;</span><span class="n">armed</span>
+<span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mo">06</span> <span class="mi">08</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">26.312241</span><span class="p">]</span> <span class="p">[</span><span class="mi">75</span><span class="n">c8c</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">BATTERY_CHARGE</span><span class="p">()</span> <span class="n">armed</span><span class="o">-&gt;</span><span class="n">armed</span>
+</pre></div>
+</div>
+<p>Notice that on line one, the signal is called <cite>start_at</cite>.  There is no signal
+called <cite>start_at</cite>, here the trace is actually using the method name <cite>start_at</cite>
+to indicate how the chart was started.</p>
+<p>A trace can be used with the <cite>sequence</cite> project to generate a sequence diagram,
+more about that is described <a class="reference internal" href="#reflection-creating-a-sequence-diagram"><span class="std std-ref">here.</span></a></p>
 </div>
 <div class="section" id="an-extremely-detailed-view-of-the-behavior">
 <span id="reflection-an-extremely-detailed-view"></span><h2>An Extremely Detailed View of the Behavior<a class="headerlink" href="#an-extremely-detailed-view-of-the-behavior" title="Permalink to this headline">¶</a></h2>
