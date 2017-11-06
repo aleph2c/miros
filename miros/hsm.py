@@ -122,7 +122,8 @@ SpyTuple = namedtuple('SpyTuple', ['signal',    'state',
                                    'hook',      'start',
                                    'internal',  'post_lifo',
                                    'post_fifo', 'post_defer',
-                                   'recall',    'ignored'])
+                                   'recall',    'ignored', 
+                                   'datetime'])
 
 
 def spy_tuple(signal     = None,
@@ -134,7 +135,8 @@ def spy_tuple(signal     = None,
               post_fifo  = False,
               post_defer = False,
               recall     = False,
-              ignored    = False
+              ignored    = False,
+              datetime   = datetime.now(),
               ):
   '''This is making it possible to have default settings in the SpyTuple,
      any attribute you need to over-write you can over-write by calling this
@@ -148,7 +150,8 @@ def spy_tuple(signal     = None,
                   post_fifo=post_fifo,
                   post_defer=post_defer,
                   recall=recall,
-                  ignored=ignored
+                  ignored=ignored,
+                  datetime=datetime
                   )
 
 
@@ -212,7 +215,8 @@ def spy_on_start(fn):
         start=True,      hook=False,
         internal=None,   post_lifo=True,
         post_fifo=False, post_defer=False,
-        recall=False,    ignored=False
+        recall=False,    ignored=False,
+        datetime=datetime.now()
     )
     self.rtc.tuples.append(sr)
     # fn is start_at
@@ -1026,22 +1030,23 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
       for sr in self.rtc.tuples:
         if sr.internal is False:
           signal_name = sr.signal
+          dt = sr.datetime
           if sr.hook:
             hooked  = True
             ignored = False
             break
           ignored = sr.ignored
-      return (signal_name, hooked, ignored)
+      return (signal_name, hooked, ignored, dt)
 
     def _append_to_full_trace(self, e):
       start_state = self.state.fun(self, Event(signal=signals.REFLECTION_SIGNAL))
       # fn is append_to_full_spy
       self.rtc.tuples.clear()
       fn(self, e)
-      signal, hooked, ignored = is_signal_hooked_or_ignored(self)
+      signal, hooked, ignored, dt = is_signal_hooked_or_ignored(self)
       if hooked is False and ignored is False:
         t = self.TraceTuple(
-              datetime    = datetime.now(),
+              datetime    = dt,
               start_state = start_state,
               signal      = signal,
               payload     = '',
@@ -1283,6 +1288,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def spy(self):
     return self.spy_full()
 
+
 @contextmanager
 def stripped(log):
   '''Context manager used to compared trace/spy logs stripped of their timestamps
@@ -1320,12 +1326,18 @@ def stripped(log):
     [2017-11-05 15:17:39.424492] [75c8c] e->BATTERY_CHARGE() armed->armed
     -------- removed -----------
                                 ------------ captured -------------------
+    OR
+
+       [2017-11-05 15:17:39.424492] [75c8c] e->BATTERY_CHARGE() armed->armed
+    ===-------- removed -----------
+          (front spaces removed)   ------------ captured -------------------
 
     '''
-    try:
-      without_time_stamp = re.findall(r"[ ]{0,}\[[0-9-:. ]+\] (.+)$", item)[0]
-    except:
-      import pdb; pdb.set_trace()
+    m = re.match(r"[ ]{0,}\[[0-9-:. ]+\] (.+)$", item)
+    if(m is not None):
+      without_time_stamp = m.group(1)
+    else:
+      without_time_stamp = item
     return without_time_stamp
 
   targets = log.splitlines()
@@ -1340,7 +1352,4 @@ def stripped(log):
   else:
     target = log
     yield(item_without_timestamp(target))
-
-
-
 
