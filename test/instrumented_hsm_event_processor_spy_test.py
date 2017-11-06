@@ -1269,7 +1269,7 @@ def test_spy_topology_g1_2():
   chart.start_at(spy_graph_g1_s2111)
   event = Event(signal=signals.B)
   chart.dispatch(e=event)
-  pp(list(chart.full.spy))
+  # pp(list(chart.full.spy))
 
   assert(list(chart.full.spy) == expected_behavior)
 

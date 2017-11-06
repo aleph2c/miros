@@ -44,7 +44,7 @@ def test_trace_topology_a_1():
   chart = InstrumentedHsmEventProcessor()
   chart.start_at(trace_graph_a1_s1)
   chart.dispatch(Event(signal=signals.A))
-  pp(chart.full.trace)
+  # pp(chart.full.trace)
   assert(len(chart.full.trace) == 2)
   start_trace = chart.full.trace[0]
   assert(start_trace.start_state == 'top')
@@ -125,7 +125,7 @@ def trace_graph_g1_s1(chart, e):
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.E):
-    print("handled")
+    # print("handled")
     status = return_status.HANDLED
   else:
     status, chart.temp.fun = return_status.SUPER, chart.top
@@ -228,8 +228,8 @@ def test_trace_topology_g1_1():
   chart = InstrumentedHsmEventProcessor()
   chart.start_at(trace_graph_g1_s2111)
   chart.dispatch(Event(signal=signals.A))
-  pp(chart.full.spy)
-  pp(chart.full.trace)
+  # pp(chart.full.spy)
+  # pp(chart.full.trace)
   assert(len(chart.full.trace) == 2)
   start_trace = chart.full.trace[0]
   assert(start_trace.start_state == 'top')
@@ -247,7 +247,7 @@ def test_trace_topology_g1_2():
   chart = InstrumentedHsmEventProcessor()
   chart.start_at(trace_graph_g1_s2111)
   chart.dispatch(Event(signal=signals.E))
-  pp(chart.full.spy)
-  pp(chart.full.trace)
+  # pp(chart.full.spy)
+  # pp(chart.full.trace)
   # assert(chart.full.spy == expected_behavior)
   assert(len(chart.full.trace) == 1)

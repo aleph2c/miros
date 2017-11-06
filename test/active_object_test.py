@@ -1,8 +1,8 @@
 import time
 import pytest
 import pprint
-from miros.hsm import spy_on
-from miros.activeobject import ActiveObject, ActiveFabric, ActiveObjectOutOfPostedEventResources
+from miros.hsm import spy_on, stripped
+from miros.activeobject import ActiveObject, ActiveObjectOutOfPostedEventResources
 from miros.event import signals, Event, return_status
 
 
@@ -274,6 +274,22 @@ def test_start_stop(fabric_fixture):
      'stop_active_object:g1_s22_active_objects_graph',
      'stop_active_object:g1_s1_active_objects_graph',
      '<- Queued:(0) Deferred:(0)'])
+
+  trace_target = \
+  '''
+  [2017-11-06 05:40:38.272609] [bob] e->start_at() top->g1_s22_active_objects_graph
+  [2017-11-06 05:40:37.216059] [bob] e->E() g1_s22_active_objects_graph->g1_s1_active_objects_graph
+  [2017-11-06 05:40:37.216059] [bob] e->F() g1_s1_active_objects_graph->g1_s01_active_objects_graph
+  [2017-11-06 05:40:37.216059] [bob] e->F() g1_s01_active_objects_graph->g1_s2111_active_objects_graph
+  [2017-11-06 05:40:37.216059] [bob] e->A() g1_s2111_active_objects_graph->g1_s321_active_objects_graph
+  [2017-11-06 05:40:37.216059] [bob] e->stop_active_object() g1_s321_active_objects_graph->g1_s321_active_objects_graph
+  '''
+  with stripped(ao.trace()) as owt, \
+       stripped(trace_target) as twt:
+    for target_item, other_item in zip(twt, owt):
+      # print(target_item)
+      assert(target_item == other_item)
+
   ao.clear_spy()
   assert(ao.spy_full() == [])
 
@@ -397,11 +413,10 @@ def test_you_can_post_the_same_signal_over_and_over(fabric_fixture):
 
 @pytest.mark.ao
 @pytest.mark.post_event
-@pytest.mark.this
 def test_you_can_cancel_an_event_thread(fabric_fixture):
   ao = ActiveObject()
   ao.start_at(posted_event_snitch)
-  print("")
+  # print("")
   # run 2 times fast
   thread_id_a = ao.post_fifo(Event(signal=signals.A),
       deferred=False,
@@ -425,11 +440,11 @@ def test_you_can_cancel_an_event_thread(fabric_fixture):
       times=200,
       period=0.1)
 
-  pp(ao.posted_events_queue)
+  # pp(ao.posted_events_queue)
   assert(len(ao.posted_events_queue) == 4)
   ao.cancel_event(thread_id_f)
   time.sleep(0.2)
-  pp(ao.posted_events_queue)
+  # pp(ao.posted_events_queue)
   assert(len(ao.posted_events_queue) == 3)
   time.sleep(0.5)
   ao.cancel_event(thread_id_g)

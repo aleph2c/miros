@@ -112,6 +112,7 @@ from datetime    import datetime
 from miros.event import signals, return_status, Event
 from collections import namedtuple, deque
 from contextlib  import contextmanager
+from functools   import wraps
 
 
 def pp(item):
@@ -157,6 +158,7 @@ def spy_tuple(signal     = None,
 
 def spy_on(fn):
   '''Instrument a state handling method'''
+  @wraps(fn)
   def _spy_on(chart, *args):
 
     if len(args) == 1:
@@ -207,6 +209,7 @@ def spy_on(fn):
 # it
 def spy_on_start(fn):
   '''instrument the on_start method into the spy log'''
+  @wraps(fn)
   def _spy_on_start(self, initial_state):
     self.init_rtc()
     self.rtc.spy.append("START")
@@ -227,6 +230,7 @@ def spy_on_start(fn):
 
 
 def append_fifo_to_spy(fn):
+  @wraps(fn)
   def _append_fifo_to_spy(self, e):
     fn(self, e)
     if self.instrumented:
@@ -240,6 +244,7 @@ def append_fifo_to_spy(fn):
 # it
 def trace_on_start(fn):
   '''instrument the on_start method into the trace log'''
+  @wraps(fn)
   def _trace_on_start(self, initial_state):
     # fn is _spy_on_start
     status = fn(self, initial_state)
@@ -259,6 +264,7 @@ def trace_on_start(fn):
 
 
 def append_queue_reflection_after_start(fn):
+  @wraps(fn)
   def _append_queue_reflection_after_start(self, initial_state):
     result = fn(self, initial_state)
     self.rtc.spy.append(self.queue_reflection())
@@ -1017,6 +1023,7 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
     super().start_at(initial_state)
 
   def append_to_full_spy(fn):
+    @wraps(fn)
     def _append_to_full_spy(self, e):
       self.rtc.spy.clear()
       # fn is dispatch
@@ -1025,6 +1032,7 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
     return _append_to_full_spy
 
   def append_to_full_trace(fn):
+    @wraps(fn)
     def is_signal_hooked_or_ignored(self):
       signal_name, hooked, ignored = "", False, True
       for sr in self.rtc.tuples:
@@ -1084,6 +1092,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     self.name        = None
 
   def print_spy_after_at_start_if_live(fn):
+    @wraps(fn)
     def _print_spy_if_live(self, initial_state):
       # fn is _print_trace_if_live
       result = fn(self, initial_state)
@@ -1112,6 +1121,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     return strace
 
   def print_trace_after_at_start_if_live(fn):
+    @wraps(fn)
     def _print_trace_if_live(self, initial_state):
       # fn is next_rtc/start_at
       result = fn(self, initial_state)
@@ -1124,6 +1134,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     return _print_trace_if_live
 
   def print_spy_after_rtc_if_live(fn):
+    @wraps(fn)
     def _print_spy_if_live(self):
       # fn is _print_trace_if_live
       result = fn(self)
@@ -1134,6 +1145,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     return _print_spy_if_live
 
   def print_trace_after_rtc_if_live(fn):
+    @wraps(fn)
     def _print_trace_if_live(self):
       # fn is next_rtc/start_at
       result = fn(self)
@@ -1176,6 +1188,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     return "<- Queued:({}) Deferred:({})".format(len(self.queue), len(self.defer_queue))
 
   def append_lifo_to_spy(fn):
+    @wraps(fn)
     def _append_lifo_to_spy(self, e):
       fn(self, e)
       if self.instrumented:
@@ -1185,6 +1198,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     return _append_lifo_to_spy
 
   def append_defer_to_spy(fn):
+    @wraps(fn)
     def _append_defer_to_spy(self, e):
       fn(self, e)
       if self.instrumented:
@@ -1192,6 +1206,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     return _append_defer_to_spy
 
   def append_recall_to_spy(fn):
+    @wraps(fn)
     def _append_recall_to_spy(self):
       e = fn(self)
       if e is not None and self.instrumented:
@@ -1201,6 +1216,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     return _append_recall_to_spy
 
   def append_queue_reflection_to_spy(fn):
+    @wraps(fn)
     def _append_queue_reflection_to_spy(self):
       # fn is _print_spy_if_live
       result = fn(self)
@@ -1313,7 +1329,7 @@ def stripped(log):
          stripped(timestamped_trace2) as otw:
 
       for target_item, other_item in zip(twt, owt):
-        assert(target_item, other_item)
+        assert(target_item == other_item)
 
   Example 2:
     with stripped('[2017-11-05 15:17:39.424492] [75c8c] e->BATTERY_CHARGE() armed->armed') /

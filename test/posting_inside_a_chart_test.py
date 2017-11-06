@@ -6,6 +6,9 @@ from miros.event import return_status as state
 from miros.activeobject import ActiveObject
 
 
+assert(pp)  # to make an irritating pep8 error go away
+
+
 ################################################################################
 #                          Posting Inside of a chart                           #
 ################################################################################
@@ -351,7 +354,7 @@ def test_live_spys(fabric_fixture):
   tazor.post_fifo(Event(signal=signals.READY))
   time.sleep(0.1)
   # print(tazor.trace())
-  pp(tazor.spy())
+  # pp(tazor.spy())
 
 
 @pytest.mark.tazor
@@ -373,5 +376,5 @@ def test_trace_testing(fabric_fixture):
   with stripped('[2017-11-05 15:17:39.424492] [75c8c] e->BATTERY_CHARGE() armed->armed') as swt:
     assert(swt == '[75c8c] e->BATTERY_CHARGE() armed->armed')
 
-
+  assert(tazor.state.fun.__name__ == 'armed')
 

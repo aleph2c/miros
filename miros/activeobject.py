@@ -5,9 +5,9 @@ import time
 from collections import deque, namedtuple
 from pprint      import pprint
 from threading   import Thread
-from datetime    import datetime
 from queue       import PriorityQueue, Queue
 from threading   import Event as ThreadEventLib
+from functools   import wraps
 
 # from this package
 from miros.hsm   import HsmWithQueues
@@ -475,6 +475,7 @@ class ActiveObject(HsmWithQueues):
 
   def append_subscribe_to_spy(fn):
     '''instrument the full spy with our subscription request'''
+    @wraps(fn)
     def _append_subscribe_to_spy(self, e, queue_type='fifo'):
       if self.instrumented:
         self.full.spy.append("SUBSCRIBING TO:({}, TYPE:{})".format(e.signal_name, queue_type))
@@ -488,6 +489,7 @@ class ActiveObject(HsmWithQueues):
 
   def append_publish_to_spy(fn):
     '''instrument the rtc spy with our publish event'''
+    @wraps(fn)
     def _append_publish_to_spy(self, e, priority=1000):
       if self.instrumented:
         self.rtc.spy.append("PUBLISH:({}, PRIORITY:{})".format(e.signal_name, priority))

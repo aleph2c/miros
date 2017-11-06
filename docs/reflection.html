@@ -40,9 +40,107 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="reflection">
+  <div class="toctree-wrapper compound">
+</div>
+<div class="section" id="reflection">
 <h1>Reflection<a class="headerlink" href="#reflection" title="Permalink to this headline">¶</a></h1>
-<p>How to instrument your state charts to you can see what is going on</p>
+<p><a class="reference internal" href="#reflection-what-state-am-i-in"><span class="std std-ref">What State Am I In?</span></a></p>
+<p><a class="reference internal" href="#reflection-a-high-level-description-of-the-behavior"><span class="std std-ref">A High Level Description of The Behavior</span></a></p>
+<p><a class="reference internal" href="#reflection-an-extremely-detailed-view"><span class="std std-ref">An Extremely Detailed View of the Behavior</span></a></p>
+<p><a class="reference internal" href="#reflection-live-output-from-your-chart"><span class="std std-ref">Live Output From Your Chart</span></a></p>
+<p><a class="reference internal" href="#reflection-how-to-test-using-reflection"><span class="std std-ref">How to Test Using Reflection</span></a></p>
+<p><a class="reference internal" href="#reflection-creating-a-sequence-diagram"><span class="std std-ref">Creating a Sequence Diagram</span></a></p>
+<div class="section" id="thoughts-on-reflection">
+<span id="reflection-thoughts-on-reflection"></span><h2>Thoughts On Reflection<a class="headerlink" href="#thoughts-on-reflection" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>miros</cite> framework has several different mechanisms to view how your design
+behaves.  This is extremely important, since with the compacting of complexity
+into behavioral maps it is very easy to lose track of what your system actually
+does.  In fact, it is inevitable that for any moderately ambitious design, you
+will not be able to track the entirety of its behavior in your head.  With any
+addition of state or event management there is an exponential increase in the
+number of possible stories your chart can tell.  This is the power and the
+curse of a statechart.</p>
+<p>The state of your chart might change as it responds to an event, so you might
+want to <a class="reference internal" href="#reflection-what-state-am-i-in"><span class="std std-ref">reflect upon the current state</span></a>.</p>
+<p>You might want to view <a class="reference internal" href="#reflection-a-high-level-description-of-the-behavior"><span class="std std-ref">what events caused what state transitions from a
+high level</span></a>.</p>
+<p><a class="reference internal" href="#reflection-an-extremely-detailed-view"><span class="std std-ref">You may need to view the state dynamics in fine detail.</span></a>.</p>
+<p><a class="reference internal" href="#reflection-live-output-from-your-chart"><span class="std std-ref">If you have a number of charts running in parallel, you may want to see how
+they interact in a live manner.</span></a></p>
+<p>The tools needed to view these dynamics are embedded into the <cite>miros</cite> framework.</p>
+<p>Another issue that is faced is how to explain your design to someone else.  A
+statechart diagram is not helpful when you are talking to a customer or someone
+within your team who is not versed in Harel formalism.  For this reason, it is
+good to talk about a specific behavior, not all of the behaviors at once.  A
+statechart diagram might make sense to you but it can psychologically shutdown
+a teammate.  <cite>miros</cite> <a class="reference internal" href="#reflection-creating-a-sequence-diagram"><span class="std std-ref">provides a way to translate how your chart responds
+to a particular event into a different type of diagram, a sequence
+diagram</span></a>.  Anyone can understand a
+sequence diagram.  By referencing something that is easy to understand you can
+reduce the transaction costs in your organization; everyone should be able to
+participate in the conversation.</p>
+<p>With the smallest adjustment of a statechart, all of your sequence diagrams can
+become moot.  For this reason the sequence diagrams can be generated
+programatically from the trace output.  This means that you don’t have to waste
+expensive engineering time on documentation that will be thrown away as you
+build out your system.  This is also important because your engineers won’t
+become reluctant to change a design to avoid hours and hours of grinding work.</p>
+<p>I would recommend that if you use statecharts, you avoid using non-text based
+documentation systems.  If you use Word to make pretty diagrams, the steps to
+manually change your documents will amplify cost through your organization.
+Whereas if you use markdown, LaTeX, HTML, anything that can quickly be
+constructed without a lot of user intervention, it is easy and cheap to change
+your design descriptions.  If you want to buy a Microsoft product, buy Visio,
+since you can make beautiful diagrams with links.  It makes sense to put a lot
+of time and attention into the map.  To save money, you can use <a class="reference external" href="http://www.umlet.com">umlet</a>
+instead.</p>
+<p>Suppose you are a documentation genius.  This doesn’t mean that anyone wants to
+read your work.  With the <cite>miros</cite> reflection features an engineer can run an
+experiment to see how the system actually behaves, rather than digging into
+dreary specifications.  The chart will quickly become the specification, this
+is the point of Harel formalism.  The specification documents can be thought of
+as temporary work orders that adjust the global specification, the chart
+itself.</p>
+<p>As your system gets bigger and more complicated, it is very important to lock
+it down with tests.  But the more specific the test, the more tightly coupled
+it is to your design.  Any change will break it.  To fix things an engineer
+could isolate the test, reflect upon the behavior, determine if it is correct
+by carefully thinking about it, then overwrite the test with a copy of the
+reflection.  <a class="reference internal" href="#reflection-how-to-test-using-reflection"><span class="std std-ref">It has to be very easy and cheap to isolate and update your tests</span></a>,
+otherwise your organization will lose this discipline and you will lose control
+of your design.</p>
+</div>
+<div class="section" id="what-state-am-i-in">
+<span id="reflection-what-state-am-i-in"></span><h2>What State Am I In?<a class="headerlink" href="#what-state-am-i-in" title="Permalink to this headline">¶</a></h2>
+<p>To see what state your chart is in:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="hll">  <span class="n">chart</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fun</span>           <span class="c1"># will be the state method</span>
+</span>  <span class="n">chart</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">fun</span><span class="o">.</span><span class="vm">__name__</span>  <span class="c1"># will be the state method name</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="a-high-level-description-of-the-behavior">
+<span id="reflection-a-high-level-description-of-the-behavior"></span><h2>A High Level Description of The Behavior<a class="headerlink" href="#a-high-level-description-of-the-behavior" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="an-extremely-detailed-view-of-the-behavior">
+<span id="reflection-an-extremely-detailed-view"></span><h2>An Extremely Detailed View of the Behavior<a class="headerlink" href="#an-extremely-detailed-view-of-the-behavior" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="how-to-test-using-reflection">
+<span id="reflection-how-to-test-using-reflection"></span><h2>How to Test Using Reflection<a class="headerlink" href="#how-to-test-using-reflection" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="live-output-from-your-chart">
+<span id="reflection-live-output-from-your-chart"></span><h2>Live Output From Your Chart<a class="headerlink" href="#live-output-from-your-chart" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="creating-a-sequence-diagram">
+<span id="reflection-creating-a-sequence-diagram"></span><h2>Creating a Sequence Diagram<a class="headerlink" href="#creating-a-sequence-diagram" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="how-to-explain-your-design-to-others">
+<span id="reflection-how-to-explain-your-design-to-others"></span><h2>How to Explain your Design to Others<a class="headerlink" href="#how-to-explain-your-design-to-others" title="Permalink to this headline">¶</a></h2>
+<p>Once your design reaches a moderate level of complexity, you will not be able
+to explain it to people who are not technical.  At some point, you too will lose
+track of how your system behaves.  You will have to study and probe your design
+to see how it works.  For this reason it is extremely important to build up
+regression tests as you work on your system.</p>
 <div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -116,7 +214,6 @@
             |                    |                    |                    &lt;
 </pre></div>
 </td></tr></table></div>
-<div class="toctree-wrapper compound">
 </div>
 </div>
 
@@ -127,7 +224,22 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
   <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
-</a></p><div class="relations">
+</a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Reflection</a><ul>
+<li><a class="reference internal" href="#thoughts-on-reflection">Thoughts On Reflection</a></li>
+<li><a class="reference internal" href="#what-state-am-i-in">What State Am I In?</a></li>
+<li><a class="reference internal" href="#a-high-level-description-of-the-behavior">A High Level Description of The Behavior</a></li>
+<li><a class="reference internal" href="#an-extremely-detailed-view-of-the-behavior">An Extremely Detailed View of the Behavior</a></li>
+<li><a class="reference internal" href="#how-to-test-using-reflection">How to Test Using Reflection</a></li>
+<li><a class="reference internal" href="#live-output-from-your-chart">Live Output From Your Chart</a></li>
+<li><a class="reference internal" href="#creating-a-sequence-diagram">Creating a Sequence Diagram</a></li>
+<li><a class="reference internal" href="#how-to-explain-your-design-to-others">How to Explain your Design to Others</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
