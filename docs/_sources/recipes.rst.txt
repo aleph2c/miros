@@ -412,16 +412,16 @@ Drawing a Sequence Diagram
 .. _recipes-testing:
 
 Testing
-=======
+-------
 
 .. _recipes-using-a-trace-as-a-test-target:
 
 Using a Trace As a Test Target
-------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: i_test_with_trace.rst
 
 Using a Spy as a Test Target
-------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: i_test_with_spy.rst
