@@ -136,7 +136,7 @@ can be used to assist in telling a very specific story about how your system
 behaves.
 
 I'm probably not following the UML standard, and I don't care.  The utility of
-the picture is in its simplicity.
+the sequence diagram picture is in its simplicity.
 
 .. _sequence: https://github.com/aleph2c/sequence
 .. _DRY: https://en.wikipedia.org/wiki/Don%27t_repeat_yourself

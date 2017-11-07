@@ -118,7 +118,19 @@ An Extremely Detailed View of the Behavior
 How to Test Your Design Using Reflection
 ----------------------------------------
 
+.. _reflection-testing-with-the-trace-output:
+
+Testing with the Trace Output
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. include:: i_test_with_trace.rst
+
+.. _reflection-testing-with-the-spy-output:
+
+Testing with the Spy Output
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: i_test_with_spy.rst
 
 .. _reflection-live-output-from-your-chart:
 

@@ -312,6 +312,8 @@ data at the tail end of its log.</p>
 </div>
 <div class="section" id="how-to-test-your-design-using-reflection">
 <span id="reflection-how-to-test-using-reflection"></span><h2>How to Test Your Design Using Reflection<a class="headerlink" href="#how-to-test-your-design-using-reflection" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="testing-with-the-trace-output">
+<span id="reflection-testing-with-the-trace-output"></span><h3>Testing with the Trace Output<a class="headerlink" href="#testing-with-the-trace-output" title="Permalink to this headline">¶</a></h3>
 <p>If you would like to sketch out the high level behavior of your statechart using
 a trace output as the target for a regression test, you would:</p>
 <ol class="arabic simple">
@@ -347,7 +349,7 @@ like this:</p>
 <p>That is something that shouldn’t change over time, it looks like something we
 could use as a test specification.  The only problem is that when we run the
 code in the future and generate a new trace we get a trace with a pre-pended
-date timestamp.  We can get around this issue like so:</p>
+date timestamp.  We can get around this issue like this:</p>
 <div class="highlight-python" id="stripped-example"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -384,6 +386,65 @@ same string with the date timestamps removed.</p>
 object’s trace output of it’s date timestamp information and place the result
 into the <code class="docutils literal"><span class="pre">stripped_trace_result</span></code> variable.</p>
 <p>Lines <strong>12-13</strong> are for testing each line of our output against our target.</p>
+<p>If our design changes, it is easy to update the test, we just copy the new
+trace of of new design into the target string and everything should be peachy.</p>
+</div>
+<div class="section" id="testing-with-the-spy-output">
+<span id="reflection-testing-with-the-spy-output"></span><h3>Testing with the Spy Output<a class="headerlink" href="#testing-with-the-spy-output" title="Permalink to this headline">¶</a></h3>
+<p>A trace does not tell the full story about what you system is doing.  For
+instance it is blind to hooks, deferred events and many other things that might
+happen in the dynamics of your active object.  If you need to look down the
+exact behavior of your system, you can:</p>
+<ol class="arabic simple">
+<li>Run your program and print your spy to the output.</li>
+<li>Copy the spy as your target behavior.</li>
+<li>Compare the target with the results.</li>
+</ol>
+<p>Here is an example:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># pp(tazor.spy())</span>
+</span><span class="hll"><span class="c1"># import pdb.set_trace()</span>
+</span><span class="hll"><span class="k">assert</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">spy</span><span class="p">()</span> <span class="o">==</span>
+</span>  <span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:arming&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;ENTRY_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;ENTRY_SIGNAL:arming&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;INIT_SIGNAL:arming&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;BATTERY_CHARGE:arming&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:armed&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;ENTRY_SIGNAL:armed&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;POST_DEFERRED:CAPACITOR_CHARGE&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;INIT_SIGNAL:armed&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;&lt;- Queued:(0) Deferred:(1)&#39;</span><span class="p">])</span>
+</pre></div>
+</td></tr></table></div>
+<p>On line <strong>1</strong> we have a commented pretty print command ready to go for when we
+need to rebuild our test specification.  When the test fails in the future,
+which it will because this is a tightly coupled test, we will uncomment lines
+<strong>1-2</strong> then re-run the test.</p>
+<p>This will drop us into a debugging session just after our next spy output has
+been printed to the screen.  At this point we would carefully determine if it
+actually describes the new behavior we are looking for. If it wasn’t, we would
+fix the issue, otherwise we over-write lines <strong>4-16</strong> with this new
+specification.</p>
+<p>We would re-comment lines <strong>1-2</strong> and re-run our tests.</p>
+</div>
 </div>
 <div class="section" id="live-output-from-your-chart">
 <span id="reflection-live-output-from-your-chart"></span><h2>Live Output From Your Chart<a class="headerlink" href="#live-output-from-your-chart" title="Permalink to this headline">¶</a></h2>
@@ -506,7 +567,7 @@ your specification.  The sequence diagrams are little throw away things, that
 can be used to assist in telling a very specific story about how your system
 behaves.</p>
 <p>I’m probably not following the UML standard, and I don’t care.  The utility of
-the picture is in its simplicity.</p>
+the sequence diagram picture is in its simplicity.</p>
 </div>
 </div>
 
@@ -525,7 +586,11 @@ the picture is in its simplicity.</p>
 <li><a class="reference internal" href="#what-state-am-i-in">What State Am I In?</a></li>
 <li><a class="reference internal" href="#a-high-level-description-of-the-behavior">A High Level Description of The Behavior</a></li>
 <li><a class="reference internal" href="#an-extremely-detailed-view-of-the-behavior">An Extremely Detailed View of the Behavior</a></li>
-<li><a class="reference internal" href="#how-to-test-your-design-using-reflection">How to Test Your Design Using Reflection</a></li>
+<li><a class="reference internal" href="#how-to-test-your-design-using-reflection">How to Test Your Design Using Reflection</a><ul>
+<li><a class="reference internal" href="#testing-with-the-trace-output">Testing with the Trace Output</a></li>
+<li><a class="reference internal" href="#testing-with-the-spy-output">Testing with the Spy Output</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#live-output-from-your-chart">Live Output From Your Chart</a></li>
 <li><a class="reference internal" href="#how-to-explain-your-design-to-others">How to Explain your Design to Others</a></li>
 </ul>

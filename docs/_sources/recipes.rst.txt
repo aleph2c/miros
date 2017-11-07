@@ -420,3 +420,8 @@ Using a Trace As a Test Target
 ------------------------------
 
 .. include:: i_test_with_trace.rst
+
+Using a Spy as a Test Target
+------------------------------
+
+.. include:: i_test_with_spy.rst

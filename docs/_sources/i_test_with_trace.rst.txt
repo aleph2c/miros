@@ -42,7 +42,7 @@ like this:
 That is something that shouldn't change over time, it looks like something we
 could use as a test specification.  The only problem is that when we run the
 code in the future and generate a new trace we get a trace with a pre-pended
-date timestamp.  We can get around this issue like so:
+date timestamp.  We can get around this issue like this:
 
 .. _stripped_example:
 
@@ -77,4 +77,5 @@ into the ``stripped_trace_result`` variable.
 
 Lines **12-13** are for testing each line of our output against our target.
 
-
+If our design changes, it is easy to update the test, we just copy the new
+trace of of new design into the target string and everything should be peachy.
