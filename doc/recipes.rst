@@ -75,7 +75,7 @@ must have first started your statechart.  Here is a simple example:
 You would post to the 'lifo' buffer if you needed your event to be moved to the
 front of the active object's collection of unprocessed events.  You might want
 to do this with a timing heart beat or for any event that needs to be processed
-with a greater priority than over events.
+with a greater priority than other events.
 
 
 .. _recipes-creating-a-one-shot-event:
@@ -93,9 +93,9 @@ outer states will be hit with one-shot messages that they don't care about
 and your chart will needlessly search as it reacts to these events.
 
 It is important to know that if your chart changes state, the event posted to
-it will look like it come from the outside, even through it has been generated
-within a given state.  The construction of any event with the  ``fifo`` or
-``lifo`` api behaves like this.
+it will look like it came from outside of your statechart, even though it was
+originally generated within a given state.  The construction of any event with
+the ``fifo`` or ``lifo`` api behaves like this.
 
 .. code-block:: python
 
@@ -313,10 +313,10 @@ that have this signal name provided to the ``cancel_events`` call.
 
 Deferring and Recalling An Event
 ^^^^^^^^^^^^^^^^^^
-There will be situations where you want to post a kind of artificial
-event into a queue which won't immediately be acted upon by your chart.  It is
-an `artificial` event, because your chart is making it up, it isn't being given
-to it by the outside world.  It is a way for your chart to build up a kind of
+There will be situations where you want to post a kind of artificial event into
+a queue which won't immediately be acted upon by your startchart.  It is an
+`artificial` event, because your chart is making it up, it isn't being given to
+it by the outside world.  It is a way for your chart to build up a kind of
 processing pressure that can be relieved when you have the cycles to work on
 things.
 
@@ -333,3 +333,90 @@ reaction to it.
     # the chart's first in first out queue
     chart.recall() # posts our deferred event to the chart.
 
+.. _seeing_what_is_going_on:
+
+Seeing What is Going On
+-----------------------
+
+.. _recipes-determining-the-current-state:
+
+Determining the Current State
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: i_determining_the_current_state.rst 
+
+.. _recipes-using-the-trace:
+
+Using the Trace
+^^^^^^^^^^^^^^^
+
+.. include:: i_trace_reactive.rst
+
+.. _recipes-using-the-spy:
+
+Using the Spy
+^^^^^^^^^^^^^
+
+.. include:: i_spy_reactive.rst
+
+.. _recipes-tracing-live:
+
+Tracing Live
+^^^^^^^^^^^^
+
+.. _recipes-spying-live:
+
+Spying Live
+^^^^^^^^^^^
+
+.. _recipes-describing-your-work:
+
+Describing your Work
+--------------------
+
+.. _recipes-drawing-a-statechart:
+
+Drawing a StateChart
+^^^^^^^^^^^^^^^^^^^^
+The Harel formalism was consumed by the UML standard.  Then the UML standards
+became over-complicated.  As a result, most drawing tools are full of garbage
+and formalisms that you probably don't care about.  I have yet to find a tool
+that doesn't get in the way of me trying to draw a simple picture, with boxes
+and arrows, I would like to be able to zoom in and out, and to write blocks of
+code anywhere I like.
+
+Visio can do this, but it is expensive.  The cheaper online alternatives, force
+their own weird sub-versions of UML into their templates so that once again you
+start fighting with them too.
+
+Miro Samek wrote his own tool to deal with this problem, and when you
+eventually switch over to his code, you will be greatly appreciative of the
+speed and ease in which you can manifest your ideas into running designs.
+But his drawing tool is tightly coupled with his framework, so we can't use
+that either.
+
+Pencil and paper are great for drawing your designs.  It is good to work on
+them over and over again without the impediment of the computer interface
+getting in your way.  When you lock down a design, though, you can transfer the
+picture using a free tool called Umlet.
+
+
+.. _recipes-drawing-a-sequence-diagram:
+
+Drawing a Sequence Diagram
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: i_making_sequence_diagrams_from_trace.rst
+
+
+.. _recipes-testing:
+
+Testing
+=======
+
+.. _recipes-using-a-trace-as-a-test-target:
+
+Using a Trace As a Test Target
+------------------------------
+
+.. include:: i_test_with_trace.rst

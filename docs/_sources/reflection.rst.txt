@@ -9,15 +9,15 @@ Reflection
 
 :ref:`reflection-what-state-am-i-in?`
 
-:ref:`reflection-a-high-level-description-of-the-behavior`
+:ref:`What happened? Summarized.<reflection-a-high-level-description-of-the-behavior>`
 
-:ref:`reflection-an-extremely-detailed-view`
+:ref:`What happened? Detailed. <reflection-an-extremely-detailed-view>`
 
-:ref:`reflection-live-output-from-your-chart`
+:ref:`What is happening now?<reflection-live-output-from-your-chart>`
 
-:ref:`reflection-how-to-test-using-reflection`
+:ref:`How can I test this behavior?<reflection-how-to-test-using-reflection>`
 
-:ref:`reflection-creating-a-sequence-diagram`
+:ref:`How can I explain this to others?<reflection-how-to-explain-your-design-to-others>`
 
 .. _reflection-thoughts-on-reflection:
 
@@ -98,139 +98,38 @@ of your design.
 
 What State Am I In?
 -------------------
-To see what state your chart is in:
 
-.. code-block:: python
-  :emphasize-lines: 1
-  :linenos:
-
-    chart.state.fun           # will be the state method
-    chart.start.fun.__name__  # will be the state method name
-
+.. include:: i_determining_the_current_state.rst 
 
 .. _reflection-a-high-level-description-of-the-behavior:
 
 A High Level Description of The Behavior
 ----------------------------------------
-If you would like to see what your active object is doing from a very high
-level, you can look at it's `trace` instrumentation.  The trace will only
-create a log item if a state transition has occurred. Each line in the `trace`
-will contain:
 
-1. A datetime stamp between square brackets
-2. The active object name, between square brackets
-3. The event that caused the transition, its signal number and its payload 
-4. The starting state
-5. The ending state
-
-If you haven't named your active object, a unique identifier is given to it,
-and the first 5 characters of this unique identifier will be used in the trace.
-The reason that an identifier is given to it is so that the trace outputs, from
-multiple active objects, can be distinguished from one another.
-
-Suppose you have built the tazor active object described in the :ref:`second
-example<examples-tazor-example>`. Suppose you named this active object `tazor`:
-To see the trace you would type:
-
-.. code-block:: python
-
-  tazor.trace()
-
-This would output the following trace:
-
-.. code-block:: python
-  :emphasize-lines: 1
-
-  [2017-11-06 08:34:28.268873] [75c8c] e->start_at() top->arming
-  [2017-11-06 08:34:26.312241] [75c8c] e->BATTERY_CHARGE() arming->armed
-  [2017-11-06 08:34:26.312241] [75c8c] e->BATTERY_CHARGE() armed->armed
-  [2017-11-06 08:34:26.312241] [75c8c] e->BATTERY_CHARGE() armed->armed
-
-Notice that on line one, the signal is called `start_at`.  There is no signal
-called `start_at`, here the trace is actually using the method name `start_at`
-to indicate how the chart was started.
-
-A trace can be used with the `sequence` project to generate a sequence diagram,
-more about that is described :ref:`here.<reflection-creating-a-sequence-diagram>`
-
-.. _reflection-an-extremely-detailed-view:
+.. include:: i_trace_reactive.rst 
 
 An Extremely Detailed View of the Behavior
 ------------------------------------------
 
+.. include:: i_spy_reactive.rst
 
 .. _reflection-how-to-test-using-reflection:
 
-How to Test Using Reflection
-----------------------------
+How to Test Your Design Using Reflection
+----------------------------------------
+
+.. include:: i_test_with_trace.rst
 
 .. _reflection-live-output-from-your-chart:
 
 Live Output From Your Chart
 ---------------------------
 
-.. _reflection-creating-a-sequence-diagram:
-
-Creating a Sequence Diagram
----------------------------
-
-
-
-
 .. _reflection-how-to-explain-your-design-to-others:
 
 How to Explain your Design to Others
 ------------------------------------
-Once your design reaches a moderate level of complexity, you will not be able
-to explain it to people who are not technical.  At some point, you too will lose
-track of how your system behaves.  You will have to study and probe your design
-to see how it works.  For this reason it is extremely important to build up
-regression tests as you work on your system.
 
-
-.. code-block:: python
-  :emphasize-lines: 1
-  :linenos:
-        
-    [05:43:06.135566] [75c8c] e->None() top->arming
-    [05:43:06.254068] [75c8c] e->BATTERY_CHARGE() arming->armed
-    [05:43:06.354835] [75c8c] e->BATTERY_CHARGE() armed->armed
-    [05:43:06.456146] [75c8c] e->BATTERY_CHARGE() armed->armed
-    [05:43:06.553918] [75c8c] e->CAPACITOR_CHARGE() armed->tazor_operating
-    [05:43:06.554796] [75c8c] e->CAPACITOR_CHARGE() tazor_operating->tazor_operating
-    [05:43:06.555828] [75c8c] e->CAPACITOR_CHARGE() tazor_operating->tazor_operating
-
-    [ Chart: 75c8c ] (?)
-             top                arming                armed           tazor_operating   
-              +------None()------->|                    |                    |
-              |        (?)         |                    |                    |
-              |                    +-BATTERY_CHARGE()-->|                    |
-              |                    |        (?)         |                    |
-              |                    |                    +                    |
-              |                    |                     \ (?)               |
-              |                    |                     BATTERY_CHARGE()    |
-              |                    |                     /                   |
-              |                    |                    <                    |
-              |                    |                    +                    |
-              |                    |                     \ (?)               |
-              |                    |                     BATTERY_CHARGE()    |
-              |                    |                     /                   |
-              |                    |                    <                    |
-              |                    |                    +-APACITOR_CHARGE()->|
-              |                    |                    |        (?)         |
-              |                    |                    |                    +                    
-              |                    |                    |                     \ (?)               
-              |                    |                    |                     CAPACITOR_CHARGE()  
-              |                    |                    |                     /                   
-              |                    |                    |                    <                    
-              |                    |                    |                    +                    
-              |                    |                    |                     \ (?)               
-              |                    |                    |                     CAPACITOR_CHARGE()  
-              |                    |                    |                     /                   
-              |                    |                    |                    <                    
-    
-    
-
-
+.. include:: i_making_sequence_diagrams_from_trace.rst
 
 .. _umlet: http://www.umlet.com
