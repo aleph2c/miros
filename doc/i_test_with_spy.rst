@@ -1,9 +1,9 @@
 .. included from recipes
 .. included from reflection
-A trace does not tell the full story about what you system is doing.  For
+A trace does not tell the full story about what your system is doing.  For
 instance it is blind to hooks, deferred events and many other things that might
-happen in the dynamics of your active object.  If you need to look down the
-exact behavior of your system, you can:
+happen in the dynamics of your active object.  If you need to look at the
+`exact` behavior of your system, you can:
 
 1. Run your program and print your spy to the output.
 2. Copy the spy as your target behavior.
