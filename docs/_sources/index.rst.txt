@@ -14,9 +14,9 @@
    installation
    introduction
    quickstart
-   reflection
    examples
    recipes
+   reflection
    patterns
    testing
    architecture

@@ -1,5 +1,3 @@
-.. _quick-start:
-
 .. _testing-testing:
 
 Testing
