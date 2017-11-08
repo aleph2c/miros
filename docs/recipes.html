@@ -48,16 +48,16 @@
 <span id="recipes-events-and-signals"></span><span id="posting-events"></span><h2>Events And Signals<a class="headerlink" href="#events-and-signals" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="creating-an-event">
 <span id="recipes-creating-an-event"></span><h3>Creating an Event<a class="headerlink" href="#creating-an-event" title="Permalink to this headline">¶</a></h3>
-<p>An event is something that will be passed into your statechart, then it will be
-reacted to, then it will be removed from memory.</p>
+<p>An event is something that will be passed into your statechart, it will be
+reacted to, then removed from memory.</p>
 <div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
 4
 5
 6</pre></div></td><td class="code"><div class="highlight"><pre><span></span>  <span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">Event</span>
-<span class="hll">  <span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span>
-</span>
+  <span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span>
+
   <span class="n">event_1</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="s2">&quot;name_of_signal&quot;</span><span class="p">)</span>
   <span class="c1"># or</span>
   <span class="n">event_2</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">name_of_signal</span><span class="p">)</span>
@@ -83,17 +83,19 @@ have to explicitly define them.</p>
 7
 8
 9</pre></div></td><td class="code"><div class="highlight"><pre><span></span>  <span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">Event</span>
-<span class="hll">  <span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span>
-</span>
+  <span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span>
+
   <span class="c1"># signal named &quot;name_of_signaL&quot; invented</span>
   <span class="c1"># here and given a unique number</span>
-  <span class="n">event_1</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="s2">&quot;name_of_signal&quot;</span><span class="p">)</span>
-  <span class="c1"># the signal number of this event will have</span>
+<span class="hll">  <span class="n">event_1</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="s2">&quot;name_of_signal&quot;</span><span class="p">)</span>
+</span>  <span class="c1"># the signal number of this event will have</span>
   <span class="c1"># the same number as in line 6</span>
   <span class="n">event_2</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">name_of_signal</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
-<p>The signals are shared across your whole program.</p>
+<p>Notice that the signal was invented on line <strong>6</strong> then re-used on line <strong>9</strong>.</p>
+<p>The signals are shared across your whole program.  To see reflect upon your
+signals read <a class="reference internal" href="#recipes-seeing-your-signals"><span class="std std-ref">this</span></a>.</p>
 </div>
 <div class="section" id="recipes-seeing-what-signals-you-have-in-your-system">
 <span id="id2"></span><h3>Posting Events<a class="headerlink" href="#recipes-seeing-what-signals-you-have-in-your-system" title="Permalink to this headline">¶</a></h3>
@@ -392,7 +394,7 @@ reaction to it.</p>
 </td></tr></table></div>
 </div>
 <div class="section" id="seeing-what-signals-you-have-in-your-system">
-<span id="recipes-using-the-trace"></span><h3>Seeing what Signals You Have In Your System<a class="headerlink" href="#seeing-what-signals-you-have-in-your-system" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-seeing-your-signals"></span><h3>Seeing what Signals You Have In Your System<a class="headerlink" href="#seeing-what-signals-you-have-in-your-system" title="Permalink to this headline">¶</a></h3>
 <p>A signal is the name that can be given to an event.  To get access to your
 signals:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span>
@@ -433,7 +435,7 @@ Python dictionary:</p>
 </div>
 </div>
 <div class="section" id="using-the-trace">
-<h3>Using the Trace<a class="headerlink" href="#using-the-trace" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-using-the-trace"></span><h3>Using the Trace<a class="headerlink" href="#using-the-trace" title="Permalink to this headline">¶</a></h3>
 <p>If you would like to see what your active object was doing from a <strong>very high
 level</strong>, you can look at it’s <cite>trace</cite> instrumentation.  The trace will only
 create a log item if a state transition has occurred. Each line in the <cite>trace</cite>

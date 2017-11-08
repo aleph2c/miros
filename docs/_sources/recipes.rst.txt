@@ -18,11 +18,10 @@ Events And Signals
 
 Creating an Event
 ^^^^^^^^^^^^^^^^^
-An event is something that will be passed into your statechart, then it will be
-reacted to, then it will be removed from memory.
+An event is something that will be passed into your statechart, it will be
+reacted to, then removed from memory.
 
 .. code-block:: python
-  :emphasize-lines: 2
   :linenos:
 
     from miros.event import Event
@@ -47,7 +46,7 @@ finishes.  They are created at the moment they are referenced, so you don't
 have to explicitly define them.
 
 .. code-block:: python
-  :emphasize-lines: 2
+  :emphasize-lines: 6
   :linenos:
 
     from miros.event import Event
@@ -60,7 +59,10 @@ have to explicitly define them.
     # the same number as in line 6
     event_2 = Event(signal=signals.name_of_signal)
 
-The signals are shared across your whole program.
+Notice that the signal was invented on line **6** then re-used on line **9**.
+
+The signals are shared across your whole program.  To see reflect upon your
+signals read :ref:`this<recipes_seeing_your_signals>`.
 
 .. _recipes-seeing-what-signals-you-have-in-your-system:
 
@@ -399,12 +401,14 @@ Determining the Current State
 
 .. include:: i_determining_the_current_state.rst 
 
-.. _recipes-using-the-trace:
+.. _recipes_seeing_your_signals:
 
 Seeing what Signals You Have In Your System
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: i_seeing_your_signals.rst 
+
+.. _recipes-using-the-trace:
 
 Using the Trace
 ^^^^^^^^^^^^^^^
