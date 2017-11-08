@@ -45,6 +45,7 @@
 <div class="section" id="reflection">
 <h1>Reflection<a class="headerlink" href="#reflection" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference internal" href="#reflection-what-state-am-i-in"><span class="std std-ref">What State Am I In?</span></a></p>
+<p><a class="reference internal" href="#reflection-what-state-am-i-in"><span class="std std-ref">What State Am I In?</span></a></p>
 <p><a class="reference internal" href="#reflection-a-high-level-description-of-the-behavior"><span class="std std-ref">What happened? Summarized.</span></a></p>
 <p><a class="reference internal" href="#reflection-an-extremely-detailed-view"><span class="std std-ref">What happened? Detailed.</span></a></p>
 <p><a class="reference internal" href="#reflection-live-output-from-your-chart"><span class="std std-ref">What is happening now?</span></a></p>
@@ -119,8 +120,49 @@ of your design.</p>
 </pre></div>
 </td></tr></table></div>
 </div>
+<div class="section" id="what-signals-do-i-have">
+<span id="reflection-what-signals-do-i-have"></span><span id="reflection-a-high-level-description-of-the-behavior"></span><h2>What Signals Do I Have?<a class="headerlink" href="#what-signals-do-i-have" title="Permalink to this headline">¶</a></h2>
+<p>A signal is the name that can be given to an event.  To get access to your
+signals:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span>
+</pre></div>
+</div>
+<p>The signals object is provided by a singleton of the SignalSource class, which
+is just an OrderedDictionary with a <code class="docutils literal"><span class="pre">__getattr__</span></code> method to make the syntax
+easier to use.</p>
+<p><cite>This basically means that you can think of the signals object as being a dict
+that is shared across your whole program.</cite></p>
+<p>To see your signals, you just reflect upon it like you would with any other
+Python dictionary:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># To see your signal names:</span>
+<span class="n">signal_names</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+<span class="c1"># To see your signal numbers:</span>
+<span class="n">signal_numbers</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+
+<span class="c1"># To output your names and number:</span>
+<span class="k">for</span> <span class="n">signal_name</span><span class="p">,</span> <span class="n">signal_number</span> <span class="ow">in</span> <span class="n">signals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">signal_name</span><span class="p">,</span> <span class="n">signal_number</span><span class="p">)</span>
+
+<span class="c1"># same output with some formatting</span>
+<span class="n">max_name_len</span>   <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">signals</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">))</span>
+<span class="n">max_number_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="nb">int</span><span class="p">)))</span>
+<span class="k">for</span> <span class="n">signal_name</span><span class="p">,</span> <span class="n">signal_number</span> <span class="ow">in</span> <span class="n">signals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{1: &lt;{0}} {2:{3}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_name_len</span><span class="p">,</span>
+                                   <span class="n">signal_name</span><span class="p">,</span>
+                                   <span class="n">signal_number</span><span class="p">,</span>
+                                   <span class="n">max_number_len</span><span class="p">))</span>  <span class="c1"># output below -&gt;</span>
+  <span class="c1"># ENTRY_SIGNAL            1</span>
+  <span class="c1"># EXIT_SIGNAL             2</span>
+  <span class="c1"># INIT_SIGNAL             3</span>
+  <span class="c1"># REFLECTION_SIGNAL       4</span>
+  <span class="c1"># SEARCH_FOR_SUPER_SIGNAL 5</span>
+  <span class="c1"># ..</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="a-high-level-description-of-the-behavior">
-<span id="reflection-a-high-level-description-of-the-behavior"></span><h2>A High Level Description of The Behavior<a class="headerlink" href="#a-high-level-description-of-the-behavior" title="Permalink to this headline">¶</a></h2>
+<h2>A High Level Description of The Behavior<a class="headerlink" href="#a-high-level-description-of-the-behavior" title="Permalink to this headline">¶</a></h2>
 <p>If you would like to see what your active object was doing from a <strong>very high
 level</strong>, you can look at it’s <cite>trace</cite> instrumentation.  The trace will only
 create a log item if a state transition has occurred. Each line in the <cite>trace</cite>
@@ -584,6 +626,7 @@ the sequence diagram picture is in its simplicity.</p>
 <li><a class="reference internal" href="#">Reflection</a><ul>
 <li><a class="reference internal" href="#thoughts-on-reflection">Thoughts On Reflection</a></li>
 <li><a class="reference internal" href="#what-state-am-i-in">What State Am I In?</a></li>
+<li><a class="reference internal" href="#what-signals-do-i-have">What Signals Do I Have?</a></li>
 <li><a class="reference internal" href="#a-high-level-description-of-the-behavior">A High Level Description of The Behavior</a></li>
 <li><a class="reference internal" href="#an-extremely-detailed-view-of-the-behavior">An Extremely Detailed View of the Behavior</a></li>
 <li><a class="reference internal" href="#how-to-test-your-design-using-reflection">How to Test Your Design Using Reflection</a><ul>

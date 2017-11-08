@@ -9,6 +9,8 @@ Reflection
 
 :ref:`reflection-what-state-am-i-in?`
 
+:ref:`reflection-what-state-am-i-in?`
+
 :ref:`What happened? Summarized.<reflection-a-high-level-description-of-the-behavior>`
 
 :ref:`What happened? Detailed. <reflection-an-extremely-detailed-view>`
@@ -102,6 +104,14 @@ What State Am I In?
 .. include:: i_determining_the_current_state.rst 
 
 .. _reflection-a-high-level-description-of-the-behavior:
+
+
+.. _reflection-what-signals-do-i-have?:
+
+What Signals Do I Have?
+-------------------------------
+
+.. include:: i_seeing_your_signals.rst 
 
 A High Level Description of The Behavior
 ----------------------------------------

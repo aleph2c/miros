@@ -10,8 +10,62 @@ Recipes
 
 .. _posting_events:
 
+.. _recipes-events-and-signals:
+
+Events And Signals
+-----------------
+.. _recipes-creating-an-event:
+
+Creating an Event
+^^^^^^^^^^^^^^^^^
+An event is something that will be passed into your statechart, then it will be
+reacted to, then it will be removed from memory.
+
+.. code-block:: python
+  :emphasize-lines: 2
+  :linenos:
+
+    from miros.event import Event
+    from miros.event import signals
+
+    event_1 = Event(signal="name_of_signal")
+    # or 
+    event_2 = Event(signal=signals.name_of_signal)
+
+.. _recipes-creating-a-signal:
+
+Creating a Signal
+^^^^^^^^^^^^^^^^^
+A signal is the name of an event.  Many different events can have the same
+name, or signal.  When a signal is created, it is given a number which is one
+higher than the oldest signal that was within your program.  You shouldn't have
+to worry about what a signal number is, they are only used to speed up the
+event processor. (it is faster to compare two numbers than two strings)
+
+When you create a signal it will not be removed from memory until your program
+finishes.  They are created at the moment they are referenced, so you don't
+have to explicitly define them.
+
+.. code-block:: python
+  :emphasize-lines: 2
+  :linenos:
+
+    from miros.event import Event
+    from miros.event import signals
+    
+    # signal named "name_of_signaL" invented
+    # here and given a unique number
+    event_1 = Event(signal="name_of_signal")
+    # the signal number of this event will have
+    # the same number as in line 6
+    event_2 = Event(signal=signals.name_of_signal)
+
+The signals are shared across your whole program.
+
+.. _recipes-seeing-what-signals-you-have-in-your-system:
+
 Posting Events
---------------
+^^^^^^^^^^^^^^
 The Active Object ``post_fifo``, ``post_lifo``, ``defer`` and ``recall``
 methods are use to feed events to the statechart.  An Event can be thought of
 as a kind of named marble that is placed onto a topological map.  If a
@@ -347,6 +401,11 @@ Determining the Current State
 
 .. _recipes-using-the-trace:
 
+Seeing what Signals You Have In Your System
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: i_seeing_your_signals.rst 
+
 Using the Trace
 ^^^^^^^^^^^^^^^
 
@@ -380,48 +439,54 @@ Drawing a StateChart
 ^^^^^^^^^^^^^^^^^^^^
 The Harel formalism was consumed by the UML standard.
 
-Then the UML standards became over-complicated (OMG).  Various committees tried
-to build a set of diagrams that could describe **all** software architecture.
-It was a losing battle from the start.
+The UML standards were not properly curated and became over-complicated.
+As a result, they are largely disregarded by the software community, so most of
+the open source drawing tool projects have been abandoned.
 
-Then something even stranger started to happen across the development
-community, "architects" were compelled to hang onto outdated design pictures
-(and the ideas underneath them) because they had spent so much time building
-them in the first place.  This created a kind of cultural backlash against the
-type of people who tried to dominate their technical communities with designs
-that obviously didn't work anymore, who felt superior because they understood
-some sort of arcane picturing that the practitioners in their community didn't
-care about.
+UML is still useful in that it provides a common way of describing software
+systems.  There is no reason not to use the parts of it that you like and leave
+the parts of it that you either don't understand or that are too complicated to
+bother with. (This happens in C++ too)
 
-The UML committees were egged on by technical people to make the pictures
-specific to what ever technical feature their language had, and there was an
-over-emphasis on class oriented diagrams, with many many different types of
-arrows that had to be use differently depending on the kind of drawing you were
-using.  In the end it created a kind of priesthood of people who had arcane
-drawings that were incomprehensible to the actual practitioners.
+To draw a statechart on a computer, you need a drawing tool.
 
-As a result, most drawing tools are full of garbage and formalisms that you
-probably don't care about.  I have yet to find an open source tool that doesn't
-get in the way of me trying to draw a simple picture, with boxes and arrows,
-where I can zoom in and out, and to write blocks of code anywhere I like.
+For this tool to be useful, you need to be able to:
 
-Visio can do this, but it is expensive and then other people have to download a
-viewer application see your diagram (welcome to the 90s).  The cheaper online
-alternatives, force their own weird sub-versions of UML into their templates so
-that once again you start fighting with them too.
+1. zoom in and out of a diagram. (asked for in 1987) 
+2. draw the basic Harel statemachine building blocks.
+3. draw arrows and the other useful parts of UML 
+4. mark up the diagram with code 
+5. quickly and easily change your design
 
-Miro Samek wrote his own tool to deal with this problem, and when you
-eventually switch over to his code, you will be greatly appreciative of the
-speed and ease in which you can manifest your ideas into running designs.  But
-his drawing tool is tightly coupled with his framework, so we can't use that
-here either.
+I have yet to find an open source tool that doesn't get in the way of me trying
+to draw a simple picture, with boxes and arrows, where I can zoom in and out,
+and write blocks of code anywhere I like.
+
+Visio can do this, but it's expensive and other people have to download a
+viewer application in order to see your diagram.  The cheaper online alternatives,
+force their own weird sub-versions of UML into their templates, so that once
+again you start fighting with the tool.
+
+Miro Samek wrote his own tool to deal with this problem and if you eventually
+switch over to his code, you will be greatly appreciative of the speed and ease
+in which you can manifest your ideas into pictures, then into running designs.
+But his drawing tool is tightly coupled with his framework (as it should be),
+so we can't use that here either.
 
 Pencil and paper are great for drawing your designs.  It is good to work on
 them over and over again without the impediment of the computer interface
-getting in your way.  Once you have locked down a design, though, you can
-transfer the picture into something digital using a free tool called `umlet`_.
+getting in your way.  Once you think you have it figured out you can transfer
+the picture into something digital using a free tool called `umlet`_.
 
 There is also an online version of the tool, which is called `umletino`_.
+
+The nice thing about this tool is that it is so simple to use.  It also makes
+ugly pictures, which is a kind of good thing.
+
+A UML diagram should be thought as graffiti on the wall, rather than a great
+work of art.  It should be easy for you to change your design.  If it took you
+5 hours to build a beautiful masterpiece you will feel a psychological
+impediment to change it.  We don't want to get locked into our thinking.
 
 .. _recipes-drawing-a-sequence-diagram:
 
@@ -450,3 +515,5 @@ Using a Spy as a Test Target
 
 .. _umlet: http://www.umlet.com/
 .. _umletino: http://www.umlet.com/umletino/umletino.html
+.. _OMG: https://en.wikipedia.org/wiki/Object_Management_Group
+.. _mandala: https://en.wikipedia.org/wiki/Sand_mandala
