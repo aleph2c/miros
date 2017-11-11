@@ -1,0 +1,1078 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Hacking to Learn &#8212; miros 2.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Recipes" href="recipes.html" />
+    <link rel="prev" title="Simple Posting Example" href="postingexample.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="hacking-to-learn">
+<span id="scribbleexample-hacking-to-learn-the-deeper-dynamics"></span><h1>Hacking to Learn<a class="headerlink" href="#hacking-to-learn" title="Permalink to this headline">¶</a></h1>
+<p id="scribbleexample-first-pass">Here I ask a small question about a statechart.  Then with small steps we will:</p>
+<ol class="arabic simple">
+<li>come up with a theory about what is going on</li>
+<li>build the chart in working code</li>
+<li>test our hypothesis</li>
+</ol>
+<div class="section" id="first-pass">
+<h2>First Pass<a class="headerlink" href="#first-pass" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
+when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?</p>
+<p>If you are unfamiliar with UML, this part of the diagram:</p>
+<img alt="_images/guard.svg" src="_images/guard.svg" /><p>contains a <strong>guard</strong>.  Specifically, the code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">g</span><span class="p">()]</span>
+</pre></div>
+</div>
+<p>on the arrow is the <strong>guard</strong>.</p>
+<p>It is shorthand for: <cite>if the logic between the square brackets is True then let
+the event on the arrow pass through</cite>.  The code that is after the guard on the
+diagram, <code class="docutils literal"><span class="pre">t()</span></code>, runs if the guard doesn’t block it.  Now that we know how a
+guard works, we can infer that:</p>
+<img alt="_images/guard.svg" src="_images/guard.svg" /><p>means:</p>
+<ol class="arabic simple">
+<li>When I see a <cite>T</cite> event ask for permission from the guard to see if it can pass.</li>
+<li>The <cite>g</cite> function is the guard</li>
+<li>If <cite>g</cite> returns True, <cite>T</cite> can pass; it can run the <cite>t</cite> function then make the transition to state <cite>s2</cite>.</li>
+<li>If <cite>g</cite> returns False the <cite>T</cite> event is ignored by the chart.</li>
+</ol>
+</div>
+<div class="section" id="second-pass">
+<h2>Second Pass<a class="headerlink" href="#second-pass" title="Permalink to this headline">¶</a></h2>
+<p>Now that we understand that, let’s re-ask the question:</p>
+<p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
+when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
+<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>Well, if we start in <code class="docutils literal"><span class="pre">s11</span></code>, then we receive a <code class="docutils literal"><span class="pre">T</span></code>, <code class="docutils literal"><span class="pre">s11</span></code> wouldn’t know
+what to do with <code class="docutils literal"><span class="pre">T</span></code>, so it would pass it out to <code class="docutils literal"><span class="pre">s1</span></code>.  <code class="docutils literal"><span class="pre">s1</span></code> <em>does know</em>
+what to do with <code class="docutils literal"><span class="pre">T</span></code>, it would try to pass it to <code class="docutils literal"><span class="pre">s2</span></code>.</p>
+<p>Ok, now how do we get from <code class="docutils literal"><span class="pre">s11</span></code> to <code class="docutils literal"><span class="pre">s2</span></code>?  We need to exit, <code class="docutils literal"><span class="pre">s11</span></code>,
+then we need to exit <code class="docutils literal"><span class="pre">s1</span></code> then we need to enter <code class="docutils literal"><span class="pre">s2</span></code>.  Oh, and don’t forget
+to run <code class="docutils literal"><span class="pre">g</span></code> and <code class="docutils literal"><span class="pre">t</span></code> on the <code class="docutils literal"><span class="pre">T</span></code> event.  Here is a working theory:</p>
+<ol class="arabic simple">
+<li><code class="docutils literal"><span class="pre">a</span></code> will run because <code class="docutils literal"><span class="pre">s11</span></code> needs to be exited.</li>
+<li><code class="docutils literal"><span class="pre">b</span></code> will run because <code class="docutils literal"><span class="pre">s1</span></code> needs to be exited.</li>
+<li><code class="docutils literal"><span class="pre">g</span></code> will run because it is the guard for the <cite>T</cite> event between the <code class="docutils literal"><span class="pre">s1</span></code> and <code class="docutils literal"><span class="pre">s2</span></code> states.</li>
+<li><code class="docutils literal"><span class="pre">t</span></code> will run (assuming that <code class="docutils literal"><span class="pre">g</span></code> returned true)</li>
+<li><code class="docutils literal"><span class="pre">c</span></code> will run because <code class="docutils literal"><span class="pre">s2</span></code> needs to be entered.</li>
+</ol>
+</div>
+<div class="section" id="third-pass">
+<h2>Third Pass<a class="headerlink" href="#third-pass" title="Permalink to this headline">¶</a></h2>
+<p>Now that we understand that, let’s re-ask the question:</p>
+<p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
+when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
+<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>If we look at the <code class="docutils literal"><span class="pre">s2</span></code> state, we see that it has an initialization event with
+another function <code class="docutils literal"><span class="pre">d</span></code> hanging on it (black dot).  After <code class="docutils literal"><span class="pre">s2</span></code> is entered, we would expect
+the next thing to be a transition into the <code class="docutils literal"><span class="pre">s21</span></code> state, but first we would
+run the <code class="docutils literal"><span class="pre">d</span></code> function on the arrow tied to the black dot, since it is outside
+of the <code class="docutils literal"><span class="pre">s21</span></code> state and we haven’t entered it yet.  Let’s add this to our
+working theory:</p>
+<ol class="arabic simple">
+<li><code class="docutils literal"><span class="pre">a</span></code> will run because <code class="docutils literal"><span class="pre">s11</span></code> needs to be exited.</li>
+<li><code class="docutils literal"><span class="pre">b</span></code> will run because <code class="docutils literal"><span class="pre">s1</span></code> needs to be exited.</li>
+<li><code class="docutils literal"><span class="pre">g</span></code> will run because it is the guard for the <cite>T</cite> event between the <code class="docutils literal"><span class="pre">s1</span></code> and <code class="docutils literal"><span class="pre">s2</span></code> states.</li>
+<li><code class="docutils literal"><span class="pre">t</span></code> will run (assuming that <code class="docutils literal"><span class="pre">g</span></code> returned true)</li>
+<li><code class="docutils literal"><span class="pre">c</span></code> will run because <code class="docutils literal"><span class="pre">s2</span></code> needs to be entered.</li>
+<li><code class="docutils literal"><span class="pre">d</span></code> will run on the init transition event from <code class="docutils literal"><span class="pre">s2</span></code> to <code class="docutils literal"><span class="pre">s21</span></code></li>
+<li><code class="docutils literal"><span class="pre">e</span></code> will run because the <code class="docutils literal"><span class="pre">s21</span></code> needs to be entered.</li>
+</ol>
+</div>
+<div class="section" id="fourth-pass">
+<h2>Fourth Pass<a class="headerlink" href="#fourth-pass" title="Permalink to this headline">¶</a></h2>
+<p>Now that we understand that, let’s re-ask the question:</p>
+<p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
+when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
+<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>Ok, our thinking is a bit clearer now but let’s tighten up our answer.  There are
+actually two parts, because the guard can return True or False.  We will start with the
+easy part of the answer, then explain the longer part of the answer:</p>
+<ol class="arabic simple">
+<li>If g() returns False, none of the functions are called.</li>
+<li>If g() returns True, then..  wait <code class="docutils literal"><span class="pre">g</span></code> had to be called first? Hmm.. whatever, here is
+my theory so far:  <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>.  It is
+easy to answer this way because my eyes work that way when I’m looking at
+the picture.</li>
+</ol>
+<p>But, there is something nagging at me now: <code class="docutils literal"><span class="pre">g</span></code> had to be called first, otherwise
+my answer doesn’t really make any sense.  So, here is my answer:</p>
+<ol class="arabic simple">
+<li>If g() returns False, only <code class="docutils literal"><span class="pre">g</span></code> is called</li>
+<li>If g() returns True, then <code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>.</li>
+</ol>
+<p>We have our theory, but we are hackers not philosophers.  We have more work to
+do.  Hackers ruthlessly deploy the scientific method to seek understanding
+about the things they care about.  Hackers do three hard things:</p>
+<ol class="arabic simple">
+<li>Think.</li>
+<li>Move past technical boundaries</li>
+<li>Destroy their own theories by seeking contrary evidence to gain deeper insight.</li>
+</ol>
+<p>Now that I think I understand how the statechart works, I have performed the
+first thing on the list.  To try and disprove my theory, I will need to build
+up the statechart in the diagram and actually see what happens.</p>
+</div>
+<div class="section" id="from-diagram-to-code-first-pass">
+<span id="scribbleexample-from-diagram-to-code-first-pass"></span><h2>From Diagram to Code, First Pass<a class="headerlink" href="#from-diagram-to-code-first-pass" title="Permalink to this headline">¶</a></h2>
+<p>To begin with I will draw the picture in the code, so that I can see what I’m
+trying to build:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">+----------------------------- s -------------------------------+</span>
+<span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
+<span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
+<span class="sd">| |    +--- s11 ----+   |                 |  +---- s21 -----+ | |</span>
+<span class="sd">| |    | exit / a() |   |                 |  | entry / e()  | | |</span>
+<span class="sd">| |    |            |   |                 |  |              | | |</span>
+<span class="sd">| |    |            |   +- T [g()] / t() -&gt;  |              | | |</span>
+<span class="sd">| |    +------------+   |                 |  +-----------/--+ | |</span>
+<span class="sd">| |                     |                 |   *-- / d() -+    | |</span>
+<span class="sd">| +---------------------+                 +-------------------+ |</span>
+<span class="sd">+---------------------------------------------------------------+</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="from-diagram-to-code-second-pass">
+<span id="scribbleexample-from-diagram-to-code-second-pass"></span><h2>From Diagram to Code, Second Pass<a class="headerlink" href="#from-diagram-to-code-second-pass" title="Permalink to this headline">¶</a></h2>
+<p>Now I’ll import the items I’ll need to run my experiment:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">+----------------------------- s -------------------------------+</span>
+<span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
+<span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
+<span class="sd">| |    +--- s11 ----+   |                 |  +---- s21 -----+ | |</span>
+<span class="sd">| |    | exit / a() |   |                 |  | entry / e()  | | |</span>
+<span class="sd">| |    |            |   |                 |  |              | | |</span>
+<span class="sd">| |    |            |   +- T [g()] / t() -&gt;  |              | | |</span>
+<span class="sd">| |    +------------+   |                 |  +-----------/--+ | |</span>
+<span class="sd">| |                     |                 |   *-- / d() -+    | |</span>
+<span class="sd">| +---------------------+                 +-------------------+ |</span>
+<span class="sd">+---------------------------------------------------------------+</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="hll"><span class="kn">import</span> <span class="nn">time</span>
+</span><span class="hll"><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
+</span><span class="hll"><span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+</span><span class="hll"><span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+</span></pre></div>
+</div>
+</div>
+<div class="section" id="from-diagram-to-code-third-pass">
+<span id="scribbleexample-from-diagram-to-code-third-pass"></span><h2>From Diagram to Code, Third Pass<a class="headerlink" href="#from-diagram-to-code-third-pass" title="Permalink to this headline">¶</a></h2>
+<p>Next I frame in the state methods:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">+----------------------------- s -------------------------------+</span>
+<span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
+<span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
+<span class="sd">| |    +--- s11 ----+   |                 |  +---- s21 -----+ | |</span>
+<span class="sd">| |    | exit / a() |   |                 |  | entry / e()  | | |</span>
+<span class="sd">| |    |            |   |                 |  |              | | |</span>
+<span class="sd">| |    |            |   +- T [g()] / t() -&gt;  |              | | |</span>
+<span class="sd">| |    +------------+   |                 |  +-----------/--+ | |</span>
+<span class="sd">| |                     |                 |   *-- / d() -+    | |</span>
+<span class="sd">| +---------------------+                 +-------------------+ |</span>
+<span class="sd">+---------------------------------------------------------------+</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
+<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+
+<span class="hll"><span class="nd">@spy_on</span>
+</span><span class="hll"><span class="k">def</span> <span class="nf">s_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span><span class="hll">  <span class="k">pass</span>
+</span>
+<span class="hll"><span class="nd">@spy_on</span>
+</span><span class="hll"><span class="k">def</span> <span class="nf">s1_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span><span class="hll">  <span class="k">pass</span>
+</span>
+<span class="hll"><span class="nd">@spy_on</span>
+</span><span class="hll"><span class="k">def</span> <span class="nf">s11_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span><span class="hll">  <span class="k">pass</span>
+</span>
+<span class="hll"><span class="nd">@spy_on</span>
+</span><span class="hll"><span class="k">def</span> <span class="nf">s2_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span><span class="hll">  <span class="k">pass</span>
+</span>
+<span class="hll"><span class="nd">@spy_on</span>
+</span><span class="hll"><span class="k">def</span> <span class="nf">s21_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span><span class="hll">  <span class="k">pass</span>
+</span></pre></div>
+</div>
+</div>
+<div class="section" id="from-diagram-to-code-fourth-pass">
+<span id="scribbleexample-from-diagram-to-code-fourth-pass"></span><h2>From Diagram to Code, Fourth Pass<a class="headerlink" href="#from-diagram-to-code-fourth-pass" title="Permalink to this headline">¶</a></h2>
+<p>Now I add the boilerplate code into each of the state methods:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">+----------------------------- s -------------------------------+</span>
+<span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
+<span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
+<span class="sd">| |    +--- s11 ----+   |                 |  +---- s21 -----+ | |</span>
+<span class="sd">| |    | exit / a() |   |                 |  | entry / e()  | | |</span>
+<span class="sd">| |    |            |   |                 |  |              | | |</span>
+<span class="sd">| |    |            |   +- T [g()] / t() -&gt;  |              | | |</span>
+<span class="sd">| |    +------------+   |                 |  +-----------/--+ | |</span>
+<span class="sd">| |                     |                 |   *-- / d() -+    | |</span>
+<span class="sd">| +---------------------+                 +-------------------+ |</span>
+<span class="sd">+---------------------------------------------------------------+</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
+<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+<span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s1_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+<span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="nd">@spy_on</span>
+<span class="hll"><span class="k">def</span> <span class="nf">s11_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s2_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+<span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s21_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+<span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span></pre></div>
+</div>
+</div>
+<div class="section" id="from-diagram-to-code-fifth-pass">
+<span id="scribbleexample-from-diagram-to-code-fifth-pass"></span><h2>From Diagram To Code, Fifth Pass<a class="headerlink" href="#from-diagram-to-code-fifth-pass" title="Permalink to this headline">¶</a></h2>
+<p>Then I add the hierarchy:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">+----------------------------- s -------------------------------+</span>
+<span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
+<span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
+<span class="sd">| |    +--- s11 ----+   |                 |  +---- s21 -----+ | |</span>
+<span class="sd">| |    | exit / a() |   |                 |  | entry / e()  | | |</span>
+<span class="sd">| |    |            |   |                 |  |              | | |</span>
+<span class="sd">| |    |            |   +- T [g()] / t() -&gt;  |              | | |</span>
+<span class="sd">| |    +------------+   |                 |  +-----------/--+ | |</span>
+<span class="sd">| |                     |                 |   *-- / d() -+    | |</span>
+<span class="sd">| +---------------------+                 +-------------------+ |</span>
+<span class="sd">+---------------------------------------------------------------+</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
+<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+<span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+</span>  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s1_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">a</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+<span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s_state</span>
+</span>  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s11_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s1_state</span>
+<span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s2_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s_state</span>
+<span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s21_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s2_state</span>
+<span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span></pre></div>
+</div>
+</div>
+<div class="section" id="from-diagram-to-code-sixth-pass">
+<span id="scribbleexample-from-diagram-to-code-sixth-pass"></span><h2>From Diagram to Code, Sixth Pass<a class="headerlink" href="#from-diagram-to-code-sixth-pass" title="Permalink to this headline">¶</a></h2>
+<p>Now I’ll add management for the <code class="docutils literal"><span class="pre">T</span></code> event in state <code class="docutils literal"><span class="pre">s1</span></code> event and the
+<code class="docutils literal"><span class="pre">init</span></code> event needed in <code class="docutils literal"><span class="pre">s2</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">+----------------------------- s -------------------------------+</span>
+<span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
+<span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
+<span class="sd">| |    +--- s11 ----+   |                 |  +---- s21 -----+ | |</span>
+<span class="sd">| |    | exit / a() |   |                 |  | entry / e()  | | |</span>
+<span class="sd">| |    |            |   |                 |  |              | | |</span>
+<span class="sd">| |    |            |   +- T [g()] / t() -&gt;  |              | | |</span>
+<span class="sd">| |    +------------+   |                 |  +-----------/--+ | |</span>
+<span class="sd">| |                     |                 |   *-- / d() -+    | |</span>
+<span class="sd">| +---------------------+                 +-------------------+ |</span>
+<span class="sd">+---------------------------------------------------------------+</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
+<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s1_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">a</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s2_state</span><span class="p">)</span>
+</span>  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s_state</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s11_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s1_state</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s2_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s21_state</span><span class="p">)</span>
+</span>  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s_state</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s21_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s2_state</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="from-diagram-to-code-eighth-pass">
+<span id="scribbleexample-from-diagram-to-code-eighth-pass"></span><h2>From Diagram to Code, Eighth Pass<a class="headerlink" href="#from-diagram-to-code-eighth-pass" title="Permalink to this headline">¶</a></h2>
+<p>Now it is time to turn on this hierarchy by giving it to an active object and
+seeing what happens:</p>
+<p>Notice, we sleep for a very short time to let the active object thread detect that
+it has received an instruction.</p>
+<p id="scribbleexample">When we run this code it outputs:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:s11_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:s1_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:s_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:s_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:s1_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:s11_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:s11_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Good, our start is structured well enough that it can run.</p>
+</div>
+<div class="section" id="from-diagram-to-code-ninth-pass">
+<span id="scribbleexample-from-diagram-to-code-ninth-pass"></span><h2>From Diagram to Code, Ninth Pass<a class="headerlink" href="#from-diagram-to-code-ninth-pass" title="Permalink to this headline">¶</a></h2>
+<p>Now lets add the guard function <code class="docutils literal"><span class="pre">g</span></code> and the <code class="docutils literal"><span class="pre">t</span></code> function into s1_state,
+this will build this part of the picture:</p>
+<img alt="_images/guard.svg" src="_images/guard.svg" /><div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">+----------------------------- s -------------------------------+</span>
+<span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
+<span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
+<span class="sd">| |    +--- s11 ----+   |                 |  +---- s21 -----+ | |</span>
+<span class="sd">| |    | exit / a() |   |                 |  | entry / e()  | | |</span>
+<span class="sd">| |    |            |   |                 |  |              | | |</span>
+<span class="sd">| |    |            |   +- T [g()] / t() -&gt;  |              | | |</span>
+<span class="sd">| |    +------------+   |                 |  +-----------/--+ | |</span>
+<span class="sd">| |                     |                 |   *-- / d() -+    | |</span>
+<span class="sd">| +---------------------+                 +-------------------+ |</span>
+<span class="sd">+---------------------------------------------------------------+</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
+<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s1_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="hll">  <span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;Running g() -- the guard, which returns True&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="k">return</span> <span class="bp">True</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;Running t() -- function run on event T&quot;</span><span class="p">)</span>
+</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
+</span><span class="hll">    <span class="k">if</span> <span class="n">g</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+</span><span class="hll">      <span class="n">t</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+</span><span class="hll">      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s2_state</span><span class="p">)</span>
+</span>  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s_state</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s11_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s1_state</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s2_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s21_state</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s_state</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s21_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s2_state</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;T_question&quot;</span><span class="p">)</span>
+  <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">s11_state</span><span class="p">)</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+  <span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>The guard condition totally makes sense when you look it it in Python.</p>
+<p>Functions <code class="docutils literal"><span class="pre">g</span></code> and <code class="docutils literal"><span class="pre">t</span></code> use the chart’s <code class="docutils literal"><span class="pre">scribble</span></code> method which puts little
+notes directly into the spy output log.  We do this so that our tests will
+reveal exactly when <code class="docutils literal"><span class="pre">g</span></code> and <code class="docutils literal"><span class="pre">t</span></code> are called by the event processor.</p>
+</div>
+<div class="section" id="from-diagram-to-code-tenth-pass">
+<span id="scribbleexample-from-diagram-to-code-tenth-pass"></span><h2>From Diagram to Code, Tenth Pass<a class="headerlink" href="#from-diagram-to-code-tenth-pass" title="Permalink to this headline">¶</a></h2>
+<p>Now let’s frame <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>. Notice we re-name the <code class="docutils literal"><span class="pre">e</span></code>
+function to <code class="docutils literal"><span class="pre">e_function</span></code> to avoid a name collision:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">+----------------------------- s -------------------------------+</span>
+<span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
+<span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
+<span class="sd">| |    +--- s11 ----+   |                 |  +---- s21 -----+ | |</span>
+<span class="sd">| |    | exit / a() |   |                 |  | entry / e()  | | |</span>
+<span class="sd">| |    |            |   |                 |  |              | | |</span>
+<span class="sd">| |    |            |   +- T [g()] / t() -&gt;  |              | | |</span>
+<span class="sd">| |    +------------+   |                 |  +-----------/--+ | |</span>
+<span class="sd">| |                     |                 |   *-- / d() -+    | |</span>
+<span class="sd">| +---------------------+                 +-------------------+ |</span>
+<span class="sd">+---------------------------------------------------------------+</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
+<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s1_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="hll">  <span class="k">def</span> <span class="nf">b</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;Running b()&quot;</span><span class="p">)</span>
+</span>
+  <span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;Running g() -- the guard, which returns True&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">True</span>
+
+  <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;Running t() -- function run on event T&quot;</span><span class="p">)</span>
+
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+<span class="hll">    <span class="n">b</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">g</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+      <span class="n">t</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s2_state</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s_state</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s11_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="hll">  <span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;Running a()&quot;</span><span class="p">)</span>
+</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+<span class="hll">    <span class="n">a</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s1_state</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s2_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="hll">  <span class="k">def</span> <span class="nf">c</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;running c()&quot;</span><span class="p">)</span>
+</span>
+<span class="hll">  <span class="k">def</span> <span class="nf">d</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;running d()&quot;</span><span class="p">)</span>
+</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+<span class="hll">    <span class="n">c</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+<span class="hll">    <span class="n">d</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s21_state</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s_state</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s21_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="hll">  <span class="k">def</span> <span class="nf">e_function</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;running e()&quot;</span><span class="p">)</span>
+</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+<span class="hll">    <span class="n">e_function</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s2_state</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;T_question&quot;</span><span class="p">)</span>
+  <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">s11_state</span><span class="p">)</span>
+
+<span class="hll">  <span class="n">ao</span><span class="o">.</span><span class="n">clear_spy</span><span class="p">()</span>
+</span><span class="hll">  <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+</span><span class="hll">  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</span><span class="hll">  <span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+</span></pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="challenging-our-hypothesis">
+<h2>Challenging Our Hypothesis<a class="headerlink" href="#challenging-our-hypothesis" title="Permalink to this headline">¶</a></h2>
+<p>Let’s bring our question and our hypothesis back into view so we can think
+about it again:</p>
+<p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
+when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
+<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>Our answer:
+<code class="docutils literal"><span class="pre">if</span> <span class="pre">g()</span> <span class="pre">returns</span> <span class="pre">True,</span> <span class="pre">then</span> <span class="pre">the</span> <span class="pre">function</span> <span class="pre">order</span> <span class="pre">will</span> <span class="pre">be:</span></code> <code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code></p>
+<p>Right now I’m feeling pretty good.  I have some thinking, but more importantly
+I have some firm reality outside of myself that I can push against.  My sense
+of possession has transfered from my answer into the structure that will be
+used to attack this answer.  This is the first part of hacking, I have
+distanced my sense of ownership away from the idea I am examining.</p>
+<p>Moreover, I feel a sense of control and I’m feeling satisfaction from building
+something.  The part of my mind that gets a buzz from pursuit, from seeking is
+activated and I’m feeling ready to grok something about these statecharts.</p>
+<p>If you have actually been doing the work and debugging your own code, well,
+maybe you feel this too.</p>
+<p>Now, let’s pull the trigger and see what happens.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;T:s11_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;T:s1_state&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;Running g() -- the guard, which return True&#39;</span><span class="p">,</span>
+</span><span class="hll"> <span class="s1">&#39;Running t() -- function run on event T&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;EXIT_SIGNAL:s11_state&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;Running a()&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:s11_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:s2_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:s1_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;EXIT_SIGNAL:s1_state&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;Running b()&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;ENTRY_SIGNAL:s2_state&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;running c()&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;INIT_SIGNAL:s2_state&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;running d()&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:s21_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:s21_state&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;running e()&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;INIT_SIGNAL:s21_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Look, it’s different.  We got an order of: <code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>,
+<code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>.  Ok, maybe there is a bug.  If we look at the guard and trans
+code in state <code class="docutils literal"><span class="pre">s1</span></code> we see this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s1_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">b</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;Running b()&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;Running g() -- the guard, which returns True&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">True</span>
+
+  <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;Running t() -- function run on event T&quot;</span><span class="p">)</span>
+
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">b</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
+<span class="hll">    <span class="k">if</span> <span class="n">g</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+</span><span class="hll">      <span class="n">t</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+</span><span class="hll">      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s2_state</span><span class="p">)</span>
+</span>  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s_state</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>We see that <code class="docutils literal"><span class="pre">t</span></code> is called right after <code class="docutils literal"><span class="pre">g</span></code>, so our new answer makes sense.  In
+fact, you might have seen it while we were working on the example.</p>
+<p>If you are deeply familiar with the UML specification for statecharts, you will
+see that this is an infraction.  The original answer was suppose to describe the
+behavior.  The good news is that this event processor algorithm is based on the
+work of Miros Samek.</p>
+<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>On pages 80-81 of his book titled “PRACTICAL UML STATECHARTS in C/C++ Second
+Edition” he writes:</p>
+<blockquote>
+<div><p>One big problem with UML transition sequence is that it requires executing
+actions associated with the transition <cite>after</cite> destroying the source state
+configuration but before creating the target state configuration.  In the
+analogy between exit actions in state machines and destructors in OOP, this
+situation corresponds to executing a class method after partially destroying an
+object.  Of course, such action is illegal in OOP.  As it turns out, it is also
+particularly awkward to implement for state machines.</p>
+<p>Executing actions associated with a transition is much more natural in the
+context of the source state – the same context in which the guard condition is
+evaluated.  Only after the guard and the transition actions execute, the source
+state configuration is exited and the target state configuration is entered
+<cite>atomically</cite>.  That way the state machine is observable only in a safe state
+configuration, either before or after the transition, but not in the middle.</p>
+</div></blockquote>
+<p>So, our <code class="docutils literal"><span class="pre">t</span></code> function runs within the context of the thing that asked for the
+transition.  This keeps it out of the strange limbo state described above.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
+  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
+</a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Hacking to Learn</a><ul>
+<li><a class="reference internal" href="#first-pass">First Pass</a></li>
+<li><a class="reference internal" href="#second-pass">Second Pass</a></li>
+<li><a class="reference internal" href="#third-pass">Third Pass</a></li>
+<li><a class="reference internal" href="#fourth-pass">Fourth Pass</a></li>
+<li><a class="reference internal" href="#from-diagram-to-code-first-pass">From Diagram to Code, First Pass</a></li>
+<li><a class="reference internal" href="#from-diagram-to-code-second-pass">From Diagram to Code, Second Pass</a></li>
+<li><a class="reference internal" href="#from-diagram-to-code-third-pass">From Diagram to Code, Third Pass</a></li>
+<li><a class="reference internal" href="#from-diagram-to-code-fourth-pass">From Diagram to Code, Fourth Pass</a></li>
+<li><a class="reference internal" href="#from-diagram-to-code-fifth-pass">From Diagram To Code, Fifth Pass</a></li>
+<li><a class="reference internal" href="#from-diagram-to-code-sixth-pass">From Diagram to Code, Sixth Pass</a></li>
+<li><a class="reference internal" href="#from-diagram-to-code-eighth-pass">From Diagram to Code, Eighth Pass</a></li>
+<li><a class="reference internal" href="#from-diagram-to-code-ninth-pass">From Diagram to Code, Ninth Pass</a></li>
+<li><a class="reference internal" href="#from-diagram-to-code-tenth-pass">From Diagram to Code, Tenth Pass</a></li>
+<li><a class="reference internal" href="#challenging-our-hypothesis">Challenging Our Hypothesis</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="examples.html">Examples</a><ul>
+      <li>Previous: <a href="postingexample.html" title="previous chapter">Simple Posting Example</a></li>
+      <li>Next: <a href="recipes.html" title="next chapter">Recipes</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/scribbleexample.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Scott Volk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/scribbleexample.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

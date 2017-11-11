@@ -1031,6 +1031,9 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
       self.full.spy.extend(self.rtc.spy)
     return _append_to_full_spy
 
+  def scribble(self, string):
+    self.rtc.spy.append(string)
+
   def append_to_full_trace(fn):
     @wraps(fn)
     def is_signal_hooked_or_ignored(self):

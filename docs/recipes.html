@@ -24,7 +24,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Reflection" href="reflection.html" />
-    <link rel="prev" title="Simple Posting Example" href="postingexample.html" />
+    <link rel="prev" title="Hacking to Learn" href="scribbleexample.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -433,6 +433,23 @@ Python dictionary:</p>
   <span class="c1"># ..</span>
 </pre></div>
 </div>
+<p>To compare a received event against a signal, compare the signal numbers:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_example_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANLDED</span>
+<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span>    <span class="c1"># do something</span>
+</pre></div>
+</div>
+<p>On lines <strong>1-2</strong> we see standard state method boiler plate code.  On line <strong>3</strong>
+we see how to compare the signal numbers against one another to see if they
+match.</p>
+<p>It you wanted read the signals name as a string, you would call the
+<code class="docutils literal"><span class="pre">signal_name</span></code> method of the Event class:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_example_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANLDED</span>
+<span class="hll">  <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal_name</span><span class="p">)</span> <span class="c1"># &quot;ENTRY_SIGNAL&quot;</span>
+</span></pre></div>
+</div>
 </div>
 <div class="section" id="using-the-trace">
 <span id="recipes-using-the-trace"></span><h3>Using the Trace<a class="headerlink" href="#using-the-trace" title="Permalink to this headline">¶</a></h3>
@@ -630,6 +647,34 @@ data at the tail end of its log.</p>
 </div>
 <div class="section" id="spying-live">
 <span id="recipes-spying-live"></span><h3>Spying Live<a class="headerlink" href="#spying-live" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="scribble-on-the-spy">
+<span id="recipes-scribble-on-the-spy"></span><h3>Scribble On the Spy<a class="headerlink" href="#scribble-on-the-spy" title="Permalink to this headline">¶</a></h3>
+<p>To add messaging to your spy log so that you can see how an activity is
+situated within the statechart’s behavior, use the <code class="docutils literal"><span class="pre">scribble</span></code> api within your
+state method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">s2_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">c</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+<span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;running c()&quot;</span><span class="p">)</span>
+</span>
+  <span class="k">def</span> <span class="nf">d</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+<span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;running d()&quot;</span><span class="p">)</span>
+</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">c</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">d</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s21_state</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">s_state</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="describing-your-work">
@@ -967,6 +1012,7 @@ specification.</p>
 <li><a class="reference internal" href="#using-the-spy">Using the Spy</a></li>
 <li><a class="reference internal" href="#tracing-live">Tracing Live</a></li>
 <li><a class="reference internal" href="#spying-live">Spying Live</a></li>
+<li><a class="reference internal" href="#scribble-on-the-spy">Scribble On the Spy</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#describing-your-work">Describing your Work</a><ul>
@@ -986,7 +1032,7 @@ specification.</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="postingexample.html" title="previous chapter">Simple Posting Example</a></li>
+      <li>Previous: <a href="scribbleexample.html" title="previous chapter">Hacking to Learn</a></li>
       <li>Next: <a href="reflection.html" title="next chapter">Reflection</a></li>
   </ul></li>
 </ul>

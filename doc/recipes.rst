@@ -432,6 +432,13 @@ Tracing Live
 Spying Live
 ^^^^^^^^^^^
 
+.. _recipes-scribble-on-the-spy:
+
+Scribble On the Spy
+^^^^^^^^^^^^^^^^^^^
+
+.. include:: i_scribble_on_the_spy.rst
+
 .. _recipes-describing-your-work:
 
 Describing your Work

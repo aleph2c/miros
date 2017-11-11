@@ -160,6 +160,23 @@ Python dictionary:</p>
   <span class="c1"># ..</span>
 </pre></div>
 </div>
+<p>To compare a received event against a signal, compare the signal numbers:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_example_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANLDED</span>
+<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span>    <span class="c1"># do something</span>
+</pre></div>
+</div>
+<p>On lines <strong>1-2</strong> we see standard state method boiler plate code.  On line <strong>3</strong>
+we see how to compare the signal numbers against one another to see if they
+match.</p>
+<p>It you wanted read the signals name as a string, you would call the
+<code class="docutils literal"><span class="pre">signal_name</span></code> method of the Event class:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_example_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANLDED</span>
+<span class="hll">  <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal_name</span><span class="p">)</span> <span class="c1"># &quot;ENTRY_SIGNAL&quot;</span>
+</span></pre></div>
+</div>
 </div>
 <div class="section" id="a-high-level-description-of-the-behavior">
 <h2>A High Level Description of The Behavior<a class="headerlink" href="#a-high-level-description-of-the-behavior" title="Permalink to this headline">¶</a></h2>

@@ -43,3 +43,28 @@ Python dictionary:
     # REFLECTION_SIGNAL       4
     # SEARCH_FOR_SUPER_SIGNAL 5
     # ..
+
+To compare a received event against a signal, compare the signal numbers:
+
+.. code-block:: python
+  :emphasize-lines: 3
+
+  def some_example_state(chart, e):
+    status = return_status.UNHANLDED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      # do something
+
+On lines **1-2** we see standard state method boiler plate code.  On line **3**
+we see how to compare the signal numbers against one another to see if they
+match.
+
+It you wanted read the signals name as a string, you would call the
+``signal_name`` method of the Event class:
+
+.. code-block:: python
+  :emphasize-lines: 3
+
+  def some_example_state(chart, e):
+    status = return_status.UNHANLDED
+    print(e.signal_name) # "ENTRY_SIGNAL"
+
