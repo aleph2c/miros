@@ -42,11 +42,12 @@
             
   <div class="section" id="hacking-to-learn">
 <span id="scribbleexample-hacking-to-learn-the-deeper-dynamics"></span><h1>Hacking to Learn<a class="headerlink" href="#hacking-to-learn" title="Permalink to this headline">¶</a></h1>
-<p id="scribbleexample-first-pass">Here I ask a small question about a statechart.  Then with small steps we will:</p>
+<p id="scribbleexample-first-pass">In this example I ask a small question about a statechart.  Then we will:</p>
 <ol class="arabic simple">
-<li>come up with a theory about what is going on</li>
+<li>try to answer the question</li>
 <li>build the chart in working code</li>
-<li>test our hypothesis</li>
+<li>test out our answer</li>
+<li>learn something</li>
 </ol>
 <div class="section" id="a-picture-and-a-question">
 <h2>A Picture and a Question<a class="headerlink" href="#a-picture-and-a-question" title="Permalink to this headline">¶</a></h2>
@@ -66,12 +67,12 @@ guard works, we can infer that:</p>
 <ol class="arabic simple">
 <li>When I see a <cite>T</cite> event ask for permission from the guard to see if it can pass.</li>
 <li>The <cite>g</cite> function is the guard</li>
-<li>If <cite>g</cite> returns True, <cite>T</cite> can pass; it can run the <cite>t</cite> function then make the transition to state <cite>s2</cite>.</li>
+<li>If <cite>g</cite> returns True, <cite>T</cite> can pass; it can run the <cite>t</cite> function then make the transition to state <cite>s2</cite> <a class="footnote-reference" href="#f1" id="id1">[1]</a>.</li>
 <li>If <cite>g</cite> returns False the <cite>T</cite> event is ignored by the chart.</li>
 </ol>
 </div>
-<div class="section" id="a-better-answer">
-<h2>A Better Answer<a class="headerlink" href="#a-better-answer" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="a-partial-answer">
+<h2>A Partial Answer<a class="headerlink" href="#a-partial-answer" title="Permalink to this headline">¶</a></h2>
 <p>Now that we understand that, let’s re-ask the question:</p>
 <p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
 when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
@@ -89,9 +90,9 @@ to run <code class="docutils literal"><span class="pre">g</span></code> and <cod
 <li><code class="docutils literal"><span class="pre">c</span></code> will run because <code class="docutils literal"><span class="pre">s2</span></code> needs to be entered.</li>
 </ol>
 </div>
-<div class="section" id="an-even-better-answer">
-<h2>An Even Better Answer<a class="headerlink" href="#an-even-better-answer" title="Permalink to this headline">¶</a></h2>
-<p>Now that we understand that, let’s re-ask the question:</p>
+<div class="section" id="a-better-answer">
+<h2>A Better Answer<a class="headerlink" href="#a-better-answer" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have a partial answer, let’s re-ask the question:</p>
 <p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
 when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
 <img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>If we look at the <code class="docutils literal"><span class="pre">s2</span></code> state, we see that it has an initialization event
@@ -112,7 +113,6 @@ Let’s add this to our working theory:</p>
 </div>
 <div class="section" id="our-first-working-hypothesis">
 <h2>Our First Working Hypothesis<a class="headerlink" href="#our-first-working-hypothesis" title="Permalink to this headline">¶</a></h2>
-<p>Now that we understand that, let’s re-ask the question:</p>
 <p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
 when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
 <img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>Ok, our thinking is a bit clearer now but let’s tighten up our answer.  There are
@@ -133,8 +133,7 @@ my answer doesn’t really make any sense.  So, here is my answer:</p>
 </ol>
 <p>We have our theory, but we are hackers not philosophers.  We have more work to
 do.  Hackers ruthlessly deploy the scientific method to seek understanding
-about the things they care about.  Hackers do these four hard things over and
-over again:</p>
+about things they care about.  Hackers four hard things over and over again:</p>
 <ol class="arabic simple">
 <li>Think.</li>
 <li>Move past technical boundaries</li>
@@ -969,8 +968,8 @@ when would each of the functions, <code class="docutils literal"><span class="pr
 see that our observed behavior is an infraction.  The original answer was
 suppose to describe the behavior.  The good news is that this event processor
 algorithm is based on the work of Miros Samek.</p>
-<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>On pages 80-81 of his book titled “PRACTICAL UML STATECHARTS in C/C++ Second
-Edition” he wrote:</p>
+<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>On pages 80-81 of his book titled <a class="reference external" href="https://www.amazon.ca/Practical-UML-Statecharts-Event-Driven-Programming/dp/0750687061/ref=sr_1_1?s=books&amp;ie=UTF8&amp;qid=1510515714&amp;sr=1-1&amp;dpID=51Uq%252BHZ9L-L&amp;preST=_SX198_BO1,204,203,200_QL40_&amp;dpSrc=srch">Practical UML Statecharts in C/C++ Second
+Edition</a> he wrote:</p>
 <blockquote>
 <div><p>One big problem with UML transition sequence is that it requires executing
 actions associated with the transition <cite>after</cite> destroying the source state
@@ -1001,6 +1000,12 @@ re-imagine the diagram as:</p>
 <li><code class="docutils literal"><span class="pre">g</span></code> if <code class="docutils literal"><span class="pre">g</span></code> returns False</li>
 </ul>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
+<table class="docutils footnote" frame="void" id="f1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>The S1 rectangle containing the two small rectangles with a line between them is short hand for a composite state</td></tr>
+</tbody>
+</table>
 </div>
 </div>
 
@@ -1016,8 +1021,8 @@ re-imagine the diagram as:</p>
   <ul>
 <li><a class="reference internal" href="#">Hacking to Learn</a><ul>
 <li><a class="reference internal" href="#a-picture-and-a-question">A Picture and a Question</a></li>
+<li><a class="reference internal" href="#a-partial-answer">A Partial Answer</a></li>
 <li><a class="reference internal" href="#a-better-answer">A Better Answer</a></li>
-<li><a class="reference internal" href="#an-even-better-answer">An Even Better Answer</a></li>
 <li><a class="reference internal" href="#our-first-working-hypothesis">Our First Working Hypothesis</a></li>
 <li><a class="reference internal" href="#code-make-a-picture">Code, Make a Picture</a></li>
 <li><a class="reference internal" href="#code-required-imports">Code, Required Imports</a></li>

@@ -6,11 +6,12 @@ Hacking to Learn
 
 .. _scribbleexample-first-pass:
 
-Here I ask a small question about a statechart.  Then with small steps we will:
+In this example I ask a small question about a statechart.  Then we will:
 
-1. come up with a theory about what is going on
+1. try to answer the question
 2. build the chart in working code
-3. test our hypothesis
+3. test out our answer
+4. learn something
 
 A Picture and a Question
 ------------------------
@@ -43,11 +44,11 @@ means:
 
 1. When I see a `T` event ask for permission from the guard to see if it can pass.
 2. The `g` function is the guard
-3. If `g` returns True, `T` can pass; it can run the `t` function then make the transition to state `s2`.
+3. If `g` returns True, `T` can pass; it can run the `t` function then make the transition to state `s2` [#f1]_.
 4. If `g` returns False the `T` event is ignored by the chart.
 
-A Better Answer
----------------
+A Partial Answer
+----------------
 
 Now that we understand that, let's re-ask the question:
 
@@ -70,9 +71,9 @@ to run ``g`` and ``t`` on the ``T`` event.  Here is a working theory:
 4. ``t`` will run (assuming that ``g`` returned true)
 5. ``c`` will run because ``s2`` needs to be entered.
 
-An Even Better Answer
-----------------------
-Now that we understand that, let's re-ask the question:
+A Better Answer
+---------------
+Now that we have a partial answer, let's re-ask the question:
 
 "Suppose we started the above chart in ``s11``, then we send a ``T`` event to it,
 when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and ``t`` happen?"
@@ -96,8 +97,6 @@ Let's add this to our working theory:
 
 Our First Working Hypothesis
 ----------------------------
-Now that we understand that, let's re-ask the question:
-
 "Suppose we started the above chart in ``s11``, then we send a ``T`` event to it,
 when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and ``t`` happen?"
 
@@ -122,8 +121,7 @@ my answer doesn't really make any sense.  So, here is my answer:
 
 We have our theory, but we are hackers not philosophers.  We have more work to
 do.  Hackers ruthlessly deploy the scientific method to seek understanding
-about the things they care about.  Hackers do these four hard things over and
-over again:
+about things they care about.  Hackers four hard things over and over again:
 
 1. Think.
 2. Move past technical boundaries
@@ -1005,8 +1003,8 @@ algorithm is based on the work of Miros Samek.
 
 .. image:: _static/scribble.svg
 
-On pages 80-81 of his book titled "PRACTICAL UML STATECHARTS in C/C++ Second
-Edition" he wrote:
+On pages 80-81 of his book titled `Practical UML Statecharts in C/C++ Second
+Edition`_ he wrote:
 
     One big problem with UML transition sequence is that it requires executing
     actions associated with the transition `after` destroying the source state
@@ -1046,3 +1044,7 @@ Then the answer to the question would just reveal itself from your imagined diag
 * ``g`` if ``g`` returns False
 
 :ref:`back to examples <examples>`
+
+.. _Practical UML Statecharts in C/C++ Second Edition: https://www.amazon.ca/Practical-UML-Statecharts-Event-Driven-Programming/dp/0750687061/ref=sr_1_1?s=books&ie=UTF8&qid=1510515714&sr=1-1&dpID=51Uq%252BHZ9L-L&preST=_SX198_BO1,204,203,200_QL40_&dpSrc=srch
+
+.. [#f1] The S1 rectangle containing the two small rectangles with a line between them is short hand for a composite state 
