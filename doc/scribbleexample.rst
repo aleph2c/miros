@@ -12,8 +12,9 @@ Here I ask a small question about a statechart.  Then with small steps we will:
 2. build the chart in working code
 3. test our hypothesis
 
-First Pass
-----------
+A Picture and a Question
+------------------------
+
 .. image:: _static/scribble.svg
 
 Suppose we started the above chart in ``s11``, then we send a ``T`` event to it,
@@ -36,7 +37,7 @@ the event on the arrow pass through`.  The code that is after the guard on the
 diagram, ``t()``, runs if the guard doesn't block it.  Now that we know how a
 guard works, we can infer that:
 
-.. image:: _static/guard.svg
+.. image:: _static/guard2.svg
 
 means:
 
@@ -45,8 +46,8 @@ means:
 3. If `g` returns True, `T` can pass; it can run the `t` function then make the transition to state `s2`.
 4. If `g` returns False the `T` event is ignored by the chart.
 
-Second Pass
-----------
+A Better Answer
+---------------
 
 Now that we understand that, let's re-ask the question:
 
@@ -69,8 +70,8 @@ to run ``g`` and ``t`` on the ``T`` event.  Here is a working theory:
 4. ``t`` will run (assuming that ``g`` returned true)
 5. ``c`` will run because ``s2`` needs to be entered.
 
-Third Pass
-----------
+An Even Better Answer
+----------------------
 Now that we understand that, let's re-ask the question:
 
 "Suppose we started the above chart in ``s11``, then we send a ``T`` event to it,
@@ -78,12 +79,12 @@ when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and 
 
 .. image:: _static/scribble.svg
 
-If we look at the ``s2`` state, we see that it has an initialization event with
-another function ``d`` hanging on it (black dot).  After ``s2`` is entered, we would expect
-the next thing to be a transition into the ``s21`` state, but first we would
-run the ``d`` function on the arrow tied to the black dot, since it is outside
-of the ``s21`` state and we haven't entered it yet.  Let's add this to our
-working theory:
+If we look at the ``s2`` state, we see that it has an initialization event
+(black dot) with another function ``d`` hanging on it .  After ``s2`` is
+entered, we would expect the next thing to be a transition into the ``s21``
+state, but first we would run the ``d`` function on the arrow tied to the black
+dot, since it is outside of the ``s21`` state and we haven't entered it yet.
+Let's add this to our working theory:
 
 1. ``a`` will run because ``s11`` needs to be exited.
 2. ``b`` will run because ``s1`` needs to be exited.
@@ -93,8 +94,8 @@ working theory:
 6. ``d`` will run on the init transition event from ``s2`` to ``s21``
 7. ``e`` will run because the ``s21`` needs to be entered.
 
-Fourth Pass
------------
+Our First Working Hypothesis
+----------------------------
 Now that we understand that, let's re-ask the question:
 
 "Suppose we started the above chart in ``s11``, then we send a ``T`` event to it,
@@ -121,11 +122,13 @@ my answer doesn't really make any sense.  So, here is my answer:
 
 We have our theory, but we are hackers not philosophers.  We have more work to
 do.  Hackers ruthlessly deploy the scientific method to seek understanding
-about the things they care about.  Hackers do three hard things:
+about the things they care about.  Hackers do these four hard things over and
+over again:
 
 1. Think.
 2. Move past technical boundaries
-3. Destroy their own theories by seeking contrary evidence to gain deeper insight.
+3. Destroy their own theories by seeking contrary evidence.
+4. Learn from their mistakes
 
 Now that I think I understand how the statechart works, I have performed the
 first thing on the list.  To try and disprove my theory, I will need to build
@@ -133,8 +136,8 @@ up the statechart in the diagram and actually see what happens.
 
 .. _scribbleexample-from-diagram-to-code,-first-pass:
 
-From Diagram to Code, First Pass
---------------------------------
+Code, Make a Picture
+--------------------
 
 To begin with I will draw the picture in the code, so that I can see what I'm
 trying to build:
@@ -157,8 +160,8 @@ trying to build:
   '''
 .. _scribbleexample-from-diagram-to-code,-second-pass:
 
-From Diagram to Code, Second Pass
----------------------------------
+Code, Required Imports
+----------------------
 
 Now I'll import the items I'll need to run my experiment:
 
@@ -187,10 +190,10 @@ Now I'll import the items I'll need to run my experiment:
 
 .. _scribbleexample-from-diagram-to-code,-third-pass:
 
-From Diagram to Code, Third Pass
---------------------------------
+Code, Frame in the States
+-------------------------
 
-Next I frame in the state methods:
+Now I will frame in the state methods:
 
 .. code-block:: python
   :emphasize-lines: 20-22,24-26,28-30,32-34,36-38
@@ -236,10 +239,11 @@ Next I frame in the state methods:
 
 .. _scribbleexample-from-diagram-to-code,-fourth-pass:
 
-From Diagram to Code, Fourth Pass
----------------------------------
+Code, Add Common Internal State Code
+------------------------------------
 
-Now I add the boilerplate code into each of the state methods:
+Now I add the internal-event-handling code into each of the state
+methods:
 
 .. code-block:: python
   :emphasize-lines: 22-30, 34-42, 45-54, 58-66, 70-78
@@ -325,8 +329,8 @@ Now I add the boilerplate code into each of the state methods:
 
 .. _scribbleexample-from-diagram-to-code,-fifth-pass:
 
-From Diagram To Code, Fifth Pass
---------------------------------
+Code, Add Hiearchy
+------------------
 
 Then I add the hierarchy:
 
@@ -420,8 +424,8 @@ Then I add the hierarchy:
 
 .. _scribbleexample-from-diagram-to-code,-sixth-pass:
 
-From Diagram to Code, Sixth Pass
---------------------------------
+Code, Add the T and Init events
+-------------------------------
 
 Now I'll add management for the ``T`` event in state ``s1`` event and the
 ``init`` event needed in ``s2``:
@@ -520,8 +524,8 @@ Now I'll add management for the ``T`` event in state ``s1`` event and the
 
 .. _scribbleexample-from-diagram-to-code,-eighth-pass:
 
-From Diagram to Code, Eighth Pass
----------------------------------
+Code, See if anything Runs
+--------------------------
 
 Now it is time to turn on this hierarchy by giving it to an active object and
 seeing what happens:
@@ -650,8 +654,8 @@ Good, our start is structured well enough that it can run.
 
 .. _scribbleexample-from-diagram-to-code,-ninth-pass:
 
-From Diagram to Code, Ninth Pass
---------------------------------
+Code, Add the guard and t function
+----------------------------------
 
 Now lets add the guard function ``g`` and the ``t`` function into s1_state,
 this will build this part of the picture:
@@ -774,8 +778,8 @@ reveal exactly when ``g`` and ``t`` are called by the event processor.
 
 .. _scribbleexample-from-diagram-to-code,-tenth-pass:
 
-From Diagram to Code, Tenth Pass
---------------------------------
+Code, Add the other functions
+-----------------------------
 
 Now let's frame ``a``, ``b``, ``c``, ``d``, ``e``. Notice we re-name the ``e``
 function to ``e_function`` to avoid a name collision:
@@ -925,11 +929,11 @@ when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and 
 Our answer:
 ``if g() returns True, then the function order will be:`` ``g``, ``a``, ``b``, ``t``, ``c``, ``d``, ``e``
 
-Right now I'm feeling pretty good.  I have some thinking, but more importantly
-I have some firm reality outside of myself that I can push against.  My sense
-of possession has transfered from my answer into the structure that will be
-used to attack this answer.  This is the first part of hacking, I have
-distanced my sense of ownership away from the idea I am examining.
+Let's examine my own personal psychological state.  I have been taking tiny
+steps to keep my cognitive load light, and right now I'm feeling pretty good.
+I have a theory, but more importantly I have built up some firm reality outside
+of myself that I can push against.  My sense of possession has transfered from
+my answer into the structure that will be used to attack this answer.
 
 Moreover, I feel a sense of control and I'm feeling satisfaction from building
 something.  The part of my mind that gets a buzz from pursuit, from seeking is
@@ -965,51 +969,44 @@ Now, let's pull the trigger and see what happens.
    '<- Queued:(0) Deferred:(0)']
 
 Look, it's different.  We got an order of: ``g``, ``t``, ``a``, ``b``, ``c``,
-``d``, ``e``.  Ok, maybe there is a bug.  If we look at the guard and trans
-code in state ``s1`` we see this:
+``d``, ``e``.  
+
+The answer:
+``g``, ``t``, ``a``, ``b``, ``c``, ``d``, ``e``.
+
+Now let's see what happens when we adjust the ``g`` function to return a False:
 
 .. code-block:: python
-  :emphasize-lines: 21-23
 
-  @spy_on
-  def s1_state(chart, e):
-    def b(chart):
-      chart.scribble("Running b()")
+  ['T:s11_state',
+   'T:s1_state',
+   'Running g() -- the guard, which return False',
+   '<- Queued:(0) Deferred:(0)']
 
-    def g(chart):
-      chart.scribble("Running g() -- the guard, which returns True")
-      return True
+Now that we understand that, let's re-ask the question:
 
-    def t(chart):
-      chart.scribble("Running t() -- function run on event T")
+"Suppose we started the above chart in ``s11``, then we send a ``T`` event to it,
+when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and ``t`` happen?"
 
-    status = return_status.UNHANDLED
+.. image:: _static/scribble.svg
 
-    if(e.signal == signals.ENTRY_SIGNAL):
-      status = return_status.HANDLED
-    elif(e.signal == signals.EXIT_SIGNAL):
-      b(chart)
-      status = return_status.HANDLED
-    elif(e.signal == signals.T):
-      if g(chart):
-        t(chart)
-        status = chart.trans(s2_state)
-    else:
-      status, chart.temp.fun = return_status.SUPER, s_state
-    return status
+1. If g() returns False, only ``g`` is called
+2. If g() returns True, then ``g``, ``t``, ``a``, ``b``, ``c``, ``d``, ``e``.
 
-We see that ``t`` is called right after ``g``, so our new answer makes sense.  In
-fact, you might have seen it while we were working on the example.
+We know this, because we just confirmed the behavior.
+
+Learning for my Mistake
+-----------------------
 
 If you are deeply familiar with the UML specification for statecharts, you will
-see that this is an infraction.  The original answer was suppose to describe the
-behavior.  The good news is that this event processor algorithm is based on the
-work of Miros Samek.
+see that our observed behavior is an infraction.  The original answer was
+suppose to describe the behavior.  The good news is that this event processor
+algorithm is based on the work of Miros Samek.
 
 .. image:: _static/scribble.svg
 
 On pages 80-81 of his book titled "PRACTICAL UML STATECHARTS in C/C++ Second
-Edition" he writes:
+Edition" he wrote:
 
     One big problem with UML transition sequence is that it requires executing
     actions associated with the transition `after` destroying the source state
@@ -1028,3 +1025,24 @@ Edition" he writes:
 
 So, our ``t`` function runs within the context of the thing that asked for the
 transition.  This keeps it out of the strange limbo state described above.
+
+Let's think about how we could re-adjust our thinking, by re-asking the
+question and considering how we could approach it the next time we see
+something like it.
+
+"Suppose we started the above chart in ``s11``, then we send a ``T`` event to it,
+when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and ``t`` happen?"
+
+.. image:: _static/scribble.svg
+
+Knowing that the source state of our ``T`` event was **s11** you would first
+re-imagine the diagram as:
+
+.. image:: _static/scribble2.svg
+
+Then the answer to the question would just reveal itself from your imagined diagram:
+
+* ``g``, ``t``, ``a``, ``b``, ``c``, ``d``, ``e`` if ``g`` returns True
+* ``g`` if ``g`` returns False
+
+:ref:`back to examples <examples>`

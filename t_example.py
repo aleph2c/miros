@@ -38,8 +38,8 @@ def s1_state(chart, e):
     chart.scribble("Running b()")
 
   def g(chart):
-    chart.scribble("Running g() -- the guard, which return True")
-    return True
+    chart.scribble("Running g() -- the guard, which return False")
+    return False
 
   def t(chart):
     chart.scribble("Running t() -- funtion run on event")
