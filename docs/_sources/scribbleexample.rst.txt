@@ -42,7 +42,7 @@ guard works, we can infer that:
 
 means:
 
-1. When I see a `T` event ask for permission from the guard to see if it can pass.
+1. When I see a `T` event, ask for permission from the guard to see if it can pass.
 2. The `g` function is the guard
 3. If `g` returns True, `T` can pass; it can run the `t` function then make the transition to state `s2` [#f1]_.
 4. If `g` returns False the `T` event is ignored by the chart.
@@ -107,7 +107,7 @@ actually two parts, because the guard can return True or False.  We will start w
 easy part of the answer, then explain the longer part of the answer:
 
 1. If g() returns False, none of the functions are called.
-2. If g() returns True, then..  wait ``g`` had to be called first? Hmm.. whatever, here is
+2. If g() returns True, then...  wait ``g`` had to be called first? Hmm.. whatever, here is
    my theory so far:  ``a``, ``b``, ``g``, ``t``, ``c``, ``d``, ``e``.  It is
    easy to answer this way because my eyes work that way when I'm looking at
    the picture.
@@ -121,7 +121,7 @@ my answer doesn't really make any sense.  So, here is my answer:
 
 We have our theory, but we are hackers not philosophers.  We have more work to
 do.  Hackers ruthlessly deploy the scientific method to seek understanding
-about things they care about.  Hackers four hard things over and over again:
+about things they care about.  Hackers do four hard things over and over again:
 
 1. Think.
 2. Move past technical boundaries
@@ -137,8 +137,8 @@ up the statechart in the diagram and actually see what happens.
 Code, Make a Picture
 --------------------
 
-To begin with I will draw the picture in the code, so that I can see what I'm
-trying to build:
+To begin with I will draw the picture in the code, so that as I work I can see
+what I'm trying to build:
 
 .. code-block:: python
 

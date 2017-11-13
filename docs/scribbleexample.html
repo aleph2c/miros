@@ -65,7 +65,7 @@ diagram, <code class="docutils literal"><span class="pre">t()</span></code>, run
 guard works, we can infer that:</p>
 <img alt="_images/guard2.svg" src="_images/guard2.svg" /><p>means:</p>
 <ol class="arabic simple">
-<li>When I see a <cite>T</cite> event ask for permission from the guard to see if it can pass.</li>
+<li>When I see a <cite>T</cite> event, ask for permission from the guard to see if it can pass.</li>
 <li>The <cite>g</cite> function is the guard</li>
 <li>If <cite>g</cite> returns True, <cite>T</cite> can pass; it can run the <cite>t</cite> function then make the transition to state <cite>s2</cite> <a class="footnote-reference" href="#f1" id="id1">[1]</a>.</li>
 <li>If <cite>g</cite> returns False the <cite>T</cite> event is ignored by the chart.</li>
@@ -120,7 +120,7 @@ actually two parts, because the guard can return True or False.  We will start w
 easy part of the answer, then explain the longer part of the answer:</p>
 <ol class="arabic simple">
 <li>If g() returns False, none of the functions are called.</li>
-<li>If g() returns True, then..  wait <code class="docutils literal"><span class="pre">g</span></code> had to be called first? Hmm.. whatever, here is
+<li>If g() returns True, then…  wait <code class="docutils literal"><span class="pre">g</span></code> had to be called first? Hmm.. whatever, here is
 my theory so far:  <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>.  It is
 easy to answer this way because my eyes work that way when I’m looking at
 the picture.</li>
@@ -133,7 +133,7 @@ my answer doesn’t really make any sense.  So, here is my answer:</p>
 </ol>
 <p>We have our theory, but we are hackers not philosophers.  We have more work to
 do.  Hackers ruthlessly deploy the scientific method to seek understanding
-about things they care about.  Hackers four hard things over and over again:</p>
+about things they care about.  Hackers do four hard things over and over again:</p>
 <ol class="arabic simple">
 <li>Think.</li>
 <li>Move past technical boundaries</li>
@@ -146,8 +146,8 @@ up the statechart in the diagram and actually see what happens.</p>
 </div>
 <div class="section" id="code-make-a-picture">
 <span id="scribbleexample-from-diagram-to-code-first-pass"></span><h2>Code, Make a Picture<a class="headerlink" href="#code-make-a-picture" title="Permalink to this headline">¶</a></h2>
-<p>To begin with I will draw the picture in the code, so that I can see what I’m
-trying to build:</p>
+<p>To begin with I will draw the picture in the code, so that as I work I can see
+what I’m trying to build:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">+----------------------------- s -------------------------------+</span>
 <span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
