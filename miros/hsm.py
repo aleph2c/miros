@@ -1307,6 +1307,45 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def spy(self):
     return self.spy_full()
 
+  def register_filter(self, state_method, signal, fn):
+    '''
+    def for_A(chart, e):
+      print("Ah!")
+      return return_status.HANDLED
+
+    def state_function(chart, e):
+      status = return_status.UNHANDLED
+      with chart.lookup(e) as fn:
+        result = fn(chart, e)
+      else:
+        status, chart.temp.fun = return_status.SUPER, chart.top
+    return status
+
+    ao.register_for_lookup(state_function, signals.A, for_A)
+    '''
+    if hasattr(self, '_lookup') is False:
+      self.__lookup = {}
+
+    if state_method in self.__lookup:
+      self.__lookup[state_method][signal]=fn
+    else:
+      self.__lookup[state_method] = {}
+      self.__lookup[state_method][signal]=fn
+
+
+  @contextmanager
+  def filter(self, e):
+    '''
+    with lookup(chart, e) as fn:
+      result = fn(chart, e)
+    '''
+    def nothing_registered_for_signal(self, e):
+      return return_status.UNHANDLED
+    fn = nothing_registered_for_signal
+    if(self.temp.fun in self.__lookup):
+      if(e.signal in self.__lookup[self.temp.fun]):
+        fn = self.__lookup[self.temp.fun][e.signal]
+    yield(fn)
 
 @contextmanager
 def stripped(log):
@@ -1371,4 +1410,6 @@ def stripped(log):
   else:
     target = log
     yield(item_without_timestamp(target))
+
+
 
