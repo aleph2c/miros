@@ -22,6 +22,7 @@ from miros.event import signals, Event, return_status
 #
 # This is used for testing the type C topology within another state, in the trans_
 # method of the HsmEventProcessor class.
+
 @spy_on
 def c2_s1(chart, e):
 
@@ -71,27 +72,27 @@ def test_post_addition_of_signal_handling(fabric_fixture):
   def trans_to_c2_s2(chart, e):
     return chart.trans(c2_s2)
 
-  def empty(chart, e):
+  def handled(chart, e):
     return return_status.HANDLED
 
   ao = ActiveObject()
 
   ao.register_signal_callback(c2_s1, signals.BB, trans_to_c2_s1)
-  ao.register_signal_callback(c2_s1, signals.ENTRY_SIGNAL, empty)
-  ao.register_signal_callback(c2_s1, signals.EXIT_SIGNAL,  empty)
+  ao.register_signal_callback(c2_s1, signals.ENTRY_SIGNAL, handled)
+  ao.register_signal_callback(c2_s1, signals.EXIT_SIGNAL,  handled)
   ao.register_signal_callback(c2_s1, signals.INIT_SIGNAL,  trans_to_c2_s2)
   ao.register_parent(c2_s1, ao.top)
 
   ao.register_signal_callback(c2_s2, signals.A, trans_to_c2_s3)
-  ao.register_signal_callback(c2_s2, signals.ENTRY_SIGNAL, empty)
-  ao.register_signal_callback(c2_s2, signals.EXIT_SIGNAL,  empty)
-  ao.register_signal_callback(c2_s2, signals.INIT_SIGNAL,  empty)
+  ao.register_signal_callback(c2_s2, signals.ENTRY_SIGNAL, handled)
+  ao.register_signal_callback(c2_s2, signals.EXIT_SIGNAL,  handled)
+  ao.register_signal_callback(c2_s2, signals.INIT_SIGNAL,  handled)
   ao.register_parent(c2_s2, c2_s1)
 
   ao.register_signal_callback(c2_s3, signals.A, trans_to_c2_s2)
-  ao.register_signal_callback(c2_s3, signals.ENTRY_SIGNAL, empty)
-  ao.register_signal_callback(c2_s3, signals.EXIT_SIGNAL,  empty)
-  ao.register_signal_callback(c2_s3, signals.INIT_SIGNAL,  empty)
+  ao.register_signal_callback(c2_s3, signals.ENTRY_SIGNAL, handled)
+  ao.register_signal_callback(c2_s3, signals.EXIT_SIGNAL,  handled)
+  ao.register_signal_callback(c2_s3, signals.INIT_SIGNAL,  handled)
   ao.register_parent(c2_s3, c2_s1)
 
   ao.start_at(c2_s2)
