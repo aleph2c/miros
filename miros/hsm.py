@@ -113,6 +113,7 @@ from miros.event import signals, return_status, Event
 from collections import namedtuple, deque
 from contextlib  import contextmanager
 from functools   import wraps
+import traceback
 
 
 def pp(item):
@@ -1307,7 +1308,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def spy(self):
     return self.spy_full()
 
-  def register_filter(self, state_method, signal, fn):
+  def register_signal_callback(self, state_method, signal, fn):
     '''
     def for_A(chart, e):
       print("Ah!")
@@ -1324,28 +1325,41 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     ao.register_for_lookup(state_function, signals.A, for_A)
     '''
     if hasattr(self, '_lookup') is False:
-      self.__lookup = {}
+      self._lookup = {}
 
-    if state_method in self.__lookup:
-      self.__lookup[state_method][signal]=fn
+    if state_method in self._lookup:
+      self._lookup[state_method][signal]=fn
     else:
-      self.__lookup[state_method] = {}
-      self.__lookup[state_method][signal]=fn
+      self._lookup[state_method] = {}
+      self._lookup[state_method][signal]=fn
+
+  def register_parent(self, state_method, parent_method):
+    if hasattr(self, '_parents') is False:
+      self._parents = {}
+
+    self._parents[state_method.__name__] = parent_method
+
+  @contextmanager
+  def parent_callback(self):
+    state_method = traceback.extract_stack(None,3)[0][2]
+    yield(self._parents[state_method])
 
 
   @contextmanager
-  def filter(self, e):
+  def signal_callback(self, e):
     '''
-    with lookup(chart, e) as fn:
+    with self.lookup(chart, e) as fn:
       result = fn(chart, e)
     '''
     def nothing_registered_for_signal(self, e):
       return return_status.UNHANDLED
     fn = nothing_registered_for_signal
-    if(self.temp.fun in self.__lookup):
-      if(e.signal in self.__lookup[self.temp.fun]):
-        fn = self.__lookup[self.temp.fun][e.signal]
+    if(self.temp.fun in self._lookup):
+      if(e.signal in self._lookup[self.temp.fun]):
+        fn = self._lookup[self.temp.fun][e.signal]
     yield(fn)
+
+
 
 @contextmanager
 def stripped(log):
