@@ -998,7 +998,7 @@ Learning for my Mistake
 
 If you are deeply familiar with the UML specification for statecharts, you will
 see that our observed behavior is an infraction.  The original answer was
-suppose to describe the behavior.  The good news is that this event processor
+supposed to describe the behavior.  The good news is that this event processor
 algorithm is based on the work of Miros Samek.
 
 .. image:: _static/scribble.svg

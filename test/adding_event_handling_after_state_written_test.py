@@ -2,7 +2,7 @@ import time
 import pytest
 
 from miros.hsm import spy_on, pp
-from miros.activeobject import ActiveObject, ActiveFabric
+from miros.activeobject import ActiveObject
 from miros.event import signals, Event, return_status
 
 
