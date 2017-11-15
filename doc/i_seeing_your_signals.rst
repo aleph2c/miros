@@ -54,11 +54,7 @@ To compare a received event against a signal, compare the signal numbers:
     if(e.signal == signals.ENTRY_SIGNAL):
       # do something
 
-On lines **1-2** we see standard state method boiler plate code.  On line **3**
-we see how to compare the signal numbers against one another to see if they
-match.
-
-It you wanted read the signals name as a string, you would call the
+It you wanted to read an event's signals name as a string, you would call the
 ``signal_name`` method of the Event class:
 
 .. code-block:: python
@@ -67,4 +63,15 @@ It you wanted read the signals name as a string, you would call the
   def some_example_state(chart, e):
     status = return_status.UNHANLDED
     print(e.signal_name) # "ENTRY_SIGNAL"
+
+If you have a signal number and you want to determine it's name:
+
+.. code-block:: python
+  
+  signal_name = signals.name_for_signal(1) # ENTRY_SIGNAL
+  signal_name = signals.name_for_signal(signals.ENTRY_SIGNAL) # ENTRY_SIGNAL
+    
+
+  
+
 

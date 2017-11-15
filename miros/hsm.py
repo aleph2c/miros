@@ -217,10 +217,6 @@ def state_method_template(name):
     with chart.signal_callback(e, name) as fn:
       status = fn(chart, e)
 
-    if(e.signal in [signals.ENTRY_SIGNAL, signals.INIT_SIGNAL, signals.EXIT_SIGNAL] and
-       status == return_status.UNHANDLED):
-      status = return_status.HANDLED
-
     if(status == return_status.UNHANDLED):
       with chart.parent_callback(name) as parent:
         status, chart.temp.fun = return_status.SUPER, parent
@@ -1338,22 +1334,37 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
 
   def register_signal_callback(self, state_method, signal, fn):
     '''
-    def for_A(chart, e):
-      print("Ah!")
+    Example 1:
+      def for_A(chart, e):
+        print("Ah!")
+        return return_status.HANDLED
+
+      def state_function(chart, e):
+        status = return_status.UNHANDLED
+        with chart.lookup(e) as fn:
+          result = fn(chart, e)
+        else:
+          status, chart.temp.fun = return_status.SUPER, chart.top
+      return status
+
+      ao.register_for_lookup(state_function, signals.A, for_A)
+
+    Example 2:
+      # if you are using the function template provided by this module
+
+    '''
+    def handled(chart, e):
       return return_status.HANDLED
 
-    def state_function(chart, e):
-      status = return_status.UNHANDLED
-      with chart.lookup(e) as fn:
-        result = fn(chart, e)
-      else:
-        status, chart.temp.fun = return_status.SUPER, chart.top
-    return status
-
-    ao.register_for_lookup(state_function, signals.A, for_A)
-    '''
+    # ensure that if the user doesn't explicitly define the behavior for
+    # 'entry', 'init' and 'exit' that these internal signals are at least
+    # blocked and not let out of the function to fall out of the current
+    # state method
     if hasattr(self, '_lookup') is False:
       self._lookup = {}
+      self.register_signal_callback(state_method, signals.ENTRY_SIGNAL, handled)
+      self.register_signal_callback(state_method, signals.INIT_SIGNAL, handled)
+      self.register_signal_callback(state_method, signals.EXIT_SIGNAL, handled)
 
     if state_method.__name__ in self._lookup:
       self._lookup[state_method.__name__][signal] = fn
@@ -1403,7 +1414,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
 
     '''
     If_Blob = namedtuple('IfLadder', ['priority', 'signal_name', 'callback'])
-    entry_priority, init_priority, other_priority, exit_priority = 1,2,3,4
+    entry_priority, init_priority, other_priority, exit_priority = 1, 2, 3, 4
 
     def get_priority(signal_name):
       if signal_name == 'ENTRY_SIGNAL':

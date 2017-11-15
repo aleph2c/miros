@@ -133,6 +133,9 @@ class SignalSource(OrderedDictWithParams):
     return result
 
   def name_for_signal(self, signal):
+    '''
+    get the name of a signal number as a string
+    '''
     signal_name = list(self.keys())[list(self.values()).index(signal)]
     return signal_name
 
