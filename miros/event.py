@@ -132,6 +132,10 @@ class SignalSource(OrderedDictWithParams):
         pass
     return result
 
+  def name_for_signal(self, signal):
+    signal_name = list(self.keys())[list(self.values()).index(signal)]
+    return signal_name
+
   def __getattr__(self, item):
     value = None
     try:

@@ -124,7 +124,7 @@ SpyTuple = namedtuple('SpyTuple', ['signal',    'state',
                                    'hook',      'start',
                                    'internal',  'post_lifo',
                                    'post_fifo', 'post_defer',
-                                   'recall',    'ignored', 
+                                   'recall',    'ignored',
                                    'datetime'])
 
 
@@ -205,6 +205,27 @@ def spy_on(fn):
     return status
   return _spy_on
 
+
+def state_method_template(name):
+  '''
+  Used to create state chart methods with the register_signal_callback and
+  register_parent API
+  '''
+
+  def base_state_method(chart, e):
+    with chart.signal_callback(e, name) as fn:
+      status = fn(chart, e)
+
+    if(status == return_status.UNHANDLED):
+      with chart.parent_callback(name) as parent:
+        status, chart.temp.fun = return_status.SUPER, parent
+    return status
+
+  resulting_function = copy(base_state_method)
+  resulting_function.__name__ = name
+  resulting_function = spy_on(resulting_function)
+
+  return resulting_function
 
 # This is defined in the module name space so that inherited classes can access
 # it
@@ -1327,11 +1348,11 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     if hasattr(self, '_lookup') is False:
       self._lookup = {}
 
-    if state_method in self._lookup:
-      self._lookup[state_method][signal]=fn
+    if state_method.__name__ in self._lookup:
+      self._lookup[state_method.__name__][signal] = fn
     else:
-      self._lookup[state_method] = {}
-      self._lookup[state_method][signal]=fn
+      self._lookup[state_method.__name__] = {}
+      self._lookup[state_method.__name__][signal] = fn
 
   def register_parent(self, state_method, parent_method):
     if hasattr(self, '_parents') is False:
@@ -1340,25 +1361,132 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     self._parents[state_method.__name__] = parent_method
 
   @contextmanager
-  def parent_callback(self):
-    state_method = traceback.extract_stack(None,3)[0][2]
+  def parent_callback(self, state_method=None):
+    if state_method is None:
+      state_method = traceback.extract_stack(None, 3)[0][2]
     yield(self._parents[state_method])
 
-
   @contextmanager
-  def signal_callback(self, e):
+  def signal_callback(self, e, name):
     '''
     with self.lookup(chart, e) as fn:
       result = fn(chart, e)
     '''
+    if callable(name):
+      key = name.__name__
+    else:
+      key = name
+
     def nothing_registered_for_signal(self, e):
       return return_status.UNHANDLED
+
     fn = nothing_registered_for_signal
-    if(self.temp.fun in self._lookup):
-      if(e.signal in self._lookup[self.temp.fun]):
-        fn = self._lookup[self.temp.fun][e.signal]
+    if(key in self._lookup):
+      if(e.signal in self._lookup[key]):
+        fn = self._lookup[key][e.signal]
     yield(fn)
 
+  def to_code(self, state_method_name):
+    '''
+    Provides the equivalent flat code for items that have been written to a
+    state_method written from a template.  This will be useful for debugging
+    your code when you have used the 'register_signal_callback' and
+    'register_parent' methods of this class.
+
+
+    '''
+    If_Ladder = namedtuple('IfLadder', ['priority', 'signal_name', 'callback'])
+
+    def get_priority(signal_name):
+      if signal_name == 'ENTRY_SIGNAL':
+        priority = 1
+      elif signal_name == 'INIT_SIGNAL':
+        priority = 2
+      elif signal_name == 'EXIT_SIGNAL':
+        priority = 4
+      else:
+        priority = 3
+      return priority
+
+    def create_unordered_if_ladder():
+      ifs = []
+      for signal in self._lookup[state_method]:
+        fn_name = self._lookup[state_method][signal].__name__
+        signal_name = signals.name_for_signal(signal)
+        priority = get_priority(signal_name)
+        if_ladder = If_Ladder(priority = priority, signal_name=signal_name, callback=fn_name)
+        ifs.append(if_ladder)
+      return ifs
+
+    def create_ordered_if_ladder(unordered_ifs):
+      _ifs = sorted(unordered_ifs, key=lambda if_: if_.priority)
+      return _ifs
+
+    def fill_missing_ifs(ordered_ifs):
+      full_ordered_ifs = []
+      entry =   [item for item in ordered_ifs if item.priority == 1]
+      init  =   [item for item in ordered_ifs if item.priority == 2]
+      others  = [item for item in ordered_ifs if item.priority == 3]
+      exit  =   [item for item in ordered_ifs if item.priority == 4]
+
+      if len(entry) != 0:
+        full_ordered_ifs.extend(entry)
+      else:
+        full_ordered_ifs.append(If_Ladder(priority=1, signal_name='ENTRY_SIGNAL', callback=None))
+
+      if len(init) != 0:
+        full_ordered_ifs.extend(init)
+      else:
+        full_ordered_ifs.append(If_Ladder(priority=2, signal_name='INIT_SIGNAL', callback=None))
+
+      if len(others) != 0:
+        full_ordered_ifs.extend(others)
+
+      if len(exit) != 0:
+        full_ordered_ifs.extend(exit)
+      else:
+        full_ordered_ifs.append(If_Ladder(priority=4, signal_name='EXIT_SIGNAL', callback=None))
+
+      return full_ordered_ifs
+
+    if callable(state_method_name):
+      state_method = state_method_name.__name__
+    else:
+      state_method = state_method_name
+
+    unordered_ifs = create_unordered_if_ladder()
+    ordered_ifs = create_ordered_if_ladder(unordered_ifs)
+    ifs = fill_missing_ifs(ordered_ifs)
+
+    # to make it easier to test this code, we will start the string with a line
+    # break
+    code = "\n"
+    for i, pair in enumerate(ifs):
+      if i == 0:
+        code += "def {}(chart, e):\n".format(state_method)
+        code += "  status = return_status.UNHANDLED\n"
+        if pair.callback is None:
+          code += "  if(e.signal == signals.{}):\n".format(pair.signal_name)
+          code += "    status = return_status.HANDLED\n"
+        else:
+          code += "  if(e.signal == signals.{}):\n".format(pair.signal_name)
+          code += "    status = {}(chart, e)\n".format(pair.callback)
+      else:
+        if pair.callback is None:
+          code += "  elif(e.signal == signals.{}):\n".format(pair.signal_name)
+          code += "    status = return_status.HANDLED\n"
+        else:
+          code += "  elsif(e.signal == signals.{}):\n".format(pair.signal_name)
+          code += "    status = {}(chart, e)\n".format(pair.callback)
+
+    parent_name = self._parents[state_method].__name__
+    if parent_name == 'top':
+      parent_name = 'chart.top'
+    code += "  else:\n"
+    code += "    status, chart.temp.fun = return_status.SUPER, {}\n".format(parent_name)
+    code += "  return status\n"
+
+    return code
 
 
 @contextmanager

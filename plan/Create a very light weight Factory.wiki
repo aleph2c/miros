@@ -1,17 +1,23 @@
 *Factory*
 = Observe =
   *What defines Success?*
-  * Simple
-  * Easy to Debug
-  * Deep Reflection
-  * Create an extremely simple way to build interacting statecharts
+  Have a simple and concise way to generate active objects without a lot of
+  boiler plate code.
+  
+  The technique should allow for outside files to reach in and add hooks to an
+  existing state chart so that they can listen for specific events.
+  This will be extremely useful for testing, and for decoupling a chart from
+  the rest of a design.
 
   *What is the problem?*
   There is too much boiler plate in the traditional approach, but we want to be
   able to keep this approach too.
   
   If the factory gets too heavy it will become very hard to debug a problem.
-  (this happened in miros1)
+  (this happened in miros 1.0).  It's very difficult to make, so imagine how hard
+  it will be to debug.  It has to be extremely easy to unwind the factory code
+  into something that can be a flat drop in replacement so that you can debug
+  it without being a super genius.
   
   Things are already scary enough with the event processor.  The solution has
   to be simple enough that an application programmer can debug their code.
@@ -21,14 +27,17 @@
 = Orient =
   *Symptoms:*
   
-  
   *Questions for Factory:*
     Can you just write the code, then include it?
-    What do other people have to say about factories? [Complicated mess.]
-    What do other people have to say about Python macros?  [Suggest against it]
+    What do other people have to say about factories? [Complicated messes.]
+    What do other people have to say about Python macros?  [Suggest against them]
 
   *Assumptions:*
-
+    That it is worth the effort
+    It has to be simple to use and debug
+    It has to be simple to unwind a design
+    It must be easy to explain
+    
 = Decide =
 
   *Ideas/Hypotheses for Factory: >=5*
@@ -36,20 +45,20 @@
   * [ ] Literally write the functions into a different file, then include that
         file, and begin that file at the required state.
   * [ ] Fusion, have the ability to have both (breaking DRY)
-  * [ ] Create a to_s, which will output the boiler plate function as a string
+  * [X] Create a to_code, which will output the boiler plate function as a string
   * [ ] Specifically provide the return type for a fn handler for a event
         signal to catch api (this way you can force the expected behavior
         block/otherwise)
   * [ ] Have a write to file api in the factory so that you can ditch it, and
         move back to a flat file.
-  * [ ] This will confuse the spy and trace, might have to add code to clear
-        this up (if it gets too complicated, back out)
+  * [X] This will confuse the spy and trace, might have to add code to clear
+        this up (if it gets too complicated, back out)[works]
   * [ ] Have the ability to add a hook to a state function after it has been
         created (write this without a factory first -- keep it simple) -- this
         might be a better approach than writing a factory.
-  * [ ] Create new functions based on a template function, then change the new
+  * [X] Create new functions based on a template function, then change the new
         function objects with the miros context managers (signal callbacks and
-        parent setup)
+        parent setup) [done]
   * [ ] As soon as you have a technical success you need to add a lot of
         instrumentation around your approach so that in the future you can make
         sense of things without having to spend hours getting the design back
