@@ -1,0 +1,196 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Using and Unwinding a Factory &#8212; miros 2.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Recipes" href="recipes.html" />
+    <link rel="prev" title="Hacking to Learn" href="scribbleexample.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="using-and-unwinding-a-factory">
+<span id="towardsthefactoryexample-towards-a-factory"></span><h1>Using and Unwinding a Factory<a class="headerlink" href="#using-and-unwinding-a-factory" title="Permalink to this headline">¶</a></h1>
+<div align="center" class="align-center"><img alt="_images/factory1.svg" src="_images/factory1.svg" /></div>
+<div class="section" id="example-summary">
+<span id="towardsthefactoryexample-example-summary"></span><h2>Example Summary<a class="headerlink" href="#example-summary" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#towardsthefactoryexample-standard-approach"><span class="std std-ref">Write a standard flat version of a statechart</span></a></li>
+<li><a class="reference internal" href="#towardsthefactoryexample-registering-callbacks-to-specific-events"><span class="std std-ref">Re-write the state methods so that you can register callbacks with specific
+events.</span></a></li>
+<li><a class="reference internal" href="#towardsthefactoryexample-registering-a-parent-to-a-state-method"><span class="std std-ref">Re-write the state methods so that you can register a parent with
+them</span></a></li>
+<li><a class="reference internal" href="#towardsthefactoryexample-building-a-method-to-build-state-methods"><span class="std std-ref">Remove the need to explicitly write a number of state methods, instead, we
+can get them from a template
+function</span></a></li>
+<li><a class="reference internal" href="#towardsthefactoryexample-using-the-miros-factory-method"><span class="std std-ref">Use the miros factory
+methods</span></a></li>
+<li><a class="reference internal" href="#towardsthefactoryexample-unwinding-a-factory-state-method"><span class="std std-ref">Use miros to convert it’s factory method into a flat version of a state
+function for
+debugging.</span></a></li>
+</ol>
+</div>
+<div class="section" id="why-a-factory">
+<span id="towardsthefactoryexample-why-you-would-want-a-factory"></span><h2>Why a Factory?<a class="headerlink" href="#why-a-factory" title="Permalink to this headline">¶</a></h2>
+<p>The event processor used to create the dynamics of your statechart expects all
+of your state methods to have a specific shape.  Their method signatures have
+to look a certain way and their if-else structures have to be framed-in just
+right, otherwise the event processor might get lost while it’s searching for
+the correct behavior.</p>
+<p>The event processor provides the illusion that you are using a completely
+different type of programming language, but it’s still all Python.  Your state
+methods are just being called over and over again with different arguments.</p>
+<p>Miro Samek describes this as “an inversion of control”.  By using his event
+processor algorithm, you are packing the management of the topological search
+complexity into the bottom of your software system.</p>
+<p>The beautiful thing about the framework is that a state method only has to
+describe which other state method is it’s parent.  Then when the event
+processor is called, it will look at the current state and
+recurse over your state methods determining how and when each of your state
+methods should be called in accordance to the Harel Formalism.  You don’t
+have to worry about how this is done, you just have to remember how the maps
+behave, then translate your map into state methods.</p>
+<p>The cost of this is that you have to express your application code within
+<em>specifically</em> structured state methods.  Wouldn’t it be nice if the library
+wrote the methods for you too?  Well, it can do that using the factory pattern,
+but let’s consider the downside of structuring your application like this.</p>
+<p>If you use this library to write your state methods for you, you are placing
+yet another layer of abstraction between you and your application code.  A bug
+might be even harder to find than it was before.  The nice thing about the
+state methods is that they are easy to understand, they are flat,
+and you can literally see the code and break within it for debugging.  The
+cognitive load experienced while trouble shooting a flat state method is much
+less than it would be for something that is auto-generated.</p>
+<p>In this example I will walk you through how we can move from a simple state
+method towards one that is written for you automatically.  I will also describe
+fusion state methods which use both techniques and thereby allow you to
+register event callbacks while your code is executing and why you might want
+to do this.</p>
+<p>I will also describe how to create a state method using a factory, then how to
+ask the framework to print out what that code would look like if it were
+hard-coded into your project.  I will then demonstrate a technique of unwinding
+a complicated design, into such flat methods, so that you can ‘see’ what is
+going on.</p>
+</div>
+<div class="section" id="standard-approach">
+<span id="towardsthefactoryexample-standard-approach"></span><h2>Standard Approach<a class="headerlink" href="#standard-approach" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="registering-callbacks-to-specific-events">
+<span id="towardsthefactoryexample-registering-callbacks-to-specific-events"></span><h2>Registering Callbacks to Specific Events<a class="headerlink" href="#registering-callbacks-to-specific-events" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="registering-a-parent-to-a-state-method">
+<span id="towardsthefactoryexample-registering-a-parent-to-a-state-method"></span><h2>Registering a Parent to a State Method<a class="headerlink" href="#registering-a-parent-to-a-state-method" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="building-a-method-to-build-state-methods">
+<span id="towardsthefactoryexample-building-a-method-to-build-state-methods"></span><h2>Building a Method to Build State Methods<a class="headerlink" href="#building-a-method-to-build-state-methods" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="using-the-miros-factory-method">
+<span id="towardsthefactoryexample-using-the-miros-factory-method"></span><h2>Using the Miros Factory Method<a class="headerlink" href="#using-the-miros-factory-method" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="unwinding-a-factory-state-method">
+<span id="towardsthefactoryexample-unwinding-a-factory-state-method"></span><h2>Unwinding a Factory State Method<a class="headerlink" href="#unwinding-a-factory-state-method" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
+  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
+</a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using and Unwinding a Factory</a><ul>
+<li><a class="reference internal" href="#example-summary">Example Summary</a></li>
+<li><a class="reference internal" href="#why-a-factory">Why a Factory?</a></li>
+<li><a class="reference internal" href="#standard-approach">Standard Approach</a></li>
+<li><a class="reference internal" href="#registering-callbacks-to-specific-events">Registering Callbacks to Specific Events</a></li>
+<li><a class="reference internal" href="#registering-a-parent-to-a-state-method">Registering a Parent to a State Method</a></li>
+<li><a class="reference internal" href="#building-a-method-to-build-state-methods">Building a Method to Build State Methods</a></li>
+<li><a class="reference internal" href="#using-the-miros-factory-method">Using the Miros Factory Method</a></li>
+<li><a class="reference internal" href="#unwinding-a-factory-state-method">Unwinding a Factory State Method</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="examples.html">Examples</a><ul>
+      <li>Previous: <a href="scribbleexample.html" title="previous chapter">Hacking to Learn</a></li>
+      <li>Next: <a href="recipes.html" title="next chapter">Recipes</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/towardsthefactoryexample.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Scott Volk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/towardsthefactoryexample.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

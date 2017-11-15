@@ -4,6 +4,7 @@ Simple Posting Example
 ======================
 
 .. image:: _static/posting_example.svg
+    :align: center
 
 Here we see an active object.  To understand it, lets take the following steps:
 

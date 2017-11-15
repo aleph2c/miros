@@ -24,6 +24,7 @@ when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and 
 If you are unfamiliar with UML, this part of the diagram:
 
 .. image:: _static/guard.svg
+    :align: center
 
 contains a **guard**.  Specifically, the code:
 
@@ -39,6 +40,7 @@ diagram, ``t()``, runs if the guard doesn't block it.  Now that we know how a
 guard works, we can infer that:
 
 .. image:: _static/guard2.svg
+    :align: center
 
 means:
 
@@ -659,6 +661,7 @@ Now lets add the guard function ``g`` and the ``t`` function into s1_state,
 this will build this part of the picture:
 
 .. image:: _static/guard.svg
+    :align: center
 
 .. code-block:: python
   :emphasize-lines: 37-42, 50-53
