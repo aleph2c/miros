@@ -108,12 +108,13 @@ Example::
 """
 import re
 import pprint
-from datetime    import datetime
-from miros.event import signals, return_status, Event
-from collections import namedtuple, deque
-from contextlib  import contextmanager
-from functools   import wraps
-import traceback
+import traceback  # try not use this if you can avoid it (it's fragile)
+from copy         import copy
+from functools    import wraps
+from datetime     import datetime
+from contextlib   import contextmanager
+from collections  import namedtuple, deque
+from miros.event  import signals, return_status, Event
 
 
 def pp(item):
@@ -216,9 +217,14 @@ def state_method_template(name):
     with chart.signal_callback(e, name) as fn:
       status = fn(chart, e)
 
+    if(e.signal in [signals.ENTRY_SIGNAL, signals.INIT_SIGNAL, signals.EXIT_SIGNAL] and
+       status == return_status.UNHANDLED):
+      status = return_status.HANDLED
+
     if(status == return_status.UNHANDLED):
       with chart.parent_callback(name) as parent:
         status, chart.temp.fun = return_status.SUPER, parent
+
     return status
 
   resulting_function = copy(base_state_method)
@@ -226,6 +232,7 @@ def state_method_template(name):
   resulting_function = spy_on(resulting_function)
 
   return resulting_function
+
 
 # This is defined in the module name space so that inherited classes can access
 # it
@@ -1389,55 +1396,56 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def to_code(self, state_method_name):
     '''
     Provides the equivalent flat code for items that have been written to a
-    state_method written from a template.  This will be useful for debugging
+    state_method written from a template.  This may be useful for debugging
     your code when you have used the 'register_signal_callback' and
     'register_parent' methods of this class.
 
 
     '''
-    If_Ladder = namedtuple('IfLadder', ['priority', 'signal_name', 'callback'])
+    If_Blob = namedtuple('IfLadder', ['priority', 'signal_name', 'callback'])
+    entry_priority, init_priority, other_priority, exit_priority = 1,2,3,4
 
     def get_priority(signal_name):
       if signal_name == 'ENTRY_SIGNAL':
-        priority = 1
+        priority = entry_priority
       elif signal_name == 'INIT_SIGNAL':
-        priority = 2
+        priority = init_priority
       elif signal_name == 'EXIT_SIGNAL':
-        priority = 4
+        priority = exit_priority
       else:
-        priority = 3
+        priority = other_priority
       return priority
 
-    def create_unordered_if_ladder():
+    def create_unordered_if_ladder(state_method):
       ifs = []
       for signal in self._lookup[state_method]:
         fn_name = self._lookup[state_method][signal].__name__
         signal_name = signals.name_for_signal(signal)
         priority = get_priority(signal_name)
-        if_ladder = If_Ladder(priority = priority, signal_name=signal_name, callback=fn_name)
+        if_ladder = If_Blob(priority=priority, signal_name=signal_name, callback=fn_name)
         ifs.append(if_ladder)
       return ifs
 
     def create_ordered_if_ladder(unordered_ifs):
-      _ifs = sorted(unordered_ifs, key=lambda if_: if_.priority)
-      return _ifs
+      ifs = sorted(unordered_ifs, key=lambda if_: if_.priority)
+      return ifs
 
     def fill_missing_ifs(ordered_ifs):
       full_ordered_ifs = []
-      entry =   [item for item in ordered_ifs if item.priority == 1]
-      init  =   [item for item in ordered_ifs if item.priority == 2]
-      others  = [item for item in ordered_ifs if item.priority == 3]
-      exit  =   [item for item in ordered_ifs if item.priority == 4]
+      entry  = [item for item in ordered_ifs if item.priority == entry_priority]
+      init   = [item for item in ordered_ifs if item.priority == init_priority]
+      others = [item for item in ordered_ifs if item.priority == other_priority]
+      exit   = [item for item in ordered_ifs if item.priority == exit_priority]
 
       if len(entry) != 0:
         full_ordered_ifs.extend(entry)
       else:
-        full_ordered_ifs.append(If_Ladder(priority=1, signal_name='ENTRY_SIGNAL', callback=None))
+        full_ordered_ifs.append(If_Blob(priority=entry_priority, signal_name='ENTRY_SIGNAL', callback=None))
 
       if len(init) != 0:
         full_ordered_ifs.extend(init)
       else:
-        full_ordered_ifs.append(If_Ladder(priority=2, signal_name='INIT_SIGNAL', callback=None))
+        full_ordered_ifs.append(If_Blob(priority=init_priority, signal_name='INIT_SIGNAL', callback=None))
 
       if len(others) != 0:
         full_ordered_ifs.extend(others)
@@ -1445,7 +1453,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       if len(exit) != 0:
         full_ordered_ifs.extend(exit)
       else:
-        full_ordered_ifs.append(If_Ladder(priority=4, signal_name='EXIT_SIGNAL', callback=None))
+        full_ordered_ifs.append(If_Blob(priority=exit_priority, signal_name='EXIT_SIGNAL', callback=None))
 
       return full_ordered_ifs
 
@@ -1454,30 +1462,30 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     else:
       state_method = state_method_name
 
-    unordered_ifs = create_unordered_if_ladder()
+    unordered_ifs = create_unordered_if_ladder(state_method)
     ordered_ifs = create_ordered_if_ladder(unordered_ifs)
     ifs = fill_missing_ifs(ordered_ifs)
 
     # to make it easier to test this code, we will start the string with a line
     # break
     code = "\n"
-    for i, pair in enumerate(ifs):
+    for i, if_tuple in enumerate(ifs):
       if i == 0:
         code += "def {}(chart, e):\n".format(state_method)
         code += "  status = return_status.UNHANDLED\n"
-        if pair.callback is None:
-          code += "  if(e.signal == signals.{}):\n".format(pair.signal_name)
+        if if_tuple.callback is None:
+          code += "  if(e.signal == signals.{}):\n".format(if_tuple.signal_name)
           code += "    status = return_status.HANDLED\n"
         else:
-          code += "  if(e.signal == signals.{}):\n".format(pair.signal_name)
-          code += "    status = {}(chart, e)\n".format(pair.callback)
+          code += "  if(e.signal == signals.{}):\n".format(if_tuple.signal_name)
+          code += "    status = {}(chart, e)\n".format(if_tuple.callback)
       else:
-        if pair.callback is None:
-          code += "  elif(e.signal == signals.{}):\n".format(pair.signal_name)
+        if if_tuple.callback is None:
+          code += "  elif(e.signal == signals.{}):\n".format(if_tuple.signal_name)
           code += "    status = return_status.HANDLED\n"
         else:
-          code += "  elsif(e.signal == signals.{}):\n".format(pair.signal_name)
-          code += "    status = {}(chart, e)\n".format(pair.callback)
+          code += "  elsif(e.signal == signals.{}):\n".format(if_tuple.signal_name)
+          code += "    status = {}(chart, e)\n".format(if_tuple.callback)
 
     parent_name = self._parents[state_method].__name__
     if parent_name == 'top':

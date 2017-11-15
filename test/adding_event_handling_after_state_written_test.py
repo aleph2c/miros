@@ -117,7 +117,7 @@ def augmenting_state_methods_after_creation_and_test(request):
   ao.post_fifo(Event(signal=signals.A))
   ao.post_fifo(Event(signal=signals.A))
   ao.post_fifo(Event(signal=signals.BB))
-  time.sleep(0.50)
+  time.sleep(0.10)
 
   yield(ao)
 
@@ -206,17 +206,44 @@ def test_creating_functions_from_a_template():
   ao.post_fifo(Event(signal=signals.A))
   ao.post_fifo(Event(signal=signals.A))
   ao.post_fifo(Event(signal=signals.BB))
-  time.sleep(0.50)
-  pp(ao.spy())
-
-  # create a set of functions
-  # manually wrap them with the spy
-  # link them up (move test code into fixture)
-  # begin the text
+  time.sleep(0.1)
+  assert(ao.spy() == \
+    ['START',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s2',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s1',
+     'ENTRY_SIGNAL:tc2_s1',
+     'ENTRY_SIGNAL:tc2_s2',
+     'INIT_SIGNAL:tc2_s2',
+     '<- Queued:(0) Deferred:(0)',
+     'A:tc2_s2',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s3',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s2',
+     'EXIT_SIGNAL:tc2_s2',
+     'ENTRY_SIGNAL:tc2_s3',
+     'INIT_SIGNAL:tc2_s3',
+     '<- Queued:(2) Deferred:(0)',
+     'A:tc2_s3',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s2',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s3',
+     'EXIT_SIGNAL:tc2_s3',
+     'ENTRY_SIGNAL:tc2_s2',
+     'INIT_SIGNAL:tc2_s2',
+     '<- Queued:(1) Deferred:(0)',
+     'BB:tc2_s2',
+     'BB:tc2_s1',
+     'EXIT_SIGNAL:tc2_s2',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s2',
+     'EXIT_SIGNAL:tc2_s1',
+     'ENTRY_SIGNAL:tc2_s1',
+     'INIT_SIGNAL:tc2_s1',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s2',
+     'ENTRY_SIGNAL:tc2_s2',
+     'INIT_SIGNAL:tc2_s2',
+     '<- Queued:(0) Deferred:(0)'])
 
 
 @pytest.mark.post_add
-def test_to_s():
+def test_to_code():
   tc2_s1 = state_method_template('tc2_s1')
   tc2_s2 = state_method_template('tc2_s2')
   tc2_s3 = state_method_template('tc2_s3')
@@ -309,3 +336,42 @@ def tc2_s3(chart, e):
 '''
   assert(ao.to_code(tc2_s3) == expected_tc2_s3_as_flat_code)
 
+  ao.start_at(tc2_s2)
+
+  ao.post_fifo(Event(signal=signals.A))
+  ao.post_fifo(Event(signal=signals.A))
+  ao.post_fifo(Event(signal=signals.BB))
+  time.sleep(0.1)
+  assert(ao.spy() == \
+    ['START',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s2',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s1',
+     'ENTRY_SIGNAL:tc2_s1',
+     'ENTRY_SIGNAL:tc2_s2',
+     'INIT_SIGNAL:tc2_s2',
+     '<- Queued:(0) Deferred:(0)',
+     'A:tc2_s2',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s3',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s2',
+     'EXIT_SIGNAL:tc2_s2',
+     'ENTRY_SIGNAL:tc2_s3',
+     'INIT_SIGNAL:tc2_s3',
+     '<- Queued:(2) Deferred:(0)',
+     'A:tc2_s3',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s2',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s3',
+     'EXIT_SIGNAL:tc2_s3',
+     'ENTRY_SIGNAL:tc2_s2',
+     'INIT_SIGNAL:tc2_s2',
+     '<- Queued:(1) Deferred:(0)',
+     'BB:tc2_s2',
+     'BB:tc2_s1',
+     'EXIT_SIGNAL:tc2_s2',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s2',
+     'EXIT_SIGNAL:tc2_s1',
+     'ENTRY_SIGNAL:tc2_s1',
+     'INIT_SIGNAL:tc2_s1',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s2',
+     'ENTRY_SIGNAL:tc2_s2',
+     'INIT_SIGNAL:tc2_s2',
+     '<- Queued:(0) Deferred:(0)'])
