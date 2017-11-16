@@ -44,8 +44,113 @@
 <span id="id1"></span><h1>Recipes<a class="headerlink" href="#recipes" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<div class="section" id="states">
+<span id="recipes-states"></span><h2>States<a class="headerlink" href="#states" title="Permalink to this headline">¶</a></h2>
+<p>States need to do a few things:</p>
+<ol class="arabic simple">
+<li>They need to react to events</li>
+<li>They need to have a parent, so if they don’t react to an event, the event
+processor can ask the parent if it knows what to do with the event.</li>
+<li>They need to have application code</li>
+<li>They need to communicate with the event processor using various return codes.</li>
+</ol>
+<p>There are different ways to create states with miros:</p>
+<ol class="arabic simple">
+<li>You can create a hand coded state method that references its parent so
+that the hierarchy of your chart can be discovered by the event processor.
+[flat states]</li>
+<li>You can have the library generate a state method for you, then register
+callback responses for the signals and register a parent state so that the
+event processor can discover the hierarchy. [factory states]</li>
+<li>You can use a fusion technique.  You can hand write a state and use context
+managers within the method so that the miros package can register callbacks
+for specific signals, or even change it’s parent at run time. [fusion states]</li>
+</ol>
+<div class="section" id="creating-a-flat-state-method">
+<span id="recipes-creating-a-flat-state-method"></span><h3>Creating a Flat State Method<a class="headerlink" href="#creating-a-flat-state-method" title="Permalink to this headline">¶</a></h3>
+<p>The state methods are defined outside of a class that has an event processor.</p>
+<p>When a class which contains an event processor, like the ActiveObject, is
+instantiated it can link to your state method using the <code class="docutils literal"><span class="pre">start_at</span></code> method.</p>
+<p>The event processor never actually learns and remembers the full nature of how
+your state methods are linked to one another.  It always searches them as it
+reacts to whatever event you have provided it.  Think of it as someone with a
+flashlight in a dark room trying to figure out where something is and what to
+do.  It can never just turn on the lights and see the full map, it has to pick
+up each state, point it’s flash light at it and see if it can react to the
+event provided, if it can’t it must determine what to do next.</p>
+<p>Your state method’s can be used by many different event processors, they are
+polyamorous.  This means that you can duplicate your maps as many times as you
+want, just by referencing them with as many active objects as you have.</p>
+<p>When an event processor is communicating with a state method, it places it’s
+<code class="docutils literal"><span class="pre">self</span></code> variable into the first argument of the state method, and uses the
+second argument to inject an event into the state method.  The state method
+communicates back, by adjusting internal attributes on the <code class="docutils literal"><span class="pre">self</span></code> variable of
+the thing searching it and by returning a status value as it reacts to the
+events given to it.</p>
+<p>The event processor can call your state method with two different intentions:</p>
+<ol class="arabic simple">
+<li>It can call your method to ask it who it’s parent is</li>
+<li>It can call it with an event to run your application code.</li>
+</ol>
+<p>When your state method is telling the event processor who its parent is, it
+does it in a way that may look confusing to someone reading the code.</p>
+<p>For a state method to inform on its parent, it must react to any event it
+doesn’t know how to handle by:</p>
+<ol class="arabic simple">
+<li>Changing the <code class="docutils literal"><span class="pre">self.temp.fun</span></code> of the event processor object to point to the
+parent state method.</li>
+<li>Returning the <code class="docutils literal"><span class="pre">return_status.SUPER</span></code> value as a result.</li>
+</ol>
+<p>Since your state method must communicate this information back to the event
+processor when it doesn’t know what to do, you place the code into the <code class="docutils literal"><span class="pre">else</span></code>
+clause of your state method’s if-else structure.</p>
+<p>There are situations where the event processor wants to search your state
+method for it’s parent explicitly.  To do this it will send a signal named
+<code class="docutils literal"><span class="pre">SUPER</span></code> to your state method.  For this reason, if your state method reacts
+to <code class="docutils literal"><span class="pre">SUPER</span></code> without reacting as it would if it didn’t know what to do (look
+above), your statechart will not work.</p>
+<p>If your state method represents the outer most state of your map, it should point to
+the <code class="docutils literal"><span class="pre">top</span></code> attribute of the first argument provided to it.  This is a state
+method that is managed internally by the event processor.  When it sees this it
+knows that it needs to stop searching for what to do.</p>
+<p>Let’s look at a few examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">g1_s0_active_objects_graph</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">F</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">g1_s2111_active_objects_graph</span><span class="p">)</span>
+<span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span></pre></div>
+</div>
+<p>The above state method is at the outermost part of its map.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">g1_s01_active_objects_graph</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">post_lifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">F</span><span class="p">))</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">C</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">g1_s22_active_objects_graph</span><span class="p">)</span>
+<span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">g1_s0_active_objects_graph</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span></pre></div>
+</div>
+<p>The state method described above is a substate of <code class="docutils literal"><span class="pre">g1_s0_active_objects_graph</span></code>.</p>
+</div>
+</div>
 <div class="section" id="events-and-signals">
-<span id="recipes-events-and-signals"></span><span id="posting-events"></span><h2>Events And Signals<a class="headerlink" href="#events-and-signals" title="Permalink to this headline">¶</a></h2>
+<h2>Events And Signals<a class="headerlink" href="#events-and-signals" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="creating-an-event">
 <span id="recipes-creating-an-event"></span><h3>Creating an Event<a class="headerlink" href="#creating-an-event" title="Permalink to this headline">¶</a></h3>
 <p>An event is something that will be passed into your statechart, it will be
@@ -97,8 +202,8 @@ have to explicitly define them.</p>
 <p>The signals are shared across your whole program.  To see reflect upon your
 signals read <a class="reference internal" href="#recipes-seeing-your-signals"><span class="std std-ref">this</span></a>.</p>
 </div>
-<div class="section" id="recipes-seeing-what-signals-you-have-in-your-system">
-<span id="id2"></span><h3>Posting Events<a class="headerlink" href="#recipes-seeing-what-signals-you-have-in-your-system" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="posting-events">
+<span id="id2"></span><h3>Posting Events<a class="headerlink" href="#posting-events" title="Permalink to this headline">¶</a></h3>
 <p>The Active Object <code class="docutils literal"><span class="pre">post_fifo</span></code>, <code class="docutils literal"><span class="pre">post_lifo</span></code>, <code class="docutils literal"><span class="pre">defer</span></code> and <code class="docutils literal"><span class="pre">recall</span></code>
 methods are use to feed events to the statechart.  An Event can be thought of
 as a kind of named marble that is placed onto a topological map.  If a
@@ -394,8 +499,8 @@ reaction to it.</p>
 </td></tr></table></div>
 </div>
 <div class="section" id="seeing-what-signals-you-have-in-your-system">
-<span id="recipes-seeing-your-signals"></span><h3>Seeing what Signals You Have In Your System<a class="headerlink" href="#seeing-what-signals-you-have-in-your-system" title="Permalink to this headline">¶</a></h3>
-<p>A signal is the name that can be given to an event.  To get access to your
+<span id="recipes-seeing-what-signals-you-have-in-your-system"></span><h3>Seeing what Signals You Have In Your System<a class="headerlink" href="#seeing-what-signals-you-have-in-your-system" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="recipes-seeing-your-signals"></span><p>A signal is the name that can be given to an event.  To get access to your
 signals:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span>
 </pre></div>
@@ -994,10 +1099,14 @@ specification.</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Recipes</a><ul>
+<li><a class="reference internal" href="#states">States</a><ul>
+<li><a class="reference internal" href="#creating-a-flat-state-method">Creating a Flat State Method</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#events-and-signals">Events And Signals</a><ul>
 <li><a class="reference internal" href="#creating-an-event">Creating an Event</a></li>
 <li><a class="reference internal" href="#creating-a-signal">Creating a Signal</a></li>
-<li><a class="reference internal" href="#recipes-seeing-what-signals-you-have-in-your-system">Posting Events</a></li>
+<li><a class="reference internal" href="#posting-events">Posting Events</a></li>
 <li><a class="reference internal" href="#posting-an-event-to-the-fifo">Posting an Event to the Fifo</a></li>
 <li><a class="reference internal" href="#posting-an-event-to-the-lifo">Posting an Event to the Lifo</a></li>
 <li><a class="reference internal" href="#creating-a-one-shot-event">Creating a One-Shot Event</a></li>

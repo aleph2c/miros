@@ -8,9 +8,134 @@ Recipes
    :caption: Contents:
 
 
-.. _posting_events:
+.. _recipes-states:
 
-.. _recipes-events-and-signals:
+States
+------
+States need to do a few things:
+
+1. They need to react to events
+
+2. They need to have a parent, so if they don't react to an event, the event
+   processor can ask the parent if it knows what to do with the event. 
+
+3. They need to have application code
+
+4. They need to communicate with the event processor using various return codes.
+
+There are different ways to create states with miros:
+
+1. You can create a hand coded state method that references its parent so
+   that the hierarchy of your chart can be discovered by the event processor.
+   [flat states]
+
+2. You can have the library generate a state method for you, then register
+   callback responses for the signals and register a parent state so that the
+   event processor can discover the hierarchy. [factory states]
+
+3. You can use a fusion technique.  You can hand write a state and use context
+   managers within the method so that the miros package can register callbacks
+   for specific signals, or even change it's parent at run time. [fusion states]
+
+.. _recipes-creating-a-flat-state-method:
+
+Creating a Flat State Method
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The state methods are defined outside of a class that has an event processor.
+
+When a class which contains an event processor, like the ActiveObject, is
+instantiated it can link to your state method using the ``start_at`` method.
+
+The event processor never actually learns and remembers the full nature of how
+your state methods are linked to one another.  It always searches them as it
+reacts to whatever event you have provided it.  Think of it as someone with a
+flashlight in a dark room trying to figure out where something is and what to
+do.  It can never just turn on the lights and see the full map, it has to pick
+up each state, point it's flash light at it and see if it can react to the
+event provided, if it can't it must determine what to do next.
+
+Your state method's can be used by many different event processors, they are
+polyamorous.  This means that you can duplicate your maps as many times as you
+want, just by referencing them with as many active objects as you have.
+
+When an event processor is communicating with a state method, it places it's
+``self`` variable into the first argument of the state method, and uses the
+second argument to inject an event into the state method.  The state method
+communicates back, by adjusting internal attributes on the ``self`` variable of
+the thing searching it and by returning a status value as it reacts to the
+events given to it.
+
+The event processor can call your state method with two different intentions:
+
+1. It can call your method to ask it who it's parent is
+2. It can call it with an event to run your application code.
+
+When your state method is telling the event processor who its parent is, it
+does it in a way that may look confusing to someone reading the code. 
+
+For a state method to inform on its parent, it must react to any event it
+doesn't know how to handle by:
+
+1. Changing the ``self.temp.fun`` of the event processor object to point to the
+   parent state method.
+2. Returning the ``return_status.SUPER`` value as a result.
+
+Since your state method must communicate this information back to the event
+processor when it doesn't know what to do, you place the code into the ``else``
+clause of your state method's if-else structure.  
+
+There are situations where the event processor wants to search your state
+method for it's parent explicitly.  To do this it will send a signal named
+``SUPER`` to your state method.  For this reason, if your state method reacts
+to ``SUPER`` without reacting as it would if it didn't know what to do (look
+above), your statechart will not work.
+
+If your state method represents the outer most state of your map, it should point to
+the ``top`` attribute of the first argument provided to it.  This is a state
+method that is managed internally by the event processor.  When it sees this it
+knows that it needs to stop searching for what to do.
+
+Let's look at a few examples:
+
+.. code-block:: python
+  :emphasize-lines: 10-12
+
+  @spy_on
+  def g1_s0_active_objects_graph(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.F):
+      status = chart.trans(g1_s2111_active_objects_graph)
+    else:
+      status, chart.temp.fun = return_status.SUPER, chart.top
+    return status
+
+The above state method is at the outermost part of its map.
+
+.. code-block:: python
+  :emphasize-lines: 13-15
+
+  @spy_on
+  def g1_s01_active_objects_graph(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      chart.post_fifo(Event(signal=signals.A))
+      chart.post_lifo(Event(signal=signals.F))
+      chart.recall()
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.C):
+      status = chart.trans(g1_s22_active_objects_graph)
+    else:
+      status, chart.temp.fun = return_status.SUPER, g1_s0_active_objects_graph
+    return status
+
+The state method described above is a substate of ``g1_s0_active_objects_graph``.
+
 
 Events And Signals
 -----------------
@@ -64,7 +189,8 @@ Notice that the signal was invented on line **6** then re-used on line **9**.
 The signals are shared across your whole program.  To see reflect upon your
 signals read :ref:`this<recipes_seeing_your_signals>`.
 
-.. _recipes-seeing-what-signals-you-have-in-your-system:
+
+.. _posting_events:
 
 Posting Events
 ^^^^^^^^^^^^^^
@@ -401,10 +527,12 @@ Determining the Current State
 
 .. include:: i_determining_the_current_state.rst 
 
-.. _recipes_seeing_your_signals:
+.. _recipes-seeing-what-signals-you-have-in-your-system:
 
 Seeing what Signals You Have In Your System
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _recipes_seeing_your_signals:
 
 .. include:: i_seeing_your_signals.rst 
 
