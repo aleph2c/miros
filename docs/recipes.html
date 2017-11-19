@@ -50,9 +50,9 @@
 application code into designed behavior.</p>
 <p>States need to:</p>
 <ol class="arabic simple">
-<li>react to events and run your application code.</li>
-<li>describe their parent state.</li>
-<li>describe how they should transition to non-parent states.</li>
+<li>React to events and run your application code.</li>
+<li>Describe their parent state.</li>
+<li>Describe how they should transition to non-parent states.</li>
 </ol>
 <p>There are different ways to create states with miros:</p>
 <ol class="arabic simple">
@@ -119,14 +119,19 @@ its response.  If the state method returns an <code class="docutils literal"><sp
 processor will call it again to find it’s parent state.  Then it will call the
 parent state with the original event.  This process continues until the event
 is handled, or the event processor falls off the edge of the map.</p>
-<p>To change the parent state, the state method will adjust the <code class="docutils literal"><span class="pre">self.temp.fun</span></code>
-value to it’s parent state method when it receives the
-<code class="docutils literal"><span class="pre">SEARCH_FOR_SUPER_SIGNAL</span></code>.  It is easier to just have an <code class="docutils literal"><span class="pre">else</span></code> clause that
-manages this signal instead of adding it as an <code class="docutils literal"><span class="pre">elif</span></code> clause:</p>
+<p>The event processor uses the <code class="docutils literal"><span class="pre">SEARCH_FOR_SUPER_SIGNAL</span></code> named event to ask for
+a parent state.  When a state method hears this event it is expected to do two
+things:</p>
+<ol class="arabic simple">
+<li>set <code class="docutils literal"><span class="pre">self.temp.fun</span></code> to point to it’s parent state method</li>
+<li>return the value of <code class="docutils literal"><span class="pre">return_status.SUPER</span></code></li>
+</ol>
+<p>It is easier to just have an <code class="docutils literal"><span class="pre">else</span></code> clause in your state method rather than
+adding <code class="docutils literal"><span class="pre">SEARCH_FOR_SUPER_SIGNAL</span></code> explicits to an <code class="docutils literal"><span class="pre">elif</span></code> clause:</p>
 <div align="center" class="align-center"><img alt="_images/stateapplicationcode1.svg" src="_images/stateapplicationcode1.svg" /></div>
 <p>For the outermost state of your state chart you set the parent to <code class="docutils literal"><span class="pre">self.top</span></code>.
 This state method is actually defined within the event processor and when it
-sees this state it knows to stop searching for parents states.</p>
+sees this state it knows that it is about to fall of the edge of your map.</p>
 <p>If your parent state isn’t the outer most state, you would just set the
 <code class="docutils literal"><span class="pre">self.temp.fun</span></code> to whatever state is:</p>
 <div align="center" class="align-center"><img alt="_images/stateapplicationcode2.svg" src="_images/stateapplicationcode2.svg" /></div>
@@ -135,8 +140,9 @@ it’s parent state is <code class="docutils literal"><span class="pre">c</span>
 <p>In the case that you would like your chart to transition to another state, you
 would use the <code class="docutils literal"><span class="pre">trans</span></code> method.</p>
 <div align="center" class="align-center"><img alt="_images/stateapplicationcode3.svg" src="_images/stateapplicationcode3.svg" /></div>
-<p>Now let’s look at the full code in the diagram, first you would describe
-state’s <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">c1</span></code> and <code class="docutils literal"><span class="pre">c2</span></code>:</p>
+<p>Now let’s look at the full code for this diagram:</p>
+<div align="center" class="align-center"><img alt="_images/eventprocessors.svg" src="_images/eventprocessors.svg" /></div>
+<p>First you would describe state’s <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">c1</span></code> and <code class="docutils literal"><span class="pre">c2</span></code>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span>
 <span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
 <span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">return_status</span><span class="p">,</span> <span class="n">Event</span>
@@ -190,14 +196,15 @@ state’s <code class="docutils literal"><span class="pre">c</span></code>, <cod
 </pre></div>
 </div>
 <p>To connect the state methods into the two different active objects, we would
-create the active objects and then state them in their desired states:</p>
+create the active objects and then start them in their desired states:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ao1</span><span class="p">,</span> <span class="n">ao2</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(),</span> <span class="n">ActiveObject</span><span class="p">()</span>
 <span class="n">ao1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-<span class="n">ao1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
+<span class="n">ao2</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Both <code class="docutils literal"><span class="pre">ao1</span></code> and <code class="docutils literal"><span class="pre">ao2</span></code> active objects would be linked into the map as if the
-described state methods were defined within the ActiveObject class itself.</p>
+<p><code class="docutils literal"><span class="pre">ao1</span></code> would act as if it owned the map, and <code class="docutils literal"><span class="pre">ao2</span></code> would act as if it owned
+the map.  Neither would know that <cite>their</cite> state methods were being used by more
+than one active object.</p>
 </div>
 </div>
 <div class="section" id="events-and-signals">

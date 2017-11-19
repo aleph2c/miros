@@ -17,9 +17,9 @@ application code into designed behavior.
 
 States need to:
 
-1. react to events and run your application code.
-2. describe their parent state.
-3. describe how they should transition to non-parent states.
+1. React to events and run your application code.
+2. Describe their parent state.
+3. Describe how they should transition to non-parent states.
 
 There are different ways to create states with miros:
 
@@ -101,17 +101,22 @@ processor will call it again to find it's parent state.  Then it will call the
 parent state with the original event.  This process continues until the event
 is handled, or the event processor falls off the edge of the map.
 
-To change the parent state, the state method will adjust the ``self.temp.fun``
-value to it's parent state method when it receives the
-``SEARCH_FOR_SUPER_SIGNAL``.  It is easier to just have an ``else`` clause that
-manages this signal instead of adding it as an ``elif`` clause:
+The event processor uses the ``SEARCH_FOR_SUPER_SIGNAL`` named event to ask for
+a parent state.  When a state method hears this event it is expected to do two
+things:
+
+1.  set ``self.temp.fun`` to point to it's parent state method
+2.  return the value of ``return_status.SUPER``
+
+It is easier to just have an ``else`` clause in your state method rather than
+adding ``SEARCH_FOR_SUPER_SIGNAL`` explicits to an ``elif`` clause:
 
 .. image:: _static/stateapplicationcode1.svg
     :align: center
 
 For the outermost state of your state chart you set the parent to ``self.top``.
 This state method is actually defined within the event processor and when it
-sees this state it knows to stop searching for parents states.
+sees this state it knows that it is about to fall of the edge of your map.
 
 If your parent state isn't the outer most state, you would just set the
 ``self.temp.fun`` to whatever state is:
@@ -128,8 +133,12 @@ would use the ``trans`` method.
 .. image:: _static/stateapplicationcode3.svg
     :align: center
 
-Now let's look at the full code in the diagram, first you would describe
-state's ``c``, ``c1`` and ``c2``:
+Now let's look at the full code for this diagram:
+
+.. image:: _static/eventprocessors.svg
+    :align: center
+
+First you would describe state's ``c``, ``c1`` and ``c2``:
 
 .. code-block:: python
 
@@ -185,16 +194,17 @@ state's ``c``, ``c1`` and ``c2``:
     return status
 
 To connect the state methods into the two different active objects, we would
-create the active objects and then state them in their desired states:
+create the active objects and then start them in their desired states:
 
 .. code-block:: python
 
   ao1, ao2 = ActiveObject(), ActiveObject()
   ao1.start_at(c)
-  ao1.start_at(c2)
+  ao2.start_at(c2)
 
-Both ``ao1`` and ``ao2`` active objects would be linked into the map as if the
-described state methods were defined within the ActiveObject class itself.
+``ao1`` would act as if it owned the map, and ``ao2`` would act as if it owned
+the map.  Neither would know that `their` state methods were being used by more
+than one active object.
 
 Events And Signals
 -----------------
