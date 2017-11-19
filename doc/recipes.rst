@@ -12,130 +12,189 @@ Recipes
 
 States
 ------
-States need to do a few things:
+In the miros frame work, your state methods act as places to link your
+application code into designed behavior.
 
-1. They need to react to events
+States need to:
 
-2. They need to have a parent, so if they don't react to an event, the event
-   processor can ask the parent if it knows what to do with the event. 
-
-3. They need to have application code
-
-4. They need to communicate with the event processor using various return codes.
+1. react to events and run your application code.
+2. describe their parent state.
+3. describe how they should transition to non-parent states.
 
 There are different ways to create states with miros:
 
-1. You can create a hand coded state method that references its parent so
-   that the hierarchy of your chart can be discovered by the event processor.
-   [flat states]
+1. You can create a hand-coded state method. [flat states]
 
 2. You can have the library generate a state method for you, then register
-   callback responses for the signals and register a parent state so that the
-   event processor can discover the hierarchy. [factory states]
+   callback responses to specific events and set a parent at runtime.
+   [factory states]
 
 3. You can use a fusion technique.  You can hand write a state and use context
    managers within the method so that the miros package can register callbacks
-   for specific signals, or even change it's parent at run time. [fusion states]
+   for specific signals, or even change it's parent at run time. [fusion
+   states]
 
-.. _recipes-creating-a-flat-state-method:
+.. _recipes-what-a-state-does-and-how-to-structure-it:
 
-Creating a Flat State Method
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The state methods are defined outside of a class that has an event processor.
+What a State Does and How to Structure it
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Your state methods represent the rounded rectangles in your statechart diagram.
+They contain information about how a state should react to an event and they
+contain information about how they relate to other states.  They do not
+explicitly create the behavior that you expect from your statechart, this is
+done by an event processor.  An event processor is created when you instantiate
+an active object. It is the thing that calls the state methods over and over
+again to enact the expected behavior of your design.
 
-When a class which contains an event processor, like the ActiveObject, is
-instantiated it can link to your state method using the ``start_at`` method.
+When an active object uses its ``start_at`` method, it connects your state
+method to its event processor.  
 
-The event processor never actually learns and remembers the full nature of how
-your state methods are linked to one another.  It always searches them as it
-reacts to whatever event you have provided it.  Think of it as someone with a
-flashlight in a dark room trying to figure out where something is and what to
-do.  It can never just turn on the lights and see the full map, it has to pick
-up each state, point it's flash light at it and see if it can react to the
-event provided, if it can't it must determine what to do next.
+An event processor never actually learns or remembers the full nature of how
+your state methods are linked to one another, it only remembers it's current
+state and where it would like to transition within the diagram on its next
+pass.  It always searches them as it reacts to whatever event you have provided
+it.  So, your design is discovered as the event processor reacts to events.  Your
+state method's can be used by many different event processors, they're
+polyamorous:
 
-Your state method's can be used by many different event processors, they are
-polyamorous.  This means that you can duplicate your maps as many times as you
-want, just by referencing them with as many active objects as you have.
+.. image:: _static/eventprocessors.svg
+    :align: center
 
-When an event processor is communicating with a state method, it places it's
-``self`` variable into the first argument of the state method, and uses the
-second argument to inject an event into the state method.  The state method
-communicates back, by adjusting internal attributes on the ``self`` variable of
-the thing searching it and by returning a status value as it reacts to the
-events given to it.
+In the diagram above we see that two different active objects can use the same
+statechart structure.  Each active object can be in a different state, even
+though they are using the same diagram.   ``ao1`` starts it's interpretation of
+the statechart in state ``c`` and ``ao2`` starts it's interpretation of the
+statechart in state ``c2``.  As someone building this design you would create
+two different active objects, and you would define three different state
+methods, then you would start the different active objects with a ``start_at``
+call.
 
-The event processor can call your state method with two different intentions:
+You don't explicitly call an event processor while using the miros api, it is
+called in the background when you use methods like ``start_at``, ``post_fifo``
+or ``post_lifo``.
 
-1. It can call your method to ask it who it's parent is
-2. It can call it with an event to run your application code.
+The event processor treats a state method as if it was defined within its own
+class.  It does this by using its ``self`` variable in the first argument in
+the state method call.  It then injects the event into the second argument to
+see what the state method will do about it.  The state method communicates
+back, by adjusting internal attributes on the ``self`` variable of the thing
+searching it and by returning a status value as it reacts to the events.
 
-When your state method is telling the event processor who its parent is, it
-does it in a way that may look confusing to someone reading the code. 
+This means that state methods themselves are stateless.  They do not keep
+internal variables, they only react and tweak the variable states of the
+objects that were given to them as input arguments.  It is the ``self``
+variable of the outside caller that has new information impressed upon it.
+This is how state methods stay polyamorous.
 
-For a state method to inform on its parent, it must react to any event it
-doesn't know how to handle by:
+The states contain a place to anchor your application code.  They also provide
+information about the design topology of your chart.  They describe their
+parent state, and they describe how some events can cause transitions to other
+state methods. That's it.  There is no full picture described in a table or in
+any other data structure.  The picture is actually written into the interaction
+between your state method descriptions and the event processor's reaction to
+them.
 
-1. Changing the ``self.temp.fun`` of the event processor object to point to the
-   parent state method.
-2. Returning the ``return_status.SUPER`` value as a result.
+The event processor remembers which state method is it's current state.  When
+it is given an event, it calls this state method with the event and listens to
+its response.  If the state method returns an ``UNHANDLED`` result, the event
+processor will call it again to find it's parent state.  Then it will call the
+parent state with the original event.  This process continues until the event
+is handled, or the event processor falls off the edge of the map.
 
-Since your state method must communicate this information back to the event
-processor when it doesn't know what to do, you place the code into the ``else``
-clause of your state method's if-else structure.  
+To change the parent state, the state method will adjust the ``self.temp.fun``
+value to it's parent state method when it receives the
+``SEARCH_FOR_SUPER_SIGNAL``.  It is easier to just have an ``else`` clause that
+manages this signal instead of adding it as an ``elif`` clause:
 
-There are situations where the event processor wants to search your state
-method for it's parent explicitly.  To do this it will send a signal named
-``SUPER`` to your state method.  For this reason, if your state method reacts
-to ``SUPER`` without reacting as it would if it didn't know what to do (look
-above), your statechart will not work.
+.. image:: _static/stateapplicationcode1.svg
+    :align: center
 
-If your state method represents the outer most state of your map, it should point to
-the ``top`` attribute of the first argument provided to it.  This is a state
-method that is managed internally by the event processor.  When it sees this it
-knows that it needs to stop searching for what to do.
+For the outermost state of your state chart you set the parent to ``self.top``.
+This state method is actually defined within the event processor and when it
+sees this state it knows to stop searching for parents states.
 
-Let's look at a few examples:
+If your parent state isn't the outer most state, you would just set the
+``self.temp.fun`` to whatever state is:
+
+.. image:: _static/stateapplicationcode2.svg
+    :align: center
+
+Here we see how the state method ``c1`` would tell the event processor that
+it's parent state is ``c``.
+
+In the case that you would like your chart to transition to another state, you
+would use the ``trans`` method.
+
+.. image:: _static/stateapplicationcode3.svg
+    :align: center
+
+Now let's look at the full code in the diagram, first you would describe
+state's ``c``, ``c1`` and ``c2``:
 
 .. code-block:: python
-  :emphasize-lines: 10-12
 
-  @spy_on
-  def g1_s0_active_objects_graph(chart, e):
-    status = return_status.UNHANDLED
+  from miros.hsm import spy_on
+  from miros.activeobject import ActiveObject
+  from miros.event import signals, return_status, Event
+
+  def c(self, e):
+    status = signals.UNHANDLED
     if(e.signal == signals.ENTRY_SIGNAL):
-      status = return_status.HANDLED
+      # call c's entry code
+      status = signals.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = self.trans(c1)
+    elif(e.signal == signals.B):
+      status = self.trans(c)
     elif(e.signal == signals.EXIT_SIGNAL):
-      status = return_status.HANDLED
-    elif(e.signal == signals.F):
-      status = chart.trans(g1_s2111_active_objects_graph)
+      # call c's exit code
+      status = signals.HANDLED
     else:
-      status, chart.temp.fun = return_status.SUPER, chart.top
+      status = return_status.SUPER
+      chart.temp.fun = self.top
     return status
 
-The above state method is at the outermost part of its map.
+  def c1(self, e):
+    status = signals.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = signals.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = signals.HANDLED
+    elif(e.signal == signals.A):
+      status = trans(c2)
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = signals.HANDLED
+    else:
+      status = return_status.SUPER
+      chart.temp.fun = self.c
+    return status
+
+  def c2(self, e):
+    status = signals.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = signals.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = signals.HANDLED
+    elif(e.signal == signals.A):
+      status = trans(c1)
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = signals.HANDLED
+    else:
+      status = return_status.SUPER
+      chart.temp.fun = self.c
+    return status
+
+To connect the state methods into the two different active objects, we would
+create the active objects and then state them in their desired states:
 
 .. code-block:: python
-  :emphasize-lines: 13-15
 
-  @spy_on
-  def g1_s01_active_objects_graph(chart, e):
-    status = return_status.UNHANDLED
-    if(e.signal == signals.ENTRY_SIGNAL):
-      chart.post_fifo(Event(signal=signals.A))
-      chart.post_lifo(Event(signal=signals.F))
-      chart.recall()
-      status = return_status.HANDLED
-    elif(e.signal == signals.EXIT_SIGNAL):
-      status = return_status.HANDLED
-    elif(e.signal == signals.C):
-      status = chart.trans(g1_s22_active_objects_graph)
-    else:
-      status, chart.temp.fun = return_status.SUPER, g1_s0_active_objects_graph
-    return status
+  ao1, ao2 = ActiveObject(), ActiveObject()
+  ao1.start_at(c)
+  ao1.start_at(c2)
 
-The state method described above is a substate of ``g1_s0_active_objects_graph``.
-
+Both ``ao1`` and ``ao2`` active objects would be linked into the map as if the
+described state methods were defined within the ActiveObject class itself.
 
 Events And Signals
 -----------------
