@@ -52,9 +52,11 @@ have to worry about how this is done, you just have to remember how the maps
 behave, then translate your map into state methods.
 
 The cost of this is that you have to express your application code within
-*specifically* structured state methods.  Wouldn't it be nice if the library
-wrote the methods for you too?  Well, it can do that using the factory pattern,
-but let's consider the downside of structuring your application like this.
+:ref:`specifically
+structured ways<recipes-what-a-state-does-and-how-to-structure-it>`.  Wouldn't it be
+nice if the library wrote the methods for you too?  Well, it can do that using
+the factory pattern, but let's consider the downside of structuring your
+application like this.
 
 If you use this library to write your state methods for you, you are placing
 yet another layer of abstraction between you and your application code.  A bug

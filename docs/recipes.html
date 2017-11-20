@@ -52,7 +52,7 @@ application code into designed behavior.</p>
 <ol class="arabic simple">
 <li>React to events and run your application code.</li>
 <li>Describe their parent state.</li>
-<li>Describe how they should transition to non-parent states.</li>
+<li>Describe how they should transition to other states for specific events.</li>
 </ol>
 <p>There are different ways to create states with miros:</p>
 <ol class="arabic simple">
@@ -65,6 +65,23 @@ managers within the method so that the miros package can register callbacks
 for specific signals, or even change it’s parent at run time. [fusion
 states]</li>
 </ol>
+<ul class="simple">
+<li><a class="reference internal" href="#recipes-boiler-plate-state-method-code"><span class="std std-ref">Boiler plate state method code</span></a></li>
+<li><a class="reference internal" href="#recipes-describe-a-parent-state"><span class="std std-ref">Describe a parent state</span></a></li>
+<li><a class="reference internal" href="#recipes-pass-an-event-through-to-a-parent-state"><span class="std std-ref">Pass an event through to a parent state</span></a></li>
+<li><a class="reference internal" href="#recipes-transition-to-another-state"><span class="std std-ref">Transition to another state</span></a></li>
+<li><a class="reference internal" href="#recipes-do-something-when-the-state-is-entered"><span class="std std-ref">Do something when the state is entered</span></a></li>
+<li><a class="reference internal" href="#recipes-do-something-when-the-state-is-initialized"><span class="std std-ref">Do something when the state is initialized</span></a></li>
+<li><a class="reference internal" href="#recipes-do-something-when-the-state-is-exited"><span class="std std-ref">Do something when the state is exited</span></a></li>
+<li><a class="reference internal" href="#recipes-create-a-hook"><span class="std std-ref">Create a hook</span></a></li>
+<li><a class="reference internal" href="#recipes-catch-and-release"><span class="std std-ref">Catch and release</span></a></li>
+<li><a class="reference internal" href="#recipes-create-a-one-shot-state"><span class="std std-ref">Create a one-shot</span></a></li>
+<li><a class="reference internal" href="#recipes-create-a-mult-shot-state"><span class="std std-ref">Create a multi-shot</span></a></li>
+<li><a class="reference internal" href="#recipes-cancelling-events-state"><span class="std std-ref">Canceling events</span></a></li>
+<li><a class="reference internal" href="#recipes-deferring-an-event-state"><span class="std std-ref">Deferring an event</span></a></li>
+<li><a class="reference internal" href="#recipes-recalling-an-event-state"><span class="std std-ref">Recalling an event</span></a></li>
+<li><a class="reference internal" href="#recipes-what-a-state-does-and-how-to-structure-it"><span class="std std-ref">A Deeper look at state methods</span></a></li>
+</ul>
 <div class="section" id="what-a-state-does-and-how-to-structure-it">
 <span id="recipes-what-a-state-does-and-how-to-structure-it"></span><h3>What a State Does and How to Structure it<a class="headerlink" href="#what-a-state-does-and-how-to-structure-it" title="Permalink to this headline">¶</a></h3>
 <p>Your state methods represent the rounded rectangles in your statechart diagram.
@@ -108,26 +125,31 @@ variable of the outside caller that has new information impressed upon it.
 This is how state methods stay polyamorous.</p>
 <p>The states contain a place to anchor your application code.  They also provide
 information about the design topology of your chart.  They describe their
-parent state, and they describe how some events can cause transitions to other
+parent state and they describe how some events can cause transitions to other
 state methods. That’s it.  There is no full picture described in a table or in
 any other data structure.  The picture is actually written into the interaction
 between your state method descriptions and the event processor’s reaction to
 them.</p>
-<p>The event processor remembers which state method is it’s current state.  When
-it is given an event, it calls this state method with the event and listens to
-its response.  If the state method returns an <code class="docutils literal"><span class="pre">UNHANDLED</span></code> result, the event
-processor will call it again to find it’s parent state.  Then it will call the
-parent state with the original event.  This process continues until the event
-is handled, or the event processor falls off the edge of the map.</p>
-<p>The event processor uses the <code class="docutils literal"><span class="pre">SEARCH_FOR_SUPER_SIGNAL</span></code> named event to ask for
-a parent state.  When a state method hears this event it is expected to do two
-things:</p>
+<p>The event processor remembers which state method is it’s current state and
+which state it is targeting.  When it is given an event, it calls it’s current
+state method with the event and listens to its response.  If your state method
+doesn’t know what to do with an event, it just has to set the targeted state of
+the event processor to its parent state and then return
+<code class="docutils literal"><span class="pre">return_status.SUPER</span></code>.  This will cause the event processor to call the
+parent state method with the same event.</p>
+<p>Another way for the parent to be called with the same event is if your state
+method returns an <code class="docutils literal"><span class="pre">UNHANDLED</span></code> result. This will cause the event processor to
+send a <code class="docutils literal"><span class="pre">SEARCH_FOR_SUPER_SIGNAL</span></code> into your state method.  This will land in
+your <code class="docutils literal"><span class="pre">else</span></code> clause, revealing the information about it’s parent state to the
+event processor.  The event processor will use this same signal any time it needs to
+learn about your state chart, and for this reason you should never explicitly
+handle <code class="docutils literal"><span class="pre">SEARCH_FOR_SUPER_SIGNAL</span></code>.</p>
+<p>For a state chart to reveal it’s parent state, it must do the following two
+things in its <code class="docutils literal"><span class="pre">else</span></code> clause:</p>
 <ol class="arabic simple">
 <li>set <code class="docutils literal"><span class="pre">self.temp.fun</span></code> to point to it’s parent state method</li>
 <li>return the value of <code class="docutils literal"><span class="pre">return_status.SUPER</span></code></li>
 </ol>
-<p>It is easier to just have an <code class="docutils literal"><span class="pre">else</span></code> clause in your state method rather than
-adding <code class="docutils literal"><span class="pre">SEARCH_FOR_SUPER_SIGNAL</span></code> explicits to an <code class="docutils literal"><span class="pre">elif</span></code> clause:</p>
 <div align="center" class="align-center"><img alt="_images/stateapplicationcode1.svg" src="_images/stateapplicationcode1.svg" /></div>
 <p>For the outermost state of your state chart you set the parent to <code class="docutils literal"><span class="pre">self.top</span></code>.
 This state method is actually defined within the event processor and when it
@@ -148,55 +170,55 @@ would use the <code class="docutils literal"><span class="pre">trans</span></cod
 <span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">return_status</span><span class="p">,</span> <span class="n">Event</span>
 
 <span class="k">def</span> <span class="nf">c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
     <span class="c1"># call c&#39;s entry code</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
     <span class="c1"># call c&#39;s exit code</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">top</span>
   <span class="k">return</span> <span class="n">status</span>
 
 <span class="k">def</span> <span class="nf">c1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">trans</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
   <span class="k">return</span> <span class="n">status</span>
 
 <span class="k">def</span> <span class="nf">c2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">trans</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
   <span class="k">return</span> <span class="n">status</span>
 </pre></div>
 </div>
-<p>To connect the state methods into the two different active objects, we would
-create the active objects and then start them in their desired states:</p>
+<p>Then you would connect the state methods into two different active objects and
+start them in their desired states:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ao1</span><span class="p">,</span> <span class="n">ao2</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(),</span> <span class="n">ActiveObject</span><span class="p">()</span>
 <span class="n">ao1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 <span class="n">ao2</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
@@ -205,6 +227,174 @@ create the active objects and then start them in their desired states:</p>
 <p><code class="docutils literal"><span class="pre">ao1</span></code> would act as if it owned the map, and <code class="docutils literal"><span class="pre">ao2</span></code> would act as if it owned
 the map.  Neither would know that <cite>their</cite> state methods were being used by more
 than one active object.</p>
+</div>
+<div class="section" id="boiler-plate-state-method-code">
+<span id="recipes-boiler-plate-state-method-code"></span><h3>Boiler Plate State Method Code<a class="headerlink" href="#boiler-plate-state-method-code" title="Permalink to this headline">¶</a></h3>
+<p>For a flat state:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="o">&lt;</span><span class="n">your_state_method_name</span><span class="o">&gt;</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="c1"># if you state method doesn&#39;t know what to do it should return this</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># call your entry application code</span>
+
+    <span class="c1"># make sure you tell the event processor you handled this event</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># call your initialization (big black dot) application code</span>
+
+    <span class="c1"># make sure you tell the event processor you handled this event</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="c1">#</span>
+  <span class="c1"># Write your custom</span>
+  <span class="c1"># event handlers in here as there own elif clauses</span>
+  <span class="c1">#</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># call your exit (big black dot) application code</span>
+
+    <span class="c1"># make sure you tell the event processor you handled this event</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="c1"># this logic will run when your event processor sends an event with the</span>
+    <span class="c1"># SEARCH_FOR_SUPER_SIGNAL name</span>
+
+    <span class="c1"># 1) place your parent state method into the chart.temp.fun</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">your_parent_state_method</span><span class="o">&gt;</span>
+
+    <span class="c1"># 2) make sure you return this value</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="c1"># return the status value</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>If your state method didn’t include handling for the <code class="docutils literal"><span class="pre">ENTRY_SIGNAL</span></code>,
+<code class="docutils literal"><span class="pre">INIT_SIGNAL</span></code> or <code class="docutils literal"><span class="pre">EXIT_SIGNAL</span></code>, the event processor will just assume it did
+and returned return_state.HANDLED.</p>
+</div>
+<div class="section" id="describe-a-parent-state">
+<span id="recipes-describe-a-parent-state"></span><h3>Describe a Parent State<a class="headerlink" href="#describe-a-parent-state" title="Permalink to this headline">¶</a></h3>
+<p>Your state method will be queried by the event processor to determine how it is
+related to the other state methods in your design.  It will do this by calling
+the state method with the first argument set to the event processor’s <code class="docutils literal"><span class="pre">self</span></code>
+and with a second argument set to an event named <code class="docutils literal"><span class="pre">SEARCH_FOR_SUPER_SIGNAL</span></code>.
+As a convention, state methods don’t handle this signal, they respond to it
+within their <code class="docutils literal"><span class="pre">else</span></code> clause by:</p>
+<ol class="arabic simple">
+<li>setting the <code class="docutils literal"><span class="pre">temp.fun</span></code> attribute of the first argument to point at their
+parent state.</li>
+<li>return the value of <code class="docutils literal"><span class="pre">return_state.SUPER</span></code></li>
+</ol>
+<p>Generally speaking this is how it is done:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="o">&lt;</span><span class="n">state_method_name</span><span class="o">&gt;</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="c1"># .</span>
+  <span class="c1"># .</span>
+  <span class="k">else</span><span class="p">:</span>
+<span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">parent_state_of_this_state_method</span><span class="o">&gt;</span>
+</span>  <span class="k">return</span> <span class="n">status</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>If you need to define your parent state as the outermost state of your diagram, you would
+set the <code class="docutils literal"><span class="pre">&lt;parent_state_of_this_state_method&gt;</span></code> to the <code class="docutils literal"><span class="pre">top</span></code> attribute of the
+first argument provided your crafted the state method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="o">&lt;</span><span class="n">state_method_name</span><span class="o">&gt;</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="c1"># .</span>
+  <span class="c1"># .</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+<span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+</span>  <span class="k">return</span> <span class="n">status</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>To read more about why you structure your state methods this way, read <a class="reference internal" href="#recipes-what-a-state-does-and-how-to-structure-it"><span class="std std-ref">this.</span></a></p>
+</div>
+<div class="section" id="pass-an-event-through-to-a-parent-state">
+<span id="recipes-pass-an-event-through-to-a-parent-state"></span><h3>Pass an event through to a Parent State<a class="headerlink" href="#pass-an-event-through-to-a-parent-state" title="Permalink to this headline">¶</a></h3>
+<p>The easiest way to pass an event outward in your statechart is not to handle it
+in your <code class="docutils literal"><span class="pre">if-elif</span></code> clauses and let your <code class="docutils literal"><span class="pre">else</span></code>
+<a class="reference internal" href="#recipes-describe-a-parent-state"><span class="std std-ref">clause</span></a> handle it.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Sending Event(signal=signals.B) to c1 would cause</span>
+<span class="c1"># the parent state c to be called with this event,</span>
+<span class="c1"># since it is not handled in the ``if-elif``</span>
+<span class="c1"># logic structure or c1.</span>
+<span class="k">def</span> <span class="nf">c1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">trans</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>Another way to pass an event out to your parent state is to handle the event in
+the <code class="docutils literal"><span class="pre">if-elif</span></code> clause, then return <code class="docutils literal"><span class="pre">return_status.UNHANDLED</span></code> to the event
+processor.  When it sees that your state method couldn’t handle the event it
+will call it again to find it’s parent state and then call that parent state
+method with the event you wanted to trickle outward.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Sending Event(signal=signals.B) to c1 would cause</span>
+<span class="c1"># the parent state c to be called with this event,</span>
+<span class="c1"># since c1 returns a `UNHANDLED` value to the event</span>
+<span class="c1"># processor</span>
+<span class="k">def</span> <span class="nf">c1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">):</span>
+<span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;saw signal B, but letting it trickle through to my parent&quot;</span><span class="p">)</span>
+</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">trans</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="transition-to-another-state">
+<span id="recipes-transition-to-another-state"></span><h3>Transition to another state<a class="headerlink" href="#transition-to-another-state" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="do-something-when-the-state-is-entered">
+<span id="recipes-do-something-when-the-state-is-entered"></span><h3>Do Something when the State is Entered<a class="headerlink" href="#do-something-when-the-state-is-entered" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="do-something-when-the-state-is-initialized">
+<span id="recipes-do-something-when-the-state-is-initialized"></span><h3>Do Something when the State is Initialized<a class="headerlink" href="#do-something-when-the-state-is-initialized" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="do-something-when-the-state-is-exited">
+<span id="recipes-do-something-when-the-state-is-exited"></span><h3>Do Something when the State is Exited<a class="headerlink" href="#do-something-when-the-state-is-exited" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="create-a-hook">
+<span id="recipes-create-a-hook"></span><h3>Create a Hook<a class="headerlink" href="#create-a-hook" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="catch-and-release">
+<span id="recipes-catch-and-release"></span><h3>Catch and Release<a class="headerlink" href="#catch-and-release" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="create-a-one-shot">
+<span id="recipes-create-a-one-shot-state"></span><h3>Create a One-Shot<a class="headerlink" href="#create-a-one-shot" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="create-a-mult-shot">
+<span id="recipes-create-a-mult-shot-state"></span><h3>Create a Mult-Shot<a class="headerlink" href="#create-a-mult-shot" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="cancelling-events">
+<span id="recipes-cancelling-events-state"></span><h2>Cancelling Events<a class="headerlink" href="#cancelling-events" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="deferring-an-event">
+<span id="recipes-deferring-an-event-state"></span><h3>Deferring an Event<a class="headerlink" href="#deferring-an-event" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="recalling-an-event">
+<span id="recipes-recalling-an-event-state"></span><h3>Recalling An Event<a class="headerlink" href="#recalling-an-event" title="Permalink to this headline">¶</a></h3>
 </div>
 </div>
 <div class="section" id="events-and-signals">
@@ -1159,6 +1349,22 @@ specification.</p>
 <li><a class="reference internal" href="#">Recipes</a><ul>
 <li><a class="reference internal" href="#states">States</a><ul>
 <li><a class="reference internal" href="#what-a-state-does-and-how-to-structure-it">What a State Does and How to Structure it</a></li>
+<li><a class="reference internal" href="#boiler-plate-state-method-code">Boiler Plate State Method Code</a></li>
+<li><a class="reference internal" href="#describe-a-parent-state">Describe a Parent State</a></li>
+<li><a class="reference internal" href="#pass-an-event-through-to-a-parent-state">Pass an event through to a Parent State</a></li>
+<li><a class="reference internal" href="#transition-to-another-state">Transition to another state</a></li>
+<li><a class="reference internal" href="#do-something-when-the-state-is-entered">Do Something when the State is Entered</a></li>
+<li><a class="reference internal" href="#do-something-when-the-state-is-initialized">Do Something when the State is Initialized</a></li>
+<li><a class="reference internal" href="#do-something-when-the-state-is-exited">Do Something when the State is Exited</a></li>
+<li><a class="reference internal" href="#create-a-hook">Create a Hook</a></li>
+<li><a class="reference internal" href="#catch-and-release">Catch and Release</a></li>
+<li><a class="reference internal" href="#create-a-one-shot">Create a One-Shot</a></li>
+<li><a class="reference internal" href="#create-a-mult-shot">Create a Mult-Shot</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cancelling-events">Cancelling Events</a><ul>
+<li><a class="reference internal" href="#deferring-an-event">Deferring an Event</a></li>
+<li><a class="reference internal" href="#recalling-an-event">Recalling An Event</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#events-and-signals">Events And Signals</a><ul>

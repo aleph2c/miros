@@ -7,7 +7,6 @@ Recipes
    :maxdepth: 2
    :caption: Contents:
 
-
 .. _recipes-states:
 
 States
@@ -19,7 +18,7 @@ States need to:
 
 1. React to events and run your application code.
 2. Describe their parent state.
-3. Describe how they should transition to non-parent states.
+3. Describe how they should transition to other states for specific events.
 
 There are different ways to create states with miros:
 
@@ -33,6 +32,22 @@ There are different ways to create states with miros:
    managers within the method so that the miros package can register callbacks
    for specific signals, or even change it's parent at run time. [fusion
    states]
+
+* :ref:`Boiler plate state method code<recipes-boiler-plate-state-method-code>`
+* :ref:`Describe a parent state<recipes-describe-a-parent-state>`
+* :ref:`Pass an event through to a parent state<recipes-pass-an-event-through-to-a-parent-state>`
+* :ref:`Transition to another state<recipes-transition-to-another-state>`
+* :ref:`Do something when the state is entered<recipes-do-something-when-the-state-is-entered>`
+* :ref:`Do something when the state is initialized<recipes-do-something-when-the-state-is-initialized>`
+* :ref:`Do something when the state is exited<recipes-do-something-when-the-state-is-exited>`
+* :ref:`Create a hook<recipes-create-a-hook>`
+* :ref:`Catch and release<recipes-catch-and-release>`
+* :ref:`Create a one-shot<recipes-create-a-one-shot-state>`
+* :ref:`Create a multi-shot<recipes-create-a-mult-shot-state>`
+* :ref:`Canceling events<recipes-cancelling-events-state>`
+* :ref:`Deferring an event<recipes-deferring-an-event-state>`
+* :ref:`Recalling an event<recipes-recalling-an-event-state>`
+* :ref:`A Deeper look at state methods<recipes-what-a-state-does-and-how-to-structure-it>`
 
 .. _recipes-what-a-state-does-and-how-to-structure-it:
 
@@ -88,28 +103,33 @@ This is how state methods stay polyamorous.
 
 The states contain a place to anchor your application code.  They also provide
 information about the design topology of your chart.  They describe their
-parent state, and they describe how some events can cause transitions to other
+parent state and they describe how some events can cause transitions to other
 state methods. That's it.  There is no full picture described in a table or in
 any other data structure.  The picture is actually written into the interaction
 between your state method descriptions and the event processor's reaction to
 them.
 
-The event processor remembers which state method is it's current state.  When
-it is given an event, it calls this state method with the event and listens to
-its response.  If the state method returns an ``UNHANDLED`` result, the event
-processor will call it again to find it's parent state.  Then it will call the
-parent state with the original event.  This process continues until the event
-is handled, or the event processor falls off the edge of the map.
+The event processor remembers which state method is it's current state and
+which state it is targeting.  When it is given an event, it calls it's current
+state method with the event and listens to its response.  If your state method
+doesn't know what to do with an event, it just has to set the targeted state of
+the event processor to its parent state and then return
+``return_status.SUPER``.  This will cause the event processor to call the
+parent state method with the same event.
 
-The event processor uses the ``SEARCH_FOR_SUPER_SIGNAL`` named event to ask for
-a parent state.  When a state method hears this event it is expected to do two
-things:
+Another way for the parent to be called with the same event is if your state
+method returns an ``UNHANDLED`` result. This will cause the event processor to
+send a ``SEARCH_FOR_SUPER_SIGNAL`` into your state method.  This will land in
+your ``else`` clause, revealing the information about it's parent state to the
+event processor.  The event processor will use this same signal any time it needs to
+learn about your state chart, and for this reason you should never explicitly
+handle ``SEARCH_FOR_SUPER_SIGNAL``.
+
+For a state chart to reveal it's parent state, it must do the following two
+things in its ``else`` clause:
 
 1.  set ``self.temp.fun`` to point to it's parent state method
 2.  return the value of ``return_status.SUPER``
-
-It is easier to just have an ``else`` clause in your state method rather than
-adding ``SEARCH_FOR_SUPER_SIGNAL`` explicits to an ``elif`` clause:
 
 .. image:: _static/stateapplicationcode1.svg
     :align: center
@@ -147,54 +167,54 @@ First you would describe state's ``c``, ``c1`` and ``c2``:
   from miros.event import signals, return_status, Event
 
   def c(self, e):
-    status = signals.UNHANDLED
+    status = return_status.UNHANDLED
     if(e.signal == signals.ENTRY_SIGNAL):
       # call c's entry code
-      status = signals.HANDLED
+      status = return_status.HANDLED
     elif(e.signal == signals.INIT_SIGNAL):
       status = self.trans(c1)
     elif(e.signal == signals.B):
-      status = self.trans(c)
+      status = return_status.trans(c)
     elif(e.signal == signals.EXIT_SIGNAL):
       # call c's exit code
-      status = signals.HANDLED
+      status = return_status.HANDLED
     else:
       status = return_status.SUPER
       chart.temp.fun = self.top
     return status
 
   def c1(self, e):
-    status = signals.UNHANDLED
+    status = return_status.UNHANDLED
     if(e.signal == signals.ENTRY_SIGNAL):
-      status = signals.HANDLED
+      status = return_status.HANDLED
     elif(e.signal == signals.INIT_SIGNAL):
-      status = signals.HANDLED
+      status = return_status.HANDLED
     elif(e.signal == signals.A):
       status = trans(c2)
     elif(e.signal == signals.EXIT_SIGNAL):
-      status = signals.HANDLED
+      status = return_status.HANDLED
     else:
       status = return_status.SUPER
       chart.temp.fun = self.c
     return status
 
   def c2(self, e):
-    status = signals.UNHANDLED
+    status = return_status.UNHANDLED
     if(e.signal == signals.ENTRY_SIGNAL):
-      status = signals.HANDLED
+      status = return_status.HANDLED
     elif(e.signal == signals.INIT_SIGNAL):
-      status = signals.HANDLED
+      status = return_status.HANDLED
     elif(e.signal == signals.A):
       status = trans(c1)
     elif(e.signal == signals.EXIT_SIGNAL):
-      status = signals.HANDLED
+      status = return_status.HANDLED
     else:
       status = return_status.SUPER
       chart.temp.fun = self.c
     return status
 
-To connect the state methods into the two different active objects, we would
-create the active objects and then start them in their desired states:
+Then you would connect the state methods into two different active objects and
+start them in their desired states:
 
 .. code-block:: python
 
@@ -205,6 +225,221 @@ create the active objects and then start them in their desired states:
 ``ao1`` would act as if it owned the map, and ``ao2`` would act as if it owned
 the map.  Neither would know that `their` state methods were being used by more
 than one active object.
+
+.. _recipes-boiler-plate-state-method-code:
+
+Boiler Plate State Method Code
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+For a flat state:
+
+.. code-block:: python
+
+  def <your_state_method_name>(self, e):
+    # if you state method doesn't know what to do it should return this
+    status = return_status.UNHANDLED
+
+    if(e.signal == signals.ENTRY_SIGNAL):
+      # call your entry application code
+
+      # make sure you tell the event processor you handled this event
+      status = return_status.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      # call your initialization (big black dot) application code
+
+      # make sure you tell the event processor you handled this event
+      status = return_status.HANDLED
+
+    #
+    # Write your custom
+    # event handlers in here as there own elif clauses
+    #
+
+    elif(e.signal == signals.EXIT_SIGNAL):
+      # call your exit (big black dot) application code
+
+      # make sure you tell the event processor you handled this event
+      status = return_status.HANDLED
+    else:
+      # this logic will run when your event processor sends an event with the
+      # SEARCH_FOR_SUPER_SIGNAL name
+
+      # 1) place your parent state method into the chart.temp.fun
+      chart.temp.fun = <your_parent_state_method>
+
+      # 2) make sure you return this value
+      status = return_status.SUPER
+    # return the status value
+    return status
+    
+If your state method didn't include handling for the ``ENTRY_SIGNAL``,
+``INIT_SIGNAL`` or ``EXIT_SIGNAL``, the event processor will just assume it did
+and returned return_state.HANDLED.
+
+.. _recipes-describe-a-parent-state:
+
+Describe a Parent State
+^^^^^^^^^^^^^^^^^^^^^^^
+Your state method will be queried by the event processor to determine how it is
+related to the other state methods in your design.  It will do this by calling
+the state method with the first argument set to the event processor's ``self``
+and with a second argument set to an event named ``SEARCH_FOR_SUPER_SIGNAL``.
+As a convention, state methods don't handle this signal, they respond to it
+within their ``else`` clause by:
+
+1. setting the ``temp.fun`` attribute of the first argument to point at their
+   parent state.
+2. return the value of ``return_state.SUPER``
+
+Generally speaking this is how it is done:
+
+.. code-block:: python
+  :emphasize-lines: 5,6
+
+  def <state_method_name>(chart, e):
+    # .
+    # .
+    else:
+      status = return_status.SUPER
+      chart.temp.fun = <parent_state_of_this_state_method>
+    return status.
+
+If you need to define your parent state as the outermost state of your diagram, you would
+set the ``<parent_state_of_this_state_method>`` to the ``top`` attribute of the
+first argument provided your crafted the state method:
+
+.. code-block:: python
+  :emphasize-lines: 6
+
+  def <state_method_name>(chart, e):
+    # .
+    # .
+    else:
+      status = return_status.SUPER
+      chart.temp.fun = chart.top
+    return status.
+
+To read more about why you structure your state methods this way, read :ref:`this.<recipes-what-a-state-does-and-how-to-structure-it>`
+
+.. _recipes-pass-an-event-through-to-a-parent-state:
+
+Pass an event through to a Parent State
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The easiest way to pass an event outward in your statechart is not to handle it
+in your ``if-elif`` clauses and let your ``else``
+:ref:`clause<recipes-describe-a-parent-state>` handle it.
+
+.. code-block:: python
+
+  # Sending Event(signal=signals.B) to c1 would cause
+  # the parent state c to be called with this event,
+  # since it is not handled in the ``if-elif``
+  # logic structure or c1.
+  def c1(self, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.A):
+      status = trans(c2)
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    else:
+      status = return_status.SUPER
+      chart.temp.fun = self.c
+    return status
+
+Another way to pass an event out to your parent state is to handle the event in
+the ``if-elif`` clause, then return ``return_status.UNHANDLED`` to the event
+processor.  When it sees that your state method couldn't handle the event it
+will call it again to find it's parent state and then call that parent state
+method with the event you wanted to trickle outward.
+
+.. code-block:: python
+  :emphasize-lines: 12
+
+  # Sending Event(signal=signals.B) to c1 would cause
+  # the parent state c to be called with this event,
+  # since c1 returns a `UNHANDLED` value to the event
+  # processor
+  def c1(self, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.B):
+      print("saw signal B, but letting it trickle through to my parent")
+    elif(e.signal == signals.A):
+      status = trans(c2)
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    else:
+      status = return_status.SUPER
+      chart.temp.fun = self.c
+    return status
+
+.. _recipes-transition-to-another-state:
+
+Transition to another state
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _recipes-do-something-when-the-state-is-entered:
+
+Do Something when the State is Entered
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _recipes-do-something-when-the-state-is-initialized:
+
+Do Something when the State is Initialized
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _recipes-do-something-when-the-state-is-exited:
+
+Do Something when the State is Exited
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _recipes-create-a-hook:
+
+Create a Hook
+^^^^^^^^^^^^^
+
+.. _recipes-catch-and-release:
+
+Catch and Release
+^^^^^^^^^^^^^^^^^
+
+.. _recipes-create-a-one-shot-state:
+
+Create a One-Shot
+^^^^^^^^^^^^^^^^^
+
+.. _recipes-create-a-mult-shot-state:
+
+Create a Mult-Shot
+^^^^^^^^^^^^^^^^^^
+
+.. _recipes-cancelling-events-state:
+
+Cancelling Events
+-----------------
+
+.. _recipes-deferring-an-event-state:
+
+Deferring an Event
+^^^^^^^^^^^^^^^^^^
+
+.. _recipes-recalling-an-event-state:
+
+Recalling An Event
+^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+
+
 
 Events And Signals
 -----------------
