@@ -4,58 +4,12 @@
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>530</x>
-      <y>120</y>
-      <w>220</w>
-      <h>100</h>
-    </coordinates>
-    <panel_attributes>ao1 = ActiveObject()
-valign=top</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>630</x>
-      <y>200</y>
-      <w>100</w>
-      <h>100</h>
-    </coordinates>
-    <panel_attributes>lt=[^]-(</panel_attributes>
-    <additional_attributes>10.0;10.0;70.0;70.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>690</x>
-      <y>280</y>
-      <w>30</w>
-      <h>100</h>
-    </coordinates>
-    <panel_attributes>lt=()-[v]</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
-  </element>
-  <element>
-    <id>UMLGeneric</id>
-    <coordinates>
-      <x>540</x>
-      <y>150</y>
-      <w>200</w>
-      <h>60</h>
-    </coordinates>
-    <panel_attributes>symbol=component
-Event Processor</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLObject</id>
-    <coordinates>
       <x>760</x>
-      <y>120</y>
+      <y>160</y>
       <w>220</w>
       <h>100</h>
     </coordinates>
-    <panel_attributes>ao2 = ActiveObject()
+    <panel_attributes>ao = ActiveObject()
 valign=top</panel_attributes>
     <additional_attributes/>
   </element>
@@ -63,7 +17,7 @@ valign=top</panel_attributes>
     <id>UMLGeneric</id>
     <coordinates>
       <x>770</x>
-      <y>150</y>
+      <y>190</y>
       <w>200</w>
       <h>60</h>
     </coordinates>
@@ -79,7 +33,7 @@ Event Processor</panel_attributes>
       <w>360</w>
       <h>190</h>
     </coordinates>
-    <panel_attributes>c
+    <panel_attributes>tc2_s1
 --
 entry / # call c's entry code
 exit / # call c's exit code
@@ -96,7 +50,7 @@ valign=top
       <w>110</w>
       <h>100</h>
     </coordinates>
-    <panel_attributes>c1
+    <panel_attributes>tc2_s1
 --
 entry / {}
 exit / {}
@@ -135,7 +89,7 @@ valign=top
       <w>110</w>
       <h>100</h>
     </coordinates>
-    <panel_attributes>c2
+    <panel_attributes>tc2_s2
 --
 entry / {}
 exit / {}
@@ -183,107 +137,35 @@ B</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>910</x>
-      <y>280</y>
+      <x>980</x>
+      <y>310</y>
       <w>30</w>
-      <h>170</h>
+      <h>140</h>
     </coordinates>
     <panel_attributes>lt=()-[v]</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;150.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;120.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>860</x>
-      <y>200</y>
-      <w>90</w>
+      <y>250</y>
+      <w>140</w>
       <h>100</h>
     </coordinates>
     <panel_attributes>lt=[^]-(</panel_attributes>
-    <additional_attributes>10.0;10.0;60.0;70.0</additional_attributes>
+    <additional_attributes>10.0;10.0;110.0;70.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>690</x>
-      <y>240</y>
-      <w>110</w>
+      <x>790</x>
+      <y>290</y>
+      <w>140</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>ao1.start_at(c)
+    <panel_attributes>ao.start_at(tc2_s2)
 style=wordwrap</panel_attributes>
     <additional_attributes/>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>920</x>
-      <y>240</y>
-      <w>120</w>
-      <h>30</h>
-    </coordinates>
-    <panel_attributes>ao2.start_at(c2)
-style=wordwrap</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>560</x>
-      <y>550</y>
-      <w>200</w>
-      <h>40</h>
-    </coordinates>
-    <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>10.0;20.0;180.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>490</x>
-      <y>380</y>
-      <w>210</w>
-      <h>140</h>
-    </coordinates>
-    <panel_attributes># in c1 state method
-.
-.
-# transition to c2
-elif(e.signal == signals.A):
-   status = self.trans(c2)
-.
-.
-style=wordwrap</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>470</x>
-      <y>540</y>
-      <w>210</w>
-      <h>140</h>
-    </coordinates>
-    <panel_attributes># in c state method
-.
-.
-# transition to c
-elif(e.signal == signals.B):
-   status = self.trans(c)
-.
-.
-style=wordwrap</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>630</x>
-      <y>440</y>
-      <w>250</w>
-      <h>80</h>
-    </coordinates>
-    <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>10.0;30.0;70.0;60.0;170.0;60.0;230.0;10.0</additional_attributes>
   </element>
 </diagram>

@@ -38,10 +38,22 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <p>To see what state your chart is in:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="hll">  <span class="n">chart</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fun</span>           <span class="c1"># will be the state method</span>
-</span><span class="hll">  <span class="n">chart</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">fun</span><span class="o">.</span><span class="vm">__name__</span>  <span class="c1"># will be the state method name</span>
-</span></pre></div>
+  <p>There will be situations where you want to post a kind of artificial event into
+a queue which won’t immediately be acted upon by your startchart.  It is an
+<cite>artificial</cite> event, because your chart is making it up, it isn’t being given to
+it by the outside world.  It is a way for your chart to build up a kind of
+processing pressure that can be relieved when you have the cycles to work on
+things.</p>
+<p>This is a two stage process, one, deferring the event, and two, recalling the
+event.  It is called a deferment of an event because we are holding off our
+reaction to it.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># code to place in the state that is deferring the event:</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">signal_that_is_deferred</span><span class="p">)</span>
+
+<span class="c1"># code to place in the state where you would like the event reposted into</span>
+<span class="c1"># the chart&#39;s first in first out queue</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span> <span class="c1"># posts our deferred event to the chart.</span>
+</pre></div>
 </div>
 
 
@@ -61,7 +73,7 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/i_determining_the_current_state.rst.txt"
+      <li><a href="_sources/i_defer_and_recall.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -87,7 +99,7 @@
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="_sources/i_determining_the_current_state.rst.txt"
+      <a href="_sources/i_defer_and_recall.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

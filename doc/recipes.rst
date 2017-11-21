@@ -22,16 +22,21 @@ States need to:
 
 There are different ways to create states with miros:
 
-1. You can create a hand-coded state method. [flat states]
+1. :ref:`You can create a hand-coded state
+   method.<recipes-boiler-plate-state-method-code>`
 
-2. You can have the library generate a state method for you, then register
-   callback responses to specific events and set a parent at runtime.
-   [factory states]
+2. :ref:`You can have the library generate a state method for you, then register
+   callback responses to specific events and set a parent at
+   runtime.<recipes-creating-a-state-method-from-a-factory>`
 
 3. You can use a fusion technique.  You can hand write a state and use context
    managers within the method so that the miros package can register callbacks
    for specific signals, or even change it's parent at run time. [fusion
    states]
+
+.. _recipes-state-recipes:
+
+**State Recipes**:
 
 * :ref:`Boiler plate state method code<recipes-boiler-plate-state-method-code>`
 * :ref:`Describe a parent state<recipes-describe-a-parent-state>`
@@ -44,10 +49,10 @@ There are different ways to create states with miros:
 * :ref:`Catch and release<recipes-catch-and-release>`
 * :ref:`Create a one-shot<recipes-create-a-one-shot-state>`
 * :ref:`Create a multi-shot<recipes-create-a-mult-shot-state>`
-* :ref:`Canceling events<recipes-cancelling-events-state>`
-* :ref:`Deferring an event<recipes-deferring-an-event-state>`
-* :ref:`Recalling an event<recipes-recalling-an-event-state>`
+* :ref:`Cancel events<recipes-cancelling-events-state>`
+* :ref:`Defer and Recall an event<recipes-deferring-an-event-state>`
 * :ref:`A Deeper look at state methods<recipes-what-a-state-does-and-how-to-structure-it>`
+* :ref:`Creating a statechart from a factory<recipes-creating-a-state-method-from-a-factory>`
 
 .. _recipes-what-a-state-does-and-how-to-structure-it:
 
@@ -59,7 +64,7 @@ contain information about how they relate to other states.  They do not
 explicitly create the behavior that you expect from your statechart, this is
 done by an event processor.  An event processor is created when you instantiate
 an active object. It is the thing that calls the state methods over and over
-again to enact the expected behavior of your design.
+again to manifest the expected behavior.
 
 When an active object uses its ``start_at`` method, it connects your state
 method to its event processor.  
@@ -279,12 +284,7 @@ and returned return_state.HANDLED.
 
 Describe a Parent State
 ^^^^^^^^^^^^^^^^^^^^^^^
-Your state method will be queried by the event processor to determine how it is
-related to the other state methods in your design.  It will do this by calling
-the state method with the first argument set to the event processor's ``self``
-and with a second argument set to an event named ``SEARCH_FOR_SUPER_SIGNAL``.
-As a convention, state methods don't handle this signal, they respond to it
-within their ``else`` clause by:
+To describe your parent state:
 
 1. setting the ``temp.fun`` attribute of the first argument to point at their
    parent state.
@@ -346,14 +346,14 @@ in your ``if-elif`` clauses and let your ``else``
       status = return_status.HANDLED
     else:
       status = return_status.SUPER
-      chart.temp.fun = self.c
+      self.temp.fun = self.c
     return status
 
 Another way to pass an event out to your parent state is to handle the event in
 the ``if-elif`` clause, then return ``return_status.UNHANDLED`` to the event
 processor.  When it sees that your state method couldn't handle the event it
 will call it again to find it's parent state and then call that parent state
-method with the event you wanted to trickle outward.
+method with the event that you want to trickle outward in your diagram.
 
 .. code-block:: python
   :emphasize-lines: 12
@@ -376,73 +376,429 @@ method with the event you wanted to trickle outward.
       status = return_status.HANDLED
     else:
       status = return_status.SUPER
-      chart.temp.fun = self.c
+      self.temp.fun = self.c
     return status
 
 .. _recipes-transition-to-another-state:
 
 Transition to another state
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To transition to another state, use the ``trans`` method:
+
+.. code-block:: python
+  :emphasize-lines: 8,9
+
+  # Sending Event(signal=signals.A) will cause a transition to c2
+  def c1(self, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.A):
+      status = trans(c2)
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    else:
+      status = return_status.SUPER
+      self.temp.fun = self.c
+    return status
+
+Make sure that you return the result of the call to your ``trans`` method, or
+the event processor will break.
 
 .. _recipes-do-something-when-the-state-is-entered:
 
 Do Something when the State is Entered
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To have your application code run when a state is entered place it in the
+``ENTRY_SIGNAL`` clause of your state's if-elif structure.  An entry event will
+occur anytime the event processor detects a transition from the outside to the
+inside of your state method's boundary.
+
+.. code-block:: python
+  :emphasize-lines: 4-6
+
+  # Running application code when the state is entered
+  def c1(self, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      print("Running my entry application code here")
+      status = return_status.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    else:
+      status = return_status.SUPER
+      self.temp.fun = self.c
+    return status
 
 .. _recipes-do-something-when-the-state-is-initialized:
 
 Do Something when the State is Initialized
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To have your application code run when a state is initialized place it in the
+``INIT_SIGNAL`` clause of your state's if-elif structure.  An init event will
+occur after the entry event, if a transition is moving from the outside to the
+inside of your state method's boundary.  It will also occur if there is a
+transition into this state from one of its child states.
+
+.. code-block:: python
+  :emphasize-lines: 6-9
+
+  # Running application code when the state is initialized
+  def c1(self, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    # BIG BLACK DOT ON DIAGRAM
+    elif(e.signal == signals.INIT_SIGNAL):
+      print("Running my init application code here")
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    else:
+      status = return_status.SUPER
+      self.temp.fun = self.c
+    return status
+
+:NOTE:  If you only want to run initialization code and do not want your state
+        to immediately transition into another state, make sure you return
+        ``HANDLED`` after running your application code, otherwise your
+        statechart will not behave properly.
+
+The ``INIT_SIGNAL`` handler is often used as the place where your state can
+immediately transition into another state.  To do this, just use the
+:ref:`trans <recipes-transition-to-another-state>` method and return its result
+from your state method call:
+
+.. code-block:: python
+  :emphasize-lines: 6-10
+
+  # Running application code when the state is initialized
+  def c1(self, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    # BIG BLACK DOT ON DIAGRAM
+    elif(e.signal == signals.INIT_SIGNAL):
+      print("Running my init application code here")
+      # now transition into the c2 state
+      status = self.trans(c2)
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    else:
+      status = return_status.SUPER
+      self.temp.fun = self.c
+    return status
 
 .. _recipes-do-something-when-the-state-is-exited:
 
 Do Something when the State is Exited
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To have your application code run when a state is exited place it in the
+``EXIT_SIGNAL`` clause of your state's if-elif structure.  An exit event will
+occur anytime the event processor detects a transition from the inside to the
+outside of of your state method's boundary.
+
+.. code-block:: python
+  :emphasize-lines: 8-10
+
+  # Running application code when the state is entered
+  def c1(self, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      print("Running my exit application code here")
+      status = return_status.HANDLED
+    else:
+      status = return_status.SUPER
+      self.temp.fun = self.c
+    return status
 
 .. _recipes-create-a-hook:
 
 Create a Hook
 ^^^^^^^^^^^^^
+A hook is some application code that is shared between your state method and
+all of its child state method's.
+
+Here we will create a hook in the c1 state, linking some application code to an
+event with the signal name ``MY_HOOK``.
+
+.. code-block:: python
+  :emphasize-lines: 9-11
+
+  # Sending Event(signal=signals.A) will cause a transition to c2
+  def c1(self, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = return_status.HANDLED
+
+    elif(e.signal == signals.MY_HOOK):
+      print("running the code defined in c1")
+      status = return_status.HANDLED
+
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    else:
+      status = return_status.SUPER
+      self.temp.fun = self.top
+    return status
+
+Now we will make a child state.
+
+.. code-block:: python
+
+  # Create a child state of c1
+  def c11(self, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    else:
+      status = return_status.SUPER
+      chart.temp.fun = self.c1
+    return status
+
+We will start up our state chart, in c11 and send the ``MY_HOOK`` event:
+
+.. code-block:: python
+
+  ao = ActiveObject()
+  ao.start_at(c11)
+  # run code in c1 from c11 by using a hook
+  ao.post_fifo(Event(signal=signals.MY_HOOK)) 
+    # => "running the code from defined in c1"
+  # demonstrate the state didn't change
+  assert(ao.state.fun.__name__ == 'c11')
+
+In the above code we see evidence that our statechart ran some application code
+contained in the parent state (``c1``) while it stayed within its child state
+(``c11``).
+
+The child state received an event called ``MY_HOOK`` which it didn't know what
+to do with.  So the event processor searched the parent state and saw that there was a
+handler for this event in ``c1``.  The ``MY_HOOK`` handler (the if-elif
+clause) returned ``return_status.HANDLED``.  Upon seeing this value, the event
+processor determined that no transition is needed and it stopped running.
+
+.. image:: _static/hook1.svg
+    :align: center
+
+In this way hook code is run in the search phase of the search-then-transition
+part of the event processor algorithm.
+
+The ``c1`` state method, "hooks" the ``MY_HOOK`` event, by capturing it, running
+its application code and returning the ``HANDLED`` value.  It stops the
+``MY_HOOK`` event from falling off the edge of the map and returns control to
+the state that originally experienced the event.
 
 .. _recipes-catch-and-release:
 
 Catch and Release
 ^^^^^^^^^^^^^^^^^
+The catch and release recipe is similar to the
+:ref:`hook<recipes-create-a-hook>` recipe in that you are using the search
+phase of the event processor algorithm to run your code.
+
+Instead of hooking the code with an ``HANDLED`` response, your state method
+returns an ``UNHANDLED`` status.  This causes the event processor, to query it
+again to find its parent, then dispatch the event to that state method.
+
+.. image:: _static/catchandrelease1.svg
+    :align: center
+
+Here we create the state in the picture, notice that ``inner`` and ``middle``
+do not return ``HANDLED`` when they see the ``BUBBLED`` signal.
+
+.. code-block:: python
+  :emphasize-lines: 3-5, 12-14, 21-23, 30, 37
+
+  def outer(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.BUBBLED):
+      print("hooked by the outer state")
+      status = return_status.HANDLED
+    else:
+      status = return_status.SUPER
+      chart.temp.fun = chart.top
+    return status
+
+  def middle(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.BUBBLED):
+      print("processed in middle")
+    else:
+      status = return_status.SUPER
+      chart.temp.fun = outer
+    return status
+
+  def inner(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.BUBBLED):
+      print("processed in inner")
+    else:
+      status = return_status.SUPER
+      chart.temp.fun = outer
+    return status
+
+  ao = ActiveObject()
+  ao.start_at(inner)
+  # run each state's application code for the bubble event
+  ao.post_fifo(Event(signal=signals.BUBBLED)) 
+    # => "processed in inner"
+    #    "processed in middle"
+    #    "hooked by the outer state"
+  # demonstrate the state didn't change
+  assert(ao.state.fun.__name__ == 'inner')
 
 .. _recipes-create-a-one-shot-state:
 
 Create a One-Shot
 ^^^^^^^^^^^^^^^^^
 
+.. include:: i_create_a_one_shot.rst 
+
 .. _recipes-create-a-mult-shot-state:
 
-Create a Mult-Shot
-^^^^^^^^^^^^^^^^^^
+Create a Multi-Shot
+^^^^^^^^^^^^^^^^^^^
+
+.. include:: i_create_a_multishot.rst 
 
 .. _recipes-cancelling-events-state:
 
 Cancelling Events
------------------
+^^^^^^^^^^^^^^^^^
+To kill a cancel a spefic event, see :ref:`this.<recipes-cancelling-a-specific-event-source>`
+
+To kill all events sharing a signal name, see :ref:`this.<recipes-cancelling-event-source-by-signal-name>`
 
 .. _recipes-deferring-an-event-state:
 
-Deferring an Event
-^^^^^^^^^^^^^^^^^^
+Deferring and Recalling an Event
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. _recipes-recalling-an-event-state:
+.. include:: i_defer_and_recall.rst 
 
-Recalling An Event
-^^^^^^^^^^^^^^^^^^
+.. _recipes-creating-a-state-method-from-a-factory:
+
+Creating a Statechart From a Factory
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To have the library create your state methods for you:
+
+1. :ref:`Import the correct items from the miros library<recipes-factory-1>`
+2. :ref:`Create a set of states from the miros template.<recipes-factory-2>`
+3. :ref:`Create callback functions which you will link into the chart<recipes-factory-3>`
+4. :ref:`Create an active object, and link it to your state handler<recipes-factory-4>`
+5. :ref:`Register callbacks to each of your events.<recipes-factory-5>`
+6. :ref:`Relate your states to one another by assigning them parents<recipes-factory-6>`
+7. :ref:`Start up the active object in the desired state<recipes-factory-7>`
+
+.. image:: _static/factory2.svg
+    :align: center
+
+.. _recipes-factory-1:
+
+Import the correct items from the miros library:
+
+.. code-block:: python
+
+  from miros.hsm import state_method_template
+  from miros.activeobject import ActiveObject
+  from miros.event import signals, Event, return_status
+
+.. _recipes-factory-2:
+
+Create a set of states from the miros template:
+
+.. code-block:: python
+
+  tc2_s1 = state_method_template('tc2_s1')
+  tc2_s2 = state_method_template('tc2_s2')
+  tc2_s3 = state_method_template('tc2_s3')
+
+.. _recipes-factory-3:
+
+Create callback functions which you will link into your chart:
+
+.. code-block:: python
+
+  def trans_to_c2_s1(chart, e):
+    return chart.trans(tc2_s1)
+
+  def trans_to_c2_s3(chart, e):
+    return chart.trans(tc2_s3)
+
+  def trans_to_c2_s2(chart, e):
+    return chart.trans(tc2_s2)
+
+  def handled(chart, e):
+    return return_status.HANDLED
+
+.. _recipes-factory-4:
+
+Create an active object and link it to your state handler:
+
+.. code-block:: python
+
+  ao = ActiveObject()
+
+.. _recipes-factory-5:
+
+Register callbacks to each of your events:
+
+.. code-block:: python
+
+  ao.register_signal_callback(tc2_s1, signals.BB, trans_to_c2_s1)
+  ao.register_signal_callback(tc2_s1, signals.ENTRY_SIGNAL, handled)
+  ao.register_signal_callback(tc2_s1, signals.EXIT_SIGNAL,  handled)
+  ao.register_signal_callback(tc2_s1, signals.INIT_SIGNAL,  trans_to_c2_s2)
+
+  ao.register_signal_callback(tc2_s2, signals.A, trans_to_c2_s3)
+  ao.register_signal_callback(tc2_s2, signals.EXIT_SIGNAL,  handled)
+  ao.register_signal_callback(tc2_s2, signals.INIT_SIGNAL,  handled)
+
+  ao.register_signal_callback(tc2_s3, signals.A, trans_to_c2_s2)
+  ao.register_signal_callback(tc2_s3, signals.ENTRY_SIGNAL, handled)
 
 
+.. _recipes-factory-6:
+
+Relate your states to one another by assigning them to parents:
+
+.. code-block:: python
+
+  ao.register_parent(tc2_s1, ao.top)
+  ao.register_parent(tc2_s2, tc2_s1)
+  ao.register_parent(tc2_s3, tc2_s1)
+
+.. _recipes-factory-7:
 
 
+Start up the active object in the desired state:
 
+.. code-block:: python
 
+  ao.start_at(tc2_s2)
 
+:ref:`Then all of you usual state recipes apply<recipes-state-recipes>`.
+
+.. _recipes-events-and-signals:
 
 Events And Signals
------------------
+------------------
+
 .. _recipes-creating-an-event:
 
 Creating an Event
@@ -451,14 +807,13 @@ An event is something that will be passed into your statechart, it will be
 reacted to, then removed from memory.
 
 .. code-block:: python
-  :linenos:
 
-    from miros.event import Event
-    from miros.event import signals
+  from miros.event import Event
+  from miros.event import signals
 
-    event_1 = Event(signal="name_of_signal")
-    # or 
-    event_2 = Event(signal=signals.name_of_signal)
+  event_1 = Event(signal="name_of_signal")
+  # or 
+  event_2 = Event(signal=signals.name_of_signal)
 
 .. _recipes-creating-a-signal:
 
@@ -476,17 +831,16 @@ have to explicitly define them.
 
 .. code-block:: python
   :emphasize-lines: 6
-  :linenos:
 
-    from miros.event import Event
-    from miros.event import signals
-    
-    # signal named "name_of_signaL" invented
-    # here and given a unique number
-    event_1 = Event(signal="name_of_signal")
-    # the signal number of this event will have
-    # the same number as in line 6
-    event_2 = Event(signal=signals.name_of_signal)
+  from miros.event import Event
+  from miros.event import signals
+  
+  # signal named "name_of_signaL" invented
+  # here and given a unique number
+  event_1 = Event(signal="name_of_signal")
+  # the signal number of this event will have
+  # the same number as in line 6
+  event_2 = Event(signal=signals.name_of_signal)
 
 Notice that the signal was invented on line **6** then re-used on line **9**.
 
@@ -531,12 +885,12 @@ must have first started your statechart.  Here is a simple example:
 
 .. code-block:: python
 
-    ao = ActiveObject()
-    # start at 'outer' for the sake of our example
-    ao.start_at(outer)
+  ao = ActiveObject()
+  # start at 'outer' for the sake of our example
+  ao.start_at(outer)
 
-    # Send an event with the signal name 'mary'
-    ao.post_fifo(Event(signal=signals.mary))
+  # Send an event with the signal name 'mary'
+  ao.post_fifo(Event(signal=signals.mary))
 
 The signal names used by the events are common across the entire system.  You
 do not need to declare them.  If the system had not seen the ``signals.mary``
@@ -550,13 +904,13 @@ must have first started your statechart.  Here is a simple example:
 
 .. code-block:: python
 
-    ao = ActiveObject()
-    # start at 'outer' for the sake of our example
-    ao.start_at(outer)
+  ao = ActiveObject()
+  # start at 'outer' for the sake of our example
+  ao.start_at(outer)
 
-    # Now say we want to send an event with
-    # th the signal name of 'mary' to the chart
-    ao.post_lifo(Event(signal=signals.mary))
+  # Now say we want to send an event with
+  # th the signal name of 'mary' to the chart
+  ao.post_lifo(Event(signal=signals.mary))
 
 You would post to the 'lifo' buffer if you needed your event to be moved to the
 front of the active object's collection of unprocessed events.  You might want
@@ -568,119 +922,14 @@ with a greater priority than other events.
 
 Creating a One-Shot Event
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-A one-shot event can be used to add some delay between state transitions.  You
-can think of them as delayed **init** signals.  You might want to use a one-shot if
-you need a system to settle down a bit before transitioning into an inner
-state.
 
-Generally speaking, you should cancel your one-shot events as your chart passes
-control to outer states.  You don't need to do this, but if you don't your
-outer states will be hit with one-shot messages that they don't care about
-and your chart will needlessly search as it reacts to these events.
-
-It is important to know that if your chart changes state, the event posted to
-it will look like it came from outside of your statechart, even though it was
-originally generated within a given state.  The construction of any event with
-the ``fifo`` or ``lifo`` api behaves like this.
-
-.. code-block:: python
-
-    # Here define a middle state the creates a one-shot event called
-    # delayed_one_second.  The same delayed_one_second signal is captured
-    # by the middle state and used to transition into the inner state
-    @spy_on
-    def middle(ao, e):
-      status = state.UNHANDLED
-
-      # we have entered the state and we would like to delay one
-      # second prior to entering the inner state
-      if(e.signal == signals.ENTRY_SIGNAL):
-          ao.post_fifo(
-            Event(signal=signals.delay_one_second),
-            times=1,
-            period=1.0,
-            deferred=True
-          )
-        status = state.HANDLED
-
-      elif(e.signal == signals.EXIT_SIGNAL):
-        # we are leaving this state for an outer state
-        # so we cancel our one-shot in case it hasn't gone off yet
-        ao.cancel_events(ao.delay_one_second)
-        status = state.HANDLED
-
-      # ignore our init
-      if(e.signal == signals.INIT_SIGNAL):
-        status = state.HANDLED
-
-      # our one-shot has fired, one second has passed since
-      # we transitioned into this state, now transition
-      # to our desired target; 'inner'
-      elif(e.signal == signals.delay_one_second):
-        status = ao.trans(inner)
-
-      else:
-        status, ao.temp.fun = state.SUPER, outer
-      return status
+.. include:: i_create_a_one_shot.rst 
 
 .. _recipes-creating-a-multishot-event:
 
 Creating a Multishot Event
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-A multi-shot event is just an extension of the one-shot idea.  Instead of only
-being fired once on entry, it can be fired between 2 and an infinite number of
-times.  You would use a multi-shot event if you would like to provide an inner
-part of your chart with a heart beat that the outer part of your chart doesn't
-need to know about.  In this way you could save cycles by avoiding unnecessary
-event processing in the parts of the chart that don't need these heart beats.
-This will also be useful while debugging your chart, your logs won't be filled
-with unnecessary events.
-
-You should cancel your multi-shot events in the exit handler of the state that
-created them.
-
-.. code-block:: python
-
-    # Here define a middle state the creates a multi-shot event called
-    # three_pulse.  The same three_pulse signal is captured
-    # by the middle state and used to transition into the inner state
-    @spy_on
-    def middle(ao, e):
-      status = state.UNHANDLED
-      if(e.signal == signals.ENTRY_SIGNAL):
-        multi_shot_thread = \
-          ao.post_fifo(Event(signal=signals.three_pulse),
-                          times=3,
-                          period=1.0,
-                          deferred=True)
-        # We mark up the ao with this id, so that
-        # state function can be used by many different aos
-        ao.augment(other=multi_shot_thread,
-                      name='multi_shot_thread')
-        status = state.HANDLED
-
-      elif(e.signal == signals.EXIT_SIGNAL):
-        ao.cancel_event(ao.multi_shot_thread)
-        status = state.HANDLED
-
-      if(e.signal == signals.INIT_SIGNAL):
-        status = state.HANDLED
-      elif(e.signal == signals.three_pulse):
-        status = ao.trans(inner)
-      else:
-        status, ao.temp.fun = state.SUPER, outer
-      return status
-
-By setting the ``times`` argument of the ``post_fifo`` to 0, you can create an
-infinite multi-shot event.  This is how you could make an inner heart beat.
-
-The ``post_lifo`` api can be used the same as the ``post_fifo`` api for
-creating these types of repeating events.  You would use the ``post_lifo`` api
-when you would need your heart beat event signal to barge ahead of all other
-events waiting to be processed by the active object.
-
-
-.. _recipes-cancelling-a-specific-event-source:
+.. include:: i_create_a_multishot.rst
 
 Cancelling a Specific Event Source
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -798,26 +1047,9 @@ that have this signal name provided to the ``cancel_events`` call.
 .. _recipes-deferring-an-event:
 
 Deferring and Recalling An Event
-^^^^^^^^^^^^^^^^^^
-There will be situations where you want to post a kind of artificial event into
-a queue which won't immediately be acted upon by your startchart.  It is an
-`artificial` event, because your chart is making it up, it isn't being given to
-it by the outside world.  It is a way for your chart to build up a kind of
-processing pressure that can be relieved when you have the cycles to work on
-things.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This is a two stage process, one, deferring the event, and two, recalling the
-event.  It is called a deferment of an event because we are holding off our
-reaction to it.
-
-.. code-block:: python
-
-    # code to place in the state that is deferring the event:
-    chart.defer(Event(signal=signals.signal_that_is_deferred)
-
-    # code to place in the state where you would like the event reposted into
-    # the chart's first in first out queue
-    chart.recall() # posts our deferred event to the chart.
+.. include:: i_defer_and_recall.rst 
 
 .. _seeing_what_is_going_on:
 
