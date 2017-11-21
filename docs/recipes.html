@@ -1266,64 +1266,7 @@ introduces all of these ideas.</p>
 </pre></div>
 </div>
 <p>This might output:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="hll"><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="hll"><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
 </span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;</span><span class="p">,</span>
  <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:outer&#39;</span><span class="p">,</span>
  <span class="s1">&#39;ENTRY_SIGNAL:outer&#39;</span><span class="p">,</span>
@@ -1382,7 +1325,7 @@ introduces all of these ideas.</p>
  <span class="s1">&#39;INIT_SIGNAL:outer&#39;</span><span class="p">,</span>
 <span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
 </span></pre></div>
-</td></tr></table></div>
+</div>
 <p>If you would like to understand in detail how to read this log, and how it
 might have occurred, reference <a class="reference internal" href="postingexample.html#examples-simple-posting-example"><span class="std std-ref">the example from which it
 came</span></a>.</p>
@@ -1431,45 +1374,32 @@ state method:</p>
 <div class="section" id="drawing-a-statechart">
 <span id="recipes-drawing-a-statechart"></span><h3>Drawing a StateChart<a class="headerlink" href="#drawing-a-statechart" title="Permalink to this headline">¶</a></h3>
 <p>The Harel formalism was consumed by the UML standard.</p>
-<p>The UML standards were not properly curated and became over-complicated.
-As a result, they are largely disregarded by the software community, so most of
-the open source drawing tool projects have been abandoned.</p>
-<p>UML is still useful in that it provides a common way of describing software
-systems.  There is no reason not to use the parts of it that you like and leave
-the parts of it that you either don’t understand or that are too complicated to
-bother with. (This happens in C++ too)</p>
-<p>To draw a statechart on a computer, you need a drawing tool.</p>
-<p>For this tool to be useful, you need to be able to:</p>
+<p>The UML standards were not properly curated and became overly-complicated and
+full of contradictions.  As a result, they were largely disregarded by the
+software community at large, so most of the open source drawing tool projects
+were just abandoned.</p>
+<p>A lot of the commercial drawing tools have tried to stay up with the overly
+complicated UML standards, so you end up fighting with the tools when you just
+want to draw a simple picture.  The point of the picture is to be expressive
+enough to explain something to someone else.  People shouldn’t have to take a
+class just to understand your diagram.</p>
+<p>A drawing tool only needs to provide the following features:</p>
 <ol class="arabic simple">
-<li>zoom in and out of a diagram. (asked for in 1987)</li>
+<li>zoom in and out of a diagram.</li>
 <li>draw the basic Harel statemachine building blocks.</li>
-<li>draw arrows and the other useful parts of UML</li>
-<li>mark up the diagram with code</li>
-<li>quickly and easily change your design</li>
+<li>draw arrows and the other useful parts of UML.</li>
+<li>mark up the diagram with code 5. simple to change a design</li>
 </ol>
-<p>I have yet to find an open source tool that doesn’t get in the way of me trying
-to draw a simple picture, with boxes and arrows, where I can zoom in and out,
-and write blocks of code anywhere I like.</p>
-<p>Visio can do this, but it’s expensive and other people have to download a
-viewer application in order to see your diagram.  The cheaper online alternatives,
-force their own weird sub-versions of UML into their templates, so that once
-again you start fighting with the tool.</p>
-<p>Miro Samek wrote his own tool to deal with this problem and if you eventually
-switch over to his code, you will be greatly appreciative of the speed and ease
-in which you can manifest your ideas into pictures, then into running designs.
-But his drawing tool is tightly coupled with his framework (as it should be),
-so we can’t use that here either.</p>
 <p>Pencil and paper are great for drawing your designs.  It is good to work on
 them over and over again without the impediment of the computer interface
-getting in your way.  Once you think you have it figured out you can transfer
-the picture into something digital using a free tool called <a class="reference external" href="http://www.umlet.com/">umlet</a>.</p>
+getting in your way.</p>
+<p>Once you think you have it figured out you can transfer the picture into
+something digital using a free tool called <a class="reference external" href="http://www.umlet.com/">umlet</a>.</p>
 <p>There is also an online version of the tool, which is called <a class="reference external" href="http://www.umlet.com/umletino/umletino.html">umletino</a>.</p>
-<p>The nice thing about this tool is that it is so simple to use.  It also makes
-ugly pictures, which is a kind of good thing.</p>
-<p>A UML diagram should be thought as graffiti on the wall, rather than a great
-work of art.  It should be easy for you to change your design.  If it took you
-5 hours to build a beautiful masterpiece you will feel a psychological
-impediment to change it.  We don’t want to get locked into our thinking.</p>
+<p>It is easy to use and it has a lot of youtube training videos.  It doesn’t
+provide the zooming features asked for by the original Harel paper, but this
+could be implemented using HTML/SVG.</p>
+<p>Good luck.</p>
 </div>
 <div class="section" id="drawing-a-sequence-diagram">
 <span id="recipes-drawing-a-sequence-diagram"></span><h3>Drawing a Sequence Diagram<a class="headerlink" href="#drawing-a-sequence-diagram" title="Permalink to this headline">¶</a></h3>

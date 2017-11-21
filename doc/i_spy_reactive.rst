@@ -34,7 +34,6 @@ This might output:
 
 .. code-block:: python
   :emphasize-lines: 1,7,13,21,29,35,46,53,58
-  :linenos:
 
   ['START',
    'SEARCH_FOR_SUPER_SIGNAL:middle',
