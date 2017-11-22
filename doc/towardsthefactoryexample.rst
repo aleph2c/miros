@@ -451,7 +451,7 @@ The output from this program is:
    'INIT_SIGNAL:fc1',
    '<- Queued:(0) Deferred:(0)']
 
-We see the expected behavior.
+Which is the expected behavior.
 
 .. _towardsthefactoryexample-unwinding-a-factory-state-method:
 
