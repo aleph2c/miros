@@ -1332,6 +1332,8 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def spy(self):
     return self.spy_full()
 
+    return return_status.HANDLED
+
   def register_signal_callback(self, state_method, signal, fn):
     '''
     Example 1:
@@ -1479,23 +1481,23 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
 
     # to make it easier to test this code, we will start the string with a line
     # break
-    code = "\n"
+    code = "\n@spy_on\n"
     for i, if_tuple in enumerate(ifs):
       if i == 0:
         code += "def {}(chart, e):\n".format(state_method)
         code += "  status = return_status.UNHANDLED\n"
-        if if_tuple.callback is None:
+        if if_tuple.callback is None or if_tuple.callback is 'handled':
           code += "  if(e.signal == signals.{}):\n".format(if_tuple.signal_name)
           code += "    status = return_status.HANDLED\n"
         else:
           code += "  if(e.signal == signals.{}):\n".format(if_tuple.signal_name)
           code += "    status = {}(chart, e)\n".format(if_tuple.callback)
       else:
-        if if_tuple.callback is None:
+        if if_tuple.callback is None or if_tuple.callback is 'handled':
           code += "  elif(e.signal == signals.{}):\n".format(if_tuple.signal_name)
           code += "    status = return_status.HANDLED\n"
         else:
-          code += "  elsif(e.signal == signals.{}):\n".format(if_tuple.signal_name)
+          code += "  elif(e.signal == signals.{}):\n".format(if_tuple.signal_name)
           code += "    status = {}(chart, e)\n".format(if_tuple.callback)
 
     parent_name = self._parents[state_method].__name__

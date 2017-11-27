@@ -10,78 +10,67 @@ Using and Unwinding a Factory
 
 Example Summary
 ---------------
-1. :ref:`Write a standard flat version of a statechart<towardsthefactoryexample-standard-approach>`
-2. :ref:`Re-write the state methods so that you can register callbacks with specific
-   events.<towardsthefactoryexample-registering-callbacks-to-specific-events>`
-3. :ref:`Re-write the state methods so that you can register a parent with
-   them<towardsthefactoryexample-registering-a-parent-to-a-state-method>`
-4. :ref:`Remove the need to explicitly write a number of state methods, instead, we
-   can get them from a template
-   function<towardsthefactoryexample-building-a-method-to-build-state-methods>`
-5. :ref:`Use the miros factory
-   methods<towardsthefactoryexample-using-the-miros-factory-method>`
-6. :ref:`Use miros to convert it's factory method into a flat version of a state
-   function for
-   debugging.<towardsthefactoryexample-unwinding-a-factory-state-method>`
+1. :ref:`Standard Approach to Writing State Methods<towardsthefactoryexample-standard-approach>`
+2. :ref:`Registering Callbacks to Specific Events<towardsthefactoryexample-registering-callbacks-to-specific-events>`
+3. :ref:`Using the Miros Factory Method<towardsthefactoryexample-registering-a-parent-to-a-state-method>`
+4. :ref:`Unwinding a Factory State Method<towardsthefactoryexample-unwinding-a-factory-state-method>`
 
 .. _towardsthefactoryexample-why-you-would-want-a-factory:
 
 Why a Factory?
 --------------
+The event processor uses the organization of your state methods, who their
+parents are and how they relate to each other as if they defined a complicated
+data structure.  These state methods contain your application code too, but
+they `are` the nodes of your graph; they define the topology of your
+statechart.
 
-The event processor used to create the dynamics of your statechart expects all
-of your state methods to have a specific shape.  Their method signatures have
-to look a certain way and their if-else structures have to be framed-in just
-right, otherwise the event processor might get lost while it's searching for
-the correct behavior.
+When you send an event which will cause a transition across multiple states with
+complicated entry/exit/init event triggering to provide the Harel Formalism,
+you don't have to worry about how it is implemented, you just need to ensure
+that you have framed in your state methods with enough structure that the event
+processing algorithm can discover the graph and build up the expected behavior.
 
-The event processor provides the illusion that you are using a completely
-different type of programming language, but it's still all Python.  Your state
-methods are just being called over and over again with different arguments.
+This provides the illusion that you are using a completely different type of
+programming language, but it's still all Python.  Your state methods are just
+being called over and over again with different arguments.
 
 Miro Samek describes this as "an inversion of control".  By using his event
-processor algorithm, you are packing the management of the topological search
+processing algorithm, you are packing the management of the topological search
 complexity into the bottom of your software system.
 
-The beautiful thing about the framework is that a state method only has to
-describe which other state method is it's parent.  Then when the event
-processor is called, it will look at the current state and
-recurse over your state methods determining how and when each of your state
-methods should be called in accordance to the Harel Formalism.  You don't
-have to worry about how this is done, you just have to remember how the maps
-behave, then translate your map into state methods.
+But to do this, the event processor expects all of your state methods to have a
+specific shape.  Their method signatures have to look a certain way and their
+if-else structures have to be framed-in just right, otherwise the event
+processor might get lost while it's searching for the correct behavior.
 
-The cost of this is that you have to express your application code within
-:ref:`specifically
-structured ways<recipes-what-a-state-does-and-how-to-structure-it>`.  Wouldn't it be
-nice if the library wrote the methods for you too?  Well, it can do that using
-the factory pattern, but let's consider the downside of structuring your
-application like this.
+Wouldn't it be nice if the library wrote the methods for you too?  Well it can,
+you can use a factory to create state method nodes, then link in event
+callbacks and assign parents at run time.  The benefit of such an approach is
+that you can avoid the strangeness of a state method.  It will become harder
+for a maintenance developer to accidentally break your statechart by making
+something that looks like an innocuous change.  The factory hides the
+topological structure of your state methods behind another layer of
+indirection.
 
-If you use this library to write your state methods for you, you are placing
-yet another layer of abstraction between you and your application code.  A bug
+However, if you use this library to write your state methods for you, you are
+placing yet another layer of abstraction between you and your design.  A bug
 might be even harder to find than it was before.  The nice thing about the
-state methods is that they are easy to understand, they are flat,
-and you can literally see the code and break within it for debugging.  The
-cognitive load experienced while trouble shooting a flat state method is much
-less than it would be for something that is auto-generated.
+state methods is that they are easy to understand, they are flat, and you can
+literally see the code and break within it for debugging.  The cognitive
+difficulty experienced while trouble shooting a flat state method is much less
+than it would be for something that is auto-generated.  
 
 In this example I will walk you through how we can move from a simple state
-method towards one that is written for you automatically.  I will also describe
-fusion state methods which use both techniques and thereby allow you to
-register event callbacks while your code is executing and why you might want
-to do this.
-
-Then I will also describe how to create a state method using a factory, then how to
-ask the framework to print out what that code would look like if it were
-hard-coded into your project.  I will then demonstrate a technique of unwinding
-a complicated design, into such flat methods, so that you can 'see' what is
-going on.
+method towards one that is written for you automatically.  Then I will show how
+to re-flatten a state chart which has been automatically built for you, so that
+you can copy this code back into your design to make it easier to debug. (Like
+looking at the preprocessor results in c).
 
 .. _towardsthefactoryexample-standard-approach:
 
-Standard Approach
------------------
+Standard Approach to Writing State Methods
+------------------------------------------
 
 .. image:: _static/factory1.svg
     :align: center
@@ -451,13 +440,242 @@ The output from this program is:
    'INIT_SIGNAL:fc1',
    '<- Queued:(0) Deferred:(0)']
 
-We see the expected behavior.
+Which is the expected behavior.
 
 .. _towardsthefactoryexample-unwinding-a-factory-state-method:
 
 Unwinding a Factory State Method
 --------------------------------
+State methods made from factories are hard to debug because you can't actually
+see their code.  If you find that you have an issue with such a state method, you
+can unwind it into flat code using the ``to_code`` method.  This method outputs a
+string that you can use as a hand written state method.
 
+In the following example, I'll show how we can 'unwind' a design.
 
+.. image:: _static/factory4.svg
+    :align: center
 
+First we repeat the work of the last section:
 
+.. code-block:: python
+ 
+  # create the specific behavior we want in our state chart
+  def trans_to_fc(chart, e):
+    return chart.trans(fc)
+
+  def trans_to_fc1(chart, e):
+    return chart.trans(fc1)
+
+  def trans_to_fc2(chart, e):
+    return chart.trans(fc2)
+
+  # create the states
+  fc  = state_method_template('fc')
+  fc1 = state_method_template('fc1')
+  fc2 = state_method_template('fc2')
+
+  # build an active object, which has an event processor
+  ao = ActiveObject()
+
+  # write the design information into the fc state
+  ao.register_signal_callback(fc, signals.BB, trans_to_fc)
+  ao.register_signal_callback(fc, signals.INIT_SIGNAL,  trans_to_fc1)
+  ao.register_parent(fc, ao.top)
+
+  # write the design information into the fc1 state
+  ao.register_signal_callback(fc, signals.BB, trans_to_fc)
+  ao.register_signal_callback(fc1, signals.A, trans_to_fc2)
+  ao.register_parent(fc1, fc)
+
+  # write the design information into the fc2 state
+  ao.register_signal_callback(fc2, signals.A, trans_to_fc1)
+  ao.register_parent(fc2, fc)
+
+The ``fc``, ``fc1`` and ``fc2`` objects contain state methods that were
+generated by the framework and their code is hidden within the ``ao`` object.
+
+Now suppose something were to go wrong with this design?  An application
+developer would have to know that there are at least four different places to
+look within the miros framework to understand their state method: the
+registration functions, the context managers and in the actual template
+generation function.  That would be a lot to keep in their head while they were
+also trying to wrestle with their own design problem.
+
+Instead, they could use the ``to_code`` method, copy the result and write it
+back into the design as flat state methods.  In this way they could focus their
+entire attention on their own issue.  Here is how they could do it:
+
+.. code-block:: python
+
+  print(ao.to_code(fc))
+  print(ao.to_code(fc1))
+  print(ao.to_code(fc2))
+
+This would output the following:
+
+.. code-block:: python
+
+  @spy_on                                                                                   
+  def fc(chart, e):                                                                         
+    status = return_status.UNHANDLED                                                        
+    if(e.signal == signals.ENTRY_SIGNAL):                                                   
+      status = return_status.HANDLED                                                        
+    elif(e.signal == signals.INIT_SIGNAL):                                                  
+      status = trans_to_fc1(chart, e)                                                       
+    elif(e.signal == signals.BB):                                                           
+      status = trans_to_fc(chart, e)                                                        
+    elif(e.signal == signals.EXIT_SIGNAL):                                                  
+      status = return_status.HANDLED                                                        
+    else:                                                                                   
+      status, chart.temp.fun = return_status.SUPER, chart.top                               
+    return status                                                                           
+                                                                                            
+                                                                                            
+  @spy_on                                                                                   
+  def fc1(chart, e):                                                                        
+    status = return_status.UNHANDLED                                                        
+    if(e.signal == signals.ENTRY_SIGNAL):                                                   
+      status = return_status.HANDLED                                                        
+    elif(e.signal == signals.INIT_SIGNAL):                                                  
+      status = return_status.HANDLED                                                        
+    elif(e.signal == signals.A):                                                            
+      status = trans_to_fc2(chart, e)                                                       
+    elif(e.signal == signals.EXIT_SIGNAL):                                                  
+      status = return_status.HANDLED                                                        
+    else:                                                                                   
+      status, chart.temp.fun = return_status.SUPER, fc                                      
+    return status                                                                           
+                                                                                            
+                                                                                            
+  @spy_on                                                                                   
+  def fc2(chart, e):                                                                        
+    status = return_status.UNHANDLED                                                        
+    if(e.signal == signals.ENTRY_SIGNAL):                                                   
+      status = return_status.HANDLED                                                        
+    elif(e.signal == signals.INIT_SIGNAL):                                                  
+      status = return_status.HANDLED                                                        
+    elif(e.signal == signals.A):                                                            
+      status = trans_to_fc1(chart, e)                                                       
+    elif(e.signal == signals.EXIT_SIGNAL):                                                  
+      status = return_status.HANDLED                                                        
+    else:                                                                                   
+      status, chart.temp.fun = return_status.SUPER, fc                                      
+    return status                                                                           
+                                                                                          
+
+They could copy these methods and re-write their original code as this, making
+sure that the comment out all of the factory code:
+
+.. code-block:: python
+  :emphasize-lines: 11-24,27-40,43-56, 58-61, 66-69,71-74,76-78
+
+  # create the specific behavior we want in our state chart
+  def trans_to_fc(chart, e):
+    return chart.trans(fc)
+
+  def trans_to_fc1(chart, e):
+    return chart.trans(fc1)
+
+  def trans_to_fc2(chart, e):
+    return chart.trans(fc2)
+
+  @spy_on                                                                                   
+  def fc(chart, e):                                                                         
+    status = return_status.UNHANDLED                                                        
+    if(e.signal == signals.ENTRY_SIGNAL):                                                   
+      status = return_status.HANDLED                                                        
+    elif(e.signal == signals.INIT_SIGNAL):                                                  
+      status = trans_to_fc1(chart, e)                                                       
+    elif(e.signal == signals.BB):                                                           
+      status = trans_to_fc(chart, e)                                                        
+    elif(e.signal == signals.EXIT_SIGNAL):                                                  
+      status = return_status.HANDLED                                                        
+    else:                                                                                   
+      status, chart.temp.fun = return_status.SUPER, chart.top                               
+    return status                                                                           
+                                                                                            
+                                                                                            
+  @spy_on                                                                                   
+  def fc1(chart, e):                                                                        
+    status = return_status.UNHANDLED                                                        
+    if(e.signal == signals.ENTRY_SIGNAL):                                                   
+      status = return_status.HANDLED                                                        
+    elif(e.signal == signals.INIT_SIGNAL):                                                  
+      status = return_status.HANDLED                                                        
+    elif(e.signal == signals.A):                                                            
+      status = trans_to_fc2(chart, e)                                                       
+    elif(e.signal == signals.EXIT_SIGNAL):                                                  
+      status = return_status.HANDLED                                                        
+    else:                                                                                   
+      status, chart.temp.fun = return_status.SUPER, fc                                      
+    return status                                                                           
+                                                                                            
+                                                                                            
+  @spy_on                                                                                   
+  def fc2(chart, e):                                                                        
+    status = return_status.UNHANDLED                                                        
+    if(e.signal == signals.ENTRY_SIGNAL):                                                   
+      status = return_status.HANDLED                                                        
+    elif(e.signal == signals.INIT_SIGNAL):                                                  
+      status = return_status.HANDLED                                                        
+    elif(e.signal == signals.A):                                                            
+      status = trans_to_fc1(chart, e)                                                       
+    elif(e.signal == signals.EXIT_SIGNAL):                                                  
+      status = return_status.HANDLED                                                        
+    else:                                                                                   
+      status, chart.temp.fun = return_status.SUPER, fc                                      
+    return status                                                                           
+                                                                                          
+  # create the states
+  # fc  = state_method_template('fc')
+  # fc1 = state_method_template('fc1')
+  # fc2 = state_method_template('fc2')
+
+  # build an active object, which has an event processor
+  ao = ActiveObject()
+
+  # write the design information into the fc state
+  # ao.register_signal_callback(fc, signals.BB, trans_to_fc)
+  # ao.register_signal_callback(fc, signals.INIT_SIGNAL,  trans_to_fc1)
+  # ao.register_parent(fc, ao.top)
+
+  # write the design information into the fc1 state
+  # ao.register_signal_callback(fc, signals.BB, trans_to_fc)
+  # ao.register_signal_callback(fc1, signals.A, trans_to_fc2)
+  # ao.register_parent(fc1, fc)
+
+  # write the design information into the fc2 state
+  # ao.register_signal_callback(fc2, signals.A, trans_to_fc1)
+  # ao.register_parent(fc2, fc)
+
+  # start up the active object what what it does
+  ao.start_at(fc2)
+  ao.post_fifo(Event(signal=signals.A))
+  time.sleep(0.01)
+  pp(ao.spy())
+
+The highlighted sections identify all of the changes to the design.  New
+flattened state methods were added and the old factory code was commented out.
+If we run this code, we see that it behaves properly:
+
+.. code-block:: python
+
+  ['START',
+   'SEARCH_FOR_SUPER_SIGNAL:fc2',
+   'SEARCH_FOR_SUPER_SIGNAL:fc',
+   'ENTRY_SIGNAL:fc',
+   'ENTRY_SIGNAL:fc2',
+   'INIT_SIGNAL:fc2',
+   '<- Queued:(0) Deferred:(0)',
+   'A:fc2',
+   'SEARCH_FOR_SUPER_SIGNAL:fc1',
+   'SEARCH_FOR_SUPER_SIGNAL:fc2',
+   'EXIT_SIGNAL:fc2',
+   'ENTRY_SIGNAL:fc1',
+   'INIT_SIGNAL:fc1',
+   '<- Queued:(0) Deferred:(0)']
+
+Metaprogramming is easy on the person who first writes the code and very hard
+on those that have to maintain or extend the design.  Like anything else,
+whether it should be done or not is dependent upon the engineering trade offs.

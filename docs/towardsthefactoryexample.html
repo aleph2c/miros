@@ -46,67 +46,57 @@
 <div class="section" id="example-summary">
 <span id="towardsthefactoryexample-example-summary"></span><h2>Example Summary<a class="headerlink" href="#example-summary" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
-<li><a class="reference internal" href="#towardsthefactoryexample-standard-approach"><span class="std std-ref">Write a standard flat version of a statechart</span></a></li>
-<li><a class="reference internal" href="#towardsthefactoryexample-registering-callbacks-to-specific-events"><span class="std std-ref">Re-write the state methods so that you can register callbacks with specific
-events.</span></a></li>
-<li><a class="reference internal" href="#towardsthefactoryexample-registering-a-parent-to-a-state-method"><span class="std std-ref">Re-write the state methods so that you can register a parent with
-them</span></a></li>
-<li><span class="xref std std-ref">Remove the need to explicitly write a number of state methods, instead, we
-can get them from a template
-function</span></li>
-<li><span class="xref std std-ref">Use the miros factory
-methods</span></li>
-<li><a class="reference internal" href="#towardsthefactoryexample-unwinding-a-factory-state-method"><span class="std std-ref">Use miros to convert it’s factory method into a flat version of a state
-function for
-debugging.</span></a></li>
+<li><a class="reference internal" href="#towardsthefactoryexample-standard-approach"><span class="std std-ref">Standard Approach to Writing State Methods</span></a></li>
+<li><a class="reference internal" href="#towardsthefactoryexample-registering-callbacks-to-specific-events"><span class="std std-ref">Registering Callbacks to Specific Events</span></a></li>
+<li><a class="reference internal" href="#towardsthefactoryexample-registering-a-parent-to-a-state-method"><span class="std std-ref">Using the Miros Factory Method</span></a></li>
+<li><a class="reference internal" href="#towardsthefactoryexample-unwinding-a-factory-state-method"><span class="std std-ref">Unwinding a Factory State Method</span></a></li>
 </ol>
 </div>
 <div class="section" id="why-a-factory">
 <span id="towardsthefactoryexample-why-you-would-want-a-factory"></span><h2>Why a Factory?<a class="headerlink" href="#why-a-factory" title="Permalink to this headline">¶</a></h2>
-<p>The event processor used to create the dynamics of your statechart expects all
-of your state methods to have a specific shape.  Their method signatures have
-to look a certain way and their if-else structures have to be framed-in just
-right, otherwise the event processor might get lost while it’s searching for
-the correct behavior.</p>
-<p>The event processor provides the illusion that you are using a completely
-different type of programming language, but it’s still all Python.  Your state
-methods are just being called over and over again with different arguments.</p>
+<p>The event processor uses the organization of your state methods, who their
+parents are and how they relate to each other as if they defined a complicated
+data structure.  These state methods contain your application code too, but
+they <cite>are</cite> the nodes of your graph; they define the topology of your
+statechart.</p>
+<p>When you send an event which will cause a transition across multiple states with
+complicated entry/exit/init event triggering to provide the Harel Formalism,
+you don’t have to worry about how it is implemented, you just need to ensure
+that you have framed in your state methods with enough structure that the event
+processing algorithm can discover the graph and build up the expected behavior.</p>
+<p>This provides the illusion that you are using a completely different type of
+programming language, but it’s still all Python.  Your state methods are just
+being called over and over again with different arguments.</p>
 <p>Miro Samek describes this as “an inversion of control”.  By using his event
-processor algorithm, you are packing the management of the topological search
+processing algorithm, you are packing the management of the topological search
 complexity into the bottom of your software system.</p>
-<p>The beautiful thing about the framework is that a state method only has to
-describe which other state method is it’s parent.  Then when the event
-processor is called, it will look at the current state and
-recurse over your state methods determining how and when each of your state
-methods should be called in accordance to the Harel Formalism.  You don’t
-have to worry about how this is done, you just have to remember how the maps
-behave, then translate your map into state methods.</p>
-<p>The cost of this is that you have to express your application code within
-<a class="reference internal" href="recipes.html#recipes-what-a-state-does-and-how-to-structure-it"><span class="std std-ref">specifically
-structured ways</span></a>.  Wouldn’t it be
-nice if the library wrote the methods for you too?  Well, it can do that using
-the factory pattern, but let’s consider the downside of structuring your
-application like this.</p>
-<p>If you use this library to write your state methods for you, you are placing
-yet another layer of abstraction between you and your application code.  A bug
+<p>But to do this, the event processor expects all of your state methods to have a
+specific shape.  Their method signatures have to look a certain way and their
+if-else structures have to be framed-in just right, otherwise the event
+processor might get lost while it’s searching for the correct behavior.</p>
+<p>Wouldn’t it be nice if the library wrote the methods for you too?  Well it can,
+you can use a factory to create state method nodes, then link in event
+callbacks and assign parents at run time.  The benefit of such an approach is
+that you can avoid the strangeness of a state method.  It will become harder
+for a maintenance developer to accidentally break your statechart by making
+something that looks like an innocuous change.  The factory hides the
+topological structure of your state methods behind another layer of
+indirection.</p>
+<p>However, if you use this library to write your state methods for you, you are
+placing yet another layer of abstraction between you and your design.  A bug
 might be even harder to find than it was before.  The nice thing about the
-state methods is that they are easy to understand, they are flat,
-and you can literally see the code and break within it for debugging.  The
-cognitive load experienced while trouble shooting a flat state method is much
-less than it would be for something that is auto-generated.</p>
+state methods is that they are easy to understand, they are flat, and you can
+literally see the code and break within it for debugging.  The cognitive
+difficulty experienced while trouble shooting a flat state method is much less
+than it would be for something that is auto-generated.</p>
 <p>In this example I will walk you through how we can move from a simple state
-method towards one that is written for you automatically.  I will also describe
-fusion state methods which use both techniques and thereby allow you to
-register event callbacks while your code is executing and why you might want
-to do this.</p>
-<p>Then I will also describe how to create a state method using a factory, then how to
-ask the framework to print out what that code would look like if it were
-hard-coded into your project.  I will then demonstrate a technique of unwinding
-a complicated design, into such flat methods, so that you can ‘see’ what is
-going on.</p>
+method towards one that is written for you automatically.  Then I will show how
+to re-flatten a state chart which has been automatically built for you, so that
+you can copy this code back into your design to make it easier to debug. (Like
+looking at the preprocessor results in c).</p>
 </div>
-<div class="section" id="standard-approach">
-<span id="towardsthefactoryexample-standard-approach"></span><h2>Standard Approach<a class="headerlink" href="#standard-approach" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="standard-approach-to-writing-state-methods">
+<span id="towardsthefactoryexample-standard-approach"></span><h2>Standard Approach to Writing State Methods<a class="headerlink" href="#standard-approach-to-writing-state-methods" title="Permalink to this headline">¶</a></h2>
 <div align="center" class="align-center"><img alt="_images/factory1.svg" src="_images/factory1.svg" /></div>
 <p>To create the above diagram we would define three state methods, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">c1</span></code>
 and <code class="docutils literal"><span class="pre">c2</span></code> and an active object.</p>
@@ -428,10 +418,225 @@ information added to them with the active object registration methods.</p>
 <span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
 </span></pre></div>
 </div>
-<p>We see the expected behavior.</p>
+<p>Which is the expected behavior.</p>
 </div>
 <div class="section" id="unwinding-a-factory-state-method">
 <span id="towardsthefactoryexample-unwinding-a-factory-state-method"></span><h2>Unwinding a Factory State Method<a class="headerlink" href="#unwinding-a-factory-state-method" title="Permalink to this headline">¶</a></h2>
+<p>State methods made from factories are hard to debug because you can’t actually
+see their code.  If you find that you have an issue with such a state method, you
+can unwind it into flat code using the <code class="docutils literal"><span class="pre">to_code</span></code> method.  This method outputs a
+string that you can use as a hand written state method.</p>
+<p>In the following example, I’ll show how we can ‘unwind’ a design.</p>
+<div align="center" class="align-center"><img alt="_images/factory4.svg" src="_images/factory4.svg" /></div>
+<p>First we repeat the work of the last section:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># create the specific behavior we want in our state chart</span>
+<span class="k">def</span> <span class="nf">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">trans_to_fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc2</span><span class="p">)</span>
+
+<span class="c1"># create the states</span>
+<span class="n">fc</span>  <span class="o">=</span> <span class="n">state_method_template</span><span class="p">(</span><span class="s1">&#39;fc&#39;</span><span class="p">)</span>
+<span class="n">fc1</span> <span class="o">=</span> <span class="n">state_method_template</span><span class="p">(</span><span class="s1">&#39;fc1&#39;</span><span class="p">)</span>
+<span class="n">fc2</span> <span class="o">=</span> <span class="n">state_method_template</span><span class="p">(</span><span class="s1">&#39;fc2&#39;</span><span class="p">)</span>
+
+<span class="c1"># build an active object, which has an event processor</span>
+<span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+
+<span class="c1"># write the design information into the fc state</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">,</span> <span class="n">trans_to_fc</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>  <span class="n">trans_to_fc1</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">top</span><span class="p">)</span>
+
+<span class="c1"># write the design information into the fc1 state</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">,</span> <span class="n">trans_to_fc</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc1</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">trans_to_fc2</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">fc1</span><span class="p">,</span> <span class="n">fc</span><span class="p">)</span>
+
+<span class="c1"># write the design information into the fc2 state</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc2</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">trans_to_fc1</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">fc2</span><span class="p">,</span> <span class="n">fc</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">fc</span></code>, <code class="docutils literal"><span class="pre">fc1</span></code> and <code class="docutils literal"><span class="pre">fc2</span></code> objects contain state methods that were
+generated by the framework and their code is hidden within the <code class="docutils literal"><span class="pre">ao</span></code> object.</p>
+<p>Now suppose something were to go wrong with this design?  An application
+developer would have to know that there are at least four different places to
+look within the miros framework to understand their state method: the
+registration functions, the context managers and in the actual template
+generation function.  That would be a lot to keep in their head while they were
+also trying to wrestle with their own design problem.</p>
+<p>Instead, they could use the <code class="docutils literal"><span class="pre">to_code</span></code> method, copy the result and write it
+back into the design as flat state methods.  In this way they could focus their
+entire attention on their own issue.  Here is how they could do it:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">to_code</span><span class="p">(</span><span class="n">fc</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">to_code</span><span class="p">(</span><span class="n">fc1</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">to_code</span><span class="p">(</span><span class="n">fc2</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>This would output the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">fc</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">fc</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>They could copy these methods and re-write their original code as this, making
+sure that the comment out all of the factory code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># create the specific behavior we want in our state chart</span>
+<span class="k">def</span> <span class="nf">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">trans_to_fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc2</span><span class="p">)</span>
+
+<span class="hll"><span class="nd">@spy_on</span>
+</span><span class="hll"><span class="k">def</span> <span class="nf">fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span>
+
+<span class="hll"><span class="nd">@spy_on</span>
+</span><span class="hll"><span class="k">def</span> <span class="nf">fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">fc</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span>
+
+<span class="hll"><span class="nd">@spy_on</span>
+</span><span class="hll"><span class="k">def</span> <span class="nf">fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">fc</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll"><span class="c1"># create the states</span>
+</span><span class="hll"><span class="c1"># fc  = state_method_template(&#39;fc&#39;)</span>
+</span><span class="hll"><span class="c1"># fc1 = state_method_template(&#39;fc1&#39;)</span>
+</span><span class="hll"><span class="c1"># fc2 = state_method_template(&#39;fc2&#39;)</span>
+</span>
+<span class="c1"># build an active object, which has an event processor</span>
+<span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+
+<span class="hll"><span class="c1"># write the design information into the fc state</span>
+</span><span class="hll"><span class="c1"># ao.register_signal_callback(fc, signals.BB, trans_to_fc)</span>
+</span><span class="hll"><span class="c1"># ao.register_signal_callback(fc, signals.INIT_SIGNAL,  trans_to_fc1)</span>
+</span><span class="hll"><span class="c1"># ao.register_parent(fc, ao.top)</span>
+</span>
+<span class="hll"><span class="c1"># write the design information into the fc1 state</span>
+</span><span class="hll"><span class="c1"># ao.register_signal_callback(fc, signals.BB, trans_to_fc)</span>
+</span><span class="hll"><span class="c1"># ao.register_signal_callback(fc1, signals.A, trans_to_fc2)</span>
+</span><span class="hll"><span class="c1"># ao.register_parent(fc1, fc)</span>
+</span>
+<span class="hll"><span class="c1"># write the design information into the fc2 state</span>
+</span><span class="hll"><span class="c1"># ao.register_signal_callback(fc2, signals.A, trans_to_fc1)</span>
+</span><span class="hll"><span class="c1"># ao.register_parent(fc2, fc)</span>
+</span>
+<span class="c1"># start up the active object what what it does</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">fc2</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>The highlighted sections identify all of the changes to the design.  New
+flattened state methods were added and the old factory code was commented out.
+If we run this code, we see that it behaves properly:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc2&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:fc&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:fc2&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:fc2&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;A:fc2&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc1&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc2&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;EXIT_SIGNAL:fc2&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:fc1&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:fc1&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Metaprogramming is easy on the person who first writes the code and very hard
+on those that have to maintain or extend the design.  Like anything else,
+whether it should be done or not is dependent upon the engineering trade offs.</p>
 </div>
 </div>
 
@@ -448,7 +653,7 @@ information added to them with the active object registration methods.</p>
 <li><a class="reference internal" href="#">Using and Unwinding a Factory</a><ul>
 <li><a class="reference internal" href="#example-summary">Example Summary</a></li>
 <li><a class="reference internal" href="#why-a-factory">Why a Factory?</a></li>
-<li><a class="reference internal" href="#standard-approach">Standard Approach</a></li>
+<li><a class="reference internal" href="#standard-approach-to-writing-state-methods">Standard Approach to Writing State Methods</a></li>
 <li><a class="reference internal" href="#registering-callbacks-to-specific-events">Registering Callbacks to Specific Events</a></li>
 <li><a class="reference internal" href="#using-the-miros-factory-method">Using the Miros Factory Method</a></li>
 <li><a class="reference internal" href="#unwinding-a-factory-state-method">Unwinding a Factory State Method</a></li>

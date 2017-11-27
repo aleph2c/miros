@@ -270,7 +270,7 @@ def test_to_code():
 
   # commented out line needed for test to work
   ao.register_signal_callback(tc2_s2, signals.A, trans_to_c2_s3)
-  # ao.register_signal_callback(tc2_s2, signals.ENTRY_SIGNAL, handled)
+  ao.register_signal_callback(tc2_s2, signals.ENTRY_SIGNAL, handled)
   ao.register_signal_callback(tc2_s2, signals.EXIT_SIGNAL,  handled)
   ao.register_signal_callback(tc2_s2, signals.INIT_SIGNAL,  handled)
   ao.register_parent(tc2_s2, ts1)
@@ -278,22 +278,23 @@ def test_to_code():
   # commented out lines needed for test to work
   ao.register_signal_callback(tc2_s3, signals.A, trans_to_c2_s2)
   ao.register_signal_callback(tc2_s3, signals.ENTRY_SIGNAL, handled)
-  # ao.register_signal_callback(tc2_s3, signals.EXIT_SIGNAL,  handled)
-  # ao.register_signal_callback(tc2_s3, signals.INIT_SIGNAL,  handled)
+  ao.register_signal_callback(tc2_s3, signals.EXIT_SIGNAL,  handled)
+  ao.register_signal_callback(tc2_s3, signals.INIT_SIGNAL,  handled)
   ao.register_parent(tc2_s3, ts1)
 
   expected_ts1_as_flat_code = \
 '''
+@spy_on
 def ts1(chart, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    status = handled(chart, e)
-  elsif(e.signal == signals.INIT_SIGNAL):
+    status = return_status.HANDLED
+  elif(e.signal == signals.INIT_SIGNAL):
     status = trans_to_c2_s2(chart, e)
-  elsif(e.signal == signals.BB):
+  elif(e.signal == signals.BB):
     status = trans_to_s1(chart, e)
-  elsif(e.signal == signals.EXIT_SIGNAL):
-    status = handled(chart, e)
+  elif(e.signal == signals.EXIT_SIGNAL):
+    status = return_status.HANDLED
   else:
     status, chart.temp.fun = return_status.SUPER, chart.top
   return status
@@ -302,16 +303,17 @@ def ts1(chart, e):
 
   expected_tc2_s2_as_flat_code = \
 '''
+@spy_on
 def tc2_s2(chart, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
-  elsif(e.signal == signals.INIT_SIGNAL):
-    status = handled(chart, e)
-  elsif(e.signal == signals.A):
+  elif(e.signal == signals.INIT_SIGNAL):
+    status = return_status.HANDLED
+  elif(e.signal == signals.A):
     status = trans_to_c2_s3(chart, e)
-  elsif(e.signal == signals.EXIT_SIGNAL):
-    status = handled(chart, e)
+  elif(e.signal == signals.EXIT_SIGNAL):
+    status = return_status.HANDLED
   else:
     status, chart.temp.fun = return_status.SUPER, ts1
   return status
@@ -320,13 +322,14 @@ def tc2_s2(chart, e):
   assert(ao.to_code(tc2_s2) == expected_tc2_s2_as_flat_code)
   expected_tc2_s3_as_flat_code = \
 '''
+@spy_on
 def tc2_s3(chart, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    status = handled(chart, e)
+    status = return_status.HANDLED
   elif(e.signal == signals.INIT_SIGNAL):
     status = return_status.HANDLED
-  elsif(e.signal == signals.A):
+  elif(e.signal == signals.A):
     status = trans_to_c2_s2(chart, e)
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED

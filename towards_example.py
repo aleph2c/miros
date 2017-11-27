@@ -157,6 +157,97 @@ def example_3():
   time.sleep(0.01)
   pp(ao.spy())
 
+  print(ao.to_code(fc))
+  print(ao.to_code(fc1))
+  print(ao.to_code(fc2))
+  
+
+def example_4():
+
+  # create the specific behavior we want in our state chart
+  def trans_to_fc(chart, e):
+    return chart.trans(fc)
+
+  def trans_to_fc1(chart, e):
+    return chart.trans(fc1)
+
+  def trans_to_fc2(chart, e):
+    return chart.trans(fc2)
+
+  @spy_on
+  def fc(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = trans_to_fc1(chart, e)
+    elif(e.signal == signals.BB):
+      status = trans_to_fc(chart, e)
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    else:
+      status, chart.temp.fun = return_status.SUPER, chart.top
+    return status
+
+
+  @spy_on
+  def fc1(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.A):
+      status = trans_to_fc2(chart, e)
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    else:
+      status, chart.temp.fun = return_status.SUPER, fc
+    return status
+
+  @spy_on
+  def fc2(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.A):
+      status = trans_to_fc1(chart, e)
+    elif(e.signal == signals.EXIT_SIGNAL):
+      status = return_status.HANDLED
+    else:
+      status, chart.temp.fun = return_status.SUPER, fc
+    return status
+  # # create the states
+  # fc  = state_method_template('fc')
+  # fc1 = state_method_template('fc1')
+  # fc2 = state_method_template('fc2')
+
+  # build an active object, which has an event processor
+  ao = ActiveObject()
+
+  # write the design information into the fc state
+  # ao.register_signal_callback(fc, signals.BB, trans_to_fc)
+  # ao.register_signal_callback(fc, signals.INIT_SIGNAL,  trans_to_fc1)
+  # ao.register_parent(fc, ao.top)
+
+  # # write the design information into the fc1 state
+  # ao.register_signal_callback(fc, signals.BB, trans_to_fc)
+  # ao.register_signal_callback(fc1, signals.A, trans_to_fc2)
+  # ao.register_parent(fc1, fc)
+
+  # # write the design information into the fc2 state
+  # ao.register_signal_callback(fc2, signals.A, trans_to_fc1)
+  # ao.register_parent(fc2, fc)
+
+  # start up the active object what what it does
+  ao.start_at(fc2)
+  ao.post_fifo(Event(signal=signals.A))
+  time.sleep(0.01)
+  pp(ao.spy())
+
 #example_1()
 #example_2()
 example_3()
+example_4()
