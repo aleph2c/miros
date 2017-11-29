@@ -7,6 +7,7 @@ from pprint      import pprint
 from threading   import Thread
 from queue       import PriorityQueue, Queue
 from threading   import Event as ThreadEventLib
+from miros.hsm   import state_method_template
 from functools   import wraps
 
 # from this package
@@ -891,3 +892,59 @@ class ActiveObject(HsmWithQueues):
         self.posted_events_queue.pop()
       else:
         self.posted_events_queue.rotate(1)
+
+
+class Factory(ActiveObject):
+
+  class State():
+    def __init__(self, name, ao):
+      self.name = name
+      self.state_method = state_method_template(name)
+      self.ao = ao
+
+    def catch(self, signal, handler):
+      self.ao.register_signal_callback(self.state_method, signal, handler)
+      return self
+
+    def to_method(self):
+      return self.state_method
+
+  def __init__(self, name):
+    super().__init__()
+    self.name = name
+    self.states = {}
+
+  def create(self, state):
+    self.states[state] = self.__class__.State(name=state, ao=self)
+    return self.states[state]
+
+  def nest(self, state, parent):
+    if type(state) == str:
+      state_method = self.state[state].state_method
+    else:
+      state_method = state
+
+    if type(parent) == str:
+      parent_state_method = self.state[parent].state_method
+    else:
+      parent_state_method = parent
+      if parent_state_method is None:
+        parent_state_method = self.top
+
+    self.register_parent(state_method, parent_state_method)
+    return self
+
+  def start_at(self, state):
+    if type(state) == str:
+      state_method = self.state[state].state_method
+    else:
+      state_method = state
+
+    super().start_at(state_method)
+
+  def to_code(self, state):
+    if type(state) == str:
+      state_method = self.states[state].state_method
+    else:
+      state_method = state
+    return super().to_code(state_method)

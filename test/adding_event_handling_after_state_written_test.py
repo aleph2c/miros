@@ -4,6 +4,7 @@ import pytest
 from miros.hsm import spy_on, pp, state_method_template
 from miros.activeobject import ActiveObject
 from miros.event import signals, Event, return_status
+from miros.activeobject import Factory as ActiveObjectFactory
 from copy import copy
 
 
@@ -378,3 +379,115 @@ def tc2_s3(chart, e):
      'ENTRY_SIGNAL:tc2_s2',
      'INIT_SIGNAL:tc2_s2',
      '<- Queued:(0) Deferred:(0)'])
+
+
+@pytest.mark.factory
+def test_factory():
+
+  chart = ActiveObjectFactory('c_example')
+
+  def trans_to_s1(chart, e):
+    return chart.trans(ts1)
+
+  def trans_to_c2_s3(chart, e):
+    return chart.trans(tc2_s3)
+
+  def trans_to_c2_s2(chart, e):
+    return chart.trans(tc2_s2)
+
+  ts1 = chart.create(state='ts1').                             \
+    catch(signal=signals.BB, handler=trans_to_s1).             \
+    catch(signal=signals.INIT_SIGNAL, handler=trans_to_c2_s2). \
+    to_method()
+
+  tc2_s2 = chart.create(state='tc2_s2').             \
+    catch(signal=signals.A, handler=trans_to_c2_s3). \
+    to_method()
+
+  tc2_s3 = chart.create(state='tc2_s3').             \
+    catch(signal=signals.A, handler=trans_to_c2_s2). \
+    to_method()
+
+  chart.nest(ts1,    parent=None). \
+        nest(tc2_s2, parent=ts1).  \
+        nest(tc2_s3, parent=ts1)
+
+  chart.start_at(ts1)
+  chart.post_fifo(Event(signal=signals.A))
+  time.sleep(0.1)
+  assert(chart.spy() ==
+    ['START',
+     'SEARCH_FOR_SUPER_SIGNAL:ts1',
+     'ENTRY_SIGNAL:ts1',
+     'INIT_SIGNAL:ts1',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s2',
+     'ENTRY_SIGNAL:tc2_s2',
+     'INIT_SIGNAL:tc2_s2',
+     '<- Queued:(0) Deferred:(0)',
+     'A:tc2_s2',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s3',
+     'SEARCH_FOR_SUPER_SIGNAL:tc2_s2',
+     'EXIT_SIGNAL:tc2_s2',
+     'ENTRY_SIGNAL:tc2_s3',
+     'INIT_SIGNAL:tc2_s3',
+     '<- Queued:(0) Deferred:(0)'])
+
+  ts1_as_code = \
+'''
+@spy_on
+def ts1(chart, e):
+  status = return_status.UNHANDLED
+  if(e.signal == signals.ENTRY_SIGNAL):
+    status = return_status.HANDLED
+  elif(e.signal == signals.INIT_SIGNAL):
+    status = trans_to_c2_s2(chart, e)
+  elif(e.signal == signals.BB):
+    status = trans_to_s1(chart, e)
+  elif(e.signal == signals.EXIT_SIGNAL):
+    status = return_status.HANDLED
+  else:
+    status, chart.temp.fun = return_status.SUPER, chart.top
+  return status
+'''
+  assert(chart.to_code('ts1') == ts1_as_code)
+  assert(chart.to_code(ts1) == ts1_as_code)
+
+  tc2_s2_as_code = \
+'''
+@spy_on
+def tc2_s2(chart, e):
+  status = return_status.UNHANDLED
+  if(e.signal == signals.ENTRY_SIGNAL):
+    status = return_status.HANDLED
+  elif(e.signal == signals.INIT_SIGNAL):
+    status = return_status.HANDLED
+  elif(e.signal == signals.A):
+    status = trans_to_c2_s3(chart, e)
+  elif(e.signal == signals.EXIT_SIGNAL):
+    status = return_status.HANDLED
+  else:
+    status, chart.temp.fun = return_status.SUPER, ts1
+  return status
+'''
+  assert(chart.to_code('tc2_s2') == tc2_s2_as_code)
+  assert(chart.to_code(tc2_s2) == tc2_s2_as_code)
+
+  tc2_s3_as_code = \
+'''
+@spy_on
+def tc2_s3(chart, e):
+  status = return_status.UNHANDLED
+  if(e.signal == signals.ENTRY_SIGNAL):
+    status = return_status.HANDLED
+  elif(e.signal == signals.INIT_SIGNAL):
+    status = return_status.HANDLED
+  elif(e.signal == signals.A):
+    status = trans_to_c2_s2(chart, e)
+  elif(e.signal == signals.EXIT_SIGNAL):
+    status = return_status.HANDLED
+  else:
+    status, chart.temp.fun = return_status.SUPER, ts1
+  return status
+'''
+  assert(chart.to_code('tc2_s3') == tc2_s3_as_code)
+  assert(chart.to_code(tc2_s3) == tc2_s3_as_code)
