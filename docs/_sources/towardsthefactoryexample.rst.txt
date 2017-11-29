@@ -29,7 +29,7 @@ When you send an event which will cause a transition across multiple states with
 complicated entry/exit/init event triggering to provide the Harel Formalism,
 you don't have to worry about how it is implemented, you just need to ensure
 that you have framed in your state methods with enough structure that the event
-processing algorithm can discover the graph and build up the expected behavior.
+processing algorithm can discover the graph and build out the expected behavior.
 
 This provides the illusion that you are using a completely different type of
 programming language, but it's still all Python.  Your state methods are just
@@ -125,9 +125,11 @@ and ``c2`` and an active object.
   time.sleep(0.01) # give your active object a moment to respond
   pp(ao.spy())
 
-Remember to give your chart a moment to react to an event before you let your
-program complete.  The output of this could would look like this in the
-terminal:
+An active object has its own thread, so when you want to communicate to it by
+posting an event, you have to give it the briefest opportunity to react.
+This delay is highlighted in the above code.  
+
+When the above code is run, it would output this to your terminal:
 
   .. code-block:: python
     :emphasize-lines: 7,14
@@ -147,12 +149,14 @@ terminal:
      'INIT_SIGNAL:c1',
      '<- Queued:(0) Deferred:(0)']
 
-We see that the spy log shows that we had two run to completion events with no
+We see from the spy log that we had two run to completion events with no
 surprises.  Notice that the event processor tried to call the state functions
 with the ``ENTRY_SIGNAL``, ``INIT_SIGNAL`` and ``EXIT_SIGNAL`` as it should
 have, even though our state methods did not handle these events.  The handlers
 for these events were left out of the state method examples to keep the code
-compact.
+compact.  This demonstrates that the event processor assumes that a missing
+handler for ``entry``, ``init`` and ``exit`` signals are handled by a state
+method.
 
 .. _towardsthefactoryexample-registering-callbacks-to-specific-events:
 

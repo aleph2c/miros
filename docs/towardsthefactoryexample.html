@@ -63,7 +63,7 @@ statechart.</p>
 complicated entry/exit/init event triggering to provide the Harel Formalism,
 you don’t have to worry about how it is implemented, you just need to ensure
 that you have framed in your state methods with enough structure that the event
-processing algorithm can discover the graph and build up the expected behavior.</p>
+processing algorithm can discover the graph and build out the expected behavior.</p>
 <p>This provides the illusion that you are using a completely different type of
 programming language, but it’s still all Python.  Your state methods are just
 being called over and over again with different arguments.</p>
@@ -145,9 +145,10 @@ and <code class="docutils literal"><span class="pre">c2</span></code> and an act
 </span><span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>Remember to give your chart a moment to react to an event before you let your
-program complete.  The output of this could would look like this in the
-terminal:</p>
+<p>An active object has its own thread, so when you want to communicate to it by
+posting an event, you have to give it the briefest opportunity to react.
+This delay is highlighted in the above code.</p>
+<p>When the above code is run, it would output this to your terminal:</p>
 <blockquote>
 <div><div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
  <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:c2&#39;</span><span class="p">,</span>
@@ -166,12 +167,14 @@ terminal:</p>
 </span></pre></div>
 </div>
 </div></blockquote>
-<p>We see that the spy log shows that we had two run to completion events with no
+<p>We see from the spy log that we had two run to completion events with no
 surprises.  Notice that the event processor tried to call the state functions
 with the <code class="docutils literal"><span class="pre">ENTRY_SIGNAL</span></code>, <code class="docutils literal"><span class="pre">INIT_SIGNAL</span></code> and <code class="docutils literal"><span class="pre">EXIT_SIGNAL</span></code> as it should
 have, even though our state methods did not handle these events.  The handlers
 for these events were left out of the state method examples to keep the code
-compact.</p>
+compact.  This demonstrates that the event processor assumes that a missing
+handler for <code class="docutils literal"><span class="pre">entry</span></code>, <code class="docutils literal"><span class="pre">init</span></code> and <code class="docutils literal"><span class="pre">exit</span></code> signals are handled by a state
+method.</p>
 </div>
 <div class="section" id="registering-callbacks-to-specific-events">
 <span id="towardsthefactoryexample-registering-callbacks-to-specific-events"></span><h2>Registering Callbacks to Specific Events<a class="headerlink" href="#registering-callbacks-to-specific-events" title="Permalink to this headline">¶</a></h2>
