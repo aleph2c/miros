@@ -12,10 +12,17 @@ Example Summary
 ---------------
 1. :ref:`Standard Approach to Writing State Methods<towardsthefactoryexample-standard-approach>`
 2. :ref:`Registering Callbacks to Specific Events<towardsthefactoryexample-registering-callbacks-to-specific-events>`
-3. :ref:`Using the Miros Factory Method<towardsthefactoryexample-registering-a-parent-to-a-state-method>`
-4. :ref:`Unwinding a Factory State Method<towardsthefactoryexample-unwinding-a-factory-state-method>`
+3. :ref:`Creating a Statechart Using Templates<towardsthefactoryexample-registering-a-parent-to-a-state-method>`
+4. :ref:`Creating a Statechart Using A Factory<towardsthefactoryexample-using-the-factory-class>`
+5. :ref:`Unwinding a Factory State Method<towardsthefactoryexample-unwinding-a-factory-state-method>`
 
 .. _towardsthefactoryexample-why-you-would-want-a-factory:
+
+In this example I will walk you through how to hand-code a simple state method
+then show how that same method could be written for you automatically.  Then I
+will show how to re-flatten a statechart, so that you can copy this code back
+into your design to make it easier to debug. (Like looking at preprocessor
+results in c).
 
 Why a Factory?
 --------------
@@ -36,13 +43,16 @@ programming language, but it's still all Python.  Your state methods are just
 being called over and over again with different arguments.
 
 Miro Samek describes this as "an inversion of control".  By using his event
-processing algorithm, you are packing the management of the topological search
-complexity into the bottom of your software system.
+processing algorithm, you are packing the management complexity of the
+topological search into the bottom part of your software system.  By pushing
+this to the bottom, you can focus on writing concise descriptions of how your
+system should behave without concerning yourself with how to implement this
+behavior, the algorithm solves that problem.  You just need to build the map.
 
 But to do this, the event processor expects all of your state methods to have a
 specific shape.  Their method signatures have to look a certain way and their
 if-else structures have to be framed-in just right, otherwise the event
-processor might get lost while it's searching for the correct behavior.
+processor will get lost while it's searching for the correct behavior.
 
 Wouldn't it be nice if the library wrote the methods for you too?  Well it can,
 you can use a factory to create state method nodes, then link in event
@@ -61,11 +71,6 @@ literally see the code and break within it for debugging.  The cognitive
 difficulty experienced while trouble shooting a flat state method is much less
 than it would be for something that is auto-generated.  
 
-In this example I will walk you through how we can move from a simple state
-method towards one that is written for you automatically.  Then I will show how
-to re-flatten a state chart which has been automatically built for you, so that
-you can copy this code back into your design to make it easier to debug. (Like
-looking at the preprocessor results in c).
 
 .. _towardsthefactoryexample-standard-approach:
 
@@ -337,8 +342,8 @@ If we ran this code, we would see:
 
 .. _towardsthefactoryexample-registering-a-parent-to-a-state-method:
 
-Using the Miros Factory Method
-------------------------------
+Creating a Statechart Using Templates
+-------------------------------------
 We pretty much wrote the same method three times in a row in our last example.
 Wouldn't it be nice if something could write the thing for us?  
 
@@ -413,7 +418,7 @@ method:
   ao.register_signal_callback(fc2, signals.A, trans_to_fc1)
   ao.register_parent(fc2, fc)
 
-  # start up the active object what what it does
+  # start up the active object and watch what is does
   ao.start_at(fc2)
   ao.post_fifo(Event(signal=signals.A))
   time.sleep(0.01)
@@ -445,6 +450,86 @@ The output from this program is:
    '<- Queued:(0) Deferred:(0)']
 
 Which is the expected behavior.
+
+.. _towardsthefactoryexample-using-the-factory-class:
+
+Using the Factory Class
+-----------------------
+The ``active_object`` module's Factory class provides a syntax which is similar to
+the previous miros version.  It has the ``create``, ``catch`` and ``nest``
+methods, but it also extends the other API with ``to_method`` and ``to_code``.
+
+The Factory class wraps the ``register_signal_callback`` and
+``register_parent`` described in the previous section making syntax that is a
+bit more concise.
+
+.. image:: _static/factory4.svg
+    :align: center
+
+Here is how you could implement this statechart with the ``Factory`` class:
+
+.. code-block:: python
+  :emphasize-lines: 15
+  :linenos:
+
+  from miros.activeobject import ActiveObject
+  from miros.event import signals, Event, return_status
+  from miros.activeobject import Factory
+
+  # create the specific behavior we want in our state chart
+  def trans_to_fc(chart, e):
+    return chart.trans(fc)
+
+  def trans_to_fc1(chart, e):
+    return chart.trans(fc1)
+
+  def trans_to_fc2(chart, e):
+    return chart.trans(fc2)
+
+  chart = Factory('factory_class_example')
+
+  fc = chart.create(state='fc').                             \
+    catch(signal=signals.B, handler=trans_to_fc).            \
+    catch(signal=signals.INIT_SIGNAL, handler=trans_to_fc1). \
+    to_method()
+
+  fc1 = chart.create(state='fc1'). \
+    catch(signal=signals.A, handler=trans_to_fc2). \
+    to_method()
+
+  fc2 = chart.create(state='fc2'). \
+    catch(signal=signals.A, handler=trans_to_fc1). \
+    to_method()
+
+  chart.nest(fc,  parent=None). \
+        nest(fc1, parent=fc). \
+        nest(fc2, parent=fc)
+
+  chart.start_at(fc)
+  chart.post_fifo(Event(signal=signals.A))
+  time.sleep(0.01)
+  pp(chart.spy())
+
+If we ran the above code we would see the expected behavior:
+
+.. code-block:: python
+
+  ['START',
+   'SEARCH_FOR_SUPER_SIGNAL:fc',
+   'ENTRY_SIGNAL:fc',
+   'INIT_SIGNAL:fc',
+   'SEARCH_FOR_SUPER_SIGNAL:fc1',
+   'ENTRY_SIGNAL:fc1',
+   'INIT_SIGNAL:fc1',
+   '<- Queued:(0) Deferred:(0)',
+   'A:fc1',
+   'SEARCH_FOR_SUPER_SIGNAL:fc2',
+   'SEARCH_FOR_SUPER_SIGNAL:fc1',
+   'EXIT_SIGNAL:fc1',
+   'ENTRY_SIGNAL:fc2',
+   'INIT_SIGNAL:fc2',
+   '<- Queued:(0) Deferred:(0)']
+
 
 .. _towardsthefactoryexample-unwinding-a-factory-state-method:
 
@@ -653,7 +738,7 @@ sure that the comment out all of the factory code:
   # ao.register_signal_callback(fc2, signals.A, trans_to_fc1)
   # ao.register_parent(fc2, fc)
 
-  # start up the active object what what it does
+  # start up the active object and watch what it does
   ao.start_at(fc2)
   ao.post_fifo(Event(signal=signals.A))
   time.sleep(0.01)

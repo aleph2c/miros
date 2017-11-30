@@ -27,7 +27,7 @@ There are different ways to create states with miros:
 
 2. :ref:`You can have the library generate a state method for you, then register
    callback responses to specific events and set a parent at
-   runtime.<recipes-creating-a-state-method-from-a-factory>`
+   runtime.<recipes-creating-a-state-method-from-a-template>`
 
 3. You can use a fusion technique.  You can hand write a state and use context
    managers within the method so that the miros package can register callbacks
@@ -52,6 +52,7 @@ There are different ways to create states with miros:
 * :ref:`Cancel events<recipes-cancelling-events-state>`
 * :ref:`Defer and Recall an event<recipes-deferring-an-event-state>`
 * :ref:`A Deeper look at state methods<recipes-what-a-state-does-and-how-to-structure-it>`
+* :ref:`Creating a statechart from a template<recipes-creating-a-state-method-from-a-template>`
 * :ref:`Creating a statechart from a factory<recipes-creating-a-state-method-from-a-factory>`
 
 .. _recipes-what-a-state-does-and-how-to-structure-it:
@@ -691,6 +692,109 @@ Deferring and Recalling an Event
 
 .. include:: i_defer_and_recall.rst 
 
+.. _recipes-creating-a-state-method-from-a-template:
+
+Creating a Statechart From a Template
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To have the library create your state methods for you:
+
+1. :ref:`Import the correct items from the miros library<recipes-template-1>`
+2. :ref:`Create a set of states from the miros template.<recipes-template-2>`
+3. :ref:`Create callback functions which you will link into the chart<recipes-template-3>`
+4. :ref:`Create an active object, and link it to your state handler<recipes-template-4>`
+5. :ref:`Register callbacks to each of your events.<recipes-template-5>`
+6. :ref:`Relate your states to one another by assigning them parents<recipes-template-6>`
+7. :ref:`Start up the active object in the desired state<recipes-template-7>`
+
+.. image:: _static/factory2.svg
+    :align: center
+
+.. _recipes-template-1:
+
+Import the correct items from the miros library:
+
+.. code-block:: python
+
+  from miros.hsm import state_method_template
+  from miros.activeobject import ActiveObject
+  from miros.event import signals, Event, return_status
+
+.. _recipes-template-2:
+
+Create a set of states from the miros template:
+
+.. code-block:: python
+
+  tc2_s1 = state_method_template('tc2_s1')
+  tc2_s2 = state_method_template('tc2_s2')
+  tc2_s3 = state_method_template('tc2_s3')
+
+.. _recipes-template-3:
+
+Create callback functions which you will link into your chart:
+
+.. code-block:: python
+
+  def trans_to_c2_s1(chart, e):
+    return chart.trans(tc2_s1)
+
+  def trans_to_c2_s3(chart, e):
+    return chart.trans(tc2_s3)
+
+  def trans_to_c2_s2(chart, e):
+    return chart.trans(tc2_s2)
+
+  def handled(chart, e):
+    return return_status.HANDLED
+
+.. _recipes-template-4:
+
+Create an active object and link it to your state handler:
+
+.. code-block:: python
+
+  ao = ActiveObject()
+
+.. _recipes-template-5:
+
+Register callbacks to each of your events:
+
+.. code-block:: python
+
+  ao.register_signal_callback(tc2_s1, signals.BB, trans_to_c2_s1)
+  ao.register_signal_callback(tc2_s1, signals.ENTRY_SIGNAL, handled)
+  ao.register_signal_callback(tc2_s1, signals.EXIT_SIGNAL,  handled)
+  ao.register_signal_callback(tc2_s1, signals.INIT_SIGNAL,  trans_to_c2_s2)
+
+  ao.register_signal_callback(tc2_s2, signals.A, trans_to_c2_s3)
+  ao.register_signal_callback(tc2_s2, signals.EXIT_SIGNAL,  handled)
+  ao.register_signal_callback(tc2_s2, signals.INIT_SIGNAL,  handled)
+
+  ao.register_signal_callback(tc2_s3, signals.A, trans_to_c2_s2)
+  ao.register_signal_callback(tc2_s3, signals.ENTRY_SIGNAL, handled)
+
+
+.. _recipes-template-6:
+
+Relate your states to one another by assigning them to parents:
+
+.. code-block:: python
+
+  ao.register_parent(tc2_s1, ao.top)
+  ao.register_parent(tc2_s2, tc2_s1)
+  ao.register_parent(tc2_s3, tc2_s1)
+
+.. _recipes-template-7:
+
+
+Start up the active object in the desired state:
+
+.. code-block:: python
+
+  ao.start_at(tc2_s2)
+
+:ref:`Then all of you usual state recipes apply<recipes-state-recipes>`.
+
 .. _recipes-creating-a-state-method-from-a-factory:
 
 Creating a Statechart From a Factory
@@ -698,7 +802,7 @@ Creating a Statechart From a Factory
 To have the library create your state methods for you:
 
 1. :ref:`Import the correct items from the miros library<recipes-factory-1>`
-2. :ref:`Create a set of states from the miros template.<recipes-factory-2>`
+2. :ref:`Create a set of states from the miros factory.<recipes-factory-2>`
 3. :ref:`Create callback functions which you will link into the chart<recipes-factory-3>`
 4. :ref:`Create an active object, and link it to your state handler<recipes-factory-4>`
 5. :ref:`Register callbacks to each of your events.<recipes-factory-5>`
@@ -714,19 +818,20 @@ Import the correct items from the miros library:
 
 .. code-block:: python
 
-  from miros.hsm import state_method_template
+  from miros.hsm import state_method_factory
+.. _recipes-creating-a-state-method-from-a-template:
   from miros.activeobject import ActiveObject
   from miros.event import signals, Event, return_status
 
 .. _recipes-factory-2:
 
-Create a set of states from the miros template:
+Create a set of states from the miros factory:
 
 .. code-block:: python
 
-  tc2_s1 = state_method_template('tc2_s1')
-  tc2_s2 = state_method_template('tc2_s2')
-  tc2_s3 = state_method_template('tc2_s3')
+  tc2_s1 = state_method_factory('tc2_s1')
+  tc2_s2 = state_method_factory('tc2_s2')
+  tc2_s3 = state_method_factory('tc2_s3')
 
 .. _recipes-factory-3:
 
@@ -1102,6 +1207,100 @@ Scribble On the Spy
 ^^^^^^^^^^^^^^^^^^^
 
 .. include:: i_scribble_on_the_spy.rst
+
+
+.. _recipes-flatting-a-state-method:
+
+Flatting a State Method
+^^^^^^^^^^^^^^^^^^^^^^^
+If you have created a state method using either a ``template`` or a ``Factory``
+and you would like to see it's code as if it where written by hand, use the
+``to_code`` call.
+
+Let's first look how to flatten a template state method:
+
+.. code-block:: python
+  :emphasize-lines: 20
+
+  from miros.hsm import state_method_template
+  from miros.activeobject import ActiveObject
+  from miros.event import signals, Event, return_status
+
+  def trans_to_fc1(chart, e):
+    return chart.trans(fc1)
+
+  # create a state method using a template
+  fc = state_method_template('fc')
+
+  # build an active object, which has an event processor
+  ao = ActiveObject()
+
+  # write the design information into the fc state method
+  ao.register_signal_callback(fc, signals.BB, trans_to_fc)
+  ao.register_signal_callback(fc, signals.INIT_SIGNAL,  trans_to_fc1)
+  ao.register_parent(fc, ao.top)
+
+  # to see how fc would be written as a flat method:
+  print(ao.to_code(fc)) # ->
+    # @spy_on                                                                                   
+    # def fc(chart, e):                                                                         
+    #   status = return_status.UNHANDLED                                                        
+    #   if(e.signal == signals.ENTRY_SIGNAL):                                                   
+    #     status = return_status.HANDLED                                                        
+    #   elif(e.signal == signals.INIT_SIGNAL):                                                  
+    #     status = trans_to_fc1(chart, e)                                                       
+    #   elif(e.signal == signals.BB):                                                           
+    #     status = trans_to_fc(chart, e)                                                        
+    #   elif(e.signal == signals.EXIT_SIGNAL):                                                  
+    #     status = return_status.HANDLED                                                        
+    #   else:                                                                                   
+    #     status, chart.temp.fun = return_status.SUPER, chart.top                               
+    #   return status                                                                           
+
+Above we see that the state method is flattened using the ``to_code`` method of
+the active object.  You could copy this and drop it into your design for
+debugging purposes.
+
+The same process applies for a state method built using the ``Factory``:
+
+.. code-block:: python
+  :emphasize-lines: 16
+  
+  from miros.activeobject import ActiveObject
+  from miros.event import signals, Event, return_status
+  from miros.activeobject import Factory
+
+  # create the specific behavior we want in our state chart
+  def trans_to_fc1(chart, e):
+    return chart.trans(fc1)
+
+  chart = Factory('factory_class_recipe_example')
+
+  fc = chart.create(state='fc').                             \
+    catch(signal=signals.BB, handler=trans_to_fc).           \
+    catch(signal=signals.INIT_SIGNAL, handler=trans_to_fc1). \
+    to_method()
+
+  chart.to_code(fc) # =>
+    # @spy_on                                                                                   
+    # def fc(chart, e):                                                                         
+    #   status = return_status.UNHANDLED                                                        
+    #   if(e.signal == signals.ENTRY_SIGNAL):                                                   
+    #     status = return_status.HANDLED                                                        
+    #   elif(e.signal == signals.INIT_SIGNAL):                                                  
+    #     status = trans_to_fc1(chart, e)                                                       
+    #   elif(e.signal == signals.BB):                                                           
+    #     status = trans_to_fc(chart, e)                                                        
+    #   elif(e.signal == signals.EXIT_SIGNAL):                                                  
+    #     status = return_status.HANDLED                                                        
+    #   else:                                                                                   
+    #     status, chart.temp.fun = return_status.SUPER, chart.top                               
+    #   return status                                                                           
+
+To see how to unwind an auto-generated statechart read
+:ref:`unwinding a state method<towardsthefactoryexample-unwinding-a-factory-state-method>`
+
+
 
 .. _recipes-describing-your-work:
 

@@ -896,7 +896,7 @@ class ActiveObject(HsmWithQueues):
 
 class Factory(ActiveObject):
 
-  class State():
+  class StateMethodBlueprint():
     def __init__(self, name, ao):
       self.name = name
       self.state_method = state_method_template(name)
@@ -914,8 +914,13 @@ class Factory(ActiveObject):
     self.name = name
     self.states = {}
 
-  def create(self, state):
-    self.states[state] = self.__class__.State(name=state, ao=self)
+  def create(self, state=None):
+    '''
+    This will allow the Factory to create different things and attach them to
+    itself, for now it can only create states.
+
+    '''
+    self.states[state] = self.__class__.StateMethodBlueprint(name=state, ao=self)
     return self.states[state]
 
   def nest(self, state, parent):
