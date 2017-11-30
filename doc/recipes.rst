@@ -808,7 +808,7 @@ To have the library create your state methods for you:
 5. :ref:`Add the hierarchy information to your factory object<recipes-factory-5>`
 6. :ref:`Start your statechart in the desired state<recipes-factory-6>`
 
-.. image:: _static/factory2.svg
+.. image:: _static/factory4.svg
     :align: center
 
 .. _recipes-factory-1:
