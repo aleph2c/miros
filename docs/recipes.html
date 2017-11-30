@@ -58,9 +58,9 @@ application code into designed behavior.</p>
 <ol class="arabic simple">
 <li><a class="reference internal" href="#recipes-boiler-plate-state-method-code"><span class="std std-ref">You can create a hand-coded state
 method.</span></a></li>
-<li><span class="xref std std-ref">You can have the library generate a state method for you, then register
+<li><a class="reference internal" href="#recipes-creating-a-state-method-from-a-template"><span class="std std-ref">You can have the library generate a state method for you, then register
 callback responses to specific events and set a parent at
-runtime.</span></li>
+runtime.</span></a></li>
 <li>You can use a fusion technique.  You can hand write a state and use context
 managers within the method so that the miros package can register callbacks
 for specific signals, or even change it’s parent at run time. [fusion
@@ -82,7 +82,7 @@ states]</li>
 <li><a class="reference internal" href="#recipes-cancelling-events-state"><span class="std std-ref">Cancel events</span></a></li>
 <li><a class="reference internal" href="#recipes-deferring-an-event-state"><span class="std std-ref">Defer and Recall an event</span></a></li>
 <li><a class="reference internal" href="#recipes-what-a-state-does-and-how-to-structure-it"><span class="std std-ref">A Deeper look at state methods</span></a></li>
-<li><span class="xref std std-ref">Creating a statechart from a template</span></li>
+<li><a class="reference internal" href="#recipes-creating-a-state-method-from-a-template"><span class="std std-ref">Creating a statechart from a template</span></a></li>
 <li><a class="reference internal" href="#recipes-creating-a-state-method-from-a-factory"><span class="std std-ref">Creating a statechart from a factory</span></a></li>
 </ul>
 <div class="section" id="what-a-state-does-and-how-to-structure-it">
@@ -810,64 +810,59 @@ reaction to it.</p>
 <p>To have the library create your state methods for you:</p>
 <ol class="arabic simple">
 <li><a class="reference internal" href="#recipes-factory-1"><span class="std std-ref">Import the correct items from the miros library</span></a></li>
-<li><a class="reference internal" href="#recipes-factory-2"><span class="std std-ref">Create a set of states from the miros factory.</span></a></li>
-<li><a class="reference internal" href="#recipes-factory-3"><span class="std std-ref">Create callback functions which you will link into the chart</span></a></li>
-<li><a class="reference internal" href="#recipes-factory-4"><span class="std std-ref">Create an active object, and link it to your state handler</span></a></li>
-<li><a class="reference internal" href="#recipes-factory-5"><span class="std std-ref">Register callbacks to each of your events.</span></a></li>
-<li><a class="reference internal" href="#recipes-factory-6"><span class="std std-ref">Relate your states to one another by assigning them parents</span></a></li>
-<li><a class="reference internal" href="#recipes-factory-7"><span class="std std-ref">Start up the active object in the desired state</span></a></li>
+<li><a class="reference internal" href="#recipes-factory-2"><span class="std std-ref">Create the statechart’s event callback methods</span></a></li>
+<li><a class="reference internal" href="#recipes-factory-3"><span class="std std-ref">Create a factory object</span></a></li>
+<li><a class="reference internal" href="#recipes-factory-4"><span class="std std-ref">Build up your statemethods using the factory object</span></a></li>
+<li><a class="reference internal" href="#recipes-factory-5"><span class="std std-ref">Add the hierarchy information to your factory object</span></a></li>
+<li><a class="reference internal" href="#recipes-factory-6"><span class="std std-ref">Start your statechart in the desired state</span></a></li>
 </ol>
 <div align="center" class="align-center"><img alt="_images/factory2.svg" src="_images/factory2.svg" /></div>
 <p id="recipes-factory-1">Import the correct items from the miros library:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">state_method_factory</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">Factory</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
 </pre></div>
 </div>
-<p id="recipes-factory-2">Create a set of states from the miros factory:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">tc2_s1</span> <span class="o">=</span> <span class="n">state_method_factory</span><span class="p">(</span><span class="s1">&#39;tc2_s1&#39;</span><span class="p">)</span>
-<span class="n">tc2_s2</span> <span class="o">=</span> <span class="n">state_method_factory</span><span class="p">(</span><span class="s1">&#39;tc2_s2&#39;</span><span class="p">)</span>
-<span class="n">tc2_s3</span> <span class="o">=</span> <span class="n">state_method_factory</span><span class="p">(</span><span class="s1">&#39;tc2_s3&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p id="recipes-factory-3">Create callback functions which you will link into your chart:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">trans_to_c2_s1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">tc2_s1</span><span class="p">)</span>
+<p id="recipes-factory-2">Create the statechart’s event callback methods:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># the statechart&#39;s event callback methods</span>
+<span class="k">def</span> <span class="nf">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">trans_to_c2_s3</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">tc2_s3</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc1</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">trans_to_c2_s2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">tc2_s2</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">handled</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="k">def</span> <span class="nf">trans_to_fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc2</span><span class="p">)</span>
 </pre></div>
 </div>
-<p id="recipes-factory-4">Create an active object and link it to your state handler:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<p id="recipes-factory-3">Create your statechart using the <code class="docutils literal"><span class="pre">Factory</span></code> class.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Factory is a type of ActiveObject, so it will have it&#39;s methods</span>
+<span class="n">chart</span> <span class="o">=</span> <span class="n">Factory</span><span class="p">(</span><span class="s1">&#39;factory_class_example&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p id="recipes-factory-5">Register callbacks to each of your events:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc2_s1</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">,</span> <span class="n">trans_to_c2_s1</span><span class="p">)</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc2_s1</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span> <span class="n">handled</span><span class="p">)</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc2_s1</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>  <span class="n">handled</span><span class="p">)</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc2_s1</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>  <span class="n">trans_to_c2_s2</span><span class="p">)</span>
+<p id="recipes-factory-4">Create the state methods and describe how you want to react to different
+signals.  Then turn it it into a method.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">fc</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fc&#39;</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fc</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fc1</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">to_method</span><span class="p">()</span>
 
-<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc2_s2</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">trans_to_c2_s3</span><span class="p">)</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc2_s2</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>  <span class="n">handled</span><span class="p">)</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc2_s2</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>  <span class="n">handled</span><span class="p">)</span>
+<span class="n">fc1</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fc1&#39;</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fc2</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">to_method</span><span class="p">()</span>
 
-<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc2_s3</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">trans_to_c2_s2</span><span class="p">)</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc2_s3</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span> <span class="n">handled</span><span class="p">)</span>
+<span class="n">fc2</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fc2&#39;</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fc1</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">to_method</span><span class="p">()</span>
 </pre></div>
 </div>
-<p id="recipes-factory-6">Relate your states to one another by assigning them to parents:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">tc2_s1</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">top</span><span class="p">)</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">tc2_s2</span><span class="p">,</span> <span class="n">tc2_s1</span><span class="p">)</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">tc2_s3</span><span class="p">,</span> <span class="n">tc2_s1</span><span class="p">)</span>
+<p id="recipes-factory-5">Add the hierarchy information to your state methods:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">chart</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span>  <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="n">fc1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">fc</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="n">fc2</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">fc</span><span class="p">)</span>
 </pre></div>
 </div>
-<p id="recipes-factory-7">Start up the active object in the desired state:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">tc2_s2</span><span class="p">)</span>
+<p id="recipes-factory-6">Start your statechart in the desired state.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">chart</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><a class="reference internal" href="#recipes-state-recipes"><span class="std std-ref">Then all of you usual state recipes apply</span></a>.</p>
@@ -914,7 +909,7 @@ have to explicitly define them.</p>
 signals read <a class="reference internal" href="#recipes-seeing-your-signals"><span class="std std-ref">this</span></a>.</p>
 </div>
 <div class="section" id="posting-events">
-<span id="id3"></span><h3>Posting Events<a class="headerlink" href="#posting-events" title="Permalink to this headline">¶</a></h3>
+<span id="id2"></span><h3>Posting Events<a class="headerlink" href="#posting-events" title="Permalink to this headline">¶</a></h3>
 <p>The Active Object <code class="docutils literal"><span class="pre">post_fifo</span></code>, <code class="docutils literal"><span class="pre">post_lifo</span></code>, <code class="docutils literal"><span class="pre">defer</span></code> and <code class="docutils literal"><span class="pre">recall</span></code>
 methods are use to feed events to the statechart.  An Event can be thought of
 as a kind of named marble that is placed onto a topological map.  If a
@@ -1075,7 +1070,7 @@ when you would need your heart beat event signal to barge ahead of all other
 events waiting to be processed by the active object.</p>
 </div>
 <div class="section" id="cancelling-a-specific-event-source">
-<span id="id4"></span><h3>Cancelling a Specific Event Source<a class="headerlink" href="#cancelling-a-specific-event-source" title="Permalink to this headline">¶</a></h3>
+<span id="id3"></span><h3>Cancelling a Specific Event Source<a class="headerlink" href="#cancelling-a-specific-event-source" title="Permalink to this headline">¶</a></h3>
 <p>The requests to the <code class="docutils literal"><span class="pre">post_fifo</span></code> and <code class="docutils literal"><span class="pre">post_lifo</span></code> methods, where <code class="docutils literal"><span class="pre">times</span></code> are
 specified, can be thought of as event sources.  This is because they create
 background threads which track time and periodically post events to the active
@@ -1178,7 +1173,7 @@ Object can just look at all of the event source threads and kill any of them
 that have this signal name provided to the <code class="docutils literal"><span class="pre">cancel_events</span></code> call.</p>
 </div>
 <div class="section" id="recipes-deferring-an-event">
-<span id="id5"></span><h3>Deferring and Recalling An Event<a class="headerlink" href="#recipes-deferring-an-event" title="Permalink to this headline">¶</a></h3>
+<span id="id4"></span><h3>Deferring and Recalling An Event<a class="headerlink" href="#recipes-deferring-an-event" title="Permalink to this headline">¶</a></h3>
 <p>There will be situations where you want to post a kind of artificial event into
 a queue which won’t immediately be acted upon by your startchart.  It is an
 <cite>artificial</cite> event, because your chart is making it up, it isn’t being given to
@@ -1199,7 +1194,7 @@ reaction to it.</p>
 </div>
 </div>
 <div class="section" id="seeing-what-is-going-on">
-<span id="id6"></span><h2>Seeing What is Going On<a class="headerlink" href="#seeing-what-is-going-on" title="Permalink to this headline">¶</a></h2>
+<span id="id5"></span><h2>Seeing What is Going On<a class="headerlink" href="#seeing-what-is-going-on" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="determining-the-current-state">
 <span id="recipes-determining-the-current-state"></span><h3>Determining the Current State<a class="headerlink" href="#determining-the-current-state" title="Permalink to this headline">¶</a></h3>
 <p>To see what state your chart is in:</p>

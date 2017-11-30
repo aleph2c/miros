@@ -802,12 +802,11 @@ Creating a Statechart From a Factory
 To have the library create your state methods for you:
 
 1. :ref:`Import the correct items from the miros library<recipes-factory-1>`
-2. :ref:`Create a set of states from the miros factory.<recipes-factory-2>`
-3. :ref:`Create callback functions which you will link into the chart<recipes-factory-3>`
-4. :ref:`Create an active object, and link it to your state handler<recipes-factory-4>`
-5. :ref:`Register callbacks to each of your events.<recipes-factory-5>`
-6. :ref:`Relate your states to one another by assigning them parents<recipes-factory-6>`
-7. :ref:`Start up the active object in the desired state<recipes-factory-7>`
+2. :ref:`Create the statechart's event callback methods<recipes-factory-2>`
+3. :ref:`Create a factory object<recipes-factory-3>`
+4. :ref:`Build up your statemethods using the factory object<recipes-factory-4>`
+5. :ref:`Add the hierarchy information to your factory object<recipes-factory-5>`
+6. :ref:`Start your statechart in the desired state<recipes-factory-6>`
 
 .. image:: _static/factory2.svg
     :align: center
@@ -818,84 +817,72 @@ Import the correct items from the miros library:
 
 .. code-block:: python
 
-  from miros.hsm import state_method_factory
-.. _recipes-creating-a-state-method-from-a-template:
-  from miros.activeobject import ActiveObject
+  from miros.activeobject import Factory
   from miros.event import signals, Event, return_status
 
 .. _recipes-factory-2:
 
-Create a set of states from the miros factory:
+Create the statechart's event callback methods:
 
 .. code-block:: python
 
-  tc2_s1 = state_method_factory('tc2_s1')
-  tc2_s2 = state_method_factory('tc2_s2')
-  tc2_s3 = state_method_factory('tc2_s3')
+  # the statechart's event callback methods
+  def trans_to_fc(chart, e):
+    return chart.trans(fc)
+
+  def trans_to_fc1(chart, e):
+    return chart.trans(fc1)
+
+  def trans_to_fc2(chart, e):
+    return chart.trans(fc2)
 
 .. _recipes-factory-3:
 
-Create callback functions which you will link into your chart:
+Create your statechart using the ``Factory`` class.
 
 .. code-block:: python
 
-  def trans_to_c2_s1(chart, e):
-    return chart.trans(tc2_s1)
-
-  def trans_to_c2_s3(chart, e):
-    return chart.trans(tc2_s3)
-
-  def trans_to_c2_s2(chart, e):
-    return chart.trans(tc2_s2)
-
-  def handled(chart, e):
-    return return_status.HANDLED
+  # Factory is a type of ActiveObject, so it will have it's methods
+  chart = Factory('factory_class_example')
 
 .. _recipes-factory-4:
 
-Create an active object and link it to your state handler:
+Create the state methods and describe how you want to react to different
+signals.  Then turn it it into a method.
 
 .. code-block:: python
 
-  ao = ActiveObject()
+  fc = chart.create(state='fc'). \
+    catch(signal=signals.B, handler=trans_to_fc). \
+    catch(signal=signals.INIT_SIGNAL, handler=trans_to_fc1). \
+    to_method()
+
+  fc1 = chart.create(state='fc1'). \
+    catch(signal=signals.A, handler=trans_to_fc2). \
+    to_method()
+
+  fc2 = chart.create(state='fc2'). \
+    catch(signal=signals.A, handler=trans_to_fc1). \
+    to_method()
 
 .. _recipes-factory-5:
 
-Register callbacks to each of your events:
+Add the hierarchy information to your state methods:
 
 .. code-block:: python
 
-  ao.register_signal_callback(tc2_s1, signals.BB, trans_to_c2_s1)
-  ao.register_signal_callback(tc2_s1, signals.ENTRY_SIGNAL, handled)
-  ao.register_signal_callback(tc2_s1, signals.EXIT_SIGNAL,  handled)
-  ao.register_signal_callback(tc2_s1, signals.INIT_SIGNAL,  trans_to_c2_s2)
-
-  ao.register_signal_callback(tc2_s2, signals.A, trans_to_c2_s3)
-  ao.register_signal_callback(tc2_s2, signals.EXIT_SIGNAL,  handled)
-  ao.register_signal_callback(tc2_s2, signals.INIT_SIGNAL,  handled)
-
-  ao.register_signal_callback(tc2_s3, signals.A, trans_to_c2_s2)
-  ao.register_signal_callback(tc2_s3, signals.ENTRY_SIGNAL, handled)
+  chart.nest(fc,  parent=None). \
+        nest(fc1, parent=fc). \
+        nest(fc2, parent=fc)
 
 
 .. _recipes-factory-6:
 
-Relate your states to one another by assigning them to parents:
+Start your statechart in the desired state.
 
 .. code-block:: python
 
-  ao.register_parent(tc2_s1, ao.top)
-  ao.register_parent(tc2_s2, tc2_s1)
-  ao.register_parent(tc2_s3, tc2_s1)
-
-.. _recipes-factory-7:
-
-
-Start up the active object in the desired state:
-
-.. code-block:: python
-
-  ao.start_at(tc2_s2)
+  chart.start_at(fc)
 
 :ref:`Then all of you usual state recipes apply<recipes-state-recipes>`.
 
