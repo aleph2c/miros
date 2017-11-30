@@ -1,53 +1,54 @@
 *Factory*
 = Observe =
   *What defines Success?*
-  
+
   Have a simple and concise way to generate active objects without a lot of
   boiler plate code.
-  
+
   The technique should allow for outside files to reach in and add hooks to an
   existing state chart so that they can listen for specific events.
-  
+
   This will be extremely useful for testing, and for decoupling a chart from
   the rest of a design.
-  
+
   Moreover, the technique should be easy to explain, use and reflect upon.
 
   *What is the problem?*
   There is too much boiler plate in the traditional approach, but we want to be
   able to keep this approach too.
-  
-  If the factory gets too heavy it will become very hard to debug a problem.
+
+  If the factory gets too heavy it will become very hard to debug.
+
   (this happened in miros 1.0).  It's very difficult to make, so imagine how hard
   it will be to debug.  It has to be extremely easy to unwind the factory code
   into something that can be a flat drop in replacement so that you can debug
-  it without being a super genius.
-  
+  it without being a super-genius.
+
   Things are already scary enough with the event processor.  The solution has
   to be simple enough that an application programmer can debug their code.
 
   *Evidence that contradicts Assumptions:*
-  
+
 = Orient =
   *Symptoms:*
-  
+
   *Questions for Factory:*
     Can you just write the code, then include it?
     What do other people have to say about factories? [Complicated messes.]
-    What do other people have to say about Python macros?  [Suggest against them]
+    What do other people have to say about Python templates?  [Warn against them]
 
   *Assumptions:*
     That it is worth the effort
     It has to be simple to use and debug
     It has to be simple to unwind a design
     It must be easy to explain
-    
+
 = Decide =
 
   *Ideas/Hypotheses for Factory: >=5*
   * [ ] Use a context manager and a closure to write the functions
   * [ ] Literally write the functions into a different file, then include that
-        file, and begin that file at the required state.
+        file, and begin that file at the required state.[bad idea]
   * [ ] Fusion, have the ability to have both (breaking DRY)
   * [X] Create a to_code, which will output the boiler plate function as a string
   * [ ] Specifically provide the return type for a fn handler for a event
@@ -67,10 +68,12 @@
         instrumentation around your approach so that in the future you can make
         sense of things without having to spend hours getting the design back
         into your head.
+  * [ ] Wrap a Factory around your templates... use the factory to provide the
+        syntax you are looking for.
 
   *Chosen Idea/Hypothesis*
     Create an example of a way to add event handling to an existing method
-    after it has been written, add this to the recipes.    
+    after it has been written, add this to the recipes.
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
 
