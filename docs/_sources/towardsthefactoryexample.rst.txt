@@ -463,7 +463,7 @@ The Factory class wraps the ``register_signal_callback`` and
 ``register_parent`` described in the previous section making syntax that is a
 bit more concise.
 
-.. image:: _static/factory4.svg
+.. image:: _static/factory5.svg
     :align: center
 
 Here is how you could implement this statechart with the ``Factory`` class:

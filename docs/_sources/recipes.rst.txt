@@ -31,8 +31,9 @@ There are different ways to create states with miros:
 
 3. You can use a fusion technique.  You can hand write a state and use context
    managers within the method so that the miros package can register callbacks
-   for specific signals, or even change it's parent at run time. [fusion
-   states]
+   for specific signals, or even change it's parent at run time.
+
+4. :ref:`You can use an Active Object Factory to create your statechart<recipes-creating-a-state-method-from-a-factory>`
 
 .. _recipes-state-recipes:
 
@@ -64,7 +65,7 @@ They contain information about how a state should react to an event and they
 contain information about how they relate to other states.  They do not
 explicitly create the behavior that you expect from your statechart, this is
 done by an event processor.  An event processor is created when you instantiate
-an active object. It is the thing that calls the state methods over and over
+an active object and it is the thing that calls the state methods over and over
 again to manifest the expected behavior.
 
 When an active object uses its ``start_at`` method, it connects your state
@@ -95,52 +96,60 @@ called in the background when you use methods like ``start_at``, ``post_fifo``
 or ``post_lifo``.
 
 The event processor treats a state method as if it was defined within its own
-class.  It does this by using its ``self`` variable in the first argument in
+class.  It does this by using its ``self`` variable in the first argument to
 the state method call.  It then injects the event into the second argument to
-see what the state method will do about it.  The state method communicates
-back, by adjusting internal attributes on the ``self`` variable of the thing
-searching it and by returning a status value as it reacts to the events.
+see what the state method will do about it.  
 
-This means that state methods themselves are stateless.  They do not keep
-internal variables, they only react and tweak the variable states of the
-objects that were given to them as input arguments.  It is the ``self``
-variable of the outside caller that has new information impressed upon it.
-This is how state methods stay polyamorous.
+The state method communicates back to it's currently connected event processor
+in two different ways.  It adjusts internal attributes on this ``self``
+variable of the thing searching it and by returning a status value.  The first
+argument of your state method does not have to be written as ``self``, it can
+be called anything.  If it is called ``chart`` or ``hsm``, it makes no
+difference to how it will actually be used by the event processor.
+
+State methods themselves are stateless.  They do not keep internal variables,
+they only react and tweak the variable states of the objects that were given to
+them as input arguments.  It is the ``self`` variable of the outside caller
+that has new information impressed upon it.  This is how state methods stay
+polyamorous.
 
 The states contain a place to anchor your application code.  They also provide
 information about the design topology of your chart.  They describe their
 parent state and they describe how some events can cause transitions to other
 state methods. That's it.  There is no full picture described in a table or in
-any other data structure.  The picture is actually written into the interaction
-between your state method descriptions and the event processor's reaction to
-them.
+any other data structure.  The picture is actually written in the interaction
+of your state method code and the event processor calling it.
 
-The event processor remembers which state method is it's current state and
-which state it is targeting.  When it is given an event, it calls it's current
-state method with the event and listens to its response.  If your state method
-doesn't know what to do with an event, it just has to set the targeted state of
-the event processor to its parent state and then return
-``return_status.SUPER``.  This will cause the event processor to call the
-parent state method with the same event.
+For this reason an event processor can call your state method many times while
+it is trying to discover how your statechart is structured.  It does this
+during the ``start_at`` call, or when a ``post_fifo`` or ``post_lifo`` method
+is called with an event.
 
-Another way for the parent to be called with the same event is if your state
-method returns an ``UNHANDLED`` result. This will cause the event processor to
-send a ``SEARCH_FOR_SUPER_SIGNAL`` into your state method.  This will land in
-your ``else`` clause, revealing the information about it's parent state to the
-event processor.  The event processor will use this same signal any time it needs to
-learn about your state chart, and for this reason you should never explicitly
-handle ``SEARCH_FOR_SUPER_SIGNAL``.
+As an application developer you don't have to care about `how` the event
+processor does its job you just need to tell it `what` to do.  You
+need to take your picture and turn it into code.  This is done by writing one
+state method at a time; linking them together with hierarchy and arrows.
 
-For a state chart to reveal it's parent state, it must do the following two
-things in its ``else`` clause:
+To make an arrow is fairly straight forward.  You just use the ``trans``
+method with your target state as an argument.  This is easy to code.
 
-1.  set ``self.temp.fun`` to point to it's parent state method
+.. image:: _static/stateapplicationcode3.svg
+    :align: center
+
+To describe the hierarchy is a little bit more subtle.
+
+All state methods must reveal their parent information.  They do this by using
+an if-elif-else and placing the parent information in the ``else`` clause.  It
+does this as a kind of default arrow for all events it doesn't know how to
+react to, to the next-outer-most-state.  In this ``else`` clause it:
+
+1.  sets ``self.temp.fun`` of the event processor to point to it's parent state method
 2.  return the value of ``return_status.SUPER``
 
 .. image:: _static/stateapplicationcode1.svg
     :align: center
 
-For the outermost state of your state chart you set the parent to ``self.top``.
+For the outermost state of your state chart you set the parent  to ``self.top``.
 This state method is actually defined within the event processor and when it
 sees this state it knows that it is about to fall of the edge of your map.
 
@@ -150,16 +159,9 @@ If your parent state isn't the outer most state, you would just set the
 .. image:: _static/stateapplicationcode2.svg
     :align: center
 
-Here we see how the state method ``c1`` would tell the event processor that
-it's parent state is ``c``.
-
-In the case that you would like your chart to transition to another state, you
-would use the ``trans`` method.
-
-.. image:: _static/stateapplicationcode3.svg
-    :align: center
-
-Now let's look at the full code for this diagram:
+Now that we understand how state methods relate to each other and to event
+processors let's look at a simple example to see how the pictures relate to
+working code.
 
 .. image:: _static/eventprocessors.svg
     :align: center
@@ -808,7 +810,7 @@ To have the library create your state methods for you:
 5. :ref:`Add the hierarchy information to your factory object<recipes-factory-5>`
 6. :ref:`Start your statechart in the desired state<recipes-factory-6>`
 
-.. image:: _static/factory4.svg
+.. image:: _static/factory5.svg
     :align: center
 
 .. _recipes-factory-1:
