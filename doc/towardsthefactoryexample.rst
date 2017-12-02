@@ -768,3 +768,5 @@ If we run this code, we see that it behaves properly:
 Metaprogramming is easy on the person who first writes the code and very hard
 on those that have to maintain or extend the design.  Like anything else,
 whether it should be done or not is dependent upon the engineering trade offs.
+
+:ref:`back to examples <examples>`

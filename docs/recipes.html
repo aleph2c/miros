@@ -24,7 +24,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Reflection" href="reflection.html" />
-    <link rel="prev" title="Using and Unwinding a Factory" href="towardsthefactoryexample.html" />
+    <link rel="prev" title="Interacting Statecharts" href="interactingcharts.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -46,8 +46,7 @@
 </div>
 <div class="section" id="states">
 <span id="recipes-states"></span><h2>States<a class="headerlink" href="#states" title="Permalink to this headline">¶</a></h2>
-<p>In the miros frame work, your state methods act as places to link your
-application code into designed behavior.</p>
+<p>In the miros frame work, your state methods act as places to link your application code into designed behavior.</p>
 <p>States need to:</p>
 <ol class="arabic simple">
 <li>React to events and run your application code.</li>
@@ -747,6 +746,7 @@ reaction to it.</p>
 <li><a class="reference internal" href="#recipes-template-5"><span class="std std-ref">Register callbacks to each of your events.</span></a></li>
 <li><a class="reference internal" href="#recipes-template-6"><span class="std std-ref">Relate your states to one another by assigning them parents</span></a></li>
 <li><a class="reference internal" href="#recipes-template-7"><span class="std std-ref">Start up the active object in the desired state</span></a></li>
+<li><a class="reference internal" href="#recipes-template-8"><span class="std std-ref">Debugging a templated state method</span></a></li>
 </ol>
 <div align="center" class="align-center"><img alt="_images/factory2.svg" src="_images/factory2.svg" /></div>
 <p id="recipes-template-1">Import the correct items from the miros library:</p>
@@ -804,6 +804,8 @@ reaction to it.</p>
 </pre></div>
 </div>
 <p><a class="reference internal" href="#recipes-state-recipes"><span class="std std-ref">Then all of you usual state recipes apply</span></a>.</p>
+<p id="recipes-template-8">If you need to debug or unwind your templated state methods, reference
+<a class="reference internal" href="#recipes-flatting-a-state-method"><span class="std std-ref">this</span></a>.</p>
 </div>
 <div class="section" id="creating-a-statechart-from-a-factory">
 <span id="recipes-creating-a-state-method-from-a-factory"></span><h3>Creating a Statechart From a Factory<a class="headerlink" href="#creating-a-statechart-from-a-factory" title="Permalink to this headline">¶</a></h3>
@@ -815,6 +817,7 @@ reaction to it.</p>
 <li><a class="reference internal" href="#recipes-factory-4"><span class="std std-ref">Build up your statemethods using the factory object</span></a></li>
 <li><a class="reference internal" href="#recipes-factory-5"><span class="std std-ref">Add the hierarchy information to your factory object</span></a></li>
 <li><a class="reference internal" href="#recipes-factory-6"><span class="std std-ref">Start your statechart in the desired state</span></a></li>
+<li><a class="reference internal" href="#recipes-factory-7"><span class="std std-ref">Debugging a state method made from a factory</span></a></li>
 </ol>
 <div align="center" class="align-center"><img alt="_images/factory5.svg" src="_images/factory5.svg" /></div>
 <p id="recipes-factory-1">Import the correct items from the miros library:</p>
@@ -866,6 +869,8 @@ signals.  Then turn it it into a method.</p>
 </pre></div>
 </div>
 <p><a class="reference internal" href="#recipes-state-recipes"><span class="std std-ref">Then all of you usual state recipes apply</span></a>.</p>
+<p id="recipes-factory-7">If you need to debug or unwind your factor generated state methods, reference
+<a class="reference internal" href="#recipes-flatting-a-state-method"><span class="std std-ref">this</span></a>.</p>
 </div>
 </div>
 <div class="section" id="events-and-signals">
@@ -1399,9 +1404,39 @@ data at the tail end of its log.</p>
 </div>
 <div class="section" id="tracing-live">
 <span id="recipes-tracing-live"></span><h3>Tracing Live<a class="headerlink" href="#tracing-live" title="Permalink to this headline">¶</a></h3>
+<p>There are situations where you would like to see what an active object is doing
+while it is running.  Each active object has an attribute called
+<code class="docutils literal"><span class="pre">live_trace</span></code>.  By setting this attribute to <code class="docutils literal"><span class="pre">True</span></code> the active object will
+output it’s trace information to the terminal while it reacts to events:</p>
+<p>To turn on/off the live trace:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ao1</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="c1"># turn on the live trace</span>
+<span class="hll"><span class="n">ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+</span><span class="c1"># your code and state interactions here</span>
+<span class="c1"># live trace information will be displayed on the terminal</span>
+
+<span class="c1"># turn off the live trace</span>
+<span class="hll"><span class="n">ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span>
+</span></pre></div>
+</div>
 </div>
 <div class="section" id="spying-live">
 <span id="recipes-spying-live"></span><h3>Spying Live<a class="headerlink" href="#spying-live" title="Permalink to this headline">¶</a></h3>
+<p>There are situations where you would like to see what an active object is doing
+while it is running.  Each active object has an attribute called
+<code class="docutils literal"><span class="pre">live_spy</span></code>.  By setting this attribute to <code class="docutils literal"><span class="pre">True</span></code> the active object will
+output it’s spy information to the terminal while it reacts to events:</p>
+<p>To turn on/off the live spy:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ao1</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="c1"># turn on the live spy</span>
+<span class="hll"><span class="n">ao1</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
+</span><span class="c1"># your code and state interactions here</span>
+<span class="c1"># live spy information will be displayed on the terminal</span>
+
+<span class="c1"># turn off the live spy</span>
+<span class="hll"><span class="n">ao1</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span>
+</span></pre></div>
+</div>
 </div>
 <div class="section" id="scribble-on-the-spy">
 <span id="recipes-scribble-on-the-spy"></span><h3>Scribble On the Spy<a class="headerlink" href="#scribble-on-the-spy" title="Permalink to this headline">¶</a></h3>
@@ -1874,7 +1909,7 @@ specification.</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="towardsthefactoryexample.html" title="previous chapter">Using and Unwinding a Factory</a></li>
+      <li>Previous: <a href="interactingcharts.html" title="previous chapter">Interacting Statecharts</a></li>
       <li>Next: <a href="reflection.html" title="next chapter">Reflection</a></li>
   </ul></li>
 </ul>

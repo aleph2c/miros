@@ -13,5 +13,5 @@ Examples
    postingexample
    scribbleexample
    towardsthefactoryexample
-
+   interactingcharts
 

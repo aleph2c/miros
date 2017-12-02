@@ -1051,3 +1051,4 @@ Then the answer to the question would just reveal itself from your imagined diag
 .. _Practical UML Statecharts in C/C++ Second Edition: https://www.amazon.ca/Practical-UML-Statecharts-Event-Driven-Programming/dp/0750687061/ref=sr_1_1?s=books&ie=UTF8&qid=1510515714&sr=1-1&dpID=51Uq%252BHZ9L-L&preST=_SX198_BO1,204,203,200_QL40_&dpSrc=srch
 
 .. [#f1] The S1 rectangle containing the two small rectangles with a line between them is short hand for a composite state 
+

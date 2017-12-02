@@ -11,8 +11,7 @@ Recipes
 
 States
 ------
-In the miros frame work, your state methods act as places to link your
-application code into designed behavior.
+In the miros frame work, your state methods act as places to link your application code into designed behavior.
 
 States need to:
 
@@ -707,6 +706,8 @@ To have the library create your state methods for you:
 5. :ref:`Register callbacks to each of your events.<recipes-template-5>`
 6. :ref:`Relate your states to one another by assigning them parents<recipes-template-6>`
 7. :ref:`Start up the active object in the desired state<recipes-template-7>`
+8. :ref:`Debugging a templated state method<recipes-template-8>`
+
 
 .. image:: _static/factory2.svg
     :align: center
@@ -797,6 +798,11 @@ Start up the active object in the desired state:
 
 :ref:`Then all of you usual state recipes apply<recipes-state-recipes>`.
 
+.. _recipes-template-8:
+
+If you need to debug or unwind your templated state methods, reference
+:ref:`this<recipes-flatting-a-state-method>`.
+
 .. _recipes-creating-a-state-method-from-a-factory:
 
 Creating a Statechart From a Factory
@@ -809,6 +815,7 @@ To have the library create your state methods for you:
 4. :ref:`Build up your statemethods using the factory object<recipes-factory-4>`
 5. :ref:`Add the hierarchy information to your factory object<recipes-factory-5>`
 6. :ref:`Start your statechart in the desired state<recipes-factory-6>`
+7. :ref:`Debugging a state method made from a factory<recipes-factory-7>`
 
 .. image:: _static/factory5.svg
     :align: center
@@ -888,7 +895,13 @@ Start your statechart in the desired state.
 
 :ref:`Then all of you usual state recipes apply<recipes-state-recipes>`.
 
+.. _recipes-factory-7:
+
+If you need to debug or unwind your factor generated state methods, reference
+:ref:`this<recipes-flatting-a-state-method>`.
+
 .. _recipes-events-and-signals:
+
 
 Events And Signals
 ------------------
@@ -1184,11 +1197,48 @@ Using the Spy
 
 Tracing Live
 ^^^^^^^^^^^^
+There are situations where you would like to see what an active object is doing
+while it is running.  Each active object has an attribute called
+``live_trace``.  By setting this attribute to ``True`` the active object will
+output it's trace information to the terminal while it reacts to events:
+
+To turn on/off the live trace:
+
+.. code-block:: python
+  :emphasize-lines: 3,8
+
+  ao1 = ActiveObject()
+  # turn on the live trace
+  ao1.live_trace = True
+  # your code and state interactions here
+  # live trace information will be displayed on the terminal
+
+  # turn off the live trace
+  ao1.live_trace = False
 
 .. _recipes-spying-live:
 
 Spying Live
 ^^^^^^^^^^^
+
+There are situations where you would like to see what an active object is doing
+while it is running.  Each active object has an attribute called
+``live_spy``.  By setting this attribute to ``True`` the active object will
+output it's spy information to the terminal while it reacts to events:
+
+To turn on/off the live spy:
+
+.. code-block:: python
+  :emphasize-lines: 3,8
+
+  ao1 = ActiveObject()
+  # turn on the live spy
+  ao1.live_spy = True
+  # your code and state interactions here
+  # live spy information will be displayed on the terminal
+
+  # turn off the live spy
+  ao1.live_spy = False
 
 .. _recipes-scribble-on-the-spy:
 
