@@ -31,7 +31,7 @@ There are different ways to create states with miros:
    callback responses to specific events and set a parent at
    runtime.<recipes-creating-a-state-method-from-a-template>`
 
-3. You can use a fusion technique.  You can hand write a state and use context
+3. You can use a fusion technique.  You can hand write a :term:`state<State>` and use context
    managers within the method so that the miros package can register callbacks
    for specific signals, or even change it's parent at run time.
 

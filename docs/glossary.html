@@ -1,0 +1,137 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Glossary &#8212; miros 2.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Architecture" href="architecture.html" />
+    <link rel="prev" title="Testing" href="testing.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="glossary">
+<span id="glossary-glossary"></span><h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h1>
+<dl class="glossary docutils">
+<dt id="term-event">Event</dt>
+<dd>Any action in the world that your program cares about.  It can be triggered
+by a user, an instrument or internally by your own design.  Your program
+will notice, then react to this event by running a subset of your design to
+manifest the behavior described in the specification.  An event is often
+named something.  This name is called a signal.  An event can also carry a
+payload, which can be any data object describable by Python.</dd>
+<dt id="term-fsm">FSM</dt>
+<dd>Finite State Machine: a <a class="reference internal" href="#term-state-machine"><span class="xref std std-term">state machine</span></a> without hierarchy.</dd>
+<dt id="term-hsm">HSM</dt>
+<dd>Hierarchical State Machine: a state machine where states can exit within
+other states.  An outer state is called a parent state and an inner state
+is called a child state.  In an HSM all child states share the behavior of
+the parents states unless this behavior is over-written by the designer.</dd>
+<dt id="term-payload">Payload</dt>
+<dd>A data object that has been injected into an Event.  It is intended to be
+used by the consumer of the event.</dd>
+<dt id="term-pseudostate">Pseudostate</dt>
+<dd>Awkward language describing icons that aren’t transitions or states in a
+statechart diagram.</dd>
+<dt id="term-signal">Signal</dt>
+<dd>A name of an event.  Signals can be shared between many different events
+and they are used by state methods to determine how they should react to a
+given event when it is called by the Event Processor.</dd>
+<dt id="term-state">State</dt>
+<dd>Defines the current operating condition of a program.  In the Harel
+Formalism, a state would map to a particular rounded rectangle in your
+state diagram.</dd>
+<dt id="term-state-machine">State Machine</dt>
+<dd>A program which uses <a class="reference internal" href="#term-state"><span class="xref std std-term">states</span></a> and <a class="reference internal" href="#term-event"><span class="xref std std-term">events</span></a> to
+determine how it should react to information coming to it in an
+asynchronous manner.</dd>
+<dt id="term-state-method">State Method</dt>
+<dd>The code used to describe a <a class="reference internal" href="#term-state"><span class="xref std std-term">state</span></a>.  They can be hand coded,
+built using a template or described within a Factory.</dd>
+</dl>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
+  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
+</a></p><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="testing.html" title="previous chapter">Testing</a></li>
+      <li>Next: <a href="architecture.html" title="next chapter">Architecture</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/glossary.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Scott Volk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/glossary.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -19,6 +19,7 @@
    reflection
    patterns
    testing
+   glossary
    architecture
 
 Indices and tables
