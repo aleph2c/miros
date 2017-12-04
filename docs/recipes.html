@@ -44,6 +44,7 @@
 <span id="id1"></span><h1>Recipes<a class="headerlink" href="#recipes" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<p><strong>Simple things should be simple, complex things should be possible.</strong> – <em>Alan Kay</em></p>
 <div class="section" id="states">
 <span id="recipes-states"></span><h2>States<a class="headerlink" href="#states" title="Permalink to this headline">¶</a></h2>
 <p>In the miros frame work, your state methods act as places to link your application code into designed behavior.</p>
@@ -735,6 +736,28 @@ reaction to it.</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="create-a-guard">
+<span id="recipes-create-a-guard"></span><h3>Create a Guard<a class="headerlink" href="#create-a-guard" title="Permalink to this headline">¶</a></h3>
+<p>There will be situations where you only would like an event to cause a
+transition between two states if a condition is true.  This is called a guard,
+in UML it looks like this:</p>
+<div align="center" class="align-center"><img alt="_images/guard.svg" src="_images/guard.svg" /></div>
+<p>The logic between the square brackets must be true for this event to work.  In
+this case the <code class="docutils literal"><span class="pre">T</span></code> event is guarded, it can only cause a transition if the the
+function <code class="docutils literal"><span class="pre">g()</span></code> returns <code class="docutils literal"><span class="pre">True</span></code>, otherwise nothing will happen.</p>
+<p>The <code class="docutils literal"><span class="pre">t()</span></code> function is a function that runs if the <code class="docutils literal"><span class="pre">g()</span></code> returns True.</p>
+<p>To implement a guard in your state method is very straight forward, you use an
+if statement:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
+<span class="hll">  <span class="k">if</span> <span class="n">g</span><span class="p">():</span>
+</span>    <span class="n">t</span><span class="p">()</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="o">&lt;</span><span class="n">state_to_transition_to</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The highlighted code is the guard.</p>
+<p>To learn more about guards read the
+<a class="reference internal" href="scribbleexample.html#scribbleexample-hacking-to-learn-the-deeper-dynamics"><span class="std std-ref">hacking to learn example.</span></a></p>
+</div>
 <div class="section" id="creating-a-statechart-from-a-template">
 <span id="recipes-creating-a-state-method-from-a-template"></span><h3>Creating a Statechart From a Template<a class="headerlink" href="#creating-a-statechart-from-a-template" title="Permalink to this headline">¶</a></h3>
 <p>To have the library create your state methods for you:</p>
@@ -1178,7 +1201,7 @@ Object can just look at all of the event source threads and kill any of them
 that have this signal name provided to the <code class="docutils literal"><span class="pre">cancel_events</span></code> call.</p>
 </div>
 <div class="section" id="recipes-deferring-an-event">
-<span id="id4"></span><h3>Deferring and Recalling An Event<a class="headerlink" href="#recipes-deferring-an-event" title="Permalink to this headline">¶</a></h3>
+<span id="id4"></span><h3>Deferring and Recalling an Event<a class="headerlink" href="#recipes-deferring-an-event" title="Permalink to this headline">¶</a></h3>
 <p>There will be situations where you want to post a kind of artificial event into
 a queue which won’t immediately be acted upon by your startchart.  It is an
 <cite>artificial</cite> event, because your chart is making it up, it isn’t being given to
@@ -1194,6 +1217,24 @@ reaction to it.</p>
 <span class="c1"># code to place in the state where you would like the event reposted into</span>
 <span class="c1"># the chart&#39;s first in first out queue</span>
 <span class="n">chart</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span> <span class="c1"># posts our deferred event to the chart.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-a-payload-to-an-event">
+<span id="recipes-adding-a-payload-to-an-event"></span><h3>Adding a Payload to an Event<a class="headerlink" href="#adding-a-payload-to-an-event" title="Permalink to this headline">¶</a></h3>
+<p>To add a payload to your event:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">e</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">YOUR_SIGNAL_NAME</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="s2">&quot;My Payload&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="determining-if-an-event-has-a-payload">
+<span id="recipes-determining-if-an-event-has-a-payload"></span><h3>Determining if an Event Has a Payload<a class="headerlink" href="#determining-if-an-event-has-a-payload" title="Permalink to this headline">¶</a></h3>
+<p>To determine if an event has a payload:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">e1</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">YOUR_SIGNAL_NAME</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="s2">&quot;My Payload&quot;</span><span class="p">)</span>
+<span class="n">e2</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">YOUR_SIGNAL_NAME</span><span class="p">)</span>
+
+<span class="k">assert</span><span class="p">(</span><span class="n">e1</span><span class="o">.</span><span class="n">has_payload</span><span class="p">()</span> <span class="o">==</span> <span class="bp">True</span><span class="p">)</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">e2</span><span class="o">.</span><span class="n">has_payload</span><span class="p">()</span> <span class="o">==</span> <span class="bp">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1864,6 +1905,7 @@ specification.</p>
 <li><a class="reference internal" href="#create-a-multi-shot">Create a Multi-Shot</a></li>
 <li><a class="reference internal" href="#cancelling-events">Cancelling Events</a></li>
 <li><a class="reference internal" href="#deferring-and-recalling-an-event">Deferring and Recalling an Event</a></li>
+<li><a class="reference internal" href="#create-a-guard">Create a Guard</a></li>
 <li><a class="reference internal" href="#creating-a-statechart-from-a-template">Creating a Statechart From a Template</a></li>
 <li><a class="reference internal" href="#creating-a-statechart-from-a-factory">Creating a Statechart From a Factory</a></li>
 </ul>
@@ -1878,7 +1920,9 @@ specification.</p>
 <li><a class="reference internal" href="#creating-a-multishot-event">Creating a Multishot Event</a></li>
 <li><a class="reference internal" href="#cancelling-a-specific-event-source">Cancelling a Specific Event Source</a></li>
 <li><a class="reference internal" href="#cancelling-event-source-by-signal-name">Cancelling Event Source By Signal Name</a></li>
-<li><a class="reference internal" href="#recipes-deferring-an-event">Deferring and Recalling An Event</a></li>
+<li><a class="reference internal" href="#recipes-deferring-an-event">Deferring and Recalling an Event</a></li>
+<li><a class="reference internal" href="#adding-a-payload-to-an-event">Adding a Payload to an Event</a></li>
+<li><a class="reference internal" href="#determining-if-an-event-has-a-payload">Determining if an Event Has a Payload</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#seeing-what-is-going-on">Seeing What is Going On</a><ul>

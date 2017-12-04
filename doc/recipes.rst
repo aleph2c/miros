@@ -7,6 +7,9 @@ Recipes
    :maxdepth: 2
    :caption: Contents:
 
+
+**Simple things should be simple, complex things should be possible.** -- *Alan Kay*
+
 .. _recipes-states:
 
 States
@@ -693,6 +696,40 @@ Deferring and Recalling an Event
 
 .. include:: i_defer_and_recall.rst 
 
+
+.. _recipes-create-a-guard:
+
+Create a Guard
+^^^^^^^^^^^^^^
+There will be situations where you only would like an event to cause a
+transition between two states if a condition is true.  This is called a guard,
+in UML it looks like this:
+
+.. image:: _static/guard.svg
+    :align: center
+
+The logic between the square brackets must be true for this event to work.  In
+this case the ``T`` event is guarded, it can only cause a transition if the the
+function ``g()`` returns ``True``, otherwise nothing will happen.
+
+The ``t()`` function is a function that runs if the ``g()`` returns True.
+
+To implement a guard in your state method is very straight forward, you use an
+if statement:
+
+.. code-block:: python
+  :emphasize-lines: 2
+
+  elif(e.signal == signals.T):
+    if g():
+      t()
+      chart.trans(<state_to_transition_to)
+
+The highlighted code is the guard.
+
+To learn more about guards read the
+:ref:`hacking to learn example.<scribbleexample-hacking-to-learn-the-deeper-dynamics>`
+
 .. _recipes-creating-a-state-method-from-a-template:
 
 Creating a Statechart From a Template
@@ -1153,12 +1190,38 @@ that have this signal name provided to the ``cancel_events`` call.
 
 .. _recipes-deferring-an-event:
 
-Deferring and Recalling An Event
+Deferring and Recalling an Event
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: i_defer_and_recall.rst 
 
+.. _recipes-adding-a-payload-to-an-event:
+
+Adding a Payload to an Event
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To add a payload to your event:
+
+.. code-block:: python
+
+  e = Event(signal=signals.YOUR_SIGNAL_NAME, event="My Payload")
+
+.. _recipes-determining-if-an-event-has-a-payload:
+
+Determining if an Event Has a Payload
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To determine if an event has a payload:
+
+.. code-block:: python
+
+  e1 = Event(signal=signals.YOUR_SIGNAL_NAME, event="My Payload")
+  e2 = Event(signal=signals.YOUR_SIGNAL_NAME)
+
+  assert(e1.has_payload() == True)
+  assert(e2.has_payload() == False)
+
 .. _seeing_what_is_going_on:
+
+
 
 Seeing What is Going On
 -----------------------

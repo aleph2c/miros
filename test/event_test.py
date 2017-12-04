@@ -72,3 +72,10 @@ def test_automatic_construction_of_signals():
   it is referenced, it is invented'''
   e = Event(signal=signals.NOT_INVENTED_YET)
   assert(e.signal_name is 'NOT_INVENTED_YET')
+  assert(e.has_payload() is False)
+
+
+def test_if_event_can_take_payload():
+  e = Event(signal=signals.whatever, payload="Bob")
+  assert(e.has_payload() is True)
+  assert(e.payload == "Bob")

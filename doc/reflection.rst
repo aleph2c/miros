@@ -147,6 +147,12 @@ Testing with the Spy Output
 Live Output From Your Chart
 ---------------------------
 
+.. code-block:: python
+
+  ao1 = ActiveObject()
+  ao1.live_trace = True  # ao1 will output it's trace live to the terminal
+  ao1.live_spy = True    # ao1 will output it's spy live to the terminal
+
 .. _reflection-how-to-explain-your-design-to-others:
 
 How to Explain your Design to Others

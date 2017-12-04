@@ -188,12 +188,16 @@ class Event(OrderedDictWithParams):
   '''
   def __init__(self, signal, payload=None):
     global signals
+
+    self.payload = payload
+
     if signal in signals.values():
       self.signal = signal
       for key, value in signals.items():
         if value == signal:
           self.signal_name = key
           break
+
     elif isinstance(signal, str):
       signals.append(signal)
       self.signal_name = signal
@@ -202,3 +206,8 @@ class Event(OrderedDictWithParams):
     else:
       raise("signal must be of type string or Signal")
 
+  def has_payload(self):
+    result = True
+    if self.payload is None:
+      result = False
+    return result
