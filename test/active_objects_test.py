@@ -160,13 +160,16 @@ def test_start_stop_c(fabric_fixture):
 @pytest.mark.aos
 @pytest.mark.here
 def test_publish_subscribe(fabric_fixture):
-  c1 = ActiveObject()
-  c2 = ActiveObject()
-  b = ActiveObject()
+  c1 = ActiveObject("c1")
+  c2 = ActiveObject("c2")
+  b = ActiveObject("b")
   c1.subscribe(Event(signal=signals.BB))
   c2.subscribe(Event(signal=signals.BB))
   c1.subscribe(Event(signal=signals.CC))
   c2.subscribe(Event(signal=signals.CC))
+  b.live_trace = True
+  c1.live_trace = True
+  c2.live_trace = True
   c1.start_at(c2_s2)
   c2.start_at(c2_s2)
   b.start_at(b1_s2)

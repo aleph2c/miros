@@ -976,7 +976,7 @@ signal code before in our above example, this name would be added and assigned
 a unique number automatically.</p>
 </div>
 <div class="section" id="posting-an-event-to-the-lifo">
-<h3>Posting an Event to the Lifo<a class="headerlink" href="#posting-an-event-to-the-lifo" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-posting-an-event-to-the-lifo"></span><h3>Posting an Event to the LIFO<a class="headerlink" href="#posting-an-event-to-the-lifo" title="Permalink to this headline">¶</a></h3>
 <p>To post an event to the active object last-in-first-out (lifo) buffer, you
 must have first started your statechart.  Here is a simple example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
@@ -1239,8 +1239,93 @@ reaction to it.</p>
 </div>
 </div>
 </div>
-<div class="section" id="seeing-what-is-going-on">
-<span id="id5"></span><h2>Seeing What is Going On<a class="headerlink" href="#seeing-what-is-going-on" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="multiple-statecharts">
+<span id="recipes-multiple-statecharts"></span><span id="seeing-what-is-going-on"></span><h2>Multiple Statecharts<a class="headerlink" href="#multiple-statecharts" title="Permalink to this headline">¶</a></h2>
+<p>Break your design down into different interacting charts by using the
+ActiveFabric.</p>
+<p>The active fabric is a set of background tasks which act together to dispatch
+events between the active objects in your system.</p>
+<p>As a user of the software you wouldn’t touch the active fabric directly, but
+instead would use your active object’s <code class="docutils literal"><span class="pre">publish</span></code> and <code class="docutils literal"><span class="pre">subscribe</span></code> methods.  The
+active fabric has two different priority queues and two different tasks which
+pend upon them.  One is for managing subscriptions in a first in first (fifo)
+out manner, the other is for managing messages in a last in first out (lifo)
+manner.  By having two different queues and two different tasks an active
+object is given the option to subscribe to another active object’s published
+events, using one of two different strategies:</p>
+<ol class="arabic simple">
+<li>If it subscribes to an event using the <code class="docutils literal"><span class="pre">fifo</span></code> strategy, the active fabric
+will post events to it using its <a class="reference internal" href="#recipes-posting-an-event-to-the-fifo"><span class="std std-ref">post_fifo</span></a> method.</li>
+<li>If it subscribes in a <code class="docutils literal"><span class="pre">lifo</span></code> way it will post using the <a class="reference internal" href="#recipes-posting-an-event-to-the-lifo"><span class="std std-ref">post_lifo</span></a> method.</li>
+</ol>
+<p>You can also set the priority of the event while it is in transit within the
+active fabric.  This would only be useful if you are expecting contension
+between various events being dispatched across your system.</p>
+<div class="section" id="subscribing-to-an-event-posted-by-another-active-object">
+<span id="recipes-subscribing-to-an-event-posted-by-another-active-object"></span><h3>Subscribing to an Event Posted by Another Active Object<a class="headerlink" href="#subscribing-to-an-event-posted-by-another-active-object" title="Permalink to this headline">¶</a></h3>
+<p>Your active object can subscribe to events published by other active objects.</p>
+<p>An active object can set how the active fabric posts events to it.  If it would
+like a message to take priority over all other events waiting to be managed,
+you would use the <code class="docutils literal"><span class="pre">lifo</span></code> technique:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">subscribing_ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">),</span> <span class="n">queue_type</span><span class="o">=</span><span class="s1">&#39;lifo&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This approach would make sense if you were subscribed to a timed heart beat
+being sent out by another active object, or if this event was some sort of
+safety related thing.</p>
+<p>In most situations you can use the subscription defaults:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">subscribing_ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">)</span>
+<span class="c1"># which is the same as writing</span>
+<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">,</span>
+  <span class="n">queue_type</span><span class="o">=</span><span class="s1">&#39;fifo&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="publishing-events-to-other-active-objects">
+<span id="recipes-publishing-event-to-other-active-objects"></span><h3>Publishing events to other Active Objects<a class="headerlink" href="#publishing-events-to-other-active-objects" title="Permalink to this headline">¶</a></h3>
+<p>Your active object can communicate to other active objects in the system by
+publishing events.  There are two different threads in the active fabric
+object that manage this communication and they each have a priority queue.  A
+priority queue lets you post items into a queue with different priorities.  If
+one posted thing is higher than another, it will be pushed closer to the front of
+the queue.  The <code class="docutils literal"><span class="pre">publish</span></code> method has access to the same prioritization.  If
+you call it with a priority number it will pass this number in with the message
+that it is transmitting out to all of its subscribers.  The task will
+automatically arrange this message relative to all of the other
+events that are waiting in the queue.</p>
+<p>For an active object to publish an event to another active object (which has
+subscribed to the event):</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">publishing_ao</span> <span class="o">=</span> <span class="n">ActiveObect</span><span class="p">()</span>
+<span class="n">publishing_ao</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">)</span>
+
+<span class="c1"># or you can set the priority (1 is the highest priority see note):</span>
+<span class="n">publishing_ao</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span>
+  <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">NOTE:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+<p>The highest event priority corresponds to the number 1 and all higher numbers
+have lower priority.  If a number is higher than another it will have lower
+priority than the number it is greater than.  By default all published events
+are given a priority of 1000.  If two events have the same priority the queue
+will behave like a first in first out queue.</p>
+</div>
+</div>
+<div class="section" id="recipes-seeing-what-is">
+<span id="id5"></span><h2>Seeing What is Going On<a class="headerlink" href="#recipes-seeing-what-is" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="determining-the-current-state">
 <span id="recipes-determining-the-current-state"></span><h3>Determining the Current State<a class="headerlink" href="#determining-the-current-state" title="Permalink to this headline">¶</a></h3>
 <p>To see what state your chart is in:</p>
@@ -1915,7 +2000,7 @@ specification.</p>
 <li><a class="reference internal" href="#creating-a-signal">Creating a Signal</a></li>
 <li><a class="reference internal" href="#posting-events">Posting Events</a></li>
 <li><a class="reference internal" href="#posting-an-event-to-the-fifo">Posting an Event to the Fifo</a></li>
-<li><a class="reference internal" href="#posting-an-event-to-the-lifo">Posting an Event to the Lifo</a></li>
+<li><a class="reference internal" href="#posting-an-event-to-the-lifo">Posting an Event to the LIFO</a></li>
 <li><a class="reference internal" href="#creating-a-one-shot-event">Creating a One-Shot Event</a></li>
 <li><a class="reference internal" href="#creating-a-multishot-event">Creating a Multishot Event</a></li>
 <li><a class="reference internal" href="#cancelling-a-specific-event-source">Cancelling a Specific Event Source</a></li>
@@ -1925,7 +2010,12 @@ specification.</p>
 <li><a class="reference internal" href="#determining-if-an-event-has-a-payload">Determining if an Event Has a Payload</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#seeing-what-is-going-on">Seeing What is Going On</a><ul>
+<li><a class="reference internal" href="#multiple-statecharts">Multiple Statecharts</a><ul>
+<li><a class="reference internal" href="#subscribing-to-an-event-posted-by-another-active-object">Subscribing to an Event Posted by Another Active Object</a></li>
+<li><a class="reference internal" href="#publishing-events-to-other-active-objects">Publishing events to other Active Objects</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#recipes-seeing-what-is">Seeing What is Going On</a><ul>
 <li><a class="reference internal" href="#determining-the-current-state">Determining the Current State</a></li>
 <li><a class="reference internal" href="#seeing-what-signals-you-have-in-your-system">Seeing what Signals You Have In Your System</a></li>
 <li><a class="reference internal" href="#using-the-trace">Using the Trace</a></li>

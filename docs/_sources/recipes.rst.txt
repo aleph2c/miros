@@ -1041,8 +1041,11 @@ do not need to declare them.  If the system had not seen the ``signals.mary``
 signal code before in our above example, this name would be added and assigned
 a unique number automatically.
 
-Posting an Event to the Lifo
+.. _recipes-posting-an-event-to-the-lifo:
+
+Posting an Event to the LIFO
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 To post an event to the active object last-in-first-out (lifo) buffer, you
 must have first started your statechart.  Here is a simple example:
 
@@ -1222,6 +1225,103 @@ To determine if an event has a payload:
 .. _seeing_what_is_going_on:
 
 
+.. _recipes-multiple-statecharts:
+
+Multiple Statecharts
+--------------------
+Break your design down into different interacting charts by using the
+ActiveFabric.
+
+The active fabric is a set of background tasks which act together to dispatch
+events between the active objects in your system.
+
+As a user of the software you wouldn't touch the active fabric directly, but
+instead would use your active object's ``publish`` and ``subscribe`` methods.  The
+active fabric has two different priority queues and two different tasks which
+pend upon them.  One is for managing subscriptions in a first in first (fifo)
+out manner, the other is for managing messages in a last in first out (lifo)
+manner.  By having two different queues and two different tasks an active
+object is given the option to subscribe to another active object's published
+events, using one of two different strategies:
+
+1.  If it subscribes to an event using the ``fifo`` strategy, the active fabric
+    will post events to it using its :ref:`post_fifo<recipes-posting-an-event-to-the-fifo\>` method.
+2.  If it subscribes in a ``lifo`` way it will post using the :ref:`post_lifo<recipes-posting-an-event-to-the-lifo>` method.
+
+You can also set the priority of the event while it is in transit within the
+active fabric.  This would only be useful if you are expecting contension
+between various events being dispatched across your system.
+
+.. _recipes-subscribing-to-an-event-posted-by-another-active-object:
+
+Subscribing to an Event Posted by Another Active Object
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Your active object can subscribe to events published by other active objects.
+
+An active object can set how the active fabric posts events to it.  If it would
+like a message to take priority over all other events waiting to be managed,
+you would use the ``lifo`` technique:
+
+.. code-block:: python
+
+  subscribing_ao = ActiveObject()
+  subscribing_ao.subscribe(
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT), queue_type='lifo')
+
+This approach would make sense if you were subscribed to a timed heart beat
+being sent out by another active object, or if this event was some sort of
+safety related thing.
+
+In most situations you can use the subscription defaults:
+
+.. code-block:: python
+
+  subscribing_ao = ActiveObject()
+  subscribing_ao.subscribe(
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT)
+  # which is the same as writing
+  subscribing_ao.subscribe(
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT,
+    queue_type='fifo')
+
+.. _recipes-publishing-event-to-other-active-objects:
+
+Publishing events to other Active Objects
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Your active object can communicate to other active objects in the system by
+publishing events.  There are two different threads in the active fabric
+object that manage this communication and they each have a priority queue.  A
+priority queue lets you post items into a queue with different priorities.  If
+one posted thing is higher than another, it will be pushed closer to the front of
+the queue.  The ``publish`` method has access to the same prioritization.  If
+you call it with a priority number it will pass this number in with the message
+that it is transmitting out to all of its subscribers.  The task will
+automatically arrange this message relative to all of the other
+events that are waiting in the queue.
+
+For an active object to publish an event to another active object (which has
+subscribed to the event):
+
+.. code-block:: python
+
+  publishing_ao = ActiveObect()
+  publishing_ao.publish(Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT)
+
+  # or you can set the priority (1 is the highest priority see note):
+  publishing_ao.publish(
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT
+    priority=1)
+
+
+:NOTE:
+The highest event priority corresponds to the number 1 and all higher numbers
+have lower priority.  If a number is higher than another it will have lower
+priority than the number it is greater than.  By default all published events
+are given a priority of 1000.  If two events have the same priority the queue
+will behave like a first in first out queue.
+
+
+.. _recipes-seeing-what-is-:
 
 Seeing What is Going On
 -----------------------
@@ -1470,6 +1570,9 @@ Using a Spy as a Test Target
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: i_test_with_spy.rst
+
+
+
 
 .. _umlet: http://www.umlet.com/
 .. _umletino: http://www.umlet.com/umletino/umletino.html
