@@ -94,5 +94,6 @@ Glossary
       which can be used to show what it's manufactured state methods would look
       like if they were hand crafted.
 
+      
 
 

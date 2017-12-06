@@ -1503,7 +1503,6 @@ To see how to unwind an auto-generated statechart read
 :ref:`unwinding a state method<towardsthefactoryexample-unwinding-a-factory-state-method>`
 
 
-
 .. _recipes-describing-your-work:
 
 Describing your Work

@@ -42,6 +42,12 @@
             
   <div class="section" id="interacting-statecharts">
 <span id="interactingcharts-interacting-statecharts"></span><h1>Interacting Statecharts<a class="headerlink" href="#interacting-statecharts" title="Permalink to this headline">¶</a></h1>
+<p>Your designs can be significantly simplified if you break them up into separate
+active objects, each running in their own thread communicating with one
+another using a central dispatcher.  If your statechart is interested in an
+event, it can subscribe to it.  If your statechart would like to provide
+information to another statechart, it can publish an event.  By separating your
+design into separate parts it makes it much easier to test and document.</p>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
 
