@@ -42,13 +42,87 @@
             
   <div class="section" id="interacting-statecharts">
 <span id="interactingcharts-interacting-statecharts"></span><h1>Interacting Statecharts<a class="headerlink" href="#interacting-statecharts" title="Permalink to this headline">¶</a></h1>
-<p>Your designs can be significantly simplified if you break them up into separate
-active objects, each running in their own thread communicating with one
-another using a central dispatcher.  If your statechart is interested in an
-event, it can subscribe to it.  If your statechart would like to provide
-information to another statechart, it can publish an event.  By separating your
-design into separate parts it makes it much easier to test and document.</p>
+<div class="section" id="some-context-about-concurrency">
+<span id="interactingcharts-some-context-about-concurrency"></span><h2>Some Context about Concurrency<a class="headerlink" href="#some-context-about-concurrency" title="Permalink to this headline">¶</a></h2>
+<p>Your designs can be significantly simplified if you break them up into a
+collection of statecharts (active-objects/factories), each running in their own
+thread.</p>
+<p>If your statechart is interested in an event provided by the system, it can
+subscribe to it.  If your statechart would like to provide information to
+another statechart, it can publish an event.  By separating your design into
+parts like this it makes it much easier to test and document your system.  More
+importantly, it makes it easier to maintain.  The majority of a software
+project’s lifetime cost is spent in maintenance.</p>
+<p>In 2008 <a class="reference external" href="https://www.crockford.com/">Douglas Crockford</a> (the man who invented JSON) released a very important
+book called, <a class="reference external" href="http://shop.oreilly.com/product/9780596517748.do">JavaScript The Good Parts</a>.”  In his book he talked about how the
+most successful programming language on our planet (written in 10 days) could
+still be used to create powerful and expressive systems.  Douglas postulated
+that despite the haste under which JavaScript was presented to humanity
+(because of idiotic leadership at Netscape), it actually contained some really
+really good pieces from which serious programs could be written.  He learned
+about these good parts by writing a <a class="reference external" href="http://www.jslint.com/">Lint</a> tool in which he packed in
+the JavaScript’s community feedback about their best practices, then let this
+program teach him how to program.</p>
+<p>After years of learning from the community through his <a class="reference external" href="http://www.jslint.com/">Lint</a> tool he wrote his
+great book.  His powerful engineering insight is this, just because it was
+invented and available to you,  doesn’t mean you have to use it.  Use the parts
+that have been demonstrated to work well; proven through their interaction with
+the world.  The parts that have caused problems should not be used, in fact
+they should be discarded immediately.  Good design is the process of discovery.</p>
+<p>Miro Samek did the same thing with <cite>concurrent systems</cite>.  Unfortunately not a
+lot of people were paying attention.  On page 444 of his book titled “Practical
+UML STATECHARTS in C/C++” he writes, “you should heed to the following two
+rules, without exception:</p>
+<ol class="arabic simple">
+<li>Active objects should interact only through an asynchronous event exchange
+and should <cite>not</cite> share memory or other resources.</li>
+<li>Active objects should <cite>not</cite> block or busy-wait for events in the middle of
+RTC [run-to-completion] processing.”</li>
+</ol>
+<p>Then he says more on the same page, “I strongly recommend that you take these
+rules seriously and follow them <cite>religiously</cite>.  In exchange [his framework] can
+guarantee that your application [will be] free from the traditional perils of
+preemptive multitasking, such as race conditions, deadlocks, priority
+inversions, starvations, and nondeterminism. In particular, you will never need
+to use mutexes, semaphores, monitors, or other such troublesome mechanisms at
+the application level”.</p>
+<p>Do you see it?  All that confusing shit that you were taught related to
+concurrency has just been cargo-culting.  The embedded community has been
+experiencing the pain from these bad ideas for years, these ideas that were
+invented back in the 1960’s (before anyone knew what they were doing).
+Your instructors, who just read the textbooks and got good grades were not
+practitioners, they were not engineering, they didn’t realize that a lot of
+these ideas were just bad.  They should be removed; Miro Samek provides a new
+approach.  Use the Harel formalism and follow Miro Samek’s “Concurrency the
+good parts”.</p>
+<p>Interestingly, David Harel was asked to help the Israeli military build better
+jet fighter software.  The Israeli military isn’t fucking around like the
+American’s are.  It is interesting that the Israeli’s achieved a 80-1 crushing
+victory over the Arabs in the 1973, 6-day war.  When asked about it the
+commander of the “Israeli Air Force (IAF), General Mordecai Hod, famously
+remarked that the outcome would have been the same if both sides had swapped
+planes.” As the great engineer Pierre M. Sprey points out <a class="footnote-reference" href="#id2" id="id1">[1]</a> , “He was exactly
+correct, simply because the IAF had the most rigorous system in the world for
+filtering out all of the most gifted pilots.  In every war, it’s the few super
+pilots that win the air battle.  A tiny handful of such pilots have dominated
+every air-to-air battleground since World War I; roughly 10 percent of all
+pilots (the “hawks”) score 60 percent to 80 percent of the dogfight kills; the
+other 90 percent of pilots (‘doves’) are fodder for the hawks on the opposite
+side. Technical performance between opposing fighter planes pale in
+comparison.”</p>
+<p>The pilot is the key piece of the design.  You are the pilot; if you aren’t
+already become a hawk and pick the strategies that work.  A pilot in the air
+force doesn’t have the luxury of building his own aircraft; you do.  We can
+learn from the people who came before us and use the curated working subsets of
+the technologies that we can choose from.  Back to the example:</p>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Pierre M. Sprey <a class="reference external" href="http://pogoarchives.org/labyrinth/09-sprey-w-covers.pdf">Evaluating Weapons Sorting the Good from the Bad</a></td></tr>
+</tbody>
+</table>
+</div>
 </div>
 
 
@@ -58,7 +132,15 @@ design into separate parts it makes it much easier to test and document.</p>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
   <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
-</a></p><div class="relations">
+</a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Interacting Statecharts</a><ul>
+<li><a class="reference internal" href="#some-context-about-concurrency">Some Context about Concurrency</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
