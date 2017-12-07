@@ -280,7 +280,7 @@ def trace_on_start(fn):
            signal      = None,
            payload     = None,
            end_state   =
-             initial_state(self,
+             self.temp.fun(self,
                Event(signal=signals.REFLECTION_SIGNAL))
          )
       self.full.trace.append(t)
