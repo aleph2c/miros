@@ -2,7 +2,7 @@ import pytest
 from miros.event import signals, Event, return_status
 from miros.hsm   import InstrumentedHsmEventProcessor, spy_on
 import pprint
-
+from miros.hsm import stripped
 
 def pp(item):
   print("")
@@ -251,3 +251,60 @@ def test_trace_topology_g1_2():
   # pp(chart.full.trace)
   # assert(chart.full.spy == expected_behavior)
   assert(len(chart.full.trace) == 1)
+
+@pytest.mark.trace
+def test_trace_on_start():
+  from miros.activeobject import ActiveObject, Factory
+  def trans_to_fc(chart, e):
+    return chart.trans(fc)
+
+  def trans_to_fc1(chart, e):
+    return chart.trans(fc1)
+
+  def bb_handler(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.BB):
+      chart.scribble(e.payload)
+      status = chart.trans(fc)
+    return status
+
+  def trans_to_fc2(chart, e):
+    return chart.trans(fc2)
+
+  # The following state chart is used to test topology C
+  # in a multichart situation, statechart built using the factory
+  #
+  #        +------------------ fc ---------------+
+  #        |   +----- fc1----+   +-----fc2-----+ |
+  #        | * |             |   |             | +----+
+  #        | | |             +-a->             | |    |
+  #        | +->             <-a-+             | |    BB
+  #        |   |             |   |             | |    |
+  #        |   |             |   |             | <----+
+  #        |   +-------------+   +-------------+ |
+  #        +-------------------------------------+
+  #
+
+  c_chart = Factory('c_chart')
+  fc = c_chart.create(state='fc'). \
+        catch(signal=signals.INIT_SIGNAL, handler=trans_to_fc1). \
+        catch(signal=signals.BB, handler=bb_handler). \
+        to_method()
+
+  fc1 = c_chart.create(state='fc1'). \
+        catch(signal=signals.a, handler=trans_to_fc2). \
+        to_method()
+
+  fc2 = c_chart.create(state='fc2'). \
+        catch(signal=signals.a, handler=trans_to_fc1). \
+        to_method()
+
+  c_chart.nest(fc,  parent=None). \
+          nest(fc1, parent=fc). \
+          nest(fc2, parent=fc)
+
+  c_chart.start_at(fc)
+  target = "[2017-12-07 12:08:41.154109] [c_chart] e->start_at() top->fc1"
+  with stripped(target) as stripped_target, stripped(c_chart.trace()) as stripped_trace_result:
+    assert(stripped_target == stripped_trace_result[0])
+

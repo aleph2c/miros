@@ -413,10 +413,124 @@ def example_5():
   print(chart.to_code(fc2))
 
 
+def multiunit_example():
+
+  from miros.activeobject import Factory
+  from miros.event import signals, Event, return_status
+  import time
+
+  # This statechart tests topology B in a multichart situation,
+  # statechart built using a factory
+  #  
+  #  +------- fb --------------s-----+
+  #  |  +---- fb1 -------t-------+   |
+  #  |  | i/pub(BB)              |   l --> BB
+  #  |  |  +- fb11---------+     |   |
+  #  |  |  |               |     |   |
+  #  |  |  |               <-b-+ <-a-+
+  #  |  |  +---------------+   +-+   |
+  #  |  +------------------------+   |
+  #  +-------------------------------+
+  #
+
+  def trans_to_fb(chart, e):
+    return chart.trans(fb)
+
+  def trans_to_fb1(chart, e):
+    return chart.trans(fb1)
+
+  def trans_to_fb11(chart, e):
+    return chart.trans(fb11)
+
+  def publish_BB(chart, e):
+    chart.publish(Event(signal=signals.BB,
+      payload="information from b_chart riding within the BB signal"))
+    return return_status.HANDLED
+
+  b_chart = Factory('b_chart')
+  fb = b_chart.create(state='fb'). \
+          catch(signal=signals.a, handler=trans_to_fb1). \
+          to_method()
+
+  fb1 = b_chart.create(state='fb1'). \
+          catch(signal=signals.b, handler=trans_to_fb11). \
+          catch(signal=signals.INIT_SIGNAL, handler=publish_BB). \
+          to_method()
+
+  fb11 = b_chart.create(state='fb11'). \
+          to_method()
+
+  b_chart.nest(fb, parent=None). \
+          nest(fb1, parent=fb). \
+          nest(fb11, parent=fb1)
+
+  def trans_to_fc(chart, e):
+    return chart.trans(fc)
+
+  def trans_to_fc1(chart, e):
+    return chart.trans(fc1)
+
+  def bb_handler(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.BB):
+      chart.scribble(e.payload)
+      status = chart.trans(fc)
+    return status
+
+  def trans_to_fc2(chart, e):
+    return chart.trans(fc2)
+
+  # The following state chart is used to test topology C
+  # in a multichart situation, statechart built using the factory
+  #
+  #        +------------------ fc ---------------+
+  #        |   +----- fc1----+   +-----fc2-----+ |
+  #        | * |             |   |             | +----+
+  #        | | |             +-a->             | |    |
+  #        | +->             <-a-+             | |    BB
+  #        |   |             |   |             | |    |
+  #        |   |             |   |             | <----+
+  #        |   +-------------+   +-------------+ |
+  #        +-------------------------------------+
+  #
+
+  c_chart = Factory('c_chart')
+  fc = c_chart.create(state='fc'). \
+        catch(signal=signals.INIT_SIGNAL, handler=trans_to_fc1). \
+        catch(signal=signals.BB, handler=bb_handler). \
+        to_method()
+
+  fc1 = c_chart.create(state='fc1'). \
+        catch(signal=signals.a, handler=trans_to_fc2). \
+        to_method()
+
+  fc2 = c_chart.create(state='fc2'). \
+        catch(signal=signals.a, handler=trans_to_fc1). \
+        to_method()
+
+  c_chart.nest(fc,  parent=None). \
+          nest(fc1, parent=fc). \
+          nest(fc2, parent=fc)
+
+  # subscribe to BB signals sent to the active fabric
+  c_chart.subscribe(Event(signal=signals.BB))
+
+  # Start up the charts and post an event to how they interact
+  c_chart.start_at(fc)
+  b_chart.start_at(fb)
+  b_chart.post_fifo(Event(signal=signals.a))
+
+  time.sleep(0.1)
+  print(c_chart.trace())
+  pp(c_chart.spy())
+  print(b_chart.trace())
+  pp(b_chart.spy())
+
 if __name__ == '__main__':
   # t_question()
   # example_1()
   # example_2()
   # example_3()
   # example_4()
-  example_5()
+  # example_5()
+  multiunit_example()
