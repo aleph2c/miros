@@ -4,8 +4,8 @@ Miros is a statechart library written in Python.  Statecharts are a type of
 behavioral drawing.
 
 These drawings use a kind of formalism that was invented by Dr. David Harel in
-the 1980s when he was trying to help the Israeli air force construct software
-for their jet fighters.
+the 1980s to help the Israeli air force construct better software for their jet
+fighters.
 
 His innovation was to take the sentences that you would find in a specification
 and quickly translate them into an easily understood picture.  These pictures
@@ -14,9 +14,9 @@ time.  You could pack a lot more complexity into them, all the while keeping
 them from needlessly spreading over multiple pages and becoming more
 complicated than the code that they were suppose to describe.
 
-Once you understand how to draw these types of pictures, you can pack a
-tremendous amount of behavioral complexity into them.  For this reason
-statecharts have been used to:
+The diagrams were easy to explain and they were easy to turn into software.
+
+For this reason statecharts have been used to:
 
 1. Allow software to write itself to automatically find better software algorithms
 2. Create extremely complex engineering systems (F35)

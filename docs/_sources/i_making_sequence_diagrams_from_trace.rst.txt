@@ -135,8 +135,17 @@ your specification.  The sequence diagrams are little throw away things, that
 can be used to assist in telling a very specific story about how your system
 behaves.
 
-I'm probably not following the UML standard, and I don't care.  The utility of
+I'm probably not following the UML standard and I don't care.  The utility of
 the sequence diagram picture is in its simplicity.
+
+I know that you can represent loops and object destructor's using these
+diagrams, but why bother?  It is easier to write a loop in the code than it is
+in a picture, so why not copy and paste the code onto the sequence diagram if
+you need to explain a loop?
+
+If you would like to create sequence diagrams that are UML compliant, the
+`umlet`_ program supports these features.
 
 .. _sequence: https://github.com/aleph2c/sequence
 .. _DRY: https://en.wikipedia.org/wiki/Don%27t_repeat_yourself
+.. _umlet: http://www.umlet.com/

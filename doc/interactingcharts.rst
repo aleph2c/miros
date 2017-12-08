@@ -6,7 +6,7 @@ Interacting Statecharts
 
 .. _interactingcharts-some-context-about-concurrency:
 
-Concurrency the Good Parts
+Concurrency: the Good Parts
 --------------------------
 Your designs can be significantly simplified if you break them up into a
 collection of statecharts (active-objects/factories), each running in their own
@@ -24,7 +24,7 @@ book called, `JavaScript The Good Parts`_."  In his book he talked about how the
 most successful programming language on our planet (written in 10 days) could
 still be used to create powerful and expressive systems.  Douglas postulated
 that despite the haste under which JavaScript was presented to humanity
-(because of idiotic leadership at Netscape), it actually contained some really
+(because of idiotic leadership at Netscape), it actually contained some really,
 really good pieces from which serious programs could be written.  He learned
 about these good parts by writing a `Lint`_ tool in which he packed in
 the JavaScript's community feedback about their best practices, then let this
@@ -34,9 +34,9 @@ After years of learning from the community through his `Lint`_ tool he wrote his
 great book.  His powerful engineering insight is this, just because it was
 invented and available to you,  doesn't mean you have to use it.  Use the parts
 that have been demonstrated to work well; proven through their interaction with
-the world.  The parts that have caused problems should not be used, in fact
+the community.  The parts that have caused problems should not be used, in fact
 they should be discarded immediately.  Good design is the process of discovery
-and editing.
+and cultural editing and curation.
 
 Miro Samek did the same thing with `concurrent systems`.  Unfortunately not a
 lot of people were paying attention.  On page 444 of his book titled "Practical
@@ -57,6 +57,39 @@ inversions, starvations, and nondeterminism. In particular, you will never need
 to use mutexes, semaphores, monitors, or other such troublesome mechanisms at
 the application level".
 
+Many of the concurrency ideas come from the 1960's when it was very unlikely
+that a software developer would write code which would run on two or more
+processors at the same time.  Multitasking was invented to break problems apart
+into threads (also called tasks) of operation to decouple designs.  Each thread
+was intended to provide the illusion, that any code running within it, was
+running in its own processor.
+
+Things became extremely complicated when a designer needed to share resources
+between two different threads, or when one thread had to operate with greater
+access to the processor than another thread.  To manage this complexity,
+preemptive multitasking was invented.  Preemption in this context means that
+one thread of a higher priority can interrupt another causing it to store its
+state, then take over the processor's time until it was done, then reconstruct
+the state of the lower priority thread so it could run without knowing that it
+hadn't been running the whole time.  Because this was such a daunting task,
+completely dependent upon the hardware, it was managed within it's own software
+(which had to be invented) called a real time operating system.
+
+Real time operating systems would also have to manage how shared variables were
+shared between tasks.  Shared variables that weren't protected by the operating
+system were like super-globals that acted as little time bombs.  A corruption
+might not happen until all of your threads happen to find the right beat; where
+they all wrote to the same variable at the same time. So an unprotected
+variable might not be corrupted until 10 months after you have turned on your
+system, when your part is floating on it's way to Saturn.  Good luck getting to
+the bottom of that problem.
+
+So when you read, "race conditions, deadlocks, priority inversions, starvations
+and nondeterminism" in his quote, just see them as billion dollar problems
+pulled from the zoology of pain, on which careers have been waisted.  [I'm
+feeling the pain right now, watching my neovim editor lock-up while trying to
+copy text.]
+
 So a lot of the ideas related to concurrency haven't worked, yet they haven't
 been dropped either.  They continue to be cargo-cult-ed into our present from
 the 1960's by well meaning instructors who are just teaching what they have
@@ -66,57 +99,98 @@ them defend them from criticism by obscuring them from view.
 
 These ideas are also like little tar babies, they get tar on anything they
 touch.  I can't guarantee that this library can follow the rules described by
-Miro Samek because I haven't re-written the operating system or the Python
-threading library.  There are many libraries that you will use which call out
-for resources and then block, like they ``http`` library.  If the Python
-language, the operating system that it runs on or any of it's libraries call
-something which shares memory or blocks in the middle of some run-to-completion
-processing then your design has broken the Samek rules.  So we can't get dogmatic
-about things here.  Just follow the rules within your own design.
+Miro Samek because I haven't re-written the operating system you are using or
+the Python threading library.  There are many libraries that you will use which
+call out for resources and then block, like they ``http`` library; it is tarred
+with these bad ideas.  If the Python language, the operating system that it
+runs on or any of it's libraries call something which shares memory or blocks
+in the middle of some run-to-completion processing then your design has broken
+the Samek rules.  So we can't get dogmatic about things here.  Just follow the
+rules within your own design.
 
-Miro Samek provides a new approach to concurrency: Use the Harel formalism and
-follow his commandments within your own design.
+If you are an embedded developer, pick a processor that Miro Samek has ported
+his framework onto and then use his technology, you won't be sorry.
 
-Interestingly, David Harel was asked to help the Israeli military build better
-jet fighter software.  The Israeli military isn't fucking around like the
+Jack Ganssle is another embedded developer who has been in the industry from
+the beginning.  He says that embedded software, or firmware was invented to
+make jet fighters infinitely expensive:
+
+   In his book "Augustine's Laws," Norman Augustine, former Lockheed Martin
+   CEO, tells a revealing story about a problem encountered by the defense
+   community. A high performance fighter aircraft is a delicate balance of
+   conflicting needs: fuel range vs. performance. Speed vs. weight. It seems
+   that by the late 70s fighters were at about as heavy as they'd ever be.
+   Contractors, always pursuing larger profits, looked in vain for something
+   they could add that would cost a lot, but which weighed nothing.
+
+   The answer: firmware. Infinite cost, zero mass. Avionics now accounts for
+   more than half of a fighter's cost. That's a chunk of change when you
+   consider the latest American fighter, the F-22, costs a cool $257m a pop.
+   Augustine practically chortles with glee when he relates this story.
+
+As you know the United States is the richest country in the world with a
+corrupt military-industrial-complex.  The Pentagon spends ungodly amounts of
+money purchasing weapon systems and yet it's staff is made up of government
+workers being paid government salaries.  Their only hope at becoming rich is to
+make a good impression on the defense contractors which they buy weapons from,
+using other people's money, so that after they 'retire' from the government
+service they can be re-hired into the defense business at executive rates of
+compensation.
+
+So it is safe to say there is very little incentive for the American defense
+community to find a better way to write the most expensive parts of their
+system.  Compare this to the Israeli military; they live in a country with an
+area a-little-bit-bigger than New Jersey, surrounded by a billion enemies.
+
+David Harel was paid by the Israeli military to help them build better jet
+fighter software.  The Israeli military isn't fucking around like the
 American's are.  "It is interesting that the Israeli's achieved a 80-1 crushing
 victory over the Arabs in the 1973, 6-day war."  When asked about it the
 commander of the "Israeli Air Force (IAF), General Mordecai Hod, famously
 remarked that the outcome would have been the same if both sides had swapped
-planes." As the great engineer Pierre M. Sprey points out [1]_ , "He was exactly
-correct, simply because the IAF had the most rigorous system in the world for
-filtering out all of the most gifted pilots.  In every war, it's the few super
-pilots that win the air battle.  A tiny handful of such pilots have dominated
-every air-to-air battleground since World War I; roughly 10 percent of all
-pilots (the "hawks") score 60 percent to 80 percent of the dogfight kills; the
-other 90 percent of pilots ('doves') are fodder for the hawks on the opposite
-side. Technical performance between opposing fighter planes pale in
+planes." As the great engineer Pierre M. Sprey points out [1]_ , "He was
+exactly correct, simply because the IAF had the most rigorous system in the
+world for filtering out all of the most gifted pilots.  In every war, it's the
+few super pilots that win the air battle.  A tiny handful of such pilots have
+dominated every air-to-air battleground since World War I; roughly 10 percent
+of all pilots (the "hawks") score 60 percent to 80 percent of the dogfight
+kills; the other 90 percent of pilots ('doves') are fodder for the hawks on the
+opposite side.  Technical performance between opposing fighter planes pale in
 comparison."
 
-The pilot is the key piece of the design.  If you aren't already, become a
-hawk; pick the strategies that work and avoid strategies that bring you into
-harm's way.  We can learn from the people who came before us and use the
-curated working subsets of our technologies and avoid the parts that have been
-shown to cause trouble.
+The pilot is a key piece of the design.  If you aren't already, become a hawk;
+pick the strategies that work and avoid strategies that bring you into harm's
+way.  Be aware of the cultural distortions.  We can learn from the people who
+came before us and use their curated working subsets of our technologies and
+avoid the parts that have been shown to cause trouble.
+
+So when Miro Samek recommends his new approach to concurrency: Use the Harel
+formalism and follow his commandments within your own design, we need to
+remember where these innovations came from and who paid for them.
 
 .. _interactingcharts-a-simple-example:
 
 A Simple Example
 ----------------
 The Miros library makes concurrency trivial.  You build up an active object,
-provide it with a starting state, then post events to it.  The active object
-runs it's own thread.  If it needs to communicate with other active objects it
-publishes an event with a payload containing its information.  If an active
-object is interested in information published by something else in the system,
-it would subscribe to that event.  That's it.
+provide it with a starting state (with it's connected map).  Then you post
+events to it.
+
+If it needs to communicate with other active objects it publishes an event with
+a payload containing its information.  If an active object is interested in
+information published by another active object, it would subscribe to that
+event.  That's it.
+
+Everything is managed in the background with threads and queues.  There are no
+shared variables.  It is up to you not to busy weight within your state methods
+or callback methods.
 
 Here is a very simple example:
 
 .. image:: _static/concurrency1.svg
     :align: center
 
-Let's begin by
-importing the required libraries:
+Let's begin by importing the required libraries:
 
 .. code-block:: python
   :emphasize-lines: 1
@@ -137,8 +211,8 @@ picture:
   from miros.event import signals, Event, return_status
   import time
 
-  # This statechart tests topology B in a multichart situation,
-  # statechart built using a factory
+  # 
+  # 
   #  
   #  +------- fb --------------s-----+
   #  |  +---- fb1 -------t-------+   |
@@ -162,8 +236,8 @@ placed on the diagram as we build it out:
   from miros.event import signals, Event, return_status
   import time
 
-  # This statechart tests topology B in a multichart situation,
-  # statechart built using a factory
+  #
+  #
   #  
   #  +------- fb --------------s-----+
   #  |  +---- fb1 -------t-------+   |
@@ -206,8 +280,8 @@ Now let's use the factory and build the ``b_chart``.
   from miros.event import signals, Event, return_status
   import time
 
-  # This statechart tests topology B in a multichart situation,
-  # statechart built using a factory
+  # 
+  # 
   #  
   #  +------- fb --------------s-----+
   #  |  +---- fb1 -------t-------+   |
@@ -261,8 +335,8 @@ Now that we have built the ``b_chart`` let's build out the ``c_chart``:
   from miros.event import signals, Event, return_status
   import time
 
-  # This statechart tests topology B in a multichart situation,
-  # statechart built using a factory
+  #
+  #
   #  
   #  +------- fb --------------s-----+
   #  |  +---- fb1 -------t-------+   |
@@ -323,8 +397,8 @@ Now that we have built the ``b_chart`` let's build out the ``c_chart``:
   def trans_to_fc2(chart, e):
     return chart.trans(fc2)
 
-  # The following state chart is used to test topology C
-  # in a multichart situation, statechart built using the factory
+  # 
+  # 
   #
   #        +------------------ fc ---------------+
   #        |   +----- fc1----+   +-----fc2-----+ |
@@ -389,8 +463,8 @@ Now that the charts are written, let's turn them on and see what happens:
   from miros.event import signals, Event, return_status
   import time
 
-  # This statechart tests topology B in a multichart situation,
-  # statechart built using a factory
+  #
+  #
   #  
   #  +------- fb --------------s-----+
   #  |  +---- fb1 -------t-------+   |
@@ -450,8 +524,8 @@ Now that the charts are written, let's turn them on and see what happens:
   def trans_to_fc2(chart, e):
     return chart.trans(fc2)
 
-  # The following state chart is used to test topology C
-  # in a multichart situation, statechart built using the factory
+  #
+  #
   #
   #        +------------------ fc ---------------+
   #        |   +----- fc1----+   +-----fc2-----+ |

@@ -1680,20 +1680,23 @@ debugging purposes.</p>
 <span id="recipes-drawing-a-statechart"></span><h3>Drawing a StateChart<a class="headerlink" href="#drawing-a-statechart" title="Permalink to this headline">¶</a></h3>
 <p>The Harel formalism was consumed by the UML standard.</p>
 <p>The UML standards were not properly curated and became overly-complicated and
-full of contradictions.  As a result, they were largely disregarded by the
+full of contradictions.  As a result, they are largely disregarded by the
 software community at large, so most of the open source drawing tool projects
-were just abandoned.</p>
-<p>A lot of the commercial drawing tools have tried to stay up with the overly
+have been abandoned.</p>
+<p>A lot of the commercial drawing tools have tried to keep up with the overly
 complicated UML standards, so you end up fighting with the tools when you just
 want to draw a simple picture.  The point of the picture is to be expressive
-enough to explain something to someone else.  People shouldn’t have to take a
-class just to understand your diagram.</p>
-<p>A drawing tool only needs to provide the following features:</p>
+enough to explain something to someone else.</p>
+<p>So in many ways UML has become a kind of anti-brand but it has it’s good parts.
+Skip the class diagrams and use the <a class="reference internal" href="#recipes-drawing-a-sequence-diagram"><span class="std std-ref">sequence
+diagram</span></a> and the statecharts.</p>
+<p>A statechart drawing tool only needs to provide the following features:</p>
 <ol class="arabic simple">
 <li>zoom in and out of a diagram.</li>
 <li>draw the basic Harel statemachine building blocks.</li>
 <li>draw arrows and the other useful parts of UML.</li>
-<li>mark up the diagram with code 5. simple to change a design</li>
+<li>mark up the diagram with code</li>
+<li>be simple to change a design</li>
 </ol>
 <p>Pencil and paper are great for drawing your designs.  It is good to work on
 them over and over again without the impediment of the computer interface
@@ -1702,8 +1705,12 @@ getting in your way.</p>
 something digital using a free tool called <a class="reference external" href="http://www.umlet.com/">umlet</a>.</p>
 <p>There is also an online version of the tool, which is called <a class="reference external" href="http://www.umlet.com/umletino/umletino.html">umletino</a>.</p>
 <p>It is easy to use and it has a lot of youtube training videos.  It doesn’t
-provide the zooming features asked for by the original Harel paper, but this
-could be implemented using HTML/SVG.</p>
+provide the zooming features asked for by the original Harel paper (1987), but
+this could be implemented using HTML/SVG if you have a lot of spare time.</p>
+<p>If you want to drop an ASCII art picture into your code (which you will see in
+the examples) you can use the <a class="reference external" href="https://github.com/vim-scripts/DrawIt">drawit</a> vim plugin, or something like it for
+your text editor.  If you don’t know how to do it yet, look up vertical
+editing, this is required if you are going to sketch in meaningful pictures.</p>
 </div>
 <div class="section" id="drawing-a-sequence-diagram">
 <span id="recipes-drawing-a-sequence-diagram"></span><h3>Drawing a Sequence Diagram<a class="headerlink" href="#drawing-a-sequence-diagram" title="Permalink to this headline">¶</a></h3>
@@ -1822,8 +1829,14 @@ your state chart diagram.  Give it a lot of attention, since it is actually
 your specification.  The sequence diagrams are little throw away things, that
 can be used to assist in telling a very specific story about how your system
 behaves.</p>
-<p>I’m probably not following the UML standard, and I don’t care.  The utility of
+<p>I’m probably not following the UML standard and I don’t care.  The utility of
 the sequence diagram picture is in its simplicity.</p>
+<p>I know that you can represent loops and object destructor’s using these
+diagrams, but why bother?  It is easier to write a loop in the code than it is
+in a picture, so why not copy and paste the code onto the sequence diagram if
+you need to explain a loop?</p>
+<p>If you would like to create sequence diagrams that are UML compliant, the
+<a class="reference external" href="http://www.umlet.com/">umlet</a> program supports these features.</p>
 </div>
 </div>
 <div class="section" id="testing">

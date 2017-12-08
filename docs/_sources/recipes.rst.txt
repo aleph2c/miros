@@ -1515,22 +1515,26 @@ Drawing a StateChart
 The Harel formalism was consumed by the UML standard.
 
 The UML standards were not properly curated and became overly-complicated and
-full of contradictions.  As a result, they were largely disregarded by the
+full of contradictions.  As a result, they are largely disregarded by the
 software community at large, so most of the open source drawing tool projects
-were just abandoned.
+have been abandoned.  
 
-A lot of the commercial drawing tools have tried to stay up with the overly
+A lot of the commercial drawing tools have tried to keep up with the overly
 complicated UML standards, so you end up fighting with the tools when you just
 want to draw a simple picture.  The point of the picture is to be expressive
-enough to explain something to someone else.  People shouldn't have to take a
-class just to understand your diagram.
+enough to explain something to someone else.
 
-A drawing tool only needs to provide the following features:
+So in many ways UML has become a kind of anti-brand but it has it's good parts.
+Skip the class diagrams and use the :ref:`sequence
+diagram<recipes-drawing-a-sequence-diagram>` and the statecharts.
+
+A statechart drawing tool only needs to provide the following features:
 
 1. zoom in and out of a diagram.
 2. draw the basic Harel statemachine building blocks.  
 3. draw arrows and the other useful parts of UML.  
-4. mark up the diagram with code 5. simple to change a design
+4. mark up the diagram with code
+5. be simple to change a design
 
 Pencil and paper are great for drawing your designs.  It is good to work on
 them over and over again without the impediment of the computer interface
@@ -1542,8 +1546,13 @@ something digital using a free tool called `umlet`_.
 There is also an online version of the tool, which is called `umletino`_.
 
 It is easy to use and it has a lot of youtube training videos.  It doesn't
-provide the zooming features asked for by the original Harel paper, but this
-could be implemented using HTML/SVG.
+provide the zooming features asked for by the original Harel paper (1987), but
+this could be implemented using HTML/SVG if you have a lot of spare time.
+
+If you want to drop an ASCII art picture into your code (which you will see in
+the examples) you can use the `drawit`_ vim plugin, or something like it for
+your text editor.  If you don't know how to do it yet, look up vertical
+editing, this is required if you are going to sketch in meaningful pictures.
 
 .. _recipes-drawing-a-sequence-diagram:
 
@@ -1570,10 +1579,8 @@ Using a Spy as a Test Target
 
 .. include:: i_test_with_spy.rst
 
-
-
-
 .. _umlet: http://www.umlet.com/
 .. _umletino: http://www.umlet.com/umletino/umletino.html
 .. _OMG: https://en.wikipedia.org/wiki/Object_Management_Group
 .. _mandala: https://en.wikipedia.org/wiki/Sand_mandala
+.. _drawit: https://github.com/vim-scripts/DrawIt
