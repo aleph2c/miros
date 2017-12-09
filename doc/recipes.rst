@@ -1256,7 +1256,7 @@ between various events being dispatched across your system.
 
 Subscribing to an Event Posted by Another Active Object
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Your active object can subscribe to events published by other active objects.
+Your active object can subscribe to the events published by other active objects.
 
 An active object can set how the active fabric posts events to it.  If it would
 like a message to take priority over all other events waiting to be managed,
@@ -1265,8 +1265,7 @@ you would use the ``lifo`` technique:
 .. code-block:: python
 
   subscribing_ao = ActiveObject()
-  subscribing_ao.subscribe(
-    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT), queue_type='lifo')
+  subscribing_ao.subscribe(signals.THING_SUBSCRIBING_AO_CARES_ABOUT, queue_type='lifo')
 
 This approach would make sense if you were subscribed to a timed heart beat
 being sent out by another active object, or if this event was some sort of
@@ -1277,12 +1276,29 @@ In most situations you can use the subscription defaults:
 .. code-block:: python
 
   subscribing_ao = ActiveObject()
-  subscribing_ao.subscribe(
-    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT)
+  subscribing_ao.subscribe(signals.THING_SUBSCRIBING_AO_CARES_ABOUT)
   # which is the same as writing
   subscribing_ao.subscribe(
-    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT,
+    signals.THING_SUBSCRIBING_AO_CARES_ABOUT, queue_type='fifo')
+
+It seems a little bit strange to subscribe to an event, since an event is a
+specific thing in which belongs a general thing; the signal.  The ``subscribe``
+method supports subscribing to events so that it's method signature looks like
+the other method signatures in the library.  (Less things for you to remember)
+
+If you chose to subscribe to events and not directly to signals, think of your
+call as saying, "I would like to subscribe to this type of event".
+
+.. code-block:: python
+  :emphasize-lines: 1
+  :linenos:
+
+  # subscribing to a `type` of event
+  subscribing_ao.subscribe(
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT),
     queue_type='fifo')
+
+
 
 .. _recipes-publishing-event-to-other-active-objects:
 

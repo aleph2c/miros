@@ -163,7 +163,7 @@ def test_publish_subscribe(fabric_fixture):
   c1 = ActiveObject("c1")
   c2 = ActiveObject("c2")
   b = ActiveObject("b")
-  c1.subscribe(Event(signal=signals.BB))
+  c1.subscribe(signals.BB)
   c2.subscribe(Event(signal=signals.BB))
   c1.subscribe(Event(signal=signals.CC))
   c2.subscribe(Event(signal=signals.CC))

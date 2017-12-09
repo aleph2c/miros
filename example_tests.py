@@ -513,7 +513,8 @@ def multiunit_example():
           nest(fc2, parent=fc)
 
   # subscribe to BB signals sent to the active fabric
-  c_chart.subscribe(Event(signal=signals.BB))
+  # c_chart.subscribe(Event(signal=signals.BB))
+  c_chart.subscribe(signals.BB)
 
   # Start up the charts and post an event to how they interact
   c_chart.start_at(fc)

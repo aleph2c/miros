@@ -231,7 +231,7 @@ class ActiveFabricSource():
       lifo_item = None
       lifo_queue.task_done()  # so that join can work
 
-  def subscribe(self, queue, event, queue_type='fifo'):
+  def subscribe(self, queue, event_or_signal, queue_type='fifo'):
     '''subscribe a queue to an event in a 'fifo' or 'lifo' way
 
     There are two different ways to subscribe to an event:
@@ -287,9 +287,14 @@ class ActiveFabricSource():
       assert(active_object_input_queue.pop().signal_name == 'A')
 
     '''
-    def _subscribe(internal_queue, event):
-      if event.signal_name in internal_queue:
-        registry = internal_queue[event.signal_name]
+    def _subscribe(internal_queue, signal):
+      if type(signal) == HsmEvent:
+        signal_name = signal.signal_name
+      elif type(signal) == int:
+        signal_name = signals.name_for_signal(signal)
+
+      if signal_name in internal_queue:
+        registry = internal_queue[signal_name]
         # make a list of queue ids in queue_ids
         queue_ids = map(lambda x: id(x), registry)
         if id(queue) in queue_ids:
@@ -298,12 +303,14 @@ class ActiveFabricSource():
         else:
           registry.append(queue)
       else:
-        internal_queue[event.signal_name] = [queue]
+        internal_queue[signal_name] = [queue]
+        return signal_name
 
     if queue_type is 'lifo':
-      _subscribe(self.lifo_subscriptions, event)
+      signal_name = _subscribe(self.lifo_subscriptions, event_or_signal)
     else:
-      _subscribe(self.fifo_subscriptions, event)
+      signal_name = _subscribe(self.fifo_subscriptions, event_or_signal)
+    return signal_name
 
   def publish(self, event, priority=1000):
     '''publish an event with a given priority to all subscribed queues
@@ -477,16 +484,20 @@ class ActiveObject(HsmWithQueues):
   def append_subscribe_to_spy(fn):
     '''instrument the full spy with our subscription request'''
     @wraps(fn)
-    def _append_subscribe_to_spy(self, e, queue_type='fifo'):
+    def _append_subscribe_to_spy(self, e_or_s, queue_type='fifo'):
+      if type(e_or_s) == HsmEvent:
+        signal_name = e_or_s.signal_name
+      elif type(e_or_s) == int:
+        signal_name = signals.name_for_signal(e_or_s)
       if self.instrumented:
-        self.full.spy.append("SUBSCRIBING TO:({}, TYPE:{})".format(e.signal_name, queue_type))
-        return fn(self, e, queue_type)
+        self.full.spy.append("SUBSCRIBING TO:({}, TYPE:{})".format(signal_name, queue_type))
+        return fn(self, e_or_s, queue_type)
     return _append_subscribe_to_spy
 
   @start_thread_if_not_running
   @append_subscribe_to_spy
-  def subscribe(self, event, queue_type='fifo'):
-    self.fabric.subscribe(self.queue, event, queue_type)
+  def subscribe(self, event_or_signal, queue_type='fifo'):
+    self.fabric.subscribe(self.queue, event_or_signal, queue_type)
 
   def append_publish_to_spy(fn):
     '''instrument the rtc spy with our publish event'''
