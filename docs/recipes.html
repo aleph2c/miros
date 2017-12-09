@@ -1268,7 +1268,8 @@ between various events being dispatched across your system.</p>
 like a message to take priority over all other events waiting to be managed,
 you would use the <code class="docutils literal"><span class="pre">lifo</span></code> technique:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">subscribing_ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
-<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">,</span> <span class="n">queue_type</span><span class="o">=</span><span class="s1">&#39;lifo&#39;</span><span class="p">)</span>
+<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">,</span>
+  <span class="n">queue_type</span><span class="o">=</span><span class="s1">&#39;lifo&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This approach would make sense if you were subscribed to a timed heart beat
@@ -1283,20 +1284,17 @@ safety related thing.</p>
 </pre></div>
 </div>
 <p>It seems a little bit strange to subscribe to an event, since an event is a
-specific thing in which belongs a general thing; the signal.  The <code class="docutils literal"><span class="pre">subscribe</span></code>
+specific thing in which belongs a general thing; the signal.  But the <code class="docutils literal"><span class="pre">subscribe</span></code>
 method supports subscribing to events so that it’s method signature looks like
 the other method signatures in the library.  (Less things for you to remember)</p>
 <p>If you chose to subscribe to events and not directly to signals, think of your
 call as saying, “I would like to subscribe to this type of event”.</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># subscribing to a `type` of event</span>
-</span><span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># subscribing to a `type` of event</span>
+<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
   <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">),</span>
   <span class="n">queue_type</span><span class="o">=</span><span class="s1">&#39;fifo&#39;</span><span class="p">)</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="publishing-events-to-other-active-objects">
 <span id="recipes-publishing-event-to-other-active-objects"></span><h3>Publishing events to other Active Objects<a class="headerlink" href="#publishing-events-to-other-active-objects" title="Permalink to this headline">¶</a></h3>
