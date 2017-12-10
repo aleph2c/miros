@@ -1100,6 +1100,7 @@ def test_spy_topology_e1_5(spy_on_instrumented_hsm):
      'E:spy_graph_e1_s4',
      'E:spy_graph_e1_s3',
      'E:spy_graph_e1_s2',
+     'E:spy_graph_e1_s1',
      'E:spy_graph_e1_s1:HOOK']
   chart.start_at(spy_graph_e1_s5)
   event  = Event(signal=signals.E)

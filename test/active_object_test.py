@@ -353,21 +353,26 @@ def test_that_it_can_post_events(fabric_fixture):
   )
   time.sleep(1)
   assert(ao.spy_full() ==
-    ['START',
-     'SEARCH_FOR_SUPER_SIGNAL:posted_event_snitch',
-     'ENTRY_SIGNAL:posted_event_snitch',
-     'INIT_SIGNAL:posted_event_snitch',
-     '<- Queued:(0) Deferred:(0)',
-     'F:posted_event_snitch:HOOK',
-     '<- Queued:(0) Deferred:(0)',
-     'F:posted_event_snitch:HOOK',
-     '<- Queued:(0) Deferred:(0)',
-     'F:posted_event_snitch:HOOK',
-     '<- Queued:(0) Deferred:(0)',
-     'F:posted_event_snitch:HOOK',
-     '<- Queued:(0) Deferred:(0)',
-     'F:posted_event_snitch:HOOK',
-     '<- Queued:(0) Deferred:(0)']
+      ['START',
+       'SEARCH_FOR_SUPER_SIGNAL:posted_event_snitch',
+       'ENTRY_SIGNAL:posted_event_snitch',
+       'INIT_SIGNAL:posted_event_snitch',
+       '<- Queued:(0) Deferred:(0)',
+       'F:posted_event_snitch',
+       'F:posted_event_snitch:HOOK',
+       '<- Queued:(0) Deferred:(0)',
+       'F:posted_event_snitch',
+       'F:posted_event_snitch:HOOK',
+       '<- Queued:(0) Deferred:(0)',
+       'F:posted_event_snitch',
+       'F:posted_event_snitch:HOOK',
+       '<- Queued:(0) Deferred:(0)',
+       'F:posted_event_snitch',
+       'F:posted_event_snitch:HOOK',
+       '<- Queued:(0) Deferred:(0)',
+       'F:posted_event_snitch',
+       'F:posted_event_snitch:HOOK',
+       '<- Queued:(0) Deferred:(0)']
   )
   assert(ao.f_signal == 5)
 

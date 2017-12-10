@@ -191,7 +191,7 @@ def spy_on(fn):
     if(signals.is_inner_signal(e.signal_name) is not True):
         # We have found a hook
         if(status is return_status.HANDLED):
-          chart.rtc.spy.pop()
+          # chart.rtc.spy.pop()
           chart.rtc.spy.append("{}:{}:HOOK".format(e.signal_name, name))
           sr = spy_tuple(signal=e.signal_name, state=name, hook=True)
         else:
@@ -1236,11 +1236,16 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def append_recall_to_spy(fn):
     @wraps(fn)
     def _append_recall_to_spy(self):
+      if self.instrumented:
+        if (len(self.defer_queue) != 0):
+          sneak_peak = self.defer_queue[0]
+          if sneak_peak is not None:
+            sr = spy_tuple(signal=sneak_peak.signal_name, recall=True)
+            self.rtc.spy.append("RECALL:{}".format(sneak_peak.signal_name))
+            self.rtc.tuples.append(sr)
       e = fn(self)
-      if e is not None and self.instrumented:
-        sr = spy_tuple(signal=e.signal_name, recall=True)
-        self.rtc.tuples.append(sr)
-        self.rtc.spy.append("RECALL:{}".format(e.signal_name))
+      return e
+
     return _append_recall_to_spy
 
   def append_queue_reflection_to_spy(fn):

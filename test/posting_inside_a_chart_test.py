@@ -202,7 +202,7 @@ def armed(ao, e):
     status, ao.temp.fun = state.SUPER, arming
   return status
 
-
+@pytest.mark.aaa
 @pytest.mark.postings
 def test_interior_postings_example(fabric_fixture):
   ao = ActiveObject()
@@ -210,6 +210,7 @@ def test_interior_postings_example(fabric_fixture):
   time.sleep(0.4)
   ao.post_fifo(Event(signal=signals.D))
   time.sleep(0.1)  # if you don't wait it won't look like it is working
+  pp(ao.spy)
   assert(ao.spy_full() ==
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:middle',
@@ -243,6 +244,7 @@ def test_interior_postings_example(fabric_fixture):
      'D:inner',
      'D:middle',
      'D:outer',
+     'RECALL:B',
      'POST_FIFO:B',
      'D:outer:HOOK',
      '<- Queued:(1) Deferred:(2)',
@@ -253,15 +255,15 @@ def test_interior_postings_example(fabric_fixture):
      'EXIT_SIGNAL:middle',
      'EXIT_SIGNAL:outer',
      'ENTRY_SIGNAL:outer',
-     'POST_FIFO:B',
      'RECALL:B',
+     'POST_FIFO:B',
      'INIT_SIGNAL:outer',
      '<- Queued:(1) Deferred:(1)',
      'B:outer',
      'EXIT_SIGNAL:outer',
      'ENTRY_SIGNAL:outer',
-     'POST_FIFO:B',
      'RECALL:B',
+     'POST_FIFO:B',
      'INIT_SIGNAL:outer',
      '<- Queued:(1) Deferred:(0)',
      'B:outer',
@@ -269,7 +271,6 @@ def test_interior_postings_example(fabric_fixture):
      'ENTRY_SIGNAL:outer',
      'INIT_SIGNAL:outer',
      '<- Queued:(0) Deferred:(0)'])
-
 
 @pytest.mark.tazor
 @pytest.mark.postings
@@ -279,6 +280,7 @@ def test_tazor_example(fabric_fixture):
   time.sleep(0.4)
   tazor.post_fifo(Event(signal=signals.TRIGGER_PULLED))
   time.sleep(0.1)  # if you don't wait it won't look like it is working
+
   assert(tazor.spy_full() ==
     ['START',
      'SEARCH_FOR_SUPER_SIGNAL:arming',
@@ -312,6 +314,7 @@ def test_tazor_example(fabric_fixture):
      'TRIGGER_PULLED:armed',
      'TRIGGER_PULLED:arming',
      'TRIGGER_PULLED:tazor_operating',
+     'RECALL:CAPACITOR_CHARGE',
      'POST_FIFO:CAPACITOR_CHARGE',
      'TRIGGER_PULLED:tazor_operating:HOOK',
      '<- Queued:(1) Deferred:(2)',
@@ -322,15 +325,15 @@ def test_tazor_example(fabric_fixture):
      'EXIT_SIGNAL:arming',
      'EXIT_SIGNAL:tazor_operating',
      'ENTRY_SIGNAL:tazor_operating',
-     'POST_FIFO:CAPACITOR_CHARGE',
      'RECALL:CAPACITOR_CHARGE',
+     'POST_FIFO:CAPACITOR_CHARGE',
      'INIT_SIGNAL:tazor_operating',
      '<- Queued:(1) Deferred:(1)',
      'CAPACITOR_CHARGE:tazor_operating',
      'EXIT_SIGNAL:tazor_operating',
      'ENTRY_SIGNAL:tazor_operating',
-     'POST_FIFO:CAPACITOR_CHARGE',
      'RECALL:CAPACITOR_CHARGE',
+     'POST_FIFO:CAPACITOR_CHARGE',
      'INIT_SIGNAL:tazor_operating',
      '<- Queued:(1) Deferred:(0)',
      'CAPACITOR_CHARGE:tazor_operating',
