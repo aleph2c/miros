@@ -1,9 +1,9 @@
+What I learned on my own I still remember -- Nassim Nicholas Taleb
 
 .. _scribbleexample-hacking-to-learn-the-deeper-dynamics:
 
 Hacking to Learn
 ================
-
 .. _scribbleexample-first-pass:
 
 In this example I ask a small question about a statechart.  Then we will:

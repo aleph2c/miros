@@ -42,10 +42,356 @@
             
   <div class="section" id="patterns">
 <span id="id1"></span><h1>Patterns<a class="headerlink" href="#patterns" title="Permalink to this headline">¶</a></h1>
+<p>The idea of software design patterns came from the architect Christopher
+Alexander.  He wrote a book, a pattern language, about how different approaches
+to architecture could be used across different scales (from the country to the
+pantry) to help people feel better about living in their communities.  It’s a
+lovely book, a child can understand it yet it is still useful for professionals.</p>
+<p>This can not be said for the book it inspired in computer science, “Design
+Patterns: Elements of Reusable Object-Oriented Software”  This book <em>was not</em>
+child friendly, in fact everyone I knew secretly hated it because of its
+illegibility; but would make sure to have a copy of it on their shelf to look
+like they were in the club.</p>
+<p>The ideas within the book were great and the follow up books that translated it
+into English were really useful.  Basically it described a set of techniques
+for solving classes of problems that come up over and over again.  If you
+haven’t learned the patterns yet, find a copy of a patterns book written by a
+practitioner in your language(s) and work through it.  You will level up.</p>
+<p>In chapter 5 of “Practical UML STATECHARTS in C/C++” I was leveled up by Miro
+Samek.  He describes 5 statechart patterns and made the bold claim that
+<strong>statecharts are a pattern of patterns</strong>.  I completely agree with him.  So here
+is my translation of his work into this library.  I’ll start each pattern with
+quotes from his book, then write about it within the context of this work.</p>
 <div class="toctree-wrapper compound">
 </div>
 <div class="section" id="ultimate-hook">
 <span id="patterns-ultimate-hook"></span><h2>Ultimate Hook<a class="headerlink" href="#ultimate-hook" title="Permalink to this headline">¶</a></h2>
+<p>Formal description:</p>
+<blockquote>
+<div><p>[The Ultimate Hook Pattern provides a] common facilities and policies for
+handling events but let clients override and specialize every aspect of the
+system’s behavior.</p>
+<p>The semantics of state nesting provide the desired mechanism of handling
+all events, first in the context of the client code (the nested state) and
+of automatically forwarding of all unhandled events to the [parent state]
+(the default behavior). In that way, the client code intercepts every
+stimulus and can override every aspect of the behavior. To reuse the
+default behavior, the client simply ignores the event and lets the
+superstate handle it (the [child state] inherits behavior from the
+superstate) <a class="footnote-reference" href="#id3" id="id2">[2]</a></p>
+</div></blockquote>
+<p>Makes sense to me.  Keep up!</p>
+<p>To understand the ultimate hook pattern, you first have to understand what a
+hook is.  It is just some code in an <code class="docutils literal"><span class="pre">if-elif</span></code> clause.   A hook is just some
+code that catches an event, runs your <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client code</span></a> and then
+returns something which tells the event processor to stop searching.  A hook
+doesn’t cause a state transition.  It is a way to get the event processor’s
+search algorithm to do work for you without changing state.</p>
+<p>You see, anytime the event processor is trying to figure out what to do with an
+event it needs to <a class="reference internal" href="recipes.html#recipes-what-a-state-does-and-how-to-structure-it"><span class="std std-ref">search your
+statechart</span></a>.  If it finds
+that it needs to do a transition, it will enlist the heavy-duty parts of it’s
+algorithm to make sure that the <a class="reference internal" href="glossary.html#term-harel-formalism"><span class="xref std std-term">Harel Formalism</span></a>
+occurs.  The hook has nothing to do with this, because it short circuits the
+search before it does a transition, but not before it gets the search algorithm
+to do some useful work.</p>
+<p>If your if-else structure in your state method catches the signal name of an
+event, runs your code, then returns the <code class="docutils literal"><span class="pre">return_status.HANDLED</span></code> back to the
+event processor, no state transition will occur.  This is how you make a hook.
+You make sure that part of your if-elif clause catches the event signal, runs
+your <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client code</span></a> and returns the <code class="docutils literal"><span class="pre">return_state.HANDLED</span></code>
+value.</p>
+<div align="center" class="align-center"><img alt="_images/ultimate_hook1.svg" src="_images/ultimate_hook1.svg" /></div>
+<p>Here is a simple example which demonstrates a hook.  In this example we will
+show that we can get some client code to run when we post an event with the
+signal name of BEHAVIOR_NAME to your statechart:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
+<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">):</span>
+</span><span class="hll">    <span class="c1"># your code would go here</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;your outer_state code here&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span>  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>The highlighted code describes the hook.  We see that when the
+BEHAVIOR_NAME signal is caught by this state method it runs your client
+code then returns <code class="docutils literal"><span class="pre">return_status.HANDLED</span></code>.</p>
+<p>The <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a> output would look like this:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:outer_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:outer_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:outer_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;BEHAVIOR_NAME:outer_state&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;your outer_state code here&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;BEHAVIOR_NAME:outer_state:HOOK&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
+</pre></div>
+</td></tr></table></div>
+<p>Lines 1-5 describe the first <a class="reference internal" href="glossary.html#term-run-to-completion"><span class="xref std std-term">rtc</span></a> event which occurs
+when we start the statechart.  Lines 5-9 of the
+<a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a> log actually describe the hook behavior.  The
+event processor ran, searching the statechart starting at the outer_state
+method to see if it knew how to process the BEHAVIOR_NAME signal and it did:
+the client code just scribbled something into our
+<a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a> log so we can see what happened.  On line 7
+we see the result of this in the <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a> log.
+Furthermore, no state transition occurred.</p>
+<div align="center" class="align-center"><img alt="_images/ultimate_hook2.svg" src="_images/ultimate_hook2.svg" /></div>
+<p>Now suppose we add another state within the outer state and start our active
+object there.</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
+<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">):</span>
+    <span class="c1"># your code would go here</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;your outer_state code here&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="hll"><span class="nd">@spy_on</span>
+</span><span class="hll"><span class="k">def</span> <span class="nf">inner_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">):</span>
+</span><span class="hll">    <span class="c1"># your code would go here</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;your inner_state code here&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">outer_state</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">inner_state</span><span class="p">)</span>
+</span><span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+</pre></div>
+</td></tr></table></div>
+<p>Then look at the spy:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:outer_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:outer_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:inner_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:inner_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;BEHAVIOR_NAME:inner_state&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;your inner_state code here&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;BEHAVIOR_NAME:inner_state:HOOK&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
+</pre></div>
+</td></tr></table></div>
+<p>Ok, no surprises.  The inner_state hooked the BEHAVIOR_NAME signal and
+ran some client code.</p>
+<div align="center" class="align-center"><img alt="_images/ultimate_hook3.svg" src="_images/ultimate_hook3.svg" /></div>
+<p>Now let’s remove the handling of the BEHAVIOR_NAME from our
+inner state and see what happens when we start the active object in the
+inner_state then send it an event with the BEHAVIOR_NAME.</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
+<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">):</span>
+    <span class="c1"># your code would go here</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;your outer_state code here&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">inner_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="c1">#if(e.signal == signals.BEHAVIOR_NAME):</span>
+  <span class="c1">#  # your code would go here</span>
+  <span class="c1">#  chart.scribble(&quot;your inner_state code here&quot;)</span>
+  <span class="c1">#  status = return_status.HANDLED</span>
+  <span class="c1">#else:</span>
+  <span class="c1">#  chart.temp.fun = outer_state</span>
+  <span class="c1">#  status = return_status.SUPER</span>
+<span class="hll">  <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer_state</span>
+</span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+</span>  <span class="k">return</span> <span class="n">status</span>
+
+<span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">inner_state</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+</pre></div>
+</td></tr></table></div>
+<p>In the highlighted code you can see that I adjusted the inner_state to run as
+if it’s <code class="docutils literal"><span class="pre">else</span></code> method clause was always active.  I did this so that it would not
+handle the BEHAVIOR_NAME signal.  Now we run the code and look at the trace.</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:outer_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:outer_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:inner_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:inner_state&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;BEHAVIOR_NAME:inner_state&#39;</span><span class="p">,</span>
+</span><span class="hll"> <span class="s1">&#39;BEHAVIOR_NAME:outer_state&#39;</span><span class="p">,</span>
+</span><span class="hll"> <span class="s1">&#39;your outer_state code here&#39;</span><span class="p">,</span>
+</span><span class="hll"> <span class="s1">&#39;BEHAVIOR_NAME:outer_state:HOOK&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
+</pre></div>
+</td></tr></table></div>
+<p>The highlighted lines show how our event processor tried to determine what to
+do with the event containing the BEHAVIOR_NAME signal.</p>
+<p>It called the inner_state with the event (8), it wasn’t handled, so it
+called the parent outer_state with the same event (9) and we see on
+line (10) that the outer_state client code was run.  Finally, on line (11)
+the spy instrumentation tells us that it detected a hooked event.  When you see
+this in the log it means there was no state transition.</p>
+<p>So, the outer_state hook code caught an event that was sent to the
+inner_state.  The <a class="reference internal" href="glossary.html#term-harel-formalism"><span class="xref std std-term">Harel Formalism</span></a> followed by the
+event processor determines that when it has an event, it will search outward
+from the current state, to the next parent state, then the next parent state
+over and over until your event is handled or, it reaches the top most state of
+your <a class="reference internal" href="glossary.html#term-hierarchical-state-machine"><span class="xref std std-term">HSM</span></a>. This means that any inner state
+method will automatically inherit the hook code of any outer state.  The outer
+most state contains the ultimate hook; this is why the pattern is called what
+it is.</p>
+<div align="center" class="align-center"><img alt="_images/ultimate_hook4.svg" src="_images/ultimate_hook4.svg" /></div>
+<p>You can overwrite the behavior of the outer state hooks simply by explicitly
+handling the signal in an inner state.  These ideas are very similar to
+inheritance and overloading in object oriented programming.</p>
+<p>As a designer you would write default client code behavior in the outer states
+of charts, and all of your inner states would get this behavior for free.  If
+they needed to overwrite this behavior they would specifically handle the
+event in their state methods.</p>
+<div align="center" class="align-center"><img alt="_images/ultimate_hook5.svg" src="_images/ultimate_hook5.svg" /></div>
 </div>
 <div class="section" id="deferred-event">
 <span id="patterns-deferred-event"></span><h2>Deferred Event<a class="headerlink" href="#deferred-event" title="Permalink to this headline">¶</a></h2>
@@ -64,6 +410,12 @@
 </div>
 <div class="section" id="multichart-pend">
 <span id="patterns-multichart-pend"></span><h2>Multichart Pend<a class="headerlink" href="#multichart-pend" title="Permalink to this headline">¶</a></h2>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>p.206 Practical UML STATECHARTS in C/C++, Second Edition</td></tr>
+</tbody>
+</table>
 </div>
 </div>
 

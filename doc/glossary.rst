@@ -32,6 +32,12 @@ Glossary
      is called a child state.  In an HSM all child states share the behavior of
      the parents states unless this behavior is over-written by the designer.
 
+   Hierarchical State Machine
+     HSM: a state machine where states can exit within other states.  An outer
+     state is called a parent state and an inner state is called a child state.
+     In an HSM all child states share the behavior of the parents states unless
+     this behavior is over-written by the designer.
+
    Payload
       A data object that has been injected into an Event.  It is intended to be
       used by the consumer of the event.
@@ -112,7 +118,7 @@ Glossary
       like to receive and respond to a message provided by another active
       object it can subscribe to the signal that that event will contain.
 
-   Run To Completion (RTC)
+   Run To Completion
       A run to completion process begins when a statechart receives an event.
       It searches it's local graph and makes a determination if it needs to
       respond, if so it will transition from the local state to the target
@@ -126,7 +132,9 @@ Glossary
       process.  If an event is received it is placed in the queue and it will
       not be considered by the event processor until it's RTC step is
       completed.
-      
+
+   RTC
+      :term:`Run To Completion<Run To Completion>`
 
    Harel Formalism
       The Harel Formalism is a set of rules for describing how events should be
@@ -197,6 +205,12 @@ Glossary
       A parent state is a relative term.  For a state to have a parent state it
       must be incircled by that parent state in a Hierarchical State Machine.
 
+   Superstate
+      A parent state.
+
+   Substate
+      A child state.
+
    Child State
       A child state is a relative term. For a state to be a child state of
       another state it must be within that other state's boundary.
@@ -251,6 +265,13 @@ Glossary
       it's value will determine the time delay prior to the event being
       presented to the active object's queue if you have deferred the event.
       It also represents the period of your multishot.
+
+   Client Code
+      Any code that you anchor onto your statechart.  It's the code that
+      actually solves your business problem.  It is different the the
+      statechart code in that it does not describe the structure of the
+      hierarchical state machine.
+
 
 
 

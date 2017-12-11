@@ -19,8 +19,8 @@ The diagrams were easy to explain and they were easy to turn into software.
 For this reason statecharts have been used to:
 
 1. Allow software to write itself to automatically find better software algorithms
-2. Create extremely complex engineering systems (F35)
-3. Describe the quantum interactions of atoms
+2. Describe the quantum interactions of atoms
+3. Create infinitely-expensive-engineering-systems (F22/F35)
 4. :ref:`Design toaster ovens<quick-start>`
 
 These pictures will also reduce the cognitive load you experience while designing

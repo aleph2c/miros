@@ -70,6 +70,11 @@ didn’t know how to process the event.</dd>
 <dt id="term-child-state">Child State</dt>
 <dd>A child state is a relative term. For a state to be a child state of
 another state it must be within that other state’s boundary.</dd>
+<dt id="term-client-code">Client Code</dt>
+<dd>Any code that you anchor onto your statechart.  It’s the code that
+actually solves your business problem.  It is different the the
+statechart code in that it does not describe the structure of the
+hierarchical state machine.</dd>
 <dt id="term-defer">Defer</dt>
 <dd><p class="first">The <code class="docutils literal"><span class="pre">defer</span></code> method is a way to place an event into a secondary queue
 that is ignored by the active object until the momenent the <code class="docutils literal"><span class="pre">recall</span></code>
@@ -117,6 +122,11 @@ sent to a state method when it’s boundary is being breached from an
 inside-to-the-outside.  If a state doesn’t know how to manage an event it
 is passed out to it’s outer state.  If no states know how to manage a
 signal it is ignored by the state chart.</dd>
+<dt id="term-hierarchical-state-machine">Hierarchical State Machine</dt>
+<dd>HSM: a state machine where states can exit within other states.  An outer
+state is called a parent state and an inner state is called a child state.
+In an HSM all child states share the behavior of the parents states unless
+this behavior is over-written by the designer.</dd>
 <dt id="term-hsm">HSM</dt>
 <dd>Hierarchical State Machine: a state machine where states can exit within
 other states.  An outer state is called a parent state and an inner state
@@ -173,7 +183,9 @@ will be consumed during a future run-to-completion process.</dd>
 <dd>The <code class="docutils literal"><span class="pre">recall</span></code> method is to pop the oldest item from the deferred queue
 and place those items into the working queue of the current active
 object.</dd>
-<dt id="term-run-to-completion-rtc">Run To Completion (RTC)</dt>
+<dt id="term-rtc">RTC</dt>
+<dd><a class="reference internal" href="#term-run-to-completion"><span class="xref std std-term">Run To Completion</span></a></dd>
+<dt id="term-run-to-completion">Run To Completion</dt>
 <dd>A run to completion process begins when a statechart receives an event.
 It searches it’s local graph and makes a determination if it needs to
 respond, if so it will transition from the local state to the target
@@ -226,6 +238,10 @@ for active object or factory in this documentation.</dd>
 <dd>A subscription is a multi-statchart concept.  When an active object would
 like to receive and respond to a message provided by another active
 object it can subscribe to the signal that that event will contain.</dd>
+<dt id="term-substate">Substate</dt>
+<dd>A child state.</dd>
+<dt id="term-superstate">Superstate</dt>
+<dd>A parent state.</dd>
 <dt id="term-template">Template</dt>
 <dd><p class="first">A template is a state method that has a structure which contains the
 <code class="docutils literal"><span class="pre">signal_callback</span></code> and <code class="docutils literal"><span class="pre">parent_callback</span></code> context managers.  You can

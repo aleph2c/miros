@@ -1,5 +1,9 @@
 .. _examples-active-object-example:
 
+Every man must define his identity against his mother. If he does not, he just falls back into her and is swallowed up. 
+  -- Camille Paglia
+
+
 Active Object Example
 =====================
 

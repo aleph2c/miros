@@ -527,6 +527,108 @@ def multiunit_example():
   print(b_chart.trace())
   pp(b_chart.spy())
 
+
+def ultimate_hook_example1():
+  import time
+  from miros.hsm import spy_on, pp
+  from miros.activeobject import ActiveObject
+  from miros.event import signals, Event, return_status
+
+  @spy_on
+  def outer_state(chart, e):
+    status = return_status.UNHANDLED
+
+    if(e.signal == signals.BEHAVIOR_NAME):
+      # your code would go here
+      chart.scribble("your code here")
+      status = return_status.HANDLED
+    else:
+      chart.temp.fun = chart.top
+      status = return_status.SUPER
+    return status
+
+  ao = ActiveObject()
+  ao.start_at(outer_state)
+  ao.post_fifo(Event(signal=signals.BEHAVIOR_NAME))
+  time.sleep(0.001)
+  pp(ao.spy())
+
+def ultimate_hook_example2():
+  import time
+  from miros.hsm import spy_on, pp
+  from miros.activeobject import ActiveObject
+  from miros.event import signals, Event, return_status
+
+
+  @spy_on
+  def outer_state(chart, e):
+    status = return_status.UNHANDLED
+
+    if(e.signal == signals.BEHAVIOR_NAME):
+      # your code would go here
+      chart.scribble("your outer_state code here")
+      status = return_status.HANDLED
+    else:
+      chart.temp.fun = chart.top
+      status = return_status.SUPER
+    return status
+
+  @spy_on
+  def inner_state(chart, e):
+    if(e.signal == signals.BEHAVIOR_NAME):
+      # your code would go here
+      chart.scribble("your inner_state code here")
+      status = return_status.HANDLED
+    else:
+      chart.temp.fun = outer_state
+      status = return_status.SUPER
+    return status
+
+  ao = ActiveObject()
+  ao.start_at(inner_state)
+  ao.post_fifo(Event(signal=signals.BEHAVIOR_NAME))
+  time.sleep(0.001)
+  pp(ao.spy())
+
+def ultimate_hook_example3():
+  import time
+  from miros.hsm import spy_on, pp
+  from miros.activeobject import ActiveObject
+  from miros.event import signals, Event, return_status
+
+  @spy_on
+  def outer_state(chart, e):
+    status = return_status.UNHANDLED
+
+    if(e.signal == signals.BEHAVIOR_NAME):
+      # your code would go here
+      chart.scribble("your outer_state code here")
+      status = return_status.HANDLED
+    else:
+      chart.temp.fun = chart.top
+      status = return_status.SUPER
+    return status
+
+  @spy_on
+  def inner_state(chart, e):
+    #if(e.signal == signals.BEHAVIOR_NAME):
+    #  # your code would go here
+    #  chart.scribble("your inner_state code here")
+    #  status = return_status.HANDLED
+    #else:
+    #  chart.temp.fun = outer_state
+    #  status = return_status.SUPER
+    chart.temp.fun = outer_state
+    status = return_status.SUPER
+    return status
+
+  ao = ActiveObject()
+  ao.start_at(inner_state)
+  ao.post_fifo(Event(signal=signals.BEHAVIOR_NAME))
+  time.sleep(0.001)
+  pp(ao.spy())
+
+
 if __name__ == '__main__':
   # t_question()
   # example_1()
@@ -534,4 +636,6 @@ if __name__ == '__main__':
   # example_3()
   # example_4()
   # example_5()
-  multiunit_example()
+  # multiunit_example()
+  #ultimate_hook_example1()
+  ultimate_hook_example3()
