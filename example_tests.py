@@ -719,7 +719,7 @@ def reminder1():
 
   def polling_enter(chart, e):
     chart.scribble("polling")
-    return return_state.HANDLED
+    return return_status.HANDLED
 
   def polling_init(chart, e):
     # illegal (init can't leave parent states)
@@ -735,7 +735,7 @@ def reminder1():
     if chart.processing_count >= 5:
       status = chart.trans(busy)
     else:
-    # illegal (init can't leave parent states)
+      # illegal (init can't leave parent states)
       status = chart.trans(polling)
     return status
 
@@ -791,14 +791,12 @@ def reminder2():
   from miros.event import signals, Event, return_status
 
   def polling_time_out(chart, e):
-    return chart.trans(polling)
-
-  def polling_enter(chart, e):
     chart.scribble("polling")
-    return return_state.HANDLED
+    chart.post_fifo(
+      Event(signal=signals.PROCESS))
+    return return_status.HANDLED
 
-  def polling_init(chart, e):
-    # illegal (init can't leave parent states)
+  def polling_process(chart, e):
     return chart.trans(processing)
 
   def processing_entry(chart, e):
@@ -807,16 +805,19 @@ def reminder2():
     return return_status.HANDLED
 
   def processing_init(chart, e):
-    status = None
-    if chart.processing_count >= 5:
+    status = return_status.HANDLED
+    if chart.processing_count >= 3:
+      chart.processing_count = 0
       status = chart.trans(busy)
     else:
-    # illegal (init can't leave parent states)
-      status = chart.trans(polling)
+      chart.post_fifo(
+        Event(signal=signals.POLL))
     return status
 
+  def processing_poll(chart, e):
+    return chart.trans(polling)
+
   def processing_exit(chart, e):
-    chart.processing_count = 0
     return return_status.HANDLED
 
   def busy_entry(chart, e):
@@ -826,23 +827,24 @@ def reminder2():
   def busy_time_out(chart, e):
     chart.busy_count += 1
     status = return_status.HANDLED
-    if chart.busy_count >= 5:
+    if chart.busy_count > 2:
       status = chart.trans(polling)
     return status
 
-  chart = Factory('reminder_pattern_needed_1')
+  chart = Factory('reminder_pattern_needed_2')
   chart.augment(other=0, name="processing_count")
   chart.augment(other=0, name="busy_count")
 
   polling = chart.create(state="polling"). \
               catch(signal=signals.TIME_OUT, handler=polling_time_out). \
-              catch(signal=signals.INIT_SIGNAL, handler=polling_init). \
+              catch(signal=signals.PROCESS,  handler=polling_process). \
               to_method()
 
   processing = chart.create(state="processing"). \
               catch(signal=signals.ENTRY_SIGNAL, handler=processing_entry). \
               catch(signal=signals.INIT_SIGNAL, handler=processing_init). \
               catch(signal=signals.EXIT_SIGNAL, handler=processing_exit). \
+              catch(signal=signals.POLL, handler=processing_poll). \
               to_method()
 
   busy = chart.create(state="busy"). \
@@ -850,14 +852,15 @@ def reminder2():
           catch(signal=signals.TIME_OUT, handler=busy_time_out). \
           to_method()
 
-  chart.nest(polling, parent=None). \
+  chart.nest(polling,    parent=None). \
         nest(processing, parent=None). \
         nest(busy, parent=processing)
 
   chart.start_at(polling)
   chart.post_fifo(Event(signal=signals.TIME_OUT), times=20, period=0.1)
-  time.sleep(5)
+  time.sleep(1.0)
   pp(chart.spy())
+  print(chart.trace())
 
 if __name__ == '__main__':
   # t_question()
@@ -871,4 +874,5 @@ if __name__ == '__main__':
   # ultimate_hook_example3()
   # ultimate_hook_example4()
   # augment_example()
-  reminder1()
+  # reminder1()
+  reminder2()

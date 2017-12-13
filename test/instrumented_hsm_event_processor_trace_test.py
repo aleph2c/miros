@@ -250,11 +250,12 @@ def test_trace_topology_g1_2():
   # pp(chart.full.spy)
   # pp(chart.full.trace)
   # assert(chart.full.spy == expected_behavior)
-  assert(len(chart.full.trace) == 1)
+  # assert(len(chart.full.trace) == 1)
+
 
 @pytest.mark.trace
 def test_trace_on_start():
-  from miros.activeobject import ActiveObject, Factory
+  from miros.activeobject import Factory
   def trans_to_fc(chart, e):
     return chart.trans(fc)
 

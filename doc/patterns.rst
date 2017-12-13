@@ -441,7 +441,7 @@ Formal description:
 
   Programming a statechart with :term:`orthogonal regions<Orthogonal Region>` is
   computationally expensive.  So if you find yourself drawing two seperate states
-  with a lot of arrows connecting them, remind yourself of the reminder pattern.
+  with a lot of arrows connecting them, remind yourself of this reminder pattern.
 
 The reminder pattern uses the ultimate hook pattern mixed with
 :term:`artificial event<Artificial Event>` injection.  It's an artificial event
@@ -457,7 +457,7 @@ We will begin with some specifications:
 * Part of the system will poll a sensor based on a system clock running with
   a period of 100ms.
 * Once polled this information will be sent to some processing code.
-* After five such events, the system will perform some processing and it will
+* After three such events, the system will perform some processing and it will
   enter a busy state (maybe communicating with a server).
 * While the unit is in a busy state it should not poll the sensor or process
   input.
@@ -472,7 +472,7 @@ Here is a first shot at implementing this specification:
 We create a polling state which upon entry poles something.  Any time there is
 a time out it will re-enter the state making this happen.  
 
-Then when it Initializes it transitions into the processing state.  Upon
+Then when it initializes it transitions into the processing state.  Upon
 entering the processing state we add one to the ``chart.processing_count`` and
 then process the message.  When the processing state initializes itself it will
 either go back to the polling state or enter the busy state, if the
@@ -483,18 +483,19 @@ TIME_OUT event is used with a :term:`hook<Hook>` to work the information.  In
 this example we just scribble "busy" into the spy log.  Then we add 1 to our
 ``chart.busy_count``.  If the count is big enough we transition back to the
 polling state.  Upon exiting the processing state, the
-``chart.processing_count`` is set to 0.  That should work!
+``chart.processing_count`` is set to 0.  That should work!  Actually, it won't
+work at all.
 
-But notice the large **Xs** on the diagram.  These are there to show that they
+Notice the large **Xs** on the diagram.  These are there to show that they
 are illegal transitions.  The Miro Samek event processoring algorithm will only
 allow init events to drill further into child states; they can not leave there
-current state and navigate to another region of the chart.   It's an honest
-mistake.
+current state and navigate to another region of the chart.  I'll just pretend I
+didn't know about this and continue.
 
 Let's see what happens when we try to make this broken statechart
 
 .. code-block:: python
-  :emphasize-lines: 11,12,25,26
+  :emphasize-lines: 14,15,27,28
 
   import time
   from miros.hsm import pp
@@ -519,10 +520,10 @@ Let's see what happens when we try to make this broken statechart
 
   def processing_init(chart, e):
     status = None
-    if chart.processing_count >= 5:
+    if chart.processing_count >= 3:
       status = chart.trans(busy)
     else:
-    # illegal (init can't leave parent states)
+      # illegal (init can't leave parent states)
       status = chart.trans(polling)
     return status
 
@@ -537,7 +538,7 @@ Let's see what happens when we try to make this broken statechart
   def busy_time_out(chart, e):
     chart.busy_count += 1
     status = return_status.HANDLED
-    if chart.busy_count >= 5:
+    if chart.busy_count >= 2:
       status = chart.trans(polling)
     return status
 
@@ -548,6 +549,7 @@ Let's see what happens when we try to make this broken statechart
   polling = chart.create(state="polling"). \
               catch(signal=signals.TIME_OUT, handler=polling_time_out). \
               catch(signal=signals.INIT_SIGNAL, handler=polling_init). \
+              catch(signal=signals.PROCESS, handler=polling_init). \
               to_method()
 
   processing = chart.create(state="processing"). \
@@ -582,14 +584,242 @@ If we run the code we will see:
 
 So, how do we make this software work?  When you see this
 ``HsmTopologyException``, it's probably time to consider another way to design
-your statechart.  We will get to that shortly, but for now let's find a way to force
-this software to work they way we want it too.
+your statechart.  We will get to that shortly, but for now let's find a way to
+force this software to work the way we want it to.
 
-Instead of making the INIT_SIGNAL transition outside of the state, instead we
-could invent a new signal, post it to ourselves and pretend like it came from
-outside of the active object and then react to it like we would any other
-event.  This is why it is called an :term:`artificial event<Artificial Event>`.
-hey
+Instead of making the INIT_SIGNAL transition outside of the state, we could
+invent a new signal, post it to ourselves and pretend like it came from outside
+of the active object.  Then our chart could react to it like it would to any
+other event.  This kind of thing is called an :term:`artificial
+event<Artificial Event>`.  Here is the code that would create an artificial
+PROCESS event:
+
+.. code-block:: python
+
+  # If 'PROCESS' signal wasn't invented before invent it now
+  # We post it to ourselves so we can react to it in the next rtc.
+  chart.post_fifo(Event(signal=signals.PROCESS))
+
+Now that we know how to do that let's redesign our statechart:
+
+.. image:: _static/reminder2.svg
+    :align: center
+
+This introduces a new glyph called the final state:
+
+.. image:: _static/reminder3.svg
+    :align: center
+
+When you see this glyph on a diagram it means, stop running.  So:
+
+
+.. image:: _static/reminder4.svg
+    :align: center
+
+Would look like this as code:
+
+  .. code-block:: python
+
+    def processing_init(chart, e):
+      status = return_status.HANDLED
+      if chart.processing_count >= 3: # Square brackets on diagram.
+        chart.processing_count = 0
+        status = chart.trans(busy) # HEAVY-DUTY Harel Formalism run here.
+                                   # This is recursive and might take
+                                   # a while  before this 
+                                   # routine finishes.
+      else:
+        # If 'POLL' signal wasn't invented before invent it now.
+        # We post it to ourselves so we can react to it in the next rtc.
+        chart.post_fifo(
+          Event(signal=signals.POLL))
+      return status
+
+Ok now that we have that all out of the way let's start fresh, reconsidering
+our specification and our proposed design, then implement it in code:
+
+* Part of the system will poll a sensor based on a system clock running with
+  a period of 100ms.
+* Once polled this information will be sent to some processing code.
+* After three such events, the system will perform some processing and it will
+  enter a busy state (maybe communicating with a server).
+* While the unit is in a busy state it should not poll the sensor or process
+  input.
+* After the busy process is completed the system should go back into it's
+  polling mode.
+
+.. image:: _static/reminder2.svg
+    :align: center
+
+Here is the code for this design with highlights for the artificial events:
+
+.. code-block:: python
+  :emphasize-lines: 8,9,26,27,53,60
+
+  import time
+  from miros.hsm import pp
+  from miros.activeobject import Factory
+  from miros.event import signals, Event, return_status
+
+  def polling_time_out(chart, e):
+    chart.scribble("polling")
+    chart.post_fifo(
+      Event(signal=signals.PROCESS))
+    return return_status.HANDLED
+
+  def polling_process(chart, e):
+    return chart.trans(processing)
+
+  def processing_entry(chart, e):
+    chart.processing_count += 1
+    chart.scribble("processing")
+    return return_status.HANDLED
+
+  def processing_init(chart, e):
+    status = return_status.HANDLED
+    if chart.processing_count >= 3:
+      chart.processing_count = 0
+      status = chart.trans(busy)
+    else:
+      chart.post_fifo(
+        Event(signal=signals.POLL))
+    return status
+
+  def processing_poll(chart, e):
+    return chart.trans(polling)
+
+  def processing_exit(chart, e):
+    return return_status.HANDLED
+
+  def busy_entry(chart, e):
+    chart.busy_count = 0
+    return return_status.HANDLED
+
+  def busy_time_out(chart, e):
+    chart.busy_count += 1
+    status = return_status.HANDLED
+    if chart.busy_count > 2:
+      status = chart.trans(polling)
+    return status
+
+  chart = Factory('reminder_pattern_needed_2')
+  chart.augment(other=0, name="processing_count")
+  chart.augment(other=0, name="busy_count")
+
+  polling = chart.create(state="polling"). \
+              catch(signal=signals.TIME_OUT, handler=polling_time_out). \
+              catch(signal=signals.PROCESS,  handler=polling_process). \
+              to_method()
+
+  processing = chart.create(state="processing"). \
+              catch(signal=signals.ENTRY_SIGNAL, handler=processing_entry). \
+              catch(signal=signals.INIT_SIGNAL, handler=processing_init). \
+              catch(signal=signals.EXIT_SIGNAL, handler=processing_exit). \
+              catch(signal=signals.POLL, handler=processing_poll). \
+              to_method()
+
+  busy = chart.create(state="busy"). \
+          catch(signal=signals.ENTRY_SIGNAL, handler=busy_entry). \
+          catch(signal=signals.TIME_OUT, handler=busy_time_out). \
+          to_method()
+
+  chart.nest(polling,    parent=None). \
+        nest(processing, parent=None). \
+        nest(busy, parent=processing)
+
+  chart.start_at(polling)
+  chart.post_fifo(Event(signal=signals.TIME_OUT), times=20, period=0.1)
+  time.sleep(1.0)
+  pp(chart.spy())
+
+If we run this code, it will output 1 seconds worth of information. The
+comments in the spy log are the thoughts I would have while viewing it.
+
+.. code-block:: python
+  :emphasize-lines: 10,19,26,31,40,47,52,63,66,69,78, 79
+
+   ['START', # start_at code running
+   'SEARCH_FOR_SUPER_SIGNAL:polling', # Harel formalism search
+   'ENTRY_SIGNAL:polling', # Harel formalism
+   'INIT_SIGNAL:polling', # Harel formalism
+   '<- Queued:(0) Deferred:(0)', # start_at code completed
+   'TIME_OUT:polling', # time out event detected in polling
+   'polling', # result of chart.scribble("polling")
+   'POST_FIFO:PROCESS', # inventing and posting our artificial event
+   'TIME_OUT:polling:HOOK',  # TIME_OUT was a hook, no state transition
+   '<- Queued:(1) Deferred:(0)', # rtc completed (event waiting)
+   'PROCESS:polling', # PROCESS event detected in polling
+   'SEARCH_FOR_SUPER_SIGNAL:processing', # Harel formalism search
+   'SEARCH_FOR_SUPER_SIGNAL:polling', # Harel formalism search
+   'EXIT_SIGNAL:polling', # Harel formalism
+   'ENTRY_SIGNAL:processing', # Harel formalism
+   'processing', # result of chart.scribble("processing")
+   'INIT_SIGNAL:processing', # Harel formalism
+   'POST_FIFO:POLL', # chart.post_fifo(Event(signal=signals.POLL))
+   '<- Queued:(1) Deferred:(0)', # rtc completed (event waiting)
+   'POLL:processing', # polling state detected POLL event
+   'SEARCH_FOR_SUPER_SIGNAL:polling', # Harel formalism search
+   'SEARCH_FOR_SUPER_SIGNAL:processing', # Harel formalism search
+   'EXIT_SIGNAL:processing', # Harel formalism
+   'ENTRY_SIGNAL:polling', # Harel formalism
+   'INIT_SIGNAL:polling', # Harel formalism
+   '<- Queued:(0) Deferred:(0)', #rtc complete (no events waiting)
+   'TIME_OUT:polling', # second TIME_OUT event cycle described above
+   'polling', 
+   'POST_FIFO:PROCESS',
+   'TIME_OUT:polling:HOOK',
+   '<- Queued:(1) Deferred:(0)',
+   'PROCESS:polling',
+   'SEARCH_FOR_SUPER_SIGNAL:processing',
+   'SEARCH_FOR_SUPER_SIGNAL:polling',
+   'EXIT_SIGNAL:polling',
+   'ENTRY_SIGNAL:processing',
+   'processing',
+   'INIT_SIGNAL:processing',
+   'POST_FIFO:POLL',
+   '<- Queued:(1) Deferred:(0)',
+   'POLL:processing',
+   'SEARCH_FOR_SUPER_SIGNAL:polling',
+   'SEARCH_FOR_SUPER_SIGNAL:processing',
+   'EXIT_SIGNAL:processing',
+   'ENTRY_SIGNAL:polling',
+   'INIT_SIGNAL:polling',
+   '<- Queued:(0) Deferred:(0)',
+   'TIME_OUT:polling', # third TIME_OUT event expecting something different now
+   'polling', # result of chart.scribble("polling")
+   'POST_FIFO:PROCESS',  # inventing and posting our artificial event
+   'TIME_OUT:polling:HOOK', # TIME_OUT was a hook, no state transition
+   '<- Queued:(1) Deferred:(0)', # rtc completed (event waiting)
+   'PROCESS:polling', # PROCESS event detected in polling
+   'SEARCH_FOR_SUPER_SIGNAL:processing', # Harel formalism search
+   'SEARCH_FOR_SUPER_SIGNAL:polling', # Harel formalism search
+   'EXIT_SIGNAL:polling', # Harel formalism
+   'ENTRY_SIGNAL:processing', # Harel formalism
+   'processing', # result of chart.scribble("processing")
+   'INIT_SIGNAL:processing', # Harel formalism
+   'SEARCH_FOR_SUPER_SIGNAL:busy', # Harel formalism search
+   'ENTRY_SIGNAL:busy', # Harel formalism
+   'INIT_SIGNAL:busy', # Harel formalism
+   '<- Queued:(0) Deferred:(0)', # rtc completed
+   'TIME_OUT:busy', # busy state detects it's first TIME_OUT
+   'TIME_OUT:busy:HOOK', # busy state hooks it and blocks it from leaving
+   '<- Queued:(0) Deferred:(0)', # rtc completed
+   'TIME_OUT:busy', # busy state detect it's second TIME_OUT
+   'TIME_OUT:busy:HOOK', # busy state hooks it and blocks it from leaving
+   '<- Queued:(0) Deferred:(0)', # rtc completed
+   'TIME_OUT:busy', # busy state detects it's third TIME_OUT
+   'SEARCH_FOR_SUPER_SIGNAL:polling', # Harel formalism search
+   'SEARCH_FOR_SUPER_SIGNAL:busy', # Harel formalism search
+   'EXIT_SIGNAL:busy', # Harel formalism
+   'EXIT_SIGNAL:processing', # Harel formalism
+   'SEARCH_FOR_SUPER_SIGNAL:processing', # Harel formalism search
+   'ENTRY_SIGNAL:polling', # Harel formalism
+   'INIT_SIGNAL:polling', # Harel formalism
+   '<- Queued:(0) Deferred:(0)', # rtc completed
+   'TIME_OUT:polling', # full circuit completed DESIGN CONFIRMED
+   # deleting the rest of the log from documentation
+
+We have a working design, the polling and processing states are kind of 
 
 .. _patterns-deferred-event:
 
@@ -605,7 +835,6 @@ Orthogonal Component
 
 Transition To History
 ^^^^^^^^^^^^^^^^^^^^^
-
 
 .. _patterns-multichart-race:
 

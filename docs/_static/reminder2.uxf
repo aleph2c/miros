@@ -4,7 +4,7 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>588</x>
+      <x>576</x>
       <y>204</y>
       <w>36</w>
       <h>96</h>
@@ -20,7 +20,7 @@
       <w>264</w>
       <h>120</h>
     </coordinates>
-    <panel_attributes>chart = ActiveObject()
+    <panel_attributes>chart = Factory()
 valign=top</panel_attributes>
     <additional_attributes/>
   </element>
@@ -41,11 +41,11 @@ Event Processor</panel_attributes>
     <coordinates>
       <x>528</x>
       <y>120</y>
-      <w>108</w>
+      <w>96</w>
       <h>108</h>
     </coordinates>
     <panel_attributes>lt=[^]-(</panel_attributes>
-    <additional_attributes>10.0;10.0;60.0;60.0</additional_attributes>
+    <additional_attributes>10.0;10.0;50.0;60.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
@@ -70,16 +70,20 @@ style=wordwrap</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>360</x>
+      <x>276</x>
       <y>264</y>
-      <w>312</w>
-      <h>456</h>
+      <w>360</w>
+      <h>180</h>
     </coordinates>
     <panel_attributes>*polling*
 --
-
-entry / 
-    char.scribble("polling")
+   
+TIME_OUT /
+   chart.scribble("polling")
+   chart.post_fifo(
+     Event(signal=signals.PROCESS))
+   
+	
 
 
 valign=top
@@ -102,7 +106,7 @@ entry /
 TIME_OUT /
    chart.scribble("busy")
    chart.busy_count += 1
-   if chart.busy_count &gt;= 5:
+   if chart.busy_count &gt; 2:
       chart.trans(polling)
 
   
@@ -124,8 +128,7 @@ entry /
   chart.processing_count += 1
   chart.scribble("processing")
 
-exit /
-   chart.processing_count = 0
+
 valign=top
 </panel_attributes>
     <additional_attributes/>
@@ -133,25 +136,14 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>396</x>
-      <y>384</y>
-      <w>216</w>
-      <h>36</h>
-    </coordinates>
-    <panel_attributes>lt=-&gt;</panel_attributes>
-    <additional_attributes>10.0;10.0;160.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>660</x>
-      <y>600</y>
-      <w>300</w>
-      <h>48</h>
+      <x>336</x>
+      <y>432</y>
+      <w>624</w>
+      <h>216</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
-    <additional_attributes>230.0;20.0;10.0;20.0</additional_attributes>
+    <additional_attributes>500.0;160.0;10.0;160.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLSpecialState</id>
@@ -169,11 +161,12 @@ valign=top
     <coordinates>
       <x>1080</x>
       <y>384</y>
-      <w>240</w>
+      <w>252</w>
       <h>132</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-[chart.processing_cout &gt;= 5]</panel_attributes>
+[chart.processing_cout &gt;= 3] \
+ (chart.processing_count = 0)</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
   </element>
   <element>
@@ -212,40 +205,6 @@ valign=top
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>384</x>
-      <y>384</y>
-      <w>24</w>
-      <h>24</h>
-    </coordinates>
-    <panel_attributes>type=initial</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>396</x>
-      <y>708</y>
-      <w>240</w>
-      <h>72</h>
-    </coordinates>
-    <panel_attributes>lt=-&gt;
-TIME_OUT</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;40.0;180.0;40.0;180.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>UMLSpecialState</id>
-    <coordinates>
-      <x>588</x>
-      <y>384</y>
-      <w>24</w>
-      <h>24</h>
-    </coordinates>
-    <panel_attributes>type=final</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLSpecialState</id>
-    <coordinates>
       <x>828</x>
       <y>480</y>
       <w>24</w>
@@ -253,5 +212,42 @@ TIME_OUT</panel_attributes>
     </coordinates>
     <panel_attributes>type=final</panel_attributes>
     <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>624</x>
+      <y>312</y>
+      <w>180</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+PROCESS</panel_attributes>
+    <additional_attributes>10.0;20.0;130.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>852</x>
+      <y>432</y>
+      <w>276</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>chart.post_fifo(
+  Event(signal=signals.POLL))
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>432</y>
+      <w>264</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+POLL</panel_attributes>
+    <additional_attributes>200.0;40.0;10.0;40.0;10.0;10.0</additional_attributes>
   </element>
 </diagram>

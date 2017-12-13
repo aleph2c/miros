@@ -193,15 +193,14 @@ def spy_on(fn):
         if(status is return_status.HANDLED):
           # chart.rtc.spy.pop()
           chart.rtc.spy.append("{}:{}:HOOK".format(e.signal_name, name))
-          sr = spy_tuple(signal=e.signal_name, state=name, hook=True)
+          sr = spy_tuple(signal=e.signal_name, state=name, hook=True, datetime=datetime.now())
         else:
           if status is return_status.IGNORED:
-            sr = spy_tuple(signal=e.signal_name, state=name, ignored=True)
+            sr = spy_tuple(signal=e.signal_name, state=name, ignored=True, datetime=datetime.now())
           else:
-            sr = spy_tuple(signal=e.signal_name, state=name)
-
+            sr = spy_tuple(signal=e.signal_name, state=name, datetime=datetime.now())
     else:
-      sr = spy_tuple(signal=e.signal_name, state=name, hook=True, internal=True)
+      sr = spy_tuple(signal=e.signal_name, state=name, hook=True, internal=True, datetime=datetime.now())
     chart.rtc.tuples.append(sr)
     return status
   return _spy_on
@@ -259,8 +258,6 @@ def append_fifo_to_spy(fn):
   def _append_fifo_to_spy(self, e):
     fn(self, e)
     if self.instrumented:
-      sr = spy_tuple(signal=e.signal_name, post_fifo=True)
-      self.rtc.tuples.append(sr)
       self.rtc.spy.append("POST_FIFO:{}".format(e.signal_name))
   return _append_fifo_to_spy
 
@@ -275,7 +272,7 @@ def trace_on_start(fn):
     status = fn(self, initial_state)
     if self.rtc.tuples[0].start:
       t = self.TraceTuple(
-          datetime=datetime.now(),
+           datetime=datetime.now(),
            start_state = 'top',
            signal      = None,
            payload     = None,
@@ -1072,6 +1069,7 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
             ignored = False
             break
           ignored = sr.ignored
+          break
       return (signal_name, hooked, ignored, dt)
 
     def _append_to_full_trace(self, e):
@@ -1220,8 +1218,6 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     def _append_lifo_to_spy(self, e):
       fn(self, e)
       if self.instrumented:
-        sr = spy_tuple(signal=e.signal_name, post_lifo=True)
-        self.rtc.tuples.append(sr)
         self.rtc.spy.append("POST_LIFO:{}".format(e.signal_name))
     return _append_lifo_to_spy
 

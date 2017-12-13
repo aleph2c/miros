@@ -563,7 +563,7 @@ processing are not quite independent. <a class="footnote-reference" href="#id5" 
 <p class="first admonition-title">Note</p>
 <p class="last">Programming a statechart with <a class="reference internal" href="glossary.html#term-orthogonal-region"><span class="xref std std-term">orthogonal regions</span></a> is
 computationally expensive.  So if you find yourself drawing two seperate states
-with a lot of arrows connecting them, remind yourself of the reminder pattern.</p>
+with a lot of arrows connecting them, remind yourself of this reminder pattern.</p>
 </div>
 <p>The reminder pattern uses the ultimate hook pattern mixed with
 <a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial event</span></a> injection.  It’s an artificial event
@@ -577,7 +577,7 @@ pattern.</p>
 <li>Part of the system will poll a sensor based on a system clock running with
 a period of 100ms.</li>
 <li>Once polled this information will be sent to some processing code.</li>
-<li>After five such events, the system will perform some processing and it will
+<li>After three such events, the system will perform some processing and it will
 enter a busy state (maybe communicating with a server).</li>
 <li>While the unit is in a busy state it should not poll the sensor or process
 input.</li>
@@ -588,7 +588,7 @@ polling mode.</li>
 <div align="center" class="align-center"><img alt="_images/reminder1.svg" src="_images/reminder1.svg" /></div>
 <p>We create a polling state which upon entry poles something.  Any time there is
 a time out it will re-enter the state making this happen.</p>
-<p>Then when it Initializes it transitions into the processing state.  Upon
+<p>Then when it initializes it transitions into the processing state.  Upon
 entering the processing state we add one to the <code class="docutils literal"><span class="pre">chart.processing_count</span></code> and
 then process the message.  When the processing state initializes itself it will
 either go back to the polling state or enter the busy state, if the
@@ -598,12 +598,13 @@ TIME_OUT event is used with a <span class="xref std std-term">hook</span> to wor
 this example we just scribble “busy” into the spy log.  Then we add 1 to our
 <code class="docutils literal"><span class="pre">chart.busy_count</span></code>.  If the count is big enough we transition back to the
 polling state.  Upon exiting the processing state, the
-<code class="docutils literal"><span class="pre">chart.processing_count</span></code> is set to 0.  That should work!</p>
-<p>But notice the large <strong>Xs</strong> on the diagram.  These are there to show that they
+<code class="docutils literal"><span class="pre">chart.processing_count</span></code> is set to 0.  That should work!  Actually, it won’t
+work at all.</p>
+<p>Notice the large <strong>Xs</strong> on the diagram.  These are there to show that they
 are illegal transitions.  The Miro Samek event processoring algorithm will only
 allow init events to drill further into child states; they can not leave there
-current state and navigate to another region of the chart.   It’s an honest
-mistake.</p>
+current state and navigate to another region of the chart.  I’ll just pretend I
+didn’t know about this and continue.</p>
 <p>Let’s see what happens when we try to make this broken statechart</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">pp</span>
@@ -615,12 +616,12 @@ mistake.</p>
 
 <span class="k">def</span> <span class="nf">polling_enter</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;polling&quot;</span><span class="p">)</span>
-<span class="hll">  <span class="k">return</span> <span class="n">return_state</span><span class="o">.</span><span class="n">HANDLED</span>
-</span><span class="hll">
-</span><span class="k">def</span> <span class="nf">polling_init</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="c1"># illegal (init can&#39;t leave parent states)</span>
-  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">processing</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">return_state</span><span class="o">.</span><span class="n">HANDLED</span>
 
+<span class="k">def</span> <span class="nf">polling_init</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="hll">  <span class="c1"># illegal (init can&#39;t leave parent states)</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">processing</span><span class="p">)</span>
+</span>
 <span class="k">def</span> <span class="nf">processing_entry</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">chart</span><span class="o">.</span><span class="n">processing_count</span> <span class="o">+=</span> <span class="mi">1</span>
   <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;processing&quot;</span><span class="p">)</span>
@@ -628,12 +629,12 @@ mistake.</p>
 
 <span class="k">def</span> <span class="nf">processing_init</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="bp">None</span>
-  <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">processing_count</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">:</span>
-<span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">busy</span><span class="p">)</span>
-</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
-</span>  <span class="c1"># illegal (init can&#39;t leave parent states)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">polling</span><span class="p">)</span>
-  <span class="k">return</span> <span class="n">status</span>
+  <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">processing_count</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">busy</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+<span class="hll">    <span class="c1"># illegal (init can&#39;t leave parent states)</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">polling</span><span class="p">)</span>
+</span>  <span class="k">return</span> <span class="n">status</span>
 
 <span class="k">def</span> <span class="nf">processing_exit</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">chart</span><span class="o">.</span><span class="n">processing_count</span> <span class="o">=</span> <span class="mi">0</span>
@@ -646,7 +647,7 @@ mistake.</p>
 <span class="k">def</span> <span class="nf">busy_time_out</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">chart</span><span class="o">.</span><span class="n">busy_count</span> <span class="o">+=</span> <span class="mi">1</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-  <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">busy_count</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">:</span>
+  <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">busy_count</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">polling</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">status</span>
 
@@ -657,6 +658,7 @@ mistake.</p>
 <span class="n">polling</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;polling&quot;</span><span class="p">)</span><span class="o">.</span> \
             <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">polling_time_out</span><span class="p">)</span><span class="o">.</span> \
             <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">polling_init</span><span class="p">)</span><span class="o">.</span> \
+            <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">PROCESS</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">polling_init</span><span class="p">)</span><span class="o">.</span> \
             <span class="n">to_method</span><span class="p">()</span>
 
 <span class="n">processing</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;processing&quot;</span><span class="p">)</span><span class="o">.</span> \
@@ -689,13 +691,221 @@ mistake.</p>
 </div>
 <p>So, how do we make this software work?  When you see this
 <code class="docutils literal"><span class="pre">HsmTopologyException</span></code>, it’s probably time to consider another way to design
-your statechart.  We will get to that shortly, but for now let’s find a way to force
-this software to work they way we want it too.</p>
-<p>Instead of making the INIT_SIGNAL transition outside of the state, instead we
-could invent a new signal, post it to ourselves and pretend like it came from
-outside of the active object and then react to it like we would any other
-event.  This is why it is called an <a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial event</span></a>.
-hey</p>
+your statechart.  We will get to that shortly, but for now let’s find a way to
+force this software to work the way we want it to.</p>
+<p>Instead of making the INIT_SIGNAL transition outside of the state, we could
+invent a new signal, post it to ourselves and pretend like it came from outside
+of the active object.  Then our chart could react to it like it would to any
+other event.  This kind of thing is called an <a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial
+event</span></a>.  Here is the code that would create an artificial
+PROCESS event:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># If &#39;PROCESS&#39; signal wasn&#39;t invented before invent it now</span>
+<span class="c1"># We post it to ourselves so we can react to it in the next rtc.</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">PROCESS</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Now that we know how to do that let’s redesign our statechart:</p>
+<div align="center" class="align-center"><img alt="_images/reminder2.svg" src="_images/reminder2.svg" /></div>
+<p>This introduces a new glyph called the final state:</p>
+<div align="center" class="align-center"><img alt="_images/reminder3.svg" src="_images/reminder3.svg" /></div>
+<p>When you see this glyph on a diagram it means, stop running.  So:</p>
+<div align="center" class="align-center"><img alt="_images/reminder4.svg" src="_images/reminder4.svg" /></div>
+<p>Would look like this as code:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">processing_init</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">processing_count</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span> <span class="c1"># Square brackets on diagram.</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">processing_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">busy</span><span class="p">)</span> <span class="c1"># HEAVY-DUTY Harel Formalism run here.</span>
+                               <span class="c1"># This is recursive and might take</span>
+                               <span class="c1"># a while  before this</span>
+                               <span class="c1"># routine finishes.</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="c1"># If &#39;POLL&#39; signal wasn&#39;t invented before invent it now.</span>
+    <span class="c1"># We post it to ourselves so we can react to it in the next rtc.</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">POLL</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Ok now that we have that all out of the way let’s start fresh, reconsidering
+our specification and our proposed design, then implement it in code:</p>
+<ul class="simple">
+<li>Part of the system will poll a sensor based on a system clock running with
+a period of 100ms.</li>
+<li>Once polled this information will be sent to some processing code.</li>
+<li>After three such events, the system will perform some processing and it will
+enter a busy state (maybe communicating with a server).</li>
+<li>While the unit is in a busy state it should not poll the sensor or process
+input.</li>
+<li>After the busy process is completed the system should go back into it’s
+polling mode.</li>
+</ul>
+<div align="center" class="align-center"><img alt="_images/reminder2.svg" src="_images/reminder2.svg" /></div>
+<p>Here is the code for this design with highlights for the artificial events:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">pp</span>
+<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">Factory</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+
+<span class="k">def</span> <span class="nf">polling_time_out</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;polling&quot;</span><span class="p">)</span>
+<span class="hll">  <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+</span><span class="hll">    <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">PROCESS</span><span class="p">))</span>
+</span>  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+<span class="k">def</span> <span class="nf">polling_process</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">processing</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">processing_entry</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">chart</span><span class="o">.</span><span class="n">processing_count</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;processing&quot;</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+<span class="k">def</span> <span class="nf">processing_init</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">processing_count</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">processing_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">busy</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+<span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+</span><span class="hll">      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">POLL</span><span class="p">))</span>
+</span>  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">def</span> <span class="nf">processing_poll</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">polling</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">processing_exit</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+<span class="k">def</span> <span class="nf">busy_entry</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">chart</span><span class="o">.</span><span class="n">busy_count</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+<span class="k">def</span> <span class="nf">busy_time_out</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">chart</span><span class="o">.</span><span class="n">busy_count</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">busy_count</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">polling</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="n">chart</span> <span class="o">=</span> <span class="n">Factory</span><span class="p">(</span><span class="s1">&#39;reminder_pattern_needed_2&#39;</span><span class="p">)</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;processing_count&quot;</span><span class="p">)</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;busy_count&quot;</span><span class="p">)</span>
+
+<span class="n">polling</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;polling&quot;</span><span class="p">)</span><span class="o">.</span> \
+            <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">polling_time_out</span><span class="p">)</span><span class="o">.</span> \
+<span class="hll">            <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">PROCESS</span><span class="p">,</span>  <span class="n">handler</span><span class="o">=</span><span class="n">polling_process</span><span class="p">)</span><span class="o">.</span> \
+</span>            <span class="n">to_method</span><span class="p">()</span>
+
+<span class="n">processing</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;processing&quot;</span><span class="p">)</span><span class="o">.</span> \
+            <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">processing_entry</span><span class="p">)</span><span class="o">.</span> \
+            <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">processing_init</span><span class="p">)</span><span class="o">.</span> \
+            <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">processing_exit</span><span class="p">)</span><span class="o">.</span> \
+<span class="hll">            <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">POLL</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">processing_poll</span><span class="p">)</span><span class="o">.</span> \
+</span>            <span class="n">to_method</span><span class="p">()</span>
+
+<span class="n">busy</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;busy&quot;</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">busy_entry</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">busy_time_out</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">to_method</span><span class="p">()</span>
+
+<span class="n">chart</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="n">polling</span><span class="p">,</span>    <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="n">processing</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="n">busy</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">processing</span><span class="p">)</span>
+
+<span class="n">chart</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">polling</span><span class="p">)</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">),</span> <span class="n">times</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>If we run this code, it will output 1 seconds worth of information. The
+comments in the spy log are the thoughts I would have while viewing it.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span> <span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span> <span class="c1"># start_at code running</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:polling&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism search</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:polling&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+ <span class="s1">&#39;INIT_SIGNAL:polling&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+ <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span> <span class="c1"># start_at code completed</span>
+ <span class="s1">&#39;TIME_OUT:polling&#39;</span><span class="p">,</span> <span class="c1"># time out event detected in polling</span>
+ <span class="s1">&#39;polling&#39;</span><span class="p">,</span> <span class="c1"># result of chart.scribble(&quot;polling&quot;)</span>
+ <span class="s1">&#39;POST_FIFO:PROCESS&#39;</span><span class="p">,</span> <span class="c1"># inventing and posting our artificial event</span>
+ <span class="s1">&#39;TIME_OUT:polling:HOOK&#39;</span><span class="p">,</span>  <span class="c1"># TIME_OUT was a hook, no state transition</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(0)&#39;</span><span class="p">,</span> <span class="c1"># rtc completed (event waiting)</span>
+</span> <span class="s1">&#39;PROCESS:polling&#39;</span><span class="p">,</span> <span class="c1"># PROCESS event detected in polling</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:processing&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism search</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:polling&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism search</span>
+ <span class="s1">&#39;EXIT_SIGNAL:polling&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:processing&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+ <span class="s1">&#39;processing&#39;</span><span class="p">,</span> <span class="c1"># result of chart.scribble(&quot;processing&quot;)</span>
+ <span class="s1">&#39;INIT_SIGNAL:processing&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+ <span class="s1">&#39;POST_FIFO:POLL&#39;</span><span class="p">,</span> <span class="c1"># chart.post_fifo(Event(signal=signals.POLL))</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(0)&#39;</span><span class="p">,</span> <span class="c1"># rtc completed (event waiting)</span>
+</span> <span class="s1">&#39;POLL:processing&#39;</span><span class="p">,</span> <span class="c1"># polling state detected POLL event</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:polling&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism search</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:processing&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism search</span>
+ <span class="s1">&#39;EXIT_SIGNAL:processing&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:polling&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+ <span class="s1">&#39;INIT_SIGNAL:polling&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span> <span class="c1">#rtc complete (no events waiting)</span>
+</span> <span class="s1">&#39;TIME_OUT:polling&#39;</span><span class="p">,</span> <span class="c1"># second TIME_OUT event cycle described above</span>
+ <span class="s1">&#39;polling&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;POST_FIFO:PROCESS&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;TIME_OUT:polling:HOOK&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(0)&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;PROCESS:polling&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:processing&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:polling&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;EXIT_SIGNAL:polling&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:processing&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;processing&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:processing&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;POST_FIFO:POLL&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(0)&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;POLL:processing&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:polling&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:processing&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;EXIT_SIGNAL:processing&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:polling&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:polling&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;TIME_OUT:polling&#39;</span><span class="p">,</span> <span class="c1"># third TIME_OUT event expecting something different now</span>
+ <span class="s1">&#39;polling&#39;</span><span class="p">,</span> <span class="c1"># result of chart.scribble(&quot;polling&quot;)</span>
+ <span class="s1">&#39;POST_FIFO:PROCESS&#39;</span><span class="p">,</span>  <span class="c1"># inventing and posting our artificial event</span>
+ <span class="s1">&#39;TIME_OUT:polling:HOOK&#39;</span><span class="p">,</span> <span class="c1"># TIME_OUT was a hook, no state transition</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(0)&#39;</span><span class="p">,</span> <span class="c1"># rtc completed (event waiting)</span>
+</span> <span class="s1">&#39;PROCESS:polling&#39;</span><span class="p">,</span> <span class="c1"># PROCESS event detected in polling</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:processing&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism search</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:polling&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism search</span>
+ <span class="s1">&#39;EXIT_SIGNAL:polling&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:processing&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+ <span class="s1">&#39;processing&#39;</span><span class="p">,</span> <span class="c1"># result of chart.scribble(&quot;processing&quot;)</span>
+ <span class="s1">&#39;INIT_SIGNAL:processing&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:busy&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism search</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:busy&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+ <span class="s1">&#39;INIT_SIGNAL:busy&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span> <span class="c1"># rtc completed</span>
+</span> <span class="s1">&#39;TIME_OUT:busy&#39;</span><span class="p">,</span> <span class="c1"># busy state detects it&#39;s first TIME_OUT</span>
+ <span class="s1">&#39;TIME_OUT:busy:HOOK&#39;</span><span class="p">,</span> <span class="c1"># busy state hooks it and blocks it from leaving</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span> <span class="c1"># rtc completed</span>
+</span> <span class="s1">&#39;TIME_OUT:busy&#39;</span><span class="p">,</span> <span class="c1"># busy state detect it&#39;s second TIME_OUT</span>
+ <span class="s1">&#39;TIME_OUT:busy:HOOK&#39;</span><span class="p">,</span> <span class="c1"># busy state hooks it and blocks it from leaving</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span> <span class="c1"># rtc completed</span>
+</span> <span class="s1">&#39;TIME_OUT:busy&#39;</span><span class="p">,</span> <span class="c1"># busy state detects it&#39;s third TIME_OUT</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:polling&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism search</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:busy&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism search</span>
+ <span class="s1">&#39;EXIT_SIGNAL:busy&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+ <span class="s1">&#39;EXIT_SIGNAL:processing&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:processing&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism search</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:polling&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+ <span class="s1">&#39;INIT_SIGNAL:polling&#39;</span><span class="p">,</span> <span class="c1"># Harel formalism</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span> <span class="c1"># rtc completed</span>
+</span><span class="hll"> <span class="s1">&#39;TIME_OUT:polling&#39;</span><span class="p">,</span> <span class="c1"># full circuit completed DESIGN CONFIRMED</span>
+</span> <span class="c1"># deleting the rest of the log from documentation</span>
+</pre></div>
+</div>
+<p>We have a working design, the polling and processing states are kind of</p>
 </div>
 <div class="section" id="deferred-event">
 <span id="patterns-deferred-event"></span><h2>Deferred Event<a class="headerlink" href="#deferred-event" title="Permalink to this headline">¶</a></h2>
