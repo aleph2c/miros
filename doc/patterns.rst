@@ -589,9 +589,7 @@ Instead of making the INIT_SIGNAL transition outside of the state, instead we
 could invent a new signal, post it to ourselves and pretend like it came from
 outside of the active object and then react to it like we would any other
 event.  This is why it is called an :term:`artificial event<Artificial Event>`.
-
-
-
+hey
 
 .. _patterns-deferred-event:
 
