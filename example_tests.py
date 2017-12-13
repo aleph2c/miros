@@ -1,6 +1,6 @@
 import time
 from miros.hsm import spy_on, pp, state_method_template
-from miros.activeobject import ActiveObject
+from miros.activeobject import ActiveObject, Factory
 from miros.event import signals, Event, return_status
 
 
@@ -628,6 +628,236 @@ def ultimate_hook_example3():
   time.sleep(0.001)
   pp(ao.spy())
 
+def ultimate_hook_example4():
+  import time
+  from miros.hsm import pp
+  from miros.activeobject import Factory
+  from miros.event import signals, Event, return_status
+
+  def process_a_generic(chart, e):
+    chart.scribble('processing a generic')
+    return return_status.HANDLED
+
+  def process_b_generic(chart, e):
+    chart.scribble('processing b generic')
+    return return_status.HANDLED
+
+  # overrides the generic hook while in the specific state
+  def process_a_specific(chart, e):
+    chart.scribble('processing a specific')
+    return return_status.HANDLED
+
+  chart = Factory('ultimate_hook_example')
+  generic = chart.create(state='generic'). \
+    catch(signal=signals.a, handler=process_a_generic). \
+    catch(signal=signals.b, handler=process_b_generic). \
+    to_method()
+
+  specific = chart.create(state='specific'). \
+      catch(signal=signals.a, handler=process_a_specific). \
+      to_method()
+
+  chart.nest(generic, parent=None). \
+        nest(specific, parent=generic)
+
+  chart.start_at(specific)
+  chart.post_fifo(Event(signal=signals.b))
+  chart.post_fifo(Event(signal=signals.a))
+  time.sleep(0.001)
+  pp(chart.spy())
+
+def augment_example():
+  import time
+  from miros.hsm import pp
+  from miros.activeobject import Factory
+  from miros.event import signals, Event, return_status
+
+  def process_a_generic(chart, e):
+    chart.scribble('processing a generic')
+    return return_status.HANDLED
+
+  def process_b_generic(chart, e):
+    chart.scribble('processing b generic')
+    return return_status.HANDLED
+
+  # overrides the generic hook while in the specific state
+  def process_a_specific(chart, e):
+    chart.scribble('processing a specific')
+    return return_status.HANDLED
+
+  chart = Factory('ultimate_hook_example')
+  chart.augment(other=0, name='counter')
+  assert(chart.counter == 0)
+  generic = chart.create(state='generic'). \
+    catch(signal=signals.a, handler=process_a_generic). \
+    catch(signal=signals.b, handler=process_b_generic). \
+    to_method()
+
+  specific = chart.create(state='specific'). \
+      catch(signal=signals.a, handler=process_a_specific). \
+      to_method()
+
+  chart.nest(generic, parent=None). \
+        nest(specific, parent=generic)
+
+  chart.start_at(specific)
+  chart.post_fifo(Event(signal=signals.b))
+  chart.post_fifo(Event(signal=signals.a))
+  time.sleep(0.001)
+  pp(chart.spy())
+
+
+def reminder1():
+
+  import time
+  from miros.hsm import pp
+  from miros.activeobject import Factory
+  from miros.event import signals, Event, return_status
+
+  def polling_time_out(chart, e):
+    return chart.trans(polling)
+
+  def polling_enter(chart, e):
+    chart.scribble("polling")
+    return return_state.HANDLED
+
+  def polling_init(chart, e):
+    # illegal (init can't leave parent states)
+    return chart.trans(processing)
+
+  def processing_entry(chart, e):
+    chart.processing_count += 1
+    chart.scribble("processing")
+    return return_status.HANDLED
+
+  def processing_init(chart, e):
+    status = None
+    if chart.processing_count >= 5:
+      status = chart.trans(busy)
+    else:
+    # illegal (init can't leave parent states)
+      status = chart.trans(polling)
+    return status
+
+  def processing_exit(chart, e):
+    chart.processing_count = 0
+    return return_status.HANDLED
+
+  def busy_entry(chart, e):
+    chart.busy_count = 0
+    return return_status.HANDLED
+
+  def busy_time_out(chart, e):
+    chart.busy_count += 1
+    status = return_status.HANDLED
+    if chart.busy_count >= 5:
+      status = chart.trans(polling)
+    return status
+
+  chart = Factory('reminder_pattern_needed_1')
+  chart.augment(other=0, name="processing_count")
+  chart.augment(other=0, name="busy_count")
+
+  polling = chart.create(state="polling"). \
+              catch(signal=signals.TIME_OUT, handler=polling_time_out). \
+              catch(signal=signals.INIT_SIGNAL, handler=polling_init). \
+              to_method()
+
+  processing = chart.create(state="processing"). \
+              catch(signal=signals.ENTRY_SIGNAL, handler=processing_entry). \
+              catch(signal=signals.INIT_SIGNAL, handler=processing_init). \
+              catch(signal=signals.EXIT_SIGNAL, handler=processing_exit). \
+              to_method()
+
+  busy = chart.create(state="busy"). \
+          catch(signal=signals.ENTRY_SIGNAL, handler=busy_entry). \
+          catch(signal=signals.TIME_OUT, handler=busy_time_out). \
+          to_method()
+
+  chart.nest(polling, parent=None). \
+        nest(processing, parent=None). \
+        nest(busy, parent=processing)
+
+  chart.start_at(polling)
+  chart.post_fifo(Event(signal=signals.TIME_OUT), times=20, period=0.1)
+  time.sleep(5)
+  pp(chart.spy())
+
+def reminder2():
+
+  import time
+  from miros.hsm import pp
+  from miros.activeobject import Factory
+  from miros.event import signals, Event, return_status
+
+  def polling_time_out(chart, e):
+    return chart.trans(polling)
+
+  def polling_enter(chart, e):
+    chart.scribble("polling")
+    return return_state.HANDLED
+
+  def polling_init(chart, e):
+    # illegal (init can't leave parent states)
+    return chart.trans(processing)
+
+  def processing_entry(chart, e):
+    chart.processing_count += 1
+    chart.scribble("processing")
+    return return_status.HANDLED
+
+  def processing_init(chart, e):
+    status = None
+    if chart.processing_count >= 5:
+      status = chart.trans(busy)
+    else:
+    # illegal (init can't leave parent states)
+      status = chart.trans(polling)
+    return status
+
+  def processing_exit(chart, e):
+    chart.processing_count = 0
+    return return_status.HANDLED
+
+  def busy_entry(chart, e):
+    chart.busy_count = 0
+    return return_status.HANDLED
+
+  def busy_time_out(chart, e):
+    chart.busy_count += 1
+    status = return_status.HANDLED
+    if chart.busy_count >= 5:
+      status = chart.trans(polling)
+    return status
+
+  chart = Factory('reminder_pattern_needed_1')
+  chart.augment(other=0, name="processing_count")
+  chart.augment(other=0, name="busy_count")
+
+  polling = chart.create(state="polling"). \
+              catch(signal=signals.TIME_OUT, handler=polling_time_out). \
+              catch(signal=signals.INIT_SIGNAL, handler=polling_init). \
+              to_method()
+
+  processing = chart.create(state="processing"). \
+              catch(signal=signals.ENTRY_SIGNAL, handler=processing_entry). \
+              catch(signal=signals.INIT_SIGNAL, handler=processing_init). \
+              catch(signal=signals.EXIT_SIGNAL, handler=processing_exit). \
+              to_method()
+
+  busy = chart.create(state="busy"). \
+          catch(signal=signals.ENTRY_SIGNAL, handler=busy_entry). \
+          catch(signal=signals.TIME_OUT, handler=busy_time_out). \
+          to_method()
+
+  chart.nest(polling, parent=None). \
+        nest(processing, parent=None). \
+        nest(busy, parent=processing)
+
+  chart.start_at(polling)
+  chart.post_fifo(Event(signal=signals.TIME_OUT), times=20, period=0.1)
+  time.sleep(5)
+  pp(chart.spy())
 
 if __name__ == '__main__':
   # t_question()
@@ -637,5 +867,8 @@ if __name__ == '__main__':
   # example_4()
   # example_5()
   # multiunit_example()
-  #ultimate_hook_example1()
-  ultimate_hook_example3()
+  # ultimate_hook_example1()
+  # ultimate_hook_example3()
+  # ultimate_hook_example4()
+  # augment_example()
+  reminder1()

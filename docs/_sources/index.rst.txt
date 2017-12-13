@@ -6,6 +6,9 @@
 .. image:: _static/miros_a_lg.svg
    :align: left
 
+Python Statecharts
+------------------
+
 .. toctree::
    :maxdepth: 1
    :caption: Contents:

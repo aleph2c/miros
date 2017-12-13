@@ -122,31 +122,31 @@ Glossary
       A run to completion process begins when a statechart receives an event.
       It searches it's local graph and makes a determination if it needs to
       respond, if so it will transition from the local state to the target
-      state while adhering to the Harel Formalism, then it will run the
-      INIT_SIGNAL within that target state.  If that state initiations itself
-      by transitioning to another state, the event processor will run that
-      transition with the Harel Formalism.  This will continue until the
-      statechart has nothing left to do at which point it is finished it's
-      run-to-completion processing.  The active objects can not be pre-empted
-      with new events while they are in the throes of running through a RTC
-      process.  If an event is received it is placed in the queue and it will
-      not be considered by the event processor until it's RTC step is
-      completed.
+      state while adhering to the :term:`Harel Formalism<Harel Formalism>`,
+      then it will run the INIT_SIGNAL within that target state.  If that state
+      initiations itself by transitioning to another state, the event processor
+      will run that transition with the :term:`Harel Formalism<Harel
+      Formalism>`.  This will continue until the statechart has nothing left to
+      do at which point it is finished it's run-to-completion processing.  The
+      active objects can not be pre-empted with new events while they are in
+      the throes of running through a RTC process.  If an event is received it
+      is placed in the queue and it will not be considered by the event
+      processor until it's RTC step is completed.
 
    RTC
       :term:`Run To Completion<Run To Completion>`
 
    Harel Formalism
       The Harel Formalism is a set of rules for describing how events should be
-      processed by active objects.  They describe when internal events should
-      be send to state methods.  For instance an ENTRY_SIGNAL event should be
-      sent to a state method when it's boundary is breached from the outside to
-      the inside of the state.  An INIT_SIGNAL will be sent to a state method
-      anytime a state has been settled upon.  An EXIT_SIGNAL event should be
-      sent to a state method when it's boundary is being breached from an
-      inside-to-the-outside.  If a state doesn't know how to manage an event it
-      is passed out to it's outer state.  If no states know how to manage a
-      signal it is ignored by the state chart.
+      processed by active objects.  They describe when :term:`internal
+      events<Internal Event>` should be send to state methods.  For instance an
+      ENTRY_SIGNAL event should be sent to a state method when it's boundary is
+      breached from the outside to the inside of the state.  An INIT_SIGNAL
+      will be sent to a state method anytime a state has been settled upon.  An
+      EXIT_SIGNAL event should be sent to a state method when it's boundary is
+      being breached from an inside-to-the-outside.  If a state doesn't know
+      how to manage an event it is passed out to it's outer state.  If no
+      states know how to manage a signal it is ignored by the state chart.
 
    Fifo
       First in first out.  Things line up as you image they should.
@@ -257,6 +257,10 @@ Glossary
       seconds and it's value will determine the time delay prior to the event
       being presented to the active object's queue.
 
+      A one shot is often used as a kind of delayed :term:`init<Initialization Event>`
+      event.  If your statechart needs to settle for a while before it
+      continues to the next state consider using a one shot.
+
    Multi Shot
       A multi shot is sent from a ``post_lifo`` call by setting the ``times``
       argument to how every many events you would like to post (0 for
@@ -272,13 +276,51 @@ Glossary
       statechart code in that it does not describe the structure of the
       hierarchical state machine.
 
+   Orthogonal Region
+      A concept taken from the original Harel paper.  To understand what is meant
+      by an orthogonal region imagine two statecharts sitting beside one
+      another with a bunch of arrows between them. Loosely speaking if your to
+      draw a circle around these two statecharts and their arrows, you would be
+      describing two orthogonal regions. The word 'orthogonal' comes from
+      geometry where it describes a right angle. In the context of physics
+      'orthogonal' builds on this right angle idea and it adds the meaning that
+      two things do not effect each other that much.
+
+      The problem with orthogonal regions is one of search expense. If you are
+      sitting deep within one region and your statechart receives and event which
+      should take it deep within the other region, it must first search the chart
+      structure to find where it needs to go. The underlying framework within the
+      library does this work before it actually starts the exit and entry processing.
+
+      Given that you might be in the inner state of one of your orthogonal regions,
+      and you will need to search all the way out of this statechart and reach into
+      another; you are wasting cycles and adding a lot of computational complexity to
+      your design. This search is handled by the miros package, but your code will
+      run a lot slower than it needs to.
+
+   Artificial Event
+      An artificial event is an event which is made within your active object
+      and posted to itself.  An example of an artificial event would be a
+      :term:`one shot<One Shot>`.  It is called `artificial` because it is not
+      an event that came from outside of the active object in an asynchronous
+      way.
+
+   Initialization Event
+      The initialization (init) event, is an :term:`internal event<Internal
+      Event>` with signal called INIT_SIGNAL.  It is injected into your state
+      method when the event processor has settled upon this state after either
+      starting within it or finishing a state transition from a called to
+      ``trans``.  In UML the init event looks like a big black dot and an arrow
+      and it can point to another state, or have some code written directly on
+      it.
 
 
+   Internal Event
+      An internal event is an event that is created by the event processor and
+      sent to your active object to manifest the :term:`Harel Formalism<Harel
+      Formalism>`.  It is different from other events in that you don't have to
+      explicitly invent it when you are creating your design.
 
 
-
-
-
-        
 
 

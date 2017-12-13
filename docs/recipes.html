@@ -75,6 +75,7 @@ for specific signals, or even change it’s parent at run time.</li>
 <li><a class="reference internal" href="#recipes-do-something-when-the-state-is-entered"><span class="std std-ref">Do something when the state is entered</span></a></li>
 <li><a class="reference internal" href="#recipes-do-something-when-the-state-is-initialized"><span class="std std-ref">Do something when the state is initialized</span></a></li>
 <li><a class="reference internal" href="#recipes-do-something-when-the-state-is-exited"><span class="std std-ref">Do something when the state is exited</span></a></li>
+<li><a class="reference internal" href="#recipes-markup-your-event-processor"><span class="std std-ref">Augment your active object</span></a></li>
 <li><a class="reference internal" href="#recipes-create-a-hook"><span class="std std-ref">Create a hook</span></a></li>
 <li><a class="reference internal" href="#recipes-catch-and-release"><span class="std std-ref">Catch and release</span></a></li>
 <li><a class="reference internal" href="#recipes-create-a-one-shot-state"><span class="std std-ref">Create a one-shot</span></a></li>
@@ -464,6 +465,17 @@ from your state method call:</p>
   <span class="k">return</span> <span class="n">status</span>
 </pre></div>
 </div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If you use an init signal to transition out of your parent state an
+<code class="docutils literal"><span class="pre">HsmTopologyException</span></code> will be issued.  Init signals should only be used to
+run code with no transitions or to transition deeper into your statechart.
+If you absolutely need to leave a state after entering  you can post an
+<a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial event</span></a> into the fifo/lifo.  This will
+cause this signal to be caught on the next <a class="reference internal" href="glossary.html#term-run-to-completion"><span class="xref std std-term">rtc</span></a>
+process and your statechart will behave as you want it to (though, you should
+probably re-visit your design).</p>
+</div>
 </div>
 <div class="section" id="do-something-when-the-state-is-exited">
 <span id="recipes-do-something-when-the-state-is-exited"></span><h3>Do Something when the State is Exited<a class="headerlink" href="#do-something-when-the-state-is-exited" title="Permalink to this headline">¶</a></h3>
@@ -485,6 +497,16 @@ outside of of your state method’s boundary.</p>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
   <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="augment-your-active-object">
+<span id="recipes-markup-your-event-processor"></span><h3>Augment Your Active Object<a class="headerlink" href="#augment-your-active-object" title="Permalink to this headline">¶</a></h3>
+<p>It is a bad idea to add variables to the state methods, instead augment your
+active objects using the <code class="docutils literal"><span class="pre">augment</span></code> command.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">chart</span> <span class="o">=</span> <span class="n">ActiveObect</span><span class="p">()</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;counter&#39;</span><span class="p">)</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">counter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2007,6 +2029,7 @@ specification.</p>
 <li><a class="reference internal" href="#do-something-when-the-state-is-entered">Do Something when the State is Entered</a></li>
 <li><a class="reference internal" href="#do-something-when-the-state-is-initialized">Do Something when the State is Initialized</a></li>
 <li><a class="reference internal" href="#do-something-when-the-state-is-exited">Do Something when the State is Exited</a></li>
+<li><a class="reference internal" href="#augment-your-active-object">Augment Your Active Object</a></li>
 <li><a class="reference internal" href="#create-a-hook">Create a Hook</a></li>
 <li><a class="reference internal" href="#catch-and-release">Catch and Release</a></li>
 <li><a class="reference internal" href="#create-a-one-shot">Create a One-Shot</a></li>

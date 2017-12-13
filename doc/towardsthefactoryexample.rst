@@ -344,7 +344,8 @@ If we ran this code, we would see:
 
 Creating a Statechart Using Templates
 -------------------------------------
-We pretty much wrote the same method three times in a row in our last example.
+We pretty much wrote the same method three times in a row in our :ref:`last
+example<towardsthefactoryexample-registering-callbacks-to-specific-events>`.
 Wouldn't it be nice if something could write the thing for us?  
 
 This is exactly what the ``miros.hsm.state_method_template`` does.
@@ -460,8 +461,9 @@ the previous miros version.  It has the ``create``, ``catch`` and ``nest``
 methods, but it also extends the other API with ``to_method`` and ``to_code``.
 
 The Factory class wraps the ``register_signal_callback`` and
-``register_parent`` described in the previous section making syntax that is a
-bit more concise.
+``register_parent`` described in the :ref:`previous
+section<towardsthefactoryexample-registering-a-parent-to-a-state-method>`
+making syntax that is a bit more concise.
 
 .. image:: _static/factory5.svg
     :align: center

@@ -48,6 +48,7 @@ There are different ways to create states with miros:
 * :ref:`Do something when the state is entered<recipes-do-something-when-the-state-is-entered>`
 * :ref:`Do something when the state is initialized<recipes-do-something-when-the-state-is-initialized>`
 * :ref:`Do something when the state is exited<recipes-do-something-when-the-state-is-exited>`
+* :ref:`Augment your active object<recipes-markup-your-event-processor>`
 * :ref:`Create a hook<recipes-create-a-hook>`
 * :ref:`Catch and release<recipes-catch-and-release>`
 * :ref:`Create a one-shot<recipes-create-a-one-shot-state>`
@@ -498,6 +499,16 @@ from your state method call:
       self.temp.fun = self.c
     return status
 
+.. warning::
+  If you use an init signal to transition out of your parent state an
+  ``HsmTopologyException`` will be issued.  Init signals should only be used to
+  run code with no transitions or to transition deeper into your statechart.
+  If you absolutely need to leave a state after entering  you can post an
+  :term:`artificial event<Artificial Event>` into the fifo/lifo.  This will
+  cause this signal to be caught on the next :term:`rtc<Run To Completion>`
+  process and your statechart will behave as you want it to (though, you should
+  probably re-visit your design).
+
 .. _recipes-do-something-when-the-state-is-exited:
 
 Do Something when the State is Exited
@@ -524,6 +535,20 @@ outside of of your state method's boundary.
       status = return_status.SUPER
       self.temp.fun = self.c
     return status
+
+.. _recipes-markup-your-event-processor:
+
+Augment Your Active Object
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+It is a bad idea to add variables to the state methods, instead augment your
+active objects using the ``augment`` command.
+
+.. code-block:: python
+  
+  chart = ActiveObect()
+  chart.augment(other=0, name='counter')
+  assert(chart.counter == 0)
+
 
 .. _recipes-create-a-hook:
 
@@ -1020,7 +1045,6 @@ the chart does.  There are a number of situations where it makes sense to do
 this, they will be described in the patterns section.
 
 .. _recipes-posting-an-event-to-the-fifo:
-
 
 Posting an Event to the Fifo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
