@@ -111,7 +111,7 @@ import pprint
 import traceback  # try not use this if you can avoid it (it's fragile)
 from copy         import copy
 from functools    import wraps
-from datetime     import datetime
+from datetime     import datetime as stdlib_datetime
 from contextlib   import contextmanager
 from collections  import namedtuple, deque
 from miros.event  import signals, return_status, Event
@@ -139,11 +139,13 @@ def spy_tuple(signal     = None,
               post_defer = False,
               recall     = False,
               ignored    = False,
-              datetime   = datetime.now(),
+              datetime   = None,
               ):
   '''This is making it possible to have default settings in the SpyTuple,
      any attribute you need to over-write you can over-write by calling this
      function with it's name filled in with what you would like.'''
+  if datetime is None:
+    datetime = stdlib_datetime.now()
   return SpyTuple(signal=signal,
                   state=state,
                   start=start,
@@ -193,14 +195,14 @@ def spy_on(fn):
         if(status is return_status.HANDLED):
           # chart.rtc.spy.pop()
           chart.rtc.spy.append("{}:{}:HOOK".format(e.signal_name, name))
-          sr = spy_tuple(signal=e.signal_name, state=name, hook=True, datetime=datetime.now())
+          sr = spy_tuple(signal=e.signal_name, state=name, hook=True)
         else:
           if status is return_status.IGNORED:
-            sr = spy_tuple(signal=e.signal_name, state=name, ignored=True, datetime=datetime.now())
+            sr = spy_tuple(signal=e.signal_name, state=name, ignored=True)
           else:
-            sr = spy_tuple(signal=e.signal_name, state=name, datetime=datetime.now())
+            sr = spy_tuple(signal=e.signal_name, state=name)
     else:
-      sr = spy_tuple(signal=e.signal_name, state=name, hook=True, internal=True, datetime=datetime.now())
+      sr = spy_tuple(signal=e.signal_name, state=name, hook=True, internal=True)
     chart.rtc.tuples.append(sr)
     return status
   return _spy_on
@@ -243,7 +245,7 @@ def spy_on_start(fn):
         internal=None,   post_lifo=True,
         post_fifo=False, post_defer=False,
         recall=False,    ignored=False,
-        datetime=datetime.now()
+        datetime=stdlib_datetime.now()
     )
     self.rtc.tuples.append(sr)
     # fn is start_at
@@ -272,7 +274,7 @@ def trace_on_start(fn):
     status = fn(self, initial_state)
     if self.rtc.tuples[0].start:
       t = self.TraceTuple(
-           datetime=datetime.now(),
+           datetime=stdlib_datetime.now(),
            start_state = 'top',
            signal      = None,
            payload     = None,
@@ -1139,7 +1141,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       signal = tr.signal
 
     strace = "[{}] [{}] e->{}() {}->{}\n".format(
-        datetime.strftime(tr.datetime, "%Y-%m-%d %H:%M:%S.%f"),
+        stdlib_datetime.strftime(tr.datetime, "%Y-%m-%d %H:%M:%S.%f"),
         name,
         signal,
         tr.start_state,
