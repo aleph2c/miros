@@ -1578,4 +1578,3 @@ def stripped(log):
     yield(item_without_timestamp(target))
 
 
-

@@ -231,7 +231,7 @@ class ActiveFabricSource():
       lifo_item = None
       lifo_queue.task_done()  # so that join can work
 
-  def subscribe(self, queue, event_or_signal, queue_type='fifo'):
+  def subscribe(self, queue, event_or_signal, queue_type=None):
     '''subscribe a queue to an event in a 'fifo' or 'lifo' way
 
     There are two different ways to subscribe to an event:
@@ -306,17 +306,23 @@ class ActiveFabricSource():
         internal_queue[signal_name] = [queue]
         return signal_name
 
+    if queue_type is None:
+      queue_type = 'fifo'
+
     if queue_type is 'lifo':
       signal_name = _subscribe(self.lifo_subscriptions, event_or_signal)
     else:
       signal_name = _subscribe(self.fifo_subscriptions, event_or_signal)
     return signal_name
 
-  def publish(self, event, priority=1000):
+  def publish(self, event, priority=None):
     '''publish an event with a given priority to all subscribed queues
 
     Priority of 1 is the highest priority
     '''
+    if priority is None:
+      priority = 1000
+
     fefifo = FabricEvent(event, priority)
     self.lifo_fabric_queue.put(fefifo)
     felifo = FabricEvent(event, priority)
@@ -427,7 +433,11 @@ class ActiveObjectOutOfPostedEventResources(Exception):
 
 
 class ActiveObject(HsmWithQueues):
-  def __init__(self, name=None, instrumented=True):
+  def __init__(self, name=None, instrumented=None):
+
+    if instrumented is None:
+      instrumented = True
+
     super().__init__(instrumented)
     self.locking_deque = LockingDeque()
     # Over-write the deque in the Hsm with Queues with the one managed by the
@@ -496,7 +506,9 @@ class ActiveObject(HsmWithQueues):
 
   @start_thread_if_not_running
   @append_subscribe_to_spy
-  def subscribe(self, event_or_signal, queue_type='fifo'):
+  def subscribe(self, event_or_signal, queue_type=None):
+    if queue_type is None:
+      queue_type = 'fifo'
     self.fabric.subscribe(self.queue, event_or_signal, queue_type)
 
   def append_publish_to_spy(fn):
@@ -510,12 +522,14 @@ class ActiveObject(HsmWithQueues):
 
   @append_publish_to_spy
   @start_thread_if_not_running
-  def publish(self, event, priority=1000):
+  def publish(self, event, priority=None):
     '''publish an event at a given priority to the active fabric'''
+    if priority is None:
+      priority = 1000
     self.fabric.publish(event, priority)
 
   @start_thread_if_not_running
-  def post_fifo(self, e, period=None, times=0, deferred=True):
+  def post_fifo(self, e, period=None, times=None, deferred=None):
     '''post an event, or events to the fifo queue
 
     Example of posting a single event into the fifo queue:
@@ -534,6 +548,11 @@ class ActiveObject(HsmWithQueues):
       ao.cancel_event(thread_id)
 
     '''
+    if times is None:
+      times = 0
+    if deferred is None:
+      deferred = True
+
     thread_id = None
     '''post to the fifo of the hsm locking deque'''
     if period is None:
@@ -544,7 +563,7 @@ class ActiveObject(HsmWithQueues):
     return thread_id
 
   @start_thread_if_not_running
-  def post_lifo(self, e, period=None, times=0, deferred=True):
+  def post_lifo(self, e, period=None, times=None, deferred=None):
     '''post an event, or events to the lifo queue
 
     Example of posting a single event into the lifo queue:
@@ -563,6 +582,11 @@ class ActiveObject(HsmWithQueues):
       ao.cancel_event(thread_id)
 
     '''
+    if times is None:
+      times = 0
+    if deferred is None:
+      deferred = True
+
     thread_id = None
     '''post to the lifo of the hsm locking deque'''
     if period is None:
@@ -621,11 +645,14 @@ class ActiveObject(HsmWithQueues):
     # crash if we can't start our thread
     assert(self.thread.is_alive())
 
-  def stop(self, stop_fabric=False):
+  def stop(self, stop_fabric=None):
     '''Stops the active object
 
     Calling this method will stop all active objects.
     '''
+    if stop_fabric is None:
+      stop_fabric = False
+
     task_off_event = ThreadEvent()
     task_off_event.clear()
     self.queue.append(HsmEvent(signal=signals.stop_active_object))
@@ -663,7 +690,7 @@ class ActiveObject(HsmWithQueues):
       strace += self.trace_tuple_to_formatted_string(tr)
     return strace
 
-  def __post_event(self, e, times=1, period=None, deferred=True, queue_type='fifo'):
+  def __post_event(self, e, times=None, period=None, deferred=None, queue_type=None):
     '''
     The post_event method is used to post one-shots or periodic events to the
     active object.
@@ -745,6 +772,12 @@ class ActiveObject(HsmWithQueues):
           return status
 
     '''
+    if deferred is None:
+      deferred = True
+    if queue_type is None:
+      queue_type = 'fifo'
+    if times is None:
+      times = 1
     # if our times are set to 1 and there is no period then just post our event
     # to the fifo/lifo
     if times is 1 and period is None:
