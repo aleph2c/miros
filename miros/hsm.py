@@ -1071,7 +1071,6 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
             ignored = False
             break
           ignored = sr.ignored
-          break
       return (signal_name, hooked, ignored, dt)
 
     def _append_to_full_trace(self, e):
