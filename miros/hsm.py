@@ -1063,7 +1063,7 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
     def is_signal_hooked_or_ignored(self):
       signal_name, hooked, ignored = "", False, True
       for sr in self.rtc.tuples:
-        if sr.internal is False:
+        if sr.internal is False and sr.recall is False:
           signal_name = sr.signal
           dt = sr.datetime
           if sr.hook:
@@ -1075,8 +1075,8 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
 
     def _append_to_full_trace(self, e):
       start_state = self.state.fun(self, Event(signal=signals.REFLECTION_SIGNAL))
-      # fn is append_to_full_spy
       self.rtc.tuples.clear()
+      # fn is append_to_full_spy
       fn(self, e)
       signal, hooked, ignored, dt = is_signal_hooked_or_ignored(self)
       if hooked is False and ignored is False:
@@ -1100,7 +1100,7 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
 
 class HsmWithQueues(InstrumentedHsmEventProcessor):
   '''An Hsm that can post to itself and run to complete on each all of next_rtc.'''
-  QUEUE_SIZE = 50
+  QUEUE_SIZE = 500
 
   def __init__(self, maxlen=QUEUE_SIZE, instrumented=True, priority=1):
     super().__init__()
