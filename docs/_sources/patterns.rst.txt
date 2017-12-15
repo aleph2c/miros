@@ -227,7 +227,7 @@ inner_state then send it an event with the BEHAVIOR_NAME.
 .. code-block:: python
   :emphasize-lines: 28-29
   :linenos:
-  
+
   import time
   from miros.hsm import spy_on, pp
   from miros.activeobject import ActiveObject
@@ -320,10 +320,11 @@ You can overwrite the behavior of the outer state hooks simply by explicitly
 handling the signal in an inner state.  These ideas are very similar to
 inheritance and overloading in object oriented programming.
 
-As a designer you would write default :term:`client code<Client Code>` behavior in the outer states
-of charts, and all of your inner states would get this behavior for free.  If
-they needed to overwrite this behavior they would specifically handle the
-event in their state methods.
+As a designer you would write default :term:`client code<Client Code>` behavior
+in the outer states of charts, and all of your inner states would get this
+behavior for free.  If they needed to overwrite this behavior they would
+specifically handle the event in their state methods.
+
 
 .. image:: _static/ultimate_hook5.svg
     :align: center
@@ -333,8 +334,7 @@ specific responses in your inner states. Let's build out the above diagram:
 
 .. code-block:: python
   :emphasize-lines: 6-8, 10-12, 14-17
-  :linenos:
-  
+
   import time
   from miros.hsm import pp
   from miros.activeobject import Factory
@@ -407,7 +407,7 @@ We can deterime if we got the expected behavior by looking at the
 
 On lines 10 and 11 we see the reaction to our first ``b`` signal.  As expected
 the generic state's hook function was run while the statechart remained in the
-specific state. 
+specific state.
 
 On lines 14 and 15 we see the specific behavior for the ``a`` signal.  The
 statechart ran the :term:`client code<Client Code>` in the specific state then
@@ -420,9 +420,9 @@ Reminder
 ^^^^^^^^
 
 Formal description:
-  
-  Make the statechart topology more flexible by inventing an event an posting
-  it  to itself.
+
+  "Make the statechart topology more flexible by inventing an event an posting
+  it to itself.
 
   Often in state modeling, loosely related functions of a system are strongly
   coupled by a common event. Consider, for example, periodic data acquisition,
@@ -435,22 +435,24 @@ Formal description:
   machine into two distinct orthogonal regions (for polling and processing).
   However, orthogonal regions increase the cost of dispatching events ... and
   require complex synchronization between the regions because the polling and
-  processing are not quite independent. [#2]_
+  processing are not quite independent." [#2]_
 
 .. note::
 
   Programming a statechart with :term:`orthogonal regions<Orthogonal Region>` is
   computationally expensive.  So if you find yourself drawing two seperate states
-  with a lot of arrows connecting them, remind yourself of this reminder pattern.
+  with a lot of arrows connecting them, remind yourself of this :ref:`reminder
+  pattern<patterns-reminder-here>`.
 
-The reminder pattern uses the ultimate hook pattern mixed with
-:term:`artificial event<Artificial Event>` injection.  It's an artificial event
-because it is invented by the statechart and injected to itself rather than
-being invented and injected by an outside caller.
+The reminder pattern uses the :ref:`ultimate hook<patterns-ultimate-hook>`
+pattern mixed with :term:`artificial event<Artificial Event>` injection.  It's
+an :term:`artificial event<Artificial Event>` because it is invented by the
+statechart and injected to itself rather than being invented and injected by an
+outside caller.
 
-I'll try to explain this idea by showing a design using orthogonal regions,
-show how it is expensive and then refactor the design using the reminder
-pattern.
+I'll try to explain this idea by showing a design using :term:`orthogonal
+regions<Orthogonal Regions>`, show how it is expensive and then refactor the
+design using the :ref:`reminder pattern<patterns-reminder-here>`.
 
 We will begin with some specifications:
 
@@ -470,7 +472,7 @@ Here is a first shot at implementing this specification:
     :align: center
 
 We create a polling state which upon entry poles something.  Any time there is
-a time out it will re-enter the state making this happen.  
+a time out it will re-enter the state making this happen.
 
 Then when it initializes it transitions into the processing state.  Upon
 entering the processing state we add one to the ``chart.processing_count`` and
@@ -480,15 +482,16 @@ either go back to the polling state or enter the busy state, if the
 
 Upon entering the busy state the ``chart.busy_count`` is set to zero.  Then the
 TIME_OUT event is used with a :term:`hook<Hook>` to work the information.  In
-this example we just scribble "busy" into the spy log.  Then we add 1 to our
-``chart.busy_count``.  If the count is big enough we transition back to the
-polling state.  Upon exiting the processing state, the
-``chart.processing_count`` is set to 0.  That should work!  Actually, it won't
-work at all.
+this example we just scribble "busy" into the :ref:`spy<recipes-using-the-spy>`
+log.  Then we add 1 to our ``chart.busy_count``.  If the count is big enough we
+transition back to the polling state.  Upon exiting the processing state, the
+``chart.processing_count`` is set to 0.  That should work!  
+
+Actually, it won't work at all.
 
 Notice the large **Xs** on the diagram.  These are there to show that they
-are illegal transitions.  The Miro Samek event processoring algorithm will only
-allow init events to drill further into child states; they can not leave there
+are illegal transitions.  The Miro Samek event processing algorithm will only
+allow INIT_SIGNAL events to drill further into child states; they can not leave there
 current state and navigate to another region of the chart.  I'll just pretend I
 didn't know about this and continue.
 
@@ -572,20 +575,21 @@ Let's see what happens when we try to make this broken statechart
   time.sleep(5)
   pp(chart.spy())
 
-I have highlighted the illegal transition.
+I have highlighted the :term:`illegal transition<Illegal Transition>`.
 
 If we run the code we will see:
 
 .. code-block:: python
 
-  miros.hsm.HsmTopologyException: 
+  miros.hsm.HsmTopologyException:
     impossible chart topology for HsmEventProcessor.init,
     see HsmEventProcessor.init doc string for details
 
 So, how do we make this software work?  When you see this
-``HsmTopologyException``, it's probably time to consider another way to design
-your statechart.  We will get to that shortly, but for now let's find a way to
-force this software to work the way we want it to.
+:term:`HsmToplogyException<HsmToplogyException>`, it's probably time to
+consider another way to design your :term:`statechart<Statechart>`.  We will
+get to that shortly, but for now let's find a way to force this software to
+work the way we want it to.
 
 Instead of making the INIT_SIGNAL transition outside of the state, we could
 invent a new signal, post it to ourselves and pretend like it came from outside
@@ -605,12 +609,12 @@ Now that we know how to do that let's redesign our statechart:
 .. image:: _static/reminder2.svg
     :align: center
 
-This introduces a new glyph called the final state:
+This introduces a new :term:`glyph<Pseudostate>` called the final state:
 
 .. image:: _static/reminder3.svg
     :align: center
 
-When you see this glyph on a diagram it means, stop running.  So:
+When you see this :term:`glyph<Pseudostate>` on a diagram it means, stop running.  So:
 
 
 .. image:: _static/reminder4.svg
@@ -626,7 +630,7 @@ Would look like this as code:
         chart.processing_count = 0
         status = chart.trans(busy) # HEAVY-DUTY Harel Formalism run here.
                                    # This is recursive and might take
-                                   # a while  before this 
+                                   # a while  before this
                                    # routine finishes.
       else:
         # If 'POLL' signal wasn't invented before invent it now.
@@ -651,7 +655,8 @@ our specification and our proposed design, then implement it in code:
 .. image:: _static/reminder2.svg
     :align: center
 
-Here is the code for this design with highlights for the artificial events:
+Here is the code for this design with highlights for the :term:`artificial
+events<Artificial Event>`:
 
 .. code-block:: python
   :emphasize-lines: 8,9,26,27,53,60
@@ -696,6 +701,7 @@ Here is the code for this design with highlights for the artificial events:
     return return_status.HANDLED
 
   def busy_time_out(chart, e):
+    chart.scribble("busy")
     chart.busy_count += 1
     status = return_status.HANDLED
     if chart.busy_count > 2:
@@ -765,7 +771,7 @@ comments in the spy log are the thoughts I would have while viewing it.
    'INIT_SIGNAL:polling', # Harel formalism
    '<- Queued:(0) Deferred:(0)', #rtc complete (no events waiting)
    'TIME_OUT:polling', # second TIME_OUT event cycle described above
-   'polling', 
+   'polling',
    'POST_FIFO:PROCESS',
    'TIME_OUT:polling:HOOK',
    '<- Queued:(1) Deferred:(0)',
@@ -801,13 +807,12 @@ comments in the spy log are the thoughts I would have while viewing it.
    'ENTRY_SIGNAL:busy', # Harel formalism
    'INIT_SIGNAL:busy', # Harel formalism
    '<- Queued:(0) Deferred:(0)', # rtc completed
-   'TIME_OUT:busy', # busy state detects it's first TIME_OUT
+   'TIME_OUT:busy', # busy state detect it's first TIME_OUT
+   'busy', # chart.scribble("busy")
    'TIME_OUT:busy:HOOK', # busy state hooks it and blocks it from leaving
    '<- Queued:(0) Deferred:(0)', # rtc completed
-   'TIME_OUT:busy', # busy state detect it's second TIME_OUT
-   'TIME_OUT:busy:HOOK', # busy state hooks it and blocks it from leaving
-   '<- Queued:(0) Deferred:(0)', # rtc completed
-   'TIME_OUT:busy', # busy state detects it's third TIME_OUT
+   'TIME_OUT:busy', # busy state detects it's second TIME_OUT
+   'busy', # chart.scribble("busy")
    'SEARCH_FOR_SUPER_SIGNAL:polling', # Harel formalism search
    'SEARCH_FOR_SUPER_SIGNAL:busy', # Harel formalism search
    'EXIT_SIGNAL:busy', # Harel formalism
@@ -819,12 +824,530 @@ comments in the spy log are the thoughts I would have while viewing it.
    'TIME_OUT:polling', # full circuit completed DESIGN CONFIRMED
    # deleting the rest of the log from documentation
 
-We have a working design, the polling and processing states are kind of 
+The code works and we have met our specifications.
+
+The polling and the processing state are strongly coupled to the TIME_OUT
+signal.  Our design of having the TIME_OUT start the system in the polling and
+end up in the processing/busy state cost us a lot of CPU time.  This is an
+example of using :term:`orthogonal regions<Orthogonal Regions>` and as
+previously stated anytime we see this we should try and use the reminder
+pattern instead.   This pattern will be explained now, with a new design:
+
+.. _patterns-reminder-here:
+
+.. image:: _static/reminder6.svg
+    :align: center
+
+Let's discuss this diagram.
+
+Instead of creating two :term:`orthogonal regions<Orthogonal Region>` of
+polling and processing we nest processing inside of polling.  We use
+INIT_SIGNAL events to climb into the idle state.
+
+We create a TIME_OUT ultimate hook, which is a method that can be used by any
+state within the statechart.  This ultimate hook counts up each time it sees a
+TIME_OUT and once this count hits 3 it posts an artificial event with the
+signal DATA_READY.
+
+Once the RTC is completed, idle will catch the DATA_READY signal and transition
+into busy.  The busy state catches the TIME_OUT event which means that it will
+not escape to the ultimate hook in polling.  Instead it uses it to count up a
+busy_count and when it hits 2 it will transition back into idle.
+
+Now, let's write the code:
+
+.. code-block:: python
+
+  import time
+  from miros.hsm import pp
+  from miros.activeobject import Factory
+  from miros.event import signals, Event, return_status
+
+  def polling_time_out_hook(chart, e):
+    '''generic TIME_OUT ultimate hook for all states,
+       injects artificial event DATA_READY'''
+    chart.scribble("polling")
+    chart.processing_count += 1
+    if(chart.processing_count >= 3):
+      chart.post_fifo(Event(signal=signals.DATA_READY))
+    return return_status.HANDLED
+
+  def polling_init(chart, e):
+    return chart.trans(processing)
+
+  def processing_init(chart, e):
+    return chart.trans(idle)
+
+  def idle_data_ready(chart, e):
+    return chart.trans(busy)
+
+  def busy_entry(chart, e):
+    chart.busy_count, chart.busy_count = 0, 0
+    return return_status.HANDLED
+
+  def busy_time_out_hook(chart, e):
+    '''specific TIME_OUT hook for busy state'''
+    status = return_status.HANDLED
+    chart.scribble("busy")
+    chart.busy_count += 1
+    if(chart.busy_count >= 2):
+      status = chart.trans(idle)
+    return status
+
+  chart = Factory('reminder')
+  chart.augment(other=0, name="processing_count")
+  chart.augment(other=0, name="busy_count")
+
+  polling = chart.create(state="polling"). \
+              catch(signal=signals.INIT_SIGNAL, handler=polling_init). \
+              catch(signal=signals.TIME_OUT, handler=polling_time_out_hook). \
+              to_method()
+
+  processing = chart.create(state="processing"). \
+                catch(signal=signals.INIT_SIGNAL, handler=processing_init). \
+                to_method()
+
+  idle = chart.create(state="idle"). \
+          catch(signal=signals.DATA_READY, handler=idle_data_ready). \
+          to_method()
+
+  busy = chart.create(state="busy"). \
+          catch(signal=signals.ENTRY_SIGNAL, handler=busy_entry). \
+          catch(signal=signals.TIME_OUT, handler=busy_time_out_hook). \
+              to_method()
+
+  chart.nest(polling, parent=None). \
+        nest(processing, parent=polling). \
+        nest(idle, parent=processing). \
+        nest(busy, parent=polling)
+
+  chart.start_at(polling)
+  chart.post_fifo(Event(signal=signals.TIME_OUT), times=20, period=0.1)
+  time.sleep(1.0)
+  pp(chart.spy())
+
+If we run the code and looked at the spy log it would look like this: (I have
+marked it up with comments)
+
+.. code-block:: python
+  :emphasize-lines: 11,17,23,30,39,43,54
+
+  ['START', # start_at code running
+   'SEARCH_FOR_SUPER_SIGNAL:polling', # Harel formalism search
+   'ENTRY_SIGNAL:polling', # Harel formalism
+   'INIT_SIGNAL:polling', # Harel formalism
+   'SEARCH_FOR_SUPER_SIGNAL:processing', # Harel formalism search
+   'ENTRY_SIGNAL:processing', # Harel formalism
+   'INIT_SIGNAL:processing', # Harel formalism
+   'SEARCH_FOR_SUPER_SIGNAL:idle', # Harel formalism search
+   'ENTRY_SIGNAL:idle', # Harel formalism
+   'INIT_SIGNAL:idle', # Harel formalism
+   '<- Queued:(0) Deferred:(0)', # rtc completed
+   'TIME_OUT:idle', # TIME_OUT detected in idle
+   'TIME_OUT:processing', # TIME_OUT passed out to processing
+   'TIME_OUT:polling', # TIME_OUT passed to polling
+   'polling', # chart.scribble("polling")
+   'TIME_OUT:polling:HOOK', # TIME_OUT hooked by the polling
+   '<- Queued:(0) Deferred:(0)', # rtc completed
+   'TIME_OUT:idle', # Second TIME_OUT circuit - dynamics same as above
+   'TIME_OUT:processing',
+   'TIME_OUT:polling',
+   'polling',
+   'TIME_OUT:polling:HOOK',
+   '<- Queued:(0) Deferred:(0)',
+   'TIME_OUT:idle', # Third TIME_OUT event
+   'TIME_OUT:processing', 
+   'TIME_OUT:polling',
+   'polling',
+   'POST_FIFO:DATA_READY', # Posting the artificial event to the chart
+   'TIME_OUT:polling:HOOK', # TIME_OUT hooked by pooling
+   '<- Queued:(1) Deferred:(0)', # rtc completed with 1 item in queue
+   'DATA_READY:idle', # DATA_READY seen by idle state
+   'SEARCH_FOR_SUPER_SIGNAL:busy', # Harel formalism search
+   'SEARCH_FOR_SUPER_SIGNAL:idle', # Harel formalism search
+   'SEARCH_FOR_SUPER_SIGNAL:polling', # Harel formalism search
+   'EXIT_SIGNAL:idle', # Harel formalism
+   'EXIT_SIGNAL:processing', # Harel formalism
+   'ENTRY_SIGNAL:busy', # Harel formalism (busy_entry call run)
+   'INIT_SIGNAL:busy', # Harel formalism 
+   '<- Queued:(0) Deferred:(0)', # rtc completed
+   'TIME_OUT:busy', # busy sees TIME_OUT event
+   'busy', # chart.scribble("busy") 
+   'TIME_OUT:busy:HOOK',  # busy hooks TIME_OUT event
+   '<- Queued:(0) Deferred:(0)', # rtc completed
+   'TIME_OUT:busy', # second TIME_OUT event seen by busy
+   'busy', # chart.scribble("busy")
+   'SEARCH_FOR_SUPER_SIGNAL:idle', # this started by return chart.trans(idle)
+   'SEARCH_FOR_SUPER_SIGNAL:busy', # Harel formalism search
+   'SEARCH_FOR_SUPER_SIGNAL:processing', # Harel formalism search
+   'SEARCH_FOR_SUPER_SIGNAL:polling', # Harel formalism search
+   'EXIT_SIGNAL:busy', # Harel formalism
+   'ENTRY_SIGNAL:processing', # Harel formalism
+   'ENTRY_SIGNAL:idle', # Harel formalism
+   'INIT_SIGNAL:idle', # Harel formalism
+   '<- Queued:(0) Deferred:(0)' # rtc completed .. full circuit demonstrated
+   .
+   .
+   ]
+
+This design required a lot less CPU time.  This is especially important if you
+are going to port your design to an embedded system.  If you are using Python
+in production you will be much less concerned with performance (since you are
+using Python), even so, it is still a better design.
+
+
+.. NOTE::
+  If you were to use the trace you might be surprised that the hooked code is
+  hidden from view.
+
+  .. code-block:: python
+
+    print(chart.trace())
+    [2017-12-14 06:49:22.157806] [reminder] e->start_at() top->idle
+    [2017-12-14 06:49:22.461012] [reminder] e->DATA_READY() idle->busy
+    [2017-12-14 06:49:22.661728] [reminder] e->TIME_OUT() busy->idle
+    [2017-12-14 06:49:22.763392] [reminder] e->DATA_READY() idle->busy
+    [2017-12-14 06:49:22.963635] [reminder] e->TIME_OUT() busy->idle
+    [2017-12-14 06:49:23.064705] [reminder] e->DATA_READY() idle->busy
+
+  This is because the trace will only track items which cause state transitions
+  and hooks do not cause state transitions.
 
 .. _patterns-deferred-event:
 
 Deferred Event
 ^^^^^^^^^^^^^^
+
+Formal description:
+  "Simplify state machines by modifying the sequencing of events" [#3]_
+
+In reactive systems events come in `bursts`_.  They come whenever they come
+with no regard for the current state of your statechart.
+
+Suppose you were building a bank machine where the receiving and authorization
+stages involved some complex computing.  To interrupt these states to deal with
+an inconveniently timed request would be difficult to program.
+
+Instead of coming up with some complicated scheme for shelving our work to
+process new requests, we just defer the event, then re-inject the event into
+our statechart when it's timing is more convenient.
+
+
+.. image:: _static/deferred1.svg
+    :align: center
+
+Here is an example of a chart using the deferred event pattern.  
+
+To begin with the chart climbs into the idle state.  Upon receiving it's first
+NEW_REQUEST it transitions into the receiving state.  After a second of
+processing it transitions into the authorizing state.  After the authorizing
+state processes for 2 seconds it transitions back to the idle state.
+
+The reminder pattern occurs when a NEW_REQUEST event is seen while the system
+is either in receiving or authorizing.  This NEW_REQUEST event is ignored by
+these states and caught by the hook in processing.  The processing state places
+this NEW_REQUEST event into the deferred queue then passes the program's
+control back into whichever state was currently active.
+
+The idle state behaves differently, upon entering, it recalls any events that
+were placed in the deferred queue.  This effectively transfers them into the
+active object working queue and for all intents and purposes the statechart
+will think that this event was just posted to it from the outside world.  In
+the next RTC the idle state will react to the posted NEW_REQUEST by
+transitioning into the receiving state and the cycle will continue.
+
+Now that you have a high level view of how things are working I will talk about
+timing.  The receiving and authorizing states are simulating difficultly by
+using one shot events.  We are pretending that instead of just waiting around
+for a one shot to fire, that instead, something really important is happening
+in the background which we do not want to interrupt.
+
+The event bursts, use to interrupt our chart, will be done with the
+``create_bursts`` function seen on the diagram.  All this function does is to
+waste a random amount of time between a few NEW_REQUEST events so that we can
+see how are chart reacts.
+
+We will use both the trace and spy instrumentation to look at our timing.  The
+trace outputs timing information for state transitions.  So we will use the
+trace to see if our chart state transitions remains steady despite the chaos we
+are sending at it.  To confirm that we aren't just fooling ourselves we will
+use the spy and scribble when timed events hit the chart.
+
+Now let's redraw the diagram and then write it's code:
+
+.. image:: _static/deferred1.svg
+    :align: center
+
+.. code-block:: python
+  :emphasize-lines: 10,11,19,20
+
+  import random
+  import time
+  from datetime import datetime
+  from miros.hsm import pp
+  from miros.activeobject import Factory
+  from miros.event import signals, Event, return_status
+
+  def processing_entry(chart, e):
+    chart.defer(e)
+    chart.scribble("deferred at {}". \
+        format(datetime.now().strftime("%M:%S:%f")))
+    return return_status.HANDLED
+
+  def processing_init(chart, e):
+    return chart.trans(idle)
+
+  def idle_entry(chart, e):
+    chart.recall()
+    chart.scribble("recalled at {}". \
+        format(datetime.now().strftime("%M:%S:%f")))
+    return return_status.HANDLED
+
+  def idle_new_request(chart, e):
+    return chart.trans(receiving)
+
+  def receiving_entry(chart, e):
+    chart.scribble("receiving")
+    chart.post_fifo(
+      Event(signal=signals.RECEIVED),
+      times=1,
+      period=1.0,
+      deferred=True)
+    return return_status.HANDLED
+
+  def receiving_received(chart, e):
+    return chart.trans(authorizing)
+
+  def authorizing_entry(chart, e):
+    chart.scribble("authorizing")
+    chart.post_fifo(
+      Event(signal=signals.COMPLETED),
+      times=1,
+      period=2.0,
+      deferred=True)
+    return return_status.HANDLED
+
+  def authorizing_authorized(chart, e):
+    return chart.trans(idle)
+
+  chart = Factory('deferred')
+  
+  processing = chart.create(state="processing"). \
+                catch(signal=signals.NEW_REQUEST, handler=processing_entry). \
+                catch(signal=signals.INIT_SIGNAL, handler=processing_init). \
+                to_method()
+
+  idle = chart.create(state='idle'). \
+          catch(signal=signals.ENTRY_SIGNAL, handler=idle_entry). \
+          catch(signal=signals.NEW_REQUEST, handler=idle_new_request). \
+          to_method()
+
+  receiving = chart.create(state='receiving'). \
+                catch(signal=signals.ENTRY_SIGNAL, handler=receiving_entry). \
+                catch(signal=signals.RECEIVED, handler=receiving_received). \
+                to_method()
+
+  authorizing = chart.create(state='authorizing'). \
+                  catch(signal=signals.ENTRY_SIGNAL, 
+                      handler=authorizing_entry). \
+                  catch(signal=signals.COMPLETED,
+                      handler=authorizing_authorized). \
+                  to_method()
+
+  chart.nest(processing, parent=None). \
+        nest(idle, parent=processing). \
+        nest(receiving, parent=processing). \
+        nest(authorizing, parent=processing)
+
+  chart.start_at(processing)
+
+  def burst_event(event, bursts, fastest_time, slowest_time):
+    for i range(bursts):
+      time.sleep(random.uniform(fastest_time,slowest_time))
+      chart.post_fifo(event)
+
+  burst_event(Event(signal=signals.NEW_REQUEST),
+               bursts=5,
+               fastest_time=0.2,
+               slowest_time=1.0)
+
+  print(chart.trace())
+  time.sleep(6)
+  pp(chart.spy())
+
+I have highlighted the code that I excluded from the diagram.  It is code that
+will put timing information into the spy log.
+
+When we run this test, it could take between 7 and 11 seconds.  The trace
+and spy results I get will be different from what you get because of the
+stochastic characteristics of when the events are posted to the statechart.
+
+Let's first look at the trace output and confirm that our statechart behaves as
+we intended:
+
+.. code-block:: python
+
+  [2017-12-15 09:20:49.465806] [deferred] e->start_at() top->idle
+  [2017-12-15 09:20:50.435495] [deferred] e->NEW_REQUEST() idle->receiving
+  [2017-12-15 09:20:51.451824] [deferred] e->RECEIVED() receiving->authorizing
+  [2017-12-15 09:20:53.458799] [deferred] e->COMPLETED() authorizing->idle
+  [2017-12-15 09:20:53.459805] [deferred] e->NEW_REQUEST() idle->receiving
+  [2017-12-15 09:20:54.461726] [deferred] e->RECEIVED() receiving->authorizing
+  [2017-12-15 09:20:56.463891] [deferred] e->COMPLETED() authorizing->idle
+  [2017-12-15 09:20:56.464915] [deferred] e->NEW_REQUEST() idle->receiving
+  [2017-12-15 09:20:57.466761] [deferred] e->RECEIVED() receiving->authorizing
+  [2017-12-15 09:20:59.468877] [deferred] e->COMPLETED() authorizing->idle
+  [2017-12-15 09:20:59.469876] [deferred] e->NEW_REQUEST() idle->receiving
+
+
+The received state takes about 1 second to complete, so we are expecting to see
+that the time between a NEW_REQUEST and a RECEIVED event should be about 1
+second.  From inspection on lines 2-3, 5-6, 8-9 we see this is true:
+
+.. code-block:: python
+  :linenos:
+
+  .
+  [2017-12-15 09:20:50.435495] [deferred] e->NEW_REQUEST() idle->receiving
+  [2017-12-15 09:20:51.451824] [deferred] e->RECEIVED() receiving->authorizing
+  .
+  [2017-12-15 09:20:53.459805] [deferred] e->NEW_REQUEST() idle->receiving
+  [2017-12-15 09:20:54.461726] [deferred] e->RECEIVED() receiving->authorizing
+  .
+  [2017-12-15 09:20:56.464915] [deferred] e->NEW_REQUEST() idle->receiving
+  [2017-12-15 09:20:57.466761] [deferred] e->RECEIVED() receiving->authorizing
+  .
+  .
+
+
+The authorizing state takes about 2 seconds to complete so the RECEIVED and
+COMPLETED events should be about 2 seconds apart.  From the inspection of lines
+3-4, 6-7 and 9-10 we see this is true.
+
+.. code-block:: python
+  :linenos:
+
+  .
+  .
+  [2017-12-15 09:20:51.451824] [deferred] e->RECEIVED() receiving->authorizing
+  [2017-12-15 09:20:53.458799] [deferred] e->COMPLETED() authorizing->idle
+  .
+  [2017-12-15 09:20:54.461726] [deferred] e->RECEIVED() receiving->authorizing
+  [2017-12-15 09:20:56.463891] [deferred] e->COMPLETED() authorizing->idle
+  .
+  [2017-12-15 09:20:57.466761] [deferred] e->RECEIVED() receiving->authorizing
+  [2017-12-15 09:20:59.468877] [deferred] e->COMPLETED() authorizing->idle
+  .
+
+The deferred event pattern states that we will react to the recalled events
+immediately and we can see this behavior on lines 4-5 and 8-9
+
+.. code-block:: python
+  :linenos:
+
+  .
+  .
+  .
+  [2017-12-15 09:20:53.458799] [deferred] e->COMPLETED() authorizing->idle
+  [2017-12-15 09:20:53.459805] [deferred] e->NEW_REQUEST() idle->receiving
+  .
+  [2017-12-15 09:20:56.463891] [deferred] e->COMPLETED() authorizing->idle
+  [2017-12-15 09:20:56.464915] [deferred] e->NEW_REQUEST() idle->receiving
+  .
+  .
+  .
+
+Now we have to confirm that NEW_REQUEST events were sent at random times and
+deferred by the chart.  To do this we will have to dig into the spy log.  To
+make it easier to see I will put spaces after the RTC event and I will
+highlight the moments when a NEW_REQUEST was seen and defered by the
+chart:
+
+.. code-block:: python
+  :emphasize-lines: 23, 39, 46, 53
+
+  ['START',
+   'SEARCH_FOR_SUPER_SIGNAL:processing',
+   'ENTRY_SIGNAL:processing',
+   'INIT_SIGNAL:processing',
+   'SEARCH_FOR_SUPER_SIGNAL:idle',
+   'ENTRY_SIGNAL:idle',
+   'recalled at 20:49:465806',
+   'INIT_SIGNAL:idle',
+   '<- Queued:(0) Deferred:(0)',
+
+   'NEW_REQUEST:idle',
+   'SEARCH_FOR_SUPER_SIGNAL:receiving',
+   'SEARCH_FOR_SUPER_SIGNAL:idle',
+   'EXIT_SIGNAL:idle',
+   'ENTRY_SIGNAL:receiving',
+   'receiving',
+   'INIT_SIGNAL:receiving',
+   '<- Queued:(0) Deferred:(0)',
+   
+   'NEW_REQUEST:receiving',
+   'NEW_REQUEST:processing',
+   'POST_DEFERRED:NEW_REQUEST',
+   'deferred at 20:51:020281',
+   'NEW_REQUEST:processing:HOOK',
+   '<- Queued:(0) Deferred:(1)',
+
+   'RECEIVED:receiving',
+   'SEARCH_FOR_SUPER_SIGNAL:authorizing',
+   'SEARCH_FOR_SUPER_SIGNAL:receiving',
+   'EXIT_SIGNAL:receiving',
+   'ENTRY_SIGNAL:authorizing',
+   'authorizing',
+   'INIT_SIGNAL:authorizing',
+   '<- Queued:(0) Deferred:(1)',
+
+   'NEW_REQUEST:authorizing',
+   'NEW_REQUEST:processing',
+   'POST_DEFERRED:NEW_REQUEST',
+   'deferred at 20:51:664940',
+   'NEW_REQUEST:processing:HOOK',
+   '<- Queued:(0) Deferred:(2)',
+
+   'NEW_REQUEST:authorizing',
+   'NEW_REQUEST:processing',
+   'POST_DEFERRED:NEW_REQUEST',
+   'deferred at 20:52:219593',
+   'NEW_REQUEST:processing:HOOK',
+   '<- Queued:(0) Deferred:(3)',
+
+   'NEW_REQUEST:authorizing',
+   'NEW_REQUEST:processing',
+   'POST_DEFERRED:NEW_REQUEST',
+   'deferred at 20:53:219562',
+   'NEW_REQUEST:processing:HOOK',
+   '<- Queued:(0) Deferred:(4)',
+
+   'COMPLETED:authorizing',
+   'SEARCH_FOR_SUPER_SIGNAL:idle',
+   'SEARCH_FOR_SUPER_SIGNAL:authorizing',
+   'EXIT_SIGNAL:authorizing',
+   'ENTRY_SIGNAL:idle',
+   'RECALL:NEW_REQUEST',
+   'POST_FIFO:NEW_REQUEST',
+   'recalled at 20:53:459805',
+   'INIT_SIGNAL:idle',
+   '<- Queued:(1) Deferred:(3)',
+    .
+    .
+    .
+   'INIT_SIGNAL:receiving',
+   '<- Queued:(0) Deferred:(9)']
+
+From the highlighted time stamps we see that these event injections were
+sporatic; so it is safe to assume the design worked.
+
+It turns out the design is a lot easier to explain and write than it is to
+verify.  
+
+.. NOTE::
+  The spy log does not contain timing information.  To add timing information to the
+  spy only takes a little effort, but use the scribble method with a
+  ``datetime.now()`` call.
 
 .. _patterns-orthogonal-component:
 
@@ -849,4 +1372,6 @@ Multichart Pend
 
 .. [#1] p.206 Practical UML STATECHARTS in C/C++, Second Edition
 .. [#2] p.211 Practical UML STATECHARTS in C/C++, Second Edition
+.. [#3] p.219 Practical UML STATECHARTS in C/C++, Second Edition
+.. _bursts: http://barabasi.com/book/bursts
 

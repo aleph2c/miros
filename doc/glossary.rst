@@ -23,8 +23,8 @@ Glossary
       built using a template or described within a Factory.
 
    Pseudostate
-      Awkward language describing icons that aren't transitions or states in a
-      statechart diagram.
+      Awkward UML language describing icons or glyphs that aren't transitions
+      or states.
 
    HSM
      Hierarchical State Machine: a state machine where states can exit within
@@ -170,7 +170,7 @@ Glossary
       line.  Unlike the spy it does not show the details related to how the
       transitions occured or any of the internal workings of the event processor.
 
-      It can be used with the sequence tool to generate ASCII sequence
+      It can be used with the :term:`sequence<Sequence>` tool to generate ASCII sequence
       diagrams.
 
       You can view the live trace log by using the live trace.  Or you can look
@@ -184,10 +184,11 @@ Glossary
       as there are active objects in the trace.
 
    Statechart
-      A statechart is a Hierarchical State Machine with it's own queue for the
-      events it hasn't reacted against yet and a thread in which it can run.
-      The word was invented by David Harel and it is often used as a synonym
-      for active object or factory in this documentation. 
+      A statechart is a :term:`hierarchical state machine<Hierarchical State
+      Machine>` with it's own queue for the events it hasn't reacted against
+      yet and a thread in which it can run.  The word was invented by David
+      Harel and it is often used as a synonym for :term:`active object<Active
+      Object>` or :term:`factory<Factory>` in this documentation. 
 
    Pattern
       A statechart pattern is an example of how to structure a map with some of
@@ -298,12 +299,18 @@ Glossary
       your design. This search is handled by the miros package, but your code will
       run a lot slower than it needs to.
 
+      If you find yourself doing this, consider refacting your code using the
+      :ref:`reminder pattern<patterns-reminder-here>`.
+
    Artificial Event
       An artificial event is an event which is made within your active object
       and posted to itself.  An example of an artificial event would be a
       :term:`one shot<One Shot>`.  It is called `artificial` because it is not
       an event that came from outside of the active object in an asynchronous
       way.
+
+      The :ref:`reminder pattern<patterns-reminder-here>` also uses artificial
+      events.
 
    Initialization Event
       The initialization (init) event, is an :term:`internal event<Internal
@@ -314,13 +321,47 @@ Glossary
       and it can point to another state, or have some code written directly on
       it.
 
-
    Internal Event
       An internal event is an event that is created by the event processor and
       sent to your active object to manifest the :term:`Harel Formalism<Harel
       Formalism>`.  It is different from other events in that you don't have to
       explicitly invent it when you are creating your design.
 
+   HsmTopologyException
+      An exception which is raised by the event processor when an INIT_SIGNAL
+      event tries to leave the current state.  This exception is often raise
+      when the chart is designed incorrectly or when the nest method of the
+      factory hasn't ordered the states properly.
 
+   Final State
+      A :term:`pseudostate<Pseudostate>` which indicates that an arrow should
+      stop processing.
 
+      .. image:: _static/reminder3.svg
+          :align: center
+
+   UML
+      Universal Modeling Language.  Any drawing referenced in this library is
+      intended to be used as a sketch of a design, not as a blue print or as
+      the language itself.
+
+   Illegal Transition
+      A transition that can not be serviced by the Miro Samek :term:`event
+      processor<Event Processor>`.  An example of an illegal transition would
+      occur then an INIT_SIGNAL event tries to leave it's current state rather
+      than by drilling further into the statechart.  An illegal transition will
+      issue a :term:`HsmTopologyException<HsmTopologyException>`
+
+    Ultimate Hook Pattern
+      This pattern uses a hook on the outer state of a statechart to provide a
+      behavior accessible to all child states.  To learn more about it read
+      :ref:`this<patterns-reminder>`.
+
+   Reminder Pattern
+      A pattern used to remidy designs which have :term:`orthogonal
+      regions<Orthogonal Regions>`.  An :term:`ultimate hook<Ultimate Hook
+      Pattern>` is used to inject an :term:`artificial event<Artificial Event>`
+      into the statechart.  To learn more about it read
+      :ref:`this<patterns-reminder>`.  To see an example click
+      :ref:`here<patterns-reminder-here>`.
 

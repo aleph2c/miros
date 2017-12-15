@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>12</zoom_level>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>504</x>
+      <y>288</y>
+      <w>36</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>336</x>
+      <y>108</y>
+      <w>264</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>chart = Factory()
+valign=top</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>348</x>
+      <y>144</y>
+      <w>240</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+Event Processor</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>456</x>
+      <y>204</y>
+      <w>96</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=[^]-(</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>612</x>
+      <y>108</y>
+      <w>576</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>chart.start_at(processing)
+
+def create_bursts(event, bursts, fastest_time, slowest_time):
+  for i in range(bursts):
+    time.sleep(random.uniform(fastest_time,slowest_time))
+    chart.post_fifo(event)
+
+create_bursts(Event(signal=signals.NEW_REQUEST),
+  bursts=5, fastest_time=0.2, slowest_time=1.0)
+
+
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>384</x>
+      <y>372</y>
+      <w>840</w>
+      <h>432</h>
+    </coordinates>
+    <panel_attributes>*processing*
+--
+NEW_REQUEST / 
+  chart.defer(e);
+   
+   
+	
+
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>480</x>
+      <y>732</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>732</x>
+      <y>420</y>
+      <w>336</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>*receiving*
+--
+entry /
+  chart.scribble("receiving")
+  chart.post_fifo(
+    Event(signal=signals.RECEIVED)
+    times=1,
+    period=1.0
+    deferred=True)
+   
+  
+
+
+  
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>480</x>
+      <y>684</y>
+      <w>36</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>216</x>
+      <y>504</y>
+      <w>144</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=.
+&lt;&lt;state pattern&gt;&gt;
+deferred event</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>324</x>
+      <y>432</y>
+      <w>144</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;70.0;100.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>276</x>
+      <y>252</y>
+      <w>144</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=.
+&lt;&lt;state pattern&gt;&gt;
+ultimate hook
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>360</x>
+      <y>324</y>
+      <w>72</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;40.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>432</x>
+      <y>468</y>
+      <w>132</w>
+      <h>228</h>
+    </coordinates>
+    <panel_attributes>*idle*
+--
+entry / 
+  chart.recall()
+
+  
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>732</x>
+      <y>612</y>
+      <w>336</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>*authorizing*
+--
+entry /
+  chart.scribble("athorizing")
+  chart.post_fifo(
+    Event(signal=signals.AUTHORIZED)
+    times=1,
+    period=2.0
+    deferred=True)
+   
+  
+
+
+  
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>552</x>
+      <y>636</y>
+      <w>204</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+COMPLETED</panel_attributes>
+    <additional_attributes>150.0;60.0;50.0;60.0;50.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>552</x>
+      <y>480</y>
+      <w>204</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+NEW_REQUEST</panel_attributes>
+    <additional_attributes>10.0;20.0;150.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1056</x>
+      <y>480</y>
+      <w>168</w>
+      <h>252</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+RECEIVED</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0;50.0;190.0;10.0;190.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>348</x>
+      <y>528</y>
+      <w>120</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>396</x>
+      <y>312</y>
+      <w>300</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;230.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>660</x>
+      <y>312</y>
+      <w>96</w>
+      <h>144</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;60.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>660</x>
+      <y>312</y>
+      <w>612</w>
+      <h>444</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;490.0;10.0;490.0;350.0;340.0;350.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1128</x>
+      <y>228</y>
+      <w>168</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>Don't allow
+NEW_REQUEST to
+change state</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1056</x>
+      <y>288</y>
+      <w>144</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;130.0;100.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1056</x>
+      <y>288</y>
+      <w>240</w>
+      <h>492</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;390.0;180.0;390.0;180.0;10.0</additional_attributes>
+  </element>
+</diagram>

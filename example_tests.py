@@ -825,9 +825,10 @@ def reminder2():
     return return_status.HANDLED
 
   def busy_time_out(chart, e):
+    chart.scribble("busy")
     chart.busy_count += 1
     status = return_status.HANDLED
-    if chart.busy_count > 2:
+    if chart.busy_count >= 2:
       status = chart.trans(polling)
     return status
 
@@ -862,6 +863,174 @@ def reminder2():
   pp(chart.spy())
   print(chart.trace())
 
+
+def reminder3():
+  import time
+  from miros.hsm import pp
+  from miros.activeobject import Factory
+  from miros.event import signals, Event, return_status
+
+  def polling_time_out_hook(chart, e):
+    '''generic TIME_OUT ultimate hook for all states,
+       injects artificial event DATA_READY'''
+    chart.scribble("polling")
+    chart.processing_count += 1
+    if(chart.processing_count >= 3):
+      chart.post_fifo(Event(signal=signals.DATA_READY))
+    return return_status.HANDLED
+
+  def polling_init(chart, e):
+    return chart.trans(processing)
+
+  def processing_init(chart, e):
+    return chart.trans(idle)
+
+  def idle_data_ready(chart, e):
+    return chart.trans(busy)
+
+  def busy_entry(chart, e):
+    chart.busy_count, chart.busy_count = 0, 0
+    return return_status.HANDLED
+
+  def busy_time_out_hook(chart, e):
+    '''specific TIME_OUT hook for busy state'''
+    status = return_status.HANDLED
+    chart.scribble("busy")
+    chart.busy_count += 1
+    if(chart.busy_count >= 2):
+      status = chart.trans(idle)
+    return status
+
+  chart = Factory('reminder')
+  chart.augment(other=0, name="processing_count")
+  chart.augment(other=0, name="busy_count")
+
+  polling = chart.create(state="polling"). \
+              catch(signal=signals.INIT_SIGNAL, handler=polling_init). \
+              catch(signal=signals.TIME_OUT, handler=polling_time_out_hook). \
+              to_method()
+
+  processing = chart.create(state="processing"). \
+                catch(signal=signals.INIT_SIGNAL, handler=processing_init). \
+                to_method()
+
+  idle = chart.create(state="idle"). \
+          catch(signal=signals.DATA_READY, handler=idle_data_ready). \
+          to_method()
+
+  busy = chart.create(state="busy"). \
+          catch(signal=signals.ENTRY_SIGNAL, handler=busy_entry). \
+          catch(signal=signals.TIME_OUT, handler=busy_time_out_hook). \
+              to_method()
+
+  chart.nest(polling, parent=None). \
+        nest(processing, parent=polling). \
+        nest(idle, parent=processing). \
+        nest(busy, parent=polling)
+
+  chart.start_at(polling)
+  chart.post_fifo(Event(signal=signals.TIME_OUT), times=20, period=0.1)
+  time.sleep(1.0)
+  pp(chart.spy())
+  print(chart.trace())
+
+def deferred1():
+  import random
+  import time
+  from datetime import datetime
+  from miros.hsm import pp
+  from miros.activeobject import Factory
+  from miros.event import signals, Event, return_status
+
+ 
+  def processing_entry(chart, e):
+    chart.defer(e)
+    chart.scribble("deferred at {}". \
+        format(datetime.now().strftime("%M:%S:%f")))
+    return return_status.HANDLED
+
+  def processing_init(chart, e):
+    return chart.trans(idle)
+
+  def idle_entry(chart, e):
+    chart.recall()
+    chart.scribble("recalled at {}". \
+        format(datetime.now().strftime("%M:%S:%f")))
+    return return_status.HANDLED
+
+  def idle_new_request(chart, e):
+    return chart.trans(receiving)
+
+  def receiving_entry(chart, e):
+    chart.scribble("receiving")
+    chart.post_fifo(
+      Event(signal=signals.RECEIVED),
+      times=1,
+      period=1.0,
+      deferred=True)
+    return return_status.HANDLED
+
+  def receiving_received(chart, e):
+    return chart.trans(authorizing)
+
+  def authorizing_entry(chart, e):
+    chart.scribble("authorizing")
+    chart.post_fifo(
+      Event(signal=signals.COMPLETED),
+      times=1,
+      period=2.0,
+      deferred=True)
+    return return_status.HANDLED
+
+  def authorizing_authorized(chart, e):
+    return chart.trans(idle)
+
+  chart = Factory('deferred')
+  
+  processing = chart.create(state="processing"). \
+                catch(signal=signals.NEW_REQUEST, handler=processing_entry). \
+                catch(signal=signals.INIT_SIGNAL, handler=processing_init). \
+                to_method()
+
+  idle = chart.create(state='idle'). \
+          catch(signal=signals.ENTRY_SIGNAL, handler=idle_entry). \
+          catch(signal=signals.NEW_REQUEST, handler=idle_new_request). \
+          to_method()
+
+  receiving = chart.create(state='receiving'). \
+                catch(signal=signals.ENTRY_SIGNAL, handler=receiving_entry). \
+                catch(signal=signals.RECEIVED, handler=receiving_received). \
+                to_method()
+
+  authorizing = chart.create(state='authorizing'). \
+                  catch(signal=signals.ENTRY_SIGNAL, 
+                      handler=authorizing_entry). \
+                  catch(signal=signals.COMPLETED,
+                      handler=authorizing_authorized). \
+                  to_method()
+
+  chart.nest(processing, parent=None). \
+        nest(idle, parent=processing). \
+        nest(receiving, parent=processing). \
+        nest(authorizing, parent=processing)
+
+  chart.start_at(processing)
+
+  def burst_event(event, bursts, fastest_time, slowest_time):
+    for i in range(bursts):
+      time.sleep(random.uniform(fastest_time,slowest_time))
+      chart.post_fifo(event)
+
+  burst_event(Event(signal=signals.NEW_REQUEST),
+               bursts=15,
+               fastest_time=0.2,
+               slowest_time=1.0)
+
+  print(chart.trace())
+  time.sleep(6)
+  pp(chart.spy())
+
+
 if __name__ == '__main__':
   # t_question()
   # example_1()
@@ -875,4 +1044,6 @@ if __name__ == '__main__':
   # ultimate_hook_example4()
   # augment_example()
   # reminder1()
-  reminder2()
+  # reminder2()
+  # reminder3()
+  deferred1()
