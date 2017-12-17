@@ -14,7 +14,7 @@
 Patterns
 ========
 The idea of software design patterns came from the architect Christopher
-Alexander.  He wrote a book, a pattern language, about how different approaches
+Alexander.  He wrote a book, `a pattern language`_, about how different approaches
 to architecture could be used across different scales (from the country to the
 pantry) to help people feel better about living in their communities.  It's a
 lovely book; a child can understand it yet it is still useful to professional
@@ -26,11 +26,11 @@ child friendly, in fact everyone I knew secretly hated it because of its
 illegibility; but would make sure to have a copy of it on their shelf to look
 like they were in the club.
 
-The ideas within the book were great and the follow up books that translated it
-into English were really useful.  Basically it described a set of techniques
-for solving classes of problems that come up over and over again.  If you
-haven't learned the patterns yet, find a copy of a patterns book written by a
-practitioner in your language(s) and work through it.  You will level up.
+The ideas within the book were great and the follow up books that `translated
+it into English`_ were really useful.  Basically it described a set of
+techniques for solving classes of problems that come up over and over again.
+If you haven't learned the patterns yet, find a copy of a patterns book written
+by a practitioner in your language(s) and work through it.  You will level up.
 
 In chapter 5 of "Practical UML STATECHARTS in C/C++" I was leveled up by Miro
 Samek.  He describes 5 statechart patterns and made the bold claim that
@@ -438,10 +438,8 @@ Formal description:
   processing are not quite independent." [#2]_
 
 .. note::
-
-  Programming a statechart with :term:`orthogonal regions<Orthogonal Region>` is
-  computationally expensive.  So if you find yourself drawing two seperate states
-  with a lot of arrows connecting them, remind yourself of this :ref:`reminder
+  If you find yourself drawing two separate states with a lot of arrows
+  connecting them, remind yourself of this :ref:`reminder
   pattern<patterns-reminder-here>`.
 
 The reminder pattern uses the :ref:`ultimate hook<patterns-ultimate-hook>`
@@ -450,9 +448,9 @@ an :term:`artificial event<Artificial Event>` because it is invented by the
 statechart and injected to itself rather than being invented and injected by an
 outside caller.
 
-I'll try to explain this idea by showing a design using :term:`orthogonal
-regions<Orthogonal Regions>`, show how it is expensive and then refactor the
-design using the :ref:`reminder pattern<patterns-reminder-here>`.
+I'll try to explain this idea by showing a bad, but working design, show how it
+is expensive and then refactor the design using the :ref:`reminder
+pattern<patterns-reminder-here>`.
 
 We will begin with some specifications:
 
@@ -575,7 +573,7 @@ Let's see what happens when we try to make this broken statechart
   time.sleep(5)
   pp(chart.spy())
 
-I have highlighted the :term:`illegal transition<Illegal Transition>`.
+I have highlighted the :term:`illegal transitions<Illegal Transition>`.
 
 If we run the code we will see:
 
@@ -826,12 +824,11 @@ comments in the spy log are the thoughts I would have while viewing it.
 
 The code works and we have met our specifications.
 
-The polling and the processing state are strongly coupled to the TIME_OUT
+But the polling and the processing state are strongly coupled to the TIME_OUT
 signal.  Our design of having the TIME_OUT start the system in the polling and
-end up in the processing/busy state cost us a lot of CPU time.  This is an
-example of using :term:`orthogonal regions<Orthogonal Regions>` and as
-previously stated anytime we see this we should try and use the reminder
-pattern instead.   This pattern will be explained now, with a new design:
+end up in the processing/busy state cost us a lot of CPU time.
+
+Lets introduce the reminder pattern with a new design:
 
 .. _patterns-reminder-here:
 
@@ -840,19 +837,18 @@ pattern instead.   This pattern will be explained now, with a new design:
 
 Let's discuss this diagram.
 
-Instead of creating two :term:`orthogonal regions<Orthogonal Region>` of
-polling and processing we nest processing inside of polling.  We use
-INIT_SIGNAL events to climb into the idle state.
+We use INIT_SIGNAL events to climb into the idle state.
 
 We create a TIME_OUT ultimate hook, which is a method that can be used by any
 state within the statechart.  This ultimate hook counts up each time it sees a
 TIME_OUT and once this count hits 3 it posts an artificial event with the
 signal DATA_READY.
 
-Once the RTC is completed, idle will catch the DATA_READY signal and transition
-into busy.  The busy state catches the TIME_OUT event which means that it will
-not escape to the ultimate hook in polling.  Instead it uses it to count up a
-busy_count and when it hits 2 it will transition back into idle.
+Once the :term:`RTC<Run To Completion>` process is completed, idle will catch
+the DATA_READY signal and transition into busy.  The busy state catches the
+TIME_OUT event which means that it will not escape to the ultimate hook in
+polling.  Instead it uses it to count up a busy_count and when it hits 2 it
+will transition back into idle.
 
 Now, let's write the code:
 
@@ -1342,17 +1338,353 @@ From the highlighted time stamps we see that these event injections were
 sporatic; so it is safe to assume the design worked.
 
 It turns out the design is a lot easier to explain and write than it is to
-verify.  
+verify.  You might be wondering what happens if more items are posted than
+there are slots in the deferred queue.  The deferred queue is a ``deque``, which
+means it is a kind of ring buffer.  It you overflow it, it will remove the
+oldest item and push the newest item onto the tail end of the queue.  It has a
+queue size of 500.
 
 .. NOTE::
   The spy log does not contain timing information.  To add timing information to the
-  spy only takes a little effort, but use the scribble method with a
+  spy only takes a little effort; use the scribble method with a
   ``datetime.now()`` call.
 
 .. _patterns-orthogonal-component:
 
 Orthogonal Component
 ^^^^^^^^^^^^^^^^^^^^
+
+Formal description:
+  "Use state machines as components."
+
+In the original statechart paper written by David Harel he describes how his
+formalism needs to capture requirements like "[The] gearbox change of state is
+independent of [the] braking system".  For this he invented something called a
+'orthogonal region':
+
+.. image:: _static/orthogonal_region1.svg
+    :align: center
+
+The two different areas in the above chart separated by the dotted line are
+orthogonal regions.  They represent two separate state machines that act
+independent of one another but are both turned on when the truck state is
+initiated.
+
+This part of the Harel formalism is not supported by the Miro Samek event
+processing algorithm.  But, it would be trivial to implement within the miros
+library, by building two separate active objects and letting them run
+independently.
+
+If you would like such a structure in your machine, you could use an orthogonal
+component instead.  An orthogonal component is just a statechart that can
+dispatch messages directly into another one.
+
+Imagine we are asked to build some software for the general fusion reactor:
+
+    "The General Fusion's Magnetized Target Fusion system uses a sphere filled
+    with molten lead-lithium that is pumped to form a vortex.  A pulse of
+    magnetically-confined plasma fuel is then injected into the vortex. Around
+    the sphere, an array of pistons drive a pressure wave into the centre of
+    the sphere, compressing the plasma to fusion conditions. This process is
+    then repeated, while the heat from the reaction is captured in the liquid
+    metal and used to generate electricity via a steam turbine."
+
+
+Ambitious.  Ok, let's say we have to write the firing mechanism to cause all of
+the pistons to initiate the pressure wave.  
+
+.. raw:: html
+
+  <center>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/zf8QIJ2VgqU" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+  </center>
+
+Each piston has a set of transducers to measure the local conditions of the
+molten lead-lithium.  The first transducer provides a composite reading that
+abstracts away a lot of the physics; it provides numbers between 0 and 100.
+The second transducer measures the temperature; it's range is 0 to 9000 degrees
+Celsius.  A piston can only fire after 1 second has passed since the last
+firing event and once it passes this time threshold it would like to fire as
+soon as possible so that the fusion reactor can output the maximum amount of
+power.  All of the pistons have to fire at the same time.
+
+There are 255 pistons.
+
+Through a lot of trial and error it has been found a piston can fire in the
+following situations:
+
+============================  =========================================
+Composite Transducer Reading  Temperature Transducer  [degrees Celsius]
+============================  =========================================
+0-20                          50-100 
+25-50                         200-333
+30-66                         403-600 
+70-100                        670-1500 
+============================  =========================================
+
+Let's design the system.  First we will need to fake out the temperature and
+composite transducer readings.  This can be done with an infinite impulse
+response filter and a random number generator using a flat distribution.
+
+.. code-block:: python
+
+    class FakeNewsSpec:
+    ''' provides the following syntax:
+        spec.initial_value
+        spec.aggression
+        spec.minimum
+        spec.maximum
+    '''
+    def __init__(self,
+                  aggression=0,
+                  initial_value=None,
+                  minimum=None,
+                  maximum=None):
+      if minimum is None:
+        assert(0)
+      if maximum is None:
+        assert(0)
+      if minimum >= maximum:
+        assert(0)
+
+      if initial_value is None:
+        initial_value = (maximum - minimum) / 2.0
+      elif initial_value < minimum:
+        initial_value = minimum
+      elif initial_value > maximum:
+        initial_value = maximum
+
+      self.initial_value = initial_value
+      self.aggression    = aggression
+      self.minimum       = minimum
+      self.maximum       = maximum
+
+
+  def fake_news(spec):
+    '''
+      # aggression ranges from 1 to 100.  1 is the least aggressive and 100 is
+      # the most agressive
+      fn = fake_news(
+        FakeNewsSpec(minimum=0, maximum=100, initial_value=45, aggression=50))
+      for i in range(5):
+        print(fn())
+      # 70.40052265431565
+      # 98.55643192543394
+      # 63.607687838082626
+      # 96.33858152348765
+      # 47.2780049249278
+
+    '''
+    AGGRESSION_MAX = 100
+    '''returns a function that will generate the kind of fake news specified'''
+    import random
+    random.seed()
+
+    if 1 <= spec.aggression <= AGGRESSION_MAX:
+      aggression = spec.aggression
+    elif spec.aggression < 1:
+      aggression = 1
+    else:
+      aggression = AGGRESSION_MAX
+
+    def _fake_news_generator():
+      '''provides an infinite set of number within the spec'''
+      current_number = spec.initial_value
+
+      while(True):
+        random_number  = random.uniform(spec.minimum, spec.maximum)
+        # IIR (infinite impulse response)
+        current_number = ((aggression * random_number +
+                           (AGGRESSION_MAX - aggression) *
+                           current_number)) / AGGRESSION_MAX
+        yield current_number
+
+    def _fake_news():
+      '''just hides the next syntax'''
+      return next(_fake_news_generator())
+
+    return _fake_news
+
+Ok, let's try it out:
+
+.. code-block:: python
+
+  transducer_worker = fake_news(
+                        FakeNewsSpec(minimum=0, maximum=100,
+                                     initial_value=45, aggression=20))
+  for i in range(10):
+    print(transducer_worker())
+  # 39.41035307935898
+  # 51.639646042274904
+  # 53.30613755950629
+
+The numbers are phasing about which is what we wanted. Pushing on.
+
+`Michel Laberge`_ can't make up his mind about the piston's firing criteria, so
+we have to make sure it's easy to change.  We will create a selection function
+then we can inject it into the chart.  For now we define it as this:
+
+.. code-block:: python
+
+  def is_this_piston_ready(chart):
+    transducers_say_go = False
+    comp = chart.get_composite_reading()
+    temp = chart.get_temperater_reading()
+
+    if 0  <= comp <= 20 and
+       50 <= temp <= 100:
+       transducers_say_go |= True
+    elif 25  <= comp <= 50 and
+         200 <= temp <= 333:
+       transducers_say_go |= True
+    elif 30  <= comp <= 66 and
+         403 <= temp <= 600:
+       transducers_say_go |= True
+    elif 70  <= comp <= 100 and
+         670 <= temp <= 1500:
+       transducers_say_go |= True
+    else:
+      transducers_say_go = False
+
+    return transducers_say_go
+
+This ``is_this_piston_ready`` function will be used by an individual piston to
+determine if it is ready to fire.
+
+Here is a UML class diagram of our approach:
+
+.. image:: _static/orthogonal_region3.svg
+    :align: center
+
+The FireManager object will aggregate 255 PistonManager objects.  A piston
+manager object will use the event dispatcher of the ActiveObject (which means I
+can't use a factory).  Or if you just read the code, you would see that the
+FireManager object will have a list containing 255 other active objects, each
+keeping track of their individual piston state.
+
+The PistonManager objects will each contain their own event dispatchers, their
+own event queues; but they will all reference the same piston_manager state
+machine.
+
+We are going to use the polyamorous nature of state methods to implement the
+255 piston managers.  Instead of having a separate piston manager statemachine
+defined for each of the 255 active objects we will instead define one that is
+shared by all of them.  I will link to it once per each active object and they
+won't know that they don't contain them as methods within their own class.  I
+have no idea how to represent this in UML.  So I will write it this way:
+
+.. image:: _static/orthogonal_region4.svg
+    :align: center
+
+The state machine will be defined as:
+
+  .. code-block:: python
+
+    @spy_on
+    def piston_ready(chart, e):
+      status = return_status.UNHANDLED
+      if(e.signal == signals.INIT_SIGNAL):
+        status = chart.trans(relaxing)
+      elif(e.signal == signals.TIME_OUT):
+        chart.count += 1
+        if chart.count >= 750:
+          chart.count = 0
+          chart.post(Event(signal=signals.PRIMED))
+      else:
+        status, chart.temp.fun = return_status.SUPER, chart.top
+      return status
+
+    @spy_on
+    def relaxing(chart, e):
+      status = return_status.UNHANDLED
+      if(e.signal == signals.ENTRY_SIGNAL):
+        chart.scribble("relaxing")
+      else:
+        status, chart.temp.fun = return_status.SUPER, piston_ready
+      return status
+
+    @spy_on
+    def triggered(chart, e):
+      status = return_status.UNHANDLED
+      if(e.signal == signals.ENTRY_SIGNAL):
+        chart.scribble("piston_slamming!")
+      else:
+        status, chart.temp.fun = return_status.SUPER, piston_ready
+      return status
+
+    @spy_on
+    def priming(chart, e):
+      status = return_status.UNHANDLED
+      if(e.signal == signals.TIME_OUT):
+        status = return_status.HANDLED
+        if chart.is_this_piston_ready():
+          status = chart.trans(ready)
+      else:
+        status, chart.temp.fun = return_status.SUPER, piston_ready
+      return status
+
+    def ready(chart, e):
+      status = return_status.UNHANDLED
+      if(e.signal == signals.FIRE):
+        status = chart.trans(triggered)
+      else:
+        status, chart.temp.fun = return_status.SUPER, priming
+      return status
+
+Now we will create the PistonManager class:
+
+  .. code-block:: python
+    
+    class PistonManager(ActiveObject):
+      def __init__(self,
+                   get_composite_reading,
+                   get_temperature_reading,
+                   is_this_piston_ready,
+                   number):
+        super().__init__()
+        self.is_this_piston_ready    = is_this_piston_ready
+        self.get_composite_reading   = get_composite_reading
+        self.get_temperature_reading = get_temperature_reading
+        self.number = number
+        self.count = 0
+        self.temperature
+        self.composite
+  
+To keep things flexible we will write a ``build_piston`` function which we can
+change once we have read data coming in from the fusion reactor:
+
+.. code-block:: python
+
+  def build_piston(number, starting_state):
+    '''
+    The place to change how a fusion piston is constructed, set:
+      get_composite_reading (where composite data is aquired)
+      get_temperature_reading (where temperature data is aquired)
+      is_this_piston_ready (to determine if it is ready to go)
+    '''
+    piston = PistonManager(
+      get_composite_reading=fake_news(
+        FakeNewsSpec(minimum=0,
+                     maximum=100,
+                     initial_value=89,
+                     aggression=21)),
+      get_temperature_reading=fake_news(
+        FakeNewsSpec(minimum=0, 
+                     maximum=1500,
+                     initial_value=798,
+                     aggression=16)),
+      is_this_piston_ready=is_this_piston_ready,
+      number=number
+    )
+    piston.start_at(starting_state)
+    return piston
+
+Now I will add the fire manager:
+
+.. image:: _static/orthogonal_region5.svg
+    :align: center
+
+To construct the invidual 
 
 .. _patterns-transition-to-history:
 
@@ -1374,4 +1706,10 @@ Multichart Pend
 .. [#2] p.211 Practical UML STATECHARTS in C/C++, Second Edition
 .. [#3] p.219 Practical UML STATECHARTS in C/C++, Second Edition
 .. _bursts: http://barabasi.com/book/bursts
+.. _a pattern language: https://www.patternlanguage.com/
+.. _translated it into English: https://www.tutorialspoint.com/design_pattern/design_pattern_overview.htm
+.. _Michel Laberge: https://www.ted.com/talks/michel_laberge_how_synchronized_hammer_strikes_could_generate_nuclear_fusion
+.. _polyamorous: https://sonichits.com/video/Jimmy_Thackery_%01_John_Mooney/Eliza
+
+
 

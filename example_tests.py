@@ -986,7 +986,7 @@ def deferred1():
     return chart.trans(idle)
 
   chart = Factory('deferred')
-  
+
   processing = chart.create(state="processing"). \
                 catch(signal=signals.NEW_REQUEST, handler=processing_entry). \
                 catch(signal=signals.INIT_SIGNAL, handler=processing_init). \
@@ -1018,7 +1018,7 @@ def deferred1():
 
   def burst_event(event, bursts, fastest_time, slowest_time):
     for i in range(bursts):
-      time.sleep(random.uniform(fastest_time,slowest_time))
+      time.sleep(random.uniform(fastest_time, slowest_time))
       chart.post_fifo(event)
 
   burst_event(Event(signal=signals.NEW_REQUEST),
@@ -1029,6 +1029,85 @@ def deferred1():
   print(chart.trace())
   time.sleep(6)
   pp(chart.spy())
+
+
+class FakeNewsSpec:
+  ''' provides the following syntax:
+      spec.initial_value
+      spec.aggression
+      spec.minimum
+      spec.maximum
+  '''
+  def __init__(self,
+                aggression=0,
+                initial_value=None,
+                minimum=None,
+                maximum=None):
+    if minimum is None:
+      assert(0)
+    if maximum is None:
+      assert(0)
+    if minimum >= maximum:
+      assert(0)
+
+    if initial_value is None:
+      initial_value = (maximum - minimum) / 2.0
+    elif initial_value < minimum:
+      initial_value = minimum
+    elif initial_value > maximum:
+      initial_value = maximum
+
+    self.initial_value = initial_value
+    self.aggression    = aggression
+    self.minimum       = minimum
+    self.maximum       = maximum
+
+
+def fake_news(spec):
+  '''
+    # aggression ranges from 1 to 100.  1 is the least aggressive and 100 is
+    # the most agressive
+    fn = fake_news(FakeNewsSpec(minimum=0, maximum=100, initial_value=45, aggression=50))
+
+    for i in range(5):
+      print(fn())
+
+    # 70.40052265431565
+    # 98.55643192543394
+    # 63.607687838082626
+    # 96.33858152348765
+    # 47.2780049249278
+
+  '''
+  AGGRESSION_MAX = 100
+  '''returns a function that will generate the kind of fake news specified'''
+  import random
+  random.seed()
+
+  if 1 <= spec.aggression <= AGGRESSION_MAX:
+    aggression = spec.aggression
+  elif spec.aggression < 1:
+    aggression = 1
+  else:
+    aggression = AGGRESSION_MAX
+
+  def _fake_news_generator():
+    '''provides an infinite set of number within the spec'''
+    current_number = spec.initial_value
+
+    while(True):
+      random_number  = random.uniform(spec.minimum, spec.maximum)
+      # IIR (infinite impulse response)
+      current_number = ((aggression * random_number +
+                         (AGGRESSION_MAX - aggression) *
+                         current_number)) / AGGRESSION_MAX
+      yield current_number
+
+  def _fake_news():
+    '''just hides the next syntax'''
+    return next(_fake_news_generator())
+
+  return _fake_news
 
 
 if __name__ == '__main__':
@@ -1046,4 +1125,210 @@ if __name__ == '__main__':
   # reminder1()
   # reminder2()
   # reminder3()
-  deferred1()
+  # deferred1()
+
+  transducer_worker = fake_news(FakeNewsSpec(minimum=0, maximum=100, initial_value=45, aggression=20))
+  for i in range(3):
+    print(transducer_worker())
+
+  def is_this_piston_ready(chart):
+    transducers_say_go = False
+    composite = chart.get_composite_reading()
+    temperature = chart.get_temperature_reading()
+    chart.composite = composite
+    chart.temperature = temperature
+    if 0  <= composite <= 20 and 50 <= temperature <= 100:
+       transducers_say_go = True
+    elif 25  <= composite <= 50 and 200 <= temperature <= 333:
+       transducers_say_go = True
+    elif 30  <= composite <= 66 and 403 <= temperature <= 600:
+       transducers_say_go = True
+    elif 70  <= composite <= 100 and 670 <= temperature <= 1500:
+       transducers_say_go = True
+    else:
+      transducers_say_go = False
+    return transducers_say_go
+
+  @spy_on
+  def piston_ready(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.INIT_SIGNAL):
+      status = chart.trans(relaxing)
+    elif(e.signal == signals.TIME_OUT):
+      chart.count += 1
+      if chart.count >= 750:
+        chart.count = 0
+        chart.post(Event(signal=signals.PRIMED))
+    else:
+      status, chart.temp.fun = return_status.SUPER, chart.top
+    return status
+
+  @spy_on
+  def relaxing(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      chart.scribble("relaxing")
+    else:
+      status, chart.temp.fun = return_status.SUPER, piston_ready
+    return status
+
+  @spy_on
+  def triggered(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      chart.scribble("piston_slamming!")
+    else:
+      status, chart.temp.fun = return_status.SUPER, piston_ready
+    return status
+
+  @spy_on
+  def priming(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.TIME_OUT):
+      status = return_status.HANDLED
+      if chart.is_this_piston_ready():
+        status = chart.trans(ready)
+    else:
+      status, chart.temp.fun = return_status.SUPER, piston_ready
+    return status
+
+  def ready(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.FIRE):
+      status = chart.trans(triggered)
+    else:
+      status, chart.temp.fun = return_status.SUPER, priming
+    return status
+
+  class PistonManager(ActiveObject):
+    def __init__(self,
+                 get_composite_reading,
+                 get_temperature_reading,
+                 is_this_piston_ready,
+                 number):
+      super().__init__()
+
+      self.is_this_piston_ready    = is_this_piston_ready
+      self.get_composite_reading   = get_composite_reading
+      self.get_temperature_reading = get_temperature_reading
+      self.number                  = number
+      self.count                   = 0
+      self.temperature             = 0
+      self.composite               = 0
+
+  def build_piston(number, starting_state):
+    # We would change the get_composite_reading and get_temperature_reading
+    # with the actual functions that would return these values in production
+    piston = PistonManager(
+              get_composite_reading=fake_news(
+                FakeNewsSpec(minimum=0, maximum=100, initial_value=89, aggression=21)),
+              get_temperature_reading=fake_news(
+                FakeNewsSpec(minimum=0, maximum=1500, initial_value=798, aggression=16)),
+              is_this_piston_ready=is_this_piston_ready,
+              number=number)
+    piston.start_at(starting_state)
+    return piston
+
+  class FireManager(Factory):
+    def __init__(self,name):
+      super().__init__(name)
+      self.pistons = []
+
+  def fusion_ready_entry(chart, e):
+    status = return_status.HANDLED
+    chart.pistons = \
+      [build_piston(piston_number, starting_state=piston_ready)
+            for piston_number in range(25)]
+    for piston in chart.pistons:
+      piston.augment(other=chart, name="fire_manager")
+    return status
+
+  def fusion_ready_time_out(chart, e):
+    status = return_status.HANDLED
+    chart.count += 1
+    if chart.count >= 1000:
+      chart.count = 0
+      chart.post_fifo(
+        Event(signal=signals.FIRE_PRIMED))
+    return status
+
+  def fusion_ready_init(chart, e):
+    status = chart.trans(energy_generation)
+    return status
+
+  def fusion_ready_priming(chart, e):
+    status = return_status.HANDLED
+    chart.pistons[e.payload].dispatch(e)
+    return status
+
+  def energy_generation_init(chart, e):
+    status = chart.trans(fusion_waiting)
+    return status
+
+  def fusion_active_entry(chart, e):
+    status = return_status.HANDLED
+    for piston in chart.pistons:
+      piston.dispatch(
+        Event(signal=signals.FIRE))
+    return status
+
+  def fusion_active_fire_primed(chart, e):
+    status = chart.trans(fusion_waiting)
+    return status
+
+  def fusion_waiting_time_out(chart, e):
+    status = return_status.HANDLED
+    all_ready = True
+    for piston in chart.pistons:
+      piston.dispatch(e)
+      if piston.state.fun.__name__ == "ready":
+        all_ready &= True
+    if all_ready:
+      chart.post_lifo(Event(signal=signals.FIRE))
+
+    return status
+
+  def fusion_waiting_fire(chart, e):
+    status = return_status.HANDLED
+    return status
+
+  fire_manager = FireManager("fire_manager")
+  fusion_ready = fire_manager.create(state="fusion_ready"). \
+                    catch(signal=signals.ENTRY_SIGNAL,
+                      handler=fusion_ready_entry). \
+                    catch(signal=signals.INIT_SIGNAL,
+                      handler=fusion_ready_init). \
+                    catch(signal=signals.TIME_OUT,
+                      handler=fusion_ready_time_out). \
+                    to_method()
+  energy_generation = fire_manager.create(state="energy_generation"). \
+                    catch(signal=signals.INIT_SIGNAL,
+                      handler=energy_generation_init). \
+                    to_method()
+  fusion_active = fire_manager.create(state="fusion_active"). \
+                    catch(signal=signals.ENTRY_SIGNAL,
+                      handler=fusion_active_entry). \
+                    catch(signal=signals.FIRE_PRIMED,
+                      handler=fusion_active_fire_primed). \
+                    to_method()
+  fusion_waiting = fire_manager.create(state='fusion_waiting'). \
+                    catch(signal=signals.TIME_OUT,
+                      handler=fusion_waiting_time_out). \
+                    catch(signal=signals.FIRE,
+                      handler=fusion_waiting_time_out). \
+                    to_method()
+
+  fire_manager.nest(fusion_ready, parent=None). \
+               nest(energy_generation, parent=fusion_ready). \
+               nest(fusion_active, parent=energy_generation). \
+               nest(fusion_waiting, parent=energy_generation)
+
+  fire_manager.start_at(fusion_ready)
+  fire_manager.post_fifo(Event(signal=signals.TIME_OUT),
+                         times=2000,
+                         period=0.001,
+                         deferred=False)
+  time.sleep(1)
+  pp(fire_manager.spy())
+
+

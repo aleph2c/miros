@@ -324,6 +324,12 @@ class HsmEventProcessor():
     # build it
     hsm.start(starting_state_function)
     '''
+    if self.state is None:
+      self.state = Attribute()
+
+    if self.temp is None:
+      self.temp  = Attribute()
+
     self.state.fun = self.top
     self.temp.fun  = initial_state
     self.init()

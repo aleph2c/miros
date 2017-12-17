@@ -58,7 +58,7 @@
 <div class="section" id="id1">
 <h1>Patterns<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
 <p>The idea of software design patterns came from the architect Christopher
-Alexander.  He wrote a book, a pattern language, about how different approaches
+Alexander.  He wrote a book, <a class="reference external" href="https://www.patternlanguage.com/">a pattern language</a>, about how different approaches
 to architecture could be used across different scales (from the country to the
 pantry) to help people feel better about living in their communities.  It’s a
 lovely book; a child can understand it yet it is still useful to professional
@@ -68,11 +68,11 @@ Patterns: Elements of Reusable Object-Oriented Software”  This book <em>was no
 child friendly, in fact everyone I knew secretly hated it because of its
 illegibility; but would make sure to have a copy of it on their shelf to look
 like they were in the club.</p>
-<p>The ideas within the book were great and the follow up books that translated it
-into English were really useful.  Basically it described a set of techniques
-for solving classes of problems that come up over and over again.  If you
-haven’t learned the patterns yet, find a copy of a patterns book written by a
-practitioner in your language(s) and work through it.  You will level up.</p>
+<p>The ideas within the book were great and the follow up books that <a class="reference external" href="https://www.tutorialspoint.com/design_pattern/design_pattern_overview.htm">translated
+it into English</a> were really useful.  Basically it described a set of
+techniques for solving classes of problems that come up over and over again.
+If you haven’t learned the patterns yet, find a copy of a patterns book written
+by a practitioner in your language(s) and work through it.  You will level up.</p>
 <p>In chapter 5 of “Practical UML STATECHARTS in C/C++” I was leveled up by Miro
 Samek.  He describes 5 statechart patterns and made the bold claim that
 <strong>statecharts are a pattern of patterns</strong>.  I completely agree with him.  So here
@@ -526,9 +526,8 @@ processing are not quite independent.” <a class="footnote-reference" href="#id
 </div></blockquote>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Programming a statechart with <a class="reference internal" href="glossary.html#term-orthogonal-region"><span class="xref std std-term">orthogonal regions</span></a> is
-computationally expensive.  So if you find yourself drawing two seperate states
-with a lot of arrows connecting them, remind yourself of this <a class="reference internal" href="#patterns-reminder-here"><span class="std std-ref">reminder
+<p class="last">If you find yourself drawing two separate states with a lot of arrows
+connecting them, remind yourself of this <a class="reference internal" href="#patterns-reminder-here"><span class="std std-ref">reminder
 pattern</span></a>.</p>
 </div>
 <p>The reminder pattern uses the <a class="reference internal" href="#patterns-ultimate-hook"><span class="std std-ref">ultimate hook</span></a>
@@ -536,9 +535,9 @@ pattern mixed with <a class="reference internal" href="glossary.html#term-artifi
 an <a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial event</span></a> because it is invented by the
 statechart and injected to itself rather than being invented and injected by an
 outside caller.</p>
-<p>I’ll try to explain this idea by showing a design using <span class="xref std std-term">orthogonal
-regions</span>, show how it is expensive and then refactor the
-design using the <a class="reference internal" href="#patterns-reminder-here"><span class="std std-ref">reminder pattern</span></a>.</p>
+<p>I’ll try to explain this idea by showing a bad, but working design, show how it
+is expensive and then refactor the design using the <a class="reference internal" href="#patterns-reminder-here"><span class="std std-ref">reminder
+pattern</span></a>.</p>
 <p>We will begin with some specifications:</p>
 <ul class="simple">
 <li>Part of the system will poll a sensor based on a system clock running with
@@ -649,7 +648,7 @@ didn’t know about this and continue.</p>
 <span class="n">pp</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>I have highlighted the <a class="reference internal" href="glossary.html#term-illegal-transition"><span class="xref std std-term">illegal transition</span></a>.</p>
+<p>I have highlighted the <a class="reference internal" href="glossary.html#term-illegal-transition"><span class="xref std std-term">illegal transitions</span></a>.</p>
 <p>If we run the code we will see:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">miros</span><span class="o">.</span><span class="n">hsm</span><span class="o">.</span><span class="n">HsmTopologyException</span><span class="p">:</span>
   <span class="n">impossible</span> <span class="n">chart</span> <span class="n">topology</span> <span class="k">for</span> <span class="n">HsmEventProcessor</span><span class="o">.</span><span class="n">init</span><span class="p">,</span>
@@ -875,25 +874,22 @@ comments in the spy log are the thoughts I would have while viewing it.</p>
 </span></pre></div>
 </div>
 <p>The code works and we have met our specifications.</p>
-<p>The polling and the processing state are strongly coupled to the TIME_OUT
+<p>But the polling and the processing state are strongly coupled to the TIME_OUT
 signal.  Our design of having the TIME_OUT start the system in the polling and
-end up in the processing/busy state cost us a lot of CPU time.  This is an
-example of using <span class="xref std std-term">orthogonal regions</span> and as
-previously stated anytime we see this we should try and use the reminder
-pattern instead.   This pattern will be explained now, with a new design:</p>
+end up in the processing/busy state cost us a lot of CPU time.</p>
+<p>Lets introduce the reminder pattern with a new design:</p>
 <div align="center" class="align-center"><img alt="_images/reminder6.svg" id="patterns-reminder-here" src="_images/reminder6.svg" /></div>
 <p>Let’s discuss this diagram.</p>
-<p>Instead of creating two <a class="reference internal" href="glossary.html#term-orthogonal-region"><span class="xref std std-term">orthogonal regions</span></a> of
-polling and processing we nest processing inside of polling.  We use
-INIT_SIGNAL events to climb into the idle state.</p>
+<p>We use INIT_SIGNAL events to climb into the idle state.</p>
 <p>We create a TIME_OUT ultimate hook, which is a method that can be used by any
 state within the statechart.  This ultimate hook counts up each time it sees a
 TIME_OUT and once this count hits 3 it posts an artificial event with the
 signal DATA_READY.</p>
-<p>Once the RTC is completed, idle will catch the DATA_READY signal and transition
-into busy.  The busy state catches the TIME_OUT event which means that it will
-not escape to the ultimate hook in polling.  Instead it uses it to count up a
-busy_count and when it hits 2 it will transition back into idle.</p>
+<p>Once the <a class="reference internal" href="glossary.html#term-run-to-completion"><span class="xref std std-term">RTC</span></a> process is completed, idle will catch
+the DATA_READY signal and transition into busy.  The busy state catches the
+TIME_OUT event which means that it will not escape to the ultimate hook in
+polling.  Instead it uses it to count up a busy_count and when it hits 2 it
+will transition back into idle.</p>
 <p>Now, let’s write the code:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">pp</span>
@@ -1366,16 +1362,331 @@ chart:</p>
 <p>From the highlighted time stamps we see that these event injections were
 sporatic; so it is safe to assume the design worked.</p>
 <p>It turns out the design is a lot easier to explain and write than it is to
-verify.</p>
+verify.  You might be wondering what happens if more items are posted than
+there are slots in the deferred queue.  The deferred queue is a <code class="docutils literal"><span class="pre">deque</span></code>, which
+means it is a kind of ring buffer.  It you overflow it, it will remove the
+oldest item and push the newest item onto the tail end of the queue.  It has a
+queue size of 500.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The spy log does not contain timing information.  To add timing information to the
-spy only takes a little effort, but use the scribble method with a
+spy only takes a little effort; use the scribble method with a
 <code class="docutils literal"><span class="pre">datetime.now()</span></code> call.</p>
 </div>
 </div>
 <div class="section" id="orthogonal-component">
 <span id="patterns-orthogonal-component"></span><h2>Orthogonal Component<a class="headerlink" href="#orthogonal-component" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Formal description:</dt>
+<dd>“Use state machines as components.”</dd>
+</dl>
+<p>In the original statechart paper written by David Harel he describes how his
+formalism needs to capture requirements like “[The] gearbox change of state is
+independent of [the] braking system”.  For this he invented something called a
+‘orthogonal region’:</p>
+<div align="center" class="align-center"><img alt="_images/orthogonal_region1.svg" src="_images/orthogonal_region1.svg" /></div>
+<p>The two different areas in the above chart separated by the dotted line are
+orthogonal regions.  They represent two separate state machines that act
+independent of one another but are both turned on when the truck state is
+initiated.</p>
+<p>This part of the Harel formalism is not supported by the Miro Samek event
+processing algorithm.  But, it would be trivial to implement within the miros
+library, by building two separate active objects and letting them run
+independently.</p>
+<p>If you would like such a structure in your machine, you could use an orthogonal
+component instead.  An orthogonal component is just a statechart that can
+dispatch messages directly into another one.</p>
+<p>Imagine we are asked to build some software for the general fusion reactor:</p>
+<blockquote>
+<div>“The General Fusion’s Magnetized Target Fusion system uses a sphere filled
+with molten lead-lithium that is pumped to form a vortex.  A pulse of
+magnetically-confined plasma fuel is then injected into the vortex. Around
+the sphere, an array of pistons drive a pressure wave into the centre of
+the sphere, compressing the plasma to fusion conditions. This process is
+then repeated, while the heat from the reaction is captured in the liquid
+metal and used to generate electricity via a steam turbine.”</div></blockquote>
+<p>Ambitious.  Ok, let’s say we have to write the firing mechanism to cause all of
+the pistons to initiate the pressure wave.</p>
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/zf8QIJ2VgqU" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+</center><p>Each piston has a set of transducers to measure the local conditions of the
+molten lead-lithium.  The first transducer provides a composite reading that
+abstracts away a lot of the physics; it provides numbers between 0 and 100.
+The second transducer measures the temperature; it’s range is 0 to 9000 degrees
+Celsius.  A piston can only fire after 1 second has passed since the last
+firing event and once it passes this time threshold it would like to fire as
+soon as possible so that the fusion reactor can output the maximum amount of
+power.  All of the pistons have to fire at the same time.</p>
+<p>There are 255 pistons.</p>
+<p>Through a lot of trial and error it has been found a piston can fire in the
+following situations:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="59%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Composite Transducer Reading</th>
+<th class="head">Temperature Transducer  [degrees Celsius]</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0-20</td>
+<td>50-100</td>
+</tr>
+<tr class="row-odd"><td>25-50</td>
+<td>200-333</td>
+</tr>
+<tr class="row-even"><td>30-66</td>
+<td>403-600</td>
+</tr>
+<tr class="row-odd"><td>70-100</td>
+<td>670-1500</td>
+</tr>
+</tbody>
+</table>
+<p>Let’s design the system.  First we will need to fake out the temperature and
+composite transducer readings.  This can be done with an infinite impulse
+response filter and a random number generator using a flat distribution.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>  <span class="k">class</span> <span class="nc">FakeNewsSpec</span><span class="p">:</span>
+  <span class="sd">&#39;&#39;&#39; provides the following syntax:</span>
+<span class="sd">      spec.initial_value</span>
+<span class="sd">      spec.aggression</span>
+<span class="sd">      spec.minimum</span>
+<span class="sd">      spec.maximum</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">aggression</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">initial_value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                <span class="n">minimum</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                <span class="n">maximum</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">minimum</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">assert</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">maximum</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">assert</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">minimum</span> <span class="o">&gt;=</span> <span class="n">maximum</span><span class="p">:</span>
+      <span class="k">assert</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">initial_value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">initial_value</span> <span class="o">=</span> <span class="p">(</span><span class="n">maximum</span> <span class="o">-</span> <span class="n">minimum</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="k">elif</span> <span class="n">initial_value</span> <span class="o">&lt;</span> <span class="n">minimum</span><span class="p">:</span>
+      <span class="n">initial_value</span> <span class="o">=</span> <span class="n">minimum</span>
+    <span class="k">elif</span> <span class="n">initial_value</span> <span class="o">&gt;</span> <span class="n">maximum</span><span class="p">:</span>
+      <span class="n">initial_value</span> <span class="o">=</span> <span class="n">maximum</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">initial_value</span> <span class="o">=</span> <span class="n">initial_value</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">aggression</span>    <span class="o">=</span> <span class="n">aggression</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">minimum</span>       <span class="o">=</span> <span class="n">minimum</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">maximum</span>       <span class="o">=</span> <span class="n">maximum</span>
+
+
+<span class="k">def</span> <span class="nf">fake_news</span><span class="p">(</span><span class="n">spec</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    # aggression ranges from 1 to 100.  1 is the least aggressive and 100 is</span>
+<span class="sd">    # the most agressive</span>
+<span class="sd">    fn = fake_news(</span>
+<span class="sd">      FakeNewsSpec(minimum=0, maximum=100, initial_value=45, aggression=50))</span>
+<span class="sd">    for i in range(5):</span>
+<span class="sd">      print(fn())</span>
+<span class="sd">    # 70.40052265431565</span>
+<span class="sd">    # 98.55643192543394</span>
+<span class="sd">    # 63.607687838082626</span>
+<span class="sd">    # 96.33858152348765</span>
+<span class="sd">    # 47.2780049249278</span>
+
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">AGGRESSION_MAX</span> <span class="o">=</span> <span class="mi">100</span>
+  <span class="sd">&#39;&#39;&#39;returns a function that will generate the kind of fake news specified&#39;&#39;&#39;</span>
+  <span class="kn">import</span> <span class="nn">random</span>
+  <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">()</span>
+
+  <span class="k">if</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">spec</span><span class="o">.</span><span class="n">aggression</span> <span class="o">&lt;=</span> <span class="n">AGGRESSION_MAX</span><span class="p">:</span>
+    <span class="n">aggression</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">aggression</span>
+  <span class="k">elif</span> <span class="n">spec</span><span class="o">.</span><span class="n">aggression</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">aggression</span> <span class="o">=</span> <span class="mi">1</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">aggression</span> <span class="o">=</span> <span class="n">AGGRESSION_MAX</span>
+
+  <span class="k">def</span> <span class="nf">_fake_news_generator</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;provides an infinite set of number within the spec&#39;&#39;&#39;</span>
+    <span class="n">current_number</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">initial_value</span>
+
+    <span class="k">while</span><span class="p">(</span><span class="bp">True</span><span class="p">):</span>
+      <span class="n">random_number</span>  <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">minimum</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">maximum</span><span class="p">)</span>
+      <span class="c1"># IIR (infinite impulse response)</span>
+      <span class="n">current_number</span> <span class="o">=</span> <span class="p">((</span><span class="n">aggression</span> <span class="o">*</span> <span class="n">random_number</span> <span class="o">+</span>
+                         <span class="p">(</span><span class="n">AGGRESSION_MAX</span> <span class="o">-</span> <span class="n">aggression</span><span class="p">)</span> <span class="o">*</span>
+                         <span class="n">current_number</span><span class="p">))</span> <span class="o">/</span> <span class="n">AGGRESSION_MAX</span>
+      <span class="k">yield</span> <span class="n">current_number</span>
+
+  <span class="k">def</span> <span class="nf">_fake_news</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;just hides the next syntax&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">_fake_news_generator</span><span class="p">())</span>
+
+  <span class="k">return</span> <span class="n">_fake_news</span>
+</pre></div>
+</div>
+<p>Ok, let’s try it out:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">transducer_worker</span> <span class="o">=</span> <span class="n">fake_news</span><span class="p">(</span>
+                      <span class="n">FakeNewsSpec</span><span class="p">(</span><span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maximum</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                                   <span class="n">initial_value</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">aggression</span><span class="o">=</span><span class="mi">20</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">transducer_worker</span><span class="p">())</span>
+<span class="c1"># 39.41035307935898</span>
+<span class="c1"># 51.639646042274904</span>
+<span class="c1"># 53.30613755950629</span>
+</pre></div>
+</div>
+<p>The numbers are phasing about which is what we wanted. Pushing on.</p>
+<p><a class="reference external" href="https://www.ted.com/talks/michel_laberge_how_synchronized_hammer_strikes_could_generate_nuclear_fusion">Michel Laberge</a> can’t make up his mind about the piston’s firing criteria, so
+we have to make sure it’s easy to change.  We will create a selection function
+then we can inject it into the chart.  For now we define it as this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">is_this_piston_ready</span><span class="p">(</span><span class="n">chart</span><span class="p">):</span>
+  <span class="n">transducers_say_go</span> <span class="o">=</span> <span class="bp">False</span>
+  <span class="n">comp</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">get_composite_reading</span><span class="p">()</span>
+  <span class="n">temp</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">get_temperater_reading</span><span class="p">()</span>
+
+  <span class="k">if</span> <span class="mi">0</span>  <span class="o">&lt;=</span> <span class="n">comp</span> <span class="o">&lt;=</span> <span class="mi">20</span> <span class="ow">and</span>
+     <span class="mi">50</span> <span class="o">&lt;=</span> <span class="n">temp</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">:</span>
+     <span class="n">transducers_say_go</span> <span class="o">|=</span> <span class="bp">True</span>
+  <span class="k">elif</span> <span class="mi">25</span>  <span class="o">&lt;=</span> <span class="n">comp</span> <span class="o">&lt;=</span> <span class="mi">50</span> <span class="ow">and</span>
+       <span class="mi">200</span> <span class="o">&lt;=</span> <span class="n">temp</span> <span class="o">&lt;=</span> <span class="mi">333</span><span class="p">:</span>
+     <span class="n">transducers_say_go</span> <span class="o">|=</span> <span class="bp">True</span>
+  <span class="k">elif</span> <span class="mi">30</span>  <span class="o">&lt;=</span> <span class="n">comp</span> <span class="o">&lt;=</span> <span class="mi">66</span> <span class="ow">and</span>
+       <span class="mi">403</span> <span class="o">&lt;=</span> <span class="n">temp</span> <span class="o">&lt;=</span> <span class="mi">600</span><span class="p">:</span>
+     <span class="n">transducers_say_go</span> <span class="o">|=</span> <span class="bp">True</span>
+  <span class="k">elif</span> <span class="mi">70</span>  <span class="o">&lt;=</span> <span class="n">comp</span> <span class="o">&lt;=</span> <span class="mi">100</span> <span class="ow">and</span>
+       <span class="mi">670</span> <span class="o">&lt;=</span> <span class="n">temp</span> <span class="o">&lt;=</span> <span class="mi">1500</span><span class="p">:</span>
+     <span class="n">transducers_say_go</span> <span class="o">|=</span> <span class="bp">True</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">transducers_say_go</span> <span class="o">=</span> <span class="bp">False</span>
+
+  <span class="k">return</span> <span class="n">transducers_say_go</span>
+</pre></div>
+</div>
+<p>This <code class="docutils literal"><span class="pre">is_this_piston_ready</span></code> function will be used by an individual piston to
+determine if it is ready to fire.</p>
+<p>Here is a UML class diagram of our approach:</p>
+<div align="center" class="align-center"><img alt="_images/orthogonal_region3.svg" src="_images/orthogonal_region3.svg" /></div>
+<p>The FireManager object will aggregate 255 PistonManager objects.  A piston
+manager object will use the event dispatcher of the ActiveObject (which means I
+can’t use a factory).  Or if you just read the code, you would see that the
+FireManager object will have a list containing 255 other active objects, each
+keeping track of their individual piston state.</p>
+<p>The PistonManager objects will each contain their own event dispatchers, their
+own event queues; but they will all reference the same piston_manager state
+machine.</p>
+<p>We are going to use the polyamorous nature of state methods to implement the
+255 piston managers.  Instead of having a separate piston manager statemachine
+defined for each of the 255 active objects we will instead define one that is
+shared by all of them.  I will link to it once per each active object and they
+won’t know that they don’t contain them as methods within their own class.  I
+have no idea how to represent this in UML.  So I will write it this way:</p>
+<div align="center" class="align-center"><img alt="_images/orthogonal_region4.svg" src="_images/orthogonal_region4.svg" /></div>
+<p>The state machine will be defined as:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">piston_ready</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">relaxing</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">750</span><span class="p">:</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">PRIMED</span><span class="p">))</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">relaxing</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;relaxing&quot;</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">piston_ready</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">triggered</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;piston_slamming!&quot;</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">piston_ready</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">priming</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">is_this_piston_ready</span><span class="p">():</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">ready</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">piston_ready</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">FIRE</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">triggered</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">priming</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Now we will create the PistonManager class:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">PistonManager</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">get_composite_reading</span><span class="p">,</span>
+               <span class="n">get_temperature_reading</span><span class="p">,</span>
+               <span class="n">is_this_piston_ready</span><span class="p">,</span>
+               <span class="n">number</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">is_this_piston_ready</span>    <span class="o">=</span> <span class="n">is_this_piston_ready</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">get_composite_reading</span>   <span class="o">=</span> <span class="n">get_composite_reading</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">get_temperature_reading</span> <span class="o">=</span> <span class="n">get_temperature_reading</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="n">number</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">composite</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>To keep things flexible we will write a <code class="docutils literal"><span class="pre">build_piston</span></code> function which we can
+change once we have read data coming in from the fusion reactor:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">build_piston</span><span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="n">starting_state</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  The place to change how a fusion piston is constructed, set:</span>
+<span class="sd">    get_composite_reading (where composite data is aquired)</span>
+<span class="sd">    get_temperature_reading (where temperature data is aquired)</span>
+<span class="sd">    is_this_piston_ready (to determine if it is ready to go)</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">piston</span> <span class="o">=</span> <span class="n">PistonManager</span><span class="p">(</span>
+    <span class="n">get_composite_reading</span><span class="o">=</span><span class="n">fake_news</span><span class="p">(</span>
+      <span class="n">FakeNewsSpec</span><span class="p">(</span><span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                   <span class="n">maximum</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                   <span class="n">initial_value</span><span class="o">=</span><span class="mi">89</span><span class="p">,</span>
+                   <span class="n">aggression</span><span class="o">=</span><span class="mi">21</span><span class="p">)),</span>
+    <span class="n">get_temperature_reading</span><span class="o">=</span><span class="n">fake_news</span><span class="p">(</span>
+      <span class="n">FakeNewsSpec</span><span class="p">(</span><span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                   <span class="n">maximum</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span>
+                   <span class="n">initial_value</span><span class="o">=</span><span class="mi">798</span><span class="p">,</span>
+                   <span class="n">aggression</span><span class="o">=</span><span class="mi">16</span><span class="p">)),</span>
+    <span class="n">is_this_piston_ready</span><span class="o">=</span><span class="n">is_this_piston_ready</span><span class="p">,</span>
+    <span class="n">number</span><span class="o">=</span><span class="n">number</span>
+  <span class="p">)</span>
+  <span class="n">piston</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">starting_state</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">piston</span>
+</pre></div>
+</div>
+<p>Now I will add the fire manager:</p>
+<div align="center" class="align-center"><img alt="_images/orthogonal_region5.svg" src="_images/orthogonal_region5.svg" /></div>
+<p>To construct the invidual</p>
 </div>
 <div class="section" id="transition-to-history">
 <span id="patterns-transition-to-history"></span><h2>Transition To History<a class="headerlink" href="#transition-to-history" title="Permalink to this headline">¶</a></h2>

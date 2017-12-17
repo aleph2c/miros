@@ -1561,8 +1561,21 @@ can run forever without using an infinite amount of memory.  Once the internal
 spy log has run out of room, it will shift out the old data and write the new
 data at the tail end of its log.</p>
 </div>
+<div class="section" id="add-timing-information-to-the-spy">
+<span id="recipes-add-timing-information-to-the-spy"></span><span id="recipes-tracing-live"></span><h3>Add Timing Information to the Spy<a class="headerlink" href="#add-timing-information-to-the-spy" title="Permalink to this headline">¶</a></h3>
+<p>The spy doesn’t contain timing information, if you would like to mark it up
+with time so that you can compare it with the trace output:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="c1"># .</span>
+<span class="c1"># .</span>
+<span class="c1"># In your state method or callback code write:</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;{} at {}&quot;</span><span class="o">.</span> \
+    <span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal_name</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%M:%S:</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="tracing-live">
-<span id="recipes-tracing-live"></span><h3>Tracing Live<a class="headerlink" href="#tracing-live" title="Permalink to this headline">¶</a></h3>
+<h3>Tracing Live<a class="headerlink" href="#tracing-live" title="Permalink to this headline">¶</a></h3>
 <p>There are situations where you would like to see what an active object is doing
 while it is running.  Each active object has an attribute called
 <code class="docutils literal"><span class="pre">live_trace</span></code>.  By setting this attribute to <code class="docutils literal"><span class="pre">True</span></code> the active object will
@@ -2067,6 +2080,7 @@ specification.</p>
 <li><a class="reference internal" href="#seeing-what-signals-you-have-in-your-system">Seeing what Signals You Have In Your System</a></li>
 <li><a class="reference internal" href="#using-the-trace">Using the Trace</a></li>
 <li><a class="reference internal" href="#using-the-spy">Using the Spy</a></li>
+<li><a class="reference internal" href="#add-timing-information-to-the-spy">Add Timing Information to the Spy</a></li>
 <li><a class="reference internal" href="#tracing-live">Tracing Live</a></li>
 <li><a class="reference internal" href="#spying-live">Spying Live</a></li>
 <li><a class="reference internal" href="#scribble-on-the-spy">Scribble On the Spy</a></li>

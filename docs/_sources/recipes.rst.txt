@@ -1396,6 +1396,23 @@ Using the Spy
 
 .. _recipes-tracing-live:
 
+.. _recipes-add-timing-information-to-the-spy:
+
+Add Timing Information to the Spy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The spy doesn't contain timing information, if you would like to mark it up
+with time so that you can compare it with the trace output:
+
+.. code-block:: python
+
+  from datetime import datetime
+  # .
+  # .
+  # In your state method or callback code write:
+  chart.scribble("{} at {}". \
+      format(e.signal_name, datetime.now().strftime("%M:%S:%f")))
+
+
 Tracing Live
 ^^^^^^^^^^^^
 There are situations where you would like to see what an active object is doing
