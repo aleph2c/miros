@@ -1389,9 +1389,10 @@ Imagine we are asked to build some software for the general fusion reactor:
     then repeated, while the heat from the reaction is captured in the liquid
     metal and used to generate electricity via a steam turbine."
 
+Now that is an ambitious project.
 
-Ambitious.  Ok, let's say we have to write the firing mechanism to cause all of
-the pistons to initiate the pressure wave.  
+Let's say we have to write the firing mechanism to cause all of the pistons to
+initiate the pressure wave.  
 
 .. raw:: html
 
@@ -1399,14 +1400,14 @@ the pistons to initiate the pressure wave.
   <iframe width="560" height="315" src="https://www.youtube.com/embed/zf8QIJ2VgqU" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
   </center>
 
-Each piston has a set of transducers to measure the local conditions of the
-molten lead-lithium.  The first transducer provides a composite reading that
-abstracts away a lot of the physics; it provides numbers between 0 and 100.
-The second transducer measures the temperature; it's range is 0 to 9000 degrees
-Celsius.  A piston can only fire after 1 second has passed since the last
-firing event and once it passes this time threshold it would like to fire as
-soon as possible so that the fusion reactor can output the maximum amount of
-power.
+Imagine that each piston has two transducers that measure the relevant
+conditions of the molten lead-lithium near its position on the sphere.  The
+first transducer provides a composite reading that abstracts away a lot of the
+physics; it provides numbers between 0 and 100.  The second transducer measures
+the temperature; it's range is 0 to 9000 degrees Celsius.  A piston can only
+fire after 1 second has passed since the last firing event and once it passes
+this time threshold it would like to fire as soon as possible so that the
+fusion reactor can output the maximum amount of power.
 
 There are 255 pistons.
 
@@ -1421,13 +1422,12 @@ Composite Transducer Reading  Temperature Transducer  [degrees Celsius]
 30-66                         403-600 
 70-100                        670-1500 
 ============================  =========================================
-
 All of the pistons have to fire at the same time and they can only fire if the
 above criteria are met.
 
 Let's design the system.  First we will need to fake-out the temperature and
 composite transducer readings.  This can be done with an infinite impulse
-response filter and a random number generator using a flat distribution.
+response filter and a random number generator using a uniform distribution.
 
 .. code-block:: python
 
@@ -1512,21 +1512,23 @@ Ok, let's try it out:
 
 .. code-block:: python
 
-  transducer_worker = fake_news(
+  fake_transducer = fake_news(
                         FakeNewsSpec(minimum=0, maximum=100,
                                      initial_value=45, aggression=20))
   for i in range(10):
-    print(transducer_worker())
+    print(fake_transducer())
   # 39.41035307935898
   # 51.639646042274904
   # 53.30613755950629
 
-We see we can make the numbers swing around, it's turnable.  Good enough,
-pushing on.
+We see we can make the numbers swing around and the function is tunable.  Good
+enough, pushing on.
 
-`Michel Laberge`_ would propably change his mind about a piston's firing
-criteria, so we have to make sure it's easy to change.  We will create a
-is-this-piston-ready function then we can inject it into our design.  For now
+As `Michel Laberge`_ builds up his prototype reactor he will change the
+piston firing specification a lot.
+
+So we have to make sure it's easy to change.  We will create a
+is-this-piston-ready method then we can inject it into our design.  For now
 we define it as this:
 
 .. code-block:: python
@@ -1554,134 +1556,396 @@ Here is the high level UML class diagram for our approach:
     :align: center
 
 The FusionReactor class will be a subclass of the Factory.  It will aggregate
-255 object of the Piston class.  The FusionReactor object will connect to the
+255 objects of the Piston class.  The FusionReactor object will connect to the
 reactor_on state machine and each of the piston objects will use the same
-piston_active state machine.  It is not show on the 
+piston_active state machine.
 
+The Piston class will be a subclass of HsmWithQueues, which means it will not
+have it's own thread.  Threads are only constructed in the ActiveObject class
+or any of it's descendants.  The orthogonal component pattern will allow a single
+thread to be shared between many different statemachines.  This will be
+described in more detail shortly.
 
-The PistonManager objects will each contain their own event dispatchers, their
+The Piston objects will each contain their own event dispatchers, their
 own event queues; but they will all reference the same piston_manager state
 machine.
 
-We are going to use the polyamorous nature of state methods to implement the
-255 piston managers.  Instead of having a separate piston manager statemachine
-defined for each of the 255 active objects we will instead define one that is
-shared by all of them.  I will link to it once per each active object and they
-won't know that they don't contain them as methods within their own class.  I
-have no idea how to represent this in UML.  So I will write it this way:
+We are going to use the :ref:`polyamorous
+nature<recipes-what-a-state-does-and-how-to-structure-it>` of state methods to
+implement the 255 piston managers.  Instead of having a separate piston_active
+:term:`HSM<Hierarchical State Machine>` defined for each of the 255 active objects we will instead define
+just one HSM and share it between all of them. (saving on memory)
+
 
 .. image:: _static/orthogonal_region4.svg
     :align: center
 
-The state machine will be defined as:
+Let's start writing the code.  Here is the Piston Class:
 
-  .. code-block:: python
+.. code-block:: python
+  :emphasize-lines: 3-5,9-11
+ 
+  class Piston(HsmWithQueues):
+    def __init__(self,
+                 get_composite_reading,
+                 get_temperature_reading,
+                 is_this_piston_ready,
+                 number):
+      super().__init__()
 
-    @spy_on
-    def piston_ready(piston, e):
-      status = return_status.UNHANDLED
-      if(e.signal == signals.INIT_SIGNAL):
-        status = piston.trans(relaxing)
-      elif(e.signal == signals.TIME_OUT):
-        piston.count += 1
-        if piston.count >= 750:
-          piston.count = 0
-          piston.post(Event(signal=signals.PRIMED))
-      else:
-        status, piston.temp.fun = return_status.SUPER, piston.top
-      return status
+      self.is_this_piston_ready    = is_this_piston_ready
+      self.get_composite_reading   = get_composite_reading
+      self.get_temperature_reading = get_temperature_reading
+      self.number                  = number
+      self.count                   = 0
+      self.armed                   = False
 
-    @spy_on
-    def relaxing(piston, e):
-      status = return_status.UNHANDLED
-      if(e.signal == signals.ENTRY_SIGNAL):
-        piston.scribble("relaxing")
-      else:
-        status, piston.temp.fun = return_status.SUPER, piston_ready
-      return status
+The highlights were made to show that it is easy to inject different types of
+functions to generate the transducer readings and the piston-ready criterion.
 
-    @spy_on
-    def triggered(piston, e):
-      status = return_status.UNHANDLED
-      if(e.signal == signals.ENTRY_SIGNAL):
-        piston.scribble("piston_slamming!")
-      else:
-        status, piston.temp.fun = return_status.SUPER, piston_ready
-      return status
+Now let's write the piston state machine:
 
-    @spy_on
-    def priming(piston, e):
-      status = return_status.UNHANDLED
-      if(e.signal == signals.TIME_OUT):
-        status = return_status.HANDLED
-        if piston.is_this_piston_ready():
-          status = piston.trans(ready)
-      else:
-        status, piston.temp.fun = return_status.SUPER, piston_ready
-      return status
+.. code-block:: python
+  :emphasize-lines: 60
 
-    def ready(piston, e):
-      status = return_status.UNHANDLED
-      if(e.signal == signals.FIRE):
-        status = piston.trans(triggered)
-      else:
-        status, piston.temp.fun = return_status.SUPER, priming
-      return status
+  # This is the piston's HSM, it will be shared by all pistons
+  @spy_on
+  def piston_ready(piston, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      piston.armed = False
+      status = return_status.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = piston.trans(relaxing)
+    else:
+      status, piston.temp.fun = return_status.SUPER, piston.top
+    return status
 
-Now we will create the PistonManager class:
+  @spy_on
+  def relaxing(piston, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      piston.scribble("relaxing")
+    elif(e.signal == signals.TIME_OUT):
+      status = return_status.HANDLED
+      piston.count += 1
+      if piston.count >= 7:
+        piston.count = 0
+        status = piston.trans(priming)
+    elif(e.signal == signals.PRIMING):
+      return piston.trans(priming)
+    else:
+      status, piston.temp.fun = return_status.SUPER, piston_ready
+    return status
 
-  .. code-block:: python
-    
-    class PistonManager(ActiveObject):
-      def __init__(self,
-                   get_composite_reading,
-                   get_temperature_reading,
-                   is_this_piston_ready,
-                   number):
-        super().__init__()
-        self.is_this_piston_ready    = is_this_piston_ready
-        self.get_composite_reading   = get_composite_reading
-        self.get_temperature_reading = get_temperature_reading
-        self.number = number
-        self.count = 0
-        self.temperature
-        self.composite
-  
-To keep things flexible we will write a ``build_piston`` function which we can
-change once we have read data coming in from the fusion reactor:
+  @spy_on
+  def triggered(piston, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      piston.scribble("piston_slamming! at {}". \
+        format(datetime.now().strftime("%M:%S:%f")))
+    elif(e.signal == signals.TIME_OUT):
+      status = piston.trans(relaxing)
+    else:
+      status, piston.temp.fun = return_status.SUPER, piston_ready
+    return status
+
+  @spy_on
+  def priming(piston, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.TIME_OUT):
+      status = return_status.HANDLED
+      if piston.is_this_piston_ready(piston):
+        status = piston.trans(ready)
+    else:
+      status, piston.temp.fun = return_status.SUPER, piston_ready
+    return status
+
+  @spy_on
+  def ready(piston, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      piston.armed = True
+      status = return_status.HANDLED
+    elif(e.signal == signals.FIRE):
+      status = piston.trans(triggered)
+    elif(e.signal == signals.TIME_OUT):
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      piston.armed = False
+      status = return_status.HANDLED
+    else:
+      status, piston.temp.fun = return_status.SUPER, priming
+    return status
+
+The first thing we notice about this code, is that it uses the :ref:`flat way
+of writing<recipes-boiler-plate-state-method-code>` state methods.
+
+This is because we want this HSM to be shared between multiple Piston objects.
+A state machine build up using a factory cannot be shared; it belongs to the
+thing that built it.  This is in contrast with flat state methods, they are
+defined outside of the event processors that will use them.  So they can be
+used over and over again if they describe behavior that wants to be shared.
+
+In our system we are going to have 255 pistons that all want the same type of
+behavior.  The internal variables for tracking counts and if that piston is
+armed will be kept within the piston objects, not in the HSM that it is using to
+define it's operational state.  Never store your :term:`extended state
+variables<Extended State Variables>` in a flat state method.
+
+The highlighted code marks the location of the FIRE signal.  This signal will
+be injected into this state machine using the ``dispatch`` method of the
+FusionReactor object.  We will talk more about that shortly.
+
+We want to build 255 pistons with a tunable ``is_this_piston_ready`` method.
+Furthermore, we want to be able to switch out our fake transducer readings with
+real functions from the reactor.  To make it easy to change these things I
+define a ``build_piston`` function.
 
 .. code-block:: python
 
+  # A function for building pistons
   def build_piston(number, starting_state):
-    '''
-    The place to change how a fusion piston is constructed, set:
-      get_composite_reading (where composite data is aquired)
-      get_temperature_reading (where temperature data is aquired)
-      is_this_piston_ready (to determine if it is ready to go)
-    '''
-    piston = PistonManager(
+    # We would change the get_composite_reading and get_temperature_reading
+    # with the actual functions that would return these values in production
+    piston = Piston(
       get_composite_reading=fake_news(
-        FakeNewsSpec(minimum=0,
-                     maximum=100,
-                     initial_value=89,
-                     aggression=21)),
+        FakeNewsSpec(
+          minimum=0,
+          maximum=100,
+          initial_value=89,
+          aggression=21)),
       get_temperature_reading=fake_news(
-        FakeNewsSpec(minimum=0, 
-                     maximum=1500,
-                     initial_value=798,
-                     aggression=16)),
+        FakeNewsSpec(
+          minimum=0,
+          maximum=1500,
+          initial_value=798,
+          aggression=16)),
       is_this_piston_ready=is_this_piston_ready,
       number=number
     )
     piston.start_at(starting_state)
     return piston
 
-Now I will add the fire manager:
+This function builds a fusion piston and starts it in whichever state we like.
+It will be changed before we actually turn on the reactor.  We will remove the
+`fake_news` calls with actual functions that return readings from our composite
+and temperature transducers.  For now, it will let us test and tune our design.
+
+Now that we can build and run a piston, let's design the FusionReactor class
+that it belongs to:
 
 .. image:: _static/orthogonal_region5.svg
     :align: center
 
-To construct the invidual 
+From a high level, the FusionReactor is a subclass of the Factory which means
+it has a thread and it can use the factory syntax to build up its HSM.  Since
+there will be only one reactor with 255 pistons, we have it build the 255
+pistons when it enters the reactor_on state.  The pistons are stored in an
+:term:`extended state variable<Extended State Variable>` in the reactor object.
+This adds convenient syntax for accessing an individual piston, or for
+iterating over all of them.
+
+After constructing it's pistons the reactor will climb into the
+pending_on_pistons state.  This state captures the TIME_OUT event and iterates
+through all of the pistons, injecting each of them with the TIME_OUT event.  To
+see how a fusion piston deals with a TIME_OUT we will look at it's state chart:
+
+.. image:: _static/orthogonal_region4.svg
+    :align: center
+
+So what happens with the first TIME_OUT event?  We see from inspection that
+each of the pistons will start in the relaxing state.  There is an assumption
+that when the fusion reactor is starting up, it lets its pistons relax into
+their firing positions.
+
+So the first TIME_OUT event will be caught by a piston's relaxing state.  Each
+successive TIME_OUT, the piston.count is incremented and when it is high
+enough, the piston transitions into pending_optimal_conditions.
+
+In the pending_optimal_conditions state, the piston uses each TIME_OUT pulse to
+read its transducers.  From this reading it can determine if the liquid metal
+on it's part of the sphere has met the design criteria for a piston strike.  It
+does this by calling the ``is_this_piston_ready`` function and transitioning
+into the ready state if the criteria are met, or by staying in the
+pending_optimal_conditions if they aren't.
+
+This behavior is shared with the ready state:  On each TIME_OUT event, the
+ready state can transition back into the pending_optimal_conditions if the
+strike conditions are no longer present; disarming the piston.  When the ready
+state is entered the piston's armed variable is set to True.  When it is exited
+it is set to false.  This is how information is shared with the fusion_reactor
+active object.
+
+Before we talk about the fusion_reactor again, we will finish the piston cycle
+walk through.  A piston can only FIRE from the ready state and it's event is
+initiated from the fusion_reactor statechart.  A FIRE event causes the piston
+to transition into the contract state and then the next TIME_OUT event will
+cause it to transition back into the relaxing state.
+
+The piston behavior described above is shared by all of the fusion pistons.
+Now that we understand how they work let's look at the fusion reactor again:
+
+.. image:: _static/orthogonal_region5.svg
+    :align: center
+
+We were talking about the pending_on_pistons TIME_OUT event handler prior to
+looking at the piston behavior.
+
+The orthogonal component pattern allows one active object to manually dispatch
+events into another.  This is done with the ``dispatch`` method.  Up until now
+we have dispatched events to our statecharts using the ``post_fifo`` and
+``post_lifo`` methods.  These methods write their events into a queue, which
+in turn wakes up a thread then causes that active object's HSM to run to completion.
+
+The piston objects do not have their own threads, they share a thread with the
+fusion_reactor object.  To pump an event into a piston object's HSM we call
+it's ``dispatch`` method with the event.  This will cause it to link to it's
+HSM, run it to completion then return control back to the fusion_reactor
+statechart.
+
+The fusion_reactor thread can be thought of as a large gear, who's rotational
+energy is coming from it's thread.  The pistons are little gears that are being
+powered by connecting with the large gear.
+
+Getting back to our example we see that the pending_on_pistons states will only
+post a FIRE event when all of its pistons are ready.  The FIRE event will cause
+a transition into the fusion_and_heat_transfer state, who's entry condition
+will pump a FIRE event into all of the pistons.  This will cause each of the
+pistons to contract and the fusion reaction will be initiated.  A small star
+will shine into the liquid metal.
+
+The fusion_and_heat_transfer state uses the reminder pattern to wait for 1
+second prior to transitioning back into the pending_on_pistons state.  Also
+notice the TIME_OUT event is pumped into each of the piston state machines
+by the TIME_OUT ultimate hook in the reactor_on class.   This will allow each
+piston to relax while the heat is being transfered out of the liquid metal.
+
+Now that we understand how the fusion reactor object works, let's write it's code:
+
+.. code-block:: python
+
+  # The fusion statechart callbacks
+  def reactor_on_entry(reactor, e):
+    status = return_status.HANDLED
+    reactor.count = 0
+    reactor.pistons = \
+      [build_piston(piston_number, starting_state=piston_ready)
+            for piston_number in range(255)]
+    return status
+
+  def reactor_on_time_out(reactor, e):
+    status = return_status.HANDLED
+
+    # provide a relaxing TIME_OUT pulse to each piston
+    for piston in reactor.pistons:
+      piston.dispatch(e)
+
+    reactor.count += 1
+    if reactor.count >= 10:
+      reactor.count = 0
+      reactor.post_fifo(
+        Event(signal=signals.COOL_ENOUGH))
+    return status
+
+  def reactor_on_init(reactor, e):
+    status = reactor.trans(energy_generation)
+    return status
+
+  def reactor_on_priming(reactor, e):
+    status = return_status.HANDLED
+    reactor.pistons[e.payload].dispatch(e)
+    return status
+
+  def energy_generation_init(reactor, e):
+    status = reactor.trans(pending_on_pistons)
+    return status
+
+  def fusion_active_entry(reactor, e):
+    status = return_status.HANDLED
+    for piston in reactor.pistons:
+      piston.dispatch(
+        Event(signal=signals.FIRE))
+    return status
+
+  def fusion_active_fire_primed(reactor, e):
+    status = reactor.trans(pending_on_pistons)
+    return status
+
+  def fusion_waiting_time_out(reactor, e):
+    status = return_status.HANDLED
+    all_ready = True
+    for piston in reactor.pistons:
+      piston.dispatch(e)
+      all_ready &= piston.armed
+    if all_ready:
+      status = reactor.trans(fusion_and_heat_transfer)
+    return status
+
+  def fusion_waiting_fire(reactor, e):
+    status = return_status.HANDLED
+    return status
+
+  # Create a fusion reactor object and its HSM
+  fusion_reactor = FusionReactor("fusion_reactor")
+
+  fusion_active = \
+    fusion_reactor.create(state="fusion_active"). \
+      catch(signal=signals.ENTRY_SIGNAL,
+        handler=reactor_on_entry). \
+      catch(signal=signals.INIT_SIGNAL,
+        handler=reactor_on_init). \
+      catch(signal=signals.TIME_OUT,
+        handler=reactor_on_time_out). \
+      catch(signal=signals.PRIMING,
+        handler=reactor_on_priming). \
+      to_method()
+
+  energy_generation = \
+    fusion_reactor.create(state="energy_generation"). \
+      catch(signal=signals.INIT_SIGNAL,
+        handler=energy_generation_init). \
+      to_method()
+
+  fusion_and_heat_transfer = \
+    fusion_reactor.create(state="fusion_and_heat_transfer"). \
+      catch(signal=signals.ENTRY_SIGNAL,
+        handler=fusion_active_entry). \
+      catch(signal=signals.COOL_ENOUGH,
+        handler=fusion_active_fire_primed). \
+      to_method()
+
+  pending_on_pistons = \
+    fusion_reactor.create(state='pending_on_pistons'). \
+      catch(signal=signals.TIME_OUT,
+        handler=fusion_waiting_time_out). \
+      catch(signal=signals.FIRE,
+        handler=fusion_waiting_time_out). \
+      to_method()
+
+  fusion_reactor.nest(fusion_active, parent=None). \
+    nest(energy_generation, parent=fusion_active). \
+    nest(fusion_and_heat_transfer, parent=energy_generation). \
+    nest(pending_on_pistons, parent=energy_generation)
+
+  fusion_reactor.start_at(fusion_active)
+
+A big issue with this design is the timing.  If you haven't noticed already, a
+TIME_OUT event needs to have a period of 100 ms otherwise we might damage our
+fusion reactor. ;)
+
+So here is some very important code:
+
+.. code-block:: python
+  :emphasize-lines: 3
+  
+  fusion_reactor.post_fifo(Event(signal=signals.TIME_OUT),
+                           times=100,
+                           period=0.1,
+                           deferred=False)
+
+We are going to post a TIME_OUT event every 100 ms, 100 times.  This will run
+things long enough to see if they work.
 
 .. _patterns-transition-to-history:
 

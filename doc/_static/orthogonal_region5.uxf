@@ -7,20 +7,23 @@
       <x>260</x>
       <y>280</y>
       <w>740</w>
-      <h>520</h>
+      <h>560</h>
     </coordinates>
     <panel_attributes>*reactor_on*
 --
 entry /
-  reactor.pistons = \
+  reactor.count = 0
+  reactor.pistons =   \
     [build_piston(number,starting_state=piston_ready)
       for piston_number in range(255)]
       
 TIME_OUT / 
+  for piston in reactor.pistons:
+    piston.dispatch(e)
   reactor.count += 1
   if reactor.count &gt;= 10
     reactor.count = 0
-    reactor.post_fifo(Event(signal=signals.FIRE_PRIMED))
+    reactor.post_fifo(Event(signal=signals.COOL_ENOUGH))
 
 
 valign=top
@@ -31,7 +34,7 @@ valign=top
     <id>UMLState</id>
     <coordinates>
       <x>290</x>
-      <y>550</y>
+      <y>600</y>
       <w>250</w>
       <h>200</h>
     </coordinates>
@@ -50,7 +53,7 @@ valign=top
     <id>UMLState</id>
     <coordinates>
       <x>660</x>
-      <y>540</y>
+      <y>590</y>
       <w>310</w>
       <h>220</h>
     </coordinates>
@@ -60,10 +63,10 @@ TIME_OUT /
   all_ready = True
   for piston in reactor.pistons:
     piston.dispatch(e)
-    if piston.start.fun.__name__ == "ready":
-      all_result &amp;= True
+    if piston.armed == True:
+      all_ready &amp;= True
      
-  if all_result:
+  if all_ready:
     reactor.post_lifo(
       Event(signal=signals.FIRE))
     
@@ -76,7 +79,7 @@ valign=top
     <id>UMLState</id>
     <coordinates>
       <x>280</x>
-      <y>500</y>
+      <y>550</y>
       <w>700</w>
       <h>270</h>
     </coordinates>
@@ -105,16 +108,16 @@ valign=top
       <x>720</x>
       <y>460</y>
       <w>30</w>
-      <h>100</h>
+      <h>150</h>
     </coordinates>
     <panel_attributes>lt=-&gt;</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;130.0</additional_attributes>
   </element>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
       <x>600</x>
-      <y>580</y>
+      <y>630</y>
       <w>20</w>
       <h>20</h>
     </coordinates>
@@ -125,7 +128,7 @@ valign=top
     <id>Relation</id>
     <coordinates>
       <x>600</x>
-      <y>580</y>
+      <y>630</y>
       <w>80</w>
       <h>30</h>
     </coordinates>
@@ -136,19 +139,19 @@ valign=top
     <id>Relation</id>
     <coordinates>
       <x>530</x>
-      <y>640</y>
+      <y>690</y>
       <w>150</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-FIRE_PRIMED</panel_attributes>
+COOL_ENOUGH</panel_attributes>
     <additional_attributes>10.0;20.0;130.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>530</x>
-      <y>700</y>
+      <y>750</y>
       <w>150</w>
       <h>40</h>
     </coordinates>
@@ -164,7 +167,7 @@ FIRE</panel_attributes>
       <w>220</w>
       <h>110</h>
     </coordinates>
-    <panel_attributes>FireManager
+    <panel_attributes>FusionReactor
 valign=top</panel_attributes>
     <additional_attributes/>
   </element>
@@ -206,12 +209,12 @@ Event Processor</panel_attributes>
     <id>Text</id>
     <coordinates>
       <x>570</x>
-      <y>230</y>
+      <y>200</y>
       <w>240</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>fire_manager = FireManager()
-fire_manager.start_at(fusion_ready)
+    <panel_attributes>fusion_reactor = FusionReactor()
+fusion_reactor.start_at(fusion_ready)
 style=wordwrap</panel_attributes>
     <additional_attributes/>
   </element>
@@ -265,7 +268,7 @@ style=wordwrap</panel_attributes>
     <id>UMLUseCase</id>
     <coordinates>
       <x>130</x>
-      <y>480</y>
+      <y>500</y>
       <w>120</w>
       <h>70</h>
     </coordinates>
@@ -278,24 +281,24 @@ reminder
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>220</x>
+      <x>240</x>
       <y>530</y>
-      <w>350</w>
-      <h>130</h>
+      <w>370</w>
+      <h>180</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>10.0;10.0;330.0;10.0;330.0;110.0</additional_attributes>
+    <additional_attributes>10.0;10.0;310.0;10.0;310.0;130.0;350.0;160.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>240</x>
-      <y>460</y>
-      <w>340</w>
-      <h>70</h>
+      <x>490</x>
+      <y>510</y>
+      <w>50</w>
+      <h>50</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>10.0;50.0;40.0;30.0;290.0;30.0;320.0;10.0</additional_attributes>
+    <additional_attributes>10.0;30.0;30.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLUseCase</id>
@@ -343,31 +346,42 @@ components
       <x>590</x>
       <y>340</y>
       <w>140</w>
-      <h>30</h>
+      <h>40</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>10.0;10.0;120.0;10.0</additional_attributes>
+    <additional_attributes>10.0;20.0;120.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>790</x>
-      <y>380</y>
+      <y>350</y>
       <w>150</w>
-      <h>260</h>
+      <h>340</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>30.0;10.0;130.0;10.0;130.0;240.0;10.0;240.0</additional_attributes>
+    <additional_attributes>40.0;10.0;130.0;40.0;130.0;320.0;10.0;320.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>500</x>
+      <x>460</x>
       <y>390</y>
-      <w>240</w>
-      <h>260</h>
+      <w>290</w>
+      <h>300</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>10.0;240.0;90.0;100.0;220.0;10.0</additional_attributes>
+    <additional_attributes>10.0;280.0;130.0;140.0;180.0;140.0;270.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>390</x>
+      <y>370</y>
+      <w>340</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;70.0;150.0;60.0;320.0;10.0</additional_attributes>
   </element>
 </diagram>

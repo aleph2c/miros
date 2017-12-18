@@ -53,9 +53,9 @@ armed
     <id>UMLState</id>
     <coordinates>
       <x>180</x>
-      <y>636</y>
+      <y>648</y>
       <w>228</w>
-      <h>132</h>
+      <h>120</h>
     </coordinates>
     <panel_attributes>*ready*
 --
@@ -87,30 +87,30 @@ valign=top
     <id>Relation</id>
     <coordinates>
       <x>84</x>
-      <y>612</y>
-      <w>408</w>
-      <h>96</h>
+      <y>600</y>
+      <w>372</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
-    <additional_attributes>10.0;10.0;320.0;10.0;320.0;60.0;270.0;60.0</additional_attributes>
+    <additional_attributes>10.0;20.0;290.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>396</x>
       <y>576</y>
-      <w>312</w>
+      <w>300</w>
       <h>180</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
-    <additional_attributes>10.0;130.0;130.0;130.0;130.0;10.0;240.0;10.0</additional_attributes>
+    <additional_attributes>10.0;130.0;130.0;130.0;130.0;10.0;230.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>684</x>
+      <x>672</x>
       <y>528</y>
       <w>336</w>
       <h>132</h>
@@ -127,10 +127,10 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>624</x>
+      <x>600</x>
       <y>708</y>
-      <w>384</w>
-      <h>204</h>
+      <w>408</w>
+      <h>228</h>
     </coordinates>
     <panel_attributes>*relaxing*
 --
@@ -141,7 +141,7 @@ entry /
 TIME_OUT /
   piston.count += 1
   if piston.count &gt;= 7:
-    status = piston.trans(priming)
+    status = piston.trans(pending_optimal_conditions)
 
 
 
@@ -154,8 +154,8 @@ valign=top
     <coordinates>
       <x>60</x>
       <y>480</y>
-      <w>972</w>
-      <h>468</h>
+      <w>984</w>
+      <h>492</h>
     </coordinates>
     <panel_attributes>*piston_active*
 --
@@ -168,7 +168,7 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>804</x>
+      <x>792</x>
       <y>648</y>
       <w>120</w>
       <h>84</h>
@@ -182,12 +182,12 @@ TIME_OUT</panel_attributes>
     <coordinates>
       <x>276</x>
       <y>780</y>
-      <w>372</w>
+      <w>348</w>
       <h>60</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
-    <additional_attributes>290.0;30.0;10.0;30.0;10.0;10.0</additional_attributes>
+    <additional_attributes>270.0;30.0;10.0;30.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLGeneric</id>
@@ -226,8 +226,8 @@ Event Processor</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>564</x>
-      <y>852</y>
+      <x>528</x>
+      <y>864</y>
       <w>24</w>
       <h>24</h>
     </coordinates>
@@ -237,8 +237,8 @@ Event Processor</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>564</x>
-      <y>852</y>
+      <x>540</x>
+      <y>864</y>
       <w>84</w>
       <h>36</h>
     </coordinates>
@@ -383,5 +383,38 @@ style=wordwrap</panel_attributes>
     <panel_attributes>piston.start_at(piston_active)
 style=wordwrap</panel_attributes>
     <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>432</x>
+      <y>600</y>
+      <w>48</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>type=decision</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>396</x>
+      <y>636</y>
+      <w>84</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>50.0;10.0;50.0;50.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>468</x>
+      <y>612</y>
+      <w>84</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
   </element>
 </diagram>

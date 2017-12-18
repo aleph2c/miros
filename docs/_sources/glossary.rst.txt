@@ -33,10 +33,11 @@ Glossary
      the parents states unless this behavior is over-written by the designer.
 
    Hierarchical State Machine
-     HSM: a state machine where states can exit within other states.  An outer
+     HSM: a state machine where states can exist within other states.  An outer
      state is called a parent state and an inner state is called a child state.
      In an HSM all child states share the behavior of the parents states unless
-     this behavior is over-written by the designer.
+     this behavior is over-written by the designer.  Software written using HSM
+     follow the :term:`harel formalism<Harel Formalism>`
 
    Payload
       A data object that has been injected into an Event.  It is intended to be
@@ -145,8 +146,9 @@ Glossary
       will be sent to a state method anytime a state has been settled upon.  An
       EXIT_SIGNAL event should be sent to a state method when it's boundary is
       being breached from an inside-to-the-outside.  If a state doesn't know
-      how to manage an event it is passed out to it's outer state.  If no
-      states know how to manage a signal it is ignored by the state chart.
+      how to manage an event it is passed outward to it's parent state.  If
+      none of the states within a state machine know how to manage an event,
+      it is ignored.
 
    Fifo
       First in first out.  Things line up as you image they should.
@@ -365,3 +367,14 @@ Glossary
       :ref:`this<patterns-reminder>`.  To see an example click
       :ref:`here<patterns-reminder-here>`.
 
+   Extended State Variables
+      This is a variable that can be used by a state machine.  They are often
+      used in guard conditions.  In the miros library the object containing the
+      :term:`event processor<Event Processor>`, which are passed into the
+      :term:`state methods<State Method>` contain the extended state variables.
+
+      `Extended state`_ variables are used to increase the complexity of a state
+      machine without having to add explite states
+      
+
+.. _Extended state: https://en.wikipedia.org/wiki/UML_state_machine#Extended_states
