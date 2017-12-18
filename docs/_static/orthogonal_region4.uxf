@@ -4,12 +4,12 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>432</x>
-      <y>204</y>
+      <x>156</x>
+      <y>72</y>
       <w>312</w>
       <h>288</h>
     </coordinates>
-    <panel_attributes>*Piston_Manager_{1-255}*
+    <panel_attributes>*Piston*
 --
 is_this_piston_ready(chart)
 --
@@ -21,14 +21,16 @@ count
 --
 number
 --
+armed
+--
 </panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>420</x>
-      <y>144</y>
+      <x>144</x>
+      <y>12</y>
       <w>120</w>
       <h>48</h>
     </coordinates>
@@ -39,8 +41,8 @@ number
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>528</x>
-      <y>156</y>
+      <x>252</x>
+      <y>24</y>
       <w>60</w>
       <h>72</h>
     </coordinates>
@@ -50,13 +52,15 @@ number
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>696</x>
-      <y>804</y>
-      <w>192</w>
+      <x>180</x>
+      <y>636</y>
+      <w>228</w>
       <h>132</h>
     </coordinates>
     <panel_attributes>*ready*
 --
+entry / piston.armed = True
+exit / piston.armed = False
 
 
 valign=top
@@ -66,12 +70,12 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>396</x>
-      <y>732</y>
-      <w>516</w>
+      <x>96</x>
+      <y>552</y>
+      <w>432</w>
       <h>240</h>
     </coordinates>
-    <panel_attributes>*priming*
+    <panel_attributes>*pending optimal conditions*
 --
 
 
@@ -82,39 +86,39 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>384</x>
-      <y>852</y>
-      <w>336</w>
-      <h>48</h>
+      <x>84</x>
+      <y>612</y>
+      <w>408</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-TIME_OUT [is_this_piston_ready()]</panel_attributes>
-    <additional_attributes>10.0;20.0;260.0;20.0</additional_attributes>
+</panel_attributes>
+    <additional_attributes>10.0;10.0;320.0;10.0;320.0;60.0;270.0;60.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>876</x>
-      <y>708</y>
-      <w>168</w>
-      <h>156</h>
+      <x>396</x>
+      <y>576</y>
+      <w>312</w>
+      <h>180</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-FIRE</panel_attributes>
-    <additional_attributes>10.0;110.0;40.0;70.0;40.0;10.0;120.0;10.0</additional_attributes>
+</panel_attributes>
+    <additional_attributes>10.0;130.0;130.0;130.0;130.0;10.0;240.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>1020</x>
-      <y>660</y>
-      <w>276</w>
+      <x>684</x>
+      <y>528</y>
+      <w>336</w>
       <h>132</h>
     </coordinates>
-    <panel_attributes>*triggered*
+    <panel_attributes>*contract*
 --
 /entry 
-  chart.scribble("piston_slamming!")
+  piston.scribble("piston_slamming!")
 
 valign=top
 </panel_attributes>
@@ -123,15 +127,22 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>1020</x>
-      <y>840</y>
-      <w>264</w>
-      <h>132</h>
+      <x>624</x>
+      <y>708</y>
+      <w>384</w>
+      <h>204</h>
     </coordinates>
     <panel_attributes>*relaxing*
 --
-/entry 
-  chart.scribble("relaxing")
+entry /
+  piston.scribble("relaxing")
+  piston.count = 0
+  
+TIME_OUT /
+  piston.count += 1
+  if piston.count &gt;= 7:
+    status = piston.trans(priming)
+
 
 
 valign=top
@@ -141,17 +152,14 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>372</x>
-      <y>612</y>
-      <w>936</w>
-      <h>396</h>
+      <x>60</x>
+      <y>480</y>
+      <w>972</w>
+      <h>468</h>
     </coordinates>
-    <panel_attributes>*piston_ready*
+    <panel_attributes>*piston_active*
 --
-TIME_OUT /
-	chart.count += 1
-	if chart.count &gt;= 750:
-	  chart.post(Event(signal=signals.PRIMING))
+entry/ piston.armed = False
 
 valign=top
 </panel_attributes>
@@ -160,8 +168,8 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1128</x>
-      <y>780</y>
+      <x>804</x>
+      <y>648</y>
       <w>120</w>
       <h>84</h>
     </coordinates>
@@ -172,20 +180,20 @@ TIME_OUT</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>900</x>
-      <y>912</y>
-      <w>144</w>
-      <h>48</h>
+      <x>276</x>
+      <y>780</y>
+      <w>372</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-PRIMING</panel_attributes>
-    <additional_attributes>100.0;20.0;10.0;20.0</additional_attributes>
+</panel_attributes>
+    <additional_attributes>290.0;30.0;10.0;30.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>468</x>
-      <y>396</y>
+      <x>192</x>
+      <y>276</y>
       <w>240</w>
       <h>72</h>
     </coordinates>
@@ -196,19 +204,19 @@ Event Processor</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>576</x>
-      <y>456</y>
+      <x>300</x>
+      <y>336</y>
       <w>156</w>
-      <h>144</h>
+      <h>132</h>
     </coordinates>
     <panel_attributes>lt=[^]-(</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;60.0;100.0;60.0;100.0;90.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0;100.0;50.0;100.0;80.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>684</x>
-      <y>576</y>
+      <x>408</x>
+      <y>444</y>
       <w>36</w>
       <h>72</h>
     </coordinates>
@@ -218,8 +226,8 @@ Event Processor</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>960</x>
-      <y>876</y>
+      <x>564</x>
+      <y>852</y>
       <w>24</w>
       <h>24</h>
     </coordinates>
@@ -229,8 +237,8 @@ Event Processor</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>960</x>
-      <y>876</y>
+      <x>564</x>
+      <y>852</y>
       <w>84</w>
       <h>36</h>
     </coordinates>
@@ -240,28 +248,28 @@ Event Processor</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>756</x>
-      <y>228</y>
-      <w>528</w>
-      <h>396</h>
+      <x>516</x>
+      <y>72</y>
+      <w>552</w>
+      <h>324</h>
     </coordinates>
-    <panel_attributes>def is_this_piston_ready(chart):
-  transducers_say_go = False
-  comp = chart.get_composite_reading()
-  temp = chart.get_temperature_reading()
- 
-  if 0  &lt;= comp &lt;= 20 and 50 &lt;= temp &lt;= 100:
-     transducers_say_go = True
-  elif 25  &lt;= comp &lt;= 50 and 200 &lt;= temp &lt;= 333:
-     transducers_say_go = True
-  elif 30  &lt;= comp &lt;= 66 and 403 &lt;= temp &lt;= 600:
-     transducers_say_go = True
-  elif 70  &lt;= comp &lt;= 100 and 670 &lt;= temp &lt;= 1500:
-     transducers_say_go = True
-  else:
-    transducers_say_go = False
-    
-  return transducers_say_go
+    <panel_attributes>  def is_this_piston_ready(piston):
+  
+    comp = piston.get_composite_reading()
+    temp = piston.get_temperature_reading()
+
+    if 0 &lt;= comp &lt;= 20 and 50 &lt;= temp &lt;= 100:
+       ready = True
+    elif 25 &lt;= comp &lt;= 50 and 200 &lt;= temp &lt;= 333:
+       ready = True
+    elif 30 &lt;= comp &lt;= 66 and 403 &lt;= temp &lt;= 600:
+       ready = True
+    elif 70 &lt;= comp &lt;= 100 and 670 &lt;= temp &lt;= 1500:
+       ready = True
+    else:
+      ready = False
+
+    return ready
 
 
      
@@ -272,19 +280,19 @@ style=wordwrap</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>948</x>
-      <y>540</y>
-      <w>180</w>
-      <h>108</h>
+      <x>672</x>
+      <y>384</y>
+      <w>108</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>10.0;70.0;130.0;10.0</additional_attributes>
+    <additional_attributes>10.0;80.0;70.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>1104</x>
-      <y>504</y>
+      <x>756</x>
+      <y>360</y>
       <w>216</w>
       <h>60</h>
     </coordinates>
@@ -295,21 +303,21 @@ used by 255 active objects</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>384</x>
-      <y>516</y>
+      <x>108</x>
+      <y>384</y>
       <w>168</w>
       <h>84</h>
     </coordinates>
-    <panel_attributes>all piston managers
-objects will use the
+    <panel_attributes>all piston objects
+will use the
 same state machine</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>396</x>
-      <y>276</y>
+      <x>120</x>
+      <y>144</y>
       <w>60</w>
       <h>264</h>
     </coordinates>
@@ -319,8 +327,8 @@ same state machine</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>588</x>
-      <y>492</y>
+      <x>312</x>
+      <y>360</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -331,12 +339,48 @@ style=wordwrap</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>672</x>
-      <y>528</y>
+      <x>396</x>
+      <y>396</y>
       <w>24</w>
       <h>36</h>
     </coordinates>
     <panel_attributes>1
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>132</x>
+      <y>588</y>
+      <w>288</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>TIME_OUT [is_this_piston_ready()]
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>564</x>
+      <y>564</y>
+      <w>72</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>FIRE
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>432</x>
+      <y>396</y>
+      <w>240</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>piston.start_at(piston_active)
 style=wordwrap</panel_attributes>
     <additional_attributes/>
   </element>

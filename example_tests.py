@@ -1,8 +1,7 @@
 import time
-from miros.hsm import spy_on, pp, state_method_template
+from miros.hsm import spy_on, pp, state_method_template, HsmWithQueues
 from miros.activeobject import ActiveObject, Factory
 from miros.event import signals, Event, return_status
-
 
 def t_question():
   '''
@@ -1030,7 +1029,7 @@ def deferred1():
   time.sleep(6)
   pp(chart.spy())
 
-
+from datetime import datetime
 class FakeNewsSpec:
   ''' provides the following syntax:
       spec.initial_value
@@ -1131,12 +1130,12 @@ if __name__ == '__main__':
   for i in range(3):
     print(transducer_worker())
 
-  def is_this_piston_ready(chart):
+  def is_this_piston_ready(piston):
     transducers_say_go = False
-    composite = chart.get_composite_reading()
-    temperature = chart.get_temperature_reading()
-    chart.composite = composite
-    chart.temperature = temperature
+    composite = piston.get_composite_reading()
+    temperature = piston.get_temperature_reading()
+    piston.composite = composite
+    piston.temperature = temperature
     if 0  <= composite <= 20 and 50 <= temperature <= 100:
        transducers_say_go = True
     elif 25  <= composite <= 50 and 200 <= temperature <= 333:
@@ -1150,57 +1149,74 @@ if __name__ == '__main__':
     return transducers_say_go
 
   @spy_on
-  def piston_ready(chart, e):
+  def piston_ready(piston, e):
     status = return_status.UNHANDLED
-    if(e.signal == signals.INIT_SIGNAL):
-      status = chart.trans(relaxing)
+    if(e.signal == signals.ENTRY_SIGNAL):
+      piston.armed = False
+      status = return_status.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = piston.trans(relaxing)
+    else:
+      status, piston.temp.fun = return_status.SUPER, piston.top
+    return status
+
+  @spy_on
+  def relaxing(piston, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      piston.scribble("relaxing")
     elif(e.signal == signals.TIME_OUT):
-      chart.count += 1
-      if chart.count >= 750:
-        chart.count = 0
-        chart.post(Event(signal=signals.PRIMED))
+      status = return_status.HANDLED
+      piston.count += 1
+      if piston.count >= 7:
+        piston.count = 0
+        status = piston.trans(priming)
+    elif(e.signal == signals.PRIMING):
+      return piston.trans(priming)
     else:
-      status, chart.temp.fun = return_status.SUPER, chart.top
+      status, piston.temp.fun = return_status.SUPER, piston_ready
     return status
 
   @spy_on
-  def relaxing(chart, e):
+  def triggered(piston, e):
     status = return_status.UNHANDLED
     if(e.signal == signals.ENTRY_SIGNAL):
-      chart.scribble("relaxing")
+      piston.scribble("piston_slamming! at {}".format(datetime.now().strftime("%M:%S:%f")))
+    elif(e.signal == signals.TIME_OUT):
+      status = piston.trans(relaxing)
     else:
-      status, chart.temp.fun = return_status.SUPER, piston_ready
+      status, piston.temp.fun = return_status.SUPER, piston_ready
     return status
 
   @spy_on
-  def triggered(chart, e):
-    status = return_status.UNHANDLED
-    if(e.signal == signals.ENTRY_SIGNAL):
-      chart.scribble("piston_slamming!")
-    else:
-      status, chart.temp.fun = return_status.SUPER, piston_ready
-    return status
-
-  @spy_on
-  def priming(chart, e):
+  def priming(piston, e):
     status = return_status.UNHANDLED
     if(e.signal == signals.TIME_OUT):
       status = return_status.HANDLED
-      if chart.is_this_piston_ready():
-        status = chart.trans(ready)
+      if piston.is_this_piston_ready(piston):
+        status = piston.trans(ready)
     else:
-      status, chart.temp.fun = return_status.SUPER, piston_ready
+      status, piston.temp.fun = return_status.SUPER, piston_ready
     return status
 
-  def ready(chart, e):
+  @spy_on
+  def ready(piston, e):
     status = return_status.UNHANDLED
-    if(e.signal == signals.FIRE):
-      status = chart.trans(triggered)
+    if(e.signal == signals.ENTRY_SIGNAL):
+      piston.armed = True
+      status = return_status.HANDLED
+    elif(e.signal == signals.FIRE):
+      status = piston.trans(triggered)
+    elif(e.signal == signals.TIME_OUT):
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      piston.armed = False
+      status = return_status.HANDLED
     else:
-      status, chart.temp.fun = return_status.SUPER, priming
+      status, piston.temp.fun = return_status.SUPER, priming
     return status
 
-  class PistonManager(ActiveObject):
+  class PistonManager(HsmWithQueues):
     def __init__(self,
                  get_composite_reading,
                  get_temperature_reading,
@@ -1215,6 +1231,7 @@ if __name__ == '__main__':
       self.count                   = 0
       self.temperature             = 0
       self.composite               = 0
+      self.armed                   = False
 
   def build_piston(number, starting_state):
     # We would change the get_composite_reading and get_temperature_reading
@@ -1230,69 +1247,67 @@ if __name__ == '__main__':
     return piston
 
   class FireManager(Factory):
-    def __init__(self,name):
+    def __init__(self, name):
       super().__init__(name)
       self.pistons = []
+      self.count = 0
 
-  def fusion_ready_entry(chart, e):
+  def fusion_ready_entry(reactor, e):
     status = return_status.HANDLED
-    chart.pistons = \
+    reactor.pistons = \
       [build_piston(piston_number, starting_state=piston_ready)
-            for piston_number in range(25)]
-    for piston in chart.pistons:
-      piston.augment(other=chart, name="fire_manager")
+            for piston_number in range(255)]
     return status
 
-  def fusion_ready_time_out(chart, e):
+  def fusion_ready_time_out(reactor, e):
     status = return_status.HANDLED
-    chart.count += 1
-    if chart.count >= 1000:
-      chart.count = 0
-      chart.post_fifo(
+    reactor.count += 1
+    if reactor.count >= 10:
+      reactor.count = 0
+      reactor.post_fifo(
         Event(signal=signals.FIRE_PRIMED))
     return status
 
-  def fusion_ready_init(chart, e):
-    status = chart.trans(energy_generation)
+  def fusion_ready_init(reactor, e):
+    status = reactor.trans(energy_generation)
     return status
 
-  def fusion_ready_priming(chart, e):
+  def fusion_ready_priming(reactor, e):
     status = return_status.HANDLED
-    chart.pistons[e.payload].dispatch(e)
+    reactor.pistons[e.payload].dispatch(e)
     return status
 
-  def energy_generation_init(chart, e):
-    status = chart.trans(fusion_waiting)
+  def energy_generation_init(reactor, e):
+    status = reactor.trans(fusion_waiting)
     return status
 
-  def fusion_active_entry(chart, e):
+  def fusion_active_entry(reactor, e):
     status = return_status.HANDLED
-    for piston in chart.pistons:
+    for piston in reactor.pistons:
       piston.dispatch(
         Event(signal=signals.FIRE))
     return status
 
-  def fusion_active_fire_primed(chart, e):
-    status = chart.trans(fusion_waiting)
+  def fusion_active_fire_primed(reactor, e):
+    status = reactor.trans(fusion_waiting)
     return status
 
-  def fusion_waiting_time_out(chart, e):
+  def fusion_waiting_time_out(reactor, e):
     status = return_status.HANDLED
     all_ready = True
-    for piston in chart.pistons:
+    for piston in reactor.pistons:
       piston.dispatch(e)
-      if piston.state.fun.__name__ == "ready":
-        all_ready &= True
+      all_ready &= piston.armed
     if all_ready:
-      chart.post_lifo(Event(signal=signals.FIRE))
-
+      status = reactor.trans(fusion_active)
     return status
 
-  def fusion_waiting_fire(chart, e):
+  def fusion_waiting_fire(reactor, e):
     status = return_status.HANDLED
     return status
 
   fire_manager = FireManager("fire_manager")
+
   fusion_ready = fire_manager.create(state="fusion_ready"). \
                     catch(signal=signals.ENTRY_SIGNAL,
                       handler=fusion_ready_entry). \
@@ -1300,17 +1315,22 @@ if __name__ == '__main__':
                       handler=fusion_ready_init). \
                     catch(signal=signals.TIME_OUT,
                       handler=fusion_ready_time_out). \
+                    catch(signal=signals.PRIMING,
+                      handler=fusion_ready_priming). \
                     to_method()
+
   energy_generation = fire_manager.create(state="energy_generation"). \
                     catch(signal=signals.INIT_SIGNAL,
                       handler=energy_generation_init). \
                     to_method()
+
   fusion_active = fire_manager.create(state="fusion_active"). \
                     catch(signal=signals.ENTRY_SIGNAL,
                       handler=fusion_active_entry). \
                     catch(signal=signals.FIRE_PRIMED,
                       handler=fusion_active_fire_primed). \
                     to_method()
+
   fusion_waiting = fire_manager.create(state='fusion_waiting'). \
                     catch(signal=signals.TIME_OUT,
                       handler=fusion_waiting_time_out). \
@@ -1324,11 +1344,15 @@ if __name__ == '__main__':
                nest(fusion_waiting, parent=energy_generation)
 
   fire_manager.start_at(fusion_ready)
+
   fire_manager.post_fifo(Event(signal=signals.TIME_OUT),
-                         times=2000,
-                         period=0.001,
+                         times=100,
+                         period=0.1,
                          deferred=False)
-  time.sleep(1)
-  pp(fire_manager.spy())
+  time.sleep(10)
+  print(fire_manager.trace()) 
+  #pp(fire_manager.pistons[0].spy())
+  #pp(fire_manager.pistons[1].spy())
+  print(fire_manager.pistons[1].trace())
 
 

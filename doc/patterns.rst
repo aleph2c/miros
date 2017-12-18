@@ -1406,7 +1406,7 @@ The second transducer measures the temperature; it's range is 0 to 9000 degrees
 Celsius.  A piston can only fire after 1 second has passed since the last
 firing event and once it passes this time threshold it would like to fire as
 soon as possible so that the fusion reactor can output the maximum amount of
-power.  All of the pistons have to fire at the same time.
+power.
 
 There are 255 pistons.
 
@@ -1422,7 +1422,10 @@ Composite Transducer Reading  Temperature Transducer  [degrees Celsius]
 70-100                        670-1500 
 ============================  =========================================
 
-Let's design the system.  First we will need to fake out the temperature and
+All of the pistons have to fire at the same time and they can only fire if the
+above criteria are met.
+
+Let's design the system.  First we will need to fake-out the temperature and
 composite transducer readings.  This can be done with an infinite impulse
 response filter and a random number generator using a flat distribution.
 
@@ -1518,49 +1521,43 @@ Ok, let's try it out:
   # 51.639646042274904
   # 53.30613755950629
 
-The numbers are phasing about which is what we wanted. Pushing on.
+We see we can make the numbers swing around, it's turnable.  Good enough,
+pushing on.
 
-`Michel Laberge`_ can't make up his mind about the piston's firing criteria, so
-we have to make sure it's easy to change.  We will create a selection function
-then we can inject it into the chart.  For now we define it as this:
+`Michel Laberge`_ would propably change his mind about a piston's firing
+criteria, so we have to make sure it's easy to change.  We will create a
+is-this-piston-ready function then we can inject it into our design.  For now
+we define it as this:
 
 .. code-block:: python
 
-  def is_this_piston_ready(chart):
-    transducers_say_go = False
-    comp = chart.get_composite_reading()
-    temp = chart.get_temperater_reading()
+  def is_this_piston_ready(piston):
+    comp = piston.get_composite_reading()
+    temp = piston.get_temperature_reading()
 
-    if 0  <= comp <= 20 and
-       50 <= temp <= 100:
-       transducers_say_go |= True
-    elif 25  <= comp <= 50 and
-         200 <= temp <= 333:
-       transducers_say_go |= True
-    elif 30  <= comp <= 66 and
-         403 <= temp <= 600:
-       transducers_say_go |= True
-    elif 70  <= comp <= 100 and
-         670 <= temp <= 1500:
-       transducers_say_go |= True
+    if 0 <= comp <= 20 and 50 <= temp <= 100:
+       ready = True
+    elif 25 <= comp <= 50 and 200 <= temp <= 333:
+       ready = True
+    elif 30 <= comp <= 66 and 403 <= temp <= 600:
+       ready = True
+    elif 70 <= comp <= 100 and 670 <= temp <= 1500:
+       ready = True
     else:
-      transducers_say_go = False
+      ready = False
 
-    return transducers_say_go
+    return ready
 
-This ``is_this_piston_ready`` function will be used by an individual piston to
-determine if it is ready to fire.
-
-Here is a UML class diagram of our approach:
+Here is the high level UML class diagram for our approach:
 
 .. image:: _static/orthogonal_region3.svg
     :align: center
 
-The FireManager object will aggregate 255 PistonManager objects.  A piston
-manager object will use the event dispatcher of the ActiveObject (which means I
-can't use a factory).  Or if you just read the code, you would see that the
-FireManager object will have a list containing 255 other active objects, each
-keeping track of their individual piston state.
+The FusionReactor class will be a subclass of the Factory.  It will aggregate
+255 object of the Piston class.  The FusionReactor object will connect to the
+reactor_on state machine and each of the piston objects will use the same
+piston_active state machine.  It is not show on the 
+
 
 The PistonManager objects will each contain their own event dispatchers, their
 own event queues; but they will all reference the same piston_manager state
@@ -1581,54 +1578,54 @@ The state machine will be defined as:
   .. code-block:: python
 
     @spy_on
-    def piston_ready(chart, e):
+    def piston_ready(piston, e):
       status = return_status.UNHANDLED
       if(e.signal == signals.INIT_SIGNAL):
-        status = chart.trans(relaxing)
+        status = piston.trans(relaxing)
       elif(e.signal == signals.TIME_OUT):
-        chart.count += 1
-        if chart.count >= 750:
-          chart.count = 0
-          chart.post(Event(signal=signals.PRIMED))
+        piston.count += 1
+        if piston.count >= 750:
+          piston.count = 0
+          piston.post(Event(signal=signals.PRIMED))
       else:
-        status, chart.temp.fun = return_status.SUPER, chart.top
+        status, piston.temp.fun = return_status.SUPER, piston.top
       return status
 
     @spy_on
-    def relaxing(chart, e):
+    def relaxing(piston, e):
       status = return_status.UNHANDLED
       if(e.signal == signals.ENTRY_SIGNAL):
-        chart.scribble("relaxing")
+        piston.scribble("relaxing")
       else:
-        status, chart.temp.fun = return_status.SUPER, piston_ready
+        status, piston.temp.fun = return_status.SUPER, piston_ready
       return status
 
     @spy_on
-    def triggered(chart, e):
+    def triggered(piston, e):
       status = return_status.UNHANDLED
       if(e.signal == signals.ENTRY_SIGNAL):
-        chart.scribble("piston_slamming!")
+        piston.scribble("piston_slamming!")
       else:
-        status, chart.temp.fun = return_status.SUPER, piston_ready
+        status, piston.temp.fun = return_status.SUPER, piston_ready
       return status
 
     @spy_on
-    def priming(chart, e):
+    def priming(piston, e):
       status = return_status.UNHANDLED
       if(e.signal == signals.TIME_OUT):
         status = return_status.HANDLED
-        if chart.is_this_piston_ready():
-          status = chart.trans(ready)
+        if piston.is_this_piston_ready():
+          status = piston.trans(ready)
       else:
-        status, chart.temp.fun = return_status.SUPER, piston_ready
+        status, piston.temp.fun = return_status.SUPER, piston_ready
       return status
 
-    def ready(chart, e):
+    def ready(piston, e):
       status = return_status.UNHANDLED
       if(e.signal == signals.FIRE):
-        status = chart.trans(triggered)
+        status = piston.trans(triggered)
       else:
-        status, chart.temp.fun = return_status.SUPER, priming
+        status, piston.temp.fun = return_status.SUPER, priming
       return status
 
 Now we will create the PistonManager class:
