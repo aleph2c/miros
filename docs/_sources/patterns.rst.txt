@@ -7,7 +7,6 @@
 
 .. _patterns:
 
-
 Patterns
 ========
 
