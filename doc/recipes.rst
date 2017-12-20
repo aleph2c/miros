@@ -7,12 +7,14 @@
 Recipes
 =======
 
+  *Simple things should be simple, complex things should be possible.* 
+  
+  -- Alan Kay
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-
-**Simple things should be simple, complex things should be possible.** -- *Alan Kay*
 
 .. _recipes-states:
 
@@ -1637,6 +1639,8 @@ Using a Spy as a Test Target
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: i_test_with_spy.rst
+
+:ref:`Next topic<reflection>`.
 
 .. _umlet: http://www.umlet.com/
 .. _umletino: http://www.umlet.com/umletino/umletino.html

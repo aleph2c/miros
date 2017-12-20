@@ -1,9 +1,15 @@
   *But in practice master plans fail - because they create totalitarian order,
   not organic order.  They are too rigid; they cannot easily adapt to the
   natural and unpredictable changes that inevitably arise in the life of a
-  community.* -- Christopher Alexander
+  community.* 
+  
+  -- Christopher Alexander
 
 .. _patterns:
+
+
+Patterns
+========
 
 .. hlist::
   :columns: 3
@@ -16,8 +22,6 @@
   * :ref:`multichart race<patterns-multichart-race>`
   * :ref:`multichart pend<patterns-multichart-pend>`
 
-Patterns
-========
 The idea of software design patterns came from the architect Christopher
 Alexander.  He wrote a book, `a pattern language`_, about how different
 approaches to architecture could be used across different scales (from the
@@ -2469,6 +2473,8 @@ Multichart Race
 
 Multichart Pend
 ^^^^^^^^^^^^^^^
+
+:ref:`Next topic<testing-testing>`.
 
 .. [#1] p.206 Practical UML STATECHARTS in C/C++, Second Edition
 .. [#2] p.211 Practical UML STATECHARTS in C/C++, Second Edition

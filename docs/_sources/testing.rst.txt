@@ -23,6 +23,7 @@ Testing
 =======
 You can use the miros instrumentation to test your designs.
 
+:ref:`Next topic<glossary-glossary>`.
 
 .. toctree::
    :maxdepth: 2

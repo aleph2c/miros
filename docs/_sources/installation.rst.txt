@@ -16,3 +16,5 @@ To install::
 
 Miros has been tested on Python 3.5 and is only dependent upon the Python
 standard library.
+
+:ref:`Next topic<introduction-introduction>`.

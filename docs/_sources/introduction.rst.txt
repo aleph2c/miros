@@ -2,8 +2,11 @@
   
   -- John Boyd
 
+.. _introduction-introduction:
+
 Introduction
 ============
+
 Miros is a statechart library written in Python.  Statecharts are a type of
 behavioral drawing.
 
@@ -41,11 +44,11 @@ view.
 As a library, Miros provides most of the features expected to express your
 Harel statechart pictures in running Python software.  The same pictorial
 formalism is used by industrial software frameworks like Matlab and Miro
-Samek's `QP framework`_ for embedded systems, just to list a few.  So, you can
-quickly prototype your ideas using this library in Python, then port your work
-into compiled production code if you need the performance such systems provide.
-Or you can use it as the reactive portion of your Python project while still
-having access to the legion of other libraries written in Python.
+Samek's `QP framework`_ for embedded systems.  So, you can quickly prototype
+your ideas using this library in Python, then port your work into compiled
+production code if you need the performance such systems provide.  Or you can
+use it as the reactive portion of your Python project while still having access
+to the legion of other libraries written in Python.
 
 Miros is not a drawing tool.  It is a way to express your drawing as running
 software.  The :term:`Harel drawing formalism<Harel Formalism>` is simple
@@ -86,6 +89,8 @@ much about how to implement such systems.  The event processor within this
 library is based on his publications.  This should make it easy to use the
 miros library for prototyping, or testing a `QP framework`_.
 
+:ref:`Next topic<quick-start>`.
+
 .. literalinclude:: ./../miros/hsm.py
    :pyobject: HsmEventProcssor.dispatch
 
@@ -96,3 +101,5 @@ miros library for prototyping, or testing a `QP framework`_.
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+

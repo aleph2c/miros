@@ -11,4 +11,5 @@ the results.
    :maxdepth: 2
    :caption: Contents:
 
+:ref:`Next topic<examples>`.
 

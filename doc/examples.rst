@@ -16,3 +16,5 @@ Examples
    interactingcharts
 
 More examples can be found in the :ref:`patterns section<patterns>`.
+
+:ref:`Next topic<recipes>`.

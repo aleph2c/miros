@@ -1,4 +1,4 @@
-.. _reflection
+.. _reflection:
 
 .. toctree::
    :maxdepth: 2
@@ -155,5 +155,7 @@ How to Explain your Design to Others
 ------------------------------------
 
 .. include:: i_making_sequence_diagrams_from_trace.rst
+
+:ref:`Next topic<patterns>`.
 
 .. _umlet: http://www.umlet.com
