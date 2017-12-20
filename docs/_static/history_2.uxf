@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>11</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>451</x>
+      <y>132</y>
+      <w>286</w>
+      <h>231</h>
+    </coordinates>
+    <panel_attributes>*ToasterOven*
+--
+history
+--
+heater_on()
+--
+heater_off()
+--
+lamp_on()
+--
+lamp_off()
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>451</x>
+      <y>66</y>
+      <w>110</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>/Factory/
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>550</x>
+      <y>77</y>
+      <w>77</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0;50.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>462</x>
+      <y>528</y>
+      <w>418</w>
+      <h>231</h>
+    </coordinates>
+    <panel_attributes>*heating*
+--
+entry / toaster.heater_on()
+exit / toaster.heater_off()
+
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>440</x>
+      <y>451</y>
+      <w>616</w>
+      <h>341</h>
+    </coordinates>
+    <panel_attributes>*door_closed*
+--
+entry/
+
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>484</x>
+      <y>286</y>
+      <w>220</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+Event Processor</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>583</x>
+      <y>407</y>
+      <w>33</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>924</x>
+      <y>528</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>990</x>
+      <y>539</y>
+      <w>33</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>616</x>
+      <y>396</y>
+      <w>220</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>toaster.start_at(door_closed)
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>572</x>
+      <y>330</y>
+      <w>55</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=[^]-(</panel_attributes>
+    <additional_attributes>20.0;10.0;20.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>990</x>
+      <y>528</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>type=history_deep</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>473</x>
+      <y>627</y>
+      <w>154</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*baking*
+--
+entry / 
+  toaster.history = \
+    baking
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>902</x>
+      <y>594</y>
+      <w>132</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*off*
+--
+entry /
+	toaster.history= \
+	  off
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>924</x>
+      <y>539</y>
+      <w>33</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>1078</x>
+      <y>539</y>
+      <w>187</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>*door_open*
+--
+entry / toaster.lamp_on()
+exit / toaster.lamp_off()
+
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>550</x>
+      <y>715</y>
+      <w>33</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>506</x>
+      <y>759</y>
+      <w>66</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>BAKE
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>671</x>
+      <y>759</y>
+      <w>77</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>TOAST
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1045</x>
+      <y>660</y>
+      <w>132</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;30.0;100.0;30.0;100.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>990</x>
+      <y>495</y>
+      <w>143</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>110.0;40.0;110.0;10.0;10.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1078</x>
+      <y>693</y>
+      <w>77</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>OPEN
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1111</x>
+      <y>473</y>
+      <w>132</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>CLOSE /
+  toaster.trans(
+    toaster.history)
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>990</x>
+      <y>341</y>
+      <w>165</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=.
+&lt;&lt;state pattern&gt;&gt;
+Transition to History
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1111</x>
+      <y>396</y>
+      <w>55</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;30.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>649</x>
+      <y>627</y>
+      <w>154</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*toasting*
+--
+entry / 
+  toaster.history = \
+    toasting
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>726</x>
+      <y>715</y>
+      <w>33</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>957</x>
+      <y>682</y>
+      <w>33</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;100.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>924</x>
+      <y>726</y>
+      <w>55</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>OFF
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1089</x>
+      <y>737</y>
+      <w>121</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>         icon  
+         not really 
+ supported but 
+ the effect is 
+ the same</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>1100</x>
+      <y>748</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>type=history_deep</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>583</x>
+      <y>374</y>
+      <w>429</w>
+      <h>319</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;270.0;370.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1001</x>
+      <y>396</y>
+      <w>88</w>
+      <h>264</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;220.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>770</x>
+      <y>396</y>
+      <w>275</w>
+      <h>297</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;250.0;230.0;10.0</additional_attributes>
+  </element>
+</diagram>

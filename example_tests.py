@@ -1371,6 +1371,159 @@ def composite_pattern_1():
   # pp(fusion_reactor.pistons[1].spy())
   print(fusion_reactor.pistons[1].trace())
 
+def history_1():
+  import time
+  from miros.hsm import pp
+  from miros.activeobject import Factory
+  from miros.event import signals, Event, return_status
+
+  # Create a ToasterOven class from Factory
+  class ToasterOven(Factory):
+    def __init__(self, name):
+      super().__init__(name)
+      self.history = None
+
+    def heater_on(toaster):
+      toaster.scribble("heater on")
+
+    def heater_off(toaster):
+      toaster.scribble("heater off")
+
+    def lamp_off(toaster):
+      toaster.scribble("lamp off")
+
+    def lamp_on(toaster):
+      toaster.scribble("lamp on")
+
+  # create the callback handlers for the HSM
+  def door_closed_init(toaster, e):
+    status = toaster.trans(off)
+    return status
+
+  def door_closed_off(toaster, e):
+    status = toaster.trans(off)
+    return status
+
+  def door_closed_open(toaster, e):
+    status = toaster.trans(door_open)
+    return status
+
+  def door_closed_bake(toasting, e):
+    status = toaster.trans(baking)
+    return status
+
+  def door_closed_toast(toaster, e):
+    status = toaster.trans(toasting)
+    return status
+
+  def door_open_entry(toaster, e):
+    status = return_status.HANDLED
+    toaster.lamp_on()
+
+  def door_open_exit(toaster, e):
+    status = return_status.HANDLED
+    toaster.lamp_off()
+
+  def door_open_close(toaster, e):
+    status = toaster.trans(toaster.history)
+    return status
+
+  def heating_entry(toaster, e):
+    status = return_status.HANDLED
+    toaster.heater_on()
+    return status
+
+  def heating_exit(toaster, e):
+    status = return_status.HANDLED
+    toaster.heater_off()
+    return status
+
+  def off_entry(toaster, e):
+    toaster.history = off
+    return return_status.HANDLED
+
+  def baking_entry(toaster, e):
+    toaster.history = baking
+    return return_status.HANDLED
+
+  def toasting_entry(toaster, e):
+    toaster.history = toasting
+    return return_status.HANDLED
+
+  # make a toaster object
+  toaster = ToasterOven("easy_bake")
+
+  door_closed = toaster.create(state="door_closed"). \
+                  catch(signal=signals.INIT_SIGNAL,
+                    handler=door_closed_init). \
+                  catch(signal=signals.OFF,
+                    handler=door_closed_off). \
+                  catch(signal=signals.OPEN,
+                    handler=door_closed_open). \
+                  catch(signal=signals.BAKE,
+                    handler=door_closed_bake). \
+                  catch(signal=signals.TOAST,
+                    handler=door_closed_toast). \
+                  to_method()
+
+  door_open = toaster.create(state="door_open"). \
+                catch(signal=signals.ENTRY_SIGNAL,
+                  handler=door_open_entry). \
+                catch(signal=signals.EXIT_SIGNAL,
+                  handler=door_open_exit). \
+                catch(signal=signals.CLOSE,
+                  handler=door_open_close). \
+                to_method()
+
+  heating = toaster.create(state="heating"). \
+              catch(signal=signals.ENTRY_SIGNAL,
+                handler=heating_entry). \
+              catch(signal=signals.EXIT_SIGNAL,
+                handler=heating_exit). \
+              to_method()
+
+  baking = toaster.create(state="baking"). \
+             catch(signal=signals.ENTRY_SIGNAL,
+               handler=baking_entry). \
+             to_method()
+
+  toasting = toaster.create(state="toasting"). \
+                catch(signal=signals.ENTRY_SIGNAL,
+                  handler=toasting_entry). \
+                to_method()
+
+  off = toaster.create(state="off"). \
+          catch(signal=signals.ENTRY_SIGNAL,
+            handler=off_entry). \
+          to_method()
+
+  # now we nest them
+  toaster.nest(door_closed, parent=None). \
+          nest(door_open, parent=None). \
+          nest(heating, parent=door_closed). \
+          nest(off, parent=door_closed). \
+          nest(baking, parent=heating). \
+          nest(toasting, parent=heating)
+
+  # start up the statechart
+  toaster.start_at(door_closed)
+
+  toaster.post_fifo(Event(signal=signals.BAKE))
+  toaster.post_fifo(Event(signal=signals.OPEN))
+  toaster.post_fifo(Event(signal=signals.CLOSE))
+  time.sleep(0.01)
+  toaster.post_fifo(Event(signal=signals.TOAST))
+  toaster.post_fifo(Event(signal=signals.OPEN))
+  toaster.post_fifo(Event(signal=signals.CLOSE))
+  time.sleep(0.01)
+  toaster.post_fifo(Event(signal=signals.OFF))
+  toaster.post_fifo(Event(signal=signals.OPEN))
+  toaster.post_fifo(Event(signal=signals.CLOSE))
+  time.sleep(0.01)
+  print(toaster.trace())
+
+
+
 if __name__ == '__main__':
   # t_question()
   # example_1()
@@ -1387,7 +1540,8 @@ if __name__ == '__main__':
   # reminder2()
   # reminder3()
   # deferred1()
-  composite_pattern_1()
+  #composite_pattern_1()
+  history_1()
 
 
 

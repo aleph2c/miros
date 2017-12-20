@@ -409,5 +409,6 @@ Glossary
       be used on a factory state method to turn it back into a flat state
       method.
 
+
 .. _Extended state: https://en.wikipedia.org/wiki/UML_state_machine#Extended_states
 .. _Sequence: https://github.com/aleph2c/sequence

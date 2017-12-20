@@ -2461,6 +2461,304 @@ used in this example:
 
 Transition To History
 ^^^^^^^^^^^^^^^^^^^^^
+Formal description:
+
+  Transition out of a composite state, but remember the most recent active
+  substate so you can return to that substate later.
+  
+  State transitions defined in high-level composite states often deal with
+  events that require immediate attention; however, after handling them, the
+  system should return to the most recent substate of the given composite
+  state.  [#4]_
+
+To describe this pattern I will re-use the toaster oven example.  If you have read
+Miro Samek's book this should seem familiar because it is his.  
+
+.. image:: _static/history_1.svg
+    :align: center
+
+In the above design we see that we have built a ToasterOven class which inherits
+from the Factory.  This means that it will have it's own thread, queues and we
+will get the convenient syntax for building up the statechart.  The ToasterOven class
+has a history, and some methods which do toaster-oven-kind-of-things.  We will
+make a toaster by instantiating the ToasterOven class, then build up the HSM
+using the factory syntax, then link the toaster's event processor to this HSM
+with the ``start_at`` method.
+
+This HSM consists of two high level states: door_closed and door_open.  From
+inspection we see that when the statechart is first turned on, it will climb
+into the off state.  If the user issues a BAKE signal, it will begin heating
+then enter the baking state.  Similarly, the TOAST signal will cause the
+heater to turn on and enter the toasting state.
+
+If an OFF or OPEN event is experienced in either the baking or toasting states
+the heater will be turned off as the event processor transitions out of the
+heating state.
+
+If the door is opened, an OPEN signal will fire causing the event processor to
+follow the Harel Formalism leaving the state(s) and enter the door_open state.
+
+Now, if the user of the toaster oven closed the door, they would expect the
+toaster oven to remember what it was doing and re-enter that mode of operation.
+
+This is what the little H* icon is doing.  It represents the UML pseudostate
+called *deep history*.  When the statechart experiences a CLOSE event while in
+the door_open state, it should change it's target state to represent the last
+mode of operation.  So you can think of the H* icon as a programmable arrow,
+where the start of it is on the door_open state and it's terminal end pointing
+to the last substate of door_closed before the door was opened.
+
+This library does not support the deep history pseudostate.  This is because
+the event processor at the heart of the library doesn't.  Miro Samek writes
+code for embedded systems which need to be fast and do not have a lot of memory.
+So instead of adding a set of heavy generalized history features; he provided a
+way that you can design it into your statechart without relying upon the
+framework.  The engineering trade off was to favor speed and simplicity over
+syntactical convenience.
+
+Here is how you can add deep history to your toaster oven:
+
+.. image:: _static/history_2.svg
+    :align: center
+
+When we enter baking, toasting or off we just take it's state method and store
+it in the history attribute.  If the statechart ever finds itself
+in the door_open state, the CLOSE event will transition to the last mode of
+operation by transitioning to the state stored in the history attribute.
+That's it.
+
+So let's build up this design and test it.
+
+.. code-block:: python
+  
+  import time
+  from miros.hsm import pp
+  from miros.activeobject import Factory
+  from miros.event import signals, Event, return_status
+
+  # Create a ToasterOven class from Factory
+  class ToasterOven(Factory):
+    def __init__(self, name):
+      super().__init__(name)
+      self.history = None
+
+    def heater_on(toaster):
+      toaster.scribble("heater on")
+
+    def heater_off(toaster):
+      toaster.scribble("heater off")
+
+    def lamp_off(toaster):
+      toaster.scribble("lamp off")
+
+    def lamp_on(toaster):
+      toaster.scribble("lamp on")
+
+  # create the callback handlers for the HSM
+  def door_closed_init(toaster, e):
+    status = toaster.trans(off)
+    return status
+
+  def door_closed_off(toaster, e):
+    status = toaster.trans(off)
+    return status
+
+  def door_closed_open(toaster, e):
+    status = toaster.trans(door_open)
+    return status
+
+  def door_closed_bake(toasting, e):
+    status = toaster.trans(baking)
+    return status
+
+  def door_closed_toast(toaster, e):
+    status = toaster.trans(toasting)
+    return status
+
+  def door_open_entry(toaster, e):
+    status = return_status.HANDLED
+    toaster.lamp_on()
+
+  def door_open_exit(toaster, e):
+    status = return_status.HANDLED
+    toaster.lamp_off()
+
+  def door_open_close(toaster, e):
+    status = toaster.trans(toaster.history)
+    return status
+
+  def heating_entry(toaster, e):
+    status = return_status.HANDLED
+    toaster.heater_on()
+    return status
+
+  def heating_exit(toaster, e):
+    status = return_status.HANDLED
+    toaster.heater_off()
+    return status
+
+  def off_entry(toaster, e):
+    toaster.history = off
+    return return_status.HANDLED
+
+  def baking_entry(toaster, e):
+    toaster.history = baking
+    return return_status.HANDLED
+
+  def toasting_entry(toaster, e):
+    toaster.history = toasting
+    return return_status.HANDLED
+
+  # make a toaster object
+  toaster = ToasterOven("easy_bake")
+
+  door_closed = toaster.create(state="door_closed"). \
+                  catch(signal=signals.INIT_SIGNAL,
+                    handler=door_closed_init). \
+                  catch(signal=signals.OFF,
+                    handler=door_closed_off). \
+                  catch(signal=signals.OPEN,
+                    handler=door_closed_open). \
+                  catch(signal=signals.BAKE,
+                    handler=door_closed_bake). \
+                  catch(signal=signals.TOAST,
+                    handler=door_closed_toast). \
+                  to_method()
+
+  door_open = toaster.create(state="door_open"). \
+                catch(signal=signals.ENTRY_SIGNAL,
+                  handler=door_open_entry). \
+                catch(signal=signals.EXIT_SIGNAL,
+                  handler=door_open_exit). \
+                catch(signal=signals.CLOSE,
+                  handler=door_open_close). \
+                to_method()
+
+  heating = toaster.create(state="heating"). \
+              catch(signal=signals.ENTRY_SIGNAL,
+                handler=heating_entry). \
+              catch(signal=signals.EXIT_SIGNAL,
+                handler=heating_exit). \
+              to_method()
+
+  baking = toaster.create(state="baking"). \
+             catch(signal=signals.ENTRY_SIGNAL,
+               handler=baking_entry). \
+             to_method()
+
+  toasting = toaster.create(state="toasting"). \
+                catch(signal=signals.ENTRY_SIGNAL,
+                  handler=toasting_entry). \
+                to_method()
+
+  off = toaster.create(state="off"). \
+          catch(signal=signals.ENTRY_SIGNAL,
+            handler=off_entry). \
+          to_method()
+
+  # now we nest them
+  toaster.nest(door_closed, parent=None). \
+          nest(door_open, parent=None). \
+          nest(heating, parent=door_closed). \
+          nest(off, parent=door_closed). \
+          nest(baking, parent=heating). \
+          nest(toasting, parent=heating)
+
+  # start up the statechart
+  toaster.start_at(door_closed)
+
+  toaster.post_fifo(Event(signal=signals.BAKE))
+  toaster.post_fifo(Event(signal=signals.OPEN))
+  toaster.post_fifo(Event(signal=signals.CLOSE))
+  time.sleep(0.01)
+  toaster.post_fifo(Event(signal=signals.TOAST))
+  toaster.post_fifo(Event(signal=signals.OPEN))
+  toaster.post_fifo(Event(signal=signals.CLOSE))
+  time.sleep(0.01)
+  toaster.post_fifo(Event(signal=signals.OFF))
+  toaster.post_fifo(Event(signal=signals.OPEN))
+  toaster.post_fifo(Event(signal=signals.CLOSE))
+  time.sleep(0.01)
+  print(toaster.trace())
+
+If we run this code we produce a high level trace of it's behavior:
+
+.. code-block:: python
+
+  [2017-12-20 09:19:33.273324] [easy_bake] e->start_at() top->off
+  [2017-12-20 09:19:33.273324] [easy_bake] e->BAKE() off->baking
+  [2017-12-20 09:19:33.273324] [easy_bake] e->OPEN() baking->door_open
+  [2017-12-20 09:19:33.274325] [easy_bake] e->CLOSE() door_open->baking
+  [2017-12-20 09:19:33.283337] [easy_bake] e->TOAST() baking->toasting
+  [2017-12-20 09:19:33.283337] [easy_bake] e->OPEN() toasting->door_open
+  [2017-12-20 09:19:33.283337] [easy_bake] e->CLOSE() door_open->toasting
+  [2017-12-20 09:19:33.293338] [easy_bake] e->OFF() toasting->off
+  [2017-12-20 09:19:33.293338] [easy_bake] e->OPEN() off->door_open
+  [2017-12-20 09:19:33.293839] [easy_bake] e->CLOSE() door_open->off
+
+Now let's break it into parts and make a few sequence diagrams so we can consider
+the results.
+
+We see that when we put the oven into it's baking mode, open and close the door
+it goes back into it's baking mode, good:
+
+.. code-block:: python
+  :emphasize-lines: 3,4
+
+  [2017-12-20 09:19:33.273324] [easy_bake] e->start_at() top->off
+  [2017-12-20 09:19:33.273324] [easy_bake] e->BAKE() off->baking
+  [2017-12-20 09:19:33.273324] [easy_bake] e->OPEN() baking->door_open
+  [2017-12-20 09:19:33.274325] [easy_bake] e->CLOSE() door_open->baking
+
+  [ Chart: easy_bake ]    
+       top          off        baking      door_open  
+        +start_at()->|            |            |
+        |            |            |            |
+        |            +--BAKE()--->|            |
+        |            |            |            |
+        |            |            +--OPEN()--->|
+        |            |            |            |
+        |            |            +<-CLOSE()---|
+        |            |            |            |
+
+
+We see that when we put the oven into it's toasting mode, open and close the door
+it goes back into it's toasting mode, good:
+
+.. code-block:: python
+  :emphasize-lines: 2,3
+
+  [2017-12-20 09:19:33.283337] [easy_bake] e->TOAST() baking->toasting
+  [2017-12-20 09:19:33.283337] [easy_bake] e->OPEN() toasting->door_open
+  [2017-12-20 09:19:33.283337] [easy_bake] e->CLOSE() door_open->toasting
+
+  [ Chart: easy_bake ]    
+    baking    toasting   door_open 
+       +-TOAST()->|          |
+       |          |          |
+       |          +-OPEN()-->|
+       |          |          |
+       |          +<CLOSE()--|
+       |          |          |
+
+We see that when we turn the toaster off, then open and close the door it goes
+back into the off state, the design works.
+
+.. code-block:: python
+  :emphasize-lines: 2,3
+
+  [2017-12-20 09:19:33.293338] [easy_bake] e->OFF() toasting->off
+  [2017-12-20 09:19:33.293338] [easy_bake] e->OPEN() off->door_open
+  [2017-12-20 09:19:33.293839] [easy_bake] e->CLOSE() door_open->off
+
+  [ Chart: easy_bake ]    
+   toasting      off     door_open 
+       +--OFF()-->|          |
+       |          |          |
+       |          +-OPEN()-->|
+       |          |          |
+       |          +<CLOSE()--|
+       |          |          |
 
 .. _patterns-multichart-race:
 
@@ -2478,6 +2776,7 @@ Multichart Pend
 .. [#1] p.206 Practical UML STATECHARTS in C/C++, Second Edition
 .. [#2] p.211 Practical UML STATECHARTS in C/C++, Second Edition
 .. [#3] p.219 Practical UML STATECHARTS in C/C++, Second Edition
+.. [#4] p.245 Practical UML STATECHARTS in C/C++, Second Edition
 .. _bursts: http://barabasi.com/book/bursts
 .. _a pattern language: https://www.patternlanguage.com/
 .. _translated it into English: https://www.tutorialspoint.com/design_pattern/design_pattern_overview.htm
