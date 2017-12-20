@@ -1,8 +1,9 @@
-.. _examples-active-object-example:
-
-Every man must define his identity against his mother. If he does not, he just falls back into her and is swallowed up. 
+  *In an era ruled by materialism and unstable geopolitics, art must be restored to the center of public education* 
+  
   -- Camille Paglia
 
+
+.. _examples-active-object-example:
 
 Active Object Example
 =====================

@@ -56,19 +56,23 @@ Glossary
       states themselves.
 
    Active Object
-      Contains an event processor, a queue and a thread which wakes up when an
-      event is placed in its queue.  Upon waking, it calls the event processor with
-      the event and the state methods which are connected to the method are run
-      in accordance to the Harel Formalism.  An active object also has a
-      relationship with the Active Fabric, which is a singleton class shared by all
-      active objects.  If the Active Fabric has not been created before it is
-      created by the active object.  The active fabric is the software which
-      allows all active objects to communicate with all other active objects.
+      Contains an :term:`event processor<Event Processor>`, a queue and a
+      thread which wakes up when an event is placed in its queue.  Upon waking,
+      it calls the :term:`event processor<Event Processor>` with the
+      :term:`event<Event>` and the :term:`state methods<State Method>` which
+      are connected to the method are run in accordance to the :term:`Harel
+      Formalism<Harel Formalism>`.  An active object also has a relationship
+      with the :term:`active fabric<Active Fabric>`, which is a singleton class
+      shared by all active objects.  If the Active Fabric has not been created
+      before it is created by the active object.  The active fabric is the
+      software which allows all active objects to communicate with all other
+      active objects.
 
    Active Fabric
-      A singleton class shared by all active objects.  Through it active
-      objects can publish and subscribe to events created by other active
-      objects.  It contains two seperate threads (fifo/lifo) each tied to their own
+      A singleton class shared by all :term:`active objects<Active Object>`.
+      Through it active objects can :term:`publish<Publish>` and
+      :term:`subscribe<Subscribe>` to events created by other active objects.
+      It contains two seperate threads (fifo/lifo) each tied to their own
       priority queue.  When an active object publishes to the active fabric, it
       places the event in both priority queues at the priorty set as an
       argument given to the publish call.  If another active object has
@@ -78,46 +82,54 @@ Glossary
       the post_lifo method.
 
    Factory
-      The Factory class inherits from the active object class and thereby gains
-      all of it's abilities and relationship with the Active Fabric.  In
-      addition to this is can be used to manufacture state methods and nest
-      them within one another.  It also has a reflection feature, ``to_code``
-      which can be used to show what it's manufactured state methods would look
-      like if they were hand crafted.
+      The Factory class inherits from the :term:`active object<Active Object>`
+      class and thereby gains all of it's abilities and relationship with the
+      Active Fabric.  In addition to this it can be used to manufacture state
+      methods and nest them within one another.  It also has a reflection
+      feature, ``to_code`` which can be used to show what it's manufactured
+      state methods would look like if they were hand crafted.
+
+      To learn about what a Factor is and how to use it, read the :ref:`using
+      and unwinding a factory
+      example<towardsthefactoryexample-towards-a-factory>`.
 
    Event
       Any action in the world that your program cares about.  It can be
-      triggered by a user, an instrument or internally by your own design.
-      Your program will notice, then react to this event by running a subset of
-      your design to manifest the behavior described by the chart's structure.  An
-      event is often named something.  This name is called a signal.  An event
-      can also carry a payload, which can be any data object describable by
-      Python.
+      triggered by a user, an instrument or internally by an :term:`artificial
+      event<Artificial Event>`.  Your program will notice, then react to this
+      event by running a subset of your design to manifest the behavior
+      described by the chart's structure.  An event is often named something.
+      This name is called a :term:`signal<Signal>`.  An event can also carry a
+      payload, which can be any data object describable by Python.
 
       An event can be source from a ``post_fifo`` or ``post_lifo`` or
-      ``publish`` call.  An event can have an optional payload but it must be
-      created with a signal.  An event is always the second argument of your
-      state methods.
+      ``publish`` or ``dispatch`` call.  An event can have an optional payload
+      but it must be created with a :term:`signal<Signal>`.  An event is always the second
+      argument of your :term:`state method<State Method>`.
 
    Signal
-      A signal is a common set of enumerations that apply to all sets of events
-      within the system.  They are used to catagorize events into pools of
-      commmon meaning that can be used by your state methods to take action
-      upon.  There are external signals (which you define as a user) and
-      internal signals like INIT_SIGNAL, ENTRY_SIGNAL, EXIT_SIGNAL .. which are
-      used internally by the event processor algorithm.
+      A signal is a common set of enumerations that apply to all sets of
+      :term:`events<Event>` within the system.  They are used to catagorize
+      events into pools of commmon meaning that can be used by your state
+      methods to take action upon.  There are external signals (which you
+      define as a user) and internal signals like INIT_SIGNAL, ENTRY_SIGNAL,
+      EXIT_SIGNAL .. which are used internally by the event processor
+      algorithm.
 
    Publish
       An active object can publish an event anytime by using the ``publish``
       method.  This will pass the event to the active fabric which will search
-      and determine if any other active objects have subscribed to the event.
-      If they have it will post this event into their internal queue so that it
-      will be consumed during a future run-to-completion process.
+      and determine if any other active objects have
+      :term:`subscribed<Subscribe>` to the :term:`event<Event>`.  If they have
+      it will post this event into their internal queue so that it will be
+      consumed during a future :term:`run to completion<Run To Completion>`
+      process.
 
    Subscribe
       A subscription is a multi-statchart concept.  When an active object would
       like to receive and respond to a message provided by another active
-      object it can subscribe to the signal that that event will contain.
+      object it can subscribe to the :term:`signal<Signal>` that that event
+      will contain.
 
    Run To Completion
       A run to completion process begins when a statechart receives an event.
@@ -127,12 +139,13 @@ Glossary
       then it will run the INIT_SIGNAL within that target state.  If that state
       initiations itself by transitioning to another state, the event processor
       will run that transition with the :term:`Harel Formalism<Harel
-      Formalism>`.  This will continue until the statechart has nothing left to
-      do at which point it is finished it's run-to-completion processing.  The
-      active objects can not be pre-empted with new events while they are in
-      the throes of running through a RTC process.  If an event is received it
-      is placed in the queue and it will not be considered by the event
-      processor until it's RTC step is completed.
+      Formalism>`.  This will continue until the :term:`statechart<Statechart>`
+      has nothing left to do at which point it is finished it's
+      run-to-completion processing.  The active objects can not be pre-empted
+      with new events while they are in the throes of running through a RTC
+      process.  If an event is received it is placed in the queue and it will
+      not be considered by the event processor until it's RTC step is
+      completed.
 
    RTC
       :term:`Run To Completion<Run To Completion>`
@@ -180,10 +193,10 @@ Glossary
       has a ring buffer which contains 250 spots.
 
    Sequence
-      Sequence is a tool that consumes trace log strings and produces ASCII
-      sequence diagrams.  If the spy log contains the output of many different
-      active objects, the sequence tool will create as many sequence diagrams
-      as there are active objects in the trace.
+      `Sequence`_ is a tool that consumes trace log strings and
+      produces ASCII sequence diagrams.  If the spy log contains the output of
+      many different active objects, the sequence tool will create as many
+      sequence diagrams as there are active objects in the trace.
 
    Statechart
       A statechart is a :term:`hierarchical state machine<Hierarchical State
@@ -200,9 +213,9 @@ Glossary
       Christopher Alexander.
 
    Event Processor
-      The event processor is the code the creates the Harel Formalism.  It was
-      ported from the work of Miro Samek.  The library is named miros in honour
-      of his contribution.
+      The event processor is the code the creates the :term:`Harel
+      Formalism<Harel Formalism>`.  It was ported from the work of Miro Samek.
+      The library is named miros in honour of his contribution.
 
    Parent State
       A parent state is a relative term.  For a state to have a parent state it
@@ -368,13 +381,33 @@ Glossary
       :ref:`here<patterns-reminder-here>`.
 
    Extended State Variables
-      This is a variable that can be used by a state machine.  They are often
-      used in guard conditions.  In the miros library the object containing the
-      :term:`event processor<Event Processor>`, which are passed into the
-      :term:`state methods<State Method>` contain the extended state variables.
+      This is a variable that can be used by a :term:`state machine<State
+      Machine>`.  They are often used in guard conditions.  In the miros
+      library the object containing the :term:`event processor<Event
+      Processor>`, which are passed into the :term:`state methods<State
+      Method>` contain the extended state variables.
 
       `Extended state`_ variables are used to increase the complexity of a state
-      machine without having to add explite states
+      machine without having to add explicit states
       
+   Transducer
+      A measuring device which converts a physical property (temperature,
+      location, acceleration .. etc) into an electrical signal or binary
+      number.
+
+   Flat State Method
+      A set of :ref:`state methods<recipes-boiler-plate-state-method-code>`
+      which use if-elif-else structures to define how they react to various
+      events based on the :term:`event<Event>` :term:`signal<Signal>` name.
+      The else clause of a flat state method must return the parent state
+      otherwise the event processor will not be able to discover the structure
+      of your statechart while it is searching your statechart and implmenting
+      the :term:`Harel Formalism<Harel Formalism>`.
+
+      A flat state method can be though of in contrast from one made from a
+      factory.  The :ref:`to_code<recipes-flatting-a-state-method>` method can
+      be used on a factory state method to turn it back into a flat state
+      method.
 
 .. _Extended state: https://en.wikipedia.org/wiki/UML_state_machine#Extended_states
+.. _Sequence: https://github.com/aleph2c/sequence

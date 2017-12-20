@@ -41,7 +41,12 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <table class="hlist"><tr><td><ul class="simple">
+  <blockquote>
+<div><em>But in practice master plans fail - because they create totalitarian order,
+not organic order.  They are too rigid; they cannot easily adapt to the
+natural and unpredictable changes that inevitably arise in the life of a
+community.</em> – Christopher Alexander</div></blockquote>
+<table class="hlist"><tr><td><ul class="simple">
 <li><a class="reference internal" href="#patterns-ultimate-hook"><span class="std std-ref">ultimate hook</span></a></li>
 <li><a class="reference internal" href="#patterns-reminder"><span class="std std-ref">reminder</span></a></li>
 <li><a class="reference internal" href="#patterns-deferred-event"><span class="std std-ref">deferred event</span></a></li>
@@ -58,11 +63,11 @@
 <div class="section" id="id1">
 <h1>Patterns<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
 <p>The idea of software design patterns came from the architect Christopher
-Alexander.  He wrote a book, <a class="reference external" href="https://www.patternlanguage.com/">a pattern language</a>, about how different approaches
-to architecture could be used across different scales (from the country to the
-pantry) to help people feel better about living in their communities.  It’s a
-lovely book; a child can understand it yet it is still useful to professional
-architects.</p>
+Alexander.  He wrote a book, <a class="reference external" href="https://www.patternlanguage.com/">a pattern language</a>, about how different
+approaches to architecture could be used across different scales (from the
+country to the pantry) to help people feel better about living in their
+communities.  It’s a lovely book (everyone should own a copy); a child can
+understand it yet it is still useful to professional architects.</p>
 <p>This can not be said for the book it inspired in computer science, “Design
 Patterns: Elements of Reusable Object-Oriented Software”  This book <em>was not</em>
 child friendly, in fact everyone I knew secretly hated it because of its
@@ -76,7 +81,7 @@ by a practitioner in your language(s) and work through it.  You will level up.</
 <p>In chapter 5 of “Practical UML STATECHARTS in C/C++” I was leveled up by Miro
 Samek.  He describes 5 statechart patterns and made the bold claim that
 <strong>statecharts are a pattern of patterns</strong>.  I completely agree with him.  So here
-is my translation of his work into this library.  I’ll start each pattern with
+is my translation of his work into this library.  I’ll start each <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> with
 quotes from his book, then write about it within the context of this work.</p>
 <div class="toctree-wrapper compound">
 </div>
@@ -97,7 +102,7 @@ superstate handle it (the [child state] inherits behavior from the
 superstate) <a class="footnote-reference" href="#id5" id="id2">[4]</a></p>
 </div></blockquote>
 <p>Makes sense to me.  Keep up! ;)</p>
-<p>To understand the ultimate hook pattern, you first have to understand what a
+<p>To understand the ultimate hook <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a>, you first have to understand what a
 hook is.  It is just some code in an <code class="docutils literal"><span class="pre">if-elif</span></code> clause.   A hook is just some
 code that catches an event, runs your <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client code</span></a> and then
 returns something which tells the event processor to stop searching.  <strong>A hook
@@ -398,7 +403,7 @@ from the current state, to the next <a class="reference internal" href="glossary
 over and over until your event is handled or, it reaches the top most state of
 your <a class="reference internal" href="glossary.html#term-hierarchical-state-machine"><span class="xref std std-term">HSM</span></a>. This means that any inner state
 method will automatically inherit the hook code of any outer state.  The outer
-most state contains the ultimate hook; this is why the pattern is called what
+most state contains the ultimate hook; this is why the <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> is called what
 it is.</p>
 <div align="center" class="align-center"><img alt="_images/ultimate_hook4.svg" src="_images/ultimate_hook4.svg" /></div>
 <div class="admonition note">
@@ -530,8 +535,8 @@ processing are not quite independent.” <a class="footnote-reference" href="#id
 connecting them, remind yourself of this <a class="reference internal" href="#patterns-reminder-here"><span class="std std-ref">reminder
 pattern</span></a>.</p>
 </div>
-<p>The reminder pattern uses the <a class="reference internal" href="#patterns-ultimate-hook"><span class="std std-ref">ultimate hook</span></a>
-pattern mixed with <a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial event</span></a> injection.  It’s
+<p>The reminder <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> uses the <a class="reference internal" href="#patterns-ultimate-hook"><span class="std std-ref">ultimate hook</span></a>
+<a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> mixed with <a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial event</span></a> injection.  It’s
 an <a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial event</span></a> because it is invented by the
 statechart and injected to itself rather than being invented and injected by an
 outside caller.</p>
@@ -877,7 +882,7 @@ comments in the spy log are the thoughts I would have while viewing it.</p>
 <p>But the polling and the processing state are strongly coupled to the TIME_OUT
 signal.  Our design of having the TIME_OUT start the system in the polling and
 end up in the processing/busy state cost us a lot of CPU time.</p>
-<p>Lets introduce the reminder pattern with a new design:</p>
+<p>Lets introduce the reminder <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> with a new design:</p>
 <div align="center" class="align-center"><img alt="_images/reminder6.svg" id="patterns-reminder-here" src="_images/reminder6.svg" /></div>
 <p>Let’s discuss this diagram.</p>
 <p>We use INIT_SIGNAL events to climb into the idle state.</p>
@@ -1057,12 +1062,12 @@ an inconveniently timed request would be difficult to program.</p>
 process new requests, we just defer the event, then re-inject the event into
 our statechart when it’s timing is more convenient.</p>
 <div align="center" class="align-center"><img alt="_images/deferred1.svg" src="_images/deferred1.svg" /></div>
-<p>Here is an example of a chart using the deferred event pattern.</p>
+<p>Here is an example of a chart using the deferred event <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a>.</p>
 <p>To begin with the chart climbs into the idle state.  Upon receiving it’s first
 NEW_REQUEST it transitions into the receiving state.  After a second of
 processing it transitions into the authorizing state.  After the authorizing
 state processes for 2 seconds it transitions back to the idle state.</p>
-<p>The reminder pattern occurs when a NEW_REQUEST event is seen while the system
+<p>The reminder <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> occurs when a NEW_REQUEST event is seen while the system
 is either in receiving or authorizing.  This NEW_REQUEST event is ignored by
 these states and caught by the hook in processing.  The processing state places
 this NEW_REQUEST event into the deferred queue then passes the program’s
@@ -1256,7 +1261,7 @@ COMPLETED events should be about 2 seconds apart.  From the inspection of lines
 <span class="o">.</span>
 </pre></div>
 </td></tr></table></div>
-<p>The deferred event pattern states that we will react to the recalled events
+<p>The deferred event <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> states that we will react to the recalled events
 immediately and we can see this behavior on lines 4-5 and 8-9</p>
 <div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
@@ -1382,21 +1387,20 @@ spy only takes a little effort; use the scribble method with a
 </dl>
 <p>In the original statechart paper written by David Harel he describes how his
 formalism needs to capture requirements like “[The] gearbox change of state is
-independent of [the] braking system”.  For this he invented something called a
+<em>independent</em> of [the] braking system”.  For this he invented something called a
 ‘orthogonal region’:</p>
 <div align="center" class="align-center"><img alt="_images/orthogonal_region1.svg" src="_images/orthogonal_region1.svg" /></div>
 <p>The two different areas in the above chart separated by the dotted line are
-orthogonal regions.  They represent two separate state machines that act
+<strong>orthogonal regions</strong>.  They represent two separate state machines that act
 independent of one another but are both turned on when the truck state is
 initiated.</p>
-<p>This part of the Harel formalism is not supported by the Miro Samek event
-processing algorithm.  But, it would be trivial to implement within the miros
-library, by building two separate active objects and letting them run
-independently.</p>
-<p>If you would like such a structure in your machine, you could use an orthogonal
-component instead.  An orthogonal component is just a statechart that can
-dispatch messages directly into another one.</p>
-<p>Imagine we are asked to build some software for the general fusion reactor:</p>
+<p>This part of the <a class="reference internal" href="glossary.html#term-harel-formalism"><span class="xref std std-term">Harel Formalism</span></a> is <strong>not supported</strong> by the
+Miro Samek event processing algorithm.</p>
+<p>If you would like such a structure in your machine, you could use an
+<strong>orthogonal component instead</strong>.  An orthogonal component is just a statechart
+that can dispatch messages directly into another one.  I’ll explain this with
+an example.</p>
+<p id="nuclear-fusion-example">Imagine we are asked to build some software for the general fusion reactor:</p>
 <blockquote>
 <div>“The General Fusion’s Magnetized Target Fusion system uses a sphere filled
 with molten lead-lithium that is pumped to form a vortex.  A pulse of
@@ -1404,7 +1408,8 @@ magnetically-confined plasma fuel is then injected into the vortex. Around
 the sphere, an array of pistons drive a pressure wave into the centre of
 the sphere, compressing the plasma to fusion conditions. This process is
 then repeated, while the heat from the reaction is captured in the liquid
-metal and used to generate electricity via a steam turbine.”</div></blockquote>
+metal and used to generate electricity via a steam turbine.” – General
+Fusion</div></blockquote>
 <p>Now that is an ambitious project.</p>
 <p>Let’s say we have to write the firing mechanism to cause all of the pistons to
 initiate the pressure wave.</p>
@@ -1412,12 +1417,13 @@ initiate the pressure wave.</p>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/zf8QIJ2VgqU" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
 </center><p>Imagine that each piston has two transducers that measure the relevant
 conditions of the molten lead-lithium near its position on the sphere.  The
-first transducer provides a composite reading that abstracts away a lot of the
-physics; it provides numbers between 0 and 100.  The second transducer measures
-the temperature; it’s range is 0 to 9000 degrees Celsius.  A piston can only
-fire after 1 second has passed since the last firing event and once it passes
-this time threshold it would like to fire as soon as possible so that the
-fusion reactor can output the maximum amount of power.</p>
+first <a class="reference internal" href="glossary.html#term-transducer"><span class="xref std std-term">transducer</span></a> provides a composite reading that
+abstracts away a lot of the physics; it provides numbers between 0 and 100.
+The second <a class="reference internal" href="glossary.html#term-transducer"><span class="xref std std-term">transducer</span></a> measures the temperature; it’s range
+is 0 to 9000 degrees Celsius.  A piston can only fire after 1 second has passed
+since the last firing event and once it passes this time threshold it would
+like to fire as soon as possible so that the fusion reactor can output the
+maximum amount of power.</p>
 <p>There are 255 pistons.</p>
 <p>Through a lot of trial and error it has been found a piston can fire in the
 following situations:</p>
@@ -1488,9 +1494,15 @@ response filter and a random number generator using a uniform distribution.</p>
 <span class="sd">    # aggression ranges from 1 to 100.  1 is the least aggressive and 100 is</span>
 <span class="sd">    # the most agressive</span>
 <span class="sd">    fn = fake_news(</span>
-<span class="sd">      FakeNewsSpec(minimum=0, maximum=100, initial_value=45, aggression=50))</span>
+<span class="sd">      FakeNewsSpec(</span>
+<span class="sd">        minimum=0,</span>
+<span class="sd">        maximum=100,</span>
+<span class="sd">        initial_value=45,</span>
+<span class="sd">        aggression=50))</span>
+
 <span class="sd">    for i in range(5):</span>
 <span class="sd">      print(fn())</span>
+
 <span class="sd">    # 70.40052265431565</span>
 <span class="sd">    # 98.55643192543394</span>
 <span class="sd">    # 63.607687838082626</span>
@@ -1541,7 +1553,7 @@ response filter and a random number generator using a uniform distribution.</p>
 </pre></div>
 </div>
 <p>We see we can make the numbers swing around and the function is tunable.  Good
-enough, pushing on.</p>
+enough (you could probably find something much better in numpy), pushing on.</p>
 <p>As <a class="reference external" href="https://www.ted.com/talks/michel_laberge_how_synchronized_hammer_strikes_could_generate_nuclear_fusion">Michel Laberge</a> builds up his prototype reactor he will change the
 piston firing specification a lot.</p>
 <p>So we have to make sure it’s easy to change.  We will create a
@@ -1573,17 +1585,16 @@ reactor_on state machine and each of the piston objects will use the same
 piston_active state machine.</p>
 <p>The Piston class will be a subclass of HsmWithQueues, which means it will not
 have it’s own thread.  Threads are only constructed in the ActiveObject class
-or any of it’s descendants.  The orthogonal component pattern will allow a single
-thread to be shared between many different statemachines.  This will be
-described in more detail shortly.</p>
-<p>The Piston objects will each contain their own event dispatchers, their
-own event queues; but they will all reference the same piston_manager state
-machine.</p>
+or any of it’s descendants.  The orthogonal component <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a>
+will allow a single thread to be shared between many different <a class="reference internal" href="glossary.html#term-state-machine"><span class="xref std std-term">state
+machines</span></a>.  This will be described in more detail shortly.</p>
+<p>The Piston objects will each contain their own <span class="xref std std-term">event dispatcher</span>, their own event queues; but they will all reference the same
+piston_manager <a class="reference internal" href="glossary.html#term-state-machine"><span class="xref std std-term">state machine</span></a>.</p>
 <p>We are going to use the <a class="reference internal" href="recipes.html#recipes-what-a-state-does-and-how-to-structure-it"><span class="std std-ref">polyamorous
 nature</span></a> of state methods to
-implement the 255 piston managers.  Instead of having a separate piston_active
-<a class="reference internal" href="glossary.html#term-hierarchical-state-machine"><span class="xref std std-term">HSM</span></a> defined for each of the 255 active objects we will instead define
-just one HSM and share it between all of them. (saving on memory)</p>
+implement the 255 pistons.  Instead of having a separate piston_active
+<a class="reference internal" href="glossary.html#term-hierarchical-state-machine"><span class="xref std std-term">HSMs</span></a> defined for each of the 255 active objects we will instead define
+just one <a class="reference internal" href="glossary.html#term-hsm"><span class="xref std std-term">HSM</span></a> and share it between all of them. (saving on memory)</p>
 <div align="center" class="align-center"><img alt="_images/orthogonal_region4.svg" src="_images/orthogonal_region4.svg" /></div>
 <p>Let’s start writing the code.  Here is the Piston Class:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Piston</span><span class="p">(</span><span class="n">HsmWithQueues</span><span class="p">):</span>
@@ -1600,10 +1611,12 @@ just one HSM and share it between all of them. (saving on memory)</p>
 </span>    <span class="bp">self</span><span class="o">.</span><span class="n">number</span>                  <span class="o">=</span> <span class="n">number</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">count</span>                   <span class="o">=</span> <span class="mi">0</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">armed</span>                   <span class="o">=</span> <span class="bp">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">name</span>                    <span class="o">=</span> <span class="s2">&quot;piston_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The highlights were made to show that it is easy to inject different types of
-functions to generate the transducer readings and the piston-ready criterion.</p>
+functions to generate the <a class="reference internal" href="glossary.html#term-transducer"><span class="xref std std-term">transducer</span></a> readings and the
+piston-ready criterion.</p>
 <p>Now let’s write the piston state machine:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># This is the piston&#39;s HSM, it will be shared by all pistons</span>
 <span class="nd">@spy_on</span>
@@ -1623,8 +1636,8 @@ functions to generate the transducer readings and the piston-ready criterion.</p
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
     <span class="n">piston</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;relaxing&quot;</span><span class="p">)</span>
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">):</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
     <span class="n">piston</span><span class="o">.</span><span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">if</span> <span class="n">piston</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">7</span><span class="p">:</span>
       <span class="n">piston</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1641,8 +1654,8 @@ functions to generate the transducer readings and the piston-ready criterion.</p
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
     <span class="n">piston</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;piston_slamming! at {}&quot;</span><span class="o">.</span> \
       <span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%M:%S:</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)))</span>
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">piston</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">relaxing</span><span class="p">)</span>
+<span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">):</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">piston</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">relaxing</span><span class="p">)</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span><span class="p">,</span> <span class="n">piston</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">piston_ready</span>
   <span class="k">return</span> <span class="n">status</span>
@@ -1650,8 +1663,8 @@ functions to generate the transducer readings and the piston-ready criterion.</p
 <span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">priming</span><span class="p">(</span><span class="n">piston</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">):</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
     <span class="k">if</span> <span class="n">piston</span><span class="o">.</span><span class="n">is_this_piston_ready</span><span class="p">(</span><span class="n">piston</span><span class="p">):</span>
       <span class="n">status</span> <span class="o">=</span> <span class="n">piston</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">ready</span><span class="p">)</span>
   <span class="k">else</span><span class="p">:</span>
@@ -1666,8 +1679,8 @@ functions to generate the transducer readings and the piston-ready criterion.</p
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 <span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">FIRE</span><span class="p">):</span>
 </span>    <span class="n">status</span> <span class="o">=</span> <span class="n">piston</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">triggered</span><span class="p">)</span>
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">):</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
     <span class="n">piston</span><span class="o">.</span><span class="n">armed</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
@@ -1678,19 +1691,23 @@ functions to generate the transducer readings and the piston-ready criterion.</p
 </div>
 <p>The first thing we notice about this code, is that it uses the <a class="reference internal" href="recipes.html#recipes-boiler-plate-state-method-code"><span class="std std-ref">flat way
 of writing</span></a> state methods.</p>
-<p>This is because we want this HSM to be shared between multiple Piston objects.
-A state machine build up using a factory cannot be shared; it belongs to the
-thing that built it.  This is in contrast with flat state methods, they are
-defined outside of the event processors that will use them.  So they can be
-used over and over again if they describe behavior that wants to be shared.</p>
+<p>This is because we want this <a class="reference internal" href="glossary.html#term-hsm"><span class="xref std std-term">HSM</span></a> to be shared between multiple
+Piston objects.  A <a class="reference internal" href="glossary.html#term-state-machine"><span class="xref std std-term">state machine</span></a> build up using a
+<a class="reference internal" href="glossary.html#term-factory"><span class="xref std std-term">factory</span></a> cannot be shared; it belongs to the thing that built
+it.  This is in contrast with <a class="reference internal" href="glossary.html#term-flat-state-method"><span class="xref std std-term">flat state methods</span></a>,
+they are defined outside of the event processors that will use them.  So they
+can be used over and over again if they describe behavior that wants to be
+shared.</p>
 <p>In our system we are going to have 255 pistons that all want the same type of
 behavior.  The internal variables for tracking counts and if that piston is
-armed will be kept within the piston objects, not in the HSM that it is using to
-define it’s operational state.  Never store your <a class="reference internal" href="glossary.html#term-extended-state-variables"><span class="xref std std-term">extended state
-variables</span></a> in a flat state method.</p>
-<p>The highlighted code marks the location of the FIRE signal.  This signal will
-be injected into this state machine using the <code class="docutils literal"><span class="pre">dispatch</span></code> method of the
-FusionReactor object.  We will talk more about that shortly.</p>
+armed will be kept within the piston objects, not in the HSM that it is using
+to define it’s operational state.  Never store your <a class="reference internal" href="glossary.html#term-extended-state-variables"><span class="xref std std-term">extended state
+variables</span></a> in a <a class="reference internal" href="glossary.html#term-flat-state-method"><span class="xref std std-term">flat state method</span></a>.</p>
+<p>The highlighted code marks the location of the TIME_OUT and FIRE
+<a class="reference internal" href="glossary.html#term-signal"><span class="xref std std-term">signals</span></a>.  This signal will be injected into this state machine
+using the <code class="docutils literal"><span class="pre">dispatch</span></code> method of the FusionReactor object (this is the essence
+of the orthogonal component <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a>).  We will talk more about
+that shortly.</p>
 <p>We want to build 255 pistons with a tunable <code class="docutils literal"><span class="pre">is_this_piston_ready</span></code> method.
 Furthermore, we want to be able to switch out our fake transducer readings with
 real functions from the reactor.  To make it easy to change these things I
@@ -1726,17 +1743,17 @@ and temperature transducers.  For now, it will let us test and tune our design.<
 <p>Now that we can build and run a piston, let’s design the FusionReactor class
 that it belongs to:</p>
 <div align="center" class="align-center"><img alt="_images/orthogonal_region5.svg" src="_images/orthogonal_region5.svg" /></div>
-<p>From a high level, the FusionReactor is a subclass of the Factory which means
-it has a thread and it can use the factory syntax to build up its HSM.  Since
-there will be only one reactor with 255 pistons, we have it build the 255
-pistons when it enters the reactor_on state.  The pistons are stored in an
-<span class="xref std std-term">extended state variable</span> in the reactor object.
-This adds convenient syntax for accessing an individual piston, or for
-iterating over all of them.</p>
+<p>From a high level, the FusionReactor is a subclass of the
+<a class="reference internal" href="glossary.html#term-factory"><span class="xref std std-term">Factory</span></a> which means it has a thread and it can use the factory
+syntax to build up its HSM.  Since there will be only one reactor with 255
+pistons, we have it build the 255 pistons when it enters the reactor_on state.
+The pistons are stored in an <span class="xref std std-term">extended state variable</span> in the reactor object.  This adds convenient syntax for accessing an
+individual piston, or for iterating over all of them.</p>
 <p>After constructing it’s pistons the reactor will climb into the
 pending_on_pistons state.  This state captures the TIME_OUT event and iterates
-through all of the pistons, injecting each of them with the TIME_OUT event.  To
-see how a fusion piston deals with a TIME_OUT we will look at it’s state chart:</p>
+through all of the pistons, injecting each of them with the TIME_OUT
+<a class="reference internal" href="glossary.html#term-event"><span class="xref std std-term">event</span></a>.  To see how a fusion piston deals with a TIME_OUT we will
+look at it’s state chart:</p>
 <div align="center" class="align-center"><img alt="_images/orthogonal_region4.svg" src="_images/orthogonal_region4.svg" /></div>
 <p>So what happens with the first TIME_OUT event?  We see from inspection that
 each of the pistons will start in the relaxing state.  There is an assumption
@@ -1746,11 +1763,11 @@ their firing positions.</p>
 successive TIME_OUT, the piston.count is incremented and when it is high
 enough, the piston transitions into pending_optimal_conditions.</p>
 <p>In the pending_optimal_conditions state, the piston uses each TIME_OUT pulse to
-read its transducers.  From this reading it can determine if the liquid metal
-on it’s part of the sphere has met the design criteria for a piston strike.  It
-does this by calling the <code class="docutils literal"><span class="pre">is_this_piston_ready</span></code> function and transitioning
-into the ready state if the criteria are met, or by staying in the
-pending_optimal_conditions if they aren’t.</p>
+read its <span class="xref std std-term">tranducers</span>.  From this reading it can determine if
+the liquid metal on it’s part of the sphere has met the design criteria for a
+piston strike.  It does this by calling the <code class="docutils literal"><span class="pre">is_this_piston_ready</span></code> function
+and transitioning into the ready state if the criteria are met, or by staying
+in the pending_optimal_conditions if they aren’t.</p>
 <p>This behavior is shared with the ready state:  On each TIME_OUT event, the
 ready state can transition back into the pending_optimal_conditions if the
 strike conditions are no longer present; disarming the piston.  When the ready
@@ -1767,26 +1784,27 @@ Now that we understand how they work let’s look at the fusion reactor again:</
 <div align="center" class="align-center"><img alt="_images/orthogonal_region5.svg" src="_images/orthogonal_region5.svg" /></div>
 <p>We were talking about the pending_on_pistons TIME_OUT event handler prior to
 looking at the piston behavior.</p>
-<p>The orthogonal component pattern allows one active object to manually dispatch
-events into another.  This is done with the <code class="docutils literal"><span class="pre">dispatch</span></code> method.  Up until now
-we have dispatched events to our statecharts using the <code class="docutils literal"><span class="pre">post_fifo</span></code> and
-<code class="docutils literal"><span class="pre">post_lifo</span></code> methods.  These methods write their events into a queue, which
-in turn wakes up a thread then causes that active object’s HSM to run to completion.</p>
+<p>The orthogonal component <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> allows one active object to
+manually dispatch events into another.  This is done with the <code class="docutils literal"><span class="pre">dispatch</span></code>
+method.  Up until now we have dispatched events to our statecharts using the
+<code class="docutils literal"><span class="pre">post_fifo</span></code> and <code class="docutils literal"><span class="pre">post_lifo</span></code> methods.  These methods write their events into
+a queue, which in turn wakes up a thread then causes that active object’s
+<a class="reference internal" href="glossary.html#term-hsm"><span class="xref std std-term">HSM</span></a> to run to completion.</p>
 <p>The piston objects do not have their own threads, they share a thread with the
 fusion_reactor object.  To pump an event into a piston object’s HSM we call
 it’s <code class="docutils literal"><span class="pre">dispatch</span></code> method with the event.  This will cause it to link to it’s
-HSM, run it to completion then return control back to the fusion_reactor
-statechart.</p>
+<a class="reference internal" href="glossary.html#term-hsm"><span class="xref std std-term">HSM</span></a>, <a class="reference internal" href="glossary.html#term-run-to-completion"><span class="xref std std-term">run it to completion</span></a> then return
+control back to the fusion_reactor statechart.</p>
 <p>The fusion_reactor thread can be thought of as a large gear, who’s rotational
 energy is coming from it’s thread.  The pistons are little gears that are being
 powered by connecting with the large gear.</p>
 <p>Getting back to our example we see that the pending_on_pistons states will only
-post a FIRE event when all of its pistons are ready.  The FIRE event will cause
-a transition into the fusion_and_heat_transfer state, who’s entry condition
-will pump a FIRE event into all of the pistons.  This will cause each of the
-pistons to contract and the fusion reaction will be initiated.  A small star
-will shine into the liquid metal.</p>
-<p>The fusion_and_heat_transfer state uses the reminder pattern to wait for 1
+post a FIRE <a class="reference internal" href="glossary.html#term-event"><span class="xref std std-term">event</span></a> when all of its pistons are ready.  The FIRE
+event will cause a transition into the fusion_and_heat_transfer state, who’s
+entry condition will pump a FIRE event into all of the pistons.  This will
+cause each of the pistons to contract and the fusion reaction will be
+initiated.  A small star will shine into the liquid metal.</p>
+<p>The fusion_and_heat_transfer state uses the reminder <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> to wait for 1
 second prior to transitioning back into the pending_on_pistons state.  Also
 notice the TIME_OUT event is pumped into each of the piston state machines
 by the TIME_OUT ultimate hook in the reactor_on class.   This will allow each
@@ -1835,22 +1853,23 @@ piston to relax while the heat is being transfered out of the liquid metal.</p>
       <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">FIRE</span><span class="p">))</span>
   <span class="k">return</span> <span class="n">status</span>
 
-<span class="k">def</span> <span class="nf">fusion_active_fire_primed</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">fusion_active_cool_enough</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">reactor</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">pending_on_pistons</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">status</span>
 
-<span class="k">def</span> <span class="nf">fusion_waiting_time_out</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">pending_on_pistons_timeout</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="n">all_ready</span> <span class="o">=</span> <span class="bp">True</span>
   <span class="k">for</span> <span class="n">piston</span> <span class="ow">in</span> <span class="n">reactor</span><span class="o">.</span><span class="n">pistons</span><span class="p">:</span>
     <span class="n">piston</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
     <span class="n">all_ready</span> <span class="o">&amp;=</span> <span class="n">piston</span><span class="o">.</span><span class="n">armed</span>
   <span class="k">if</span> <span class="n">all_ready</span><span class="p">:</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">reactor</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fusion_and_heat_transfer</span><span class="p">)</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">FIRE</span><span class="p">))</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">return</span> <span class="n">status</span>
 
-<span class="k">def</span> <span class="nf">fusion_waiting_fire</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="k">def</span> <span class="nf">fusion_and_heat_transfer_fire</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">reactor</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fusion_and_heat_transfer</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">status</span>
 
 <span class="c1"># Create a fusion reactor object and its HSM</span>
@@ -1879,15 +1898,15 @@ piston to relax while the heat is being transfered out of the liquid metal.</p>
     <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
       <span class="n">handler</span><span class="o">=</span><span class="n">fusion_active_entry</span><span class="p">)</span><span class="o">.</span> \
     <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">COOL_ENOUGH</span><span class="p">,</span>
-      <span class="n">handler</span><span class="o">=</span><span class="n">fusion_active_fire_primed</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">handler</span><span class="o">=</span><span class="n">fusion_active_cool_enough</span><span class="p">)</span><span class="o">.</span> \
     <span class="n">to_method</span><span class="p">()</span>
 
 <span class="n">pending_on_pistons</span> <span class="o">=</span> \
   <span class="n">fusion_reactor</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;pending_on_pistons&#39;</span><span class="p">)</span><span class="o">.</span> \
     <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">,</span>
-      <span class="n">handler</span><span class="o">=</span><span class="n">fusion_waiting_time_out</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">handler</span><span class="o">=</span><span class="n">pending_on_pistons_timeout</span><span class="p">)</span><span class="o">.</span> \
     <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">FIRE</span><span class="p">,</span>
-      <span class="n">handler</span><span class="o">=</span><span class="n">fusion_waiting_time_out</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">handler</span><span class="o">=</span><span class="n">fusion_and_heat_transfer_fire</span><span class="p">)</span><span class="o">.</span> \
     <span class="n">to_method</span><span class="p">()</span>
 
 <span class="n">fusion_reactor</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="n">fusion_active</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
@@ -1903,13 +1922,481 @@ TIME_OUT event needs to have a period of 100 ms otherwise we might damage our
 fusion reactor. ;)</p>
 <p>So here is some very important code:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">fusion_reactor</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">),</span>
-                         <span class="n">times</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                         <span class="n">times</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span>
 <span class="hll">                         <span class="n">period</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
 </span>                         <span class="n">deferred</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">2.1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fusion_reactor</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+<span class="c1"># pp(fusion_reactor.pistons[0].spy())</span>
+<span class="c1"># pp(fusion_reactor.pistons[1].spy())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fusion_reactor</span><span class="o">.</span><span class="n">pistons</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>We are going to post a TIME_OUT event every 100 ms, 100 times.  This will run
-things long enough to see if they work.</p>
+<p>We are going to post a TIME_OUT event every 100 ms, 21 times.  This will run
+things long enough to see if we see two fusion cycles.  Then we wait 2.1
+seconds and then output the results:</p>
+<p>This will output:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">19</span> <span class="mi">09</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mf">27.968188</span><span class="p">]</span> <span class="p">[</span><span class="n">fusion_reactor</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">pending_on_pistons</span>
+<span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">19</span> <span class="mi">09</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mf">28.736951</span><span class="p">]</span> <span class="p">[</span><span class="n">fusion_reactor</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">FIRE</span><span class="p">()</span> <span class="n">pending_on_pistons</span><span class="o">-&gt;</span><span class="n">fusion_and_heat_transfer</span>
+<span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">19</span> <span class="mi">09</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mf">29.687615</span><span class="p">]</span> <span class="p">[</span><span class="n">fusion_reactor</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">COOL_ENOUGH</span><span class="p">()</span> <span class="n">fusion_and_heat_transfer</span><span class="o">-&gt;</span><span class="n">pending_on_pistons</span>
+<span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">19</span> <span class="mi">09</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mf">29.787727</span><span class="p">]</span> <span class="p">[</span><span class="n">fusion_reactor</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">FIRE</span><span class="p">()</span> <span class="n">pending_on_pistons</span><span class="o">-&gt;</span><span class="n">fusion_and_heat_transfer</span>
+
+<span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">19</span> <span class="mi">09</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mf">27.823549</span><span class="p">]</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">relaxing</span>
+<span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">19</span> <span class="mi">09</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mf">28.571081</span><span class="p">]</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">TIME_OUT</span><span class="p">()</span> <span class="n">relaxing</span><span class="o">-&gt;</span><span class="n">pending_optimal_conditions</span>
+<span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">19</span> <span class="mi">09</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mf">28.672391</span><span class="p">]</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">TIME_OUT</span><span class="p">()</span> <span class="n">pending_optimal_conditions</span><span class="o">-&gt;</span><span class="n">ready</span>
+<span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">19</span> <span class="mi">09</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mf">28.737451</span><span class="p">]</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">FIRE</span><span class="p">()</span> <span class="n">ready</span><span class="o">-&gt;</span><span class="n">triggered</span>
+<span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">19</span> <span class="mi">09</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mf">28.775499</span><span class="p">]</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">TIME_OUT</span><span class="p">()</span> <span class="n">triggered</span><span class="o">-&gt;</span><span class="n">relaxing</span>
+<span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">19</span> <span class="mi">09</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mf">29.479119</span><span class="p">]</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">TIME_OUT</span><span class="p">()</span> <span class="n">relaxing</span><span class="o">-&gt;</span><span class="n">pending_optimal_conditions</span>
+<span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">19</span> <span class="mi">09</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mf">29.578757</span><span class="p">]</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">TIME_OUT</span><span class="p">()</span> <span class="n">pending_optimal_conditions</span><span class="o">-&gt;</span><span class="n">ready</span>
+<span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">19</span> <span class="mi">09</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mf">29.788228</span><span class="p">]</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">FIRE</span><span class="p">()</span> <span class="n">ready</span><span class="o">-&gt;</span><span class="n">triggered</span>
+<span class="p">[</span><span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">19</span> <span class="mi">09</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mf">29.880259</span><span class="p">]</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">TIME_OUT</span><span class="p">()</span> <span class="n">triggered</span><span class="o">-&gt;</span><span class="n">relaxing</span>
+</pre></div>
+</div>
+<p>Let’s run the first trace through sequence and compare it to its design
+diagram, then I’ll write some documentation that I would post to the General
+Fusion wiki so that other people could understand my code.</p>
+<div align="center" class="align-center"><img alt="_images/orthogonal_region5.svg" src="_images/orthogonal_region5.svg" /></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span> <span class="n">Chart</span><span class="p">:</span> <span class="n">fusion_reactor</span> <span class="p">]</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+           <span class="n">top</span>              <span class="n">pending_on_pistons</span>    <span class="n">fusion_and_heat_transfer</span>
+            <span class="o">+------</span><span class="n">start_at</span><span class="p">()</span><span class="o">-------&gt;|</span>                        <span class="o">|</span>
+            <span class="o">|</span>          <span class="p">(</span><span class="mi">2</span><span class="p">)</span>           <span class="o">|</span>                        <span class="o">|</span>
+            <span class="o">|</span>                        <span class="o">+--------</span><span class="n">FIRE</span><span class="p">()</span><span class="o">---------&gt;|</span>
+            <span class="o">|</span>                        <span class="o">|</span>          <span class="p">(</span><span class="mi">3</span><span class="p">)</span>           <span class="o">|</span>
+            <span class="o">|</span>                        <span class="o">+&lt;----</span><span class="n">COOL_ENOUGH</span><span class="p">()</span><span class="o">------|</span>
+            <span class="o">|</span>                        <span class="o">|</span>          <span class="p">(</span><span class="mi">4</span><span class="p">)</span>           <span class="o">|</span>
+            <span class="o">|</span>                        <span class="o">+--------</span><span class="n">FIRE</span><span class="p">()</span><span class="o">---------&gt;|</span>
+            <span class="o">|</span>                        <span class="o">|</span>          <span class="p">(</span><span class="mi">5</span><span class="p">)</span>           <span class="o">|</span>
+</pre></div>
+</div>
+<ol class="arabic">
+<li><p class="first">The fusion_reactor is the high level state chart which runs in it’s own
+thread.</p>
+</li>
+<li><p class="first">Upon starting, the reactor builds 255 different piston orthogonal components
+then climbs into the pending_on_pistons state.  While in this state it will
+inject the TIME_OUT event into each of these pistons and when it finds that
+each piston is armed it will post a FIRE event to itself.</p>
+</li>
+<li><p class="first">The fusion_reactor FIRE event indicates that all of the pistons are ready.
+Upon entering this state each of the piston HSMs will be issued their own
+FIRE event, causing them to contract in unison.</p>
+<p>After each of the piston heads slam on the outer chamber of the fusion
+sphere a liquid metal compression wave will propagate towards the core of
+the system.  When this wave hits the plasma containment field it’s energy
+will add to the field and cause a nuclear fusion event.  This event will
+release a lot of energy and heat into the liquid metal.</p>
+<p>The fusion_reactor will remain in the fusion_and_heat_transfer state for
+about 1 second.  This will be enough time for turbines to extract the heat
+from the system and cool things down enough so that another fusion reaction
+can safely take place.</p>
+</li>
+<li><p class="first">The COOL_ENOUGH event is sent to the reactor when it is cool enough for
+another reaction.  While in this state the fusion_reactor will inject it’s
+TIME_OUT events into each of the piston HSMs and wait until they have all
+reported that they are armed and ready to go.</p>
+</li>
+<li><p class="first">This is a repeat of step 3.</p>
+</li>
+</ol>
+<p>Let’s run the second trace (a piston trace) through sequence and compare it to
+it’s design diagram.  Then I’ll add the comments I would use to describe this
+design to the rest of engineering.</p>
+<div align="center" class="align-center"><img alt="_images/orthogonal_region4.svg" src="_images/orthogonal_region4.svg" /></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Chart</span><span class="p">:</span> <span class="n">piston_1</span><span class="p">]</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">top</span>           <span class="n">relaxing</span>   <span class="n">pending_optimal_conditions</span> <span class="n">ready</span>         <span class="n">triggered</span>
+ <span class="o">+--</span><span class="n">start_at</span><span class="p">()</span><span class="o">---&gt;|</span>                 <span class="o">|</span>                 <span class="o">|</span>               <span class="o">|</span>
+ <span class="o">|</span>      <span class="p">(</span><span class="mi">2</span><span class="p">)</span>       <span class="o">|</span>                 <span class="o">|</span>                 <span class="o">|</span>               <span class="o">|</span>
+ <span class="o">|</span>                <span class="o">+---</span><span class="n">TIME_OUT</span><span class="p">()</span><span class="o">---&gt;|</span>                 <span class="o">|</span>               <span class="o">|</span>
+ <span class="o">|</span>                <span class="o">|</span>       <span class="p">(</span><span class="mi">3</span><span class="p">)</span>       <span class="o">|</span>                 <span class="o">|</span>               <span class="o">|</span>
+ <span class="o">|</span>                <span class="o">|</span>                 <span class="o">+--</span><span class="n">TIME_OUT</span><span class="p">()</span><span class="o">----&gt;|</span>               <span class="o">|</span>
+ <span class="o">|</span>                <span class="o">|</span>                 <span class="o">|</span>      <span class="p">(</span><span class="mi">4</span><span class="p">)</span>        <span class="o">|</span>               <span class="o">|</span>
+ <span class="o">|</span>                <span class="o">|</span>                 <span class="o">|</span>                 <span class="o">+----</span><span class="n">FIRE</span><span class="p">()</span><span class="o">----&gt;|</span>
+ <span class="o">|</span>                <span class="o">|</span>                 <span class="o">|</span>                 <span class="o">|</span>      <span class="p">(</span><span class="mi">5</span><span class="p">)</span>      <span class="o">|</span>
+ <span class="o">|</span>                <span class="o">+&lt;----------------+-----------------+--</span><span class="n">TIME_OUT</span><span class="p">()</span><span class="o">---|</span>
+ <span class="o">|</span>                <span class="o">|</span>                 <span class="o">|</span>                 <span class="o">|</span>      <span class="p">(</span><span class="mi">6</span><span class="p">)</span>      <span class="o">|</span>
+ <span class="o">|</span>                <span class="o">+---</span><span class="n">TIME_OUT</span><span class="p">()</span><span class="o">---&gt;|</span>                 <span class="o">|</span>               <span class="o">|</span>
+ <span class="o">|</span>                <span class="o">|</span>       <span class="p">(</span><span class="mi">7</span><span class="p">)</span>       <span class="o">|</span>                 <span class="o">|</span>               <span class="o">|</span>
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li>This trace is describing a single piston in the fusion reactor.  This
+piston’s HSM is driven from the fusion_reactor thread (using the orthogonal
+component statechart <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a>).  The TIME_OUT and FIRE events are actually
+fed into this HSM from the fusion_reactor.  The piston can arm itself,
+but it can not fire without a command provided by the fusion_reactor.</li>
+<li>When the piston starts, it disarms by setting it’s armed attribute to False
+then it enters the relaxing state.  The piston will remain in this state for 7
+TIME_OUT events, after which it will transition into the
+pending_optimal_conditions state.  The relaxing state is intended to
+describe a piston physically relaxing back into a position where it can be
+triggered.</li>
+<li>After enough time has passed and the piston is back in it’s firing position a
+TIME_OUT event will cause it to transition from the relaxing state into the
+pending_optimal_conditions state.  The pending_optimal_conditions state is
+used to sample the local transducers to see if the liquid metal has settled
+into a state where it is safe to fire the piston.</li>
+<li>While the piston is in the pending_optimal_conditions or any of its child
+states, any TIME_OUT event will cause it to re-evaluate its firing
+criteria.  If after testing its sensors it determines it is ready to fire,
+the piston will arm by transitioning into the ready state.  When the piston
+is in the ready state it is armed; if it is not in this state it is not armed.</li>
+<li>The FIRE event will be issued by the fusion_reactor thread if all of the
+pistons are armed (in their ready states).  This will cause the transition
+into the contract state which will slam the piston, beginning the pressure
+wave and initiate nuclear fusion.</li>
+</ol>
+<p>If you would like to skip to the next <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> click
+<a class="reference internal" href="#patterns-transition-to-history"><span class="std std-ref">here</span></a>.  Here is the full code listing
+used in this example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Make Something that can generate numbers for us</span>
+<span class="c1"># 1) needs to return a function</span>
+<span class="c1"># 2) needs to be tunable</span>
+<span class="c1"># 3) needs to be stochastic</span>
+<span class="k">class</span> <span class="nc">FakeNewsSpec</span><span class="p">:</span>
+  <span class="sd">&#39;&#39;&#39; provides the following syntax:</span>
+<span class="sd">      spec.initial_value</span>
+<span class="sd">      spec.aggression</span>
+<span class="sd">      spec.minimum</span>
+<span class="sd">      spec.maximum</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">aggression</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">initial_value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                <span class="n">minimum</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                <span class="n">maximum</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">minimum</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">assert</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">maximum</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">assert</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">minimum</span> <span class="o">&gt;=</span> <span class="n">maximum</span><span class="p">:</span>
+      <span class="k">assert</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">initial_value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">initial_value</span> <span class="o">=</span> <span class="p">(</span><span class="n">maximum</span> <span class="o">-</span> <span class="n">minimum</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="k">elif</span> <span class="n">initial_value</span> <span class="o">&lt;</span> <span class="n">minimum</span><span class="p">:</span>
+      <span class="n">initial_value</span> <span class="o">=</span> <span class="n">minimum</span>
+    <span class="k">elif</span> <span class="n">initial_value</span> <span class="o">&gt;</span> <span class="n">maximum</span><span class="p">:</span>
+      <span class="n">initial_value</span> <span class="o">=</span> <span class="n">maximum</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">initial_value</span> <span class="o">=</span> <span class="n">initial_value</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">aggression</span>    <span class="o">=</span> <span class="n">aggression</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">minimum</span>       <span class="o">=</span> <span class="n">minimum</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">maximum</span>       <span class="o">=</span> <span class="n">maximum</span>
+
+<span class="k">def</span> <span class="nf">fake_news</span><span class="p">(</span><span class="n">spec</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    # aggression ranges from 1 to 100.  1 is the least aggressive and 100 is</span>
+<span class="sd">    # the most agressive</span>
+<span class="sd">    fn = fake_news(FakeNewsSpec(</span>
+<span class="sd">                    minimum=0,</span>
+<span class="sd">                    maximum=100,</span>
+<span class="sd">                    initial_value=45,</span>
+<span class="sd">                    aggression=50))</span>
+
+<span class="sd">    for i in range(5):</span>
+<span class="sd">      print(fn())</span>
+
+<span class="sd">    # 70.40052265431565</span>
+<span class="sd">    # 98.55643192543394</span>
+<span class="sd">    # 63.607687838082626</span>
+<span class="sd">    # 96.33858152348765</span>
+<span class="sd">    # 47.2780049249278</span>
+
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">AGGRESSION_MAX</span> <span class="o">=</span> <span class="mi">100</span>
+  <span class="sd">&#39;&#39;&#39;returns a function that will generate the kind of fake news specified&#39;&#39;&#39;</span>
+  <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">()</span>
+
+  <span class="k">if</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">spec</span><span class="o">.</span><span class="n">aggression</span> <span class="o">&lt;=</span> <span class="n">AGGRESSION_MAX</span><span class="p">:</span>
+    <span class="n">aggression</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">aggression</span>
+  <span class="k">elif</span> <span class="n">spec</span><span class="o">.</span><span class="n">aggression</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">aggression</span> <span class="o">=</span> <span class="mi">1</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">aggression</span> <span class="o">=</span> <span class="n">AGGRESSION_MAX</span>
+
+  <span class="k">def</span> <span class="nf">_fake_news_generator</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;provides an infinite set of number within the spec&#39;&#39;&#39;</span>
+    <span class="n">current_number</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">initial_value</span>
+
+    <span class="k">while</span><span class="p">(</span><span class="bp">True</span><span class="p">):</span>
+      <span class="n">random_number</span>  <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">minimum</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">maximum</span><span class="p">)</span>
+      <span class="c1"># IIR (infinite impulse response)</span>
+      <span class="n">current_number</span> <span class="o">=</span> <span class="p">((</span><span class="n">aggression</span> <span class="o">*</span> <span class="n">random_number</span> <span class="o">+</span>
+                         <span class="p">(</span><span class="n">AGGRESSION_MAX</span> <span class="o">-</span> <span class="n">aggression</span><span class="p">)</span> <span class="o">*</span>
+                         <span class="n">current_number</span><span class="p">))</span> <span class="o">/</span> <span class="n">AGGRESSION_MAX</span>
+      <span class="k">yield</span> <span class="n">current_number</span>
+
+  <span class="k">def</span> <span class="nf">_fake_news</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;just hides the next syntax&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">_fake_news_generator</span><span class="p">())</span>
+
+  <span class="k">return</span> <span class="n">_fake_news</span>
+
+<span class="c1"># Try it out</span>
+<span class="n">fake_transducer</span> <span class="o">=</span> <span class="n">fake_news</span><span class="p">(</span>
+  <span class="n">FakeNewsSpec</span><span class="p">(</span>
+    <span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">maximum</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">initial_value</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+    <span class="n">aggression</span><span class="o">=</span><span class="mi">20</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">fake_transducer</span><span class="p">())</span>
+
+<span class="c1"># Define a method which will determine if the piston is ready to fire ..</span>
+<span class="c1"># keep it separate and easy to change.  We will inject it into the Piston</span>
+<span class="c1"># class when we build it</span>
+<span class="k">def</span> <span class="nf">is_this_piston_ready</span><span class="p">(</span><span class="n">piston</span><span class="p">):</span>
+
+  <span class="n">comp</span>  <span class="o">=</span> <span class="n">piston</span><span class="o">.</span><span class="n">get_composite_reading</span><span class="p">()</span>
+  <span class="n">temp</span>  <span class="o">=</span> <span class="n">piston</span><span class="o">.</span><span class="n">get_temperature_reading</span><span class="p">()</span>
+
+  <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">comp</span> <span class="o">&lt;=</span> <span class="mi">20</span> <span class="ow">and</span> <span class="mi">50</span> <span class="o">&lt;=</span> <span class="n">temp</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">:</span>
+     <span class="n">ready</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="k">elif</span> <span class="mi">25</span>  <span class="o">&lt;=</span> <span class="n">comp</span> <span class="o">&lt;=</span> <span class="mi">50</span> <span class="ow">and</span> <span class="mi">200</span> <span class="o">&lt;=</span> <span class="n">temp</span> <span class="o">&lt;=</span> <span class="mi">333</span><span class="p">:</span>
+     <span class="n">ready</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="k">elif</span> <span class="mi">30</span>  <span class="o">&lt;=</span> <span class="n">comp</span> <span class="o">&lt;=</span> <span class="mi">66</span> <span class="ow">and</span> <span class="mi">403</span> <span class="o">&lt;=</span> <span class="n">temp</span> <span class="o">&lt;=</span> <span class="mi">600</span><span class="p">:</span>
+     <span class="n">ready</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="k">elif</span> <span class="mi">70</span>  <span class="o">&lt;=</span> <span class="n">comp</span> <span class="o">&lt;=</span> <span class="mi">100</span> <span class="ow">and</span> <span class="mi">670</span> <span class="o">&lt;=</span> <span class="n">temp</span> <span class="o">&lt;=</span> <span class="mi">1500</span><span class="p">:</span>
+     <span class="n">ready</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">ready</span> <span class="o">=</span> <span class="bp">False</span>
+
+  <span class="k">return</span> <span class="n">ready</span>
+
+<span class="k">class</span> <span class="nc">FusionReactor</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pistons</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">class</span> <span class="nc">Piston</span><span class="p">(</span><span class="n">HsmWithQueues</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">get_composite_reading</span><span class="p">,</span>
+               <span class="n">get_temperature_reading</span><span class="p">,</span>
+               <span class="n">is_this_piston_ready</span><span class="p">,</span>
+               <span class="n">number</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">is_this_piston_ready</span>    <span class="o">=</span> <span class="n">is_this_piston_ready</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">get_composite_reading</span>   <span class="o">=</span> <span class="n">get_composite_reading</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">get_temperature_reading</span> <span class="o">=</span> <span class="n">get_temperature_reading</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">number</span>                  <span class="o">=</span> <span class="n">number</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">count</span>                   <span class="o">=</span> <span class="mi">0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">armed</span>                   <span class="o">=</span> <span class="bp">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">name</span>                    <span class="o">=</span> <span class="s2">&quot;piston_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number</span><span class="p">)</span>
+
+<span class="c1"># This is the piston&#39;s HSM, it will be shared by all pistons</span>
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">piston_ready</span><span class="p">(</span><span class="n">piston</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">piston</span><span class="o">.</span><span class="n">armed</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">piston</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">relaxing</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">piston</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">piston</span><span class="o">.</span><span class="n">top</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">relaxing</span><span class="p">(</span><span class="n">piston</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">piston</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;relaxing&quot;</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">piston</span><span class="o">.</span><span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">piston</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">7</span><span class="p">:</span>
+      <span class="n">piston</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">piston</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">pending_optimal_conditions</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">PRIMING</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">piston</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">pending_optimal_conditions</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">piston</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">piston_ready</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">triggered</span><span class="p">(</span><span class="n">piston</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">piston</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;piston_slamming! at {}&quot;</span><span class="o">.</span> \
+      <span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%M:%S:</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)))</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">piston</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">relaxing</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">piston</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">piston_ready</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">pending_optimal_conditions</span><span class="p">(</span><span class="n">piston</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">piston</span><span class="o">.</span><span class="n">is_this_piston_ready</span><span class="p">(</span><span class="n">piston</span><span class="p">):</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">piston</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">ready</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">piston</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">pending_optimal_conditions</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">piston</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">piston_ready</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="n">piston</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">piston</span><span class="o">.</span><span class="n">armed</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">FIRE</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">piston</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">triggered</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">piston</span><span class="o">.</span><span class="n">armed</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">piston</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">pending_optimal_conditions</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="c1"># A function for building pistons</span>
+<span class="k">def</span> <span class="nf">build_piston</span><span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="n">starting_state</span><span class="p">):</span>
+  <span class="c1"># We would change the get_composite_reading and get_temperature_reading</span>
+  <span class="c1"># with the actual functions that would return these values in production</span>
+  <span class="n">piston</span> <span class="o">=</span> <span class="n">Piston</span><span class="p">(</span>
+    <span class="n">get_composite_reading</span><span class="o">=</span><span class="n">fake_news</span><span class="p">(</span>
+      <span class="n">FakeNewsSpec</span><span class="p">(</span>
+        <span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">maximum</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">initial_value</span><span class="o">=</span><span class="mi">89</span><span class="p">,</span>
+        <span class="n">aggression</span><span class="o">=</span><span class="mi">21</span><span class="p">)),</span>
+    <span class="n">get_temperature_reading</span><span class="o">=</span><span class="n">fake_news</span><span class="p">(</span>
+      <span class="n">FakeNewsSpec</span><span class="p">(</span>
+        <span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">maximum</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span>
+        <span class="n">initial_value</span><span class="o">=</span><span class="mi">798</span><span class="p">,</span>
+        <span class="n">aggression</span><span class="o">=</span><span class="mi">16</span><span class="p">)),</span>
+    <span class="n">is_this_piston_ready</span><span class="o">=</span><span class="n">is_this_piston_ready</span><span class="p">,</span>
+    <span class="n">number</span><span class="o">=</span><span class="n">number</span>
+  <span class="p">)</span>
+  <span class="n">piston</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">starting_state</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">piston</span>
+
+<span class="c1"># The fusion statechart callbacks</span>
+<span class="k">def</span> <span class="nf">reactor_on_entry</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="n">reactor</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="n">reactor</span><span class="o">.</span><span class="n">pistons</span> <span class="o">=</span> \
+    <span class="p">[</span><span class="n">build_piston</span><span class="p">(</span><span class="n">piston_number</span><span class="p">,</span> <span class="n">starting_state</span><span class="o">=</span><span class="n">piston_ready</span><span class="p">)</span>
+          <span class="k">for</span> <span class="n">piston_number</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">255</span><span class="p">)]</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">def</span> <span class="nf">reactor_on_time_out</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="c1"># provide a relaxing TIME_OUT pulse to each piston</span>
+  <span class="k">for</span> <span class="n">piston</span> <span class="ow">in</span> <span class="n">reactor</span><span class="o">.</span><span class="n">pistons</span><span class="p">:</span>
+    <span class="n">piston</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+  <span class="n">reactor</span><span class="o">.</span><span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="k">if</span> <span class="n">reactor</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">:</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">COOL_ENOUGH</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">def</span> <span class="nf">reactor_on_init</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">reactor</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">energy_generation</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">def</span> <span class="nf">reactor_on_priming</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="n">reactor</span><span class="o">.</span><span class="n">pistons</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="p">]</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">def</span> <span class="nf">energy_generation_init</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">reactor</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">pending_on_pistons</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">def</span> <span class="nf">fusion_active_entry</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">for</span> <span class="n">piston</span> <span class="ow">in</span> <span class="n">reactor</span><span class="o">.</span><span class="n">pistons</span><span class="p">:</span>
+    <span class="n">piston</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span>
+      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">FIRE</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">def</span> <span class="nf">fusion_active_cool_enough</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">reactor</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">pending_on_pistons</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">def</span> <span class="nf">pending_on_pistons_timeout</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="n">all_ready</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="k">for</span> <span class="n">piston</span> <span class="ow">in</span> <span class="n">reactor</span><span class="o">.</span><span class="n">pistons</span><span class="p">:</span>
+    <span class="n">piston</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="n">all_ready</span> <span class="o">&amp;=</span> <span class="n">piston</span><span class="o">.</span><span class="n">armed</span>
+  <span class="k">if</span> <span class="n">all_ready</span><span class="p">:</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">FIRE</span><span class="p">))</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">def</span> <span class="nf">fusion_and_heat_transfer_fire</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">reactor</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fusion_and_heat_transfer</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="c1"># Create a fusion reactor object and its HSM</span>
+<span class="n">fusion_reactor</span> <span class="o">=</span> <span class="n">FusionReactor</span><span class="p">(</span><span class="s2">&quot;fusion_reactor&quot;</span><span class="p">)</span>
+
+<span class="n">fusion_active</span> <span class="o">=</span> \
+  <span class="n">fusion_reactor</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;fusion_active&quot;</span><span class="p">)</span><span class="o">.</span> \
+    <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+      <span class="n">handler</span><span class="o">=</span><span class="n">reactor_on_entry</span><span class="p">)</span><span class="o">.</span> \
+    <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+      <span class="n">handler</span><span class="o">=</span><span class="n">reactor_on_init</span><span class="p">)</span><span class="o">.</span> \
+    <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">,</span>
+      <span class="n">handler</span><span class="o">=</span><span class="n">reactor_on_time_out</span><span class="p">)</span><span class="o">.</span> \
+    <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">PRIMING</span><span class="p">,</span>
+      <span class="n">handler</span><span class="o">=</span><span class="n">reactor_on_priming</span><span class="p">)</span><span class="o">.</span> \
+    <span class="n">to_method</span><span class="p">()</span>
+
+<span class="n">energy_generation</span> <span class="o">=</span> \
+  <span class="n">fusion_reactor</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;energy_generation&quot;</span><span class="p">)</span><span class="o">.</span> \
+    <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+      <span class="n">handler</span><span class="o">=</span><span class="n">energy_generation_init</span><span class="p">)</span><span class="o">.</span> \
+    <span class="n">to_method</span><span class="p">()</span>
+
+<span class="n">fusion_and_heat_transfer</span> <span class="o">=</span> \
+  <span class="n">fusion_reactor</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;fusion_and_heat_transfer&quot;</span><span class="p">)</span><span class="o">.</span> \
+    <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+      <span class="n">handler</span><span class="o">=</span><span class="n">fusion_active_entry</span><span class="p">)</span><span class="o">.</span> \
+    <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">COOL_ENOUGH</span><span class="p">,</span>
+      <span class="n">handler</span><span class="o">=</span><span class="n">fusion_active_cool_enough</span><span class="p">)</span><span class="o">.</span> \
+    <span class="n">to_method</span><span class="p">()</span>
+
+<span class="n">pending_on_pistons</span> <span class="o">=</span> \
+  <span class="n">fusion_reactor</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;pending_on_pistons&#39;</span><span class="p">)</span><span class="o">.</span> \
+    <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">,</span>
+      <span class="n">handler</span><span class="o">=</span><span class="n">pending_on_pistons_timeout</span><span class="p">)</span><span class="o">.</span> \
+    <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">FIRE</span><span class="p">,</span>
+      <span class="n">handler</span><span class="o">=</span><span class="n">fusion_and_heat_transfer_fire</span><span class="p">)</span><span class="o">.</span> \
+    <span class="n">to_method</span><span class="p">()</span>
+
+<span class="n">fusion_reactor</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="n">fusion_active</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">nest</span><span class="p">(</span><span class="n">energy_generation</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">fusion_active</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">nest</span><span class="p">(</span><span class="n">fusion_and_heat_transfer</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">energy_generation</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">nest</span><span class="p">(</span><span class="n">pending_on_pistons</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">energy_generation</span><span class="p">)</span>
+
+<span class="n">fusion_reactor</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">fusion_active</span><span class="p">)</span>
+
+<span class="n">fusion_reactor</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">TIME_OUT</span><span class="p">),</span>
+                       <span class="n">times</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span>
+                       <span class="n">period</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                       <span class="n">deferred</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">2.1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fusion_reactor</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+<span class="c1"># pp(fusion_reactor.pistons[0].spy())</span>
+<span class="c1"># pp(fusion_reactor.pistons[1].spy())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fusion_reactor</span><span class="o">.</span><span class="n">pistons</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="transition-to-history">
 <span id="patterns-transition-to-history"></span><h2>Transition To History<a class="headerlink" href="#transition-to-history" title="Permalink to this headline">¶</a></h2>

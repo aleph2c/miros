@@ -45,9 +45,10 @@
 <span id="glossary-glossary"></span><h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h1>
 <dl class="glossary docutils">
 <dt id="term-active-fabric">Active Fabric</dt>
-<dd>A singleton class shared by all active objects.  Through it active
-objects can publish and subscribe to events created by other active
-objects.  It contains two seperate threads (fifo/lifo) each tied to their own
+<dd>A singleton class shared by all <a class="reference internal" href="#term-active-object"><span class="xref std std-term">active objects</span></a>.
+Through it active objects can <a class="reference internal" href="#term-publish"><span class="xref std std-term">publish</span></a> and
+<a class="reference internal" href="#term-subscribe"><span class="xref std std-term">subscribe</span></a> to events created by other active objects.
+It contains two seperate threads (fifo/lifo) each tied to their own
 priority queue.  When an active object publishes to the active fabric, it
 places the event in both priority queues at the priorty set as an
 argument given to the publish call.  If another active object has
@@ -56,14 +57,17 @@ will post the event into it’s deque using the post_fifo method.  If it
 subscribed using a lifo subscription it will post into it’s deque using
 the post_lifo method.</dd>
 <dt id="term-active-object">Active Object</dt>
-<dd>Contains an event processor, a queue and a thread which wakes up when an
-event is placed in its queue.  Upon waking, it calls the event processor with
-the event and the state methods which are connected to the method are run
-in accordance to the Harel Formalism.  An active object also has a
-relationship with the Active Fabric, which is a singleton class shared by all
-active objects.  If the Active Fabric has not been created before it is
-created by the active object.  The active fabric is the software which
-allows all active objects to communicate with all other active objects.</dd>
+<dd>Contains an <a class="reference internal" href="#term-event-processor"><span class="xref std std-term">event processor</span></a>, a queue and a
+thread which wakes up when an event is placed in its queue.  Upon waking,
+it calls the <a class="reference internal" href="#term-event-processor"><span class="xref std std-term">event processor</span></a> with the
+<a class="reference internal" href="#term-event"><span class="xref std std-term">event</span></a> and the <a class="reference internal" href="#term-state-method"><span class="xref std std-term">state methods</span></a> which
+are connected to the method are run in accordance to the <a class="reference internal" href="#term-harel-formalism"><span class="xref std std-term">Harel
+Formalism</span></a>.  An active object also has a relationship
+with the <a class="reference internal" href="#term-active-fabric"><span class="xref std std-term">active fabric</span></a>, which is a singleton class
+shared by all active objects.  If the Active Fabric has not been created
+before it is created by the active object.  The active fabric is the
+software which allows all active objects to communicate with all other
+active objects.</dd>
 <dt id="term-artificial-event">Artificial Event</dt>
 <dd><p class="first">An artificial event is an event which is made within your active object
 and posted to itself.  An example of an artificial event would be a
@@ -95,42 +99,57 @@ using the spy instrumentation.</p>
 </dd>
 <dt id="term-event">Event</dt>
 <dd><p class="first">Any action in the world that your program cares about.  It can be
-triggered by a user, an instrument or internally by your own design.
-Your program will notice, then react to this event by running a subset of
-your design to manifest the behavior described by the chart’s structure.  An
-event is often named something.  This name is called a signal.  An event
-can also carry a payload, which can be any data object describable by
-Python.</p>
+triggered by a user, an instrument or internally by an <a class="reference internal" href="#term-artificial-event"><span class="xref std std-term">artificial
+event</span></a>.  Your program will notice, then react to this
+event by running a subset of your design to manifest the behavior
+described by the chart’s structure.  An event is often named something.
+This name is called a <a class="reference internal" href="#term-signal"><span class="xref std std-term">signal</span></a>.  An event can also carry a
+payload, which can be any data object describable by Python.</p>
 <p class="last">An event can be source from a <code class="docutils literal"><span class="pre">post_fifo</span></code> or <code class="docutils literal"><span class="pre">post_lifo</span></code> or
-<code class="docutils literal"><span class="pre">publish</span></code> call.  An event can have an optional payload but it must be
-created with a signal.  An event is always the second argument of your
-state methods.</p>
+<code class="docutils literal"><span class="pre">publish</span></code> or <code class="docutils literal"><span class="pre">dispatch</span></code> call.  An event can have an optional payload
+but it must be created with a <a class="reference internal" href="#term-signal"><span class="xref std std-term">signal</span></a>.  An event is always the second
+argument of your <a class="reference internal" href="#term-state-method"><span class="xref std std-term">state method</span></a>.</p>
 </dd>
 <dt id="term-event-processor">Event Processor</dt>
-<dd>The event processor is the code the creates the Harel Formalism.  It was
-ported from the work of Miro Samek.  The library is named miros in honour
-of his contribution.</dd>
+<dd>The event processor is the code the creates the <a class="reference internal" href="#term-harel-formalism"><span class="xref std std-term">Harel
+Formalism</span></a>.  It was ported from the work of Miro Samek.
+The library is named miros in honour of his contribution.</dd>
 <dt id="term-extended-state-variables">Extended State Variables</dt>
-<dd><p class="first">This is a variable that can be used by a state machine.  They are often
-used in guard conditions.  In the miros library the object containing the
-<a class="reference internal" href="#term-event-processor"><span class="xref std std-term">event processor</span></a>, which are passed into the
-<a class="reference internal" href="#term-state-method"><span class="xref std std-term">state methods</span></a> contain the extended state variables.</p>
+<dd><p class="first">This is a variable that can be used by a <a class="reference internal" href="#term-state-machine"><span class="xref std std-term">state machine</span></a>.  They are often used in guard conditions.  In the miros
+library the object containing the <a class="reference internal" href="#term-event-processor"><span class="xref std std-term">event processor</span></a>, which are passed into the <a class="reference internal" href="#term-state-method"><span class="xref std std-term">state methods</span></a> contain the extended state variables.</p>
 <p class="last"><a class="reference external" href="https://en.wikipedia.org/wiki/UML_state_machine#Extended_states">Extended state</a> variables are used to increase the complexity of a state
-machine without having to add explite states</p>
+machine without having to add explicit states</p>
 </dd>
 <dt id="term-factory">Factory</dt>
-<dd>The Factory class inherits from the active object class and thereby gains
-all of it’s abilities and relationship with the Active Fabric.  In
-addition to this is can be used to manufacture state methods and nest
-them within one another.  It also has a reflection feature, <code class="docutils literal"><span class="pre">to_code</span></code>
-which can be used to show what it’s manufactured state methods would look
-like if they were hand crafted.</dd>
+<dd><p class="first">The Factory class inherits from the <a class="reference internal" href="#term-active-object"><span class="xref std std-term">active object</span></a>
+class and thereby gains all of it’s abilities and relationship with the
+Active Fabric.  In addition to this it can be used to manufacture state
+methods and nest them within one another.  It also has a reflection
+feature, <code class="docutils literal"><span class="pre">to_code</span></code> which can be used to show what it’s manufactured
+state methods would look like if they were hand crafted.</p>
+<p class="last">To learn about what a Factor is and how to use it, read the <a class="reference internal" href="towardsthefactoryexample.html#towardsthefactoryexample-towards-a-factory"><span class="std std-ref">using
+and unwinding a factory
+example</span></a>.</p>
+</dd>
 <dt id="term-fifo">Fifo</dt>
 <dd>First in first out.  Things line up as you image they should.</dd>
 <dt id="term-final-state">Final State</dt>
 <dd><p class="first">A <a class="reference internal" href="#term-pseudostate"><span class="xref std std-term">pseudostate</span></a> which indicates that an arrow should
 stop processing.</p>
 <div align="center" class="align-center"><img alt="_images/reminder3.svg" class="last" src="_images/reminder3.svg" /></div>
+</dd>
+<dt id="term-flat-state-method">Flat State Method</dt>
+<dd><p class="first">A set of <a class="reference internal" href="recipes.html#recipes-boiler-plate-state-method-code"><span class="std std-ref">state methods</span></a>
+which use if-elif-else structures to define how they react to various
+events based on the <a class="reference internal" href="#term-event"><span class="xref std std-term">event</span></a> <a class="reference internal" href="#term-signal"><span class="xref std std-term">signal</span></a> name.
+The else clause of a flat state method must return the parent state
+otherwise the event processor will not be able to discover the structure
+of your statechart while it is searching your statechart and implmenting
+the <a class="reference internal" href="#term-harel-formalism"><span class="xref std std-term">Harel Formalism</span></a>.</p>
+<p class="last">A flat state method can be though of in contrast from one made from a
+factory.  The <a class="reference internal" href="recipes.html#recipes-flatting-a-state-method"><span class="std std-ref">to_code</span></a> method can
+be used on a factory state method to turn it back into a flat state
+method.</p>
 </dd>
 <dt id="term-fsm">FSM</dt>
 <dd>Finite State Machine: a <a class="reference internal" href="#term-state-machine"><span class="xref std std-term">state machine</span></a> without hierarchy.</dd>
@@ -254,9 +273,11 @@ or states.</dd>
 <dt id="term-publish">Publish</dt>
 <dd>An active object can publish an event anytime by using the <code class="docutils literal"><span class="pre">publish</span></code>
 method.  This will pass the event to the active fabric which will search
-and determine if any other active objects have subscribed to the event.
-If they have it will post this event into their internal queue so that it
-will be consumed during a future run-to-completion process.</dd>
+and determine if any other active objects have
+<a class="reference internal" href="#term-subscribe"><span class="xref std std-term">subscribed</span></a> to the <a class="reference internal" href="#term-event"><span class="xref std std-term">event</span></a>.  If they have
+it will post this event into their internal queue so that it will be
+consumed during a future <a class="reference internal" href="#term-run-to-completion"><span class="xref std std-term">run to completion</span></a>
+process.</dd>
 <dt id="term-recall">Recall</dt>
 <dd>The <code class="docutils literal"><span class="pre">recall</span></code> method is to pop the oldest item from the deferred queue
 and place those items into the working queue of the current active
@@ -276,24 +297,26 @@ respond, if so it will transition from the local state to the target
 state while adhering to the <a class="reference internal" href="#term-harel-formalism"><span class="xref std std-term">Harel Formalism</span></a>,
 then it will run the INIT_SIGNAL within that target state.  If that state
 initiations itself by transitioning to another state, the event processor
-will run that transition with the <a class="reference internal" href="#term-harel-formalism"><span class="xref std std-term">Harel Formalism</span></a>.  This will continue until the statechart has nothing left to
-do at which point it is finished it’s run-to-completion processing.  The
-active objects can not be pre-empted with new events while they are in
-the throes of running through a RTC process.  If an event is received it
-is placed in the queue and it will not be considered by the event
-processor until it’s RTC step is completed.</dd>
+will run that transition with the <a class="reference internal" href="#term-harel-formalism"><span class="xref std std-term">Harel Formalism</span></a>.  This will continue until the <a class="reference internal" href="#term-statechart"><span class="xref std std-term">statechart</span></a>
+has nothing left to do at which point it is finished it’s
+run-to-completion processing.  The active objects can not be pre-empted
+with new events while they are in the throes of running through a RTC
+process.  If an event is received it is placed in the queue and it will
+not be considered by the event processor until it’s RTC step is
+completed.</dd>
 <dt id="term-sequence">Sequence</dt>
-<dd>Sequence is a tool that consumes trace log strings and produces ASCII
-sequence diagrams.  If the spy log contains the output of many different
-active objects, the sequence tool will create as many sequence diagrams
-as there are active objects in the trace.</dd>
+<dd><a class="reference external" href="https://github.com/aleph2c/sequence">Sequence</a> is a tool that consumes trace log strings and
+produces ASCII sequence diagrams.  If the spy log contains the output of
+many different active objects, the sequence tool will create as many
+sequence diagrams as there are active objects in the trace.</dd>
 <dt id="term-signal">Signal</dt>
-<dd>A signal is a common set of enumerations that apply to all sets of events
-within the system.  They are used to catagorize events into pools of
-commmon meaning that can be used by your state methods to take action
-upon.  There are external signals (which you define as a user) and
-internal signals like INIT_SIGNAL, ENTRY_SIGNAL, EXIT_SIGNAL .. which are
-used internally by the event processor algorithm.</dd>
+<dd>A signal is a common set of enumerations that apply to all sets of
+<a class="reference internal" href="#term-event"><span class="xref std std-term">events</span></a> within the system.  They are used to catagorize
+events into pools of commmon meaning that can be used by your state
+methods to take action upon.  There are external signals (which you
+define as a user) and internal signals like INIT_SIGNAL, ENTRY_SIGNAL,
+EXIT_SIGNAL .. which are used internally by the event processor
+algorithm.</dd>
 <dt id="term-spy">Spy</dt>
 <dd>The spy is one of the two instrumentation techniques used by the miros
 library.  It shows every detail that the event processor is doing while
@@ -319,7 +342,8 @@ Harel and it is often used as a synonym for <a class="reference internal" href="
 <dt id="term-subscribe">Subscribe</dt>
 <dd>A subscription is a multi-statchart concept.  When an active object would
 like to receive and respond to a message provided by another active
-object it can subscribe to the signal that that event will contain.</dd>
+object it can subscribe to the <a class="reference internal" href="#term-signal"><span class="xref std std-term">signal</span></a> that that event
+will contain.</dd>
 <dt id="term-substate">Substate</dt>
 <dd>A child state.</dd>
 <dt id="term-superstate">Superstate</dt>
@@ -350,6 +374,10 @@ diagrams.</p>
 to what what the log contains using the <code class="docutils literal"><span class="pre">trace</span></code> method.  The trace log
 has a ring buffer which contains 250 spots.</p>
 </dd>
+<dt id="term-transducer">Transducer</dt>
+<dd>A measuring device which converts a physical property (temperature,
+location, acceleration .. etc) into an electrical signal or binary
+number.</dd>
 <dt id="term-uml">UML</dt>
 <dd>Universal Modeling Language.  Any drawing referenced in this library is
 intended to be used as a sketch of a design, not as a blue print or as

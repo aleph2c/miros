@@ -1,3 +1,7 @@
+  *I know who in the family is a great cook.  I know where the great recipes are.*
+  
+  -- Irma S. Rombauer
+  
 .. _recipes:
 
 Recipes

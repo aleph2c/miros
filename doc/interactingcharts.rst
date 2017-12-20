@@ -1,10 +1,6 @@
 A prophet is not someone with special visions, just someone blind to most of
 what others see -- Nassim Nicholas Taleb
 
-The individual has always had to struggle to keep from being overwhelmed by the
-tribe.  If you try it, you will be frightened.  But no price is too high to pay
-for the privilege of owning yourself -- Friedrich Nietzsche
-
 .. _interactingcharts-interacting-statecharts:
 
 Interacting Statecharts
@@ -15,15 +11,15 @@ Interacting Statecharts
 Concurrency: the Good Parts
 --------------------------
 Your designs can be significantly simplified if you break them up into a
-collection of statecharts (active-objects/factories), each running in their own
-thread.
+:ref:`collection of statecharts<interactingcharts-a-simple-example>`
+(active-objects/factories), each running in their own thread.
 
 If your statechart is interested in an event provided by the system, it can
-subscribe to it.  If your statechart would like to provide information to
-another statechart, it can publish an event.  By separating your design into
-parts like this it makes it much easier to test and document your system.  More
-importantly, it makes it easier to maintain.  The majority of a software
-project's lifetime cost is spent in maintenance.
+:term:`subscribe<Subscribe>` to it.  If your statechart would like to provide
+information to another statechart, it can :term:`publish<Publish>` an event.
+By separating your design into parts like this it makes it much easier to test
+and document your system.  More importantly, it makes it easier to maintain.
+The majority of a software project's lifetime cost is spent in maintenance.
 
 In 2008 `Douglas Crockford`_ (the man who invented JSON) released a very important
 book called, `JavaScript The Good Parts`_."  In his book he talked about how the
@@ -120,6 +116,8 @@ his framework onto and then use his technology, you won't be sorry.
 Jack Ganssle is another embedded developer who has been in the industry from
 the beginning.  He says that embedded software, or firmware was invented to
 make jet fighters infinitely expensive:
+
+.. _on-firmware:
 
    In his book "Augustine's Laws," Norman Augustine, former Lockheed Martin
    CEO, tells a revealing story about a problem encountered by the defense

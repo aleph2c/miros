@@ -1,4 +1,6 @@
-What I learned on my own I still remember -- Nassim Nicholas Taleb
+  *What I learned on my own I still remember*
+  
+  -- Nassim Nicholas Taleb
 
 .. _scribbleexample-hacking-to-learn-the-deeper-dynamics:
 

@@ -15,3 +15,4 @@ Examples
    towardsthefactoryexample
    interactingcharts
 
+More examples can be found in the :ref:`patterns section<patterns>`.

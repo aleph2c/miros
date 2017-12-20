@@ -1,3 +1,8 @@
+  *But in practice master plans fail - because they create totalitarian order,
+  not organic order.  They are too rigid; they cannot easily adapt to the
+  natural and unpredictable changes that inevitably arise in the life of a
+  community.* -- Christopher Alexander
+
 .. _patterns:
 
 .. hlist::
@@ -14,11 +19,11 @@
 Patterns
 ========
 The idea of software design patterns came from the architect Christopher
-Alexander.  He wrote a book, `a pattern language`_, about how different approaches
-to architecture could be used across different scales (from the country to the
-pantry) to help people feel better about living in their communities.  It's a
-lovely book; a child can understand it yet it is still useful to professional
-architects.
+Alexander.  He wrote a book, `a pattern language`_, about how different
+approaches to architecture could be used across different scales (from the
+country to the pantry) to help people feel better about living in their
+communities.  It's a lovely book (everyone should own a copy); a child can
+understand it yet it is still useful to professional architects.
 
 This can not be said for the book it inspired in computer science, "Design
 Patterns: Elements of Reusable Object-Oriented Software"  This book *was not*
@@ -35,7 +40,7 @@ by a practitioner in your language(s) and work through it.  You will level up.
 In chapter 5 of "Practical UML STATECHARTS in C/C++" I was leveled up by Miro
 Samek.  He describes 5 statechart patterns and made the bold claim that
 **statecharts are a pattern of patterns**.  I completely agree with him.  So here
-is my translation of his work into this library.  I'll start each pattern with
+is my translation of his work into this library.  I'll start each :term:`pattern<Pattern>` with
 quotes from his book, then write about it within the context of this work.
 
 .. toctree::
@@ -63,7 +68,7 @@ Formal description:
 
 Makes sense to me.  Keep up! ;)
 
-To understand the ultimate hook pattern, you first have to understand what a
+To understand the ultimate hook :term:`pattern<Pattern>`, you first have to understand what a
 hook is.  It is just some code in an ``if-elif`` clause.   A hook is just some
 code that catches an event, runs your :term:`client code<Client Code>` and then
 returns something which tells the event processor to stop searching.  **A hook
@@ -303,7 +308,7 @@ from the current state, to the next :term:`parent state<Parent State>`, then the
 over and over until your event is handled or, it reaches the top most state of
 your :term:`HSM<Hierarchical State Machine>`. This means that any inner state
 method will automatically inherit the hook code of any outer state.  The outer
-most state contains the ultimate hook; this is why the pattern is called what
+most state contains the ultimate hook; this is why the :term:`pattern<Pattern>` is called what
 it is.
 
 .. image:: _static/ultimate_hook4.svg
@@ -442,8 +447,8 @@ Formal description:
   connecting them, remind yourself of this :ref:`reminder
   pattern<patterns-reminder-here>`.
 
-The reminder pattern uses the :ref:`ultimate hook<patterns-ultimate-hook>`
-pattern mixed with :term:`artificial event<Artificial Event>` injection.  It's
+The reminder :term:`pattern<Pattern>` uses the :ref:`ultimate hook<patterns-ultimate-hook>`
+:term:`pattern<Pattern>` mixed with :term:`artificial event<Artificial Event>` injection.  It's
 an :term:`artificial event<Artificial Event>` because it is invented by the
 statechart and injected to itself rather than being invented and injected by an
 outside caller.
@@ -828,7 +833,7 @@ But the polling and the processing state are strongly coupled to the TIME_OUT
 signal.  Our design of having the TIME_OUT start the system in the polling and
 end up in the processing/busy state cost us a lot of CPU time.
 
-Lets introduce the reminder pattern with a new design:
+Lets introduce the reminder :term:`pattern<Pattern>` with a new design:
 
 .. _patterns-reminder-here:
 
@@ -1032,14 +1037,14 @@ our statechart when it's timing is more convenient.
 .. image:: _static/deferred1.svg
     :align: center
 
-Here is an example of a chart using the deferred event pattern.  
+Here is an example of a chart using the deferred event :term:`pattern<Pattern>`.  
 
 To begin with the chart climbs into the idle state.  Upon receiving it's first
 NEW_REQUEST it transitions into the receiving state.  After a second of
 processing it transitions into the authorizing state.  After the authorizing
 state processes for 2 seconds it transitions back to the idle state.
 
-The reminder pattern occurs when a NEW_REQUEST event is seen while the system
+The reminder :term:`pattern<Pattern>` occurs when a NEW_REQUEST event is seen while the system
 is either in receiving or authorizing.  This NEW_REQUEST event is ignored by
 these states and caught by the hook in processing.  The processing state places
 this NEW_REQUEST event into the deferred queue then passes the program's
@@ -1235,7 +1240,7 @@ COMPLETED events should be about 2 seconds apart.  From the inspection of lines
   [2017-12-15 09:20:59.468877] [deferred] e->COMPLETED() authorizing->idle
   .
 
-The deferred event pattern states that we will react to the recalled events
+The deferred event :term:`pattern<Pattern>` states that we will react to the recalled events
 immediately and we can see this behavior on lines 4-5 and 8-9
 
 .. code-block:: python
@@ -1359,25 +1364,26 @@ Formal description:
 
 In the original statechart paper written by David Harel he describes how his
 formalism needs to capture requirements like "[The] gearbox change of state is
-independent of [the] braking system".  For this he invented something called a
+*independent* of [the] braking system".  For this he invented something called a
 'orthogonal region':
 
 .. image:: _static/orthogonal_region1.svg
     :align: center
 
 The two different areas in the above chart separated by the dotted line are
-orthogonal regions.  They represent two separate state machines that act
+**orthogonal regions**.  They represent two separate state machines that act
 independent of one another but are both turned on when the truck state is
 initiated.
 
-This part of the Harel formalism is not supported by the Miro Samek event
-processing algorithm.  But, it would be trivial to implement within the miros
-library, by building two separate active objects and letting them run
-independently.
+This part of the :term:`Harel Formalism<Harel Formalism>` is **not supported** by the
+Miro Samek event processing algorithm.
 
-If you would like such a structure in your machine, you could use an orthogonal
-component instead.  An orthogonal component is just a statechart that can
-dispatch messages directly into another one.
+If you would like such a structure in your machine, you could use an
+**orthogonal component instead**.  An orthogonal component is just a statechart
+that can dispatch messages directly into another one.  I'll explain this with
+an example.
+
+.. _nuclear_fusion_example:
 
 Imagine we are asked to build some software for the general fusion reactor:
 
@@ -1387,12 +1393,13 @@ Imagine we are asked to build some software for the general fusion reactor:
     the sphere, an array of pistons drive a pressure wave into the centre of
     the sphere, compressing the plasma to fusion conditions. This process is
     then repeated, while the heat from the reaction is captured in the liquid
-    metal and used to generate electricity via a steam turbine."
+    metal and used to generate electricity via a steam turbine." -- General
+    Fusion
 
 Now that is an ambitious project.
 
 Let's say we have to write the firing mechanism to cause all of the pistons to
-initiate the pressure wave.  
+initiate the pressure wave.
 
 .. raw:: html
 
@@ -1402,12 +1409,13 @@ initiate the pressure wave.
 
 Imagine that each piston has two transducers that measure the relevant
 conditions of the molten lead-lithium near its position on the sphere.  The
-first transducer provides a composite reading that abstracts away a lot of the
-physics; it provides numbers between 0 and 100.  The second transducer measures
-the temperature; it's range is 0 to 9000 degrees Celsius.  A piston can only
-fire after 1 second has passed since the last firing event and once it passes
-this time threshold it would like to fire as soon as possible so that the
-fusion reactor can output the maximum amount of power.
+first :term:`transducer<Transducer>` provides a composite reading that
+abstracts away a lot of the physics; it provides numbers between 0 and 100.
+The second :term:`transducer<Transducer>` measures the temperature; it's range
+is 0 to 9000 degrees Celsius.  A piston can only fire after 1 second has passed
+since the last firing event and once it passes this time threshold it would
+like to fire as soon as possible so that the fusion reactor can output the
+maximum amount of power.
 
 There are 255 pistons.
 
@@ -1468,9 +1476,15 @@ response filter and a random number generator using a uniform distribution.
       # aggression ranges from 1 to 100.  1 is the least aggressive and 100 is
       # the most agressive
       fn = fake_news(
-        FakeNewsSpec(minimum=0, maximum=100, initial_value=45, aggression=50))
+        FakeNewsSpec(
+          minimum=0,
+          maximum=100,
+          initial_value=45,
+          aggression=50))
+
       for i in range(5):
         print(fn())
+
       # 70.40052265431565
       # 98.55643192543394
       # 63.607687838082626
@@ -1522,7 +1536,7 @@ Ok, let's try it out:
   # 53.30613755950629
 
 We see we can make the numbers swing around and the function is tunable.  Good
-enough, pushing on.
+enough (you could probably find something much better in numpy), pushing on.
 
 As `Michel Laberge`_ builds up his prototype reactor he will change the
 piston firing specification a lot.
@@ -1562,20 +1576,19 @@ piston_active state machine.
 
 The Piston class will be a subclass of HsmWithQueues, which means it will not
 have it's own thread.  Threads are only constructed in the ActiveObject class
-or any of it's descendants.  The orthogonal component pattern will allow a single
-thread to be shared between many different statemachines.  This will be
-described in more detail shortly.
+or any of it's descendants.  The orthogonal component :term:`pattern<Pattern>`
+will allow a single thread to be shared between many different :term:`state
+machines<State Machine>`.  This will be described in more detail shortly.
 
-The Piston objects will each contain their own event dispatchers, their
-own event queues; but they will all reference the same piston_manager state
-machine.
+The Piston objects will each contain their own :term:`event dispatcher<Event
+Dispatcher>`, their own event queues; but they will all reference the same
+piston_manager :term:`state machine<State Machine>`.
 
 We are going to use the :ref:`polyamorous
 nature<recipes-what-a-state-does-and-how-to-structure-it>` of state methods to
-implement the 255 piston managers.  Instead of having a separate piston_active
-:term:`HSM<Hierarchical State Machine>` defined for each of the 255 active objects we will instead define
-just one HSM and share it between all of them. (saving on memory)
-
+implement the 255 pistons.  Instead of having a separate piston_active
+:term:`HSMs<Hierarchical State Machine>` defined for each of the 255 active objects we will instead define
+just one :term:`HSM<Hsm>` and share it between all of them. (saving on memory)
 
 .. image:: _static/orthogonal_region4.svg
     :align: center
@@ -1599,14 +1612,16 @@ Let's start writing the code.  Here is the Piston Class:
       self.number                  = number
       self.count                   = 0
       self.armed                   = False
+      self.name                    = "piston_"+str(self.number)
 
 The highlights were made to show that it is easy to inject different types of
-functions to generate the transducer readings and the piston-ready criterion.
+functions to generate the :term:`transducer<Transducer>` readings and the
+piston-ready criterion.
 
 Now let's write the piston state machine:
 
 .. code-block:: python
-  :emphasize-lines: 60
+  :emphasize-lines: 19,37,46,60,62
 
   # This is the piston's HSM, it will be shared by all pistons
   @spy_on
@@ -1681,21 +1696,26 @@ Now let's write the piston state machine:
 The first thing we notice about this code, is that it uses the :ref:`flat way
 of writing<recipes-boiler-plate-state-method-code>` state methods.
 
-This is because we want this HSM to be shared between multiple Piston objects.
-A state machine build up using a factory cannot be shared; it belongs to the
-thing that built it.  This is in contrast with flat state methods, they are
-defined outside of the event processors that will use them.  So they can be
-used over and over again if they describe behavior that wants to be shared.
+This is because we want this :term:`HSM<Hsm>` to be shared between multiple
+Piston objects.  A :term:`state machine<State Machine>` build up using a
+:term:`factory<Factory>` cannot be shared; it belongs to the thing that built
+it.  This is in contrast with :term:`flat state methods<Flat State Method>`,
+they are defined outside of the event processors that will use them.  So they
+can be used over and over again if they describe behavior that wants to be
+shared.
 
 In our system we are going to have 255 pistons that all want the same type of
 behavior.  The internal variables for tracking counts and if that piston is
-armed will be kept within the piston objects, not in the HSM that it is using to
-define it's operational state.  Never store your :term:`extended state
-variables<Extended State Variables>` in a flat state method.
+armed will be kept within the piston objects, not in the HSM that it is using
+to define it's operational state.  Never store your :term:`extended state
+variables<Extended State Variables>` in a :term:`flat state method<Flat State
+Method>`.
 
-The highlighted code marks the location of the FIRE signal.  This signal will
-be injected into this state machine using the ``dispatch`` method of the
-FusionReactor object.  We will talk more about that shortly.
+The highlighted code marks the location of the TIME_OUT and FIRE
+:term:`signals<Signal>`.  This signal will be injected into this state machine
+using the ``dispatch`` method of the FusionReactor object (this is the essence
+of the orthogonal component :term:`pattern<Pattern>`).  We will talk more about
+that shortly.
 
 We want to build 255 pistons with a tunable ``is_this_piston_ready`` method.
 Furthermore, we want to be able to switch out our fake transducer readings with
@@ -1738,18 +1758,19 @@ that it belongs to:
 .. image:: _static/orthogonal_region5.svg
     :align: center
 
-From a high level, the FusionReactor is a subclass of the Factory which means
-it has a thread and it can use the factory syntax to build up its HSM.  Since
-there will be only one reactor with 255 pistons, we have it build the 255
-pistons when it enters the reactor_on state.  The pistons are stored in an
-:term:`extended state variable<Extended State Variable>` in the reactor object.
-This adds convenient syntax for accessing an individual piston, or for
-iterating over all of them.
+From a high level, the FusionReactor is a subclass of the
+:term:`Factory<Factory>` which means it has a thread and it can use the factory
+syntax to build up its HSM.  Since there will be only one reactor with 255
+pistons, we have it build the 255 pistons when it enters the reactor_on state.
+The pistons are stored in an :term:`extended state variable<Extended State
+Variable>` in the reactor object.  This adds convenient syntax for accessing an
+individual piston, or for iterating over all of them.
 
 After constructing it's pistons the reactor will climb into the
 pending_on_pistons state.  This state captures the TIME_OUT event and iterates
-through all of the pistons, injecting each of them with the TIME_OUT event.  To
-see how a fusion piston deals with a TIME_OUT we will look at it's state chart:
+through all of the pistons, injecting each of them with the TIME_OUT
+:term:`event<Event>`.  To see how a fusion piston deals with a TIME_OUT we will
+look at it's state chart:
 
 .. image:: _static/orthogonal_region4.svg
     :align: center
@@ -1764,11 +1785,11 @@ successive TIME_OUT, the piston.count is incremented and when it is high
 enough, the piston transitions into pending_optimal_conditions.
 
 In the pending_optimal_conditions state, the piston uses each TIME_OUT pulse to
-read its transducers.  From this reading it can determine if the liquid metal
-on it's part of the sphere has met the design criteria for a piston strike.  It
-does this by calling the ``is_this_piston_ready`` function and transitioning
-into the ready state if the criteria are met, or by staying in the
-pending_optimal_conditions if they aren't.
+read its :term:`tranducers<Tranducer>`.  From this reading it can determine if
+the liquid metal on it's part of the sphere has met the design criteria for a
+piston strike.  It does this by calling the ``is_this_piston_ready`` function
+and transitioning into the ready state if the criteria are met, or by staying
+in the pending_optimal_conditions if they aren't.
 
 This behavior is shared with the ready state:  On each TIME_OUT event, the
 ready state can transition back into the pending_optimal_conditions if the
@@ -1792,30 +1813,31 @@ Now that we understand how they work let's look at the fusion reactor again:
 We were talking about the pending_on_pistons TIME_OUT event handler prior to
 looking at the piston behavior.
 
-The orthogonal component pattern allows one active object to manually dispatch
-events into another.  This is done with the ``dispatch`` method.  Up until now
-we have dispatched events to our statecharts using the ``post_fifo`` and
-``post_lifo`` methods.  These methods write their events into a queue, which
-in turn wakes up a thread then causes that active object's HSM to run to completion.
+The orthogonal component :term:`pattern<Pattern>` allows one active object to
+manually dispatch events into another.  This is done with the ``dispatch``
+method.  Up until now we have dispatched events to our statecharts using the
+``post_fifo`` and ``post_lifo`` methods.  These methods write their events into
+a queue, which in turn wakes up a thread then causes that active object's
+:term:`HSM<HSM>` to run to completion.
 
 The piston objects do not have their own threads, they share a thread with the
 fusion_reactor object.  To pump an event into a piston object's HSM we call
 it's ``dispatch`` method with the event.  This will cause it to link to it's
-HSM, run it to completion then return control back to the fusion_reactor
-statechart.
+:term:`HSM<HSM>`, :term:`run it to completion<Run To Completion>` then return
+control back to the fusion_reactor statechart.
 
 The fusion_reactor thread can be thought of as a large gear, who's rotational
 energy is coming from it's thread.  The pistons are little gears that are being
 powered by connecting with the large gear.
 
 Getting back to our example we see that the pending_on_pistons states will only
-post a FIRE event when all of its pistons are ready.  The FIRE event will cause
-a transition into the fusion_and_heat_transfer state, who's entry condition
-will pump a FIRE event into all of the pistons.  This will cause each of the
-pistons to contract and the fusion reaction will be initiated.  A small star
-will shine into the liquid metal.
+post a FIRE :term:`event<Event>` when all of its pistons are ready.  The FIRE
+event will cause a transition into the fusion_and_heat_transfer state, who's
+entry condition will pump a FIRE event into all of the pistons.  This will
+cause each of the pistons to contract and the fusion reaction will be
+initiated.  A small star will shine into the liquid metal.
 
-The fusion_and_heat_transfer state uses the reminder pattern to wait for 1
+The fusion_and_heat_transfer state uses the reminder :term:`pattern<Pattern>` to wait for 1
 second prior to transitioning back into the pending_on_pistons state.  Also
 notice the TIME_OUT event is pumped into each of the piston state machines
 by the TIME_OUT ultimate hook in the reactor_on class.   This will allow each
@@ -1868,22 +1890,23 @@ Now that we understand how the fusion reactor object works, let's write it's cod
         Event(signal=signals.FIRE))
     return status
 
-  def fusion_active_fire_primed(reactor, e):
+  def fusion_active_cool_enough(reactor, e):
     status = reactor.trans(pending_on_pistons)
     return status
 
-  def fusion_waiting_time_out(reactor, e):
+  def pending_on_pistons_timeout(reactor, e):
     status = return_status.HANDLED
     all_ready = True
     for piston in reactor.pistons:
       piston.dispatch(e)
       all_ready &= piston.armed
     if all_ready:
-      status = reactor.trans(fusion_and_heat_transfer)
+      reactor.post_fifo(Event(signal=signals.FIRE))
+      status = return_status.HANDLED
     return status
 
-  def fusion_waiting_fire(reactor, e):
-    status = return_status.HANDLED
+  def fusion_and_heat_transfer_fire(reactor, e):
+    status = reactor.trans(fusion_and_heat_transfer)
     return status
 
   # Create a fusion reactor object and its HSM
@@ -1912,15 +1935,15 @@ Now that we understand how the fusion reactor object works, let's write it's cod
       catch(signal=signals.ENTRY_SIGNAL,
         handler=fusion_active_entry). \
       catch(signal=signals.COOL_ENOUGH,
-        handler=fusion_active_fire_primed). \
+        handler=fusion_active_cool_enough). \
       to_method()
 
   pending_on_pistons = \
     fusion_reactor.create(state='pending_on_pistons'). \
       catch(signal=signals.TIME_OUT,
-        handler=fusion_waiting_time_out). \
+        handler=pending_on_pistons_timeout). \
       catch(signal=signals.FIRE,
-        handler=fusion_waiting_time_out). \
+        handler=fusion_and_heat_transfer_fire). \
       to_method()
 
   fusion_reactor.nest(fusion_active, parent=None). \
@@ -1940,12 +1963,496 @@ So here is some very important code:
   :emphasize-lines: 3
   
   fusion_reactor.post_fifo(Event(signal=signals.TIME_OUT),
-                           times=100,
+                           times=21,
                            period=0.1,
                            deferred=False)
 
-We are going to post a TIME_OUT event every 100 ms, 100 times.  This will run
-things long enough to see if they work.
+  time.sleep(2.1)
+  print(fusion_reactor.trace())
+  # pp(fusion_reactor.pistons[0].spy())
+  # pp(fusion_reactor.pistons[1].spy())
+  print(fusion_reactor.pistons[1].trace())
+
+We are going to post a TIME_OUT event every 100 ms, 21 times.  This will run
+things long enough to see if we see two fusion cycles.  Then we wait 2.1
+seconds and then output the results:
+
+This will output:
+
+.. code-block:: python
+
+  [2017-12-19 09:28:27.968188] [fusion_reactor] e->start_at() top->pending_on_pistons
+  [2017-12-19 09:28:28.736951] [fusion_reactor] e->FIRE() pending_on_pistons->fusion_and_heat_transfer
+  [2017-12-19 09:28:29.687615] [fusion_reactor] e->COOL_ENOUGH() fusion_and_heat_transfer->pending_on_pistons
+  [2017-12-19 09:28:29.787727] [fusion_reactor] e->FIRE() pending_on_pistons->fusion_and_heat_transfer
+
+  [2017-12-19 09:28:27.823549] [None] e->start_at() top->relaxing
+  [2017-12-19 09:28:28.571081] [None] e->TIME_OUT() relaxing->pending_optimal_conditions
+  [2017-12-19 09:28:28.672391] [None] e->TIME_OUT() pending_optimal_conditions->ready
+  [2017-12-19 09:28:28.737451] [None] e->FIRE() ready->triggered
+  [2017-12-19 09:28:28.775499] [None] e->TIME_OUT() triggered->relaxing
+  [2017-12-19 09:28:29.479119] [None] e->TIME_OUT() relaxing->pending_optimal_conditions
+  [2017-12-19 09:28:29.578757] [None] e->TIME_OUT() pending_optimal_conditions->ready
+  [2017-12-19 09:28:29.788228] [None] e->FIRE() ready->triggered
+  [2017-12-19 09:28:29.880259] [None] e->TIME_OUT() triggered->relaxing
+
+Let's run the first trace through sequence and compare it to its design
+diagram, then I'll write some documentation that I would post to the General
+Fusion wiki so that other people could understand my code.
+
+.. image:: _static/orthogonal_region5.svg
+    :align: center
+
+.. code-block:: python
+
+  [ Chart: fusion_reactor ] (1)
+             top              pending_on_pistons    fusion_and_heat_transfer 
+              +------start_at()------->|                        |
+              |          (2)           |                        |
+              |                        +--------FIRE()--------->|
+              |                        |          (3)           |
+              |                        +<----COOL_ENOUGH()------|
+              |                        |          (4)           |
+              |                        +--------FIRE()--------->|
+              |                        |          (5)           |
+
+1. The fusion_reactor is the high level state chart which runs in it's own
+   thread. 
+
+2. Upon starting, the reactor builds 255 different piston orthogonal components
+   then climbs into the pending_on_pistons state.  While in this state it will
+   inject the TIME_OUT event into each of these pistons and when it finds that
+   each piston is armed it will post a FIRE event to itself.
+
+3. The fusion_reactor FIRE event indicates that all of the pistons are ready.
+   Upon entering this state each of the piston HSMs will be issued their own
+   FIRE event, causing them to contract in unison.
+
+   After each of the piston heads slam on the outer chamber of the fusion
+   sphere a liquid metal compression wave will propagate towards the core of
+   the system.  When this wave hits the plasma containment field it's energy
+   will add to the field and cause a nuclear fusion event.  This event will
+   release a lot of energy and heat into the liquid metal.
+
+   The fusion_reactor will remain in the fusion_and_heat_transfer state for
+   about 1 second.  This will be enough time for turbines to extract the heat
+   from the system and cool things down enough so that another fusion reaction
+   can safely take place.
+   
+4. The COOL_ENOUGH event is sent to the reactor when it is cool enough for
+   another reaction.  While in this state the fusion_reactor will inject it's
+   TIME_OUT events into each of the piston HSMs and wait until they have all
+   reported that they are armed and ready to go.
+
+5. This is a repeat of step 3.
+
+Let's run the second trace (a piston trace) through sequence and compare it to
+it's design diagram.  Then I'll add the comments I would use to describe this
+design to the rest of engineering.
+
+.. image:: _static/orthogonal_region4.svg
+    :align: center
+
+.. code-block:: python
+
+  [Chart: piston_1] (1)
+  top           relaxing   pending_optimal_conditions ready         triggered         
+   +--start_at()--->|                 |                 |               |
+   |      (2)       |                 |                 |               |
+   |                +---TIME_OUT()--->|                 |               |
+   |                |       (3)       |                 |               |
+   |                |                 +--TIME_OUT()---->|               |
+   |                |                 |      (4)        |               |
+   |                |                 |                 +----FIRE()---->|
+   |                |                 |                 |      (5)      |
+   |                +<----------------+-----------------+--TIME_OUT()---|
+   |                |                 |                 |      (6)      |
+   |                +---TIME_OUT()--->|                 |               |
+   |                |       (7)       |                 |               |
+
+
+1. This trace is describing a single piston in the fusion reactor.  This
+   piston's HSM is driven from the fusion_reactor thread (using the orthogonal
+   component statechart :term:`pattern<Pattern>`).  The TIME_OUT and FIRE events are actually
+   fed into this HSM from the fusion_reactor.  The piston can arm itself,
+   but it can not fire without a command provided by the fusion_reactor.
+
+2. When the piston starts, it disarms by setting it's armed attribute to False
+   then it enters the relaxing state.  The piston will remain in this state for 7
+   TIME_OUT events, after which it will transition into the
+   pending_optimal_conditions state.  The relaxing state is intended to
+   describe a piston physically relaxing back into a position where it can be
+   triggered.
+
+3. After enough time has passed and the piston is back in it's firing position a
+   TIME_OUT event will cause it to transition from the relaxing state into the
+   pending_optimal_conditions state.  The pending_optimal_conditions state is
+   used to sample the local transducers to see if the liquid metal has settled
+   into a state where it is safe to fire the piston.
+
+4. While the piston is in the pending_optimal_conditions or any of its child
+   states, any TIME_OUT event will cause it to re-evaluate its firing
+   criteria.  If after testing its sensors it determines it is ready to fire,
+   the piston will arm by transitioning into the ready state.  When the piston
+   is in the ready state it is armed; if it is not in this state it is not armed.
+
+5. The FIRE event will be issued by the fusion_reactor thread if all of the
+   pistons are armed (in their ready states).  This will cause the transition
+   into the contract state which will slam the piston, beginning the pressure
+   wave and initiate nuclear fusion.
+
+If you would like to skip to the next :term:`pattern<Pattern>` click
+:ref:`here<patterns-transition-to-history>`.  Here is the full code listing
+used in this example:
+
+.. code-block:: python
+
+  # Make Something that can generate numbers for us
+  # 1) needs to return a function
+  # 2) needs to be tunable
+  # 3) needs to be stochastic
+  class FakeNewsSpec:
+    ''' provides the following syntax:
+        spec.initial_value
+        spec.aggression
+        spec.minimum
+        spec.maximum
+    '''
+    def __init__(self,
+                  aggression=0,
+                  initial_value=None,
+                  minimum=None,
+                  maximum=None):
+      if minimum is None:
+        assert(0)
+      if maximum is None:
+        assert(0)
+      if minimum >= maximum:
+        assert(0)
+
+      if initial_value is None:
+        initial_value = (maximum - minimum) / 2.0
+      elif initial_value < minimum:
+        initial_value = minimum
+      elif initial_value > maximum:
+        initial_value = maximum
+
+      self.initial_value = initial_value
+      self.aggression    = aggression
+      self.minimum       = minimum
+      self.maximum       = maximum
+
+  def fake_news(spec):
+    '''
+      # aggression ranges from 1 to 100.  1 is the least aggressive and 100 is
+      # the most agressive
+      fn = fake_news(FakeNewsSpec(
+                      minimum=0,
+                      maximum=100,
+                      initial_value=45,
+                      aggression=50))
+
+      for i in range(5):
+        print(fn())
+
+      # 70.40052265431565
+      # 98.55643192543394
+      # 63.607687838082626
+      # 96.33858152348765
+      # 47.2780049249278
+
+    '''
+    AGGRESSION_MAX = 100
+    '''returns a function that will generate the kind of fake news specified'''
+    random.seed()
+
+    if 1 <= spec.aggression <= AGGRESSION_MAX:
+      aggression = spec.aggression
+    elif spec.aggression < 1:
+      aggression = 1
+    else:
+      aggression = AGGRESSION_MAX
+
+    def _fake_news_generator():
+      '''provides an infinite set of number within the spec'''
+      current_number = spec.initial_value
+
+      while(True):
+        random_number  = random.uniform(spec.minimum, spec.maximum)
+        # IIR (infinite impulse response)
+        current_number = ((aggression * random_number +
+                           (AGGRESSION_MAX - aggression) *
+                           current_number)) / AGGRESSION_MAX
+        yield current_number
+
+    def _fake_news():
+      '''just hides the next syntax'''
+      return next(_fake_news_generator())
+
+    return _fake_news
+
+  # Try it out
+  fake_transducer = fake_news(
+    FakeNewsSpec(
+      minimum=0,
+      maximum=100,
+      initial_value=45,
+      aggression=20))
+  for i in range(3):
+    print(fake_transducer())
+
+  # Define a method which will determine if the piston is ready to fire ..
+  # keep it separate and easy to change.  We will inject it into the Piston
+  # class when we build it
+  def is_this_piston_ready(piston):
+
+    comp  = piston.get_composite_reading()
+    temp  = piston.get_temperature_reading()
+
+    if 0 <= comp <= 20 and 50 <= temp <= 100:
+       ready = True
+    elif 25  <= comp <= 50 and 200 <= temp <= 333:
+       ready = True
+    elif 30  <= comp <= 66 and 403 <= temp <= 600:
+       ready = True
+    elif 70  <= comp <= 100 and 670 <= temp <= 1500:
+       ready = True
+    else:
+      ready = False
+
+    return ready
+
+  class FusionReactor(Factory):
+    def __init__(self, name):
+      super().__init__(name)
+      self.pistons = []
+      self.count = 0
+
+  class Piston(HsmWithQueues):
+    def __init__(self,
+                 get_composite_reading,
+                 get_temperature_reading,
+                 is_this_piston_ready,
+                 number):
+      super().__init__()
+
+      self.is_this_piston_ready    = is_this_piston_ready
+      self.get_composite_reading   = get_composite_reading
+      self.get_temperature_reading = get_temperature_reading
+      self.number                  = number
+      self.count                   = 0
+      self.armed                   = False
+      self.name                    = "piston_"+str(self.number)
+
+  # This is the piston's HSM, it will be shared by all pistons
+  @spy_on
+  def piston_ready(piston, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      piston.armed = False
+      status = return_status.HANDLED
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = piston.trans(relaxing)
+    else:
+      status, piston.temp.fun = return_status.SUPER, piston.top
+    return status
+
+  @spy_on
+  def relaxing(piston, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      piston.scribble("relaxing")
+    elif(e.signal == signals.TIME_OUT):
+      status = return_status.HANDLED
+      piston.count += 1
+      if piston.count >= 7:
+        piston.count = 0
+        status = piston.trans(pending_optimal_conditions)
+    elif(e.signal == signals.PRIMING):
+      return piston.trans(pending_optimal_conditions)
+    else:
+      status, piston.temp.fun = return_status.SUPER, piston_ready
+    return status
+
+  @spy_on
+  def triggered(piston, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      piston.scribble("piston_slamming! at {}". \
+        format(datetime.now().strftime("%M:%S:%f")))
+    elif(e.signal == signals.TIME_OUT):
+      status = piston.trans(relaxing)
+    else:
+      status, piston.temp.fun = return_status.SUPER, piston_ready
+    return status
+
+  @spy_on
+  def pending_optimal_conditions(piston, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.TIME_OUT):
+      if piston.is_this_piston_ready(piston):
+        status = piston.trans(ready)
+      else:
+        status = piston.trans(pending_optimal_conditions)
+    else:
+      status, piston.temp.fun = return_status.SUPER, piston_ready
+    return status
+
+  @spy_on
+  def ready(piston, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      piston.armed = True
+      status = return_status.HANDLED
+    elif(e.signal == signals.FIRE):
+      status = piston.trans(triggered)
+    elif(e.signal == signals.TIME_OUT):
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      piston.armed = False
+      status = return_status.HANDLED
+    else:
+      status, piston.temp.fun = return_status.SUPER, pending_optimal_conditions
+    return status
+
+  # A function for building pistons
+  def build_piston(number, starting_state):
+    # We would change the get_composite_reading and get_temperature_reading
+    # with the actual functions that would return these values in production
+    piston = Piston(
+      get_composite_reading=fake_news(
+        FakeNewsSpec(
+          minimum=0,
+          maximum=100,
+          initial_value=89,
+          aggression=21)),
+      get_temperature_reading=fake_news(
+        FakeNewsSpec(
+          minimum=0,
+          maximum=1500,
+          initial_value=798,
+          aggression=16)),
+      is_this_piston_ready=is_this_piston_ready,
+      number=number
+    )
+    piston.start_at(starting_state)
+    return piston
+
+  # The fusion statechart callbacks
+  def reactor_on_entry(reactor, e):
+    status = return_status.HANDLED
+    reactor.count = 0
+    reactor.pistons = \
+      [build_piston(piston_number, starting_state=piston_ready)
+            for piston_number in range(255)]
+    return status
+
+  def reactor_on_time_out(reactor, e):
+    status = return_status.HANDLED
+
+    # provide a relaxing TIME_OUT pulse to each piston
+    for piston in reactor.pistons:
+      piston.dispatch(e)
+
+    reactor.count += 1
+    if reactor.count >= 10:
+      reactor.count = 0
+      reactor.post_fifo(
+        Event(signal=signals.COOL_ENOUGH))
+    return status
+
+  def reactor_on_init(reactor, e):
+    status = reactor.trans(energy_generation)
+    return status
+
+  def reactor_on_priming(reactor, e):
+    status = return_status.HANDLED
+    reactor.pistons[e.payload].dispatch(e)
+    return status
+
+  def energy_generation_init(reactor, e):
+    status = reactor.trans(pending_on_pistons)
+    return status
+
+  def fusion_active_entry(reactor, e):
+    status = return_status.HANDLED
+    for piston in reactor.pistons:
+      piston.dispatch(
+        Event(signal=signals.FIRE))
+    return status
+
+  def fusion_active_cool_enough(reactor, e):
+    status = reactor.trans(pending_on_pistons)
+    return status
+
+  def pending_on_pistons_timeout(reactor, e):
+    status = return_status.HANDLED
+    all_ready = True
+    for piston in reactor.pistons:
+      piston.dispatch(e)
+      all_ready &= piston.armed
+    if all_ready:
+      reactor.post_fifo(Event(signal=signals.FIRE))
+      status = return_status.HANDLED
+    return status
+
+  def fusion_and_heat_transfer_fire(reactor, e):
+    status = reactor.trans(fusion_and_heat_transfer)
+    return status
+
+  # Create a fusion reactor object and its HSM
+  fusion_reactor = FusionReactor("fusion_reactor")
+
+  fusion_active = \
+    fusion_reactor.create(state="fusion_active"). \
+      catch(signal=signals.ENTRY_SIGNAL,
+        handler=reactor_on_entry). \
+      catch(signal=signals.INIT_SIGNAL,
+        handler=reactor_on_init). \
+      catch(signal=signals.TIME_OUT,
+        handler=reactor_on_time_out). \
+      catch(signal=signals.PRIMING,
+        handler=reactor_on_priming). \
+      to_method()
+
+  energy_generation = \
+    fusion_reactor.create(state="energy_generation"). \
+      catch(signal=signals.INIT_SIGNAL,
+        handler=energy_generation_init). \
+      to_method()
+
+  fusion_and_heat_transfer = \
+    fusion_reactor.create(state="fusion_and_heat_transfer"). \
+      catch(signal=signals.ENTRY_SIGNAL,
+        handler=fusion_active_entry). \
+      catch(signal=signals.COOL_ENOUGH,
+        handler=fusion_active_cool_enough). \
+      to_method()
+
+  pending_on_pistons = \
+    fusion_reactor.create(state='pending_on_pistons'). \
+      catch(signal=signals.TIME_OUT,
+        handler=pending_on_pistons_timeout). \
+      catch(signal=signals.FIRE,
+        handler=fusion_and_heat_transfer_fire). \
+      to_method()
+
+  fusion_reactor.nest(fusion_active, parent=None). \
+    nest(energy_generation, parent=fusion_active). \
+    nest(fusion_and_heat_transfer, parent=energy_generation). \
+    nest(pending_on_pistons, parent=energy_generation)
+
+  fusion_reactor.start_at(fusion_active)
+
+  fusion_reactor.post_fifo(Event(signal=signals.TIME_OUT),
+                         times=21,
+                         period=0.1,
+                         deferred=False)
+  time.sleep(2.1)
+  print(fusion_reactor.trace())
+  # pp(fusion_reactor.pistons[0].spy())
+  # pp(fusion_reactor.pistons[1].spy())
+  print(fusion_reactor.pistons[1].trace())
 
 .. _patterns-transition-to-history:
 

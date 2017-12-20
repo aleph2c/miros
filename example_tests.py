@@ -1159,6 +1159,7 @@ def composite_pattern_1():
       self.number                  = number
       self.count                   = 0
       self.armed                   = False
+      self.name                    = "piston_"+str(self.number)
 
   # This is the piston's HSM, it will be shared by all pistons
   @spy_on
@@ -1297,22 +1298,23 @@ def composite_pattern_1():
         Event(signal=signals.FIRE))
     return status
 
-  def fusion_active_fire_primed(reactor, e):
+  def fusion_active_cool_enough(reactor, e):
     status = reactor.trans(pending_on_pistons)
     return status
 
-  def fusion_waiting_time_out(reactor, e):
+  def pending_on_pistons_timeout(reactor, e):
     status = return_status.HANDLED
     all_ready = True
     for piston in reactor.pistons:
       piston.dispatch(e)
       all_ready &= piston.armed
     if all_ready:
-      status = reactor.trans(fusion_and_heat_transfer)
+      reactor.post_fifo(Event(signal=signals.FIRE))
+      status = return_status.HANDLED
     return status
 
-  def fusion_waiting_fire(reactor, e):
-    status = return_status.HANDLED
+  def fusion_and_heat_transfer_fire(reactor, e):
+    status = reactor.trans(fusion_and_heat_transfer)
     return status
 
   # Create a fusion reactor object and its HSM
@@ -1341,15 +1343,15 @@ def composite_pattern_1():
       catch(signal=signals.ENTRY_SIGNAL,
         handler=fusion_active_entry). \
       catch(signal=signals.COOL_ENOUGH,
-        handler=fusion_active_fire_primed). \
+        handler=fusion_active_cool_enough). \
       to_method()
 
   pending_on_pistons = \
     fusion_reactor.create(state='pending_on_pistons'). \
       catch(signal=signals.TIME_OUT,
-        handler=fusion_waiting_time_out). \
+        handler=pending_on_pistons_timeout). \
       catch(signal=signals.FIRE,
-        handler=fusion_waiting_time_out). \
+        handler=fusion_and_heat_transfer_fire). \
       to_method()
 
   fusion_reactor.nest(fusion_active, parent=None). \
@@ -1360,10 +1362,10 @@ def composite_pattern_1():
   fusion_reactor.start_at(fusion_active)
 
   fusion_reactor.post_fifo(Event(signal=signals.TIME_OUT),
-                         times=100,
+                         times=21,
                          period=0.1,
                          deferred=False)
-  time.sleep(10)
+  time.sleep(2.1)
   print(fusion_reactor.trace())
   # pp(fusion_reactor.pistons[0].spy())
   # pp(fusion_reactor.pistons[1].spy())
