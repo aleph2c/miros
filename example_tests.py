@@ -1540,8 +1540,7 @@ if __name__ == '__main__':
   # reminder2()
   # reminder3()
   # deferred1()
-  #composite_pattern_1()
+  # composite_pattern_1()
   history_1()
-
 
 

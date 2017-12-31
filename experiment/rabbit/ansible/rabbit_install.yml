@@ -1,0 +1,69 @@
+---
+- hosts: scotty
+  vars:
+    python_packages_to_install:
+      - pika
+
+    rabbit_name: bob
+    rabbit_password: dobbs
+    rabbit_tags:
+      - administrator
+    guest_password: rabbit123
+
+
+  tasks:
+   - name: Install rabbitmq-server
+     become: true
+     apt: name={{ item }} state=present update_cache=false
+     with_items:
+       - erlang
+       - rabbitmq-server
+
+   - name: Remove user
+     become: true 
+     shell: rabbitmqctl delete_user {{rabbit_name}}
+     ignore_errors: True
+
+   - name: Create a user with password
+     become: true 
+     shell: rabbitmqctl add_user {{rabbit_name}} {{rabbit_password}}
+     ignore_errors: True
+
+   - name: Assign a tag to the user
+     become: true 
+     shell: "rabbitmqctl set_user_tags {{rabbit_name}} {{rabbit_tags | join(' ')}}"
+     ignore_errors: True
+
+   - name: Set permissions
+     become: true
+     shell: rabbitmqctl set_permissions -p / {{rabbit_name}} ".*" ".*" ".*"
+     ignore_errors: True
+  
+   - name: Change default admin password
+     become: true
+     shell: rabbitmqctl change_password guest {{guest_password}}
+     ignore_errors: True
+
+   - name: Setup environment variables
+     become: true
+     template:
+       src: ./rabbitmq-env.conf.j2
+       dest: /etc/rabbitmq/rabbitmq-env.conf
+       mode: 644
+
+   - name: Setup configuration file
+     become: true
+     template:
+       src: ./rabbitmq.config.j2
+       dest: /etc/rabbitmq/rabbitmq.config
+       mode: 644
+
+   - name: Enable the management plugin
+     become: true
+     shell: rabbitmq-plugins enable rabbitmq_management
+     ignore_errors: True
+
+   - name: Restart the rabbitmq-server service
+     become: true
+     shell: sudo service rabbitmq-server restart
+     ignore_errors: True
