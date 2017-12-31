@@ -2764,12 +2764,13 @@ back into the off state, the design works.
 
 Multichart Race
 ^^^^^^^^^^^^^^^
-
+:ref:`setting up rabbit mq<setting_up_rabbit_mq-setting-up-rabbit-mq>`
 
 .. _patterns-multichart-pend:
 
 Multichart Pend
 ^^^^^^^^^^^^^^^
+:ref:`setting up rabbit mq<setting_up_rabbit_mq-setting-up-rabbit-mq>`
 
 :ref:`Next topic<testing-testing>`.
 
