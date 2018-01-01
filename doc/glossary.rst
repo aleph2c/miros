@@ -409,6 +409,21 @@ Glossary
       be used on a factory state method to turn it back into a flat state
       method.
 
+   DRY
+      "Do Not Repeat Yourself": A software best-practice for reducing the
+      maintence cost of your software system.
+
+   YAML
+      Yet Another Markup Language.  This is a plain text file with the
+      extension yml or yaml.  It was constructed as a reaction against XML.
+      XML was too difficult to read and format, so YAML was invented to make
+      configurations easy to read and edit.  (YAML files are largely hated by
+      MINECRAFT admistrators.)
+
+   JINJA2
+      Jinja_ is a templating language written by Armin Ronacher.
+
 
 .. _Extended state: https://en.wikipedia.org/wiki/UML_state_machine#Extended_states
 .. _Sequence: https://github.com/aleph2c/sequence
+.. _Jinja: http://jinja.pocoo.org/
