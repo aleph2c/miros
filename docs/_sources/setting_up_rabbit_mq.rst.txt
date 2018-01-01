@@ -203,24 +203,24 @@ RPC                `simple RPC`_           - `networked rpc send`_
   messages across the network using the default user name, guest.  Also, the
   messages are not encrypted.
 
-.. _rabbit_install.yml: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/ansible/rabbit_install.yml
-.. _rabbit-env.conf.j2: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/ansible/rabbitmq-env.conf.j2
-.. _rabbitmq.config.j2: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/ansible/rabbitmq.config.j2
+.. _rabbit_install.yml: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbit_install.yml
+.. _rabbit-env.conf.j2: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbitmq-env.conf.j2
+.. _rabbitmq.config.j2: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbitmq.config.j2
 .. _simple hello world: https://www.rabbitmq.com/tutorials/tutorial-one-python.html
-.. _networked hello world send: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/a_send.py
-.. _networked hello world receive: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/a_receive.py
+.. _networked hello world send: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/a_send.py
+.. _networked hello world receive: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/a_receive.py
 .. _simple work queues: https://www.rabbitmq.com/tutorials/tutorial-two-python.html
-.. _networked work queues send: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/b_new_task.py
-.. _networked work queues receive: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/b_worker.py
+.. _networked work queues send: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/b_new_task.py
+.. _networked work queues receive: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/b_worker.py
 .. _simple pub-sub: https://www.rabbitmq.com/tutorials/tutorial-three-python.html
-.. _networked pub-sub send: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/c_emit_log_fanout.py
-.. _networked pub-sub receive: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/c_receive_logs_fanout.py
+.. _networked pub-sub send: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/c_emit_log_fanout.py
+.. _networked pub-sub receive: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/c_receive_logs_fanout.py
 .. _simple routing: https://www.rabbitmq.com/tutorials/tutorial-four-python.html
-.. _networked routing send: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/d_emit_log_direct.py
-.. _networked routing receive: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/d_receive_logs_direct.py
+.. _networked routing send: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/d_emit_log_direct.py
+.. _networked routing receive: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/d_receive_logs_direct.py
 .. _simple topic routing: https://www.rabbitmq.com/tutorials/tutorial-five-python.html
-.. _networked topic routing send: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/e_emit_log_topic.py
-.. _networked topic routing receive: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/e_receive_logs_topic.py
+.. _networked topic routing send: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/e_emit_log_topic.py
+.. _networked topic routing receive: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/e_receive_logs_topic.py
 .. _simple RPC: https://www.rabbitmq.com/tutorials/tutorial-six-python.html
-.. _networked rpc send: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/f_rpc_client.py
-.. _networked rpc receive: https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/f_rpc_server.py
+.. _networked rpc send: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/f_rpc_client.py
+.. _networked rpc receive: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/f_rpc_server.py

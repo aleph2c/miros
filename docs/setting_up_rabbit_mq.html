@@ -146,13 +146,13 @@ be used by Ansible:</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>The deployment <span class="xref std std-term">yml</span> script</td>
-<td><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/ansible/rabbit_install.yml">rabbit_install.yml</a></td>
+<td><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbit_install.yml">rabbit_install.yml</a></td>
 </tr>
 <tr class="row-odd"><td>The rabbitmq environment configuration</td>
-<td><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/ansible/rabbitmq-env.conf.j2">rabbit-env.conf.j2</a></td>
+<td><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbitmq-env.conf.j2">rabbit-env.conf.j2</a></td>
 </tr>
 <tr class="row-even"><td>The rabbitmq configuration</td>
-<td><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/ansible/rabbitmq.config.j2">rabbitmq.config.j2</a></td>
+<td><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbitmq.config.j2">rabbitmq.config.j2</a></td>
 </tr>
 </tbody>
 </table>
@@ -160,7 +160,7 @@ be used by Ansible:</p>
 <p>The only thing you should change is the <code class="docutils literal"><span class="pre">hosts</span></code> (which is set to scotty), the
 <code class="docutils literal"><span class="pre">rabbit_name</span></code> (bob), <code class="docutils literal"><span class="pre">rabbit_password</span></code> (dobbs) and the <code class="docutils literal"><span class="pre">guest_password</span></code>
 (rabbit123) to whatever you want.  These variables are found in the
-<a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/ansible/rabbit_install.yml">rabbit_install.yml</a> file.</p>
+<a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbit_install.yml">rabbit_install.yml</a> file.</p>
 <p>Now to setup your RabbitMQ server, type:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">K</span> <span class="n">rabbit_install</span><span class="o">.</span><span class="n">yml</span>
 </pre></div>
@@ -170,7 +170,7 @@ rabbitmq server should be setup.</p>
 <p>To see if your server is running, you can open the management software that
 comes with it via their web app, by typing <code class="docutils literal"><span class="pre">localhost:15672</span></code> and log in with your
 user name and password, if you didn’t change this in the
-<a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/ansible/rabbit_install.yml">rabbit_install.yml</a> file, your user name will be <code class="docutils literal"><span class="pre">bob</span></code> and the password will
+<a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbit_install.yml">rabbit_install.yml</a> file, your user name will be <code class="docutils literal"><span class="pre">bob</span></code> and the password will
 be <code class="docutils literal"><span class="pre">dobbs</span></code>:</p>
 <img alt="_images/RabbitMQ.PNG" class="align-center" src="_images/RabbitMQ.PNG" />
 <p>If you have come this far you have a working RabbitMQ message broker running on
@@ -199,48 +199,48 @@ tutorials, then use my code to see how to make it work across a network:</p>
 <tr class="row-even"><td>Hello World</td>
 <td><a class="reference external" href="https://www.rabbitmq.com/tutorials/tutorial-one-python.html">simple hello world</a></td>
 <td><ul class="first last simple">
-<li><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/a_send.py">networked hello world send</a></li>
-<li><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/a_receive.py">networked hello world receive</a></li>
+<li><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/a_send.py">networked hello world send</a></li>
+<li><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/a_receive.py">networked hello world receive</a></li>
 </ul>
 </td>
 </tr>
 <tr class="row-odd"><td>Work Queues</td>
 <td><a class="reference external" href="https://www.rabbitmq.com/tutorials/tutorial-two-python.html">simple work queues</a></td>
 <td><ul class="first last simple">
-<li><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/b_new_task.py">networked work queues send</a></li>
-<li><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/b_worker.py">networked work queues receive</a></li>
+<li><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/b_new_task.py">networked work queues send</a></li>
+<li><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/b_worker.py">networked work queues receive</a></li>
 </ul>
 </td>
 </tr>
 <tr class="row-even"><td>Publish/Subscribe</td>
 <td><a class="reference external" href="https://www.rabbitmq.com/tutorials/tutorial-three-python.html">simple pub-sub</a></td>
 <td><ul class="first last simple">
-<li><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/c_emit_log_fanout.py">networked pub-sub send</a></li>
-<li><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/c_receive_logs_fanout.py">networked pub-sub receive</a></li>
+<li><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/c_emit_log_fanout.py">networked pub-sub send</a></li>
+<li><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/c_receive_logs_fanout.py">networked pub-sub receive</a></li>
 </ul>
 </td>
 </tr>
 <tr class="row-odd"><td>Routing</td>
 <td><a class="reference external" href="https://www.rabbitmq.com/tutorials/tutorial-four-python.html">simple routing</a></td>
 <td><ul class="first last simple">
-<li><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/d_emit_log_direct.py">networked routing send</a></li>
-<li><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/d_receive_logs_direct.py">networked routing receive</a></li>
+<li><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/d_emit_log_direct.py">networked routing send</a></li>
+<li><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/d_receive_logs_direct.py">networked routing receive</a></li>
 </ul>
 </td>
 </tr>
 <tr class="row-even"><td>Topic Routing</td>
 <td><a class="reference external" href="https://www.rabbitmq.com/tutorials/tutorial-five-python.html">simple topic routing</a></td>
 <td><ul class="first last simple">
-<li><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/e_emit_log_topic.py">networked topic routing send</a></li>
-<li><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/e_receive_logs_topic.py">networked topic routing receive</a></li>
+<li><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/e_emit_log_topic.py">networked topic routing send</a></li>
+<li><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/e_receive_logs_topic.py">networked topic routing receive</a></li>
 </ul>
 </td>
 </tr>
 <tr class="row-odd"><td>RPC</td>
 <td><a class="reference external" href="https://www.rabbitmq.com/tutorials/tutorial-six-python.html">simple RPC</a></td>
 <td><ul class="first last simple">
-<li><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/f_rpc_client.py">networked rpc send</a></li>
-<li><a class="reference external" href="https://github.com/aleph2c/py-activeobject/blob/master/experiment/rabbit/f_rpc_server.py">networked rpc receive</a></li>
+<li><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/f_rpc_client.py">networked rpc send</a></li>
+<li><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/f_rpc_server.py">networked rpc receive</a></li>
 </ul>
 </td>
 </tr>
