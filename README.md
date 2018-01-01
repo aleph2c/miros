@@ -1,6 +1,4 @@
-This is a python statecharts library.
-
-To install:
+To install this python statechart's library:
   
     pip3 install miros
 
