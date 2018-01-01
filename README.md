@@ -1,4 +1,7 @@
-This software is not ready yet, it is going to be the replacement code used by
-the miros library re-write.
+This is a python statecharts library.
 
-[link to documentation on github pages](https://aleph2c.github.io/miros/index.html)
+To install:
+  
+  pip install miros
+
+The full documentation can be found [here](https://aleph2c.github.io/miros/index.html)
