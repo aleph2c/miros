@@ -30,15 +30,17 @@ channel = connection.channel()
 # if this queue already exists this call will not do anything
 channel.queue_declare(queue='task_queue', durable=True)
 
-message = ' '.join(sys.argv[1:]) or "Hello World!"
+simple_trace = ['11:35:20.470871 [01352] WaitComplete: outer->inner',
+                '11:35:20.469870 [01352] WaitComplete: inner->inner']
 
-#
-channel.basic_publish(exchange='',
-    routing_key='task_queue',
-    body=message,
-    properties=pika.BasicProperties(
-      delivery_mode=2,  # make message persistent
-    ))
+# Send our trace and print what we sent
+for trace_item in simple_trace:
+  channel.basic_publish(exchange='',
+      routing_key='task_queue',
+      body=trace_item,
+      properties=pika.BasicProperties(
+        delivery_mode=2,  # make message persistent
+      ))
+  print(" [x] Sent: {}".format(trace_item))
 
-print(" [x] Sent {}".format(message))
 connection.close()
