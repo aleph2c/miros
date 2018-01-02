@@ -2,42 +2,79 @@
 
 = Observe =
   *What defines Success?*
-  
-  *Notes:*
-  statecharts = state-diagrams + depth + orthogonality +
-                broadcast-communications + time 
- 
-  1) "in all airborne state, when yellow handle is pulled seat will be ejected"
-  2) "gearbox change state is independent of breaking system"
-  3) "when selection button is pressed enter selected mode"
-  4) "display-mode consists of time-display, data-display and stopwatch-display"
 
-  1 calls for ability to cluster events into super states
-  2 introduces the idea of independence or orthogonality
-  3 more general transition than a signal event-labelled arrow[?]
-  4 captures the refinement of states[?]
-  
-  The idea of zooming ... Focusing into the detail of an aspect of the system.
-  Even though I know what they are talking about, the paper is hard to read.
-  
-  By using this library you are in better shape to use the quantum programming
-  library, since it is using the same concepts and similar event processor.
-  
-  In the writing talk about cognitive load
-  
-  
-  An understandable heart to the miros python package
-  * [.] High Level Project List
-    * [ ] Add Pattern Support (with and without the factory)
-      * [ ] Multi-Chart Race
-      * [ ] Multi-Chart Pend
-    * [ ] Figure out how to send a trace/spy stream across the network using rabbitmq
-      * [ ] clone repo onto pi
-    * [X] Get all rabbit patterns working on both windows and Linux
-    * [ ] Understand more about acks
+  Two statecharts running on different machines can have their trace/spy
+  information reported together on one machine:
+
+    # standard spy and trace should work
+    pp(ao.spy)
+    pp(fao.spy)      # spy from other machine
+    print(oa.trace)
+    print(foa.trace) # trace from other machine
+
+    # live output should work to
+    ao.live_spy = True
+    fao.live_spy = True   # live spy information from other machine
+    ao.live_trace = True
+    fao.live_trace = True # live trace information from other machine
+
+
+  *What is the problem?*
+
+  Miros doesn't support networking.  So to make this work we will use rabbitmq
+  and pika to handle the networking.
+
+  There will need to be a network shim that forwards messages to the miros
+  library.
+
+  *Evidence that contradicts Assumptions:*
+
+= Orient =
+  *Symptoms of current issue:*
+
+  *Questions regarding current issue:*
+
+  *Assumptions:*
+
+= Decide =
+  *Idea/Hypothesises: >=5*
+  * [ ] Construct a version of the rabbitmq example that sends messages from one
+        computer to another
+  * [ ] From the source computer, add a statechart, then have it's trace/spy
+        live output send information over rabbitmq.  Confirm this can be seen on
+        another computer.
+  * [ ] Link in the foreign hsm object to this stream of information, the
+        foreign hsm object will only be providing an iterface that looks the
+        same as any object which is derived from an ancestor of the
+        HsmEventProcessor
+  * [ ] On the source machine, follow a similar pattern so that both statecharts
+        can talk to each other.
+  * [ ] Iterate on the designs to simplify them
+  * [ ] Write up the results in your docs -- example or pattern information
+
+  *Chosen Idea/Hypothesis*
+  * Construct a version of the rabbitmq example that sends messages from one
+    computer to another.
+
+  *Plan to Expand-on-Idea/Disprove-Hypothesis*
+    * use example b, since this is a point to point example where we need the
+      messages coming in.
+    * copy example b into the examples folder
+    * commit/push
+    * one differnt computers get it working
+    * slowly change the send/receive code until it is ready for the next step
+
+= Act =
+
+= Up Coming =
+
+  *Backlog*
     * [ ] Figure out how to draw a network connection with rabbitmq using UML
-    * [ ] Each example should have it's own code which will be linked to in the
-          docs
+    * [ ] Spec to diagram
+    * [ ] diagram sematics
+    * [ ] examples directory containing one file for each example/pattern
+    * [ ] Multi-Chart Race
+    * [ ] Multi-Chart Pend
 
   *Weird and Fun Ideas*
     * [ ] Add statistics
@@ -47,15 +84,15 @@
     * [ ] Self organizing criticality
     * [ ] The devil's staircase
     * [ ] Turn on/off spy within a subset of the chart [recipe]
-  
+
   *House Keeping:*
     * [ ] Make sure all examples are working in example file
     * [ ] Move examples into their own files for download
-          
+
   *Someday Maybe*
     * [ ] Encrypt rabbit messages
     * [ ] Link IP addresses to URL's (on the cheap)
-  
+
   *Resources:*
   Setting up a python project is needlessly complicated, but here are the steps:
   * [ ] Move your production files into a subdirectory, named after your project
@@ -75,24 +112,3 @@
         from your package.  Test it with > pytest, confirm failure from assert
         not an import error.
   * [ ] Wrestle with it until it works.
-
-  *What is the problem?*
-
-  *Evidence that contradicts Assumptions:*
-
-= Orient =
-  *Symptoms of current issue:*
-  
-  *Questions regarding current issue:*
-
-  *Assumptions:*
-
-= Decide =
-  *Idea/Hypothesises: >=5*
-
-  *Chosen Idea/Hypothesis*
-
-  *Plan to Expand-on-Idea/Disprove-Hypothesis*
-
-= Act =
-
