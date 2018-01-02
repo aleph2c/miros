@@ -44,19 +44,22 @@ channel = connection.channel()
 channel.queue_declare(queue='task_queue', durable=True)
 print(' [*] Waiting for message. To exit press CTRL+C')
 
+
 # create a callback function received messages in the queue
 def callback(ch, method, properties, body):
   print(" [x]  Received {!s}".format(body.decode('utf8')))
   print("sleeping for {}".format(body.count(b'.')))
   time.sleep(body.count(b'.'))
   print(" [x] Done")
+  # the delivery tags are monotonically growing positive
+  # integers scoped on a channel
   ch.basic_ack(delivery_tag = method.delivery_tag)
+
 
 channel.basic_qos(prefetch_count=1)
 
 # register the callback with a queue
-channel.basic_consume(callback,
-  queue='task_queue')
+channel.basic_consume(callback, queue='task_queue')
 
 # patiently wait forever
 channel.start_consuming()

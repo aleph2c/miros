@@ -11,7 +11,7 @@ import socket
 
   Demonstrates:
     * Hello world
-     
+
   Monitoring:
     * to view the results with the RabbitMQ manager:
     <hostname>:15672 in browser
@@ -19,6 +19,8 @@ import socket
     where <hostname> is the results of your hostname command
 
 '''
+
+
 def get_ip():
   s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
   try:
@@ -31,29 +33,33 @@ def get_ip():
     s.close()
   return IP
 
+
 def hostname():
   return socket.gethostname()
+
 
 # connection
 def connection_using_basic_parameters():
   credentials = pika.PlainCredentials('bob', 'dobbs')
-  parameters = pika.ConnectionParameters(hostname(), 5672, '/', credentials)
+  parameters = pika.ConnectionParameters(get_ip(), 5672, '/', credentials)
   connection = pika.BlockingConnection(parameters=parameters)
   return connection
 
+
 def connection_using_url_parameters():
   credentials = {
-      'protocol':'amqp',
-      'user_name':'bob',
-      'password':'dobbs',
-      'hostname':hostname(),
-      'port':'5672',
-      'virtual_host':'/'}
+      'protocol': 'amqp',
+      'user_name': 'bob',
+      'password': 'dobbs',
+      'hostname': hostname(),
+      'port': '5672',
+      'virtual_host': '/'}
   url = \
     "{protocol}://{user_name}:{password}@{hostname}:{port}/%2F".format(**credentials)
   parameters = pika.URLParameters(url)
   connection = pika.BlockingConnection(parameters=parameters)
   return connection
+
 
 connection = connection_using_url_parameters()
 channel = connection.channel()
@@ -61,9 +67,11 @@ channel = connection.channel()
 # if the queue already exists this call will do nothing
 channel.queue_declare(queue='hello')
 
+
 # create a callback function received messages in the queue
 def callback(ch, method, properties, body):
   print(" [x]  Received {}".format(body.decode('utf8')))
+
 
 # register the callback with a queue
 channel.basic_consume(callback,

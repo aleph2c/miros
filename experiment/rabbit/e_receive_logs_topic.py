@@ -8,10 +8,10 @@ import socket
     Receives all messages routed via topic (set from cli) emitted from "e_emit_log_topic.py"
     1) start up a couple of e_receive_logs_topic.py sessions with different
        routes:
-    > python3 e_receive_logs_topic.py "#" 
-    > python3 e_receive_logs_topic.py "kern.*" 
-    > python3 e_receive_logs_topic.py "*.critical" 
-    > python3 e_receive_logs_topic.py "kern.*" ".critical" 
+    > python3 e_receive_logs_topic.py "#"
+    > python3 e_receive_logs_topic.py "kern.*"
+    > python3 e_receive_logs_topic.py "*.critical"
+    > python3 e_receive_logs_topic.py "kern.*" ".critical"
 
     2) send routed topic messages:
 
