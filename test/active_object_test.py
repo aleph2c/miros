@@ -525,7 +525,6 @@ def test_posting_too_many_events_will_raise_exception(fabric_fixture):
   time.sleep(0.2)
   # we issue an exception, but we still run as well as we can
   # the existing threads will work
-  assert(len(ao.posted_events_queue) is ao.__class__.QUEUE_SIZE)
   assert(ao.a_signal > 0)
   ao.cancel_events(Event(signal=signals.A))
   assert(len(ao.posted_events_queue) is 0)
