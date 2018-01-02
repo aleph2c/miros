@@ -47,12 +47,7 @@ print(' [*] Waiting for message. To exit press CTRL+C')
 
 # create a callback function received messages in the queue
 def callback(ch, method, properties, body):
-  print(" [x]  Received {!s}".format(body.decode('utf8')))
-  print("sleeping for {}".format(body.count(b'.')))
-  time.sleep(body.count(b'.'))
-  print(" [x] Done")
-  # the delivery tags are monotonically growing positive
-  # integers scoped on a channel
+  print(" [x] Received: {!s}".format(body.decode('utf8')))
   ch.basic_ack(delivery_tag = method.delivery_tag)
 
 
