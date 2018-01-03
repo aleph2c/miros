@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from miros.singletlon import SingletonDecorator
+from miros.singleton import SingletonDecorator
 
 
 # Not intended for export
