@@ -18,8 +18,8 @@
 
 '''
 import pika
-import time
 import socket
+
 
 # Taken from Jamieson Becker
 def get_ip():
@@ -34,6 +34,7 @@ def get_ip():
     s.close()
   return IP
 
+
 # create a connection and a channel
 credentials = pika.PlainCredentials('bob', 'dobbs')
 parameters = pika.ConnectionParameters(get_ip(), 5672, '/', credentials)
@@ -41,20 +42,28 @@ connection = pika.BlockingConnection(parameters=parameters)
 channel = connection.channel()
 
 # if the queue already exists this call will do nothing
-channel.queue_declare(queue='task_queue', durable=True)
+channel.queue_declare(queue='spy_queue', durable=True)
+channel.queue_declare(queue='trace_queue', durable=True)
 print(' [*] Waiting for message. To exit press CTRL+C')
 
 
-# create a callback function received messages in the queue
-def callback(ch, method, properties, body):
-  print(" [x] Received: {!s}".format(body.decode('utf8')))
+# create a spy_callback function received messages in the queue
+def spy_callback(ch, method, properties, body):
+  print(" [x] {!s}".format(body.decode('utf8')))
+  ch.basic_ack(delivery_tag = method.delivery_tag)
+
+
+# create a trace_callback function received messages in the queue
+def trace_callback(ch, method, properties, body):
+  print(" [x] Trace: {!s}".format(body.decode('utf8')))
   ch.basic_ack(delivery_tag = method.delivery_tag)
 
 
 channel.basic_qos(prefetch_count=1)
 
-# register the callback with a queue
-channel.basic_consume(callback, queue='task_queue')
+# register the spy_callback with a queue
+channel.basic_consume(spy_callback,   queue='spy_queue')
+channel.basic_consume(trace_callback, queue='trace_queue')
 
 # patiently wait forever
 channel.start_consuming()
