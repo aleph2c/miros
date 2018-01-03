@@ -21,11 +21,12 @@ setup(
     tests_require=['pytest'],
 
     name='miros',
+    py_modules=['miros'],
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='2.0.1',
+    version='2.0.2',
 
     description='A statechart library for Python',
     long_description=long_description,
@@ -67,4 +68,5 @@ setup(
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
     packages=find_packages(exclude=['docs', 'test', 'experiment', 'prot', 'wsl', 'plan']),
+
 )
