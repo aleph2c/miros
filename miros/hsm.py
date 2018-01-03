@@ -1124,6 +1124,23 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     self.live_trace  = False
     self.name        = None
 
+    self.live_spy_callback   = self.__class__.live_spy_callback_default
+    self.live_trace_callback = self.__class__.live_trace_callback_default
+
+  @staticmethod
+  def live_spy_callback_default(spy_line):
+    print(spy_line)
+
+  @staticmethod
+  def live_trace_callback_default(trace_line):
+    print(trace_line)
+
+  def register_live_spy_callback(self, live_spy_callback):
+    self.live_spy_callback = live_spy_callback
+
+  def register_live_trace_callback(self, live_trace_callback):
+    self.live_trace_callback = live_trace_callback
+
   def print_spy_after_at_start_if_live(fn):
     @wraps(fn)
     def _print_spy_if_live(self, initial_state):
@@ -1131,7 +1148,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       result = fn(self, initial_state)
       if self.instrumented and self.live_spy:
         for line in self.rtc.spy:
-          print(line)
+          self.live_spy_callback(line)
       return result
     return _print_spy_if_live
 
@@ -1162,7 +1179,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
         strace = "\n"
         tr = self.full.trace[-1]
         strace  += self.trace_tuple_to_formatted_string(tr)
-        print(strace)
+        self.live_trace_callback(strace)
       return result
     return _print_trace_if_live
 
@@ -1173,7 +1190,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       result = fn(self)
       if self.instrumented and self.live_spy:
         for line in list(self.rtc.spy):
-          print(line)
+          self.live_spy_callback(line)
       return result
     return _print_spy_if_live
 
@@ -1186,7 +1203,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
         strace = "\n"
         tr = self.full.trace[-1]
         strace += self.trace_tuple_to_formatted_string(tr)
-        print(strace)
+        self.live_trace_callback(strace)
       return result
     return _print_trace_if_live
 
