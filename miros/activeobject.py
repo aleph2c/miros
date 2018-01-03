@@ -14,7 +14,7 @@ from functools   import wraps
 from miros.hsm   import HsmWithQueues
 from miros.event import signals, Signal
 from miros.event import Event as HsmEvent
-from miros.singletlon import SingletonDecorator
+from miros.singleton import SingletonDecorator
 
 
 def pp(item):
