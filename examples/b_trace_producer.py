@@ -41,17 +41,16 @@ class RabbitProducer(Factory):
     self.channel.queue_declare(queue='spy_queue', durable=True)
     self.channel.queue_declare(queue='trace_queue', durable=True)
 
-    def encrypt(self, plain_text_string):
+    def encrypt( plain_text_string):
       key = b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
       f = Fernet(key)
       cyphertext = f.encrypt(plain_text_string.encode())
-      cyphertext = plain_text_string.encode()
       return cyphertext
 
     def live_spy_callback_rabbit(spy_live):
       self.channel.basic_publish(exchange='',
           routing_key='spy_queue',
-          body=self.encrypt(spy_live),
+          body=encrypt(spy_live),
           properties=pika.BasicProperties(
             delivery_mode=2,  # make message persistent
           ))
@@ -60,7 +59,7 @@ class RabbitProducer(Factory):
       trace = trace_live.replace('\n', '')
       self.channel.basic_publish(exchange='',
           routing_key='trace_queue',
-          body=self.encrypt(trace),
+          body=encrypt(trace),
           properties=pika.BasicProperties(
             delivery_mode=2,  # make message persistent
           ))
