@@ -1,71 +1,61 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="14.2">
-  <zoom_level>10</zoom_level>
+  <zoom_level>8</zoom_level>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>530</x>
-      <y>120</y>
-      <w>220</w>
-      <h>100</h>
+      <x>456</x>
+      <y>112</y>
+      <w>176</w>
+      <h>184</h>
     </coordinates>
-    <panel_attributes>ao1 = ActiveObject()
+    <panel_attributes>*RabbitProducer*
+--
+rabbit_user
+--
+rabbit_password
+--
+destination_ip
+--
+destination_port
+--
+connection
+--
+channel
+--
+
 valign=top</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>530</x>
-      <y>200</y>
-      <w>130</w>
-      <h>130</h>
+      <x>472</x>
+      <y>272</y>
+      <w>80</w>
+      <h>80</h>
     </coordinates>
     <panel_attributes>lt=[^]-(</panel_attributes>
-    <additional_attributes>110.0;10.0;20.0;100.0</additional_attributes>
+    <additional_attributes>80.0;10.0;20.0;70.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>540</x>
-      <y>310</y>
-      <w>30</w>
-      <h>70</h>
+      <x>480</x>
+      <y>336</y>
+      <w>24</w>
+      <h>64</h>
     </coordinates>
     <panel_attributes>lt=()-[v]</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
   </element>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>540</x>
-      <y>150</y>
-      <w>200</w>
-      <h>60</h>
-    </coordinates>
-    <panel_attributes>symbol=component
-Event Processor</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLObject</id>
-    <coordinates>
-      <x>760</x>
-      <y>120</y>
-      <w>220</w>
-      <h>100</h>
-    </coordinates>
-    <panel_attributes>ao2 = ActiveObject()
-valign=top</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLGeneric</id>
-    <coordinates>
-      <x>770</x>
-      <y>150</y>
-      <w>200</w>
-      <h>60</h>
+      <x>464</x>
+      <y>240</y>
+      <w>160</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>symbol=component
 Event Processor</panel_attributes>
@@ -74,17 +64,15 @@ Event Processor</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>510</x>
-      <y>350</y>
-      <w>520</w>
-      <h>250</h>
+      <x>456</x>
+      <y>376</y>
+      <w>304</w>
+      <h>192</h>
     </coordinates>
     <panel_attributes>producer_outer
 --
 entry / 
-	# set up rabbitmq
-	
-exit / # call c's exit code
+exit /
 
 valign=top
 </panel_attributes>
@@ -93,10 +81,10 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>580</x>
-      <y>470</y>
-      <w>110</w>
-      <h>100</h>
+      <x>512</x>
+      <y>464</y>
+      <w>88</w>
+      <h>80</h>
     </coordinates>
     <panel_attributes>c1
 --
@@ -110,10 +98,10 @@ valign=top
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>550</x>
-      <y>470</y>
-      <w>20</w>
-      <h>20</h>
+      <x>488</x>
+      <y>464</y>
+      <w>16</w>
+      <h>16</h>
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -121,10 +109,10 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>550</x>
-      <y>480</y>
-      <w>50</w>
-      <h>60</h>
+      <x>488</x>
+      <y>472</y>
+      <w>40</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>lt=-&gt;</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;40.0;30.0;40.0</additional_attributes>
@@ -132,10 +120,10 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>830</x>
-      <y>470</y>
-      <w>120</w>
-      <h>100</h>
+      <x>640</x>
+      <y>464</y>
+      <w>96</w>
+      <h>80</h>
     </coordinates>
     <panel_attributes>c2
 --
@@ -149,94 +137,144 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>680</x>
-      <y>480</y>
-      <w>170</w>
-      <h>40</h>
+      <x>592</x>
+      <y>472</y>
+      <w>64</w>
+      <h>32</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 A</panel_attributes>
-    <additional_attributes>10.0;20.0;150.0;20.0</additional_attributes>
+    <additional_attributes>10.0;20.0;60.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>680</x>
-      <y>520</y>
-      <w>170</w>
-      <h>40</h>
+      <x>592</x>
+      <y>504</y>
+      <w>64</w>
+      <h>32</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 A</panel_attributes>
-    <additional_attributes>150.0;20.0;10.0;20.0</additional_attributes>
+    <additional_attributes>60.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>620</x>
-      <y>590</y>
-      <w>230</w>
-      <h>50</h>
+      <x>504</x>
+      <y>560</y>
+      <w>184</w>
+      <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 B</panel_attributes>
     <additional_attributes>210.0;10.0;210.0;30.0;10.0;30.0;10.0;10.0</additional_attributes>
   </element>
   <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>910</x>
-      <y>310</y>
-      <w>30</w>
-      <h>190</h>
-    </coordinates>
-    <panel_attributes>lt=()-[v]</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;170.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>860</x>
-      <y>200</y>
-      <w>90</w>
-      <h>130</h>
-    </coordinates>
-    <panel_attributes>lt=[^]-(</panel_attributes>
-    <additional_attributes>10.0;10.0;60.0;100.0</additional_attributes>
-  </element>
-  <element>
     <id>Text</id>
     <coordinates>
-      <x>580</x>
-      <y>260</y>
-      <w>200</w>
-      <h>30</h>
+      <x>512</x>
+      <y>320</y>
+      <w>160</w>
+      <h>24</h>
     </coordinates>
-    <panel_attributes>ao1.start_at(producer_outer)
+    <panel_attributes>chart.start_at(producer_outer)
 style=wordwrap</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>910</x>
-      <y>260</y>
-      <w>120</w>
-      <h>30</h>
+      <x>760</x>
+      <y>400</y>
+      <w>104</w>
+      <h>48</h>
     </coordinates>
-    <panel_attributes>ao2.start_at(c2)
+    <panel_attributes>Encrypted spy to
+destination ip/port
+via AMQP
 style=wordwrap</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>512</x>
+      <y>64</y>
+      <w>64</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>/Factory/
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>592</x>
+      <y>64</y>
+      <w>80</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>/Active Object/
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>568</x>
+      <y>72</y>
+      <w>40</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>30.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>480</x>
+      <y>72</y>
+      <w>48</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>40.0;10.0;10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>752</x>
+      <y>512</y>
+      <w>128</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;140.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>752</x>
+      <y>440</y>
+      <w>128</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;140.0;10.0</additional_attributes>
+  </element>
+  <element>
     <id>Text</id>
     <coordinates>
-      <x>380</x>
-      <y>340</y>
-      <w>100</w>
-      <h>70</h>
+      <x>760</x>
+      <y>472</y>
+      <w>112</w>
+      <h>48</h>
     </coordinates>
-    <panel_attributes>This is a text element to place text anywhere.
+    <panel_attributes>Encrypted Trace to
+destination ip/port
+via AMQP
 style=wordwrap</panel_attributes>
     <additional_attributes/>
   </element>
