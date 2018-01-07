@@ -53,15 +53,16 @@ print(' [*] Waiting for message. To exit press CTRL+C')
 
 foreign_hsm = ForeignHsm()
 
+
 def decrypt(cyphertext):
   key = b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
   f = Fernet(key)
   plain_text = f.decrypt(cyphertext).decode()
   return plain_text
-  
 
-# create a spy_callback function received messages in the queue
+
 def spy_callback(ch, method, properties, body):
+  '''create a spy_callback function received messages in the queue'''
   global foreign_hsm
   foreign_spy_item = decrypt(body)
   foreign_hsm.append_to_spy(foreign_spy_item)
@@ -69,8 +70,8 @@ def spy_callback(ch, method, properties, body):
   ch.basic_ack(delivery_tag = method.delivery_tag)
 
 
-# create a trace_callback function received messages in the queue
 def trace_callback(ch, method, properties, body):
+  '''create a trace_callback function received messages in the queue'''
   global foreign_hsm
   foreign_trace_item = decrypt(body)
   foreign_hsm.append_to_trace(foreign_trace_item)
