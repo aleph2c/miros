@@ -40,7 +40,6 @@ class RabbitProducer(Factory):
     self.connection = pika.BlockingConnection(parameters=parameters)
     
     self.channel = self.connection.channel()
-    self.channel.exchange_declare(exchange='hsm_broadcast', exchange_type='fanout')
     self.channel.queue_declare(queue='spy_queue', durable=True)
     self.channel.queue_declare(queue='trace_queue', durable=True)
 
@@ -48,9 +47,7 @@ class RabbitProducer(Factory):
       @wraps(fn)
       def _strip_trace(trace_live):
 
-        trace_live = trace_live.replace("/n", "")
-        import pdb; pdb.set_trace()
-        #encrypt
+        trace_live = trace_live.replace("\n", "")
         fn(trace_live)
       return _strip_trace
 
