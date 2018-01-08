@@ -39,9 +39,20 @@ class LocalConsumer():
     parameters           = pika.ConnectionParameters(LocalConsumer.get_ip(), 5672, '/', credentials)
     self.connection      = pika.BlockingConnection(parameters=parameters)
     self.channel         = self.connection.channel()
+    self.channel.exchange_declare(exchange='spy', exchange_type='fanout')
+    self.channel.exchange_declare(exchange='trace', exchange_type='fanout')
+
+    # delete queues when we disconnect from them
+    spy_result = self.channel.queue_declare(exclusive=True)
+    trace_result = self.channel.queue_declare(exclusive=True)
+
+    spy_queue_name = spy_result.method.queue
+    trace_queue_name = trace_result.method.queue
+    self.channel.queue_bind(exchange='spy', queue=spy_queue_name)
+    self.channel.queue_bind(exchange='trace', queue=trace_queue_name)
 
     # keep a count so we can exit the program
-    self.count       = 0
+    self.count = 0
     # make a ForeignHsm to track activity on another machine
     self.foreign_hsm = ForeignHsm()
 
@@ -51,7 +62,6 @@ class LocalConsumer():
       foreign_spy_item = body
       self.foreign_hsm.append_to_spy(foreign_spy_item)
       print(" [x] Spy: {!s}".format(foreign_spy_item))
-      ch.basic_ack(delivery_tag = method.delivery_tag)
 
     @LocalConsumer.decrypt
     def trace_callback(ch, method, properties, body):
@@ -59,7 +69,6 @@ class LocalConsumer():
       foreign_trace_item = body
       self.foreign_hsm.append_to_trace(foreign_trace_item)
       print(" [x] Trace: {!s}".format(foreign_trace_item))
-      ch.basic_ack(delivery_tag = method.delivery_tag)
 
     def timeout_callback():
       '''callback for outputting the foreign trace and exiting the program'''
@@ -80,8 +89,8 @@ class LocalConsumer():
     self.connection.add_timeout(deadline=10, callback_method=timeout_callback)
 
     # register the spy_callback and trace_callback with a queue
-    self.channel.basic_consume(spy_callback,   queue='spy_queue')
-    self.channel.basic_consume(trace_callback, queue='trace_queue')
+    self.channel.basic_consume(spy_callback,   queue=spy_queue_name,   no_ack=True)
+    self.channel.basic_consume(trace_callback, queue=trace_queue_name, no_ack=True)
 
   def start(self):
     self.channel.start_consuming()
