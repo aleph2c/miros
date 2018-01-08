@@ -25,6 +25,7 @@ from miros.activeobject import Factory
 from miros.event import signals, Event, return_status
 from miros.hsm import pp
 import time
+from functools import wraps
 
 class RabbitProducer(Factory):
   def __init__(self, chart_name, rabbit_user, rabbit_password, ip, port):
@@ -34,40 +35,59 @@ class RabbitProducer(Factory):
     self.destination_ip = ip
     self.destination_port = port
 
-    self.credentials = pika.PlainCredentials(rabbit_user, rabbit_password)
-    self.parameters  = pika.ConnectionParameters(ip, port, '/', self.credentials)
-    self.connection  = pika.BlockingConnection(parameters=self.parameters)
-    self.channel     = self.connection.channel()
+    credentials = pika.PlainCredentials(rabbit_user, rabbit_password)
+    parameters = pika.ConnectionParameters(ip, port, '/', credentials)
+    self.connection = pika.BlockingConnection(parameters=parameters)
+    
+    self.channel = self.connection.channel()
+    self.channel.exchange_declare(exchange='hsm_broadcast', exchange_type='fanout')
     self.channel.queue_declare(queue='spy_queue', durable=True)
     self.channel.queue_declare(queue='trace_queue', durable=True)
 
-    def encrypt( plain_text_string):
-      key = b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
-      f = Fernet(key)
-      cyphertext = f.encrypt(plain_text_string.encode())
-      return cyphertext
+    def strip_trace(fn):
+      @wraps(fn)
+      def _strip_trace(trace_live):
 
-    def live_spy_callback_rabbit(spy_live):
+        trace_live = trace_live.replace("/n", "")
+        import pdb; pdb.set_trace()
+        #encrypt
+        fn(trace_live)
+      return _strip_trace
+
+    def encrypt(fn):
+      @wraps(fn)
+      def _encrypt(plain_text):
+        key = b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
+        f = Fernet(key)
+        cyphertext = f.encrypt(plain_text.encode())
+        # broadcast_trace
+        fn(cyphertext)
+      return _encrypt
+
+    @encrypt
+    def broadcast_spy(spy_live):
       self.channel.basic_publish(exchange='',
           routing_key='spy_queue',
-          body=encrypt(spy_live),
+          body=spy_live,
           properties=pika.BasicProperties(
             delivery_mode=2,  # make message persistent
           ))
 
-    def live_trace_callback_rabbit(trace_live):
-      trace = trace_live.replace('\n', '')
+    @strip_trace
+    @encrypt
+    def broadcast_trace(trace_live):
       self.channel.basic_publish(exchange='',
           routing_key='trace_queue',
-          body=encrypt(trace),
+          body=trace_live,
           properties=pika.BasicProperties(
             delivery_mode=2,  # make message persistent
           ))
 
-    self.register_live_spy_callback(live_spy_callback_rabbit)
-    self.register_live_trace_callback(live_trace_callback_rabbit)
+    self.register_live_spy_callback(broadcast_spy)
+    self.register_live_trace_callback(broadcast_trace)
     self.live_spy   = True
     self.live_trace = True
+
 
 def producer_outer_entry(chart, e):
   status = return_status.UNHANDLED
