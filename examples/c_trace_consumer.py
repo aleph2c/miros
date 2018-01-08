@@ -46,7 +46,7 @@ class LocalConsumer():
                                              +-> trace_callback
 
   ``p`` is the producer (statechart emitting spy/trace information) on
-  another machine.
+  another machine. (See c_trace_producer.py)
 
   The spy_callback/trace_callback place decrypted spy/trace strings into the
   foreign_hsm.  This foreign_hsm has the same spy/trace api as a local object
