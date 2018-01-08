@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 '''
   Usage:
-    Sends a new task request to "b_trace_consumer.py"
-    1) start up a couple of b_trace_consumer.py sessions
+    Sends a new task request to "c_trace_consumer.py"
+    1) start up a couple of c_trace_consumer.py sessions
 
-    > python3 b_trace_consumer.py message....
+    > python3 c_trace_consumer.py message....
 
   Demonstrates:
+    * Exchanges
+    * 'fanout' routing
     * Work queues
 
   Monitoring:
@@ -40,8 +42,11 @@ class RabbitProducer(Factory):
     self.connection = pika.BlockingConnection(parameters=parameters)
     
     self.channel = self.connection.channel()
-    self.channel.queue_declare(queue='spy_queue', durable=True)
-    self.channel.queue_declare(queue='trace_queue', durable=True)
+    self.channel.exchange_declare(exchange='spy', exchange_type='fanout')
+    self.channel.exchange_declare(exchange='trace', exchange_type='fanout')
+
+    #self.channel.queue_declare(queue='spy_queue', durable=True)
+    #self.channel.queue_declare(queue='trace_queue', durable=True)
 
     def strip_trace(fn):
       @wraps(fn)
@@ -63,22 +68,18 @@ class RabbitProducer(Factory):
 
     @encrypt
     def broadcast_spy(spy_live):
-      self.channel.basic_publish(exchange='',
-          routing_key='spy_queue',
-          body=spy_live,
-          properties=pika.BasicProperties(
-            delivery_mode=2,  # make message persistent
-          ))
+      self.channel.basic_publish(exchange='spy',
+          routing_key='',
+          body=spy_live
+          )
 
     @strip_trace
     @encrypt
     def broadcast_trace(trace_live):
-      self.channel.basic_publish(exchange='',
-          routing_key='trace_queue',
-          body=trace_live,
-          properties=pika.BasicProperties(
-            delivery_mode=2,  # make message persistent
-          ))
+      self.channel.basic_publish(exchange='trace',
+          routing_key='',
+          body=trace_live
+          )
 
     self.register_live_spy_callback(broadcast_spy)
     self.register_live_trace_callback(broadcast_trace)
