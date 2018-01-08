@@ -28,26 +28,60 @@ from miros.hsm import pp
 from cryptography.fernet import Fernet
 from functools import wraps
 
-
 class LocalConsumer():
+  '''
+  The Local Consumer looks like this:
+                
+               |---> LocalConsumer spans this part of pic--->|
+                
+                  +----------------+  +----------------------+
+     +-----+   +->| spy exchange   +->| queue (random name)  |
+     |     |   |  +----------------+  +------+---------------+
+     |  p  +-->|                             |
+     |     |   |                             +-> spy_callback
+     +-----+   |  +----------------+  +----------------------+
+               +->| trace exchange +->| queue (random name)  |
+                  +----------------+  +------+---------------+
+                                             |
+                                             +-> trace_callback
+
+  ``p`` is the producer (statechart emitting spy/trace information) on
+  another machine.
+
+  The spy_callback/trace_callback place decrypted spy/trace strings into the
+  foreign_hsm.  This foreign_hsm has the same spy/trace api as a local object
+  from a class which is inherited from the HsmWithQueue.
+
+  To build a LocalConsumer:
+
+    local_consumer = LocalConsumer(rabbit_user='bob', rabbit_password='dobbs')
+
+  To start it:
+
+    locall_consumer.start()
+
+  '''
   def __init__(self, rabbit_user, rabbit_password):
 
     # rabbit related
     self.rabbit_user     = rabbit_user
     self.rabbit_password = rabbit_password
-    credentials          = pika.PlainCredentials('bob', 'dobbs')
+    credentials          = pika.PlainCredentials(rabbit_user, rabbit_password)
     parameters           = pika.ConnectionParameters(LocalConsumer.get_ip(), 5672, '/', credentials)
     self.connection      = pika.BlockingConnection(parameters=parameters)
     self.channel         = self.connection.channel()
-    self.channel.exchange_declare(exchange='spy', exchange_type='fanout')
+    self.channel.exchange_declare(exchange='spy',   exchange_type='fanout')
     self.channel.exchange_declare(exchange='trace', exchange_type='fanout')
 
-    # delete queues when we disconnect from them
-    spy_result = self.channel.queue_declare(exclusive=True)
+    # create new queues, and ensure they destroy themselves when we disconnect from them
+    spy_result   = self.channel.queue_declare(exclusive=True)
     trace_result = self.channel.queue_declare(exclusive=True)
 
-    spy_queue_name = spy_result.method.queue
+    # queue names are random, so we need to get their names
+    spy_queue_name   = spy_result.method.queue
     trace_queue_name = trace_result.method.queue
+
+    # bind the exchanges to each of the queues
     self.channel.queue_bind(exchange='spy', queue=spy_queue_name)
     self.channel.queue_bind(exchange='trace', queue=trace_queue_name)
 
