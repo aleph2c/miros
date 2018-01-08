@@ -30,6 +30,43 @@ import time
 from functools import wraps
 
 class RabbitProducer(Factory):
+  '''
+  The networking side of the RabbitProducer looks like this:
+                
+  |--- RabbitProducer ---------------------->|
+
+                            +----------------+  +---------+
+  +------------------+   +->| spy exchange   +->| spy_c   |
+  |                  |   |  +----------------+  +---------+
+  | startchart emit  +-->|                       
+  |                  |   |                      
+  +------------------+   |  +----------------+  +---------+
+                         +->| trace exchange +->| trace_c |
+                            +----------------+  +---------+
+
+  The RabbitProducer ties a rabbitmq producer and some exchanges to an active
+  object.   The live spy/trace output are encrypted then routed into two
+  separate exchanges, which transmit their messaging to the ``spy_c` and
+  ``trace_c`` consumers, running on a different machine (see c_trace_consumer.py
+  for this code). 
+
+  To build a chart with this rabbitmq producer you would slightly adjust how
+  you build a factory:
+
+      chart = RabbitProducer(chart_name="rabbit_producer",
+          rabbit_user="bob",
+          rabbit_password="dobbs",
+          ip="192.168.1.72",
+          port=5672)
+  
+  The chart would have a typical factory api, and with it you could build and
+  start your statechart.
+
+  To turn off the networking:
+      
+      chart.connection.close()
+
+  '''
   def __init__(self, chart_name, rabbit_user, rabbit_password, ip, port):
     super().__init__(chart_name+'_'+ip)
     self.rabbit_user = rabbit_user
@@ -44,9 +81,6 @@ class RabbitProducer(Factory):
     self.channel = self.connection.channel()
     self.channel.exchange_declare(exchange='spy', exchange_type='fanout')
     self.channel.exchange_declare(exchange='trace', exchange_type='fanout')
-
-    #self.channel.queue_declare(queue='spy_queue', durable=True)
-    #self.channel.queue_declare(queue='trace_queue', durable=True)
 
     def strip_trace(fn):
       @wraps(fn)
