@@ -197,7 +197,7 @@ First you would describe state's ``c``, ``c1`` and ``c2``:
       status = return_status.HANDLED
     else:
       status = return_status.SUPER
-      chart.temp.fun = self.top
+      self.temp.fun = self.top
     return status
 
   def c1(self, e):
@@ -212,7 +212,7 @@ First you would describe state's ``c``, ``c1`` and ``c2``:
       status = return_status.HANDLED
     else:
       status = return_status.SUPER
-      chart.temp.fun = self.c
+      self.temp.fun = self.c
     return status
 
   def c2(self, e):
@@ -227,7 +227,7 @@ First you would describe state's ``c``, ``c1`` and ``c2``:
       status = return_status.HANDLED
     else:
       status = return_status.SUPER
-      chart.temp.fun = self.c
+      self.temp.fun = self.c
     return status
 
 Then you would connect the state methods into two different active objects and
@@ -280,8 +280,8 @@ For a flat state:
       # this logic will run when your event processor sends an event with the
       # SEARCH_FOR_SUPER_SIGNAL name
 
-      # 1) place your parent state method into the chart.temp.fun
-      chart.temp.fun = <your_parent_state_method>
+      # 1) place your parent state method into the self.temp.fun
+      self.temp.fun = <your_parent_state_method>
 
       # 2) make sure you return this value
       status = return_status.SUPER
