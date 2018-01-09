@@ -110,8 +110,8 @@ class LocalConsumer():
       if len(spy) is not 0:
         pp(self.foreign_hsm.spy())
         print(self.foreign_hsm.trace())
-      # stop processing or reconnect this callback to a timer
       self.count += 1
+      # stop processing or reconnect this callback to a timer
       if self.count >= 30:
         self.channel.stop_consuming()
       else:
