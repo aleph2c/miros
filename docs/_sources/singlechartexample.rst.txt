@@ -48,7 +48,7 @@ First we import some items from the miros library:
   from miros.event import signals
   from miros.event import return_status
 
-  from miros.activeobject import spy_on
+  from miros.hsm import spy_on
   from miros.activeobject import ActiveObject
 
 Now we write our state methods.  Each of these methods will represent a specific

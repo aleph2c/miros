@@ -6,7 +6,6 @@
 
 Introduction
 ============
-
 Miros is a statechart library written in Python.  Statecharts are a type of
 behavioral drawing.
 
