@@ -183,6 +183,15 @@ chart = RabbitProducer(
   port=5672
 )
 
+#  +-------- producer_outer --------+
+#  |   +--- c1 ----+   +---- c2 ---+ |
+#  | * |           |   |           | +----+
+#  | | |           +-A->           | |    |
+#  | +->           <-A-+           | |    B
+#  |   |           |   |           | <----+
+#  |   +-----------+   +-----------+ |
+#  +---------------------------------+
+
 producer_outer = chart.create(state='producer_outer'). \
   catch(signal=signals.ENTRY_SIGNAL, handler=producer_outer_entry). \
   catch(signal=signals.EXIT_SIGNAL, handler=producer_outer_exit). \
