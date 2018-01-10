@@ -27,9 +27,10 @@ from miros.hsm import pp
 import time
 from functools import wraps
 
+
 class RabbitProducer(Factory):
   def __init__(self, chart_name, rabbit_user, rabbit_password, ip, port):
-    super().__init__(chart_name+'_'+ip)
+    super().__init__(chart_name + '_' + ip)
     self.rabbit_user = rabbit_user
     self.rabbit_password = rabbit_password
     self.destination_ip = ip
@@ -38,9 +39,9 @@ class RabbitProducer(Factory):
     credentials = pika.PlainCredentials(rabbit_user, rabbit_password)
     parameters = pika.ConnectionParameters(ip, port, '/', credentials)
     self.connection = pika.BlockingConnection(parameters=parameters)
-    
+
     self.channel = self.connection.channel()
-    self.channel.queue_declare(queue='spy_queue', durable=True)
+    self.channel.queue_declare(queue='spy_queue',   durable=True)
     self.channel.queue_declare(queue='trace_queue', durable=True)
 
     def strip_trace(fn):
@@ -86,45 +87,63 @@ class RabbitProducer(Factory):
     self.live_trace = True
 
 
+#  +-------- producer_outer --------+
+#  |   +--- c1 ----+   +---- c2 ---+ |
+#  | * |           |   |           | +----+
+#  | | |           +-A->           | |    |
+#  | +->           <-A-+           | |    B
+#  |   |           |   |           | <----+
+#  |   +-----------+   +-----------+ |
+#  +---------------------------------+
 def producer_outer_entry(chart, e):
   status = return_status.UNHANDLED
   return status
+
 
 def producer_outer_exit(chart, e):
   status = return_status.UNHANDLED
   return status
 
+
 def producer_outer_init(chart, e):
   status = return_status.UNHANDLED
   return status
+
 
 def producer_outer_B(chart, e):
   status = chart.trans(producer_outer)
   return status
 
+
 def c1_entry(chart, e):
   status = return_status.UNHANDLED
   return status
+
 
 def c1_exit(chart, e):
   status = return_status.UNHANDLED
   return status
 
+
 def c1_A(chart, e):
   status = return_status.UNHANDLED
   return status
+
 
 def c2_entry(chart, e):
   status = return_status.UNHANDLED
   return status
 
+
 def c2_exit(chart, e):
   status = return_status.UNHANDLED
   return status
 
+
 def c2_A(chart, e):
   status = return_status.UNHANDLED
   return status
+
 
 chart = RabbitProducer(chart_name="rabbit_producer",
     rabbit_user="bob",
