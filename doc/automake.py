@@ -25,8 +25,9 @@ class Handler(watchdog.events.PatternMatchingEventHandler):
       # remove the old artifacts from this directory
       cmd = 'make clean'
       p = subprocess.Popen(cmd,
-                      stdout = subprocess.PIPE,
-                      stdin  = subprocess.PIPE)
+                      stdout=subprocess.PIPE,
+                      stdin=subprocess.PIPE,
+                      shell=True)
       output = p.communicate()
       p.wait()
       print("{}".format(cmd))
@@ -35,8 +36,9 @@ class Handler(watchdog.events.PatternMatchingEventHandler):
       # make the new html
       cmd = 'make html'
       p = subprocess.Popen(cmd,
-                      stdout = subprocess.PIPE,
-                      stdin  = subprocess.PIPE)
+                      stdout=subprocess.PIPE,
+                      stdin=subprocess.PIPE,
+                      shell=True)
       output = p.communicate()
       p.wait()
       print("{}".format(cmd))

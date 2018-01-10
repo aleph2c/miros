@@ -87,8 +87,8 @@ class RabbitProducer(Factory):
     def strip_trace(fn):
       @wraps(fn)
       def _strip_trace(trace_live):
-
         trace_live = trace_live.replace("\n", "")
+        # broadcast_trace
         fn(trace_live)
       return _strip_trace
 
@@ -98,7 +98,7 @@ class RabbitProducer(Factory):
         key = b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
         f = Fernet(key)
         cyphertext = f.encrypt(plain_text.encode())
-        # broadcast_trace
+        # broadcast_trace/broadcast_spy
         fn(cyphertext)
       return _encrypt
 
