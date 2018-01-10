@@ -125,19 +125,16 @@ class RabbitProducer(Factory):
     self.live_trace = True
 
 
-def producer_outer_entry(chart, e):
-  status = return_status.UNHANDLED
-  return status
-
-
-def producer_outer_exit(chart, e):
-  status = return_status.UNHANDLED
-  return status
-
-
+#  +-------- producer_outer --------+
+#  |   +--- c1 ----+   +---- c2 ---+ |
+#  | * |           |   |           | +--+
+#  | | |           +-A->           | |  |
+#  | +->           <-A-+           | |  B
+#  |   |           |   |           | <--+
+#  |   +-----------+   +-----------+ |
+#  +---------------------------------+
 def producer_outer_init(chart, e):
-  status = return_status.UNHANDLED
-  return status
+  return chart.trans(c1)
 
 
 def producer_outer_B(chart, e):
@@ -145,33 +142,13 @@ def producer_outer_B(chart, e):
   return status
 
 
-def c1_entry(chart, e):
-  status = return_status.UNHANDLED
-  return status
-
-
-def c1_exit(chart, e):
-  status = return_status.UNHANDLED
-  return status
-
-
 def c1_A(chart, e):
-  status = return_status.UNHANDLED
-  return status
-
-
-def c2_entry(chart, e):
-  status = return_status.UNHANDLED
-  return status
-
-
-def c2_exit(chart, e):
-  status = return_status.UNHANDLED
+  status = chart.trans(c2)
   return status
 
 
 def c2_A(chart, e):
-  status = return_status.UNHANDLED
+  status = chart.trans(c1)
   return status
 
 
@@ -184,21 +161,15 @@ chart = RabbitProducer(
 )
 
 producer_outer = chart.create(state='producer_outer'). \
-  catch(signal=signals.ENTRY_SIGNAL, handler=producer_outer_entry). \
-  catch(signal=signals.EXIT_SIGNAL, handler=producer_outer_exit). \
   catch(signal=signals.INIT_SIGNAL, handler=producer_outer_init). \
   catch(signal=signals.B, handler=producer_outer_B). \
   to_method()
 
 c1 = chart.create(state='c1'). \
-  catch(signal=signals.ENTRY_SIGNAL, handler=c1_entry). \
-  catch(signal=signals.EXIT_SIGNAL, handler=c1_exit). \
   catch(signal=signals.A, handler=c1_A). \
   to_method()
 
 c2 = chart.create(state='c2'). \
-  catch(signal=signals.ENTRY_SIGNAL, handler=c2_entry). \
-  catch(signal=signals.EXIT_SIGNAL, handler=c2_exit). \
   catch(signal=signals.A, handler=c2_A). \
   to_method()
 
