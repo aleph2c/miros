@@ -41,39 +41,49 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <blockquote id="recipes">
-<div><p><em>Simple things should be simple, complex things should be possible.</em></p>
-<p class="attribution">&mdash;Alan Kay</p>
-</div></blockquote>
-<div class="section" id="id1">
-<h1>Recipes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="recipes">
+<span id="id1"></span><h1>Recipes<a class="headerlink" href="#recipes" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <div class="section" id="states">
 <span id="recipes-states"></span><h2>States<a class="headerlink" href="#states" title="Permalink to this headline">¶</a></h2>
-<p>In the miros frame work, your state methods act as places to link your application code into designed behavior.</p>
+<blockquote>
+<div><p><em>Simple things should be simple, complex things should be possible.</em></p>
+<p class="attribution">&mdash;Alan Kay</p>
+</div></blockquote>
+<p>In the miros frame work, your state methods act as places to link your
+application code into designed behavior.  Together they create a state machine.</p>
 <p>States need to:</p>
 <ol class="arabic simple">
 <li>React to events and run your application code.</li>
 <li>Describe their parent state.</li>
 <li>Describe how they should transition to other states for specific events.</li>
 </ol>
+<p>State methods can be structured as simple methods that have if-elif-else
+clauses.  In fact if you follow this way of programming your state methods, you
+will have a very easy time porting your design into the C/C++ programming
+language supported by the Quantum Leaps framework for embedded systems (It uses
+the same event processing algorithm).  This style is pretty much self
+documenting.</p>
+<p>If you have no intention of porting your work and would like to avoid sissy
+if-elif-else structures and use some Macho Python data object instead, go for it.
+Just ensure that your state methods react the way the are expected to, so
+that the event processor can discover your design while it’s parsing the events.</p>
+<p>If you would like to metaprogram your statecharts, UML be damned, you can.
+Miros provides several ways that you can synthesize statecharts on the fly.</p>
 <p>There are different ways to create states with miros:</p>
 <ol class="arabic simple">
-<li><a class="reference internal" href="#recipes-boiler-plate-state-method-code"><span class="std std-ref">You can create a hand-coded state method with if-elif structures.</span></a> (so you can easily port your design
+<li><a class="reference internal" href="#recipes-boiler-plate-state-method-code"><span class="std std-ref">You can create simple state method with if-elif structures.</span></a> (so you can easily port your design
 back into the c programming language for embedded applications)</li>
+<li><a class="reference internal" href="#recipes-creating-a-state-method-from-a-factory"><span class="std std-ref">You can use an Active Object Factory to create your statechart</span></a></li>
 <li><a class="reference internal" href="#recipes-creating-a-state-method-from-a-template"><span class="std std-ref">You can have the library generate a state method for you, then register
 callback responses to specific events and set a parent at
 runtime.</span></a></li>
-<li>You can use a fusion technique.  You can hand write a <a class="reference internal" href="glossary.html#term-state"><span class="xref std std-term">state</span></a> and use context
-managers within the method so that the miros package can register callbacks
-for specific signals, or even change it’s parent at run time.</li>
-<li><a class="reference internal" href="#recipes-creating-a-state-method-from-a-factory"><span class="std std-ref">You can use an Active Object Factory to create your statechart</span></a></li>
 </ol>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">I recommend that you only use methods 1 and 4.  Methods 2 and 3 are built up to
-provide method 4.  A statechart built using a factory, method 4, can always be
+<p class="last">I recommend that you only use methods 1 and 2.  Method 3 was built to
+provide method 2.  A statechart built using a factory, method 2, can always be
 turned back into a statechart of method 1 using the <code class="docutils literal"><span class="pre">to_code</span></code> method.</p>
 </div>
 <p id="recipes-state-recipes"><strong>State Recipes</strong>:</p>
@@ -245,7 +255,11 @@ than one active object.</p>
 <div class="section" id="boiler-plate-state-method-code">
 <span id="recipes-boiler-plate-state-method-code"></span><h3>Boiler Plate State Method Code<a class="headerlink" href="#boiler-plate-state-method-code" title="Permalink to this headline">¶</a></h3>
 <p>For a flat state:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="o">&lt;</span><span class="n">your_state_method_name</span><span class="o">&gt;</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">return_status</span><span class="p">,</span> <span class="n">Event</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="o">&lt;</span><span class="n">your_state_method_name</span><span class="o">&gt;</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="c1"># if you state method doesn&#39;t know what to do it should return this</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 
@@ -286,6 +300,7 @@ than one active object.</p>
 <p>If your state method didn’t include handling for the <code class="docutils literal"><span class="pre">ENTRY_SIGNAL</span></code>,
 <code class="docutils literal"><span class="pre">INIT_SIGNAL</span></code> or <code class="docutils literal"><span class="pre">EXIT_SIGNAL</span></code>, the event processor will just assume it did
 and returned return_state.HANDLED.</p>
+<p>To see factory boiler plate go, see <a class="reference internal" href="#recipes-creating-a-state-method-from-a-factory"><span class="std std-ref">this</span></a></p>
 </div>
 <div class="section" id="describe-a-parent-state">
 <span id="recipes-describe-a-parent-state"></span><h3>Describe a Parent State<a class="headerlink" href="#describe-a-parent-state" title="Permalink to this headline">¶</a></h3>
@@ -318,6 +333,7 @@ first argument provided to your state method:</p>
 </pre></div>
 </div>
 <p>To read more about why you structure your state methods this way, read <a class="reference internal" href="#recipes-what-a-state-does-and-how-to-structure-it"><span class="std std-ref">this.</span></a></p>
+<p>To see how to define a parent state with a factory, read <a class="reference internal" href="#recipes-factory-5"><span class="std std-ref">this</span></a></p>
 </div>
 <div class="section" id="pass-an-event-through-to-a-parent-state">
 <span id="recipes-pass-an-event-through-to-a-parent-state"></span><h3>Pass an event through to a Parent State<a class="headerlink" href="#pass-an-event-through-to-a-parent-state" title="Permalink to this headline">¶</a></h3>

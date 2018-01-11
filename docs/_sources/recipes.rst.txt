@@ -1,8 +1,5 @@
 .. _recipes:
 
-  *Simple things should be simple, complex things should be possible.* 
-  
-  -- Alan Kay
 
 Recipes
 =======
@@ -16,7 +13,13 @@ Recipes
 
 States
 ------
-In the miros frame work, your state methods act as places to link your application code into designed behavior.
+
+  *Simple things should be simple, complex things should be possible.* 
+  
+  -- Alan Kay
+
+In the miros frame work, your state methods act as places to link your
+application code into designed behavior.  Together they create a state machine.
 
 States need to:
 
@@ -24,25 +27,36 @@ States need to:
 2. Describe their parent state.
 3. Describe how they should transition to other states for specific events.
 
+State methods can be structured as simple methods that have if-elif-else
+clauses.  In fact if you follow this way of programming your state methods, you
+will have a very easy time porting your design into the C/C++ programming
+language supported by the Quantum Leaps framework for embedded systems (It uses
+the same event processing algorithm).  This style is pretty much self
+documenting.
+
+If you have no intention of porting your work and would like to avoid sissy
+if-elif-else structures and use some Macho Python data object instead, go for it.
+Just ensure that your state methods react the way the are expected to, so
+that the event processor can discover your design while it's parsing the events.
+
+If you would like to metaprogram your statecharts, UML be damned, you can.
+Miros provides several ways that you can synthesize statecharts on the fly.
+
 There are different ways to create states with miros:
 
-1. :ref:`You can create a hand-coded state method with if-elif structures.
+1. :ref:`You can create simple state method with if-elif structures.
    <recipes-boiler-plate-state-method-code>` (so you can easily port your design
    back into the c programming language for embedded applications)
 
-2. :ref:`You can have the library generate a state method for you, then register
+2. :ref:`You can use an Active Object Factory to create your statechart<recipes-creating-a-state-method-from-a-factory>`
+
+3. :ref:`You can have the library generate a state method for you, then register
    callback responses to specific events and set a parent at
    runtime.<recipes-creating-a-state-method-from-a-template>`
 
-3. You can use a fusion technique.  You can hand write a :term:`state<State>` and use context
-   managers within the method so that the miros package can register callbacks
-   for specific signals, or even change it's parent at run time.
-
-4. :ref:`You can use an Active Object Factory to create your statechart<recipes-creating-a-state-method-from-a-factory>`
-
 .. note:: 
-  I recommend that you only use methods 1 and 4.  Methods 2 and 3 are built up to
-  provide method 4.  A statechart built using a factory, method 4, can always be
+  I recommend that you only use methods 1 and 2.  Method 3 was built to
+  provide method 2.  A statechart built using a factory, method 2, can always be
   turned back into a statechart of method 1 using the ``to_code`` method.
 
 .. _recipes-state-recipes:
@@ -253,6 +267,10 @@ For a flat state:
 
 .. code-block:: python
 
+  from miros.hsm import spy_on
+  from miros.event import signals, return_status, Event
+
+  @spy_on
   def <your_state_method_name>(self, e):
     # if you state method doesn't know what to do it should return this
     status = return_status.UNHANDLED
@@ -294,6 +312,8 @@ If your state method didn't include handling for the ``ENTRY_SIGNAL``,
 ``INIT_SIGNAL`` or ``EXIT_SIGNAL``, the event processor will just assume it did
 and returned return_state.HANDLED.
 
+To see factory boiler plate go, see :ref:`this<recipes-creating-a-state-method-from-a-factory>`
+
 .. _recipes-describe-a-parent-state:
 
 Describe a Parent State
@@ -333,6 +353,8 @@ first argument provided to your state method:
     return status.
 
 To read more about why you structure your state methods this way, read :ref:`this.<recipes-what-a-state-does-and-how-to-structure-it>`
+
+To see how to define a parent state with a factory, read :ref:`this<recipes-factory-5>`
 
 .. _recipes-pass-an-event-through-to-a-parent-state:
 
