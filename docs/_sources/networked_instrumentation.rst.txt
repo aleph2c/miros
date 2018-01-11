@@ -438,7 +438,7 @@ Now it is time to start our chart and watch it change it's state.  We will start
 it in the producer_outer state, wait, then send a ``B`` signal at it.
 
 .. code-block:: python
-  :emphasize-lines: 1
+  :emphasize-lines: 2-6
   :linenos:
   
   # RabbitMq chart construction above 
@@ -455,6 +455,8 @@ Close the Connection
 To close our connection:
 
 .. code-block:: python
+  :linenos:
+  :emphasize-lines: 3
 
   # RabbitMq chart construction above 
   # Chart start code and B signal injection above
@@ -532,7 +534,7 @@ This design will be broken down into:
 
 .. _networked_instrumentation-report-the-required-libraries:
 
-Report the Required Libraries
+Import the Required Libraries
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To begin with we will import the required libraries:
 

@@ -632,23 +632,25 @@ it in the producer_outer state, wait, then send a <code class="docutils literal"
 3
 4
 5
-6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># RabbitMq chart construction above</span>
-</span><span class="n">chart</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">producer_outer</span><span class="p">)</span>
-<span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">))</span>
-<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-<span class="n">pp</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
-<span class="k">print</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
-</pre></div>
+6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># RabbitMq chart construction above</span>
+<span class="hll"><span class="n">chart</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">producer_outer</span><span class="p">)</span>
+</span><span class="hll"><span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">))</span>
+</span><span class="hll"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</span><span class="hll"><span class="n">pp</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+</span><span class="hll"><span class="k">print</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+</span></pre></div>
 </td></tr></table></div>
 </div>
 <div class="section" id="close-the-connection">
 <span id="networked-instrumentation-close-the-connection"></span><h3>Close the Connection<a class="headerlink" href="#close-the-connection" title="Permalink to this headline">¶</a></h3>
 <p>To close our connection:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># RabbitMq chart construction above</span>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># RabbitMq chart construction above</span>
 <span class="c1"># Chart start code and B signal injection above</span>
-<span class="n">chart</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</pre></div>
-</div>
+<span class="hll"><span class="n">chart</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></pre></div>
+</td></tr></table></div>
 <p>The code to build our designed producer is complete.  Now let’s see it’s
 terminal output on the raspberry pi:</p>
 <div class="highlight-guess" id="producer-output"><div class="highlight"><pre><span></span>[&#39;START&#39;,
@@ -709,8 +711,8 @@ screen.</p>
 <li><a class="reference internal" href="#networked-instrumentation-decrypt-our-messages"><span class="std std-ref">Message decryption</span></a></li>
 <li><a class="reference internal" href="#networked-instrumentation-turn-off-the-network-and-shutdown-the-program"><span class="std std-ref">Stopping the program and turning off the network connection</span></a></li>
 </ol>
-<div class="section" id="report-the-required-libraries">
-<span id="networked-instrumentation-report-the-required-libraries"></span><h3>Report the Required Libraries<a class="headerlink" href="#report-the-required-libraries" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="import-the-required-libraries">
+<span id="networked-instrumentation-report-the-required-libraries"></span><h3>Import the Required Libraries<a class="headerlink" href="#import-the-required-libraries" title="Permalink to this headline">¶</a></h3>
 <p>To begin with we will import the required libraries:</p>
 <div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
@@ -2068,7 +2070,7 @@ machine within another.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#the-consumer-design">The Consumer Design</a><ul>
-<li><a class="reference internal" href="#report-the-required-libraries">Report the Required Libraries</a></li>
+<li><a class="reference internal" href="#import-the-required-libraries">Import the Required Libraries</a></li>
 <li><a class="reference internal" href="#create-a-class-and-a-drawing-in-its-docstring">Create a Class and a Drawing in its Docstring</a></li>
 <li><a class="reference internal" href="#add-the-rabbitmq-boiler-plat-code-and-ability-to-get-ip">Add the RabbitMq Boiler Plat Code and Ability to get IP</a></li>
 <li><a class="reference internal" href="#add-a-shutdown-count-and-a-foreignhsm-object">Add a Shutdown Count and a ForeignHsm Object</a></li>
