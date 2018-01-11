@@ -177,7 +177,7 @@ network RabbitMQ.  I wrestled with their example code for a while and got them
 working across my network.
 
 If you want to code by example I recommend that you work through their
-tutorials, then use my code to see how to make it work across a network:
+tutorials, then use my code to see how to make it work across your own network:
 
 =================  ======================= ===================================
 Tutorial Purpose   RabbitMQ Pika Tutorial  Networked Version of their Tutorial

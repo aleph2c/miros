@@ -12,7 +12,7 @@ Installation
 
 To install::
 
-   > pip3 install miros
+   > pip3 install miros --user
 
 Miros has been tested on Python 3.5 and is only dependent upon the Python
 standard library.

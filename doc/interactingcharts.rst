@@ -3,8 +3,8 @@ what others see -- Nassim Nicholas Taleb
 
 .. _interactingcharts-interacting-statecharts:
 
-Interacting Statecharts
-=======================
+Interacting Statecharts (Same Machine)
+======================================
 
 .. _interactingcharts-some-context-about-concurrency:
 
