@@ -277,7 +277,7 @@ def test_start_stop(fabric_fixture):
 
   trace_target = \
   '''
-  [2017-11-06 05:40:38.272609] [bob] e->start_at() top->g1_s22_active_objects_graph
+  [2018-11-06 05:40:38.272609] [bob] e->start_at() top->g1_s22_active_objects_graph
   [2017-11-06 05:40:37.216059] [bob] e->D() g1_s22_active_objects_graph->g1_s1_active_objects_graph
   [2017-11-06 05:40:37.216059] [bob] e->E() g1_s1_active_objects_graph->g1_s01_active_objects_graph
   [2017-11-06 05:40:37.216059] [bob] e->F() g1_s01_active_objects_graph->g1_s2111_active_objects_graph

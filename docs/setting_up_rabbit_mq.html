@@ -55,10 +55,15 @@ library.</p>
 </center><p>I found the installation documentation on the RabbitMQ website to be largely
 illegible to me as a new user, so I wrote this guide to save you the pain which
 I went through.</p>
+<div class="section" id="installing-on-linux-with-ansible">
+<span id="setting-up-rabbit-mq-installing-on-linux-with-ansible"></span><h2>Installing On Linux with Ansible<a class="headerlink" href="#installing-on-linux-with-ansible" title="Permalink to this headline">¶</a></h2>
 <p>To get your RabbitMQ server working over a network with Python requires at
 least 10 steps, so I have automated them using Ansible.</p>
 <p>If you haven’t seen Ansible before it is a tool for automatically deploying
-software onto Linux systems.</p>
+software onto Linux systems.  It makes sense to use Ansible for two different
+reasons, it turns your program installation into source code that you can keep
+under revision control and it is scalable; with very little effort you can
+deploy things onto multiple machines.</p>
 <p>To install Ansible:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">ansible</span>
 </pre></div>
@@ -82,20 +87,25 @@ hostname.</p>
 <p>Save (write-out) and exit the file.  What I have done is to link my hostname, <code class="docutils literal"><span class="pre">scotty</span></code> to
 my IP address.  127.0.0.1 is always the IP of your local machine.  This is
 telling Ansible that I want to do a deployment to this machine when I reference
-<code class="docutils literal"><span class="pre">scotty</span></code> in the Ansible file (which we will talk about shortly).   If you want
-to have Ansible deploy RabbitMQ to other IP addresses, you can add them below
-the 127.0.0.1 address.</p>
+<code class="docutils literal"><span class="pre">scotty</span></code> in the Ansible file (which we will talk about shortly).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you want to have Ansible deploy RabbitMQ to other IP addresses, you can add
+them below the 127.0.0.1 address.  In this way you can have rabbitMq install
+everywhere you need it, all at once.</p>
+</div>
 <p>Ansible does it’s deployments using ssh.  This means that we have to setup ssh
 for our computer.</p>
 <p>To do this, we generate a public and private key, then concatenate our public
 key into our <code class="docutils literal"><span class="pre">authorized_keys</span></code>.  If you don’t have a <code class="docutils literal"><span class="pre">id_rsa</span></code> or a
 <code class="docutils literal"><span class="pre">id_rsa.pub</span></code> in your <code class="docutils literal"><span class="pre">~/.ssh/</span></code> directory, then you need to make them.  To
 do this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">cd</span> <span class="o">~/.</span><span class="n">ssh</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">mkdir</span> <span class="o">~/.</span><span class="n">ssh</span>
+<span class="o">&gt;</span> <span class="n">cd</span> <span class="o">~/.</span><span class="n">ssh</span>
 <span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">ssh</span><span class="o">-</span><span class="n">keygen</span>
 </pre></div>
 </div>
-<p>When you see option to enter a passphrase, just hit enter.</p>
+<p>When you see an option to enter a passphrase, just hit enter.</p>
 <p>Now that you have a public and private key, you want to concatenate your
 <code class="docutils literal"><span class="pre">authorized_keys</span></code> file with your public key:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">cat</span> <span class="s1">&#39;~/.ssh/id_rsa.pub&#39;</span> <span class="o">&gt;&gt;</span> <span class="s1">&#39;~/.ssh/authorized_keys&#39;</span>
@@ -177,6 +187,11 @@ be <code class="docutils literal"><span class="pre">dobbs</span></code>:</p>
 <img alt="_images/RabbitMQ.PNG" class="align-center" src="_images/RabbitMQ.PNG" />
 <p>If you have come this far you have a working RabbitMQ message broker running on
 your Linux system.</p>
+</div>
+<div class="section" id="installing-on-windows">
+<span id="setting-up-rabbit-mq-installing-on-windows"></span><h2>Installing On Windows<a class="headerlink" href="#installing-on-windows" title="Permalink to this headline">¶</a></h2>
+<p>To install the same infrasture on Windows if followed <a class="reference external" href="https://www.rabbitmq.com/install-windows.html">these instructions</a>.  Once I had enough of it
+working I opened the</p>
 <p>Ok, now what?</p>
 <p>To learn how to use it with Python, there is a great set of tutorials provided
 on the <a class="reference external" href="https://www.rabbitmq.com/getstarted.html/">RabbitMQ site</a>.</p>
@@ -256,6 +271,7 @@ messages across the network using the default user name, guest.  Also, the
 messages are not encrypted.</p>
 </div>
 </div>
+</div>
 
 
           </div>
@@ -264,7 +280,16 @@ messages are not encrypted.</p>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
   <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
-</a></p><div class="relations">
+</a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Setting Up RabbitMQ</a><ul>
+<li><a class="reference internal" href="#installing-on-linux-with-ansible">Installing On Linux with Ansible</a></li>
+<li><a class="reference internal" href="#installing-on-windows">Installing On Windows</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>

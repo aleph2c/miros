@@ -1,15 +1,11 @@
-  *I know who in the family is a great cook.  I know where the great recipes are.*
-  
-  -- Irma S. Rombauer
-  
 .. _recipes:
-
-Recipes
-=======
 
   *Simple things should be simple, complex things should be possible.* 
   
   -- Alan Kay
+
+Recipes
+=======
 
 .. toctree::
    :maxdepth: 2
@@ -30,8 +26,9 @@ States need to:
 
 There are different ways to create states with miros:
 
-1. :ref:`You can create a hand-coded state
-   method.<recipes-boiler-plate-state-method-code>`
+1. :ref:`You can create a hand-coded state method with if-elif structures.
+   <recipes-boiler-plate-state-method-code>` (so you can easily port your design
+   back into the c programming language for embedded applications)
 
 2. :ref:`You can have the library generate a state method for you, then register
    callback responses to specific events and set a parent at
@@ -42,6 +39,11 @@ There are different ways to create states with miros:
    for specific signals, or even change it's parent at run time.
 
 4. :ref:`You can use an Active Object Factory to create your statechart<recipes-creating-a-state-method-from-a-factory>`
+
+.. note:: 
+  I recommend that you only use methods 1 and 4.  Methods 2 and 3 are built up to
+  provide method 4.  A statechart built using a factory, method 4, can always be
+  turned back into a statechart of method 1 using the ``to_code`` method.
 
 .. _recipes-state-recipes:
 

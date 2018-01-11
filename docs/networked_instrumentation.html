@@ -50,12 +50,9 @@ and documenting the behavior of your statecharts.</p>
 <p>But how would you view the spy and trace information from different statecharts,
 running on different computers, across a network?</p>
 <p>It would be useful if you could send the spy and trace information from one
-machine to another and aggregate it in one location.  Aggregating all of the spy
-and trace information onto one machine will make it look like all of your
-statecharts are just running in different threads, on that machine, instead of on different
-computers.  We already know how to make sense of statecharts running in different
-threads.  So if we use such an aggregation technique, we could understand how
-different statecharts running on different machines are working together.</p>
+machine to another and aggregate it in one location.  This way you could view
+the instrumentation results of all of your networked state machines as is they
+were all running in one location.</p>
 <p>In this example I will run a statechart on one computer, then view it’s
 spy and trace log on another.</p>
 </div>
@@ -63,8 +60,8 @@ spy and trace log on another.</p>
 <span id="networked-instrumentation-getting-the-required-libraries"></span><h2>Getting the Required Libraries<a class="headerlink" href="#getting-the-required-libraries" title="Permalink to this headline">¶</a></h2>
 <p>Up until now I have only been using <code class="docutils literal"><span class="pre">miros</span></code> and the Python standard library.
 To make this example work, you will have to install <code class="docutils literal"><span class="pre">pika</span></code> for messaging with
-RabbitMq and <code class="docutils literal"><span class="pre">cryptography</span></code> for encrypting your messages.  So let’s do that
-now:</p>
+<a class="reference internal" href="setting_up_rabbit_mq.html#setting-up-rabbit-mq-setting-up-rabbit-mq"><span class="std std-ref">RabbitMq</span></a> and <code class="docutils literal"><span class="pre">cryptography</span></code>
+for encrypting your messages.  So let’s do that now:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">pip3</span> <span class="n">install</span> <span class="n">pika</span> <span class="n">cryptography</span> <span class="o">--</span><span class="n">user</span>
 </pre></div>
 </div>

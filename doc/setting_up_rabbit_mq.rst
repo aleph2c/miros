@@ -22,11 +22,18 @@ I found the installation documentation on the RabbitMQ website to be largely
 illegible to me as a new user, so I wrote this guide to save you the pain which
 I went through.
 
+.. _setting_up_rabbit_mq-installing-on-linux-with-ansible:
+
+Installing On Linux with Ansible
+--------------------------------
 To get your RabbitMQ server working over a network with Python requires at
 least 10 steps, so I have automated them using Ansible.
 
 If you haven't seen Ansible before it is a tool for automatically deploying
-software onto Linux systems.  
+software onto Linux systems.  It makes sense to use Ansible for two different
+reasons, it turns your program installation into source code that you can keep
+under revision control and it is scalable; with very little effort you can
+deploy things onto multiple machines.
 
 To install Ansible:
 
@@ -60,9 +67,12 @@ Now add the following:
 Save (write-out) and exit the file.  What I have done is to link my hostname, ``scotty`` to
 my IP address.  127.0.0.1 is always the IP of your local machine.  This is
 telling Ansible that I want to do a deployment to this machine when I reference
-``scotty`` in the Ansible file (which we will talk about shortly).   If you want
-to have Ansible deploy RabbitMQ to other IP addresses, you can add them below
-the 127.0.0.1 address.
+``scotty`` in the Ansible file (which we will talk about shortly).
+
+.. note:: 
+  If you want to have Ansible deploy RabbitMQ to other IP addresses, you can add
+  them below the 127.0.0.1 address.  In this way you can have rabbitMq install
+  everywhere you need it, all at once.
 
 Ansible does it's deployments using ssh.  This means that we have to setup ssh
 for our computer.
@@ -73,11 +83,12 @@ key into our ``authorized_keys``.  If you don't have a ``id_rsa`` or a
 do this:
 
 .. code-block:: python
-
+  
+  > mkdir ~/.ssh
   > cd ~/.ssh
   > sudo ssh-keygen
 
-When you see option to enter a passphrase, just hit enter.
+When you see an option to enter a passphrase, just hit enter.
 
 Now that you have a public and private key, you want to concatenate your
 ``authorized_keys`` file with your public key:
@@ -166,6 +177,14 @@ be ``dobbs``:
 
 If you have come this far you have a working RabbitMQ message broker running on
 your Linux system.
+
+.. _setting_up_rabbit_mq-installing-on-windows:
+
+Installing On Windows
+---------------------
+To install the same infrasture on Windows if followed `these instructions
+<https://www.rabbitmq.com/install-windows.html>`_.  Once I had enough of it
+working I opened the 
 
 Ok, now what?
 

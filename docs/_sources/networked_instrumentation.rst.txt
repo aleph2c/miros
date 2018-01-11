@@ -8,7 +8,6 @@ Spy and Trace Across a Network
 Context
 -------
 
-
 The spy and trace tools are extremely useful for designing, debugging, testing
 and documenting the behavior of your statecharts.
 
@@ -16,12 +15,9 @@ But how would you view the spy and trace information from different statecharts,
 running on different computers, across a network?
 
 It would be useful if you could send the spy and trace information from one
-machine to another and aggregate it in one location.  Aggregating all of the spy
-and trace information onto one machine will make it look like all of your
-statecharts are just running in different threads, on that machine, instead of on different
-computers.  We already know how to make sense of statecharts running in different
-threads.  So if we use such an aggregation technique, we could understand how
-different statecharts running on different machines are working together.
+machine to another and aggregate it in one location.  This way you could view
+the instrumentation results of all of your networked state machines as is they
+were all running in one location.
 
 In this example I will run a statechart on one computer, then view it's
 spy and trace log on another.
@@ -33,8 +29,8 @@ Getting the Required Libraries
 
 Up until now I have only been using ``miros`` and the Python standard library.
 To make this example work, you will have to install ``pika`` for messaging with
-RabbitMq and ``cryptography`` for encrypting your messages.  So let's do that
-now:
+:ref:`RabbitMq<setting_up_rabbit_mq-setting-up-rabbit-mq>` and ``cryptography``
+for encrypting your messages.  So let's do that now:
 
 .. code-block:: python
 

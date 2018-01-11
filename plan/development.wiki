@@ -1,24 +1,10 @@
 *Feature Guide*
 = Observe =
   *What defines Success?*
-
-  Two statecharts running on different machines can have their trace/spy
-  information reported together on one machine:
-
-    # standard spy and trace should work
-    pp(ao.spy)
-    pp(fao.spy)      # spy from other machine
-    print(oa.trace)
-    print(foa.trace) # trace from other machine
-
-    # live output should work to
-    ao.live_spy = True
-    fao.live_spy = True   # live spy information from other machine
-    ao.live_trace = True
-    fao.live_trace = True # live trace information from other machine
+  Remove the irritating newline from the live trace
 
   *What is the problem?*
-    Create a clean interface into rabbitmq
+  The new lines are creating noise in the output... 
 
   *Evidence that contradicts Assumptions:*
 
@@ -26,39 +12,20 @@
   *Symptoms of current issue:*
 
   *Questions regarding current issue:*
+  Why was this done?
 
   *Assumptions:*
 
 = Decide =
   *Idea/Hypothesises: >=5*
-  * [X] Construct a version of the rabbitmq example that sends messages from one
-        computer to another
-  * [X] From the source computer, add a statechart, then have it's trace/spy
-        live output send information over rabbitmq.  Confirm this can be seen on
-        another computer.
-  * [X] Add a callback handler to the live trace/spy feature. Confirm over the
-        network.
-  * [X] Link in the foreign hsm object to this stream of information, the
-        foreign hsm object will only be providing an interface that looks the
-        same as any object which is derived from an ancestor of the
-        HsmEventProcessor.
-  * [X] Encrypt the channel
-  * [X] Ensure multiple workers all get the same foreign spy/trace information
-  * [X] Iterate on the designs to simplify them
-  * [X] Clean/Document until they aren't embarrassing
-  * [ ] Write up the results in your docs -- example or pattern information
+  * [ ] reproduce the issue
+  * [ ] run the test in autotest mode
+  * [ ] identify the location of the problem in the code
+  * [ ] adjust it and iterate until all tests pass
 
   *Chosen Idea/Hypothesis*
-  * Construct a version of the rabbitmq example that sends messages from one
-    computer to another.
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
-    * use example b, since this is a point to point example where we need the
-      messages coming in.
-    * copy example b into the examples folder
-    * commit/push
-    * one different computers get it working
-    * slowly change the send/receive code until it is ready for the next step
 
 = Act =
 
@@ -66,13 +33,16 @@
 
   *Backlog*
     * [ ] Remove irritating newline in live trace
+    * [ ] Add factory examples to the state recipes
+    * [ ] Remove options 2 and 3 from the state recipes
+    * [ ] Move all examples into the examples directory
     * [ ] Fix and verify all examples
-    * [ ] Figure out how to draw a network connection with rabbitmq using UML
-    * [ ] Spec to diagram
-    * [ ] diagram sematics
-    * [ ] examples directory containing one file for each example/pattern
-    * [ ] Multi-Chart Race
-    * [ ] Multi-Chart Pend
+    * [ ] Add botnet example
+    * [ ] Multi-Chart Race pattern
+    * [ ] Multi-Chart Pend pattern
+    * [ ] diagram sematics writing
+    * [ ] Spec to diagram writing
+    * [ ] Read messaging patterns link off of RabbitMq
 
   *Weird and Fun Ideas*
     * [ ] Add statistics
@@ -83,30 +53,39 @@
     * [ ] The devil's staircase
     * [ ] Turn on/off spy within a subset of the chart [recipe]
 
-  *House Keeping:*
-    * [ ] Make sure all examples are working in example file
-    * [ ] Move examples into their own files for download
-
   *Someday Maybe*
-    * [ ] Encrypt rabbit messages
     * [ ] Link IP addresses to URL's (on the cheap)
 
-  *Resources:*
-  Setting up a python project is needlessly complicated, but here are the steps:
-  * [ ] Move your production files into a subdirectory, named after your project
-        (miros)
-  * [ ] Add a setup.py file at the same level as this directory
-  * [ ] Install virtualenv
-  * [ ] > virtualenv <whatever> # in this case: > virtualenv prot
-  * [ ] In bash > source ./prot/Scripts/activate
-  * [ ] In the named subdirectory, (miros), add a file called __init__.py, this
-        turns it into a package.  Your test code will be able to import files
-        into themselves like:  from miros.events import <Class>
-  * [ ] Add a test directory
-  * [ ] Name your tests as <whatever>_test.py
-  * [ ] In the test files your imports should work
-  * [ ] Install your local package > pip install --editable .
-  * [ ] Write a super simple test that just fails with tries to import something
-        from your package.  Test it with > pytest, confirm failure from assert
-        not an import error.
-  * [ ] Wrestle with it until it works.
+  *Project Workflows:*
+  
+    *Setting up a python project is needlessly complicated, but here are the steps*:
+    * [ ] Update the state documentation... Simplify it!
+    * [ ] Move your production files into a subdirectory, named after your project
+          (miros)
+    * [ ] Add a setup.py file at the same level as this directory
+    * [ ] Install virtualenv
+    * [ ] > virtualenv <whatever> # in this case: > virtualenv prot
+    * [ ] In bash > source ./prot/Scripts/activate
+    * [ ] In the named subdirectory, (miros), add a file called __init__.py, this
+          turns it into a package.  Your test code will be able to import files
+          into themselves like:  from miros.events import <Class>
+    * [ ] Add a test directory
+    * [ ] Name your tests as <whatever>_test.py
+    * [ ] In the test files your imports should work
+    * [ ] Install your local package > pip install --editable .
+    * [ ] Write a super simple test that just fails with tries to import something
+          from your package.  Test it with > pytest, confirm failure from assert
+          not an import error.
+    * [ ] Wrestle with it until it works.
+
+    *Getting your examples folder to work*:
+    
+    * [ ] Navigate to the root directory of your project
+    * [ ] > pip3 install -e . --user
+  
+    *Getting your autotester working:*
+    
+      > pip3 install pytest-watch --user
+      > ptw
+    
+    *Automation of documentation:*

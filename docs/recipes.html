@@ -41,16 +41,12 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <blockquote>
-<div><p><em>I know who in the family is a great cook.  I know where the great recipes are.</em></p>
-<p class="attribution">&mdash;Irma S. Rombauer</p>
-</div></blockquote>
-<div class="section" id="recipes">
-<span id="id1"></span><h1>Recipes<a class="headerlink" href="#recipes" title="Permalink to this headline">¶</a></h1>
-<blockquote>
+  <blockquote id="recipes">
 <div><p><em>Simple things should be simple, complex things should be possible.</em></p>
 <p class="attribution">&mdash;Alan Kay</p>
 </div></blockquote>
+<div class="section" id="id1">
+<h1>Recipes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <div class="section" id="states">
@@ -64,8 +60,8 @@
 </ol>
 <p>There are different ways to create states with miros:</p>
 <ol class="arabic simple">
-<li><a class="reference internal" href="#recipes-boiler-plate-state-method-code"><span class="std std-ref">You can create a hand-coded state
-method.</span></a></li>
+<li><a class="reference internal" href="#recipes-boiler-plate-state-method-code"><span class="std std-ref">You can create a hand-coded state method with if-elif structures.</span></a> (so you can easily port your design
+back into the c programming language for embedded applications)</li>
 <li><a class="reference internal" href="#recipes-creating-a-state-method-from-a-template"><span class="std std-ref">You can have the library generate a state method for you, then register
 callback responses to specific events and set a parent at
 runtime.</span></a></li>
@@ -74,6 +70,12 @@ managers within the method so that the miros package can register callbacks
 for specific signals, or even change it’s parent at run time.</li>
 <li><a class="reference internal" href="#recipes-creating-a-state-method-from-a-factory"><span class="std std-ref">You can use an Active Object Factory to create your statechart</span></a></li>
 </ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">I recommend that you only use methods 1 and 4.  Methods 2 and 3 are built up to
+provide method 4.  A statechart built using a factory, method 4, can always be
+turned back into a statechart of method 1 using the <code class="docutils literal"><span class="pre">to_code</span></code> method.</p>
+</div>
 <p id="recipes-state-recipes"><strong>State Recipes</strong>:</p>
 <ul class="simple">
 <li><a class="reference internal" href="#recipes-boiler-plate-state-method-code"><span class="std std-ref">Boiler plate state method code</span></a></li>
