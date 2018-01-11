@@ -125,7 +125,7 @@ class RabbitProducer(Factory):
     self.live_trace = True
 
 
-#  +-------- producer_outer --------+
+#  +-------- producer_outer ---------+
 #  |   +--- c1 ----+   +---- c2 ---+ |
 #  | * |           |   |           | +--+
 #  | | |           +-A->           | |  |
@@ -153,7 +153,7 @@ def c2_A(chart, e):
 
 
 chart = RabbitProducer(
-  chart_name="rabbit_producer",
+  chart_name="producer",
   rabbit_user="bob",
   rabbit_password="dobbs",
   ip="192.168.1.72",

@@ -58,7 +58,7 @@ class LocalConsumer():
 
   To start it:
 
-    locall_consumer.start()
+    local_consumer.start()
 
   '''
   def __init__(self, rabbit_user, rabbit_password):
@@ -73,7 +73,8 @@ class LocalConsumer():
     self.channel.exchange_declare(exchange='spy',   exchange_type='fanout')
     self.channel.exchange_declare(exchange='trace', exchange_type='fanout')
 
-    # create new queues, and ensure they destroy themselves when we disconnect from them
+    # create new queues, and ensure they destroy themselves when we disconnect
+    # from them
     spy_result   = self.channel.queue_declare(exclusive=True)
     trace_result = self.channel.queue_declare(exclusive=True)
 
