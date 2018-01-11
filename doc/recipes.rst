@@ -319,7 +319,7 @@ Generally speaking this is how it is done:
 
 If you need to define your parent state as the outermost state of your diagram, you would
 set the ``<parent_state_of_this_state_method>`` to the ``top`` attribute of the
-first argument provided your crafted the state method:
+first argument provided to your state method:
 
 .. code-block:: python
   :emphasize-lines: 6
