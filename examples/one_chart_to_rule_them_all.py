@@ -26,7 +26,7 @@ class Mirrored(Factory):
         exchange='mirror_exchange',
         exchange_type='direct')
 
-    result     = channel.queue_declare(exclusive = True)
+    result     = self.channel.queue_declare(exclusive = True)
     queue_name = result.method.queque
 
     # Our routing key is our IP address
