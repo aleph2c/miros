@@ -31,6 +31,7 @@ class Mirrored(Factory):
 
     # Our routing key is our IP address
     received_routing_key = Mirrored.get_ip().replace('.', '')
+    print(received_routing_key)
     self.channel.queue_bind(
         exchange='mirror_exchange',
         queue=queue_name,
