@@ -77,7 +77,7 @@ if __name__ == "__main__":
       rabbit_password='dobbs',
       ip=other_ip,
       port = '5672')
-  mirrored.publish_over_network("From Pi")
+  mirrored.publish_over_network("From Pi {}".format(Mirrored.get_ip()))
   mirrored.channel.start_consuming()
 
 
