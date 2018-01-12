@@ -30,7 +30,7 @@ class Mirrored(Factory):
     queue_name = result.method.queue
 
     # Our routing key is our IP address
-    received_routing_key = Mirrored.get_ip()
+    received_routing_key = Mirrored.get_ip().replace('.', '')
     self.channel.queue_bind(
         exchange='mirror_exchange',
         queue=queue_name,
@@ -50,7 +50,7 @@ class Mirrored(Factory):
   def publish_over_network(self, message):
     self.channel.basic_publish(
         exchange='mirror_exchange',
-        routing_key = self.destination_ip,
+        routing_key = self.destination_ip.replace('.',''),
         body=message)
 
   def receive_message_from_network(self, ch, method, properties, body):
