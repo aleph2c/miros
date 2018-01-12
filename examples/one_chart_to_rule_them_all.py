@@ -26,8 +26,8 @@ class Mirrored(Factory):
         exchange='mirror_exchange',
         exchange_type='direct')
 
-    result     = self.channel.queue_declare(exclusive = True)
-    queue_name = result.method.queque
+    result     = self.channel.queue_declare(exclusive=True)
+    queue_name = result.method.queue
 
     # Our routing key is our IP address
     received_routing_key = Mirrored.get_ip()
@@ -77,5 +77,7 @@ if __name__ == "__main__":
       rabbit_password='dobbs',
       ip=other_ip,
       port = '5672')
+  mirrored.publish_over_network("From Pi")
+  mirrored.channel.start_consuming()
 
 
