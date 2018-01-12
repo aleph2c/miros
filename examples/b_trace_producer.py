@@ -36,18 +36,15 @@ class RabbitProducer(Factory):
     self.destination_ip = ip
     self.destination_port = port
 
-    credentials = pika.PlainCredentials(rabbit_user, rabbit_password)
-    parameters = pika.ConnectionParameters(ip, port, '/', credentials)
+    credentials     = pika.PlainCredentials(rabbit_user, rabbit_password)
+    parameters      = pika.ConnectionParameters(ip, port, '/', credentials)
     self.connection = pika.BlockingConnection(parameters=parameters)
 
     self.channel = self.connection.channel()
-    self.channel.queue_declare(queue='spy_queue',   durable=True)
-    self.channel.queue_declare(queue='trace_queue', durable=True)
 
     def strip_trace(fn):
       @wraps(fn)
       def _strip_trace(trace_live):
-
         trace_live = trace_live.replace("\n", "")
         fn(trace_live)
       return _strip_trace
