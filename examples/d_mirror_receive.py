@@ -68,7 +68,7 @@ credentials = pika.PlainCredentials('bob', 'dobbs')
 connection = connection_using_url_parameters()
 channel = connection.channel()
 
-channel.exchange_declare(exchange='direct_logs', exchange_type='direct')
+channel.exchange_declare(exchange='mirror', exchange_type='direct')
 
 result = channel.queue_declare(exclusive=True)
 queue_name = result.method.queue
@@ -79,8 +79,8 @@ if not severities:
   sys.exit(1)
 
 for severity in severities:
-  channel.queue_bind(exchange='direct_logs', queue=queue_name,
-      routing_key=severity)
+  channel.queue_bind(exchange='mirror', queue=queue_name,
+      routing_key=get_ip())
 
 print(' [x] Waiting for logs. To exit press CTRL-C')
 def callback(ch, method, properties, body):

@@ -38,6 +38,7 @@ class Mirrored(Factory):
         routing_key=received_routing_key)
 
     def receive_callback(ch, method, properties, body):
+      import pdb; pdb.set_trace()
       self.receive_message_from_network(
           ch,
           method,
@@ -79,8 +80,10 @@ if __name__ == "__main__":
       rabbit_user='bob',
       rabbit_password='dobbs',
       ip=other_ip,
-      port = '5672')
-  mirrored.publish_over_network("From Pi {}".format(Mirrored.get_ip()))
+      port = 5672)
+  for i in range(10):
+    mirrored.publish_over_network("From Pi {}".format(Mirrored.get_ip()))
+    time.sleep(1)
   mirrored.channel.start_consuming()
 
 
