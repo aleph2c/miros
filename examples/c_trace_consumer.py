@@ -124,8 +124,13 @@ class LocalConsumer():
     self.connection.add_timeout(deadline=10, callback_method=timeout_callback)
 
     # register the spy_callback and trace_callback with a queue
-    self.channel.basic_consume(spy_callback,   queue=spy_queue_name,   no_ack=True)
-    self.channel.basic_consume(trace_callback, queue=trace_queue_name, no_ack=True)
+    self.channel.basic_consume(spy_callback,
+        queue=spy_queue_name,
+        no_ack=True)
+
+    self.channel.basic_consume(trace_callback,
+        queue=trace_queue_name,
+        no_ack=True)
 
   def start(self):
     self.channel.start_consuming()

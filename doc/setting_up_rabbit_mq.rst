@@ -182,9 +182,15 @@ your Linux system.
 
 Installing On Windows
 ---------------------
-To install the same infrasture on Windows if followed `these instructions
-<https://www.rabbitmq.com/install-windows.html>`_.  Once I had enough of it
-working I opened the 
+To install the same infrastructure on Windows follow `these instructions
+<https://www.rabbitmq.com/install-windows.html>`_. Or you can reference this
+`guy's blog <http://arcware.net/installing-rabbitmq-on-windows/>`_.  To open the
+required ports, look at `this. <http://www.tomshardware.com/faq/id-3114787/open-firewall-ports-windows.html>`_
+
+.. _setting_up_rabbit_mq-learning-to-basic-messaging-patterns-and-networking-rabbitmq:
+
+Learning to Basic Messaging Patterns and Networking RabbitMQ
+------------------------------------------------------------
 
 Ok, now what?
 
@@ -243,3 +249,5 @@ RPC                `simple RPC`_           - `networked rpc send`_
 .. _simple RPC: https://www.rabbitmq.com/tutorials/tutorial-six-python.html
 .. _networked rpc send: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/f_rpc_client.py
 .. _networked rpc receive: https://github.com/aleph2c/miros/blob/master/experiment/rabbit/f_rpc_server.py
+.. _opening_ports_on_windows_10: http://www.tomshardware.com/faq/id-3114787/open-firewall-ports-windows.html
+.. _installing_rabbit_mq_on_windows_10: http://arcware.net/installing-rabbitmq-on-windows/
