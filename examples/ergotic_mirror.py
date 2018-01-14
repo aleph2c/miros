@@ -114,26 +114,48 @@ class EmitConnections():
         pass
     return channels
 
-# input_.start_consuming()
-# output.message_to_other_channels("an actual message")
+class Receiver():
+  def __init__(self, user, password):
+    self.user     = user
+    self.password = password
+    self.rx = ReceiveConnections(user, password)
+
+  def start_consuming(self):
+    self.rx.start_consuming()
+
+  def stop_consuming(self):
+    self.rx.stop_consuming()
+    del(self.rx)
+    self.rx = ReceiveConnections(self.user, self.password)
+
+class Transmitter():
+
+  def __init__(self, user, password):
+    self.tx = EmitConnections(base="192.168.1.",
+                start=70,
+                end=73,
+                user=user,
+                password=password)
+
+  def message_to_other_channels(self, message):
+    self.tx.message_to_other_channels(message)
+
 
 tranceiver_type = sys.argv[1:]
 if not tranceiver_type:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
 
 if tranceiver_type[0] == 'rx':
-  rx = ReceiveConnections('bob', 'dobbs')
+  rx = Receiver('bob', 'dobbs')
   rx.start_consuming()
   time.sleep(10)
   rx.stop_consuming()
-  del(rx)
-  rx = ReceiveConnections('bob', 'dobbs')
   rx.start_consuming()
   time.sleep(10)
   rx.stop_consuming()
 
 elif tranceiver_type[0] == 'tx':
-  tx = EmitConnections(base="192.168.1.", start=70, end=73, user="bob", password="dobbs")
+  tx = Transmitter(user="bob", password="dobbs")
   tx.message_to_other_channels("an actual message")
 else:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
