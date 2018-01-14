@@ -1,9 +1,11 @@
 
 #!/usr/bin/env python3
-import pika
 import sys
+import pika
+import time
 import socket
 from types import SimpleNamespace
+from threading import Thread, Event
 
 class Connection():
 
@@ -37,7 +39,10 @@ class ReceiveConnections():
     self.queue_name = result.method.queue
     self.channel.queue_bind(exchange='mirror', queue=self.queue_name, routing_key=Connection.get_ip())
 
-    print(' [x] Waiting for logs. To exit press CTRL-C')
+    self.task_run_event = Event()
+    self.task_run_event.set()
+
+    print(' [x] Waiting for messages. To exit press CTRL-C')
     def callback(ch, method, properties, body):
       self.callback(ch, method, properties, body)
     self.channel.basic_consume(callback, queue=self.queue_name, no_ack=True)
@@ -46,10 +51,21 @@ class ReceiveConnections():
     print(" [x] {}:{}".format(method.routing_key, body.decode('utf8')))
 
   def start_consuming(self):
-    self.channel.start_consuming()
+    def channel_consumer(self):
+      self.task_run_event.set()
+      def timeout_callback():
+        if self.task_run_event.is_set():
+          self.connection.add_timeout(deadline=10, callback_method=timeout_callback)
+        else:
+          self.channel.stop_consuming()
+          return
+      self.connection.add_timeout(deadline=10, callback_method=timeout_callback)
+      self.channel.start_consuming()
+    thread = Thread(target=channel_consumer, args=(self,), daemon=True)
+    thread.start()
 
   def stop_consuming(self):
-    self.channel.stop_consuming()
+    self.task_run_event.clear()
 
 class EmitConnections():
 
@@ -108,9 +124,18 @@ if not tranceiver_type:
 if tranceiver_type[0] == 'rx':
   rx = ReceiveConnections('bob', 'dobbs')
   rx.start_consuming()
+  time.sleep(10)
+  rx.stop_consuming()
+  del(rx)
+  rx = ReceiveConnections('bob', 'dobbs')
+  rx.start_consuming()
+  time.sleep(10)
+  rx.stop_consuming()
+
 elif tranceiver_type[0] == 'tx':
   tx = EmitConnections(base="192.168.1.", start=70, end=73, user="bob", password="dobbs")
   tx.message_to_other_channels("an actual message")
 else:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
+
 
