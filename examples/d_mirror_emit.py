@@ -94,4 +94,4 @@ class Connections():
     return channels
 
 rabbit = Connections(base="192.168.1.", start=70, end=80, user="bob", password="dobbs")
-rabbit.message_to_other_channels(channels, "an actual message")
+rabbit.message_to_other_channels("an actual message")
