@@ -276,13 +276,18 @@ if not tranceiver_type:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
 
 def custom_rx_callback(ch, method, properties, body):
-    print(" [+] {}:{}".format(method.routing_key, Event.loads(body)))
+  if "signal_name" in body:
+    event = Event.loads(body)
+    print(" [+] {}:{}".format(method.routing_key, event))
+  else:
+    print(" [+] {}:{}".format(method.routing_key, body))
+
 
 if tranceiver_type[0] == 'rx':
   rx = Receiver('bob', 'dobbs')
   rx.register_live_callback(custom_rx_callback)
   rx.start_consuming()
-  time.sleep(10)
+  time.sleep(100)
   rx.stop_consuming()
   rx.start_consuming()
   time.sleep(10)
@@ -290,6 +295,7 @@ if tranceiver_type[0] == 'rx':
 elif tranceiver_type[0] == 'tx':
   tx = Transmitter(user="bob", password="dobbs")
   tx.message_to_other_channels(Event.dumps(Event(signal=signals.Mirror, payload=[1,2,3])))
+  tx.message_to_other_channels([1,2,3,4])
 else:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
 
