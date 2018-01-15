@@ -211,3 +211,17 @@ class Event(OrderedDictWithParams):
     if self.payload is None:
       result = False
     return result
+
+  def __str__(self):
+    if self.payload is None:
+      result = "{}::<>".format(self.signal_name)
+    else:
+      result = "{}::<{}>".format(self.signal_name, str(self.payload))
+    return result
+
+  def __repr__(self):
+    if self.payload is None:
+      result = "{}:{}::<>".format(self.signal_name, self.signal)
+    else:
+      result = "{}:{}::<{}>".format(self.signal_name, self.signal, str(self.payload))
+    return result
