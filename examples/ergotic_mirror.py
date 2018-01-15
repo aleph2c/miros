@@ -287,7 +287,7 @@ if tranceiver_type[0] == 'rx':
   rx.stop_consuming()
 elif tranceiver_type[0] == 'tx':
   tx = Transmitter(user="bob", password="dobbs")
-  tx.message_to_other_channels(pickle.dumps("an actual message"))
+  tx.message_to_other_channels("an actual message")
 else:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
 
