@@ -23,14 +23,13 @@ class Connection():
   def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-      # doesn't have to be reachable
       s.connect(('10.255.255.255', 1))
-      IP = s.getsockname()[0]
+      ip = s.getsockname()[0]
     except:
-      IP = '127.0.0.1'
+      ip = '127.0.0.1'
     finally:
       s.close()
-    return IP
+    return ip
 
   @staticmethod
   def key():
@@ -65,7 +64,6 @@ class Connection():
         assert(False)
       f = Fernet(Connection.key())
       cyphertext = f.encrypt(plain_text)
-      # broadcast_trace/broadcast_spy
       if len(args) == 1:
         fn(cyphertext)
       else:
@@ -82,31 +80,65 @@ class ReceiveConnections():
 
   '''
   def __init__(self, user, password):
+    # create a connection and a direct exchange called 'mirror' on this ip
     self.connection = Connection.get_blocking_connection(user, password, Connection.get_ip(), 5672)
-    self.channel = self.connection.channel()
+    self.channel    = self.connection.channel()
     self.channel.exchange_declare(exchange='mirror', exchange_type='direct')
 
-    # destroy queue when done
-    result = self.channel.queue_declare(exclusive=True)
+    # destroy the rabbitmq queue when done
+    result          = self.channel.queue_declare(exclusive=True)
     self.queue_name = result.method.queue
+    # create a channel with a direct routing key, the key is our ip address
     self.channel.queue_bind(exchange='mirror', queue=self.queue_name, routing_key=Connection.get_ip())
 
+    # The 'start_consuming' method of the pika library will block the program.
+    # for this reason we will put it in it's own thread so that it does not harm
+    # our program flow, to communicate to it we use an Event from the threading
+    # class
     self.task_run_event = ThreadingEvent()
     self.task_run_event.set()
+
+    # We provide a default message callback, but it is more than likely that the
+    # client will register their own (why else use this class?)
     self.live_callback = self.default_callback
     print(' [x] Waiting for messages. To exit press CTRL-C')
 
+    # We wrap the tunable callback with decryption and a serial decoder
+    # this way the client doesn't have to know about this complexity
     @Connection.decrypt
     def callback(ch, method, properties, body):
       decoded = pickle.loads(body)
       self.live_callback(ch, method, properties, decoded)
 
+    # Register the above callback with the queue
     self.channel.basic_consume(callback, queue=self.queue_name, no_ack=True)
 
   def default_callback(self, ch, method, properties, body):
+    '''
+    This default callback is provided out of the box, it will be ignored by the
+    client since they will register their own callback
+    '''
     print(" [x] {}:{}".format(method.routing_key, body))
 
   def register_live_callback(self, live_callback):
+    '''
+    Register a callback with this object.  It will be called once a message is
+    received, decrypted and decoded.
+
+    Example:
+
+      def custom_rx_callback(ch, method, properties, body):
+        if "signal_name" in body:
+          # turn our event json object back into an event
+          event = Event.loads(body)
+          print(" [+] {}:{}".format(method.routing_key, event))
+        else:
+          print(" [+] {}:{}".format(method.routing_key, body))
+
+      rx = Receiver('bob', 'dobbs')
+      rx.register_live_callback(custom_rx_callback)
+
+    '''
     self.live_callback = live_callback
 
   def start_consuming(self):
@@ -219,8 +251,14 @@ class Receiver():
 
   Example:
     import time
+
     def custom_rx_callback(ch, method, properties, body):
-        print(" [+] {}:{}".format(method.routing_key, body.decode('utf8')))
+      if "signal_name" in body:
+        # turn our event json object back into an event
+        event = Event.loads(body)
+        print(" [+] {}:{}".format(method.routing_key, event))
+      else:
+        print(" [+] {}:{}".format(method.routing_key, body))
 
     rx = Receiver(user='bob', password='dobbs')
     rx.register_live_callback(custom_rx_callback)
@@ -260,6 +298,14 @@ class Transmitter():
     tx = Transmitter(user="bob", password="dobbs")
     tx.message_to_other_channels("an actual message")
 
+    # Note, to send a miros event across the network you will have to encode it
+    # first:
+    tx.message_to_other_channels(Event.dumps(Event(signal=signals.Mirror, payload=[1,2,3])))
+
+    # To decode this event:
+    event = Event.loads(event_as_json)
+    print(event) #=> Mirror::<[1,2,3]>
+
   '''
   def __init__(self, user, password):
     self.tx = EmitConnections(base="192.168.1.",
@@ -277,6 +323,7 @@ if not tranceiver_type:
 
 def custom_rx_callback(ch, method, properties, body):
   if "signal_name" in body:
+    # turn our event json object back into an event
     event = Event.loads(body)
     print(" [+] {}:{}".format(method.routing_key, event))
   else:
