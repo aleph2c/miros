@@ -58,6 +58,7 @@ class Connection():
         assert(False)
       key = b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
       f = Fernet(key)
+      print(plain_text)
       cyphertext = f.encrypt(plain_text.encode())
       # broadcast_trace/broadcast_spy
       if len(args) == 1:
@@ -156,6 +157,7 @@ class EmitConnections():
     targets       = EmitConnections.scout_targets(possible_ips, user, password)
     self.channels = EmitConnections.get_channels(targets, user, password)
 
+  @Connection.encrypt
   def message_to_other_channels(self, message):
     for channel in self.channels:
       ip = channel.extension.ip_address
@@ -174,7 +176,12 @@ class EmitConnections():
         connection = Connection.get_blocking_connection(user, password, target, 5672)
         channel = connection.channel()
         channel.exchange_declare(exchange='mirror', exchange_type='direct')
-        channel.basic_publish(exchange='mirror', routing_key=target, body=message)
+
+        @Connection.encrypt
+        def send(message):
+          channel.basic_publish(exchange='mirror', routing_key=target, body=message)
+
+        send(message)
         print(" [x] Sent \"{}\" to {}".format(message, target))
         connection.close()
       except:
@@ -261,7 +268,7 @@ if not tranceiver_type:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
 
 def custom_rx_callback(ch, method, properties, body):
-    print(" [+] {}:{}".format(method.routing_key, body.decode('utf8')))
+    print(" [+] {}:{}".format(method.routing_key, body))
 
 if tranceiver_type[0] == 'rx':
   rx = Receiver('bob', 'dobbs')
