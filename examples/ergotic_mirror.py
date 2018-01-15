@@ -96,7 +96,6 @@ class ReceiveConnections():
     @Connection.decrypt
     def callback(ch, method, properties, body):
       decoded = pickle.loads(body)
-      import pdb; pdb.set_trace()
       self.live_callback(ch, method, properties, decoded)
 
     self.channel.basic_consume(callback, queue=self.queue_name, no_ack=True)
