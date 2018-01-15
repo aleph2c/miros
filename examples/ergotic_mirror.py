@@ -276,7 +276,7 @@ if not tranceiver_type:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
 
 def custom_rx_callback(ch, method, properties, body):
-    print(" [+] {}:{}".format(method.routing_key, body))
+    print(" [+] {}:{}".format(method.routing_key, Event.loads(body)))
 
 if tranceiver_type[0] == 'rx':
   rx = Receiver('bob', 'dobbs')
