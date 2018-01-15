@@ -171,7 +171,7 @@ class EmitConnections():
     possible_targets = targets[:]
     possible_targets.remove(Connection.get_ip())
     # some random message so that our encryption isn't easily broken
-    message = str(uuid.uuid4().get_hex().upper()[0:12])
+    message = uuid.uuid4().hex.upper()[0:12]
 
     for target in possible_targets[:]:
       try:
