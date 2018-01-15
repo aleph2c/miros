@@ -59,7 +59,6 @@ class Connection():
         assert(False)
       key = b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
       f = Fernet(key)
-      print(plain_text)
       cyphertext = f.encrypt(plain_text.encode())
       # broadcast_trace/broadcast_spy
       if len(args) == 1:
