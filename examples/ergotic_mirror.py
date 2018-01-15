@@ -289,7 +289,7 @@ if tranceiver_type[0] == 'rx':
   rx.stop_consuming()
 elif tranceiver_type[0] == 'tx':
   tx = Transmitter(user="bob", password="dobbs")
-  tx.message_to_other_channels(json.dumps(payload=[1,2,3]))
+  tx.message_to_other_channels(Event.dumps(Event(signal=signals.Mirror, payload=[1,2,3])))
 else:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
 

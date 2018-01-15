@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from miros.singleton import SingletonDecorator
+import json
 
 
 # Not intended for export
@@ -225,3 +226,23 @@ class Event(OrderedDictWithParams):
     else:
       result = "{}:{}::<{}>".format(self.signal_name, self.signal, str(self.payload))
     return result
+
+  @staticmethod
+  def dumps(event):
+    signal_name = event.signal_name
+    payload = None
+    if event.payload is not None:
+      payload = event.payload
+
+    event_as_dict = {'signal_name' : signal_name,
+                     'payload' : payload}
+    return json.dumps(event_as_dict)
+
+  @staticmethod
+  def loads(json_event):
+    event_as_dict = json.loads(json_event)
+    signal_name = event_as_dict['signal_name']
+    payload     = event_as_dict['payload']
+
+    event = Event(signal = signal_name, payload=payload)
+    return event
