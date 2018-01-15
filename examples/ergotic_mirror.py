@@ -46,7 +46,7 @@ class Connection():
     def _decrypt(ch, method, properties, cyphertext):
       '''LocalConsumer.decrypt()'''
       f = Fernet(Connection.key())
-      plain_text = f.decrypt(cyphertext).decode()
+      plain_text = f.decrypt(cyphertext)
       fn(ch, method, properties, plain_text)
     return _decrypt
 
@@ -96,6 +96,7 @@ class ReceiveConnections():
     @Connection.decrypt
     def callback(ch, method, properties, body):
       decoded = pickle.loads(body)
+      import pdb; pdb.set_trace()
       self.live_callback(ch, method, properties, decoded)
 
     self.channel.basic_consume(callback, queue=self.queue_name, no_ack=True)
