@@ -32,6 +32,9 @@ class Connection():
 
   @staticmethod
   def key():
+    '''
+    A better way to do this is to get the key from your flash key.
+    '''
     return b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
 
   @staticmethod
@@ -69,6 +72,31 @@ class Connection():
         fn(args[0], cyphertext)
     return _encrypt
 
+  @staticmethod
+  def serialize(fn):
+    @wraps(fn)
+    def _pickle_dumps(*args):
+      if len(args) == 1:
+        message = args[0]
+      elif len(args) == 2:
+        message = args[1]
+      else:
+        assert(False)
+      pmessage = pickle.dumps(message)
+      if len(args) == 1:
+        fn(pmessage)
+      else:
+        fn(args[0], pmessage)
+    return _pickle_dumps
+
+  @staticmethod
+  def deserialize(fn):
+    @wraps(fn)
+    def _pickle_loads(ch, method, properties, p_plain_text):
+      '''LocalConsumer.decrypt()'''
+      plain_text = pickle.loads(p_plain_text)
+      fn(ch, method, properties, plain_text)
+    return _pickle_loads
 
 class ReceiveConnections():
   '''
@@ -106,9 +134,9 @@ class ReceiveConnections():
     # We wrap the tunable callback with decryption and a serial decoder
     # this way the client doesn't have to know about this complexity
     @Connection.decrypt
+    @Connection.deserialize
     def callback(ch, method, properties, body):
-      decoded = pickle.loads(body)
-      self.live_callback(ch, method, properties, decoded)
+      self.live_callback(ch, method, properties, body)
 
     # Register the above callback with the queue
     self.channel.basic_consume(callback, queue=self.queue_name, no_ack=True)
@@ -198,8 +226,12 @@ class EmitConnections():
     targets       = EmitConnections.scout_targets(possible_ips, user, password)
     self.channels = EmitConnections.get_channels(targets, user, password)
 
+  @Connection.serialize  # pickle.dumps
   @Connection.encrypt
   def message_to_other_channels(self, message):
+    '''
+    Send messages to all of confirmed channels
+    '''
     for channel in self.channels:
       ip = channel.extension.ip_address
       channel.basic_publish(exchange='mirror',
@@ -208,6 +240,15 @@ class EmitConnections():
 
   @staticmethod
   def scout_targets(targets, user, password):
+    '''
+    Returns a subset of ip address from the targets.  The common feature of
+    these subsets is that they can you can connect to the via rabbitmq.  To do
+    this:
+    - They have have a mirror exchange
+    - They need to be able to respond to a message with a routing_key that is
+      the same as their ip address
+    - They can descrypt the message we are sending to them
+    '''
     possible_targets = targets[:]
     possible_targets.remove(Connection.get_ip())
     # some random message so that our encryption isn't easily broken
@@ -219,11 +260,12 @@ class EmitConnections():
         channel = connection.channel()
         channel.exchange_declare(exchange='mirror', exchange_type='direct')
 
+        @Connection.serialize
         @Connection.encrypt
         def send(message):
           channel.basic_publish(exchange='mirror', routing_key=target, body=message)
 
-        send(pickle.dumps(message))
+        send(message)
         print(" [x] Sent \"{}\" to {}".format(message, target))
         connection.close()
       except:
@@ -232,6 +274,10 @@ class EmitConnections():
 
   @staticmethod
   def get_channels(targets, user, password):
+    '''
+    Get a set of rabbitmq channels given a list of ip addresses and the user
+    name and password of the local rabbitmq server.
+    '''
     channels = []
     for target in targets:
       try:
@@ -337,7 +383,8 @@ class Transmitter():
                 password=password)
 
   def message_to_other_channels(self, message):
-    self.tx.message_to_other_channels(pickle.dumps(message))
+    #self.tx.message_to_other_channels(pickle.dumps(message))
+    self.tx.message_to_other_channels(message)
 
 
 tranceiver_type = sys.argv[1:]
