@@ -10,6 +10,7 @@ from functools import wraps
 from types import SimpleNamespace
 from threading import Thread, Event
 from cryptography.fernet import Fernet
+from miros.event import Event, signals
 
 class Connection():
   '''
@@ -286,7 +287,7 @@ if tranceiver_type[0] == 'rx':
   rx.stop_consuming()
 elif tranceiver_type[0] == 'tx':
   tx = Transmitter(user="bob", password="dobbs")
-  tx.message_to_other_channels("an actual message")
+  tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1,2,3]))
 else:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
 
