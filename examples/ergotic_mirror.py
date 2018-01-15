@@ -1,10 +1,8 @@
-
 #!/usr/bin/env python3
 import sys
 import pika
 import time
 import uuid
-import json
 import socket
 import pickle
 from functools import wraps
@@ -13,6 +11,7 @@ from threading import Thread
 from threading import Event as ThreadingEvent
 from cryptography.fernet import Fernet
 from miros.event import Event, signals
+
 
 class Connection():
   '''
@@ -69,6 +68,7 @@ class Connection():
       else:
         fn(args[0], cyphertext)
     return _encrypt
+
 
 class ReceiveConnections():
   '''
@@ -157,6 +157,7 @@ class ReceiveConnections():
       another timeout callback.  (Working with the library)
       '''
       self.task_run_event.set()
+
       def timeout_callback():
         if self.task_run_event.is_set():
           self.connection.add_timeout(deadline=10, callback_method=timeout_callback)
@@ -180,6 +181,7 @@ class ReceiveConnections():
     This will kill the channel_consumer within the next 10 seconds
     '''
     self.task_run_event.clear()
+
 
 class EmitConnections():
   '''
@@ -243,6 +245,7 @@ class EmitConnections():
         pass
     return channels
 
+
 class Receiver():
   '''
   Creates a rabbitmq receiver.  You can register a live callback which will be
@@ -276,6 +279,24 @@ class Receiver():
     self.rx.start_consuming()
 
   def register_live_callback(self, live_callback):
+    '''
+    Register a callback with this object.  It will be called once a message is
+    received, decrypted and decoded.
+
+    Example:
+
+      def custom_rx_callback(ch, method, properties, body):
+        if "signal_name" in body:
+          # turn our event json object back into an event
+          event = Event.loads(body)
+          print(" [+] {}:{}".format(method.routing_key, event))
+        else:
+          print(" [+] {}:{}".format(method.routing_key, body))
+
+      rx = Receiver('bob', 'dobbs')
+      rx.register_live_callback(custom_rx_callback)
+
+    '''
     self.live_callback = live_callback
     self.rx.register_live_callback(live_callback)
 
@@ -287,6 +308,7 @@ class Receiver():
     if hasattr(self, 'live_callback') is True:
       if self.live_callback is not None:
         self.rx.register_live_callback(self.live_callback)
+
 
 class Transmitter():
   '''
@@ -317,9 +339,11 @@ class Transmitter():
   def message_to_other_channels(self, message):
     self.tx.message_to_other_channels(pickle.dumps(message))
 
+
 tranceiver_type = sys.argv[1:]
 if not tranceiver_type:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
+
 
 def custom_rx_callback(ch, method, properties, body):
   if "signal_name" in body:
@@ -341,8 +365,8 @@ if tranceiver_type[0] == 'rx':
   rx.stop_consuming()
 elif tranceiver_type[0] == 'tx':
   tx = Transmitter(user="bob", password="dobbs")
-  tx.message_to_other_channels(Event.dumps(Event(signal=signals.Mirror, payload=[1,2,3])))
-  tx.message_to_other_channels([1,2,3,4])
+  tx.message_to_other_channels(Event.dumps(Event(signal=signals.Mirror, payload=[1, 2, 3])))
+  tx.message_to_other_channels([1, 2, 3, 4])
 else:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
 
