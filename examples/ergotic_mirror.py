@@ -50,7 +50,6 @@ class Connection():
   def encrypt(fn):
     @wraps(fn)
     def _encrypt(*args):
-      import pdb; pdb.set_trace()
       if len(args) == 1:
         plain_text = args[0]
       elif len(args) == 2:
@@ -157,7 +156,6 @@ class EmitConnections():
     targets       = EmitConnections.scout_targets(possible_ips, user, password)
     self.channels = EmitConnections.get_channels(targets, user, password)
 
-  @Connection.encrypt
   def message_to_other_channels(self, message):
     for channel in self.channels:
       ip = channel.extension.ip_address
