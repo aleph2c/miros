@@ -8,6 +8,7 @@ from functools import wraps
 from types import SimpleNamespace
 from threading import Thread, Event
 from cryptography.fernet import Fernet
+import uuid
 
 class Connection():
   '''
@@ -169,7 +170,8 @@ class EmitConnections():
   def scout_targets(targets, user, password):
     possible_targets = targets[:]
     possible_targets.remove(Connection.get_ip())
-    message = 'discovery probe'
+    # some random message so that our encryption isn't easily broken
+    message = str(uuid.uuid4().get_hex().upper()[0:12])
 
     for target in possible_targets[:]:
       try:
