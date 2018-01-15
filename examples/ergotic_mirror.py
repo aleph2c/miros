@@ -3,19 +3,19 @@
 import sys
 import pika
 import time
+import uuid
 import socket
+import pickle
 from functools import wraps
 from types import SimpleNamespace
 from threading import Thread, Event
 from cryptography.fernet import Fernet
-import uuid
 
 class Connection():
   '''
   A grab bag of networking static methods used by different objects within this
   module
   '''
-
   @staticmethod
   def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -30,6 +30,10 @@ class Connection():
     return IP
 
   @staticmethod
+  def key():
+    return b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
+
+  @staticmethod
   def get_blocking_connection(user, password, ip, port):
     credentials = pika.PlainCredentials(user, password)
     parameters = pika.ConnectionParameters(ip, port, '/', credentials)
@@ -41,8 +45,7 @@ class Connection():
     @wraps(fn)
     def _decrypt(ch, method, properties, cyphertext):
       '''LocalConsumer.decrypt()'''
-      key = b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
-      f = Fernet(key)
+      f = Fernet(Connection.key())
       plain_text = f.decrypt(cyphertext).decode()
       fn(ch, method, properties, plain_text)
     return _decrypt
@@ -57,9 +60,8 @@ class Connection():
         plain_text = args[1]
       else:
         assert(False)
-      key = b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
-      f = Fernet(key)
-      cyphertext = f.encrypt(plain_text.encode())
+      f = Fernet(Connection.key())
+      cyphertext = f.encrypt(plain_text)
       # broadcast_trace/broadcast_spy
       if len(args) == 1:
         fn(cyphertext)
@@ -80,6 +82,7 @@ class ReceiveConnections():
     self.connection = Connection.get_blocking_connection(user, password, Connection.get_ip(), 5672)
     self.channel = self.connection.channel()
     self.channel.exchange_declare(exchange='mirror', exchange_type='direct')
+
     # destroy queue when done
     result = self.channel.queue_declare(exclusive=True)
     self.queue_name = result.method.queue
@@ -92,12 +95,13 @@ class ReceiveConnections():
 
     @Connection.decrypt
     def callback(ch, method, properties, body):
-      self.live_callback(ch, method, properties, body)
+      decoded = pickle.loads(body)
+      self.live_callback(ch, method, properties, decoded)
 
     self.channel.basic_consume(callback, queue=self.queue_name, no_ack=True)
 
   def default_callback(self, ch, method, properties, body):
-    print(" [x] {}:{}".format(method.routing_key, body.decode('utf8')))
+    print(" [x] {}:{}".format(method.routing_key, body))
 
   def register_live_callback(self, live_callback):
     self.live_callback = live_callback
@@ -182,7 +186,7 @@ class EmitConnections():
         def send(message):
           channel.basic_publish(exchange='mirror', routing_key=target, body=message)
 
-        send(message)
+        send(pickle.dumps(message))
         print(" [x] Sent \"{}\" to {}".format(message, target))
         connection.close()
       except:
@@ -262,7 +266,7 @@ class Transmitter():
                 password=password)
 
   def message_to_other_channels(self, message):
-    self.tx.message_to_other_channels(message)
+    self.tx.message_to_other_channels(pickle.dumps(message))
 
 tranceiver_type = sys.argv[1:]
 if not tranceiver_type:
@@ -282,8 +286,7 @@ if tranceiver_type[0] == 'rx':
   rx.stop_consuming()
 elif tranceiver_type[0] == 'tx':
   tx = Transmitter(user="bob", password="dobbs")
-  tx.message_to_other_channels("an actual message")
+  tx.message_to_other_channels(pickle.dumps("an actual message"))
 else:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
-
 
