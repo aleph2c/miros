@@ -208,12 +208,24 @@ class Event(OrderedDictWithParams):
       raise("signal must be of type string or Signal")
 
   def has_payload(self):
+    '''
+    Example:
+      event = Event(signal=signals.Mary, payload=[1,2,3])
+      event.has_payload() # => True
+    '''
     result = True
     if self.payload is None:
       result = False
     return result
 
   def __str__(self):
+    '''
+    Provides a string representation of an event object.
+
+    Example:
+      event = Event(signal=signals.Mary, payload=[1,2,3])
+      pdb> print(event) #=> Mary::<[1, 2, 3]>
+    '''
     if self.payload is None:
       result = "{}::<>".format(self.signal_name)
     else:
@@ -221,6 +233,17 @@ class Event(OrderedDictWithParams):
     return result
 
   def __repr__(self):
+    '''
+    Provides an internal representation of an event object.
+
+    Example:
+      event = Event(signal=signals.Mary, payload=[1,2,3])
+      pdb> event #=> Mary:8::<[1, 2, 3]>
+
+    Note: The number after the signal name is the internal number used for
+    tracking the signal.
+
+    '''
     if self.payload is None:
       result = "{}:{}::<>".format(self.signal_name, self.signal)
     else:
@@ -229,6 +252,31 @@ class Event(OrderedDictWithParams):
 
   @staticmethod
   def dumps(event):
+    '''
+    Required for serialization prior to sending an event across an IO
+    stream/networks.
+
+    Due to the dynamic nature of the Event/signals object, an event object can
+    not just be pickled.  Instead the object must be passed through this 'Event.dumps'
+    function, then de-serialized using the 'Event.loads' function.
+
+    The numbering parity of the signal is not guaranteed across a network, but,
+    the signal name will be unique within all of the signals objects expressed on each
+    machine.  This is because signals are constructed dynamically.  So if one
+    machine defines the signal 'A' before 'B' and another just defines 'B'.  The
+    internal signals numbers for 'B' will not be the same for each machine.
+    This doesn't matter, since it is the signal name 'B' that distinguishes the
+    signal within a statechart and each machine will have the 'B' signal defined
+    once.
+
+    This 'dumps' method pulls out the signal name and payload, creates a
+    dictionary from them then turns it into a json object.   The signal number
+    is ignored during the process.
+
+    Example:
+      json_event = Event.dumps(Event(signal=signals.Mary))
+
+    '''
     signal_name = event.signal_name
     payload = None
     if event.payload is not None:
@@ -240,6 +288,19 @@ class Event(OrderedDictWithParams):
 
   @staticmethod
   def loads(json_event):
+    '''
+    De-serializes a serialized Event object.  An event object can not be
+    serialized using pickle due to it's dynamic nature.  For this reason the
+    'Event.dumps' method provides custom serialization for events.  This 'loads'
+    method is for deserializing a serialized event object.  See the example for
+    clarity.
+
+    Example:
+      json_event = Event.dumps(Event(signal=signals.Mary))
+      event = Event.loads(json_event)
+      print(event) # => Mary::<>
+
+    '''
     event_as_dict = json.loads(json_event)
     signal_name = event_as_dict['signal_name']
     payload     = event_as_dict['payload']
