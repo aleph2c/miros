@@ -9,7 +9,7 @@ import pickle
 from functools import wraps
 from types import SimpleNamespace
 from threading import Thread
-from threading Event as ThreadingEvent
+from threading import Event as ThreadingEvent
 from cryptography.fernet import Fernet
 from miros.event import Event, signals
 
