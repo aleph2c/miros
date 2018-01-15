@@ -8,7 +8,8 @@ import socket
 import pickle
 from functools import wraps
 from types import SimpleNamespace
-from threading import Thread, Event
+from threading import Thread
+from threading Event as ThreadingEvent
 from cryptography.fernet import Fernet
 from miros.event import Event, signals
 
@@ -89,7 +90,7 @@ class ReceiveConnections():
     self.queue_name = result.method.queue
     self.channel.queue_bind(exchange='mirror', queue=self.queue_name, routing_key=Connection.get_ip())
 
-    self.task_run_event = Event()
+    self.task_run_event = ThreadingEvent()
     self.task_run_event.set()
     self.live_callback = self.default_callback
     print(' [x] Waiting for messages. To exit press CTRL-C')
