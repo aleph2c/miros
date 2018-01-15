@@ -4,8 +4,10 @@ import sys
 import pika
 import time
 import socket
+from functools import wraps
 from types import SimpleNamespace
 from threading import Thread, Event
+from cryptography.fernet import Fernet
 
 class Connection():
   '''
@@ -33,6 +35,38 @@ class Connection():
     connection = pika.BlockingConnection(parameters=parameters)
     return connection
 
+  @staticmethod
+  def decrypt(fn):
+    @wraps(fn)
+    def _decrypt(ch, method, properties, cyphertext):
+      '''LocalConsumer.decrypt()'''
+      key = b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
+      f = Fernet(key)
+      plain_text = f.decrypt(cyphertext).decode()
+      fn(ch, method, properties, plain_text)
+    return _decrypt
+
+  @staticmethod
+  def encrypt(fn):
+    @wraps(fn)
+    def _encrypt(*args):
+      import pdb; pdb.set_trace()
+      if len(args) == 1:
+        plain_text = args[0]
+      elif len(args) == 2:
+        plain_text = args[1]
+      else:
+        assert(False)
+      key = b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
+      f = Fernet(key)
+      cyphertext = f.encrypt(plain_text.encode())
+      # broadcast_trace/broadcast_spy
+      if len(args) == 1:
+        fn(cyphertext)
+      else:
+        fn(args[0], cyphertext)
+    return _encrypt
+
 class ReceiveConnections():
   '''
   Receives connections on this ip address from port 5672
@@ -55,8 +89,11 @@ class ReceiveConnections():
     self.task_run_event.set()
     self.live_callback = self.default_callback
     print(' [x] Waiting for messages. To exit press CTRL-C')
+
+    @Connection.decrypt
     def callback(ch, method, properties, body):
       self.live_callback(ch, method, properties, body)
+
     self.channel.basic_consume(callback, queue=self.queue_name, no_ack=True)
 
   def default_callback(self, ch, method, properties, body):
@@ -120,6 +157,7 @@ class EmitConnections():
     targets       = EmitConnections.scout_targets(possible_ips, user, password)
     self.channels = EmitConnections.get_channels(targets, user, password)
 
+  @Connection.encrypt
   def message_to_other_channels(self, message):
     for channel in self.channels:
       ip = channel.extension.ip_address
