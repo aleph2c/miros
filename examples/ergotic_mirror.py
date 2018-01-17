@@ -20,6 +20,7 @@ class Connection():
   '''
   @staticmethod
   def get_ip():
+    '''Connection.get_ip()'''
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
       s.connect(('10.255.255.255', 1))
@@ -33,44 +34,21 @@ class Connection():
   @staticmethod
   def key():
     '''
-    A better way to do this is to get the key from your flash key.
+    Connection.key()
+
+    To generate a new key: Fernet.generate_key()
+
+    A better way to do this is to get the key from your connected flash-drive.
     '''
     return b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
 
   @staticmethod
   def get_blocking_connection(user, password, ip, port):
+    '''connection = Connection.get_blocking_connection('bob', 'dobbs', '192.168.1.72', 5672)'''
     credentials = pika.PlainCredentials(user, password)
     parameters = pika.ConnectionParameters(ip, port, '/', credentials)
     connection = pika.BlockingConnection(parameters=parameters)
     return connection
-
-  @staticmethod
-  def decrypt(fn):
-    @wraps(fn)
-    def _decrypt(ch, method, properties, cyphertext):
-      '''LocalConsumer.decrypt()'''
-      f = Fernet(Connection.key())
-      plain_text = f.decrypt(cyphertext)
-      fn(ch, method, properties, plain_text)
-    return _decrypt
-
-  @staticmethod
-  def encrypt(fn):
-    @wraps(fn)
-    def _encrypt(*args):
-      if len(args) == 1:
-        plain_text = args[0]
-      elif len(args) == 2:
-        plain_text = args[1]
-      else:
-        assert(False)
-      f = Fernet(Connection.key())
-      cyphertext = f.encrypt(plain_text)
-      if len(args) == 1:
-        fn(cyphertext)
-      else:
-        fn(args[0], cyphertext)
-    return _encrypt
 
   @staticmethod
   def serialize(fn):
@@ -97,6 +75,24 @@ class Connection():
     return _pickle_dumps
 
   @staticmethod
+  def encrypt(fn):
+    @wraps(fn)
+    def _encrypt(*args):
+      if len(args) == 1:
+        plain_text = args[0]
+      elif len(args) == 2:
+        plain_text = args[1]
+      else:
+        assert(False)
+      f = Fernet(Connection.key())
+      cyphertext = f.encrypt(plain_text)
+      if len(args) == 1:
+        fn(cyphertext)
+      else:
+        fn(args[0], cyphertext)
+    return _encrypt
+
+  @staticmethod
   def deserialize(fn):
     @wraps(fn)
     def _pickle_loads(ch, method, properties, p_plain_text):
@@ -105,6 +101,17 @@ class Connection():
         plain_text = Event.loads(plain_text)
       fn(ch, method, properties, plain_text)
     return _pickle_loads
+
+  @staticmethod
+  def decrypt(fn):
+    @wraps(fn)
+    def _decrypt(ch, method, properties, cyphertext):
+      '''LocalConsumer.decrypt()'''
+      f = Fernet(Connection.key())
+      plain_text = f.decrypt(cyphertext)
+      fn(ch, method, properties, plain_text)
+    return _decrypt
+
 
 
 class ReceiveConnections():
@@ -119,7 +126,7 @@ class ReceiveConnections():
   def __init__(self, user, password):
     # create a connection and a direct exchange called 'mirror' on this ip
     self.connection = Connection.get_blocking_connection(user, password, Connection.get_ip(), 5672)
-    self.channel    = self.connection.channel()
+    self.channel = self.connection.channel()
     self.channel.exchange_declare(exchange='mirror', exchange_type='direct')
 
     # destroy the rabbitmq queue when done
@@ -165,12 +172,7 @@ class ReceiveConnections():
     Example:
 
       def custom_rx_callback(ch, method, properties, body):
-        if "signal_name" in body:
-          # turn our event json object back into an event
-          event = Event.loads(body)
-          print(" [+] {}:{}".format(method.routing_key, event))
-        else:
-          print(" [+] {}:{}".format(method.routing_key, body))
+        print(" [+] {}:{}".format(method.routing_key, body))
 
       rx = Receiver('bob', 'dobbs')
       rx.register_live_callback(custom_rx_callback)
