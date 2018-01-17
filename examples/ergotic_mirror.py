@@ -15,12 +15,17 @@ from miros.event import Event, signals
 
 class Connection():
   '''
-  A grab bag of networking static methods used by different objects within this
-  module
+  A set of networking static methods used by different objects within this
+  module.
   '''
   @staticmethod
   def get_ip():
-    '''Connection.get_ip()'''
+    '''
+    Get the ip of this computer:
+
+    Example:
+      Connection.get_ip()
+    '''
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
       s.connect(('10.255.255.255', 1))
@@ -34,17 +39,28 @@ class Connection():
   @staticmethod
   def key():
     '''
-    Connection.key()
+    Get the encryption key for this connection.  This key is used for encryption
+    and decryption.
 
+    Example:
+      key = Connection.key()
+
+    Note:
     To generate a new key: Fernet.generate_key()
-
     A better way to do this is to get the key from your connected flash-drive.
     '''
     return b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
 
   @staticmethod
   def get_blocking_connection(user, password, ip, port):
-    '''connection = Connection.get_blocking_connection('bob', 'dobbs', '192.168.1.72', 5672)'''
+    '''
+    Create and get a blocking connection to a rabbitMq server running on this,
+    or another machine:
+
+    Example:
+      connection = Connection.get_blocking_connection(
+        'bob', 'dobbs', '192.168.1.72', 5672)
+    '''
     credentials = pika.PlainCredentials(user, password)
     parameters = pika.ConnectionParameters(ip, port, '/', credentials)
     connection = pika.BlockingConnection(parameters=parameters)
@@ -52,6 +68,20 @@ class Connection():
 
   @staticmethod
   def serialize(fn):
+    '''
+    A decorator which will turn arguments into a byte stream prior to encryption:
+
+    Example:
+      @Connection.serialize  # <- HERE: 'message' turned into byte stream
+      @Connection.encrypt
+      def message_to_other_channels(self, message):
+        for channel in self.channels:
+          ip = channel.extension.ip_address
+          channel.basic_publish(exchange='mirror',
+              routing_key=ip, body=message)
+          print(" [x] Sent \"{}\" to {}".format(message, ip))
+
+    '''
     @wraps(fn)
     def _pickle_dumps(*args):
       if len(args) == 1:
@@ -76,6 +106,20 @@ class Connection():
 
   @staticmethod
   def encrypt(fn):
+    '''
+    A decorator which will encrypt a byte stream prior to transmission:
+
+    Example:
+      @Connection.serialize
+      @Connection.encrypt   # <- HERE: 'message' bytestream encyrpted
+      def message_to_other_channels(self, message):
+        for channel in self.channels:
+          ip = channel.extension.ip_address
+          channel.basic_publish(exchange='mirror',
+              routing_key=ip, body=message)
+          print(" [x] Sent \"{}\" to {}".format(message, ip))
+
+    '''
     @wraps(fn)
     def _encrypt(*args):
       if len(args) == 1:
@@ -93,17 +137,17 @@ class Connection():
     return _encrypt
 
   @staticmethod
-  def deserialize(fn):
-    @wraps(fn)
-    def _pickle_loads(ch, method, properties, p_plain_text):
-      plain_text = pickle.loads(p_plain_text)
-      if isinstance(plain_text, Event):
-        plain_text = Event.loads(plain_text)
-      fn(ch, method, properties, plain_text)
-    return _pickle_loads
-
-  @staticmethod
   def decrypt(fn):
+    '''
+    A decorator which will decrypt a received message into a byte stream.
+
+    Example:
+      @Connection.decrypt  # <- HERE: 'body' decrypted into a byte stream
+      @Connection.deserialize
+      def custom_rx_callback(ch, method, properties, body):
+        print(" [+] {}:{}".format(method.routing_key, body))
+
+    '''
     @wraps(fn)
     def _decrypt(ch, method, properties, cyphertext):
       '''LocalConsumer.decrypt()'''
@@ -112,6 +156,25 @@ class Connection():
       fn(ch, method, properties, plain_text)
     return _decrypt
 
+  @staticmethod
+  def deserialize(fn):
+    '''
+    A decorator turn a serialized byte stream into a python object
+
+    Example:
+      @Connection.decrypt
+      @Connection.deserialize  # <- HERE: 'body' bytestream turn into object
+      def custom_rx_callback(ch, method, properties, body):
+        print(" [+] {}:{}".format(method.routing_key, body))
+
+    '''
+    @wraps(fn)
+    def _pickle_loads(ch, method, properties, p_plain_text):
+      plain_text = pickle.loads(p_plain_text)
+      if isinstance(plain_text, Event):
+        plain_text = Event.loads(plain_text)
+      fn(ch, method, properties, plain_text)
+    return _pickle_loads
 
 
 class ReceiveConnections():
@@ -120,7 +183,7 @@ class ReceiveConnections():
   It creates a 'mirror' exchange using direct routing where the routing key is
   this ip address as a string.
 
-  The interface to this class should be done through the Receiver
+  The interface to this class should be done through the RabbitDirectReceiver
 
   '''
   def __init__(self, user, password):
@@ -174,7 +237,7 @@ class ReceiveConnections():
       def custom_rx_callback(ch, method, properties, body):
         print(" [+] {}:{}".format(method.routing_key, body))
 
-      rx = Receiver('bob', 'dobbs')
+      rx = RabbitDirectReceiver('bob', 'dobbs')
       rx.register_live_callback(custom_rx_callback)
 
     '''
@@ -234,7 +297,7 @@ class EmitConnections():
   to this message is serialized into bytes then encrypted prior to being
   dispatched accross the network.
 
-  This class should be accessed through the Transmitter object
+  This class should be accessed through the RabbitDirectTransmitter object
 
   '''
   def __init__(self, base, start, end, user, password):
@@ -260,10 +323,10 @@ class EmitConnections():
     Returns a subset of ip address from the targets.  The common feature of
     these subsets is that they can you can connect to the via rabbitmq.  To do
     this:
-    - They have have a mirror exchange
-    - They need to be able to respond to a message with a routing_key that is
+    * They have have a mirror exchange
+    * They need to be able to respond to a message with a routing_key that is
       the same as their ip address
-    - They can descrypt the message we are sending to them
+    * They can descrypt the message we are sending to them
     '''
     possible_targets = targets[:]
     possible_targets.remove(Connection.get_ip())
@@ -308,7 +371,7 @@ class EmitConnections():
     return channels
 
 
-class Receiver():
+class RabbitDirectReceiver():
   '''
   Creates a rabbitmq receiver.  You can register a live callback which will be
   called when a message is received, then start consuming.  You can stop
@@ -325,7 +388,7 @@ class Receiver():
       else:
         print(" [+] {}:{}".format(method.routing_key, body))
 
-    rx = Receiver(user='bob', password='dobbs')
+    rx = RabbitDirectReceiver(user='bob', password='dobbs')
     rx.register_live_callback(custom_rx_callback)
     rx.start_consuming() # launches a consuming task
     time.sleep(10)
@@ -355,7 +418,7 @@ class Receiver():
         else:
           print(" [+] {}:{}".format(method.routing_key, body))
 
-      rx = Receiver('bob', 'dobbs')
+      rx = RabbitDirectReceiver('bob', 'dobbs')
       rx.register_live_callback(custom_rx_callback)
 
     '''
@@ -372,14 +435,14 @@ class Receiver():
         self.rx.register_live_callback(self.live_callback)
 
 
-class Transmitter():
+class RabbitDirectTransmitter():
   '''
   Scans addresses 192.168.1.70-192.168.1.73 looking for rabbitmq receivers.  If
   it finds them, they will be accessible through the message_to_other_channels
   method provided by the class.
 
   Example:
-    tx = Transmitter(user="bob", password="dobbs")
+    tx = RabbitDirectTransmitter(user="bob", password="dobbs")
     tx.message_to_other_channels("an actual message")
 
     # Note, to send a miros event across the network you will have to encode it
@@ -412,7 +475,7 @@ def custom_rx_callback(ch, method, properties, body):
 
 
 if tranceiver_type[0] == 'rx':
-  rx = Receiver('bob', 'dobbs')
+  rx = RabbitDirectReceiver('bob', 'dobbs')
   rx.register_live_callback(custom_rx_callback)
   rx.start_consuming()
   time.sleep(100)
@@ -421,7 +484,7 @@ if tranceiver_type[0] == 'rx':
   time.sleep(10)
   rx.stop_consuming()
 elif tranceiver_type[0] == 'tx':
-  tx = Transmitter(user="bob", password="dobbs")
+  tx = RabbitDirectTransmitter(user="bob", password="dobbs")
   tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
   tx.message_to_other_channels([1, 2, 3, 4])
 else:
