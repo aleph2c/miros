@@ -82,7 +82,14 @@ class Connection():
         message = args[1]
       else:
         assert(False)
+
+      # The event object is dynamically constructed and can't be serialized by
+      # pickle, so we call it's custom serializer prior to pickling it
+      if isinstance(message, Event):
+        message = Event.dumps(message)
+
       pmessage = pickle.dumps(message)
+
       if len(args) == 1:
         fn(pmessage)
       else:
@@ -93,10 +100,12 @@ class Connection():
   def deserialize(fn):
     @wraps(fn)
     def _pickle_loads(ch, method, properties, p_plain_text):
-      '''LocalConsumer.decrypt()'''
       plain_text = pickle.loads(p_plain_text)
+      if isinstance(plain_text, Event):
+        plain_text = Event.loads(plain_text)
       fn(ch, method, properties, plain_text)
     return _pickle_loads
+
 
 class ReceiveConnections():
   '''
@@ -217,6 +226,11 @@ class EmitConnections():
   messages to any rabbitmq server it has detected in the ip range.  It uses a
   direct routing strategy where the routing_key is the ip address of the node it
   wishes to communicate with.
+
+  Once it has access to a number of network nodes, it provide a method to
+  communicate with them, 'message_to_other_channels'.  Any object that is sent
+  to this message is serialized into bytes then encrypted prior to being
+  dispatched accross the network.
 
   This class should be accessed through the Transmitter object
 
@@ -383,7 +397,6 @@ class Transmitter():
                 password=password)
 
   def message_to_other_channels(self, message):
-    #self.tx.message_to_other_channels(pickle.dumps(message))
     self.tx.message_to_other_channels(message)
 
 
@@ -395,7 +408,6 @@ if not tranceiver_type:
 def custom_rx_callback(ch, method, properties, body):
   if "signal_name" in body:
     # turn our event json object back into an event
-    event = Event.loads(body)
     print(" [+] {}:{}".format(method.routing_key, event))
   else:
     print(" [+] {}:{}".format(method.routing_key, body))
@@ -412,7 +424,7 @@ if tranceiver_type[0] == 'rx':
   rx.stop_consuming()
 elif tranceiver_type[0] == 'tx':
   tx = Transmitter(user="bob", password="dobbs")
-  tx.message_to_other_channels(Event.dumps(Event(signal=signals.Mirror, payload=[1, 2, 3])))
+  tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
   tx.message_to_other_channels([1, 2, 3, 4])
 else:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
