@@ -411,12 +411,7 @@ class RabbitDirectReceiver():
     Example:
 
       def custom_rx_callback(ch, method, properties, body):
-        if "signal_name" in body:
-          # turn our event json object back into an event
-          event = Event.loads(body)
-          print(" [+] {}:{}".format(method.routing_key, event))
-        else:
-          print(" [+] {}:{}".format(method.routing_key, body))
+        print(" [+] {}:{}".format(method.routing_key, body))
 
       rx = RabbitDirectReceiver('bob', 'dobbs')
       rx.register_live_callback(custom_rx_callback)
