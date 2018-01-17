@@ -408,11 +408,7 @@ if not tranceiver_type:
 
 
 def custom_rx_callback(ch, method, properties, body):
-  if "signal_name" in body:
-    # turn our event json object back into an event
-    print(" [+] {}:{}".format(method.routing_key, event))
-  else:
-    print(" [+] {}:{}".format(method.routing_key, body))
+  print(" [+] {}:{}".format(method.routing_key, body))
 
 
 if tranceiver_type[0] == 'rx':
