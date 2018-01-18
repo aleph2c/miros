@@ -6,11 +6,11 @@ import uuid
 import socket
 import pickle
 from functools import wraps
-from types import SimpleNamespace
 from threading import Thread
-from threading import Event as ThreadingEvent
+from types import SimpleNamespace
 from cryptography.fernet import Fernet
 from miros.event import Event, signals
+from threading import Event as ThreadingEvent
 
 
 class Connection():
@@ -469,19 +469,22 @@ def custom_rx_callback(ch, method, properties, body):
   print(" [+] {}:{}".format(method.routing_key, body))
 
 
-if tranceiver_type[0] == 'rx':
-  rx = RabbitDirectReceiver('bob', 'dobbs')
-  rx.register_live_callback(custom_rx_callback)
-  rx.start_consuming()
-  time.sleep(100)
-  rx.stop_consuming()
-  rx.start_consuming()
-  time.sleep(10)
-  rx.stop_consuming()
-elif tranceiver_type[0] == 'tx':
-  tx = RabbitDirectTransmitter(user="bob", password="dobbs")
-  tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
-  tx.message_to_other_channels([1, 2, 3, 4])
-else:
-  sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
+if __name__ == "__main__":
+  if tranceiver_type[0] == 'rx':
+    rx = RabbitDirectReceiver('bob', 'dobbs')
+    rx.register_live_callback(custom_rx_callback)
+    rx.start_consuming()
+    time.sleep(100)
+    rx.stop_consuming()
+    rx.start_consuming()
+    time.sleep(10)
+    rx.stop_consuming()
+  elif tranceiver_type[0] == 'tx':
+    tx = RabbitDirectTransmitter(user="bob", password="dobbs")
+    tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
+    tx.message_to_other_channels([1, 2, 3, 4])
+  elif tranceiver_type[0] == 'ergotic':
+    print("running ergotic demo")
+  else:
+    sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
 
