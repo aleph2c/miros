@@ -171,7 +171,8 @@ def spy_on(fn):
       e = args[-1]
 
     name = fn.__name__
-
+    chart.state_name = name
+    chart.state_fn   = fn
     # if the chart is not instrumented, don't try to wrap it
     if hasattr(chart, 'rtc') is False:
       # call the original handler and exit
@@ -183,7 +184,6 @@ def spy_on(fn):
       # instead we write the function name as a string
       status = name
       return status
-
     else:
       chart.rtc.spy.append("{}:{}".format(e.signal_name, name))
 

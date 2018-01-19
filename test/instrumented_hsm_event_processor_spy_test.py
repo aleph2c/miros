@@ -410,6 +410,7 @@ class.
 @spy_on
 def spy_graph_f1_s0(chart, e):
   status = return_status.UNHANDLED
+  assert(chart.state_name == 'spy_graph_f1_s0')
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
@@ -424,6 +425,7 @@ def spy_graph_f1_s0(chart, e):
 @spy_on
 def spy_graph_f1_s1(chart, e):
   status = return_status.UNHANDLED
+  assert(chart.state_name == 'spy_graph_f1_s1')
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
@@ -436,6 +438,7 @@ def spy_graph_f1_s1(chart, e):
 @spy_on
 def spy_graph_f1_s21(chart, e):
   status = return_status.UNHANDLED
+  assert(chart.state_name == 'spy_graph_f1_s21')
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
@@ -450,6 +453,7 @@ def spy_graph_f1_s21(chart, e):
 @spy_on
 def spy_graph_f1_s22(chart, e):
   status = return_status.UNHANDLED
+  assert(chart.state_name == 'spy_graph_f1_s22')
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
@@ -462,6 +466,7 @@ def spy_graph_f1_s22(chart, e):
 @spy_on
 def spy_graph_f1_s3(chart, e):
   status = return_status.UNHANDLED
+  assert(chart.state_name == 'spy_graph_f1_s3')
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
@@ -474,6 +479,7 @@ def spy_graph_f1_s3(chart, e):
 @spy_on
 def spy_graph_f1_s31(chart, e):
   status = return_status.UNHANDLED
+  assert(chart.state_name == 'spy_graph_f1_s31')
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
@@ -488,6 +494,7 @@ def spy_graph_f1_s31(chart, e):
 @spy_on
 def spy_graph_f1_s32(chart, e):
   status = return_status.UNHANDLED
+  assert(chart.state_name == 'spy_graph_f1_s32')
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
@@ -550,9 +557,12 @@ class.
 @spy_on
 def spy_graph_g1_s0(chart, e):
   status = return_status.UNHANDLED
+  assert(chart.state_name == 'spy_graph_g1_s0')
   if(e.signal == signals.ENTRY_SIGNAL):
+    assert(chart.state_name == 'spy_graph_g1_s0')
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
+    assert(chart.state_name == 'spy_graph_g1_s0')
     status = return_status.HANDLED
   else:
     status, chart.temp.fun = return_status.SUPER, chart.top
@@ -1229,6 +1239,7 @@ def test_spy_topology_g1_1(spy_on_instrumented_hsm):
   chart.start_at(spy_graph_g1_s2111)
   event = Event(signal=signals.A)
   chart.dispatch(e=event)
+  assert(chart.state_name == 'spy_graph_g1_s321')
   # pp(list(chart.full.spy))
   assert(list(chart.full.spy) == expected_behavior)
 
@@ -1272,6 +1283,7 @@ def test_spy_topology_g1_2():
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
 
+  assert(chart.state_name == 'spy_graph_g1_s321')
   assert(list(chart.full.spy) == expected_behavior)
 
 
@@ -1300,6 +1312,7 @@ def test_spy_topology_g1_3(spy_on_instrumented_hsm):
   event = Event(signal=signals.C)
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
+  assert(chart.state_name == 'spy_graph_g1_s22')
   assert(list(chart.full.spy) == expected_behavior)
 
 
@@ -1338,4 +1351,5 @@ def test_spy_topology_g1_4(spy_on_instrumented_hsm):
   event = Event(signal=signals.D)
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
+  assert(chart.state_name == 'spy_graph_g1_s1')
   assert(list(chart.full.spy) == expected_behavior)

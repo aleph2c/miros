@@ -9,8 +9,10 @@ from functools import wraps
 from threading import Thread
 from types import SimpleNamespace
 from cryptography.fernet import Fernet
-from miros.event import Event, signals
 from threading import Event as ThreadingEvent
+
+from miros.activeobject import Factory
+from miros.event import signals, Event, return_status
 
 
 class Connection():
@@ -467,6 +469,116 @@ if not tranceiver_type:
 
 def custom_rx_callback(ch, method, properties, body):
   print(" [+] {}:{}".format(method.routing_key, body))
+
+
+def charger_bulk(chart, e):
+  # run some custom code
+  status = chart.trans(engaging_bulk)
+  return status
+
+def charger_n_bulk(chart, e):
+  # run some custom code
+  status = chart.trans(engaging_bulk)
+  return status
+
+def charger_init(chart, e):
+  # run some custom code
+  status = chart.trans(engaging_bulk)
+  return status
+
+def engage_bulk_entry(chart, e):
+  chart.post_fifo(
+      Event(signal=signals.engage_bulk_timeout),
+      times=1,
+      period=1.0,
+      deferred=True)
+  return return_status.HANDLED
+
+def engage_bulk_exit(chart, e):
+  chart.cancel_events(signals.engage_bulk_timeout)
+  return return_status.HANDLED
+
+def engage_bulk_timeout(chart, e):
+  status = chart.trans(bulk)
+  return status
+
+def bulk_absorption(chart, e):
+  # run some custom code
+  status = chart.trans(absorption)
+  return status
+
+def absorption_absorption_end(chart, e):
+  # run some custom code
+  status = chart.trans(absorption_pending)
+  return status
+
+def absorption_pending_entry(chart, e):
+  status = return_status.HANDLED
+  # run some custom code
+  return status
+
+def absorption_pending_n_absorption_end(chart, e):
+  # some custom code
+  status = chart.trans(absorption_pending)
+  return status
+
+def absorption_pending_absorption_timeout(chart, e):
+  # some custom code
+  status = chart.trans(float)
+  return status
+
+def absorption_pending_n_float(chart, e):
+  # some custom code
+  status = chart.trans(float)
+  return status
+
+def absorption_pending_float(chart, e):
+  # some custom code
+  status = chart.trans(float)
+  return status
+
+def empathy_my_bulk(chart, e):
+  status = return_status.HANDLED
+  # send out bulk signal to all
+  return status
+
+def empathy_my_float(chart, e):
+  status = return_status.HANDLED
+  # send out float signal to all
+  return status
+
+def empathy_bulk_from_them(chart, e):
+  status = chart.trans(other_absorption)
+  return status
+
+def empathy_float_from_them(chart, e):
+  status = chart.trans(other_absorption)
+  return status
+
+def other_absorption_absorption_end_from_them(chart, e):
+  status = chart.trans(other_absorption_pending)
+  return status
+
+
+class ErgoticCharger(Factory):
+  def __init__(self, name, tx, rx):
+    super().__init()
+    self.name = name
+
+ec = ErgoticCharger(
+    name = 'erotic_charger',
+    tx = RabbitDirectTransmitter(user='bob', password='dobbs'),
+    rx = RabbitDirectReceiver(user='bob', password='dobbs'))
+
+charger = ec.create(state='charger'). \
+    catch(signal=signals.INIT_SIGNAL, handler=charger_n_bulk). \
+    catch(signal=signals.bulk, handler=charger_bulk). \
+    catch(signal=signals.n_bulk, handler=charger_n_bulk). \
+    to_method()
+
+engaging_bulk = ec.create(state='engaging_bulk'). \
+    catch(signal=signals.ENTRY_SIGNAL, handler=engaging_bulk_entry)
+
 
 
 if __name__ == "__main__":
