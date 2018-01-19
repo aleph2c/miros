@@ -9,3 +9,6 @@ To see what state your chart is in:
     # state as a function
     chart.state_fn
 
+.. note::
+  This will only work if you have wrapped your statemethod with a ``@spy_on``
+  decorator or if you have constructed your statechart with the Factory class.

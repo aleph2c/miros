@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-This module provides a heirarchical state machine event class (HsmEventProcessor), and an
-instrumented heirarchical state machine class (InstrumentedHsmEventProcessor).  The
+This module provides a hierarchical state machine event class (HsmEventProcessor), and an
+instrumented hierarchical state machine class (InstrumentedHsmEventProcessor).  The
 InstrumentedHsmEventProcessor is inherited from the HsmEventProcessor, and it provides two different views
 into the workings of your state machine:
 
@@ -193,7 +193,6 @@ def spy_on(fn):
     if(signals.is_inner_signal(e.signal_name) is not True):
         # We have found a hook
         if(status is return_status.HANDLED):
-          # chart.rtc.spy.pop()
           chart.rtc.spy.append("{}:{}:HOOK".format(e.signal_name, name))
           sr = spy_tuple(signal=e.signal_name, state=name, hook=True)
         else:
