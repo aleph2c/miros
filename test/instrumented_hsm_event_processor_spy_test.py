@@ -507,6 +507,7 @@ def spy_graph_f1_s32(chart, e):
 @spy_on
 def spy_graph_f1_s321(chart, e):
   status = return_status.UNHANDLED
+  assert(chart.state_name == 'spy_graph_f1_s321')
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
@@ -716,6 +717,7 @@ def test_spy_topology_a_1():
   event = Event(signal=signals.A)
   chart.dispatch(e=event)
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_a1_s1')
 
 
 # grep test name to view diagram
@@ -738,6 +740,7 @@ def test_spy_topology_a_2():
   event  = Event(signal=signals.A)
   chart.dispatch(e=event)
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_a1_s1')
 
 
 @pytest.mark.internalspy
@@ -762,6 +765,7 @@ def test_spy_topology_b1_1(spy_on_instrumented_hsm):
   event  = Event(signal=signals.A)
   chart.dispatch(e=event)
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_b1_s2')
 
 
 @pytest.mark.internalspy
@@ -790,6 +794,7 @@ def test_spy_topology_b1_2(spy_on_instrumented_hsm):
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_b1_s3')
 
 
 @pytest.mark.internalspy
@@ -811,6 +816,7 @@ def test_spy_topology_c1_1(spy_on_instrumented_hsm):
   chart.start_at(spy_graph_c1_s1)
   chart.dispatch(e=event)
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_c1_s2')
 
 
 @pytest.mark.internalspy
@@ -833,6 +839,7 @@ def test_spy_topology_c1_3(spy_on_instrumented_hsm):
   chart.dispatch(e = event)
   # pp(list(chart.full.spy))
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_c1_s1')
 
 
 @pytest.mark.internalspy
@@ -858,7 +865,7 @@ def test_spy_topology_c2_1():
   chart.dispatch(e = event)
   # pp(list(chart.full.spy))
   assert(list(chart.full.spy) == expected_behavior)
-
+  assert(chart.state_name == 'spy_graph_c2_s3')
 
 @pytest.mark.internalspy
 @pytest.mark.topology_c
@@ -882,6 +889,7 @@ def test_spy_topology_c2_2(spy_on_instrumented_hsm):
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_c2_s2')
 
 
 @pytest.mark.internalspy
@@ -904,6 +912,7 @@ def test_spy_topology_d1_1(spy_on_instrumented_hsm):
   event  = Event(signal=signals.A)
   chart.dispatch(e=event)
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_d1_s1')
 
 
 @pytest.mark.internalspy
@@ -929,6 +938,7 @@ def test_spy_topology_d1_2(spy_on_instrumented_hsm):
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_d1_s2')
 
 
 @pytest.mark.internalspy
@@ -976,6 +986,7 @@ def test_spy_topology_e1_1(spy_on_instrumented_hsm):
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_e1_s5')
 
 
 @pytest.mark.internalspy
@@ -1016,6 +1027,7 @@ def test_spy_topology_e1_2(spy_on_instrumented_hsm):
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_e1_s4')
 
 
 @pytest.mark.internalspy
@@ -1050,6 +1062,7 @@ def test_spy_topology_e1_3(spy_on_instrumented_hsm):
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_e1_s4')
 
 
 @pytest.mark.internalspy
@@ -1116,6 +1129,7 @@ def test_spy_topology_e1_5(spy_on_instrumented_hsm):
   event  = Event(signal=signals.E)
   chart.dispatch(e=event)
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_e1_s5')
 
 
 @pytest.mark.internalspy
@@ -1149,6 +1163,7 @@ def test_spy_topology_f1_1(spy_on_instrumented_hsm):
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_f1_s321')
 
 
 @pytest.mark.internalspy
@@ -1178,6 +1193,7 @@ def test_spy_topology_f1_2(spy_on_instrumented_hsm):
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
   assert(list(list(chart.full.spy)) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_f1_s32')
 
 
 @pytest.mark.internalspy
@@ -1202,6 +1218,7 @@ def test_spy_topology_f1_3(spy_on_instrumented_hsm):
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_f1_s22')
 
 
 @pytest.mark.internalspy
@@ -1242,6 +1259,7 @@ def test_spy_topology_g1_1(spy_on_instrumented_hsm):
   assert(chart.state_name == 'spy_graph_g1_s321')
   # pp(list(chart.full.spy))
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_g1_s321')
 
 
 @pytest.mark.internalspy
@@ -1283,8 +1301,8 @@ def test_spy_topology_g1_2():
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
 
-  assert(chart.state_name == 'spy_graph_g1_s321')
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_g1_s321')
 
 
 @pytest.mark.internalspy
@@ -1312,8 +1330,8 @@ def test_spy_topology_g1_3(spy_on_instrumented_hsm):
   event = Event(signal=signals.C)
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
-  assert(chart.state_name == 'spy_graph_g1_s22')
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_g1_s22')
 
 
 @pytest.mark.internalspy
@@ -1351,5 +1369,5 @@ def test_spy_topology_g1_4(spy_on_instrumented_hsm):
   event = Event(signal=signals.D)
   chart.dispatch(e=event)
   # pp(list(chart.full.spy))
-  assert(chart.state_name == 'spy_graph_g1_s1')
   assert(list(chart.full.spy) == expected_behavior)
+  assert(chart.state_name == 'spy_graph_g1_s1')
