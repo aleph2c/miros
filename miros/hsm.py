@@ -332,6 +332,8 @@ class HsmEventProcessor():
     self.state.fun = self.top
     self.temp.fun  = initial_state
     self.init()
+    self.state_name = self.state.fun.__name__
+    self.state_fn = self.state.fun
 
   def top(self, *args):
     '''top most state given to all HSM; treat it as an outside function'''
@@ -622,6 +624,9 @@ class HsmEventProcessor():
     # t contains T
     self.state.fun = t
     self.temp.fun  = t
+
+    self.state_name = t.__name__
+    self.state_fn = t
 
   def trans(self, fn):
     '''sets a new function target and returns that transition required by engine'''
