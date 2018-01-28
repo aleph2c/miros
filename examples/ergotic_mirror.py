@@ -453,7 +453,7 @@ class RabbitDirectTransmitter():
   '''
   def __init__(self, user, password):
     self.tx = EmitConnections(base="192.168.1.",
-                start=70,
+                start=68,
                 end=73,
                 user=user,
                 password=password)
@@ -486,7 +486,7 @@ def charger_init(chart, e):
   status = chart.trans(engaging_bulk)
   return status
 
-def engage_bulk_entry(chart, e):
+def engaging_bulk_entry(chart, e):
   chart.post_fifo(
       Event(signal=signals.engage_bulk_timeout),
       times=1,
@@ -562,7 +562,7 @@ def other_absorption_absorption_end_from_them(chart, e):
 
 class ErgoticCharger(Factory):
   def __init__(self, name, tx, rx):
-    super().__init()
+    super().__init__(name)
     self.name = name
 
 ec = ErgoticCharger(
