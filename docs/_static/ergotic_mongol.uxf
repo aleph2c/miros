@@ -39,9 +39,9 @@ Event Processor</panel_attributes>
     <id>UMLState</id>
     <coordinates>
       <x>224</x>
-      <y>256</y>
+      <y>384</y>
       <w>1136</w>
-      <h>568</h>
+      <h>440</h>
     </coordinates>
     <panel_attributes>*Holographic_Defeat_in_Detail_Tactic*
 --
@@ -59,11 +59,11 @@ valign=top
     <id>UMLState</id>
     <coordinates>
       <x>736</x>
-      <y>456</y>
+      <y>448</y>
       <w>528</w>
-      <h>200</h>
+      <h>208</h>
     </coordinates>
-    <panel_attributes>*Squimish*
+    <panel_attributes>*Skirmish*
 --
 entry /
 exit /
@@ -427,12 +427,16 @@ valign=top
       <w>208</w>
       <h>144</h>
     </coordinates>
-    <panel_attributes>*Pending Feigned Retreat*
+    <panel_attributes>*Waiting to Lure*
 --
 entry /
-  Start Acting as Though Scared
+  # Put away bow
+  # Pull scimitar
+  # Start Acting as Though Scared
   
 exit / 
+  # Put away scimitar
+  # Pull and arm bow
   chart.post_fifo(Retreat_War_Cry)
 
 Out_of_Ammunition /
@@ -481,7 +485,7 @@ Broadcast(Advance_War_Cry)</panel_attributes>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-Squirmish War Cry
+Skirmish War Cry
 Broadcast(Squirmish_War_Cry)</panel_attributes>
     <additional_attributes>10.0;20.0;210.0;20.0</additional_attributes>
   </element>
@@ -577,7 +581,7 @@ style=wordwrap</panel_attributes>
       <w>184</w>
       <h>112</h>
     </coordinates>
-    <panel_attributes>*Other Unit Pendering Retreat*
+    <panel_attributes>*Waiting to Lure*
 --
 entry /
 exit / 
@@ -903,7 +907,7 @@ valign=top
       <h>32</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-Other Squirmish War Cry</panel_attributes>
+Other Skirmish War Cry</panel_attributes>
     <additional_attributes>10.0;20.0;210.0;20.0</additional_attributes>
   </element>
   <element>
@@ -925,7 +929,8 @@ Other Squirmish War Cry</panel_attributes>
       <w>240</w>
       <h>64</h>
     </coordinates>
-    <panel_attributes>Retreat_War_Cry \ 
+    <panel_attributes>Officer_Lured 
+Retreat_War_Cry \ 
   Broadcast(Retreat_War_Cry)
   for soldier in unit:
     soldier.dispatch(Retreat_War_Cry)
@@ -964,7 +969,7 @@ style=wordwrap</panel_attributes>
       <h>32</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-Other_Squirmish_War_Cry(ip)</panel_attributes>
+Other_Skirmish_War_Cry(ip)</panel_attributes>
     <additional_attributes>10.0;20.0;330.0;20.0</additional_attributes>
   </element>
   <element>
@@ -1210,8 +1215,8 @@ style=wordwrap</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>1088</x>
-      <y>688</y>
+      <x>1080</x>
+      <y>696</y>
       <w>376</w>
       <h>88</h>
     </coordinates>

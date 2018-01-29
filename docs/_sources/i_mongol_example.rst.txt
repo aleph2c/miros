@@ -22,6 +22,22 @@ have the ability to link up with another node and act in unison and then unlink
 and act under their own initiative.  The overall unit tactic will continue to
 work even if only one node remains.
 
+**Example Background:**
+
+* :ref:`Historical Context<i_mongol_example-historical-context>`
+* :ref:`Deceit in Detail<i_mongol_example-distributed-officers>`
+* :ref:`Modelling the Mongol Mind<i_mongol_example-modelling-the-mongol-mind>`
+
+**Example Software:**
+
+* :ref:`Technical Overview<i_mongol_example-technical-oveview>`
+* :ref:`Designing the Mongol in its Tactic<i_mongol_example-designing-the-mongol-in-its-tactic>`
+* :ref:`Encrypted Commnications<i_mongol_example-encrypted-communications>`
+* :ref:`Instrumenting to Debug a Horse Archer<i_mongol_example-instrumenting-to-debug-the-botnet>`
+* :ref:`Implementing the Mogol in miros<i_mongol_example-implementing-the-mongol-in-miros>`
+
+
+
 .. _i_mongol_example-historical-context:
 
 Some Historical Context For the Example
@@ -272,4 +288,108 @@ shoot; you would skirmish and lure and retreat-to-fire when followed.
 .. image:: _static/backwards.jpg
     :align: center
 
-:ref:`back to examples <examples>
+Now that we have an understanding of what we are trying to model, let's build it
+in software using miros.
+
+.. _i_mongol_example-technical-oveview:
+
+Technical Overview
+------------------
+To build our horse archer botnet we need code that can be expressed on at least
+two different computers; I'll be using a windows machine and a raspberry pi.
+
+I'll try to design a set of statecharts that will model an individual horse
+archer and it's understanding of it's brethren.
+
+Any communication between our horse archer bots will need to be encrypted, since
+we don't want our enemy understanding what we are up to.
+
+While we are building the software to implement a node in our botnet we will
+instrument it and have all of its information stream to one location so we can
+debug the whole botnet.  I will use this instrumentation to show that the code
+is working as designed.
+
+Finally I'll write the software; run it on two or more computers and demonstrate
+that it is working.
+
+* :ref:`Designing the Mongol in its Tactic<i_mongol_example-designing-the-mongol-in-its-tactic>`
+* :ref:`Encrypted Commnications<i_mongol_example-encrypted-communications>`
+* :ref:`Instrumenting to Debug the Mongol Botnet<i_mongol_example-instrumenting-to-debug-the-botnet>`
+* :ref:`Implementing the Mogol in miros<i_mongol_example-implementing-the-mongol-in-miros>`
+
+.. _i_mongol_example-designing-the-mongol-in-its-tactic:
+
+Designing the Mongol in its Tactic
+----------------------------------
+We already understand the tactic, so I'll draw and describe how I think it might
+work in an HSM several times over; adding complexity and technical improvements with
+each iteration.  When we have a design that can sufficiently sketch out our bot
+net I'll move to the next technical step.
+
+Let's think about a single horse archer and the actions he would take.  He would
+meet up with his brethren (marshal), then they would determine where they would like
+to meet after their first maneuver, then they would fill their quivers with
+arrows.
+
+So, I have to first figure out what to call the outer state.  For now I'll call it,
+Deceit_in_Detail_Tactic (marshaled), because I want to express that the horse
+archers are meeting and that this is one tactic of many that they could choose from.
+
+.. image:: _static/ergotic_mongol_11.svg
+    :align: center
+
+`ergotic_mongol_11`_
+
+Immediately after filling their arrows, they attack.  This may not be
+historically true, but let's have our botnet just attack right away.
+
+Once the horse archers advance close enough to the mass of their enemy, they
+will circle and fire.  How do we express this in software?  If we were building
+a botnet to fight the North Koreans or a malevolent AI or something, we could
+have each node in our botnet read a transducer or take a reading.  For now we
+will fake out this information with a
+:ref:`one-shot<recipes-create-a-one-shot-state>` so that we can frame in our
+design.  Three seconds after advancing they will issue the
+Close_Enough_For_Circle event.
+
+So our horse archers circle and fire; creating a constant stream of chaos and
+danger onto their enemy's mass.  They move away from the danger and loosen their
+ranks so that our horse archers can charge in for their next play.
+
+Notice that the Circle and Fire state is within the Advance state.  Why do this?
+I did this in case an individual horse archer decided that the enemies front was
+sufficiently disorganized enough not to waste arrows on an imprecise
+bombardment.  Any horse archer can become an officer and make a war cry, so in
+the case that our node takes a reading and determines that a skirmish is in
+order directly upon advancing they can make the call and the other nodes will
+follow them into the fray.
+
+.. image:: _static/ergotic_mongol_12.svg
+    :align: center
+
+.. image:: _static/ergotic_mongol_13.svg
+    :align: center
+
+.. image:: _static/ergotic_mongol_14.svg
+    :align: center
+
+Change design to link Retreat_War_Cry to side of deceit in detail (explain why)
+
+.. _i_mongol_example-encrypted-communications:
+
+Encrypted Communications
+------------------------
+
+.. _i_mongol_example-instrumenting-to-debug-the-botnet:
+
+Instrumenting to Debug the Mongol Botnet
+----------------------------------------
+
+.. _i_mongol_example-implementing-the-mongol-in-miros:
+
+Implementing the Mongol in miros
+--------------------------------
+
+.. _ergotic_mongol_11: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_11.png
+
+:ref:`back to examples <examples>`

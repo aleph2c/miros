@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>8</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>112</x>
+      <y>32</y>
+      <w>1008</w>
+      <h>648</h>
+    </coordinates>
+    <panel_attributes>*Deceit_in_Detail_Tactic (marshaled)*
+--
+entry / 
+  # Identify next marshal point
+  # Load horse with arrows
+
+  
+
+
+valign=top
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>224</x>
+      <y>96</y>
+      <w>328</w>
+      <h>320</h>
+    </coordinates>
+    <panel_attributes>*Advance*
+--
+entry /
+  chart.post_fifo(
+    Event(signal=signals.Close_Enough_for_Circle),
+      times=1,
+      period=3.0,
+      deferred=True)
+exit /
+
+valign=top
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>168</x>
+      <y>368</y>
+      <w>16</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>168</x>
+      <y>360</y>
+      <w>72</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;20.0;70.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>296</x>
+      <y>216</y>
+      <w>232</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>*Circle and Fire*
+--
+entry /
+  chart.post_fifo(
+    Event(signal=signals.Skirmish_War_Cry),
+    times=1,
+    period=10,
+    deferrred=True)
+valign=top
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>304</x>
+      <y>328</y>
+      <w>200</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Close_Enough_For_Circle
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;110.0;10.0;60.0;230.0;60.0;230.0;10.0</additional_attributes>
+  </element>
+</diagram>

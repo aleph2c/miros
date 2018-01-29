@@ -59,6 +59,20 @@ a network, which have limited information about one another.  Each node will
 have the ability to link up with another node and act in unison and then unlink
 and act under their own initiative.  The overall unit tactic will continue to
 work even if only one node remains.</p>
+<p><strong>Example Background:</strong></p>
+<ul class="simple">
+<li><a class="reference internal" href="#i-mongol-example-historical-context"><span class="std std-ref">Historical Context</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-distributed-officers"><span class="std std-ref">Deceit in Detail</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-modelling-the-mongol-mind"><span class="std std-ref">Modelling the Mongol Mind</span></a></li>
+</ul>
+<p><strong>Example Software:</strong></p>
+<ul class="simple">
+<li><a class="reference internal" href="#i-mongol-example-technical-oveview"><span class="std std-ref">Technical Overview</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-designing-the-mongol-in-its-tactic"><span class="std std-ref">Designing the Mongol in its Tactic</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-encrypted-communications"><span class="std std-ref">Encrypted Commnications</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-instrumenting-to-debug-the-botnet"><span class="std std-ref">Instrumenting to Debug a Horse Archer</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-implementing-the-mongol-in-miros"><span class="std std-ref">Implementing the Mogol in miros</span></a></li>
+</ul>
 <div class="section" id="some-historical-context-for-the-example">
 <span id="i-mongol-example-historical-context"></span><h2>Some Historical Context For the Example<a class="headerlink" href="#some-historical-context-for-the-example" title="Permalink to this headline">¶</a></h2>
 <p>Military officers are faced with the paradox of leadership.</p>
@@ -262,7 +276,79 @@ being your need to track who in your unit was ready to go.  If you were the last
 horseman, the rules would still apply:  You would advance; you would circle and
 shoot; you would skirmish and lure and retreat-to-fire when followed.</p>
 <img alt="_images/backwards.jpg" class="align-center" src="_images/backwards.jpg" />
-<p>:ref:<a href="#id1"><span class="problematic" id="id2">`</span></a>back to examples &lt;examples&gt;</p>
+<p>Now that we have an understanding of what we are trying to model, let’s build it
+in software using miros.</p>
+</div>
+<div class="section" id="technical-overview">
+<span id="i-mongol-example-technical-oveview"></span><h2>Technical Overview<a class="headerlink" href="#technical-overview" title="Permalink to this headline">¶</a></h2>
+<p>To build our horse archer botnet we need code that can be expressed on at least
+two different computers; I’ll be using a windows machine and a raspberry pi.</p>
+<p>I’ll try to design a set of statecharts that will model an individual horse
+archer and it’s understanding of it’s brethren.</p>
+<p>Any communication between our horse archer bots will need to be encrypted, since
+we don’t want our enemy understanding what we are up to.</p>
+<p>While we are building the software to implement a node in our botnet we will
+instrument it and have all of its information stream to one location so we can
+debug the whole botnet.  I will use this instrumentation to show that the code
+is working as designed.</p>
+<p>Finally I’ll write the software; run it on two or more computers and demonstrate
+that it is working.</p>
+<ul class="simple">
+<li><a class="reference internal" href="#i-mongol-example-designing-the-mongol-in-its-tactic"><span class="std std-ref">Designing the Mongol in its Tactic</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-encrypted-communications"><span class="std std-ref">Encrypted Commnications</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-instrumenting-to-debug-the-botnet"><span class="std std-ref">Instrumenting to Debug the Mongol Botnet</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-implementing-the-mongol-in-miros"><span class="std std-ref">Implementing the Mogol in miros</span></a></li>
+</ul>
+</div>
+<div class="section" id="designing-the-mongol-in-its-tactic">
+<span id="i-mongol-example-designing-the-mongol-in-its-tactic"></span><h2>Designing the Mongol in its Tactic<a class="headerlink" href="#designing-the-mongol-in-its-tactic" title="Permalink to this headline">¶</a></h2>
+<p>We already understand the tactic, so I’ll draw and describe how I think it might
+work in an HSM several times over; adding complexity and technical improvements with
+each iteration.  When we have a design that can sufficiently sketch out our bot
+net I’ll move to the next technical step.</p>
+<p>Let’s think about a single horse archer and the actions he would take.  He would
+meet up with his brethren (marshal), then they would determine where they would like
+to meet after their first maneuver, then they would fill their quivers with
+arrows.</p>
+<p>So, I have to first figure out what to call the outer state.  For now I’ll call it,
+Deceit_in_Detail_Tactic (marshaled), because I want to express that the horse
+archers are meeting and that this is one tactic of many that they could choose from.</p>
+<div align="center" class="align-center"><img alt="_images/ergotic_mongol_11.svg" src="_images/ergotic_mongol_11.svg" /></div>
+<p><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_11.png">ergotic_mongol_11</a></p>
+<p>Immediately after filling their arrows, they attack.  This may not be
+historically true, but let’s have our botnet just attack right away.</p>
+<p>Once the horse archers advance close enough to the mass of their enemy, they
+will circle and fire.  How do we express this in software?  If we were building
+a botnet to fight the North Koreans or a malevolent AI or something, we could
+have each node in our botnet read a transducer or take a reading.  For now we
+will fake out this information with a
+<a class="reference internal" href="recipes.html#recipes-create-a-one-shot-state"><span class="std std-ref">one-shot</span></a> so that we can frame in our
+design.  Three seconds after advancing they will issue the
+Close_Enough_For_Circle event.</p>
+<p>So our horse archers circle and fire; creating a constant stream of chaos and
+danger onto their enemy’s mass.  They move away from the danger and loosen their
+ranks so that our horse archers can charge in for their next play.</p>
+<p>Notice that the Circle and Fire state is within the Advance state.  Why do this?
+I did this in case an individual horse archer decided that the enemies front was
+sufficiently disorganized enough not to waste arrows on an imprecise
+bombardment.  Any horse archer can become an officer and make a war cry, so in
+the case that our node takes a reading and determines that a skirmish is in
+order directly upon advancing they can make the call and the other nodes will
+follow them into the fray.</p>
+<div align="center" class="align-center"><img alt="_images/ergotic_mongol_12.svg" src="_images/ergotic_mongol_12.svg" /></div>
+<div align="center" class="align-center"><img alt="_images/ergotic_mongol_13.svg" src="_images/ergotic_mongol_13.svg" /></div>
+<div align="center" class="align-center"><img alt="_images/ergotic_mongol_14.svg" src="_images/ergotic_mongol_14.svg" /></div>
+<p>Change design to link Retreat_War_Cry to side of deceit in detail (explain why)</p>
+</div>
+<div class="section" id="encrypted-communications">
+<span id="i-mongol-example-encrypted-communications"></span><h2>Encrypted Communications<a class="headerlink" href="#encrypted-communications" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="instrumenting-to-debug-the-mongol-botnet">
+<span id="i-mongol-example-instrumenting-to-debug-the-botnet"></span><h2>Instrumenting to Debug the Mongol Botnet<a class="headerlink" href="#instrumenting-to-debug-the-mongol-botnet" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="implementing-the-mongol-in-miros">
+<span id="i-mongol-example-implementing-the-mongol-in-miros"></span><h2>Implementing the Mongol in miros<a class="headerlink" href="#implementing-the-mongol-in-miros" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
 </div>
 
@@ -280,6 +366,11 @@ shoot; you would skirmish and lure and retreat-to-fire when followed.</p>
 <li><a class="reference internal" href="#some-historical-context-for-the-example">Some Historical Context For the Example</a></li>
 <li><a class="reference internal" href="#deceit-in-detail">Deceit in Detail</a></li>
 <li><a class="reference internal" href="#modelling-the-mongol-mind">Modelling the Mongol Mind</a></li>
+<li><a class="reference internal" href="#technical-overview">Technical Overview</a></li>
+<li><a class="reference internal" href="#designing-the-mongol-in-its-tactic">Designing the Mongol in its Tactic</a></li>
+<li><a class="reference internal" href="#encrypted-communications">Encrypted Communications</a></li>
+<li><a class="reference internal" href="#instrumenting-to-debug-the-mongol-botnet">Instrumenting to Debug the Mongol Botnet</a></li>
+<li><a class="reference internal" href="#implementing-the-mongol-in-miros">Implementing the Mongol in miros</a></li>
 </ul>
 </li>
 </ul>

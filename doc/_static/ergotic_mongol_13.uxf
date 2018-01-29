@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>8</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>200</x>
+      <y>8</y>
+      <w>1008</w>
+      <h>648</h>
+    </coordinates>
+    <panel_attributes>*Deceit_in_Detail_Tactic (marshaled)*
+--
+entry / 
+  # Identify next marshal point
+  # Load horse with arrows
+
+  
+
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>752</x>
+      <y>56</y>
+      <w>448</w>
+      <h>272</h>
+    </coordinates>
+    <panel_attributes>*Skirmish*
+--
+entry /
+exit /
+
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>312</x>
+      <y>72</y>
+      <w>328</w>
+      <h>320</h>
+    </coordinates>
+    <panel_attributes>*Advance*
+--
+entry /
+  chart.post_fifo(
+    Event(signal=signals.Close_Enough_for_Circle),
+      times=1,
+      period=3.0,
+      deferred=True)
+exit /
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>976</x>
+      <y>88</y>
+      <w>208</w>
+      <h>216</h>
+    </coordinates>
+    <panel_attributes>*Waiting to Lure*
+--
+entry /
+  # Put away bow
+  # Pull scimitar
+  # Start Acting as Though Scared
+  # Fake Goal Achievement
+  
+exit / 
+  # Put away scimitar
+  # Pull and arm bow
+
+Officer_Lured /
+  chart.post_fifo(Retreat_War_Cry)
+
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>832</x>
+      <y>464</y>
+      <w>272</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>*Feigned Retreat*
+--
+entry / 
+  # Fire on officers
+  # Fire on soldiers
+
+valign=top
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>632</x>
+      <y>176</y>
+      <w>136</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Skirmish_War_Cry
+</panel_attributes>
+    <additional_attributes>10.0;20.0;150.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>744</x>
+      <y>152</y>
+      <w>248</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+</panel_attributes>
+    <additional_attributes>10.0;20.0;290.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>256</x>
+      <y>344</y>
+      <w>16</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>256</x>
+      <y>336</y>
+      <w>72</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+</panel_attributes>
+    <additional_attributes>10.0;20.0;70.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>760</x>
+      <y>136</y>
+      <w>216</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>Ammunition_Low / 
+chart.post_fifo(Retreat_Ready_War_Cry)
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1000</x>
+      <y>296</y>
+      <w>24</w>
+      <h>184</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;210.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>640</x>
+      <y>504</y>
+      <w>208</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Out_Of_Arrows
+fg=blue</panel_attributes>
+    <additional_attributes>240.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>384</x>
+      <y>192</y>
+      <w>232</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>*Circle and Fire*
+--
+entry /
+  chart.post_fifo(
+    Event(signal=signals.Skirmish_War_Cry),
+    times=1,
+    period=10,
+    deferrred=True)
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>392</x>
+      <y>304</y>
+      <w>200</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Close_Enough_For_Circle</panel_attributes>
+    <additional_attributes>10.0;110.0;10.0;60.0;230.0;60.0;230.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1008</x>
+      <y>376</y>
+      <w>104</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>Retreat_War_Cry
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>744</x>
+      <y>200</y>
+      <w>248</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Retreat_Ready_War_Cry
+</panel_attributes>
+    <additional_attributes>10.0;20.0;290.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1208</x>
+      <y>128</y>
+      <w>200</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>chart.post_fifo(
+  Event(signal=signals.Officer_Lured),
+    times=1,
+    period=random.randint(3,12),
+    deferred=True)
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1112</x>
+      <y>144</y>
+      <w>120</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;30.0;130.0;10.0</additional_attributes>
+  </element>
+</diagram>
