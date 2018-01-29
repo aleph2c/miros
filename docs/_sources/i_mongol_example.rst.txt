@@ -390,6 +390,6 @@ Instrumenting to Debug the Mongol Botnet
 Implementing the Mongol in miros
 --------------------------------
 
-.. _ergotic_mongol_11: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_11.png
+.. _ergotic_mongol_11: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_11.pdf
 
 :ref:`back to examples <examples>`
