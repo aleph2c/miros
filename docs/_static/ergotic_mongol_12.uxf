@@ -4,8 +4,8 @@
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>112</x>
-      <y>32</y>
+      <x>64</x>
+      <y>16</y>
       <w>1008</w>
       <h>648</h>
     </coordinates>
@@ -25,15 +25,21 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>664</x>
-      <y>80</y>
+      <x>616</x>
+      <y>64</y>
       <w>448</w>
       <h>272</h>
     </coordinates>
     <panel_attributes>*Skirmish*
 --
 entry /
+  # close distance to enemy front
+  # individually target enemies with arrows
 exit /
+
+Ammunition_Low /
+  chart.post_fifo(Retreat_Ready_War_Cry)
+
 
 
 valign=top
@@ -44,8 +50,8 @@ fg=blue</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>224</x>
-      <y>96</y>
+      <x>176</x>
+      <y>80</y>
       <w>328</w>
       <h>320</h>
     </coordinates>
@@ -66,8 +72,8 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>888</x>
-      <y>112</y>
+      <x>840</x>
+      <y>96</y>
       <w>208</w>
       <h>216</h>
     </coordinates>
@@ -95,8 +101,21 @@ fg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>544</x>
-      <y>200</y>
+      <x>56</x>
+      <y>184</y>
+      <w>136</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Advance_War_Cry
+</panel_attributes>
+    <additional_attributes>10.0;20.0;150.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>496</x>
+      <y>184</y>
       <w>136</w>
       <h>40</h>
     </coordinates>
@@ -106,23 +125,10 @@ Skirmish_War_Cry
     <additional_attributes>10.0;20.0;150.0;20.0</additional_attributes>
   </element>
   <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>656</x>
-      <y>176</y>
-      <w>248</w>
-      <h>32</h>
-    </coordinates>
-    <panel_attributes>lt=-&gt;
-
-fg=blue</panel_attributes>
-    <additional_attributes>10.0;20.0;290.0;20.0</additional_attributes>
-  </element>
-  <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>168</x>
-      <y>368</y>
+      <x>120</x>
+      <y>352</y>
       <w>16</w>
       <h>16</h>
     </coordinates>
@@ -132,8 +138,8 @@ fg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>168</x>
-      <y>360</y>
+      <x>120</x>
+      <y>344</y>
       <w>72</w>
       <h>32</h>
     </coordinates>
@@ -142,24 +148,10 @@ fg=blue</panel_attributes>
     <additional_attributes>10.0;20.0;70.0;20.0</additional_attributes>
   </element>
   <element>
-    <id>Text</id>
-    <coordinates>
-      <x>672</x>
-      <y>160</y>
-      <w>216</w>
-      <h>48</h>
-    </coordinates>
-    <panel_attributes>Ammunition_Low / 
-chart.post_fifo(Retreat_Ready_War_Cry)
-style=wordwrap
-fg=blue</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
     <id>Relation</id>
     <coordinates>
-      <x>912</x>
-      <y>320</y>
+      <x>864</x>
+      <y>304</y>
       <w>24</w>
       <h>184</h>
     </coordinates>
@@ -170,8 +162,8 @@ fg=blue</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>296</x>
-      <y>216</y>
+      <x>248</x>
+      <y>200</y>
       <w>232</w>
       <h>120</h>
     </coordinates>
@@ -190,8 +182,8 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>304</x>
-      <y>328</y>
+      <x>256</x>
+      <y>312</y>
       <w>200</w>
       <h>104</h>
     </coordinates>
@@ -202,8 +194,8 @@ Close_Enough_For_Circle</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>920</x>
-      <y>400</y>
+      <x>872</x>
+      <y>384</y>
       <w>104</w>
       <h>24</h>
     </coordinates>
@@ -215,8 +207,8 @@ fg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>656</x>
-      <y>224</y>
+      <x>608</x>
+      <y>240</y>
       <w>248</w>
       <h>40</h>
     </coordinates>
@@ -229,8 +221,8 @@ fg=blue</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>1120</x>
-      <y>152</y>
+      <x>1072</x>
+      <y>136</y>
       <w>200</w>
       <h>88</h>
     </coordinates>
@@ -246,8 +238,8 @@ fg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1024</x>
-      <y>168</y>
+      <x>976</x>
+      <y>152</y>
       <w>120</w>
       <h>40</h>
     </coordinates>

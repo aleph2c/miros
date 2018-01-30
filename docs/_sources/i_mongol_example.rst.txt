@@ -295,22 +295,23 @@ in software using miros.
 
 Technical Overview
 ------------------
-To build our horse archer botnet we need code that can be expressed on at least
-two different computers; I'll be using a windows machine and a raspberry pi.
+To build the horse archer botnet we need at least two different computers.  I'll
+be using a windows machine and a raspberry pi.
 
-I'll try to design a set of statecharts that will model an individual horse
+First, we'll design a set of statecharts that will model an individual horse
 archer and it's understanding of it's brethren.
 
-Any communication between our horse archer bots will need to be encrypted, since
-we don't want our enemy understanding what we are up to.
+Any communication between our horse archer bots will be encrypted, since we
+don't want our enemy to learn about what we are doing.
 
-While we are building the software to implement a node in our botnet we will
-instrument it and have all of its information stream to one location so we can
-debug the whole botnet.  I will use this instrumentation to show that the code
-is working as designed.
+We will adjust how our instrumentation works; we will make it so that it can
+stream its output to any computer of our choosing.  We will do this so we can
+debug our entire botnet from one location.
 
-Finally I'll write the software; run it on two or more computers and demonstrate
+Finally We'll write the software; run it on two or more computers and demonstrate
 that it is working.
+
+Here are the steps:
 
 * :ref:`Designing the Mongol in its Tactic<i_mongol_example-designing-the-mongol-in-its-tactic>`
 * :ref:`Encrypted Commnications<i_mongol_example-encrypted-communications>`
@@ -352,26 +353,103 @@ will fake out this information with a
 design.  Three seconds after advancing they will issue the
 Close_Enough_For_Circle event.
 
-So our horse archers circle and fire; creating a constant stream of chaos and
-danger onto their enemy's mass.  They move away from the danger and loosen their
-ranks so that our horse archers can charge in for their next play.
+So our horse archers circle and fire; creating an intangible rain of arrows down
+upon the enemy's front line.  To save themselves, the enemy loosens their ranks
+allowing enough space and safety for our horse archers to charge in for their
+next play.
 
 Notice that the Circle and Fire state is within the Advance state.  Why do this?
 I did this in case an individual horse archer decided that the enemies front was
 sufficiently disorganized enough not to waste arrows on an imprecise
-bombardment.  Any horse archer can become an officer and make a war cry, so in
-the case that our node takes a reading and determines that a skirmish is in
-order directly upon advancing they can make the call and the other nodes will
-follow them into the fray.
+bombardment; To skip the circle and fire step and just advance into a skirmish.
+To do this, they would issue a Skirmish_War_Cry and charge into the enemy's
+disorganized front and to make individual attacks.
 
 .. image:: _static/ergotic_mongol_12.svg
     :align: center
 
+`ergotic_mongol_12`_
+
+Upon making the Skirmish_War_Cry are horse archer charges into close enough
+range to make individual attacks with their arrows.  This type of fighting is
+called a skirmish to show that we do not want them to stick around.
+
+Our war bot would have some client code connected to the entry condition of the
+skirmish state.  It might be the initialization of a specific targeting and
+attack control system, whatever it is it would have to issue the Ammunition_Low
+event when it was done firing upon specific targets.  This Ammunition_Low event
+would be caught by the skirmish state as a :ref:`hook<patterns-ultimate-hook>`.
+This hook would in turn, trigger a Retreat_Ready_War_Cry event.
+
+I could have just used a single Ammunition_Low event to cause the transition
+from the Skirmish state into the "Waiting To Lure" state.  But, I often use two
+distinct events like this to make the debugging and reflection processes easier
+on myself, so that I can debug a statechart faster than I could with only one
+event that expresses two different semantic meanings.  (This will also give our
+design more flexibility, which we will see later in this example).
+
+After a horse archer issues the Retreat_Ready_War_Cry they enter the "Waiting to
+Lure" state.  He would expertly attach his bow to his mount and pull his
+scimitar, then he would do something really brave.  He draw the attention of an
+enemy officer and somehow convince him that he was scared and incompetent, that
+his unit's will was broken.  While in the waiting to lure state, he would act
+like a father who is being chased by his children.  He would pretend that they
+could actually catch him if they only just tried a little bit harder.
+
+The western Knight would be spoiling for a fight, feeling enraged, yet
+incompetent, he would want to do something other than watch his footmen die.  He
+might look down at his massive warhorse and compare it to the strange little
+ponies these horse archers are riding.
+
+What he doesn't know is that he is the quarry.  They are on a hunting trip; not
+every arrow carries the same value; the whole point of their attack was to find
+him.  They have something to give him.
+
+The Knight see's his chance and attacks!
+
+Once again we find ourselves needing real input from the world.   This is where
+our bot would need another transducer or reading to determine if the officer had
+been lured.  For now we will fake out the reading with another one-shot, so that
+we can frame in the design.  To make things interesting we will pick a random
+integer between 3 and 12 and then count down in seconds before we trigger our
+fake Officer_Lured event.
+
+The horse archer has been paying careful attention to the Knight even though he
+has been pretending not to see him.  When he sees him begin his attack, he
+issues the Officer_Lured event.
+
+The Officer_Lured event is caught by a hook, which triggers the Retreat_War_Cry.
+The Retreat_Ready_War_Cry causes an exit transition from the "Waiting to Lure"
+state.  This will have the horse archer put away his scimitar and arm his bow
+with an arrow.
+
 .. image:: _static/ergotic_mongol_13.svg
     :align: center
 
+`ergotic_mongol_13`_
+
+The Retreat_War_Cry causes the horse to enter the "Feigned Retreat" state.  In
+this state, a different control system would come into play.  The horse archer
+would let the Knight close the distance to him, so that he can comfortably make
+his shot.
+
+He might veer and dodge to place bodies and soldiers between him and the
+charging Knight, or lure him closer toward other horse archers who could flank
+the knight; taking advantage of how his helmet has cut off his peripheral
+vision.
+
+Once the knight is killed, the horse archers would unload the rest of their
+ammunition on any other soldiers giving chase.  Upon loosing all arrows, the
+horse archer would issue and Out_Of_Arrows event.  This would cause them to
+exit the "Feigned Retreat" state and enter a full gallop to their marshal point.
+
 .. image:: _static/ergotic_mongol_14.svg
     :align: center
+
+The final stage of our tactic would have the horse archers meet at their marshal
+point.  Decide upon where to meet after their next attack.  Load their horses
+with arrows, field wrap their wounds.  Drink some water and prepare themselves
+for the next advance.
 
 Change design to link Retreat_War_Cry to side of deceit in detail (explain why)
 
@@ -390,6 +468,8 @@ Instrumenting to Debug the Mongol Botnet
 Implementing the Mongol in miros
 --------------------------------
 
-.. _ergotic_mongol_11: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_11.svg
+.. _ergotic_mongol_11: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_11.pgn
+.. _ergotic_mongol_12: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_12.pgn
+.. _ergotic_mongol_13: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_13.pgn
 
 :ref:`back to examples <examples>`
