@@ -4,9 +4,9 @@
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>144</x>
-      <y>48</y>
-      <w>1008</w>
+      <x>56</x>
+      <y>64</y>
+      <w>1080</w>
       <h>704</h>
     </coordinates>
     <panel_attributes>*Deceit_in_Detail_Tactic (marshaled)*
@@ -25,26 +25,31 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>696</x>
-      <y>96</y>
+      <x>600</x>
+      <y>112</y>
       <w>448</w>
       <h>272</h>
     </coordinates>
     <panel_attributes>*Skirmish*
 --
 entry /
+  if archer.arrow &lt; 10:
+    archer.post_fifo(
+      Event(
+        signal=signals.Ammunition_Low))
 exit /
 
 
 valign=top
-</panel_attributes>
+
+fg=black</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>256</x>
-      <y>112</y>
+      <x>240</x>
+      <y>128</y>
       <w>328</w>
       <h>320</h>
     </coordinates>
@@ -65,8 +70,8 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>920</x>
-      <y>128</y>
+      <x>824</x>
+      <y>144</y>
       <w>208</w>
       <h>216</h>
     </coordinates>
@@ -87,72 +92,80 @@ Officer_Lured /
 
 
 valign=top
-</panel_attributes>
+
+fg=black</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>776</x>
-      <y>504</y>
+      <x>680</x>
+      <y>496</y>
       <w>272</w>
-      <h>120</h>
+      <h>136</h>
     </coordinates>
     <panel_attributes>*Feigned Retreat*
 --
 entry / 
   # Fire on officers
   # Fire on soldiers
+  if archer.arrows == 0
+    archer.post_fifo(
+      Event(
+        signal=signals.Out_Of_Arrow))
 
 valign=top
-</panel_attributes>
+
+fg=black</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>472</x>
-      <y>424</y>
-      <w>120</w>
-      <h>200</h>
+      <x>48</x>
+      <y>184</y>
+      <w>208</w>
+      <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 Advance_War_Cry
 
 bg=blue
 fg=black</panel_attributes>
-    <additional_attributes>10.0;230.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;20.0;240.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>576</x>
-      <y>216</y>
-      <w>136</w>
-      <h>40</h>
+      <x>944</x>
+      <y>376</y>
+      <w>208</w>
+      <h>88</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 Skirmish_War_Cry
-</panel_attributes>
-    <additional_attributes>10.0;20.0;150.0;20.0</additional_attributes>
+
+fg=black</panel_attributes>
+    <additional_attributes>240.0;80.0;10.0;80.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>688</x>
-      <y>192</y>
+      <x>592</x>
+      <y>256</y>
       <w>248</w>
       <h>32</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-</panel_attributes>
+
+fg=black</panel_attributes>
     <additional_attributes>10.0;20.0;290.0;20.0</additional_attributes>
   </element>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>200</x>
-      <y>384</y>
+      <x>184</x>
+      <y>400</y>
       <w>16</w>
       <h>16</h>
     </coordinates>
@@ -162,8 +175,8 @@ Skirmish_War_Cry
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>200</x>
-      <y>376</y>
+      <x>184</x>
+      <y>392</y>
       <w>72</w>
       <h>32</h>
     </coordinates>
@@ -174,32 +187,35 @@ Skirmish_War_Cry
   <element>
     <id>Text</id>
     <coordinates>
-      <x>704</x>
-      <y>176</y>
+      <x>608</x>
+      <y>232</y>
       <w>216</w>
       <h>48</h>
     </coordinates>
     <panel_attributes>Ammunition_Low / 
 chart.post_fifo(Retreat_Ready_War_Cry)
-style=wordwrap</panel_attributes>
+style=wordwrap
+fg=black</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>944</x>
-      <y>336</y>
-      <w>24</w>
-      <h>184</h>
+      <y>520</y>
+      <w>208</w>
+      <h>32</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;210.0</additional_attributes>
+    <panel_attributes>lt=-&gt;
+Retreat_War_Cry
+fg=black</panel_attributes>
+    <additional_attributes>240.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>216</x>
-      <y>480</y>
+      <x>200</x>
+      <y>496</y>
       <w>376</w>
       <h>232</h>
     </coordinates>
@@ -224,20 +240,21 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>584</x>
-      <y>544</y>
-      <w>208</w>
+      <x>568</x>
+      <y>552</y>
+      <w>128</w>
       <h>32</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-Out_Of_Arrows</panel_attributes>
-    <additional_attributes>240.0;20.0;10.0;20.0</additional_attributes>
+Out_Of_Arrows
+fg=black</panel_attributes>
+    <additional_attributes>140.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>328</x>
-      <y>232</y>
+      <x>312</x>
+      <y>248</y>
       <w>232</w>
       <h>120</h>
     </coordinates>
@@ -256,8 +273,8 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>336</x>
-      <y>344</y>
+      <x>320</x>
+      <y>360</y>
       <w>200</w>
       <h>104</h>
     </coordinates>
@@ -266,35 +283,24 @@ Close_Enough_For_Circle</panel_attributes>
     <additional_attributes>10.0;110.0;10.0;60.0;230.0;60.0;230.0;10.0</additional_attributes>
   </element>
   <element>
-    <id>Text</id>
-    <coordinates>
-      <x>952</x>
-      <y>416</y>
-      <w>104</w>
-      <h>24</h>
-    </coordinates>
-    <panel_attributes>Retreat_War_Cry
-style=wordwrap</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
     <id>Relation</id>
     <coordinates>
-      <x>688</x>
-      <y>240</y>
+      <x>592</x>
+      <y>296</y>
       <w>248</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 Retreat_Ready_War_Cry
-</panel_attributes>
+
+fg=black</panel_attributes>
     <additional_attributes>10.0;20.0;290.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>1152</x>
-      <y>168</y>
+      <x>1056</x>
+      <y>184</y>
       <w>200</w>
       <h>88</h>
     </coordinates>
@@ -303,25 +309,27 @@ Retreat_Ready_War_Cry
     times=1,
     period=random.randint(3,12),
     deferred=True)
-style=wordwrap</panel_attributes>
+style=wordwrap
+fg=black</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1056</x>
-      <y>184</y>
+      <x>960</x>
+      <y>200</y>
       <w>120</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=.</panel_attributes>
+    <panel_attributes>lt=.
+fg=black</panel_attributes>
     <additional_attributes>10.0;30.0;130.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>624</x>
-      <y>672</y>
+      <x>608</x>
+      <y>688</y>
       <w>232</w>
       <h>88</h>
     </coordinates>
@@ -336,8 +344,8 @@ style=wordwrap</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>416</x>
-      <y>632</y>
+      <x>400</x>
+      <y>648</y>
       <w>224</w>
       <h>88</h>
     </coordinates>
@@ -347,8 +355,8 @@ style=wordwrap</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>384</x>
-      <y>608</y>
+      <x>368</x>
+      <y>624</y>
       <w>176</w>
       <h>88</h>
     </coordinates>
@@ -365,8 +373,8 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>208</x>
-      <y>656</y>
+      <x>192</x>
+      <y>672</y>
       <w>192</w>
       <h>40</h>
     </coordinates>
@@ -375,5 +383,47 @@ READY (marshal point)
 
 bg=blue</panel_attributes>
     <additional_attributes>10.0;20.0;220.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>48</x>
+      <y>280</y>
+      <w>208</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Other_Advance_War_Cry
+
+bg=blue
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;20.0;240.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>784</x>
+      <y>376</y>
+      <w>368</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Other_Skirmish_War_Cry
+
+fg=blue</panel_attributes>
+    <additional_attributes>440.0;120.0;10.0;120.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>944</x>
+      <y>584</y>
+      <w>208</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Other_Retreat_War_Cry
+fg=blue</panel_attributes>
+    <additional_attributes>240.0;20.0;10.0;20.0</additional_attributes>
   </element>
 </diagram>

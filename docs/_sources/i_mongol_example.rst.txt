@@ -221,7 +221,7 @@ directly at individual opponents.  To begin a skirmish any of the horse archers
 could issue a skirmish war cry and all other units would follow, breaking away
 from their circle to move close into the now disordered front of their enemy.
 At some point one of the horse archers would become low on ammunition; then they
-would begin the most dangerous and effective movement in their 'defeat in
+would begin the most dangerous and effective movement in their 'deceit in
 detail' tactic, they would pull their scimitar; saving the last of their arrows
 for their luring retreat.
 
@@ -245,7 +245,7 @@ could do this when they had successfully lured an officer are when enough time
 had passed that the enemy was becoming sufficiently reorganized to actually put
 up real opposition.
 
-So the retreat war cry would occur when the last horse archer pulled his
+The retreat war cry would occur when the last horse archer pulled his
 scimitar, or when an officer was lured or when enough time had passed for the
 enemy to re-organize.
 
@@ -256,8 +256,9 @@ flanking soldier; but there would be another horse archer their also retreating
 with his brethren.  They were especially dangerous to officers, since an officer
 would often be on horse back to increase their mobility and express their rank.
 The speed of the chasing officer would pull him away from his protecting mass;
-leaving him alone and flanked by his enemies.  He had no real chance of catching
-his prey; all of his training and ideas about the world working against him.
+leaving him alone and flanked by his enemies, his helmet blinding his peripheral
+vision.  He had no real chance of catching his prey; all of his training and
+ideas about the world working against him.
 
 From the outside the mongols would appear like a angry swarm of wasps;
 incomprehensible, always out of reach.  Any engagement with them reducing the
@@ -281,9 +282,11 @@ the officer chasing you.
 
 Most of your concentration would be used to make your shots, or to put on the
 deceitful-play while close enough to the enemy.  The only exception to this
-being your need to track who in your unit was ready to go.  If you were the last
-horseman, the rules would still apply:  You would advance; you would circle and
-shoot; you would skirmish and lure and retreat-to-fire when followed.
+being your need to track who in your unit was ready to go.
+
+If you were the last horseman, the rules would still apply:  You would advance;
+you would circle and shoot; you would skirmish and lure and retreat-to-fire when
+followed.
 
 .. image:: _static/backwards.jpg
     :align: center
@@ -323,9 +326,15 @@ Here are the steps:
 Designing the Mongol in its Tactic
 ----------------------------------
 We already understand the tactic, so I'll draw and describe how I think it might
-work in an HSM several times over; adding complexity and technical improvements with
-each iteration.  When we have a design that can sufficiently sketch out our bot
-net I'll move to the next technical step.
+work in an HSM several times over; adding complexity and technical improvements
+with each iteration.  When we have a design that can sufficiently sketch out our
+bot net I'll move to the next technical step.
+
+While working through the example we will introduce different events that cause
+changes in the horse archer's behavior.  When an event is a war cry, who exactly
+is yelling it out?  Any war cry can come from one of two places.  It can come
+from the horse archer himself, or a senior officer.  We do this so that the
+unit tactic can be autonomous yet flexible enough to receive outside direction.
 
 Let's think about a single horse archer and the actions he would take.  He would
 meet up with his brethren (marshal), then they would determine where they would like
@@ -345,7 +354,7 @@ Immediately after filling their arrows, they attack.  This may not be
 historically true, but let's have our botnet just attack right away.
 
 Once the horse archers advance close enough to the mass of their enemy, they
-will circle and fire.  How do we express this in software?  If we were building
+would circle and fire.  How do we express this in software?  If we were building
 a botnet to fight the North Koreans or a malevolent AI or something, we could
 have each node in our botnet read a transducer or take a reading.  For now we
 will fake out this information with a
@@ -433,25 +442,175 @@ this state, a different control system would come into play.  The horse archer
 would let the Knight close the distance to him, so that he can comfortably make
 his shot.
 
-He might veer and dodge to place bodies and soldiers between him and the
+He might even veer and dodge to place bodies and soldiers between him and the
 charging Knight, or lure him closer toward other horse archers who could flank
 the knight; taking advantage of how his helmet has cut off his peripheral
-vision.
+vision.  It doesn't really matter; once the knight attacks, stupidly charging
+into a group of organized horse archers with unprotected flanks, he is doomed.
 
-Once the knight is killed, the horse archers would unload the rest of their
-ammunition on any other soldiers giving chase.  Upon loosing all arrows, the
-horse archer would issue and Out_Of_Arrows event.  This would cause them to
-exit the "Feigned Retreat" state and enter a full gallop to their marshal point.
+What to do next?  The unit goal has been achieved, yet they still have arrows.
+So they leave them in any other pursuing soldiers, then ride full gallop back to
+the marshal point.
 
 .. image:: _static/ergotic_mongol_14.svg
     :align: center
 
 The final stage of our tactic would have the horse archers meet at their marshal
-point.  Decide upon where to meet after their next attack.  Load their horses
-with arrows, field wrap their wounds.  Drink some water and prepare themselves
-for the next advance.
+point.  Their they would decide upon where to meet again after their next
+attack.  Load their horses with arrows, field wrap their wounds.  Drink and
+water their horses and mentally prepare themselves for the next advance.
 
-Change design to link Retreat_War_Cry to side of deceit in detail (explain why)
+The requirement for group cohesion still applies.  Any horse archer would be
+limited on the battle field if he had to advance with an empty quiver; so every
+horse archer would want to wait for the last horse archer to finish reloading
+before advancing.
+
+Therefore like the "Waiting to Lure" state, there must be a "Waiting to Advance"
+state.  In this first pass at a design, we setup a one shot that will trigger
+the READY event after three seconds.
+
+In the "Waiting to Advance" state we place a randomized one-shot that will
+trigger the Advance_War_Cry at some time between 3 and 12 seconds.
+
+But this overall tactic, as it is currently designed is completely fragile.
+What happens if a horse archer is issued an Advance_War_Cry while in the
+"Marshal" state?  Well, he would just sit there.  What would happen if a
+Skirmish_War_Cry was issued while the horse archer was in the "Feigned Retreat"
+state?  They would ignore the command.  This is not flexible.
+
+There will be situations where a senior officer issues an Advance_War_Cry when
+the horse archer is not ready; no matter, it is time to attack, even without
+arrows.  Group cohesion is of paramount importance to the Mongols.
+
+So, as a map it is easy to see what is going on, but it tells a very specific
+and inflexible story.  With a few light adjustments we could make the horse
+archer much more seasoned and responsive in the face of unexpected events.
+
+For instance we could make the Advance_War_Cry cause an advance on the enemy
+while the horse archer is in any of it's maneuvers.  Suppose a horse archer is
+in the "Feigned Retreat" stage and a senior officer sees some sort of global
+opportunity and bangs on a war drum, issuing a global Advance_War_Cry.  Our
+horse archer would turn around and advance.
+
+In this way the control at a higher leadership level of the mongol army could
+reach into this unit, tweak its behavior, then let it run autonomously again.
+
+Let's improve the design:
+
+.. image:: _static/ergotic_mongol_2.svg
+    :align: center
+
+As a statechart designer, you might look at the Advance_War_Cry event connecting
+the outer state to the advance state and become confused.  Where does this
+Advance_War_Cry come from?  Oh, there it is, in the "Waiting to Advance" state.  
+
+I have seen junior developers destroy designs by adjusting arrows to make the
+"story easier to read" off of the map.  It is tempting to put the arrow source
+back to the "Waiting to Advance" state so that the map makes immediate sense
+upon looking at it. But think about what this has done to our design.  When an
+arrow is connected from the outer state, to the "Advance" state, it is shorthand
+for connecting *all of the states* to the "Advance" state with an
+Advance_War_Cry arrow.  When the junior developer mistakenly adjusts the tactic
+to make the map "make more sense", they would break 7 different behavioral
+pathways in this design; causing our horse archer unit to lose cohesion and thereby
+guarantee its execution by a senior officer.  Statecharts are
+extremely powerful at packing tactical complexity onto a map; so you really have
+to be careful moving the arrows around.
+
+Remember, at this stage of our design process any war cry can be issued by the
+horse archer themselves, or by a senior officer.
+
+Now let's adjust the Skirmish_War_Cry and the Retreat_Ready_War_Cry from the
+outer state to their respective states.  We just added 14 different behavioral
+paths.
+
+Suppose that in the future, a new developer decides to adjust the deceit-in-detail
+tactic by adding another state within it.  If they do not change how our
+war-cry event arrows are attached, they will automatically get the behavior of
+the old tactic without knowing that they did.  Statecharts are robust against
+state additions made by future programmers.  So statecharts can quickly act like
+a culture, they become smarter than the individual programming them.
+
+Notice that the Out_Of_Arrows event was not globalized.  We do not want our
+horse archer to just leave when he's out of arrows.  Furthermore, because of our
+adjustments to globalize the Advance_War_Cry, Skirmish_War_Cry and the
+Retreat_War_Cry we have to ensure we don't accidentally leave our horse archer
+stranded in a state when he is out of arrows.
+
+So what happens if an empty horse archer is asked to advance?  Well, he
+uselessly circles and then will issue a Skirmish_War_Cry.  Good, he can escape
+the "Advance" state.
+
+Notice that some code was added to the entry state of the "Skirmish" state.  Now
+if a horse archer has less than 10 arrows, or no arrows, he will end up in the
+"Waiting to Lure" state.  This is good, he is no longer just uselessly riding
+around because he can start to bait knights and he can escape the "Skirmish"
+state event if he doesn't have arrows.
+
+Likewise, entry code was added to the "Feigned Retreat" state.  When he enters
+this state with no arrows, he will just ride back to the marshal point.
+
+Now that we have a decent adumbration of a horse archer acting alone, let's add
+control so the horse archers can react to the behavior of other horse archers.
+
+A horse archer is a distributed officer.  This means that any horse archer can
+issue commands to, or obey commands from, any other horse archer in his unit.
+For this unit tactic, there are two types of commands.  There is a "Let's do
+this thing right now!" and a "Track that I am ready in your head!" kind of
+command.
+
+To see what I mean consider the Advance_War_Cry.  That is a "Let's do this thing
+right now" command.  All horse archers will immediately advance and circle if
+they issued the command themselves or if they hear it come from another horse
+archer or a senior officer.  In the deceit in detail there are three different
+war cries that have this type of characteristic: Advance_War_Cry,
+Skirmish_War_Cry and Retreat_War_Cry.
+
+.. note::
+
+  The "Let's do this thing right now!" variety of signaling between different
+  statechart can be generalized into the "multi-chart race pattern", since each of
+  the statecharts can be thought of racing to give the command to another chart.
+  If given all of the statecharts will race to state indicated.
+
+.. image:: _static/ergotic_mongol_31.svg
+    :align: center
+
+Let's turn each of these commands into three distinct events so that we can tell
+if it was issued by a senior officer, the horse archer themselves or another
+horse archer.  By doing this our statechart will be easier to debug, it's
+instrumentation will be clear and the sequence tool will tell a better story.
+
+We construct three new events, Senior_Advance_War_Cry, Senior_Skirmish_War_Cry
+and Senior_Retreat_War_Cry.  Imagine that these commands can be issued at a high
+vantage point by war drums near the back of the Mongol horde.
+
+When a horse archer hears a command from a senior officer, they will give the
+cry themselves and then perform the action.  We implement this using the
+reminder pattern.  A hook is placed at the outer state for these commands; and
+it re-issues a new event as a response.  When a horse archer calls out, it can
+be heard by other horse archers through mechanism we haven't programmed yet, but
+that doesn't mean we can't name them: Other_Advance_War_Cry,
+Other_Skirmish_War_Cry and Retreat_War_Cry.
+
+There will be situations where a horse archer wants to ignore a command coming
+from a senior officer or from his brethren.  This is when he is already engaged
+in a complicated maneuver that would be initiated by that command.  For instance
+while the horse archer is baiting a night in the "Waiting to Lure" state, they
+would ignore the Senior_Skirmish_War_Cry and the Other_Skirmish_War_Cry since
+they are already engaged in that activity.
+
+Likewise, a horse archer would ignore any order to advance, coming from someone
+else, if they are already advancing or engaged in the circle and fire maneuver.
+
+.. image:: _static/ergotic_mongol_32.svg
+    :align: center
+
+Battle is a noisy affair.  There is a good chance that one horse archer might
+not hear a war cry issued by another one far away from him (network issues); so
+anytime a horse archer hears a war cry coming from another horse archer, they
+yell out the command again so as to re-transmit it to the brethren within
+earshot.  In our diagram we do this with the reminder pattern.
 
 .. _i_mongol_example-encrypted-communications:
 
