@@ -1,11 +1,10 @@
 .. _i_mongol_example-mongol-horsemen:
 
-  *The most difficult subjects can be explained to the most slow-witted man if
-  he has not formed any idea of them already; but the simplest thing cannot be
-  made clear to the most intelligent man if he is firmly persuaded that he knows
-  already, without a shadow of a doubt, what is laid before him.* 
+  *It ain't what you don't know that gets you into trouble.  It's what you know
+  for sure that just ain't so.* 
+  
+  -- Mark Twain (fake quote)
 
-   -- Leo Tolstoy
 
 Mongol Horse Archer
 ===================
@@ -587,7 +586,7 @@ cry themselves and then perform the action.  We implement this using the
 reminder pattern.  A hook is placed at the outer state for these commands; and
 it re-issues a new event as a response.  
 
-When a horse archer calls out, it can be heard by other horse archers through
+When a horse archer calls out, it can be heard by other horse archers through a
 mechanism we haven't programmed yet, but that doesn't mean we can't name these new
 events: Other_Advance_War_Cry, Other_Skirmish_War_Cry and Retreat_War_Cry.
 
@@ -608,11 +607,12 @@ Battle is a noisy affair.  There is a good chance that one horse archer might
 not hear a war cry issued by another one far away from him (due to network issues); so
 anytime a horse archer hears a war cry coming from another horse archer, they
 yell out the command again so as to re-transmit it to their brethren within
-earshot.  In our diagram we do this with the reminder pattern.
+earshot.
 
-Any advance, skirmish or retreat command coming from anyone other than
-themselves will cause them to shout out the command and then follow that
-instruction as if it was their own idea.
+Notice also that I moved the Officer_Lured hook from the "Waiting to Lure" state
+into the "Skirmish" state.  This will give us the same behavior as before, with
+the option of short circuiting the dangerous "Waiting to Lure" state in the case
+that I knight charges at the moment the Mongols start to Skirmish.
 
 Our design so far, has encompassed the "Let's do this thing right now!" part of
 it's collaboration.  Senior officers can issue messages, any horse archer can
@@ -661,7 +661,7 @@ something new added to the empathy statechart; the "other is dead" state.
 If you wait for a dead man, you will be waiting a long time -- unless you are
 waiting for a dead man on a battlefield, then you will not be waiting long.
 
-So, It almost goes without saying that a horse archer will only wait for another
+It almost goes without saying that a horse archer will only wait for another
 horse archer if he thinks he's alive.
 
 There really isn't perfect knowledge in battle.  So, the idea that a horse archer
@@ -683,7 +683,7 @@ horse archer is dead.  So, the horse archer assumes the other is dead and
 continues with the maneuver.
 
 Of course this will often be wrong.  If the first horse archer to enter the
-"Waiting to Lure" state lures and officer right away; he would issue a
+"Waiting to Lure" state lures a knight right away; he would issue a
 Retreat_War_Cry and by this call, and with this design, he would think everyone
 else is dead.  This is OK, because he will immediately hear the other members of
 his unit yell out; which will quickly change his belief back into a more
@@ -704,9 +704,9 @@ cohesion will actually be broken by what happens to them in the world.
 
 But what about the draconian requirement placed on this unit by it's senior
 officers, "maintain your group cohesion or we will kill every member in your
-unit".  If the horde adhered this command with autistic compliance, all the way
-up their leadership hierarchy, there would only be one horse archer left and his
-name would be Genghis Khan.
+unit".  If the Mongol horde adhered to this command with autistic compliance, all
+the way up their leadership hierarchy, there would only be one horse archer left
+and his name would be Genghis Khan.
 
 .. image:: _static/Genghis_Khan.jpg
     :align: center
@@ -728,17 +728,22 @@ the same path, but they would follow the same path-ish-ness:
 We aren't going to delve into any mathematical rigor, but instead lean heavily
 on our intuition and our design sensibilities.  A set of statecharts could be
 explained using a stick in some mud in the 13th century.   This would be harder
-to do with calculus, differential equations and linear algebra.
+to do with calculus, differential equations and linear algebra, so let's stay
+away from that.
 
 Which brings us back to the idea of cognitive load.  We are expecting these
 horse archers to remember a lot of things while in the heat of battle.  If I
 were an officer explaining this empathy tactic, I would be complicit in weakening the
-unit by filling their head with over complicated maps.
+unit by filling their head with over complicated crap.
 
-So, I'll try to simplify how I would want them to model their brethren to this:
+So let's simplify things:
 
 .. image:: _static/empathypartial.svg
     :align: center
+
+Now they are less precise in how they model the other members of their unit; yet
+the same main states appear.  They know who is not waiting who is waiting and
+who is dead.
 
 much less effective asking them to do something mentally complicated when I could be
 asking them to do something simple.

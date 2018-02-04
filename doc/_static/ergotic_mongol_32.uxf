@@ -18,13 +18,9 @@ entry /
 Senior_Advance_War_Cry \ chart.post_fifo(Event(signal=signals.Advance_War_Cry))
 Senior_Skirmish_War_Cry \ chart.post_fifo(Event(signal=signals.Skirmish_War_Cry))
 Senior_Retreat_War_Cry \ chart.post_fifo(Event(signal=signals.Retreat_War_Cry))
-Other_Advance_War_Cry \ chart.post_fifo(Event(signal=signals.Advance_War_Cry))
-Other_Skirmish_War_Cry \ chart.post_fifo(Event(signal=signals.Skirmish_War_Cry))
-Other_Retreat_War_Cry \ chart.post_fifo(Event(signal=signals.Retreat_War_Cry))
-
 valign=top
 
-fg=blue</panel_attributes>
+fg=black</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -43,13 +39,16 @@ entry /
       Event(
         signal=signals.Ammunition_Low))
 
+Officer_Lured /
+  chart.post_fifo(Retreat_War_Cry)
+  
 Senior_Skirmish_War_Cry / {}
 Other_Skirmish_War_Cry / {}
 
 
 valign=top
 
-fg=black</panel_attributes>
+fg=blue</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -97,8 +96,7 @@ exit /
   # Put away scimitar
   # Pull and arm bow
 
-Officer_Lured /
-  chart.post_fifo(Retreat_War_Cry)
+
 
 
 valign=top
@@ -406,7 +404,8 @@ fg=blue</panel_attributes>
     </coordinates>
     <panel_attributes>Advance_War_Cry /
 Broadcast(Advance_War_Cry)
-style=wordwrap</panel_attributes>
+style=wordwrap
+fg=blue</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -419,7 +418,8 @@ style=wordwrap</panel_attributes>
     </coordinates>
     <panel_attributes>Skirmish_War_Cry /
 Broadcast(Skirmish_War_Cry)
-style=wordwrap</panel_attributes>
+style=wordwrap
+fg=blue</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -432,7 +432,77 @@ style=wordwrap</panel_attributes>
     </coordinates>
     <panel_attributes>Retreat_War_Cry /
 Broadcast(Retreat_War_Cry)
-style=wordwrap</panel_attributes>
+style=wordwrap
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>56</x>
+      <y>392</y>
+      <w>240</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Other_Advance_War_Cry
+
+bg=blue
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;20.0;280.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>672</x>
+      <y>448</y>
+      <w>560</w>
+      <h>128</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+
+fg=blue</panel_attributes>
+    <additional_attributes>680.0;130.0;10.0;130.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>688</x>
+      <y>528</y>
+      <w>176</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>Other_Skirmish_War_Cry
+
+style=wordwrap
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>984</x>
+      <y>696</y>
+      <w>248</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+fg=blue</panel_attributes>
+    <additional_attributes>290.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1016</x>
+      <y>688</y>
+      <w>176</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>Other_Retreat_War_Cry
+style=wordwrap
+fg=blue</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>
