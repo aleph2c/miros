@@ -517,9 +517,6 @@ guarantee its execution by a senior officer.  Statecharts are
 extremely powerful at packing tactical complexity onto a map; so you really have
 to be careful moving the arrows around.
 
-Remember, at this stage of our design process any war cry can be issued by the
-horse archer themselves, or by a senior officer.
-
 Now let's adjust the Skirmish_War_Cry and the Retreat_Ready_War_Cry from the
 outer state to their respective states.  We just added 14 different behavioral
 paths.
@@ -588,15 +585,16 @@ vantage point by war drums near the back of the Mongol horde.
 When a horse archer hears a command from a senior officer, they will give the
 cry themselves and then perform the action.  We implement this using the
 reminder pattern.  A hook is placed at the outer state for these commands; and
-it re-issues a new event as a response.  When a horse archer calls out, it can
-be heard by other horse archers through mechanism we haven't programmed yet, but
-that doesn't mean we can't name them: Other_Advance_War_Cry,
-Other_Skirmish_War_Cry and Retreat_War_Cry.
+it re-issues a new event as a response.  
+
+When a horse archer calls out, it can be heard by other horse archers through
+mechanism we haven't programmed yet, but that doesn't mean we can't name these new
+events: Other_Advance_War_Cry, Other_Skirmish_War_Cry and Retreat_War_Cry.
 
 There will be situations where a horse archer wants to ignore a command coming
 from a senior officer or from his brethren.  This is when he is already engaged
 in a complicated maneuver that would be initiated by that command.  For instance
-while the horse archer is baiting a night in the "Waiting to Lure" state, they
+while the horse archer is baiting a knight in the "Waiting to Lure" state, they
 would ignore the Senior_Skirmish_War_Cry and the Other_Skirmish_War_Cry since
 they are already engaged in that activity.
 
@@ -607,13 +605,147 @@ else, if they are already advancing or engaged in the circle and fire maneuver.
     :align: center
 
 Battle is a noisy affair.  There is a good chance that one horse archer might
-not hear a war cry issued by another one far away from him (network issues); so
+not hear a war cry issued by another one far away from him (due to network issues); so
 anytime a horse archer hears a war cry coming from another horse archer, they
-yell out the command again so as to re-transmit it to the brethren within
+yell out the command again so as to re-transmit it to their brethren within
 earshot.  In our diagram we do this with the reminder pattern.
+
+Any advance, skirmish or retreat command coming from anyone other than
+themselves will cause them to shout out the command and then follow that
+instruction as if it was their own idea.
+
+Our design so far, has encompassed the "Let's do this thing right now!" part of
+it's collaboration.  Senior officers can issue messages, any horse archer can
+hear messages from other horse archers and the horse archer can yell out
+messages to other horse archers.  When an action is taken by one Mongol, it will
+be immediately taken by the others in its unit.  So, in a way they are racing
+each other to get to the next state.  For this reason I call this a "multi-chart
+race pattern".
+
+Now let's talk about the "Track that I am ready in your head!" set of commands.
+These types of commands are issued when the unit is waiting for the last of it's
+members to do something before they can all continue onto the next collective
+behavior.  We have two such moments in this "deceit in detail" tactic.  The
+first occurs when a horse archer puts away is bow and tries to lure a knight.
+He yells his Retreat_Ready_War_Cry, hoping that all of the members in his unit
+will hear him.  When the last horse archer issues the Retreat_Ready_War_Cry he
+will know that it is up to him to issue the Retreat_War_Cry so his entire unit
+can escape this dangerous luring maneuver.
+
+The second "Track that I'm ready in your head!" command happens when the units
+are marshaled.  It is up to the last horse archer to tell the others that he is
+ready so the can get back in the fray.  He does this by issuing the
+Advance_War_Cry.
+
+So, a horse archer has to track what is happening with his brethren.  He has to
+know what state they are in.  Thankfully he doesn't have to know *precisely* what
+they are doing but only a small subset of what they are doing.  I would call this
+unit empathy and it could be tracked by a second statechart.
+
+Here is a first shot at it's design:
 
 .. _i_mongol_example-encrypted-communications:
 
+.. image:: _static/empathyfull.svg
+    :align: center
+
+A horse archer will have one of these statecharts for each member of his unit.
+It is a simplification of how another horse archer is conducting themselves.
+
+Another horse archer's "Advance", "Circle and Fire" and "Skirmish" states are
+simplified in the "Other Attacking" empathetic state.  The "Marshal" and
+"Feigned Retreat" states are simplified into the "Other Marshaling" state.
+The "Waiting to Lure" and "Waiting to Advance" states are left intact.  There is
+something new added to the empathy statechart; the "other is dead" state.
+
+If you wait for a dead man, you will be waiting a long time -- unless you are
+waiting for a dead man on a battlefield, then you will not be waiting long.
+
+So, It almost goes without saying that a horse archer will only wait for another
+horse archer if he thinks he's alive.
+
+There really isn't perfect knowledge in battle.  So, the idea that a horse archer
+has about another horse archer will often be wrong, until that belief is updated
+by more evidence and it snaps back to the truth.
+
+But how would a horse archer come to the conclusion that someone else in their
+unit is dead?  The answer can be found when group cohesion breaks: if they find
+themselves giving the Retreat_War_Cry while they think another is still in their
+"Other Attacking" state, they will assume that *that* comrade is dead.  But why?
+
+The "Other Attacking" state is an empathetic simplification of their own
+"Advance", "Circle and Fire" and "Skirmish" states.  The group's cohesion is
+only kept if the Retreat_War_Cry is issued while *everyone* is in the "Waiting
+to Lure" state.  So if a horse archer gives this call while they think another
+horse archer is still in their "Other Attacking" state, there are two
+conclusions to be made, one the group broke cohesion by design, or the other
+horse archer is dead.  So, the horse archer assumes the other is dead and
+continues with the maneuver.
+
+Of course this will often be wrong.  If the first horse archer to enter the
+"Waiting to Lure" state lures and officer right away; he would issue a
+Retreat_War_Cry and by this call, and with this design, he would think everyone
+else is dead.  This is OK, because he will immediately hear the other members of
+his unit yell out; which will quickly change his belief back into a more
+truthful state of empathy.
+
+So here we are talking about a kind of belief lag.  The thing that the horse
+archer needs to know is if the person is dead while they are waiting around.  If
+they have incorrectly concluded their entire unit is dead, there is plenty of
+time to fix this erroneous belief with the truth.  The next wait state doesn't
+happen until after they have finished their false retreat and equipped their
+horse for another attack.  So, they can be wrong about things for a while
+without any consequence to the over all group.
+
+A symmetrical logic applies to the "Other Marshaling" part of the design.
+
+The important thing to notice here is that in many situations the group's
+cohesion will actually be broken by what happens to them in the world.  
+
+But what about the draconian requirement placed on this unit by it's senior
+officers, "maintain your group cohesion or we will kill every member in your
+unit".  If the horde adhered this command with autistic compliance, all the way
+up their leadership hierarchy, there would only be one horse archer left and his
+name would be Genghis Khan.
+
+.. image:: _static/Genghis_Khan.jpg
+    :align: center
+
+So the group cohesion requirement has to be some kind of hand waving thing.  "We
+want you to follow each other around or re-synchronize in unusual situations, if
+you don't we will kill you."
+
+Basically the design has to be such that when cohesion is lost across the nodes
+in our botnet that they snap back into the desired group dynamic when given the
+opportunity to do so.
+
+Here we are talking about attractors.  The idea was first introduced by Edward
+Lorenz when he was studying chaotic systems.  His equations would never follow
+the same path, but they would follow the same path-ish-ness:
+
+.. image:: _static/lorenz1.png
+
+We aren't going to delve into any mathematical rigor, but instead lean heavily
+on our intuition and our design sensibilities.  A set of statecharts could be
+explained using a stick in some mud in the 13th century.   This would be harder
+to do with calculus, differential equations and linear algebra.
+
+Which brings us back to the idea of cognitive load.  We are expecting these
+horse archers to remember a lot of things while in the heat of battle.  If I
+were an officer explaining this empathy tactic, I would be complicit in weakening the
+unit by filling their head with over complicated maps.
+
+So, I'll try to simplify how I would want them to model their brethren to this:
+
+.. image:: _static/empathypartial.svg
+    :align: center
+
+much less effective asking them to do something mentally complicated when I could be
+asking them to do something simple.
+
+
+
+# move the Officer_Lured out to the skirmish state as a hook
 Encrypted Communications
 ------------------------
 
