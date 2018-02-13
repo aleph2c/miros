@@ -330,10 +330,12 @@ with each iteration.  When we have a design that can sufficiently sketch out our
 bot net I'll move to the next technical step.
 
 While working through the example we will introduce different events that cause
-changes in the horse archer's behavior.  When an event is a war cry, who exactly
-is yelling it out?  Any war cry can come from one of two places.  It can come
-from the horse archer himself, or a senior officer.  We do this so that the
-unit tactic can be autonomous yet flexible enough to receive outside direction.
+changes in the horse archer's behavior.  
+
+When an event is a war cry, who exactly is yelling it out?  Any war cry can come
+from one of two places.  It can come from the horse archer himself, or a senior
+officer.  We do this so that the unit tactic can be autonomous yet flexible
+enough to receive outside direction.
 
 Let's think about a single horse archer and the actions he would take.  He would
 meet up with his brethren (marshal), then they would determine where they would like
@@ -350,7 +352,7 @@ archers are meeting and that this is one tactic of many that they could choose f
 `ergotic_mongol_11`_
 
 Immediately after filling their arrows, they attack.  This may not be
-historically true, but let's have our botnet just attack right away.
+historically accurate, but let's have our botnet just attack right away.
 
 Once the horse archers advance close enough to the mass of their enemy, they
 would circle and fire.  How do we express this in software?  If we were building
@@ -362,16 +364,16 @@ design.  Three seconds after advancing they will issue the
 Close_Enough_For_Circle event.
 
 So our horse archers circle and fire; creating an intangible rain of arrows down
-upon the enemy's front line.  To save themselves, the enemy loosens their ranks
-allowing enough space and safety for our horse archers to charge in for their
-next play.
+upon the enemy's front line. So far so good.  To save themselves, the enemy
+loosens their ranks allowing enough space and safety for our horse archers to
+charge in for their next play.
 
 Notice that the Circle and Fire state is within the Advance state.  Why do this?
 I did this in case an individual horse archer decided that the enemies front was
 sufficiently disorganized enough not to waste arrows on an imprecise
 bombardment; To skip the circle and fire step and just advance into a skirmish.
 To do this, they would issue a Skirmish_War_Cry and charge into the enemy's
-disorganized front and to make individual attacks.
+disorganized front to make individual attacks.
 
 .. image:: _static/ergotic_mongol_12.svg
     :align: center
@@ -408,6 +410,9 @@ The western Knight would be spoiling for a fight, feeling enraged, yet
 incompetent, he would want to do something other than watch his footmen die.  He
 might look down at his massive warhorse and compare it to the strange little
 ponies these horse archers are riding.
+
+.. image:: _static/horsearcher.jpg
+    :align: center
 
 What he doesn't know is that he is the quarry.  They are on a hunting trip; not
 every arrow carries the same value; the whole point of their attack was to find
@@ -456,8 +461,9 @@ the marshal point.
 
 The final stage of our tactic would have the horse archers meet at their marshal
 point.  Their they would decide upon where to meet again after their next
-attack.  Load their horses with arrows, field wrap their wounds.  Drink and
-water their horses and mentally prepare themselves for the next advance.
+attack.  Load their horses with arrows, tell some jokes and field wrap their
+wounds.  Drink and water their horses and mentally prepare themselves for the
+next advance.
 
 The requirement for group cohesion still applies.  Any horse archer would be
 limited on the battle field if he had to advance with an empty quiver; so every
@@ -565,9 +571,10 @@ Skirmish_War_Cry and Retreat_War_Cry.
 .. note::
 
   The "Let's do this thing right now!" variety of signaling between different
-  statechart can be generalized into the "multi-chart race pattern", since each of
-  the statecharts can be thought of racing to give the command to another chart.
-  If given all of the statecharts will race to state indicated.
+  statechart can be generalized into the "multi-chart race pattern", since each
+  of the statecharts can be thought of racing each other to be the first to give
+  the command to another chart.  If given all of the statecharts will race to
+  the state indicated on their map.
 
 .. image:: _static/ergotic_mongol_31.svg
     :align: center
@@ -588,7 +595,7 @@ it re-issues a new event as a response.
 
 When a horse archer calls out, it can be heard by other horse archers through a
 mechanism we haven't programmed yet, but that doesn't mean we can't name these new
-events: Other_Advance_War_Cry, Other_Skirmish_War_Cry and Retreat_War_Cry.
+events: Other_Advance_War_Cry, Other_Skirmish_War_Cry and Other_Retreat_War_Cry.
 
 There will be situations where a horse archer wants to ignore a command coming
 from a senior officer or from his brethren.  This is when he is already engaged
@@ -604,15 +611,15 @@ else, if they are already advancing or engaged in the circle and fire maneuver.
     :align: center
 
 Battle is a noisy affair.  There is a good chance that one horse archer might
-not hear a war cry issued by another one far away from him (due to network issues); so
-anytime a horse archer hears a war cry coming from another horse archer, they
-yell out the command again so as to re-transmit it to their brethren within
-earshot.
+not hear a war cry issued by another one far away from him (due to network
+issues); so anytime a horse archer hears a war cry coming from another horse
+archer, they yell out the command again so as to re-transmit it to any other unit
+member within earshot.
 
 Notice also that I moved the Officer_Lured hook from the "Waiting to Lure" state
 into the "Skirmish" state.  This will give us the same behavior as before, with
 the option of short circuiting the dangerous "Waiting to Lure" state in the case
-that I knight charges at the moment the Mongols start to Skirmish.
+that a Knight stupidly charges at the moment the Mongols start to Skirmish.
 
 Our design so far, has encompassed the "Let's do this thing right now!" part of
 it's collaboration.  Senior officers can issue messages, any horse archer can
@@ -634,13 +641,13 @@ can escape this dangerous luring maneuver.
 
 The second "Track that I'm ready in your head!" command happens when the units
 are marshaled.  It is up to the last horse archer to tell the others that he is
-ready so the can get back in the fray.  He does this by issuing the
+ready so they can get back into the fray.  He does this by issuing the
 Advance_War_Cry.
 
 So, a horse archer has to track what is happening with his brethren.  He has to
-know what state they are in.  Thankfully he doesn't have to know *precisely* what
-they are doing but only a small subset of what they are doing.  I would call this
-unit empathy and it could be tracked by a second statechart.
+know what state they are in.  Thankfully he doesn't have to know *precisely*
+what they are doing but only a small subset of what they are doing.  For this
+reason I call this unit empathy and it could be tracked by a second statechart.
 
 Here is a first shot at it's design:
 
@@ -653,10 +660,10 @@ A horse archer will have one of these statecharts for each member of his unit.
 It is a simplification of how another horse archer is conducting themselves.
 
 Another horse archer's "Advance", "Circle and Fire" and "Skirmish" states are
-simplified in the "Other Attacking" empathetic state.  The "Marshal" and
-"Feigned Retreat" states are simplified into the "Other Marshaling" state.
+rendered down in the "Other Attacking" empathetic state.  The "Marshal" and
+"Feigned Retreat" states are rendered down into the "Other Marshaling" state.
 The "Waiting to Lure" and "Waiting to Advance" states are left intact.  There is
-something new added to the empathy statechart; the "other is dead" state.
+something new added to the empathy statechart; the "Other [is] Dead" state.
 
 If you wait for a dead man, you will be waiting a long time -- unless you are
 waiting for a dead man on a battlefield, then you will not be waiting long.
@@ -669,38 +676,33 @@ has about another horse archer will often be wrong, until that belief is updated
 by more evidence and it snaps back to the truth.
 
 But how would a horse archer come to the conclusion that someone else in their
-unit is dead?  The answer can be found when group cohesion breaks: if they find
-themselves giving the Retreat_War_Cry while they think another is still in their
-"Other Attacking" state, they will assume that *that* comrade is dead.  But why?
+unit is dead?  Well if that other horse archer is breaking the rules of their
+collective tactic, it is safe to assume he is doing so because he has been killed.
 
-The "Other Attacking" state is an empathetic simplification of their own
-"Advance", "Circle and Fire" and "Skirmish" states.  The group's cohesion is
-only kept if the Retreat_War_Cry is issued while *everyone* is in the "Waiting
-to Lure" state.  So if a horse archer gives this call while they think another
-horse archer is still in their "Other Attacking" state, there are two
-conclusions to be made, one the group broke cohesion by design, or the other
-horse archer is dead.  So, the horse archer assumes the other is dead and
-continues with the maneuver.
+We see this when a horse archer thinks that another member is attacking but
+finds himself issuing a Retreat_War_Cry.  The other member should have been in
+the waiting to lure state, but they weren't, so he just assumes they are dead
+and continues to fight.
 
 Of course this will often be wrong.  If the first horse archer to enter the
 "Waiting to Lure" state lures a knight right away; he would issue a
-Retreat_War_Cry and by this call, and with this design, he would think everyone
-else is dead.  This is OK, because he will immediately hear the other members of
-his unit yell out; which will quickly change his belief back into a more
-truthful state of empathy.
+Retreat_War_Cry and with this design, he would think everyone else is dead.
+This is OK, because he will immediately hear the other members of his unit yell
+out; which will quickly change his beliefs back into a more truthful state of
+empathy.
 
 So here we are talking about a kind of belief lag.  The thing that the horse
 archer needs to know is if the person is dead while they are waiting around.  If
-they have incorrectly concluded their entire unit is dead, there is plenty of
-time to fix this erroneous belief with the truth.  The next wait state doesn't
-happen until after they have finished their false retreat and equipped their
-horse for another attack.  So, they can be wrong about things for a while
-without any consequence to the over all group.
+they have incorrectly concluded their entire unit is dead while retreating,
+there is plenty of time to fix this erroneous belief with the truth.  The next
+wait state doesn't happen until after they have finished their false retreat and
+equipped their horse for another attack.  So, they can be wrong about things for
+a while without any consequence to the over all group tactic.
 
 A symmetrical logic applies to the "Other Marshaling" part of the design.
 
 The important thing to notice here is that in many situations the group's
-cohesion will actually be broken by what happens to them in the world.  
+cohesion will actually be broken by what happens to them in battle.  
 
 But what about the draconian requirement placed on this unit by it's senior
 officers, "maintain your group cohesion or we will kill every member in your
@@ -733,26 +735,121 @@ away from that.
 
 Which brings us back to the idea of cognitive load.  We are expecting these
 horse archers to remember a lot of things while in the heat of battle.  If I
-were an officer explaining this empathy tactic, I would be complicit in weakening the
-unit by filling their head with over complicated crap.
+were an officer explaining *this* empathy tactic, I would be complicit in
+weakening the unit by filling their head with over complicated maps.
 
-So let's simplify things:
+So let's make things easier on them:
 
 .. image:: _static/empathypartial.svg
     :align: center
 
 Now they are less precise in how they model the other members of their unit; yet
-the same main states appear.  They know who is not waiting who is waiting and
+the same kind of states appear.  They know who is waiting, who is not waiting and
 who is dead.
 
-much less effective asking them to do something mentally complicated when I could be
-asking them to do something simple.
+Let's layer in a Mongol's empathy into his tactical statechart:
+
+.. image:: _static/ergotic_mongol_41.svg
+    :align: center
+
+The point of this design iteration is to add the two different unit-wait states.
+
+If you were a horse archer, you would know the names and the voices of every
+member of your unit.  Maybe you wouldn't be able to do multiplication in your
+head, or count cards, but you certainly would know what your brothers were doing
+in battle.  It would be a basic skill, like riding your horse, like operating
+your bow, like knowing where your arm is.
+
+Our botnet is running on a computer, so tracking things in memory is trivial for
+it.  Yet, we want to ensure the code is maintainable; legible.  So, we organize
+our unit empathy into a data dictionary where the keys are just the IP addresses
+of the other nodes.  The name of this collection would be called "others".
+
+The mental operation of tracking another horse archer in battle would involve
+hearing his war cry, recognizing his voice and updating your notion of what he
+is doing.
+
+In our botnet, another's war cry, is just an event with the "Other" as a prefix.
+This event will carry with it a name and the node's IP address as its payload.
+
+So anytime we hear another make a war cry, we have to feed this information into
+his empathy statechart.  We can see this logic placed on all of the "Other" war
+cry events in the chart.
+
+We also have to feed all of our empathy charts with information anytime we issue
+the Advance_War_Cry or the Retreat_Ready_War_Cry.  This is done using an
+iterator on the ``other`` object.
+
+Now we get to the meat of the multichart pending pattern.  The horse archers
+have to wait until the last of their members have entered the "waiting to lure"
+state before they can all perform the false retreat.  So in plain English, when
+a horse archer yells that they are ready to retreat, they mentally check to see
+if they are the last living member of their unit to give the call.  If so, they
+issue the Retreat_War_Cry.
+
+Very similar logic appears in the marshal state.  A horse archer will yell the
+Advance_War_Cry if they are the last living member who has entered the "Waiting
+to Advance" state.
+
+I was trying to avoid it to save space on our diagram, but there is no way to
+avoid it anymore, a horse archer needs to experience time and they need to fire
+arrows:
+
+.. image:: _static/ergotic_mongol_51.svg
+    :align: center
+
+To track time a horse archer will have a tick attribute which will increment
+every second.  We see this implemented as a hook in the outer state.
+
+In the circle and fire state we see that the horse archer rotates in his war
+circle every 15 seconds; and depending on his preference he fires 1 to 3 arrows
+per shot.  When he has less than 20 arrows he yells out the Skirmish_War_Cry and
+together with his unit, they break their circle formation and charge into the
+enemy front.
+
+.. image:: _static/mongol-warrior.jpg
+    :align: center
+
+While skirmishing the horse archer is given a chance to make a shot every 3
+seconds but only 40 percent of the time does he feel it is worth while to loose
+an arrow.  It becomes easier to make a shot during the feigned retreat, so we
+say that there is an 80 percent chance to take the shot, every 3 seconds.
+
+Of course these numbers are arbitrary.  Your war bot would be hooked into a set
+of sensors and controllers and the feedback would be based on a greater
+semblance of reality.  I am putting in these times and probabilities to inject a
+bit of chaos into our group tactic, to see if it can hold together in its
+path-ish-ness, but it's just a sketch.
+
+It seems possible for this design to complete a loop; but I can not say for sure
+that I have removed all of its accidental oscillations. Once it is written in
+code and run a few times we will remove the remaining design bugs.
+
+There are no technical miracles on this page.  The simple snippets of Python in
+the map could have been explained to a horse archer using their language.  Their
+enemy-lobotomizing swarm behavior can be rendered down into a number of
+rectangles, some arrows and a few sentences.  The individual actions required at
+each step are also unexceptional.  They are simple things that a horse archer
+already knows how to do.  Once we explain Harel formalism and this basic tactic
+to our troops and their junior officers, watch out; they will innovate and
+improve it until we get something truly remarkable.
 
 
-
-# move the Officer_Lured out to the skirmish state as a hook
 Encrypted Communications
 ------------------------
+The ergodic nature of are war-bot has a downside.  Once you know how to defeat
+one node, you know how to defeat all of them.  The communications between the
+bots is fundamental to its system design; if you can inject your own messaging
+between them, you will pwn the bot net.
+
+A Mongol horse archer would have no problem with this, since a 13th century
+European would have not spoken Mongolian.  But, what would have happened if they
+had to fight another unit of horse archers?  It would make sense if each Mongol
+unit had their own set of calls.  This way they could act on an instruction
+without doubt or hesitation.
+
+The communications need to be encrypted.
+
 
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:
 
