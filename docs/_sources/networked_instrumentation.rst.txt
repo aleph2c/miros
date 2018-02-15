@@ -16,7 +16,7 @@ running on different computers, across a network?
 
 It would be useful if you could send the spy and trace information from one
 machine to another and aggregate it in one location.  This way you could view
-the instrumentation results of all of your networked state machines as is they
+the instrumentation results of all of your networked state machines as if they
 were all running in one location.
 
 In this example I will run a statechart on one computer, then view it's
@@ -101,8 +101,8 @@ I'll start with the producer's code, let's call it `c_trace_producer`_ to show
 that it is based on the `3rd (c) example
 <https://www.rabbitmq.com/tutorials/tutorial-three-python.html>`_ provided by
 the rabbitmq team.  If you haven't gone through these tutorials, here is a link
-to the referenced tutorial and a link to my own code that extends it so that it
-works over a network:
+to their tutorial and a link to my own code that extends their example so that
+it works across a network:
 
 ===================  ======================= ===================================
 Tutorial Purpose     RabbitMQ Pika Tutorial  Networked Version of their Tutorial

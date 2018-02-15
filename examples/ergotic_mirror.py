@@ -124,6 +124,10 @@ class Connection():
     '''
     @wraps(fn)
     def _encrypt(*args):
+      '''
+      encrypt a byte stream
+      '''
+      # To get around the self as the first argument issue
       if len(args) == 1:
         plain_text = args[0]
       elif len(args) == 2:
