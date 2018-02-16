@@ -457,8 +457,8 @@ class RabbitDirectTransmitter():
   '''
   def __init__(self, user, password):
     self.tx = EmitConnections(base="192.168.1.",
-                start=68,
-                end=73,
+                start=69,
+                end=75,
                 user=user,
                 password=password)
 
@@ -584,6 +584,15 @@ engaging_bulk = ec.create(state='engaging_bulk'). \
     catch(signal=signals.ENTRY_SIGNAL, handler=engaging_bulk_entry)
 
 
+class HorseArcher(Factory):
+
+  def __init__(self, name):
+    super().__init__(name)
+    self.arrows = 0
+    self.ticks  = 0
+
+  def yell(self, event):
+    pass
 
 if __name__ == "__main__":
   if tranceiver_type[0] == 'rx':

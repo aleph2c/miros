@@ -32,6 +32,7 @@ work even if only one node remains.
 * :ref:`Technical Overview<i_mongol_example-technical-oveview>`
 * :ref:`Designing the Mongol in its Tactic<i_mongol_example-designing-the-mongol-in-its-tactic>`
 * :ref:`Encrypted Commnications<i_mongol_example-encrypted-communications>`
+* :ref:`The First Horseman<i_mongol_example-the-first-horseman>`
 * :ref:`Instrumenting to Debug a Horse Archer<i_mongol_example-instrumenting-to-debug-the-botnet>`
 * :ref:`Implementing the Mogol in miros<i_mongol_example-implementing-the-mongol-in-miros>`
 
@@ -1117,9 +1118,235 @@ To give myself a bit more credit; it's a good start.
 
 Security is hard, the attacker has the advantage; you can't know when you have
 been compromised and you can't trust anything, from your GPU, to the encryption
-standard, to your CPU, it's all exposed.
+standard, to your CPU, it's all exposed and compromised.
 
 The attacker has the advantage, so when in doubt, attack!
+
+.. _i_mongol_example-the-first-horseman:
+
+The First Horseman
+------------------
+Let's reference our previous design and create the first horseman, Gandbold.
+
+.. image:: _static/ergotic_mongol_51.svg
+    :align: center
+
+Scanning the design diagram we see he can carry 60 arrows, he should have an
+internal counter, ``tick``, some ``arrows`` and the ability to ``yell``:
+
+.. code-block:: python
+
+  import random
+  from miros.activeobject import Factory
+  from miros.event import signals, Event, return_status
+
+  class HorseArcher(Factory):
+    MAXIMUM_ARROW_CAPACITY = 60
+
+    def __init__(self, name='Gandbold'):
+      super().__init__(name)
+      self.arrows = 0
+      self.ticks  = 0
+      self.others = {}
+
+    def yell(self, event):
+      pass
+
+In this example we will implement the statechart using the Factory class.  We
+don't have to use this, we could implement it using flat methods instead.  Or, we
+could implement it with the Factory, then run the ``to_code`` method to see what
+our factory methods would look like if they were written using the flat method
+technique, then drop these methods into our code.  We have options.
+
+Let's add the state callbacks.
+
+Starting with the outer Deceit_in_Detail_Tactic state, we scan the top left
+corner of it's state rectangle and write those callbacks.  Then we look for
+arrows connecting it's state rectangle to other rectangles and write those
+callbacks, finally, we look for the big black dot and write its callback.  
+
+By breaking our software development into these small units of work, it becomes
+easy to think about.  Our attention can linger, jump to something else, then
+come back again and refixate on our intellectual task without much effort.
+Furthermore, because we are looking so carefully at each spot on the picture, we
+can fix it's little naming issues or other small mistakes as we go.
+
+Let's begin by writing the callbacks for the defeat_in_detail_tactic state:
+
+.. image:: _static/ergotic_mongol_61.svg
+    :align: center
+
+.. code-block:: python
+  
+  # Deceit-In-Detail-Tactic state callbacks
+  def didt_entry(archer, e):
+    '''Load up on arrows and start tracking time within this tactic'''
+    archer.arrows = HorseArcher.MAXIMUM_ARROW_CAPACITY
+    archer.ticks  = 0
+    return return_status.HANDLED
+
+  def didt_second(archer, e):
+    '''A second within the tactic has passed'''
+    archer.tick += 1
+    return return_status.HANDLED
+
+  def didt_senior_war_cry(archer, e):
+    '''A Horse archer heard a command from a senior officer.  They give this
+       senior officer's war cry to themselves as if they thought of it'''
+    archer.post_fifo(e)
+    return return_status.HANDLED
+
+  def didt_advance_war_cry(archer, e):
+    '''Yell out "advance war cry" to others and introspect on the state of the
+       unit'''
+    archer.yell(e)
+    for ip, other in archer.others.items():
+      other.dispatch(e)
+    return return_status.HANDLED
+
+  def didt_other_advance_war_cry(archer, e):
+    '''A horse archer heard another's Advance_War_Cry, so so they 
+       give the command to and introspect on the state of their unit'''
+    archer.post_fifo(Event(signal=signals.Advance_War_Cry))
+    ip = e.payload['ip']
+    archer.other[ip].dispatch(e)
+    return archer.trans(advance)
+
+  def didt_skirmish_war_cry(archer, e):
+    '''Yell out "skirmish war cry" to others'''
+    archer.yell(e)
+    return archer.trans(skirmish)
+
+  def didt_other_skirmish_war_cry(archer, e):
+    '''A horse archer heard another's Skirmish_War_Cry, so so they 
+       give the command to and introspect on the state of their unit'''
+    archer.post_fifo(Event(signal=signals.Skirmish_War_Cry))
+    ip = e.payload['ip']
+    archer.other[ip].dispatch(e)
+    return archer.trans(skirmish)
+
+  def didt_retreat_war_cry(archer, e):
+    '''Yell out the "retreat war cry" and introspect on the state of the unit'''
+    archer.yell(e)
+    for ip, other in archer.others.items():
+      other.dispatch(e)
+    return archer.trans(feigned_retreat)
+
+Now lets write the callbacks for the "Advance" state:
+
+.. image:: _static/ergotic_mongol_62.svg
+    :align: center
+
+.. code-block:: python
+
+  # Advance callbacks
+  def advance_entry(archer, e):
+    '''Upon entering the advanced state wait 3 seconds then issue
+       Close_Enough_For_Circle war cry'''
+    archer.post_fifo(
+      Event(signal=signals.Close_Enough_For_Circle),
+      times=1,
+      period=3.0,
+      deferred=True)
+    return return_status.HANDLED
+
+  def advance_senior_advanced_war_cry(archer, e):
+    '''Stop Senior_Advance_War_Cry events from being handled outside of this
+       state, the horse archer is already in the process of performing the
+       order.'''
+    return return_status.HANDLED
+
+  def advance_other_advanced_war_cry(archer, e):
+    '''Stop Other_Advance_War_Cry events from being handled outside of this
+       state, the horse archer is already in the process of performing the
+       order.'''
+    return return_status.HANDLED
+
+  def advance_close_enough_for_circle(archer, e):
+    '''The Horse Archer is close enough to begin a Circle and Fire maneuver'''
+    return archer.trans(circle_and_fire)
+  
+Now lets write the callbacks for the "Circle and Fire" state:
+
+.. image:: _static/ergotic_mongol_63.svg
+    :align: center
+
+.. code-block:: python
+
+  # Circle-And-Fire callbacks
+  def caf_second(archer, e):
+    '''A horse archer can fire 1 to 3 arrows at a time in this maneuver,
+       how they behave is up to them and how they respond
+       to their local conditions'''
+    if(archer.tick % 8 == 0):
+      archer.arrow -= random.randint(1, 3)
+
+    if archer.arrows < 20:
+      archer.post_fifo(
+        Event(signal=
+          signals.Skirmish_War_Cry))
+
+    archer.tick += 1
+    return return_status.HANDLED
+
+Now lets write the callbacks for the "Skirmish" state:
+
+.. image:: _static/ergotic_mongol_64.svg
+    :align: center
+
+.. code-block:: python
+
+  # Skirmish state callbacks
+  def skirmish_entry(archer, e):
+    '''The Horse Archer will trigger an Ammunition_Low event if he
+       has less than 10 arrows when he begins skirmishing'''
+    if archer.arrow < 10:
+      archer.post_fifo(Event(signal=signals.Ammunition_Low))
+    return return_status.HANDLED
+
+  def skirmish_second(archer, e):
+    '''Every 3 seconds the horse archer fires an arrow, if he has
+       less than 10 arrows he will trigger an Ammunition_Low event'''
+    if archer.tick % 3 == 0:
+      if random.randint(1, 10) <= 4:
+        archer.arrows -= 1
+    if archer.arrows < 10:
+      archer.post_fifo(Event(signal=signals.Ammunition_Low))
+    archer.ticks += 1
+
+  def skirmish_officer_lured(archer, e):
+    '''If Horse Archer lures an enemy officer they issue a
+       Retreat_War_Cry'''
+    archer.post_fifo(
+      Event(signal=signals.Retreat_War_Cry))
+    return return_status.HANDLED
+
+  def skirmish_ammunition_low(archer, e):
+    '''If Horse Archer is low on low on ammunition they will give
+       a Retreat_War_Cry'''
+    archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
+    return return_status.HANDLED
+
+  def skirmish_senior_officer_squirmish_war_cry(archer, e):
+    '''Ignore skirmish war cries from other while skirmishing'''
+    return return_status.HANDLED
+
+  def skirmish_other_squirmish_war_cry(archer, e):
+    '''Ignore skirmish war cries from other while skirmishing'''
+    return return_status.HANDLED
+
+  def skirmish_retreat_ready_war_cry(archer, e):
+    '''If all other horse archers are ready for a return, issue a
+       Retreat_War_Cry, if not or either way, transition into the
+       waiting_to_lure state'''
+    ready = True
+    for ip, other in archer.other.items():
+      if other.state_name != 'dead':
+        ready &= other.state_name == 'waiting'
+    if ready:
+      archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
+    return archer.trans(waiting_to_lure)
+
 
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:
 
