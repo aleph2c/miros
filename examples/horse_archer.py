@@ -1,4 +1,6 @@
+import time
 import random
+from miros.hsm import pp
 from miros.activeobject import Factory
 from miros.event import signals, Event, return_status
 
@@ -27,7 +29,7 @@ def didt_second(archer, e):
   archer.tick += 1
   return return_status.HANDLED
 
-def didt_senior_war_cry(archer, e):
+def didt_senior_advance_war_cry(archer, e):
   '''A Horse archer heard a command from a senior officer.  They give this
      senior officer's war cry to themselves as if they thought of it'''
   archer.post_fifo(e)
@@ -55,7 +57,7 @@ def didt_skirmish_war_cry(archer, e):
   return archer.trans(skirmish)
 
 def didt_other_skirmish_war_cry(archer, e):
-  '''A horse archer heard another's Skirmish_War_Cry, so so they
+  '''A horse archer heard another's Skirmish_War_Cry, so they
      give the command to and introspect on the state of their unit'''
   archer.post_fifo(Event(signal=signals.Skirmish_War_Cry))
   ip = e.payload['ip']
@@ -141,7 +143,7 @@ def skirmish_ammunition_low(archer, e):
   archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
   return return_status.HANDLED
 
-def skirmish_senior_officer_squirmish_war_cry(archer, e):
+def skirmish_senior_squirmish_war_cry(archer, e):
   '''Ignore skirmish war cries from other while skirmishing'''
   return return_status.HANDLED
 
@@ -161,29 +163,219 @@ def skirmish_retreat_ready_war_cry(archer, e):
     archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
   return archer.trans(waiting_to_lure)
 
+# Waiting-to-Lure callbacks
+def wtl_entry(archer, e):
+  archer.scribble('put away bow')
+  archer.scribble('pull scimitar')
+  archer.scribble('act scared')
+  archer.post_fifo(
+    Event(signal=signals.Officer_Lured),
+    times=1,
+    period=random.randint(30, 120),
+    deferred=True)
+  return return_status.HANDLED
 
+def wtl_exit(archer, e):
+  archer.scribble('stash scimitar')
+  archer.scribble('pull bow')
+  archer.scribble('stop acting')
+  archer.cancel_events(Event(signal=signals.Officer_Lured))
+  return return_status.HANDLED
 
-def advance(archer, e):
-  pass
+# Feigned-Retreat callbacks
+def fr_entry(archer, e):
+  archer.scribble('fire on knights')
+  archer.scribble('fire on footman')
+  if archer.arrows == 0:
+    archer.post_fifo(
+      Event(signal=signals.Out_Of_Arrows))
+  return return_status.HANDLED
 
-def circle_and_fire(archer, e):
-  pass
+def fr_exit(archer, e):
+  archer.cancel_events(Event(signal=signals.Out_Of_Arrows))
+  archer.scribble("full gallop")
+  return return_status.HANDLED
 
-def skirmish(archer, e):
-  pass
+def fr_second(archer, e):
+  if archer.tick % 3 == 0:
+    if random.randint(1, 10) <= 8:
+      archer.arrows -= 1
+    if archer.arrows == 0:
+      archer.post_fifo(
+        Event(signal=signals.Out_Of_Arrows))
+  archer.ticks += 1
+  return return_status.HANDLED
 
-def feigned_retreat(archer, e):
-  pass
+def fr_retreat_war_cry(archer, e):
+  return return_status.HANDLED
 
-def waiting_to_lure(archer, e):
-  pass
+def fr_other_retreat_war_cry(archer, e):
+  return return_status.HANDLED
 
-def marshal(archer, e):
-  pass
+# Marshal callbacks
+def marshal_entry(archer, e):
+  archer.scribble("halt horse")
+  archer.scribble("identify next marshal point")
+  archer.scribble("field wrap wounds on self and horse")
+  archer.scribble("drink water")
+  archer.post_fifo(
+    Event(signal=signals.Ready),
+    times=1,
+    period=3,
+    deferred=True)
+  return return_status.HANDLED
 
-def waiting_to_advance(archer, e):
-  pass
+def marshal_ready(archer, e):
+  ready = True
+  for ip, other in archer.others.items():
+    if other.state_name != 'dead':
+      ready &= other.state_name == 'waiting'
+  if ready:
+    archer.post_fifo(
+      Event(signal=signals.Advance_War_Cry))
+  return archer.trans(waiting_to_advance)
+
+# Waiting-to-Advance callbacks
+def wta_entry(archer, e):
+  archer.arrows = HorseArcher.MAXIMUM_ARROW_CAPACITY
+
+  archer.post_fifo(Event(signal=signals.Advance_War_Cry),
+    times=1,
+    period=random.randint(30, 120),
+    deferred=True)
+  return return_status.HANDLED
+
+# Create the archer
+archer = HorseArcher()
+
+# Create the archer states
+deceit_in_detail = archer.create(state='deceit_in_detail'). \
+  catch(
+    signal=signals.ENTRY_SIGNAL,
+    handler=didt_entry). \
+  catch(
+    signal=signals.Second,
+    handler=didt_second). \
+  catch(
+    signal=signals.Senior_Advance_War_Cry,
+    handler=didt_senior_advance_war_cry). \
+  catch(
+    signal=signals.Advance_War_Cry,
+    handler=didt_advance_war_cry). \
+  catch(
+    signal=signals.Other_Advance_War_Cry,
+    handler=didt_other_advance_war_cry). \
+  catch(
+    signal=signals.Skirmish_War_Cry,
+    handler=didt_skirmish_war_cry). \
+  catch(
+    signal=signals.Other_Skirmish_War_Cry,
+    handler=didt_other_skirmish_war_cry). \
+  catch(
+    signal=signals.Retreat_War_Cry,
+    handler=didt_retreat_war_cry). \
+  to_method()
+
+advance = archer.create(state='advance'). \
+  catch(
+    signal=signals.ENTRY_SIGNAL,
+    handler=advance_entry).  \
+  catch(
+    signal=signals.Senior_Advance_War_Cry,
+    handler=advance_senior_advanced_war_cry).  \
+  catch(
+    signal=signals.Other_Advance_War_Cry,
+    handler=advance_other_advanced_war_cry).  \
+  catch(
+    signal=signals.Close_Enough_For_Circle,
+    handler=advance_close_enough_for_circle). \
+  to_method()
+
+circle_and_fire = archer.create(state='circle_and_fire'). \
+  catch(
+    signal=signals.Second,
+    handler=caf_second). \
+  to_method()
+
+skirmish = archer.create(state='skirmish'). \
+  catch(
+    signal=signals.ENTRY_SIGNAL,
+    handler=skirmish_entry). \
+  catch(
+    signal=signals.Second,
+    handler=skirmish_second). \
+  catch(
+    signal=signals.Officer_Lured,
+    handler=skirmish_officer_lured). \
+  catch(
+    signal=signals.Ammunition_Low,
+    handler=skirmish_ammunition_low). \
+  catch(
+    signal=signals.Senior_Skirmish_War_Cry,
+    handler=skirmish_senior_squirmish_war_cry). \
+  catch(
+    signal=signals.Other_Skirmish_War_Cry,
+    handler=skirmish_other_squirmish_war_cry). \
+  catch(
+    signal=signals.Retreat_Ready_War_Cry,
+    handler=skirmish_retreat_ready_war_cry). \
+  to_method()
+
+waiting_to_lure = archer.create(state='waiting_to_lure'). \
+  catch(
+    signal=signals.ENTRY_SIGNAL,
+    handler=wtl_entry). \
+  catch(
+    signal=signals.EXIT_SIGNAL,
+    handler=wtl_exit). \
+  to_method()
+
+feigned_retreat = archer.create(state='feigned_retreat'). \
+  catch(
+    signal=signals.ENTRY_SIGNAL,
+    handler=fr_entry). \
+  catch(
+    signal=signals.EXIT_SIGNAL,
+    handler=fr_exit). \
+  catch(
+    signal=signals.Second,
+    handler=fr_second). \
+  catch(
+    signal=signals.Retreat_War_Cry,
+    handler=fr_retreat_war_cry). \
+  catch(
+    signal=signals.Other_Retreat_War_Cry,
+    handler=fr_other_retreat_war_cry). \
+  to_method()
+
+marshal = archer.create(state='marshal'). \
+  catch(
+    signal=signals.ENTRY_SIGNAL,
+    handler=marshal_entry). \
+  catch(
+    signal=signals.Ready,
+    handler=marshal_ready). \
+  to_method()
+
+waiting_to_advance = archer.create(state='waiting_to_advance'). \
+  catch(
+    signal=signals.ENTRY_SIGNAL,
+    handler=wta_entry). \
+  to_method()
+
+archer.nest(deceit_in_detail, parent=None). \
+  nest(advance, parent=deceit_in_detail). \
+  nest(circle_and_fire, parent=advance). \
+  nest(skirmish, parent=deceit_in_detail). \
+  nest(waiting_to_lure, parent=skirmish). \
+  nest(feigned_retreat, parent=deceit_in_detail). \
+  nest(marshal, parent=deceit_in_detail). \
+  nest(waiting_to_advance, parent=marshal)
 
 
 if __name__ == '__main__':
-  horse_archer = HorseArcher()
+  print(archer.name)
+  archer.start_at(deceit_in_detail)
+  archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
+  time.sleep(0.5)
+  pp(archer.spy())

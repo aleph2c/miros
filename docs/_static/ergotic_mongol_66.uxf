@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>8</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>40</x>
+      <y>0</y>
+      <w>1080</w>
+      <h>1040</h>
+    </coordinates>
+    <panel_attributes>*Deceit_in_Detail_Tactic (marshaled)*
+--
+entry / 
+  # Identify next marshal point
+  # Load horse with arrows
+  archer.arrows = 60
+  archer.ticks = 0
+second /
+  archer.ticks += 1
+
+Senior_Advance_War_Cry as e\ archer.post_fifo(e)
+Senior_Skirmish_War_Cry as e\ archer.post_fifo(e)
+Senior_Retreat_War_Cry as e \ archer.post_fifo(e)
+valign=top
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>600</x>
+      <y>88</y>
+      <w>488</w>
+      <h>496</h>
+    </coordinates>
+    <panel_attributes>*Skirmish*
+--
+entry /
+  if archer.arrow &lt; 10:
+    archer.post_fifo(
+      Event(
+        signal=signals.Ammunition_Low))
+        
+second /
+  if archer.tick % 3 == 0:
+    if random.randint(1, 10) &lt;= 4:
+      archer.arrow -= 1
+    if archer.arrows &lt; 10:
+      archer.post_fifo(
+      Event(
+        signal=signals.Ammunition_Low))
+  archer.ticks += 1  
+  
+Officer_Lured /
+  chart.post_fifo(Retreat_War_Cry)
+  
+Ammunition_Low /
+  chart.post_fifo(Retreat_Ready_War_Cry)
+  
+Senior_Skirmish_War_Cry / {}
+Other_Skirmish_War_Cry / {}
+
+valign=top
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>240</x>
+      <y>176</y>
+      <w>328</w>
+      <h>432</h>
+    </coordinates>
+    <panel_attributes>*Advance*
+--
+entry /
+  archer.post_fifo(
+    Event(signal=signals.Close_Enough_for_Circle),
+      times=1,
+      period=3.0,
+      deferred=True)
+
+Senior_Advance_War_Cry / {}
+Other_Advance_War_Cry / {}
+
+valign=top
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>848</x>
+      <y>136</y>
+      <w>208</w>
+      <h>424</h>
+    </coordinates>
+    <panel_attributes>*Waiting to Lure*
+--
+entry /
+  archer.scribbe("put away bow")
+  archer.scribble("pull scimitar")
+  archer.scribble("act scared")
+  
+exit / 
+  archer.scribble("stash scimitar")
+  archer.scribble("pull bow")
+  archer.scribble("stop acting")
+  archer.cancel_event(
+    Event(
+      signal=signals.Office_Lured))
+
+
+
+
+valign=top
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>688</x>
+      <y>688</y>
+      <w>224</w>
+      <h>336</h>
+    </coordinates>
+    <panel_attributes>*Feigned Retreat*
+--
+entry / 
+  # Fire on officers
+  # Fire on soldiers
+  if archer.arrows == 0
+    archer.post_fifo(
+      Event(
+        signal=signals.Out_Of_Arrow))
+exit /
+  archer.cancel_events(
+    Event(signal=signals.Out_Of_Arrows))
+  archer.scribble("full gallop")
+
+second /
+  if archer.tick % 3 == 0:
+    if random.randint(1, 10) &lt;= 8:
+    archer.arrow -= 1
+    if archer.arrows == 0:
+      archer.post_fifo(
+      Event(
+        signal=signals.Out_Of_Arrows))
+  archer.ticks += 1          
+
+Retreat_War_Cry / {}
+Other_Retreat_War_Cry / {}
+
+valign=top
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>32</x>
+      <y>360</y>
+      <w>224</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+
+bg=blue
+fg=black</panel_attributes>
+    <additional_attributes>10.0;20.0;260.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>144</x>
+      <y>568</y>
+      <w>16</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>type=initial
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>144</x>
+      <y>568</y>
+      <w>112</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+fg=black</panel_attributes>
+    <additional_attributes>10.0;10.0;120.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>904</x>
+      <y>752</y>
+      <w>232</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+fg=black</panel_attributes>
+    <additional_attributes>270.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>80</x>
+      <y>632</y>
+      <w>496</w>
+      <h>296</h>
+    </coordinates>
+    <panel_attributes>*Marshal*
+--
+entry / 
+  # Identify next marshal point (pick best ground)
+  # Load horse with arrows
+  # Field wrap wounds on self and horse
+  # Drink water
+  chart.post_fifo(
+    Event(signal=signals.READY),
+      times=1,
+      period=3.0,
+      deferred=True)
+
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>568</x>
+      <y>768</y>
+      <w>136</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Out_Of_Arrows
+fg=black</panel_attributes>
+    <additional_attributes>150.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>288</x>
+      <y>320</y>
+      <w>256</w>
+      <h>232</h>
+    </coordinates>
+    <panel_attributes>*Circle and Fire*
+--
+
+second /
+  if archer.ticks % 8 == 0:
+    archer.arrow -= random.randint(1,3)
+    
+  if archer.arrows &lt; 20:
+    archer.post_fifo(
+    Event(signal=signals.Skirmish_War_Cry))
+    
+  archer.ticks += 1  
+valign=top
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>296</x>
+      <y>544</y>
+      <w>224</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Close_Enough_For_Circle
+fg=black</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;50.0;260.0;50.0;260.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>592</x>
+      <y>520</y>
+      <w>272</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+
+fg=black</panel_attributes>
+    <additional_attributes>10.0;20.0;320.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>856</x>
+      <y>328</y>
+      <w>200</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>chart.post_fifo(
+  Event(signal=signals.Officer_Lured),
+    times=1,
+    period=random.randint(30,120),
+    deferred=True)
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>944</x>
+      <y>208</y>
+      <w>104</w>
+      <h>152</h>
+    </coordinates>
+    <panel_attributes>lt=.
+fg=black</panel_attributes>
+    <additional_attributes>60.0;10.0;110.0;10.0;110.0;130.0;10.0;170.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>344</x>
+      <y>696</y>
+      <w>200</w>
+      <h>216</h>
+    </coordinates>
+    <panel_attributes>*Waiting to Advance*
+--
+entry /
+  mongol.post_fifo(
+    Event(
+      signal=signals.Advance_War_Cry),
+    times=1,
+    period=random.randint(30,120),
+    deferred=True)
+  mongol.arrows = 60
+
+  
+
+valign=top
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>72</x>
+      <y>792</y>
+      <w>288</w>
+      <h>136</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+
+bg=blue
+fg=black</panel_attributes>
+    <additional_attributes>10.0;150.0;320.0;150.0;320.0;10.0;340.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>864</x>
+      <y>576</y>
+      <w>272</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+
+fg=black</panel_attributes>
+    <additional_attributes>320.0;90.0;10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>40</x>
+      <y>320</y>
+      <w>200</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>Advance_War_Cry as e /
+  archer.yell(e)
+  for ip, other in archer.others.items():
+    other.dispatch(e)
+
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>872</x>
+      <y>616</y>
+      <w>176</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>Skirmish_War_Cry /
+  archer.yell(Skirmish_War_Cry)
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>920</x>
+      <y>712</y>
+      <w>200</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>Retreat_War_Cry as e /
+  archer.yell(e)
+  for ip, other in mongol.others.items()
+    other.dispatch(e)
+
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>32</x>
+      <y>456</y>
+      <w>224</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+  
+
+bg=blue
+fg=black</panel_attributes>
+    <additional_attributes>10.0;20.0;260.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>656</x>
+      <y>576</y>
+      <w>480</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+
+fg=black</panel_attributes>
+    <additional_attributes>580.0;120.0;10.0;120.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>672</x>
+      <y>584</y>
+      <w>200</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>Other_Skirmish_War_Cry as e, ip \
+  archer.post_fifo(
+    Event(
+      signal=/
+        signals.Skirmish_War_Cry))
+  mongol.other[ip].dispatch(e)
+
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>904</x>
+      <y>928</y>
+      <w>232</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+fg=black</panel_attributes>
+    <additional_attributes>270.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>920</x>
+      <y>912</y>
+      <w>184</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>Other_Retreat_War_Cry as e, ip:
+  mongol.other[ip].dispatch(e)
+
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>40</x>
+      <y>392</y>
+      <w>200</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>Other_Advance_War_Cry as e, ip: /
+  archer.post_fifo(
+    Event(
+      signal=/
+        signals.Advance_War_Cry))
+  archer.other[ip].dispatch(e)
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>600</x>
+      <y>440</y>
+      <w>256</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>Retreat_Ready_War_Cry /
+  ready = True
+  for ip, other in archer.others.items():
+    if other.state_name != 'dead':
+      ready &amp;= other.state_name == 'waiting'
+  if ready:
+    mongol.post_fifo(Retreat_War_Cry)
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>80</x>
+      <y>816</y>
+      <w>256</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>Ready (Marshal Point) /
+  ready = True
+  for ip, other in archer.others.items():
+    if other.state_name != 'Dead':
+      ready &amp;= other.state_name == 'Waiting'
+  if ready:
+    archer.post_fifo(Advance_War_Cry)
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

@@ -1152,24 +1152,30 @@ internal counter, ``tick``, some ``arrows`` and the ability to ``yell``:
     def yell(self, event):
       pass
 
-In this example we will implement the statechart using the Factory class.  We
-don't have to use this, we could implement it using flat methods instead.  Or, we
-could implement it with the Factory, then run the ``to_code`` method to see what
-our factory methods would look like if they were written using the flat method
+Let's implement Gandbold's statechart using the Factory class.  We don't *have to
+use this*, we could implement it using flat methods instead.  Or, we could
+implement it with the Factory, then run the ``to_code`` method to see what our
+factory methods would look like if they were written using the flat method
 technique, then drop these methods into our code.  We have options.
 
-Let's add the state callbacks.
+When using a Factory class we create statecharts by first writing callbacks.
+Then we create states and link the callbacks to their states.  Finally, we layer
+the states into a hierarchy.
+
+So, let's begin by writing the state callbacks.
 
 Starting with the outer Deceit_in_Detail_Tactic state, we scan the top left
 corner of it's state rectangle and write those callbacks.  Then we look for
 arrows connecting it's state rectangle to other rectangles and write those
 callbacks, finally, we look for the big black dot and write its callback.  
 
+We will follow this same workflow for each state.
+
 By breaking our software development into these small units of work, it becomes
 easy to think about.  Our attention can linger, jump to something else, then
-come back again and refixate on our intellectual task without much effort.
-Furthermore, because we are looking so carefully at each spot on the picture, we
-can fix it's little naming issues or other small mistakes as we go.
+come back to refocus on our task without much effort.  As this attention is
+focus on each of the small spots on the map, we can improve the design by fixing
+it's little naming issues or other small mistakes.
 
 Let's begin by writing the callbacks for the defeat_in_detail_tactic state:
 
@@ -1190,7 +1196,7 @@ Let's begin by writing the callbacks for the defeat_in_detail_tactic state:
     archer.tick += 1
     return return_status.HANDLED
 
-  def didt_senior_war_cry(archer, e):
+  def didt_senior_advance_war_cry(archer, e):
     '''A Horse archer heard a command from a senior officer.  They give this
        senior officer's war cry to themselves as if they thought of it'''
     archer.post_fifo(e)
@@ -1327,7 +1333,7 @@ Now lets write the callbacks for the "Skirmish" state:
     archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
     return return_status.HANDLED
 
-  def skirmish_senior_officer_squirmish_war_cry(archer, e):
+  def skirmish_senior_squirmish_war_cry(archer, e):
     '''Ignore skirmish war cries from other while skirmishing'''
     return return_status.HANDLED
 
@@ -1346,6 +1352,259 @@ Now lets write the callbacks for the "Skirmish" state:
     if ready:
       archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
     return archer.trans(waiting_to_lure)
+
+
+Here are the callbacks for the "Waiting to Lure" state:
+
+.. image:: _static/ergotic_mongol_65.svg
+    :align: center
+
+.. code-block:: python
+
+  # Waiting-to-Lure callbacks
+  def wtl_entry(archer, e):
+    archer.scribble('put away bow')
+    archer.scribble('pull scimitar')
+    archer.scribble('act scared')
+    archer.post_fifo(
+      Event(signal=signals.Officer_Lured),
+      times=1,
+      period=random.randint(30, 120),
+      deferred=True)
+    return return_status.HANDLED
+
+  def wtl_exit(archer, e):
+    archer.scribble('stash scimitar')
+    archer.scribble('pull bow')
+    archer.scribble('stop acting')
+    archer.cancel_events(Event(signal=signals.Officer_Lured))
+    return return_status.HANDLED
+
+Lets write the callbacks for the "Feigned Retreat" state:
+
+.. image:: _static/ergotic_mongol_66.svg
+    :align: center
+
+.. code-block:: python
+
+  # Feigned-Retreat callbacks
+  def fr_entry(archer, e):
+    archer.scribble('fire on knights')
+    archer.scribble('fire on footman')
+    if archer.arrows == 0:
+      archer.post_fifo(
+        Event(signal=signals.Out_Of_Arrows))
+    return return_status.HANDLED
+
+  def fr_exit(archer, e):
+    archer.cancel_events(Event(signal=signals.Out_Of_Arrows))
+    archer.scribble("full gallop")
+    return return_status.HANDLED
+
+  def fr_second(archer, e):
+    if archer.tick % 3 == 0:
+      if random.randint(1, 10) <= 8:
+        archer.arrows -= 1
+      if archer.arrows == 0:
+        archer.post_fifo(
+          Event(signal=signals.Out_Of_Arrows))
+    archer.ticks += 1
+    return return_status.HANDLED
+
+  def fr_retreat_war_cry(archer, e):
+    return return_status.HANDLED
+
+  def fr_other_retreat_war_cry(archer, e):
+    return return_status.HANDLED
+
+The "Marshal" state callbacks:
+
+.. image:: _static/ergotic_mongol_67.svg
+    :align: center
+
+.. code-block:: python
+
+  # Marshal callbacks
+  def marshal_entry(archer, e):
+    archer.scribble("halt horse")
+    archer.scribble("identify next marshal point")
+    archer.scribble("field wrap wounds on self and horse")
+    archer.scribble("drink water")
+    archer.post_fifo(
+      Event(signal=signals.Ready),
+      times=1,
+      period=3,
+      deferred=True)
+    return return_status.HANDLED
+
+  def marshal_ready(archer, e):
+    ready = True
+    for ip, other in archer.others.items():
+      if other.state_name != 'dead':
+        ready &= other.state_name == 'waiting'
+    if ready:
+      archer.post_fifo(
+        Event(signal=signals.Advance_War_Cry))
+    return archer.trans(waiting_to_advance)
+
+Now we write the callbacks for our last state, "Waiting to Advance":
+
+.. image:: _static/ergotic_mongol_68.svg
+    :align: center
+
+.. code-block:: python
+
+  # Waiting-to-Advance callbacks
+  def wta_entry(archer, e):
+    archer.arrows = HorseArcher.MAXIMUM_ARROW_CAPACITY
+
+    archer.post_fifo(Event(signal=signals.Advance_War_Cry),
+      times=1,
+      period=random.randint(30, 120),
+      deferred=True)
+    return return_status.HANDLED
+
+Here is the latest iteration of our design:
+
+.. image:: _static/ergotic_mongol_7.svg
+    :align: center
+
+Now that the callbacks are written, let's make a statechart, and wire these
+callbacks into its states:
+
+.. code-block:: python
+  
+  # Create the archer
+  archer = HorseArcher()
+
+  # Create the archer states
+  deceit_in_detail = archer.create(state='deceit_in_detail'). \
+    catch(
+      signal=signals.ENTRY_SIGNAL,
+      handler=didt_entry). \
+    catch(
+      signal=signals.Second,
+      handler=didt_second). \
+    catch(
+      signal=signals.Senior_Advance_War_Cry,
+      handler=didt_senior_advance_war_cry). \
+    catch(
+      signal=signals.Advance_War_Cry,
+      handler=didt_advance_war_cry). \
+    catch(
+      signal=signals.Other_Advance_War_Cry,
+      handler=didt_other_advance_war_cry). \
+    catch(
+      signal=signals.Skirmish_War_Cry,
+      handler=didt_skirmish_war_cry). \
+    catch(
+      signal=signals.Other_Skirmish_War_Cry,
+      handler=didt_other_skirmish_war_cry). \
+    catch(
+      signal=signals.Retreat_War_Cry,
+      handler=didt_retreat_war_cry). \
+    to_method()
+
+  advance = archer.create(state='advance'). \
+    catch(
+      signal=signals.ENTRY_SIGNAL,
+      handler=advance_entry).  \
+    catch(
+      signal=signals.Senior_Advance_War_Cry,
+      handler=advance_senior_advanced_war_cry).  \
+    catch(
+      signal=signals.Other_Advance_War_Cry,
+      handler=advance_other_advanced_war_cry).  \
+    catch(
+      signal=signals.Close_Enough_For_Circle,
+      handler=advance_close_enough_for_circle). \
+    to_method()
+
+  circle_and_fire = archer.create(state='circle_and_fire'). \
+    catch(
+      signal=signals.Second,
+      handler=caf_second). \
+    to_method()
+
+  skirmish = archer.create(state='skirmish'). \
+    catch(
+      signal=signals.ENTRY_SIGNAL,
+      handler=skirmish_entry). \
+    catch(
+      signal=signals.Second,
+      handler=skirmish_second). \
+    catch(
+      signal=signals.Officer_Lured,
+      handler=skirmish_officer_lured). \
+    catch(
+      signal=signals.Ammunition_Low,
+      handler=skirmish_ammunition_low). \
+    catch(
+      signal=signals.Senior_Skirmish_War_Cry,
+      handler=skirmish_senior_squirmish_war_cry). \
+    catch(
+      signal=signals.Other_Skirmish_War_Cry,
+      handler=skirmish_other_squirmish_war_cry). \
+    catch(
+      signal=signals.Retreat_Ready_War_Cry,
+      handler=skirmish_retreat_ready_war_cry). \
+    to_method()
+
+  waiting_to_lure = archer.create(state='waiting_to_lure'). \
+    catch(
+      signal=signals.ENTRY_SIGNAL,
+      handler=wtl_entry). \
+    catch(
+      signal=signals.EXIT_SIGNAL,
+      handler=wtl_exit). \
+    to_method()
+
+  feigned_retreat = archer.create(state='feigned_retreat'). \
+    catch(
+      signal=signals.ENTRY_SIGNAL,
+      handler=fr_entry). \
+    catch(
+      signal=signals.EXIT_SIGNAL,
+      handler=fr_exit). \
+    catch(
+      signal=signals.Second,
+      handler=fr_second). \
+    catch(
+      signal=signals.Retreat_War_Cry,
+      handler=fr_retreat_war_cry). \
+    catch(
+      signal=signals.Other_Retreat_War_Cry,
+      handler=fr_other_retreat_war_cry). \
+    to_method()
+
+  marshal = archer.create(state='marshal'). \
+    catch(
+      signal=signals.ENTRY_SIGNAL,
+      handler=marshal_entry). \
+    catch(
+      signal=signals.Ready,
+      handler=marshal_ready). \
+    to_method()
+
+  waiting_to_advance = archer.create(state='waiting_to_advance'). \
+    catch(
+      signal=signals.ENTRY_SIGNAL,
+      handler=wta_entry). \
+    to_method()
+
+Using the ``nest`` method we add the design's hierarchy:
+
+.. code-block:: python
+
+  archer.nest(deceit_in_detail, parent=None). \
+    nest(advance, parent=deceit_in_detail). \
+    nest(circle_and_fire, parent=advance). \
+    nest(skirmish, parent=deceit_in_detail). \
+    nest(waiting_to_lure, parent=skirmish). \
+    nest(feigned_retreat, parent=deceit_in_detail). \
+    nest(marshal, parent=deceit_in_detail). \
+    nest(waiting_to_advance, parent=marshal)
+
 
 
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:
