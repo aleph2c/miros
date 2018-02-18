@@ -1131,6 +1131,8 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     self.live_spy_callback   = self.__class__.live_spy_callback_default
     self.live_trace_callback = self.__class__.live_trace_callback_default
 
+    self.last_live_trace_size = len(self.full.trace)
+
   @staticmethod
   def live_spy_callback_default(spy_line):
     print(spy_line)
@@ -1184,6 +1186,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
         tr = self.full.trace[-1]
         strace  += self.trace_tuple_to_formatted_string(tr)
         self.live_trace_callback(strace)
+      self.last_live_trace_size = len(self.full.trace)
       return result
     return _print_trace_if_live
 
@@ -1203,11 +1206,13 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     def _print_trace_if_live(self):
       # fn is next_rtc/start_at
       result = fn(self)
-      if self.instrumented and self.live_trace:
+      if(self.instrumented and self.live_trace and
+         len(self.full.trace) != self.last_live_trace_size):
         strace = "\n"
         tr = self.full.trace[-1]
         strace += self.trace_tuple_to_formatted_string(tr)
         self.live_trace_callback(strace)
+      self.last_live_trace_size = len(self.full.trace)
       return result
     return _print_trace_if_live
 
@@ -1335,6 +1340,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def clear_trace(self):
     if self.instrumented:
       self.full.trace.clear()
+      self.last_live_trace_size = 0
 
   def trace(self):
     '''Output state transition information only:
