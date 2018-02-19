@@ -1483,6 +1483,9 @@ callbacks into its states:
       signal=signals.ENTRY_SIGNAL,
       handler=didt_entry). \
     catch(
+      signal=signals.INIT_SIGNAL,
+      handler=didt_init). \
+    catch(
       signal=signals.Second,
       handler=didt_second). \
     catch(

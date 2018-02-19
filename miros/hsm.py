@@ -125,8 +125,7 @@ SpyTuple = namedtuple('SpyTuple', ['signal',    'state',
                                    'hook',      'start',
                                    'internal',  'post_lifo',
                                    'post_fifo', 'post_defer',
-                                   'recall',    'ignored',
-                                   'datetime'])
+                                   'recall',    'datetime'])
 
 
 def spy_tuple(signal     = None,
@@ -138,7 +137,6 @@ def spy_tuple(signal     = None,
               post_fifo  = False,
               post_defer = False,
               recall     = False,
-              ignored    = False,
               datetime   = None,
               ):
   '''This is making it possible to have default settings in the SpyTuple,
@@ -155,7 +153,6 @@ def spy_tuple(signal     = None,
                   post_fifo=post_fifo,
                   post_defer=post_defer,
                   recall=recall,
-                  ignored=ignored,
                   datetime=datetime
                   )
 
@@ -196,10 +193,7 @@ def spy_on(fn):
           chart.rtc.spy.append("{}:{}:HOOK".format(e.signal_name, name))
           sr = spy_tuple(signal=e.signal_name, state=name, hook=True)
         else:
-          if status is return_status.IGNORED:
-            sr = spy_tuple(signal=e.signal_name, state=name, ignored=True)
-          else:
-            sr = spy_tuple(signal=e.signal_name, state=name)
+          sr = spy_tuple(signal=e.signal_name, state=name)
     else:
       sr = spy_tuple(signal=e.signal_name, state=name, hook=True, internal=True)
     chart.rtc.tuples.append(sr)
@@ -243,8 +237,7 @@ def spy_on_start(fn):
         start=True,      hook=False,
         internal=None,   post_lifo=True,
         post_fifo=False, post_defer=False,
-        recall=False,    ignored=False,
-        datetime=stdlib_datetime.now()
+        recall=False,    datetime=stdlib_datetime.now()
     )
     self.rtc.tuples.append(sr)
     # fn is start_at
@@ -316,6 +309,10 @@ class HsmEventProcessor():
     # used by the event processor
     self.state = Attribute()
     self.temp  = Attribute()
+    self.event = Attribute()
+
+    # this is useful if you instrument your event processor
+    self.event.ignored = False
 
   def start_at(self, initial_state):
     '''
@@ -509,6 +506,7 @@ class HsmEventProcessor():
     tpath       = [None, None, None]
     t, s, ip    = None, None, 0
     max_index   = 2
+    self.event.ignored = False
 
     entry_e, exit_e, super_e, init_e =                       \
               Event(signal=signals.ENTRY_SIGNAL),            \
@@ -617,9 +615,11 @@ class HsmEventProcessor():
     elif(r is return_status.HANDLED):  # trans handled
       # This is the ultimate hook pattern
       pass
+    elif(r is return_status.IGNORED):  # trans handled
+      # The event was not handled by this HSM
+      self.event.ignored = True
     else:
       pass
-      # ignore the event since our chart doesn't handle it
 
     # t contains T
     self.state.fun = t
@@ -1070,26 +1070,24 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
 
   def append_to_full_trace(fn):
     @wraps(fn)
-    def is_signal_hooked_or_ignored(self):
-      signal_name, hooked, ignored = "", False, True
+    def is_signal_hooked(self):
+      signal_name, hooked = "", False
       for sr in self.rtc.tuples:
         if sr.internal is False and sr.recall is False:
           signal_name = sr.signal
           dt = sr.datetime
           if sr.hook:
             hooked  = True
-            ignored = False
             break
-          ignored = sr.ignored
-      return (signal_name, hooked, ignored, dt)
+      return (signal_name, hooked, dt)
 
     def _append_to_full_trace(self, e):
       start_state = self.state.fun(self, Event(signal=signals.REFLECTION_SIGNAL))
       self.rtc.tuples.clear()
       # fn is append_to_full_spy
       fn(self, e)
-      signal, hooked, ignored, dt = is_signal_hooked_or_ignored(self)
-      if hooked is False and ignored is False:
+      signal, hooked, dt = is_signal_hooked(self)
+      if hooked is False and self.event.ignored is False:
         t = self.TraceTuple(
               datetime    = dt,
               start_state = start_state,
