@@ -1189,11 +1189,10 @@ issues or by making slight design alterations.</p>
       <span class="n">ready</span> <span class="o">&amp;=</span> <span class="n">other</span><span class="o">.</span><span class="n">state_name</span> <span class="o">==</span> <span class="s1">&#39;waiting&#39;</span>
   <span class="k">if</span> <span class="n">ready</span><span class="p">:</span>
     <span class="c1"># let&#39;s make sure Gandbold isn&#39;t a chicken</span>
-    <span class="n">delay_time</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
     <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
       <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">),</span>
       <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-      <span class="n">period</span><span class="o">=</span><span class="n">archer</span><span class="o">.</span><span class="n">to_time</span><span class="p">(</span><span class="n">delay_time</span><span class="p">),</span>
+      <span class="n">period</span><span class="o">=</span><span class="n">archer</span><span class="o">.</span><span class="n">to_time</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">)),</span>
       <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">archer</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">waiting_to_lure</span><span class="p">)</span>
 </pre></div>
@@ -1226,7 +1225,10 @@ issues or by making slight design alterations.</p>
   <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s1">&#39;fire on footman&#39;</span><span class="p">)</span>
   <span class="k">if</span> <span class="n">archer</span><span class="o">.</span><span class="n">arrows</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
     <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
-      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Out_Of_Arrows</span><span class="p">))</span>
+      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Out_Of_Arrows</span><span class="p">),</span>
+      <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">period</span><span class="o">=</span><span class="n">archer</span><span class="o">.</span><span class="n">to_time</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">)),</span>
+      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 
 <span class="k">def</span> <span class="nf">fr_exit</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>

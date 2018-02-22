@@ -5,20 +5,21 @@
     <id>UMLState</id>
     <coordinates>
       <x>104</x>
-      <y>0</y>
+      <y>72</y>
       <w>1080</w>
-      <h>1040</h>
+      <h>1064</h>
     </coordinates>
     <panel_attributes>*Deceit_in_Detail_Tactic (marshaled)*
 --
 entry / 
   # Identify next marshal point
   # Load horse with arrows
-  archer.arrows = 60
+  archer.arrows = HorseArcher.MAXIMUM_ARROW_CAPACITY
   archer.ticks = 0
+  archer.post_fifo(Event(signal=signals.Second, times=0, period=archer.to_time(1.0), deferred=True)
 second /
   archer.ticks += 1
-
+exit / archer.cancel_event(Event(signal=signals.Seconed))
 Senior_Advance_War_Cry as e\ archer.post_fifo(e)
 Senior_Skirmish_War_Cry as e\ archer.post_fifo(e)
 Senior_Retreat_War_Cry as e \ archer.post_fifo(e)
@@ -31,7 +32,7 @@ fg=blue</panel_attributes>
     <id>UMLState</id>
     <coordinates>
       <x>664</x>
-      <y>88</y>
+      <y>184</y>
       <w>488</w>
       <h>496</h>
     </coordinates>
@@ -68,7 +69,7 @@ fg=black</panel_attributes>
     <id>UMLState</id>
     <coordinates>
       <x>304</x>
-      <y>176</y>
+      <y>272</y>
       <w>328</w>
       <h>432</h>
     </coordinates>
@@ -93,7 +94,7 @@ fg=black</panel_attributes>
     <id>UMLState</id>
     <coordinates>
       <x>912</x>
-      <y>136</y>
+      <y>232</y>
       <w>208</w>
       <h>424</h>
     </coordinates>
@@ -121,7 +122,7 @@ fg=black</panel_attributes>
     <id>UMLState</id>
     <coordinates>
       <x>752</x>
-      <y>696</y>
+      <y>792</y>
       <w>224</w>
       <h>320</h>
     </coordinates>
@@ -158,7 +159,7 @@ fg=black</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>96</x>
-      <y>360</y>
+      <y>456</y>
       <w>224</w>
       <h>40</h>
     </coordinates>
@@ -173,7 +174,7 @@ fg=blue</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>656</x>
-      <y>400</y>
+      <y>496</y>
       <w>272</w>
       <h>32</h>
     </coordinates>
@@ -186,7 +187,7 @@ fg=black</panel_attributes>
     <id>UMLSpecialState</id>
     <coordinates>
       <x>208</x>
-      <y>568</y>
+      <y>664</y>
       <w>16</w>
       <h>16</h>
     </coordinates>
@@ -198,7 +199,7 @@ fg=black</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>208</x>
-      <y>568</y>
+      <y>664</y>
       <w>112</w>
       <h>24</h>
     </coordinates>
@@ -210,7 +211,7 @@ fg=blue</panel_attributes>
     <id>Text</id>
     <coordinates>
       <x>664</x>
-      <y>384</y>
+      <y>480</y>
       <w>216</w>
       <h>48</h>
     </coordinates>
@@ -224,7 +225,7 @@ fg=black</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>968</x>
-      <y>752</y>
+      <y>848</y>
       <w>232</w>
       <h>32</h>
     </coordinates>
@@ -237,7 +238,7 @@ fg=blue</panel_attributes>
     <id>UMLState</id>
     <coordinates>
       <x>144</x>
-      <y>632</y>
+      <y>728</y>
       <w>496</w>
       <h>296</h>
     </coordinates>
@@ -263,7 +264,7 @@ valign=top
     <id>Relation</id>
     <coordinates>
       <x>632</x>
-      <y>768</y>
+      <y>864</y>
       <w>136</w>
       <h>32</h>
     </coordinates>
@@ -276,7 +277,7 @@ fg=black</panel_attributes>
     <id>UMLState</id>
     <coordinates>
       <x>352</x>
-      <y>320</y>
+      <y>416</y>
       <w>256</w>
       <h>232</h>
     </coordinates>
@@ -305,7 +306,7 @@ fg=black</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>360</x>
-      <y>544</y>
+      <y>640</y>
       <w>224</w>
       <h>80</h>
     </coordinates>
@@ -317,7 +318,7 @@ Close_Enough_For_Circle</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>656</x>
-      <y>520</y>
+      <y>616</y>
       <w>272</w>
       <h>40</h>
     </coordinates>
@@ -331,7 +332,7 @@ fg=black</panel_attributes>
     <id>Text</id>
     <coordinates>
       <x>920</x>
-      <y>328</y>
+      <y>424</y>
       <w>200</w>
       <h>88</h>
     </coordinates>
@@ -348,7 +349,7 @@ fg=black</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>1008</x>
-      <y>208</y>
+      <y>304</y>
       <w>104</w>
       <h>152</h>
     </coordinates>
@@ -360,7 +361,7 @@ fg=black</panel_attributes>
     <id>UMLState</id>
     <coordinates>
       <x>408</x>
-      <y>696</y>
+      <y>792</y>
       <w>200</w>
       <h>216</h>
     </coordinates>
@@ -386,7 +387,7 @@ fg=dark_gray</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>136</x>
-      <y>792</y>
+      <y>888</y>
       <w>288</w>
       <h>136</h>
     </coordinates>
@@ -401,7 +402,7 @@ fg=black</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>928</x>
-      <y>576</y>
+      <y>672</y>
       <w>272</w>
       <h>96</h>
     </coordinates>
@@ -415,7 +416,7 @@ fg=blue</panel_attributes>
     <id>Text</id>
     <coordinates>
       <x>104</x>
-      <y>320</y>
+      <y>416</y>
       <w>200</w>
       <h>64</h>
     </coordinates>
@@ -432,7 +433,7 @@ fg=blue</panel_attributes>
     <id>Text</id>
     <coordinates>
       <x>936</x>
-      <y>616</y>
+      <y>712</y>
       <w>176</w>
       <h>48</h>
     </coordinates>
@@ -446,7 +447,7 @@ fg=blue</panel_attributes>
     <id>Text</id>
     <coordinates>
       <x>984</x>
-      <y>712</y>
+      <y>808</y>
       <w>200</w>
       <h>64</h>
     </coordinates>
@@ -463,7 +464,7 @@ fg=blue</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>96</x>
-      <y>456</y>
+      <y>560</y>
       <w>224</w>
       <h>48</h>
     </coordinates>
@@ -479,7 +480,7 @@ fg=blue</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>720</x>
-      <y>576</y>
+      <y>672</y>
       <w>480</w>
       <h>120</h>
     </coordinates>
@@ -493,7 +494,7 @@ fg=blue</panel_attributes>
     <id>Text</id>
     <coordinates>
       <x>736</x>
-      <y>584</y>
+      <y>680</y>
       <w>200</w>
       <h>104</h>
     </coordinates>
@@ -512,7 +513,7 @@ fg=blue</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>968</x>
-      <y>928</y>
+      <y>1024</y>
       <w>232</w>
       <h>32</h>
     </coordinates>
@@ -525,7 +526,7 @@ fg=blue</panel_attributes>
     <id>Text</id>
     <coordinates>
       <x>984</x>
-      <y>912</y>
+      <y>1008</y>
       <w>184</w>
       <h>48</h>
     </coordinates>
@@ -540,7 +541,7 @@ fg=blue</panel_attributes>
     <id>Text</id>
     <coordinates>
       <x>104</x>
-      <y>392</y>
+      <y>488</y>
       <w>200</w>
       <h>112</h>
     </coordinates>
@@ -558,7 +559,7 @@ fg=blue</panel_attributes>
     <id>Text</id>
     <coordinates>
       <x>664</x>
-      <y>440</y>
+      <y>536</y>
       <w>256</w>
       <h>104</h>
     </coordinates>
@@ -577,7 +578,7 @@ fg=black</panel_attributes>
     <id>Text</id>
     <coordinates>
       <x>144</x>
-      <y>816</y>
+      <y>912</y>
       <w>256</w>
       <h>104</h>
     </coordinates>

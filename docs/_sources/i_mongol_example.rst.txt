@@ -1403,14 +1403,12 @@ Now lets write the callbacks for the "Skirmish" state:
         ready &= other.state_name == 'waiting'
     if ready:
       # let's make sure Gandbold isn't a chicken
-      delay_time = random.randint(10, 30)
       archer.post_fifo(
         Event(signal=signals.Retreat_War_Cry),
         times=1,
-        period=archer.to_time(delay_time),
+        period=archer.to_time(random.randint(10, 30)),
         deferred=True)
     return archer.trans(waiting_to_lure)
-
 
 Here are the callbacks for the "Waiting to Lure" state:
 
@@ -1449,7 +1447,10 @@ Lets write the callbacks for the "Feigned Retreat" state:
     archer.scribble('fire on footman')
     if archer.arrows == 0:
       archer.post_fifo(
-        Event(signal=signals.Out_Of_Arrows))
+        Event(signal=signals.Out_Of_Arrows),
+        times=1,
+        period=archer.to_time(random.randint(10, 30)),
+        deferred=True)
     return return_status.HANDLED
 
   def fr_exit(archer, e):
