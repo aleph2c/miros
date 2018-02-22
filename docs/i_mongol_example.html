@@ -48,18 +48,18 @@ for sure that just ain’t so.</em></p>
 </div></blockquote>
 <div class="section" id="mongol-horse-archer">
 <h1>Mongol Horse Archer<a class="headerlink" href="#mongol-horse-archer" title="Permalink to this headline">¶</a></h1>
-<p>In this example I will demonstrate how to write a type of tactical botnet.  I
+<p>In this example, I will demonstrate how to write a type of tactical botnet.  I
 will base it on something from history, the Mongol Horsemen.</p>
 <img alt="_images/archer.jpg" class="align-center" src="_images/archer.jpg" />
 <p>The example will demonstrate how to design <a class="reference external" href="https://en.wikipedia.org/wiki/Self-organization">emergent order</a> using multiple nodes across
-a network, which have limited information about one another.  Each node will
-have the ability to link up with another node and act in unison and then unlink
-and act under their own initiative.  The overall unit tactic will continue to
-work even if only one node remains.</p>
+a network, which have limited information about one another. Each node will have
+the ability to link up with another node and act in unison and then unlink and
+act independently. The overall unit tactic will continue to work even if only
+one node remains.</p>
 <p><strong>Example Background:</strong></p>
 <ul class="simple">
 <li><a class="reference internal" href="#i-mongol-example-historical-context"><span class="std std-ref">Historical Context</span></a></li>
-<li><a class="reference internal" href="#i-mongol-example-distributed-officers"><span class="std std-ref">Deceit in Detail</span></a></li>
+<li><span class="xref std std-ref">Deceit in Detail</span></li>
 <li><a class="reference internal" href="#i-mongol-example-modelling-the-mongol-mind"><span class="std std-ref">Modelling the Mongol Mind</span></a></li>
 </ul>
 <p><strong>Example Software:</strong></p>
@@ -73,225 +73,222 @@ work even if only one node remains.</p>
 </ul>
 <div class="section" id="some-historical-context-for-the-example">
 <span id="i-mongol-example-historical-context"></span><h2>Some Historical Context For the Example<a class="headerlink" href="#some-historical-context-for-the-example" title="Permalink to this headline">¶</a></h2>
-<p>Military officers are faced with the paradox of leadership.</p>
-<p>As a leader they collect information about their army and as much intelligence
-about their enemy as they can access.  From this information they render a plan
-of how to harm their enemy as much as possible while limiting losses to their
-own force.</p>
 <p>An officer must exert their plan onto an army of men who would rather be at
-home working their fields and feeding their families.  When an officer exerts
-their power over a soldier they reduce that soldier’s ability to think for
-themselves.  But each battling soldier consumes tremendous amounts of
-information; far too much to send up the chain of command.  If they could act
-upon it independently, it could be to the great advantage of their army.  This
-is the paradox of leadership, when a leader exerts too much control over their
-subordinates they limit the effective intelligence of the group to their <em>own
-mental ability</em> and the <em>limited information</em> they are receiving.</p>
-<p>The chain of command is like an extremely slow nervous system.  Limited and
+home, feeding their families. When an officer exercises their power over a
+soldier, they reduce that soldier’s ability to think for themselves.</p>
+<p>But each battling soldier consumes tremendous amounts of information; far too
+much to send up the chain of command.  If they could act upon it independently,
+it could be done for the significant advantage of their army.  This is the
+paradox of leadership: when a leader exerts too much control over their
+subordinates, they limit the effective-intelligence of the group to their mental
+ability and the limited information they are receiving.</p>
+<p>The chain of command is like an extremely slow nervous system. Limited and
 bottle-necked by the cognitive load and biases of each officer as they transmit
 orders to their soldiers and the results of those orders back up to their own
 ranking officer.</p>
-<p>But without officers providing decisions in battle, the group would breakdown
+<p>But without officers providing decisions in battle, the group would break down
 into a set of unorganized individuals who at best, would default to their
 training and at the worst would run from the enemy exposing themselves to
-slaughter.  Group cohesion is the key.</p>
-<p>In war their are hard points and weak points to armies.  Ideally, you would
-attack your opponents weak point with your hard point.  An example of this is a
-flanking maneuver.  If you can hit your enemy at the side (flank), rather than
-at their front, you would minimize your losses while maximizing theirs.</p>
-<p>But the chain of command itself, is a weak point in an army.  If you could kill
+slaughter. Group cohesion is the key.</p>
+<p>In war, there are hard points and weak points to armies. Ideally, you would
+attack your opponent’s weak point with your hard point. An example of this is a
+flanking maneuver. If you can hit your enemy at the side (flank), rather than at
+their front, you would minimize your losses while maximizing theirs.</p>
+<p>But the chain of command itself is a weak point in an army. If you could kill
 the officer’s of your opposing force, you would turn the army into a group of
-scared men all acting alone.  A micromanaging general who is exerting absolute
-control can be attacked directly with confusion and mental over-taxation.  Such
-a general becomes a weak point because of the paradox of leadership.  As their
-mental abilities are diminished by confusion their army acts dumber, making ever
-worse collective decisions.</p>
-<p>In the 13th Century, western armies typically organized their officers in
-hierarchical structures, using command and control architectures.  The officers
-would be on the front line, mounted on horse back, wearing heavy armor, easy to
+scared men all acting alone. A micromanaging general who is exerting absolute
+control can be attacked directly with confusion and mental over-taxation. Such a
+general becomes a weak point because of the paradox of leadership. As confusion
+diminishes their mental ability, their whole army acts dumber, making ever worse
+collective decisions.</p>
+<p>In the 13th Century, western armies typically organized their officers into
+hierarchical structures, using command and control architectures. The officers
+would be on the front line, mounted on horseback, wearing heavy armour, easy to
 identify.</p>
-<p>The Mongol forces were organized differently, each horse archer could act as a
-local officer to control the over all efforts of their local unit.  Each unit
-was made up of no more than ten horse archers.  The cognitive load required to
-control the whole system was limited, because each unit could act independently
+<p>The Mongols organized their forces differently, each horse archer could act as a
+local officer to control the overall efforts of their local unit. Each unit was
+made up of no more than ten horse archers. The cognitive load required to
+control the whole system was limited because each unit could act independently
 from their whole.</p>
 <p>There was still a hierarchy of leadership in the Mongol army with different
 ranking officers controlling the actions of the groups of units under their
-command; but orders where issued as intentions, rather than a specific set of
-individual instructions.  Today we call this, “commander’s intent”.  If such
+command; but orders were issued as intentions, rather than a specific set of
+individual instructions. Today we call this, “commander’s intent”. If such
 orders are used, the military force under their command becomes smarter than the
-officer issuing them.  Each officer at each level can innovate and react to
-their local battles as they unfold.  Officer-ship itself is pushed down into the
+officer issuing them. Each officer at each level can innovate and react to their
+local battles as they unfold. Officer-ship itself is pushed down into the
 individual soldiers.</p>
-<p>The Mongol tactics and strategy were intended to harm the state of mind of the
-opposing military commander.  They would not stay put, they would not act in a
-way that could be fathomed by theory or previous experience.  They would put
-their opponents into constant conundrums, if their enemy closed ranks the
-Mongols would fire arrows on the mass of men, if they spread out, the Mongol
-could attack and pick off the individuals.</p>
+<p>The Mongol strategy and tactics were intended to harm the state of mind of the
+opposing military commander. They would not stay put; they would not act in a
+way that could be fathomed by theory or previous experience. They would snare
+their opponents in an ever-changing conundrum – if their enemy closed ranks the
+Mongols would fire arrows on the mass of men, if they spread out, the Mongols
+would attack and pick off the individuals.</p>
 <p>Any opposing micro-manager would quickly become overwhelmed, leaving their
-forces lobotomized; breaking down cohesion.</p>
-<p>So confusion was the great weapon of the Mongols and it was blasted directly at the
-minds of the military commanders controlling the opposing force.  When a Mongol
-army came upon a larger army controlled using traditional-command-and-control
-cognition, it was a simple matter to destroy them at their leisure – since the
-opposing army lacked to mobility to catch or surround the mongols.</p>
-<p>The Mongols would engage, feign a retreat, then move into more favorable
-terrain.  The opposing force would be lead away from their strong point,
-exposing a supply line and become small enough that the Mongols could attack
-them en masse with numerical superiority.</p>
-<p>This tactic is called “Defeat in Detail”.</p>
+forces lobotomized; breaking down group cohesion.</p>
+<p>So confusion was the great weapon of the Mongols, and it was blasted directly
+into the minds of the military commanders controlling their opposing force. When
+a Mongol army came upon a larger army using traditional-command-and-control
+cognition, it was a simple matter to destroy them at their leisure – since this
+opposing force lacked to mobility to catch or surround the Mongols.</p>
+<p>The Mongols would engage, feign a retreat, then move into more favourable
+terrain. The opposing force would be lead away from their strong point, exposing
+a supply line and become small enough that the Mongols could attack them en
+masse with numerical superiority.</p>
+<p>This tactic is called “Defeat in Detail”.
+.. _i_mongol_example-distributed-officers:</p>
 </div>
 <div class="section" id="deceit-in-detail">
-<span id="i-mongol-example-distributed-officers"></span><h2>Deceit in Detail<a class="headerlink" href="#deceit-in-detail" title="Permalink to this headline">¶</a></h2>
+<h2>Deceit in Detail<a class="headerlink" href="#deceit-in-detail" title="Permalink to this headline">¶</a></h2>
 <p>Now let’s talk about a specific “Defeat in Detail” set of tactics used by an
-individual unit of Mongol horse archers.</p>
-<p>Their commander’s intent was for them to lure the enemy away from its protecting
-mass and kill as many officer’s as possible.</p>
-<p>Each horse archer started a fight with 60 arrow’s and a scimitar.  They wanted
-to damage the enemy with the arrows from a distance so that they could avoid
-risk.  They would only pull their scimitar while close to their prey.  But the
-point of the scimitar wasn’t to kill or maim their enemy, but to protect
-themselves while they got close enough to present a lie.</p>
-<p>In close quarters the Mongol would pretend that they were scared.  They would
-act as if their unit’s will was broken when it wasn’t.  This behavior would have
-been especially alluring to any opposing military officer’s who wanted to prove
-their valor.  They would have been more willing to see this fake weakness as a
-truth; enraged and frustrated with their own inability to take action, they
-would be inclined to take the bait.</p>
-<p>The Mongol units had to attack as a unit and retreat as a unit.  To do otherwise
-would have had them executed by their own senior officers for lack of cohesion.</p>
+individual group of Mongol horse archers.</p>
+<p>Their commander’s intent: lure the enemy away from its protecting mass and kill
+as many officers as possible.</p>
+<p>Each horse archer started a fight with 60 arrows and a scimitar.  The arrows
+could be used to damage the enemy from a distance while avoiding personal risk.</p>
+<p>They would only pull their scimitar while close to their prey. But the point of
+the scimitar wasn’t to kill or maim their enemy, but to protect themselves while
+they got close enough to present a lie.</p>
+<p>In close quarters the Mongol would pretend that they were scared. They would act
+as if their unit’s will was broken when it wasn’t. This bating behaviour would
+be especially alluring to anyone wanting to prove their valour.  An opposing
+soldier, enraged and frustrated with their inability to take action, would have
+been more willing to see this fake weakness as truth, to break ranks and attack.</p>
+<p>The Mongol units had to attack as a unit and retreat as a unit. To do otherwise
+would have had them executed by their senior officers for lack of cohesion.</p>
 <p>But the retreat requirement of this cohesion-directive was often broken by the
 fog of war. They couldn’t always know if another horse archer had been killed
 and to wait around and get killed themselves would have been stupid; so a
-compromise was reached.  When a horse archer saw that their enemy was
-re-organized enough to put up real resistance, or better yet,  they had
+compromise was reached. When a horse archer saw that their enemy was
+re-organized enough to put up real resistance, or better yet, they had
 successfully lured an officer, they could issue a retreat war cry and all other
 horse archers within earshot would follow them to a predetermined marshal point.</p>
 <p>While retreating, the horse archers would turn and use their last arrows on the
 enemies chasing them; placing the highest priority on officers.</p>
 <p>It is possible that modern Western military theory has still not caught up to
-medieval Mongol thinking.  The tactic name, “defeat in detail” might have been
+medieval Mongol thinking. The tactic name, “defeat in detail” might have been
 called “deceit in detail” had it been written down by a 13th century Mongol,
-instead of a despotic Frenchman.</p>
+instead of by a despotic Frenchman.</p>
 </div>
 <div class="section" id="modelling-the-mongol-mind">
 <span id="i-mongol-example-modelling-the-mongol-mind"></span><h2>Modelling the Mongol Mind<a class="headerlink" href="#modelling-the-mongol-mind" title="Permalink to this headline">¶</a></h2>
 <p>A group of Mongol horse archers needed to protect their mental flanks while
-doing the most to harm their opponents.  The key to this is to make the group
+doing the most to harm their opponents. The key to this is to make the group
 tactic simple from the inside and bafflingly complex from the outside.</p>
 <p>Each soldier needed independent thought and action but in a moment to be able to
-snap back into a collective dance with the rest of their unit.  The calls
-between the members of a unit needed to be encrypted, simple and loud.</p>
+snap back into a collective dance with the rest of their unit. The calls between
+the members of a unit needed to be encrypted, simple and loud.</p>
 <p>The amount of memory needed to track their brethren also needed to be limited.
 Unlike the general trying to remember and track everything all at once, our
 distributed officer only needed to remember a few crucial things.</p>
 <p>To make things mentally easier, the Mongol soldier relied on the idea of
-sameness.  The ergodic mirror metaphor is useful here.  If you were surrounded
-by an ergodic mirror, anywhere you turn you would be looking into your own eyes.
-So the Mongol horse archers where ergodic; they were surrounded by themselves.
+sameness. The ergodic mirror metaphor is useful here. If you were surrounded by
+an ergodic mirror, anywhere you turn, you would be looking into your own eyes.
+So the Mongol horse archers were ergodic; they were surrounded by themselves.
 Every member of their unit would act as they would, so there was no concern or
 doubt about what to do.</p>
 <p>The tactics used by a unit of horse archers needed to work even if some of its
-members were killed.  The hologram provides another useful metaphor.  A
-holographic sheet is a two dimensional thing, yet as its parts work together it
-produces something in the third dimension.  If you scratch the holographic
-sheet, the three dimensional image remains, only slightly fuzzier than it was
-before.  To be effective the Mongol tactics needed to have this same property.
-As a unit they express complexity beyond the sum of their parts and this
-complexity would not break down with losses, but only lose its fidelity.</p>
-<p>Let’s weave these metaphors into the specifics of battle.  To begin with a
+members got killed. The hologram provides another useful metaphor. A holographic
+sheet is a two-dimensional thing, yet as its parts work together, it produces
+something in the third dimension. If you scratch the holographic sheet, the
+three-dimensional image remains, only slightly fuzzier than it was before. To be
+effective the Mongol tactics needed to have this same property. As a unit they
+express complexity beyond the sum of their parts, and this complexity would not
+break down with losses, but only lose its fidelity.</p>
+<p>Let’s weave these metaphors into the specifics of battle.  To begin with, a
 Mongol unit would meet, fill their quivers with arrows and decide where they
-would meet again after their first encounter.  This next place, call it a
-marshal point, would be on ground which would give them some sort of advantage
-and access to more ammunition.</p>
-<p>They would wait for an advance-war-cry.  Any member of their unit could issue
-this call and all members would immediately advance.</p>
-<p>At a certain distance from the enemy the horse archers would have their horses
-follow each other to form a circle.  The closest horse archer to the enemy front
+would meet again after their first encounter. This next place, call it a marshal
+point, would be on ground which would give them some advantage and access to
+more ammunition.</p>
+<p>They would wait for an advance-war-cry. Any member of their unit could issue
+this call, and all members would immediately advance.</p>
+<p>At a certain distance from the enemy, the horse archers would have their horses
+follow each other to form a circle. The closest horse archer to the enemy front
 lines would shoot an arrow, then reload as their horse took them around the
-circle again.  This would create a kind of sustained machine gun effect on their
+circle again. This would create a kind of sustained machine gun effect on their
 opponent’s mass; causing them to loosen their ranks as to avoid the constant
 barrage of arrows.</p>
 <p>The next stage of battle would have the horse archers get close enough to their
-enemy to skirmish.  While skirmishing a horse archer would aim their arrows
-directly at individual opponents.  To begin a skirmish any of the horse archers
-could issue a skirmish war cry and all other units would follow, breaking away
-from their circle to move close into the now disordered front of their enemy.
-At some point one of the horse archers would become low on ammunition; then they
+enemy to skirmish. While skirmishing, a horse archer would aim their arrows
+directly at individual opponents. Any of the horse archers could issue a
+skirmish-war-cry, and all other units would follow them into the skirmish
+manoeuvre, riding their horse out of their circle-and-fire formation to gallop
+closer to the now disordered front of their enemy.</p>
+<p>At some point one of the horse archers would become low on ammunition; then they
 would begin the most dangerous and effective movement in their ‘deceit in
 detail’ tactic, they would pull their scimitar; saving the last of their arrows
 for their luring retreat.</p>
-<p>While swinging their scimitar they would do exactly the opposite of what you
-would expect a terrible horse archer to do.  They would appear scared and
-confused; disoriented and craven.  It is not easy to charge into the heart of
-your enemy only to put on a play for them; but this deceit was necessary to lure
-their enemy into <em>real</em> danger.</p>
-<p>So as a horse archer was fighting, they would have to remember enough about their
-unit to know if they were the last to pull their scimitar.  If they were, it
-meant that as a unit they were low on ammunition and they were ready for a their
-next collective action.</p>
+<p>While swinging their scimitar, they would do precisely the opposite of what you
+would expect a terrible horse archer to do. They would appear scared and
+confused. It is not easy to charge into the heart of your enemy only to put on a
+play for them, but this deceit was necessary to lure their enemy into real
+danger.</p>
+<p>So as a horse archer was fighting, they would have to remember enough about
+their unit to know if they were the last to pull their scimitar. If they were,
+it meant that as a unit they were low on ammunition, and they were ready for
+their next collective action.</p>
 <p>This would mean that a horse archer would have to call out when they were
-pulling their scimitar; and each other horse archer would have to track this
-information.  But if a horse archer was killed; they wouldn’t be able to call
+pulling their scimitar, and each other horse archer would have to track this
+information. But if a horse archer got killed; they wouldn’t be able to call
 out; so there had to be another way for the unit to communicate to itself that
-it was time to go.  So any horse archer could issue a retreat war cry.  They
+it was time to go. So any horse archer could issue a retreat war cry.   They
 could do this when they had successfully lured an officer are when enough time
-had passed that the enemy was becoming sufficiently reorganized to actually put
-up real opposition.</p>
-<p>The retreat war cry would occur when the last horse archer pulled his
-scimitar, or when an officer was lured or when enough time had passed for the
-enemy to re-organize.</p>
-<p>A retreating horse archer was extremely dangerous; since they would pretend to
-be slow when they were actually fast.  The closer you got to them, the easier
-you would make their shot on you.  Your advance would not be protected by a
-flanking soldier; but there would be another horse archer their also retreating
-with his brethren.  They were especially dangerous to officers, since an officer
-would often be on horse back to increase their mobility and express their rank.
+had passed that the enemy was becoming reorganized enough to put up a real
+opposition.</p>
+<p>The retreat war cry would occur when the last horse archer pulled his scimitar,
+or when an officer got lured or when enough time had passed for the enemy to
+re-organize.</p>
+<p>A retreating horse archer is extremely dangerous; since they would pretend to be
+slow when they were fast. The closer you got to them, the more comfortable you
+would make their shot on you. As you charge, there would be no flanking soldier
+to protect your sides, or you’re back, but there would be another horse archer
+there, intent on hunting you from a blind spot.</p>
+<p>Retreating horse archers were mainly dangerous to officers since an officer
+would often be on horseback to increase their mobility and express their rank.
 The speed of the chasing officer would pull him away from his protecting mass;
 leaving him alone and flanked by his enemies, his helmet blinding his peripheral
-vision.  He had no real chance of catching his prey; all of his training and
+vision. He had no real chance of catching his prey; all of his training and his
 ideas about the world working against him.</p>
-<p>From the outside the mongols would appear like a angry swarm of wasps;
-incomprehensible, always out of reach.  Any engagement with them reducing the
+<p>From the outside the Mongols would appear like an angry swarm of hornets;
+Incomprehensible, always out of reach. Any engagement with them reducing the
 leadership and cohesion within your own force.</p>
-<p>But if you were an individual horseman, you would only have to follow a few
-simple rules.  Advance if you heard an Advance war cry.  Create a circle when
-close enough to the enemy.  Skirmish when you heard a Skirmish war cry.  Track
+<p>But if you were an individual Mongol horseman, you would only have to follow a
+few simple rules. Advance if you heard an Advance war cry. Create a circle when
+close enough to the enemy. Skirmish when you heard a Skirmish war cry. Track
 your unit’s Retreat Ready War cries; so you can know if it is up to you to issue
-the Retreat.  When you heard a Retreat War cry retreat and attack any lured
-enemy’s flank.</p>
-<p>As an individual horseman, you could issue your own commands to your group.  You
-could give an Advance War Cry, to start the circle.  When you were low enough on
-arrows you could make the Skirmish war cry and your brethren would close the
-distance to the enemy with you.  If your ammunition was running low, you would
-issue the Ammunition Low war cry and the other members of your unit would know
-you are ready to go.  If you had successfully lured an officer, you could issue
+the Retreat. When you heard a Retreat War cry, turn your horse around and start
+firing arrows at the sides of attacking enemy Knights.</p>
+<p>As an individual horseman, you could issue your own commands to your group. You
+could give an Advance War Cry, to start the circle. When you were low enough on
+arrows you could make the Skirmish war cry, and your brethren would close the
+distance to the enemy with you. If your ammunition were running low, you would
+issue the Ammunition Low war cry, and the other members of your unit would know
+you are ready to go. If you had successfully lured an officer, you could issue
 the Retreat war cry and leave knowing that your brethren would follow and flank
 the officer chasing you.</p>
-<p>Most of your concentration would be used to make your shots, or to put on the
-deceitful-play while close enough to the enemy.  The only exception to this
-being your need to track who in your unit was ready to go.</p>
-<p>If you were the last horseman, the rules would still apply:  You would advance;
+<p>Most of your concentration would be used to make your shots or to put on the
+deceitful-play while close enough to the enemy. The only exception to this being
+your need to track who in your unit was ready to go.</p>
+<p>If you were the last horseman, the rules would still apply: You would advance;
 you would circle and shoot; you would skirmish and lure and retreat-to-fire when
 followed.</p>
 <img alt="_images/backwards.jpg" class="align-center" src="_images/backwards.jpg" />
-<p>Now that we have an understanding of what we are trying to model, let’s build it
-in software using miros.</p>
+<p>Now that we have an understanding of what we are trying to model let’s build it
+in software using ‘miros’.</p>
 </div>
 <div class="section" id="technical-overview">
 <span id="i-mongol-example-technical-oveview"></span><h2>Technical Overview<a class="headerlink" href="#technical-overview" title="Permalink to this headline">¶</a></h2>
-<p>To build the horse archer botnet we need at least two different computers.  I’ll
+<p>To build the horse archer botnet, we need at least two different computers. I’ll
 be using a windows machine and a raspberry pi.</p>
 <p>First, we’ll design a set of statecharts that will model an individual horse
-archer and it’s understanding of it’s brethren.</p>
-<p>Any communication between our horse archer bots will be encrypted, since we
-don’t want our enemy to learn about what we are doing.</p>
+archer and its understanding of its brethren.</p>
+<p>Any communication between our horse archer bots will be encrypted since we don’t
+want our enemy to learn about what we are doing.</p>
 <p>We will adjust how our instrumentation works; we will make it so that it can
-stream its output to any computer of our choosing.  We will do this so we can
+stream its output to any computer of our choosing. We will do this so we can
 debug our entire botnet from one location.</p>
-<p>Finally We’ll write the software; run it on two or more computers and demonstrate
-that it is working.</p>
+<p>Finally, We’ll write the software; run it on two or more computers and
+demonstrate that it is working.</p>
 <p>Here are the steps:</p>
 <ul class="simple">
 <li><a class="reference internal" href="#i-mongol-example-designing-the-mongol-in-its-tactic"><span class="std std-ref">Designing the Mongol in its Tactic</span></a></li>
@@ -304,21 +301,21 @@ that it is working.</p>
 <span id="i-mongol-example-designing-the-mongol-in-its-tactic"></span><h2>Designing the Mongol in its Tactic<a class="headerlink" href="#designing-the-mongol-in-its-tactic" title="Permalink to this headline">¶</a></h2>
 <p>We already understand the tactic, so I’ll draw and describe how I think it might
 work in an HSM several times over; adding complexity and technical improvements
-with each iteration.  When we have a design that can sufficiently sketch out our
-bot net I’ll move to the next technical step.</p>
-<p>While working through the example we will introduce different events that cause
-changes in the horse archer’s behavior.</p>
-<p>When an event is a war cry, who exactly is yelling it out?  Any war cry can come
-from one of two places.  It can come from the horse archer himself, or a senior
-officer.  We do this so that the unit tactic can be autonomous yet flexible
+with each iteration. When we have a design that can sufficiently sketch out our
+botnet, I’ll move to the next step.</p>
+<p>While working on the example, we will introduce different events that cause
+changes in the horse archer’s behaviour.</p>
+<p>When is an event a war cry, who exactly is yelling it out? Any war cry can come
+from one of two places. It can come from the horse archer himself, or a senior
+officer. We do this so that the unit tactic can be autonomous yet flexible
 enough to receive outside direction.</p>
-<p>Let’s think about a single horse archer and the actions he would take.  He would
-meet up with his brethren (marshal), then they would determine where they would like
-to meet after their first maneuver, then they would fill their quivers with
+<p>Let’s think about a single horse archer and the actions he would take. He would
+meet up with his brethren (marshal), then they would determine where they would
+like to meet after their first maneuver, then they would fill their quivers with
 arrows.</p>
-<p>So, I have to first figure out what to call the outer state.  For now I’ll call it,
-Deceit_in_Detail_Tactic (marshaled), because I want to express that the horse
-archers are meeting and that this is one tactic of many that they could choose from.</p>
+<p>So, I have to first figure out what to call the outer state. For now, I’ll call
+it, Deceit_in_Detail_Tactic (marshalled), because I want to express that the
+horse archers are meeting and that this is one tactic of many.</p>
 <div align="center" class="align-center"><img alt="_images/ergotic_mongol_11.svg" src="_images/ergotic_mongol_11.svg" /></div>
 <p><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_11.pgn">ergotic_mongol_11</a></p>
 <p>Immediately after filling their arrows, they attack.  This may not be
@@ -326,7 +323,7 @@ historically accurate, but let’s have our botnet just attack right away.</p>
 <p>Once the horse archers advance close enough to the mass of their enemy, they
 would circle and fire.  How do we express this in software?  If we were building
 a botnet to fight the North Koreans or a malevolent AI or something, we could
-have each node in our botnet read a transducer or take a reading.  For now we
+have each node in our botnet read a transducer or take a reading.  For now, we
 will fake out this information with a
 <a class="reference internal" href="recipes.html#recipes-create-a-one-shot-state"><span class="std std-ref">one-shot</span></a> so that we can frame in our
 design.  Three seconds after advancing they will issue the
@@ -351,7 +348,7 @@ skirmish state.  It might be the initialization of a specific targeting and
 attack control system, whatever it is it would have to issue the Ammunition_Low
 event when it was done firing upon specific targets.  This Ammunition_Low event
 would be caught by the skirmish state as a <a class="reference internal" href="patterns.html#patterns-ultimate-hook"><span class="std std-ref">hook</span></a>.
-This hook would in turn, trigger a Retreat_Ready_War_Cry event.</p>
+This hook would, in turn, trigger a Retreat_Ready_War_Cry event.</p>
 <p>I could have just used a single Ammunition_Low event to cause the transition
 from the Skirmish state into the “Waiting To Lure” state.  But, I often use two
 distinct events like this to make the debugging and reflection processes easier
@@ -360,8 +357,8 @@ event that expresses two different semantic meanings.  (This will also give our
 design more flexibility, which we will see later in this example).</p>
 <p>After a horse archer issues the Retreat_Ready_War_Cry they enter the “Waiting to
 Lure” state.  He would expertly attach his bow to his mount and pull his
-scimitar, then he would do something really brave.  He draw the attention of an
-enemy officer and somehow convince him that he was scared and incompetent, that
+scimitar, then he would do something really brave.  He draws the attention of an
+enemy officer and somehow convinces him that he was scared and incompetent, that
 his unit’s will was broken.  While in the waiting to lure state, he would act
 like a father who is being chased by his children.  He would pretend that they
 could actually catch him if they only just tried a little bit harder.</p>
@@ -376,8 +373,8 @@ him.  They have something to give him.</p>
 <p>The Knight see’s his chance and attacks!</p>
 <p>Once again we find ourselves needing real input from the world.   This is where
 our bot would need another transducer or reading to determine if the officer had
-been lured.  For now we will fake out the reading with another one-shot, so that
-we can frame in the design.  To make things interesting we will pick a random
+been lured.  For now, we will fake out the reading with another one-shot so that
+we can frame the design.  To make things interesting we will pick a random
 integer between 3 and 12 and then count down in seconds before we trigger our
 fake Officer_Lured event.</p>
 <p>The horse archer has been paying careful attention to the Knight even though he
@@ -391,7 +388,7 @@ with an arrow.</p>
 <p><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_13.pgn">ergotic_mongol_13</a></p>
 <p>The Retreat_War_Cry causes the horse to enter the “Feigned Retreat” state.  In
 this state, a different control system would come into play.  The horse archer
-would let the Knight close the distance to him, so that he can comfortably make
+would let the Knight close the distance to him so that he can comfortably make
 his shot.</p>
 <p>He might even veer and dodge to place bodies and soldiers between him and the
 charging Knight, or lure him closer toward other horse archers who could flank
@@ -408,7 +405,7 @@ attack.  Load their horses with arrows, tell some jokes and field wrap their
 wounds.  Drink and water their horses and mentally prepare themselves for the
 next advance.</p>
 <p>The requirement for group cohesion still applies.  Any horse archer would be
-limited on the battle field if he had to advance with an empty quiver; so every
+limited on the battlefield if he had to advance with an empty quiver; so every
 horse archer would want to wait for the last horse archer to finish reloading
 before advancing.</p>
 <p>Therefore like the “Waiting to Lure” state, there must be a “Waiting to Advance”
@@ -424,16 +421,16 @@ state?  They would ignore the command.  This is not flexible.</p>
 <p>There will be situations where a senior officer issues an Advance_War_Cry when
 the horse archer is not ready; no matter, it is time to attack, even without
 arrows.  Group cohesion is of paramount importance to the Mongols.</p>
-<p>So, as a map it is easy to see what is going on, but it tells a very specific
-and inflexible story.  With a few light adjustments we could make the horse
+<p>So, as a map, it is easy to see what is going on, but it tells a very specific
+and inflexible story.  With a few light adjustments, we could make the horse
 archer much more seasoned and responsive in the face of unexpected events.</p>
-<p>For instance we could make the Advance_War_Cry cause an advance on the enemy
-while the horse archer is in any of it’s maneuvers.  Suppose a horse archer is
+<p>For instance, we could make the Advance_War_Cry cause an advance on the enemy
+while the horse archer is in any of its maneuvers.  Suppose a horse archer is
 in the “Feigned Retreat” stage and a senior officer sees some sort of global
 opportunity and bangs on a war drum, issuing a global Advance_War_Cry.  Our
 horse archer would turn around and advance.</p>
-<p>In this way the control at a higher leadership level of the mongol army could
-reach into this unit, tweak its behavior, then let it run autonomously again.</p>
+<p>In this way, the control at a higher leadership level of the Mongol army could
+reach into this unit, tweak its behaviour, then let it run autonomously again.</p>
 <p>Let’s improve the design:</p>
 <div align="center" class="align-center"><img alt="_images/ergotic_mongol_2.svg" src="_images/ergotic_mongol_2.svg" /></div>
 <p>As a statechart designer, you might look at the Advance_War_Cry event connecting
@@ -443,20 +440,20 @@ Advance_War_Cry come from?  Oh, there it is, in the “Waiting to Advance” sta
 “story easier to read” off of the map.  It is tempting to put the arrow source
 back to the “Waiting to Advance” state so that the map makes immediate sense
 upon looking at it. But think about what this has done to our design.  When an
-arrow is connected from the outer state, to the “Advance” state, it is shorthand
+arrow is connected from the outer state to the “Advance” state, it is shorthand
 for connecting <em>all of the states</em> to the “Advance” state with an
 Advance_War_Cry arrow.  When the junior developer mistakenly adjusts the tactic
-to make the map “make more sense”, they would break 7 different behavioral
+to make the map “make more sense”, they would break 7 different behavioural
 pathways in this design; causing our horse archer unit to lose cohesion and thereby
 guarantee its execution by a senior officer.  Statecharts are
 extremely powerful at packing tactical complexity onto a map; so you really have
 to be careful moving the arrows around.</p>
 <p>Now let’s adjust the Skirmish_War_Cry and the Retreat_Ready_War_Cry from the
-outer state to their respective states.  We just added 14 different behavioral
+outer state to their respective states.  We just added 14 different behavioural
 paths.</p>
 <p>Suppose that in the future, a new developer decides to adjust the deceit-in-detail
-tactic by adding another state within it.  If they do not change how our
-war-cry event arrows are attached, they will automatically get the behavior of
+tactic by adding another state to it.  If they do not change how our
+war-cry event arrows are attached, they will automatically get the behaviour of
 the old tactic without knowing that they did.  Statecharts are robust against
 state additions made by future programmers.  So statecharts can quickly act like
 a culture, they become smarter than the individual programming them.</p>
@@ -469,14 +466,14 @@ stranded in a state when he is out of arrows.</p>
 uselessly circles and then will issue a Skirmish_War_Cry.  Good, he can escape
 the “Advance” state.</p>
 <p>Notice that some code was added to the entry state of the “Skirmish” state.  Now
-if a horse archer has less than 10 arrows, or no arrows, he will end up in the
+if a horse archer has less than 10 arrows or no arrows, he will end up in the
 “Waiting to Lure” state.  This is good, he is no longer just uselessly riding
 around because he can start to bait knights and he can escape the “Skirmish”
 state event if he doesn’t have arrows.</p>
 <p>Likewise, entry code was added to the “Feigned Retreat” state.  When he enters
 this state with no arrows, he will just ride back to the marshal point.</p>
-<p>Now that we have a decent adumbration of a horse archer acting alone, let’s add
-control so the horse archers can react to the behavior of other horse archers.</p>
+<p>Now that we have a decent sketch of a horse archer acting alone, let’s have
+him react to the behavior of other horse archers.</p>
 <p>A horse archer is a distributed officer.  This means that any horse archer can
 issue commands to, or obey commands from, any other horse archer in his unit.
 For this unit tactic, there are two types of commands.  There is a “Let’s do
@@ -1372,7 +1369,9 @@ callbacks into its states:</p>
   <span class="n">nest</span><span class="p">(</span><span class="n">waiting_to_advance</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">marshal</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/K1A2xZwgryw" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</center></div>
 <div class="section" id="instrumenting-to-debug-the-mongol-botnet">
 <span id="i-mongol-example-instrumenting-to-debug-the-botnet"></span><h2>Instrumenting to Debug the Mongol Botnet<a class="headerlink" href="#instrumenting-to-debug-the-mongol-botnet" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -1441,7 +1440,7 @@ callbacks into its states:</p>
       &copy;2018, Scott Volk.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.6</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |

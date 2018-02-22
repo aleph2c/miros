@@ -18,8 +18,12 @@ class HorseArcher(Factory):
   def yell(self, event):
     pass
 
-  def compressed_time(self, time_in_seconds):
+  def compress(self, time_in_seconds):
     return 1.0 * time_in_seconds / self.time_compression
+
+  def to_time(self, time_in_seconds):
+    return self.compress(time_in_seconds)
+
 
 # Deceit-In-Detail-Tactic state callbacks
 def didt_entry(archer, e):
@@ -29,7 +33,7 @@ def didt_entry(archer, e):
   archer.post_fifo(
     Event(signal=signals.Second),
     times=0,
-    period=archer.compressed_time(1.0),
+    period=archer.to_time(1.0),
     deferred=True)
   return return_status.HANDLED
 
@@ -96,7 +100,7 @@ def advance_entry(archer, e):
   archer.post_fifo(
     Event(signal=signals.Close_Enough_For_Circle),
     times=1,
-    period=archer.compressed_time(3.0),
+    period=archer.to_time(3.0),
     deferred=True)
   return return_status.HANDLED
 
@@ -140,14 +144,25 @@ def caf_second(archer, e):
 # Skirmish state callbacks
 def skirmish_entry(archer, e):
   '''The Horse Archer will trigger an Ammunition_Low event if he
-     has less than 10 arrows when he begins skirmishing'''
+     has less than 10 arrows when he begins skirmishing
+
+     An knight can charge at this horse archer at some time between 40 and 200
+     seconds after entering the skirmish state of the maneuver.
+  '''
+
+  archer.post_fifo(
+    Event(signal=signals.Officer_Lured),
+    times=1,
+    period=archer.to_time(random.randint(40, 200)),
+    deferred=True)
+
   if archer.arrows < 10:
     archer.post_fifo(Event(signal=signals.Ammunition_Low))
   return return_status.HANDLED
 
 def skirmish_exit(archer, e):
-  #archer.cancel_events(Event(signal=signals.Retreat_War_Cry))
-  #archer.cancel_events(Event(signal=signals.Officer_Lured))
+  archer.cancel_events(Event(signal=signals.Retreat_War_Cry))
+  archer.cancel_events(Event(signal=signals.Officer_Lured))
   return return_status.HANDLED
 
 def skirmish_second(archer, e):
@@ -199,7 +214,7 @@ def skirmish_retreat_ready_war_cry(archer, e):
     archer.post_fifo(
       Event(signal=signals.Retreat_War_Cry),
       times=1,
-      period=archer.compressed_time(delay_time),
+      period=archer.to_time(delay_time),
       deferred=True)
   return archer.trans(waiting_to_lure)
 
@@ -209,14 +224,6 @@ def wtl_entry(archer, e):
   archer.scribble('put away bow')
   archer.scribble('pull scimitar')
   archer.scribble('act scared')
-  #archer.post_fifo(
-  #  Event(signal=signals.Officer_Lured))
-  delay_time = random.randint(5, 40)
-  archer.post_fifo(
-    Event(signal=signals.Officer_Lured),
-    times=1,
-    period=archer.compressed_time(delay_time),
-    deferred=True)
   return return_status.HANDLED
 
 def wtl_second(archer, e):
@@ -272,7 +279,7 @@ def marshal_entry(archer, e):
   archer.post_fifo(
     Event(signal=signals.Ready),
     times=1,
-    period=archer.compressed_time(3.0),
+    period=archer.to_time(3),
     deferred=True)
   return return_status.HANDLED
 
@@ -292,7 +299,7 @@ def wta_entry(archer, e):
 
   archer.post_fifo(Event(signal=signals.Advance_War_Cry),
     times=1,
-    period=archer.compressed_time(random.randint(30, 120)),
+    period=archer.to_time(random.randint(30, 120)),
     deferred=True)
   return return_status.HANDLED
 
@@ -448,9 +455,6 @@ archer.nest(deceit_in_detail, parent=None). \
 if __name__ == '__main__':
   print(archer.name)
   archer.live_trace = True
-  archer.time_compression = 1000.0
+  archer.time_compression = 100.0
   archer.start_at(deceit_in_detail)
-  archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
-  time.sleep(5.0)
-  #print(archer.trace())
-  #pp(archer.spy())
+  time.sleep(6.0)
