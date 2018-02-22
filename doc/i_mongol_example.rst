@@ -50,13 +50,13 @@ But each battling soldier consumes tremendous amounts of information; far too
 much to send up the chain of command.  If they could act upon it independently,
 it could be done for the significant advantage of their army.  This is the
 paradox of leadership: when a leader exerts too much control over their
-subordinates, they limit the effective-intelligence of the group to their mental
-ability and the limited information they are receiving.  
+subordinates, they limit the effective-intelligence of the group to their own mental
+ability and the limited information they are receiving.
 
 The chain of command is like an extremely slow nervous system. Limited and
-bottle-necked by the cognitive load and biases of each officer as they transmit
-orders to their soldiers and the results of those orders back up to their own
-ranking officer.
+bottle-necked by the cognitive load and cognitive biases of each officer as they
+transmit orders to their soldiers and the results of those orders back up to
+their own ranking officer.
 
 But without officers providing decisions in battle, the group would break down
 into a set of unorganized individuals who at best, would default to their
@@ -349,7 +349,7 @@ horse archers are meeting and that this is one tactic of many.
 
 `ergotic_mongol_11`_
 
-Immediately after filling their arrows, they attack.  This may not be
+Immediately after filling their arrows, they attack.  This action may not be
 historically accurate, but let's have our botnet just attack right away.
 
 Once the horse archers advance close enough to the mass of their enemy, they
@@ -1129,50 +1129,66 @@ Let's reference our previous design and create the first horseman, Gandbold.
     :align: center
 
 Scanning the design diagram we see he can carry 60 arrows, he should have an
-internal counter, ``tick``, some ``arrows`` and the ability to ``yell``:
+internal counter, ``tick``, some ``arrows`` and the ability to ``yell``.
+
+Gandbold moves around the battlefield slowly; and as developers, we don't want
+to wait around and see what he does while we are trying to debug his program.
+So I will add the ability to compress time in Gandbold's universe, this way we
+can speed him up.
 
 .. code-block:: python
 
+  import time
   import random
+  from miros.hsm import pp
   from miros.activeobject import Factory
   from miros.event import signals, Event, return_status
 
   class HorseArcher(Factory):
+
     MAXIMUM_ARROW_CAPACITY = 60
 
-    def __init__(self, name='Gandbold'):
+    def __init__(self, name='Gandbold', time_compression=1.0):
       super().__init__(name)
       self.arrows = 0
       self.ticks  = 0
+      self.time_compression = time_compression
       self.others = {}
 
     def yell(self, event):
       pass
 
-Let's implement Gandbold's statechart using the Factory class.  We don't *have to
-use this*, we could implement it using flat methods instead.  Or, we could
-implement it with the Factory, then run the ``to_code`` method to see what our
-factory methods would look like if they were written using the flat method
-technique, then drop these methods into our code.  We have options.
+    def compress(self, time_in_seconds):
+      return 1.0 * time_in_seconds / self.time_compression
 
-When using a Factory class we create statecharts by first writing callbacks.
+    def to_time(self, time_in_seconds):
+      return self.compress(time_in_seconds)
+
+Let's implement Gandbold's statechart using the Factory class.  We don't *have
+to use this*; we could write the code using flat methods instead.  Or, we could
+program it with the Factory class, then run the ``to_code`` method to see what
+our factory methods would look like if they were written using the flat method
+technique, then drop these resulting methods into our code.  We have options.
+
+When using a Factory class, we create statecharts by first writing callbacks.
 Then we create states and link the callbacks to their states.  Finally, we layer
-the states into a hierarchy.
+these states into a hierarchy.
 
 So, let's begin by writing the state callbacks.
 
 Starting with the outer Deceit_in_Detail_Tactic state, we scan the top left
-corner of it's state rectangle and write those callbacks.  Then we look for
-arrows connecting it's state rectangle to other rectangles and write those
-callbacks, finally, we look for the big black dot and write its callback.  
+corner of its state rectangle and write those callbacks.  Then we look for
+arrows connecting its state rectangle to other rectangles and write those
+callbacks. Finally, we look for the big black dot and write its callback.  
 
 We will follow this same workflow for each state.
 
-By breaking our software development into these small units of work, it becomes
-easy to think about.  Our attention can linger, jump to something else, then
-come back to refocus on our task without much effort.  As this attention is
-focus on each of the small spots on the map, we can improve the design by fixing
-it's little naming issues or other small mistakes.
+Our program is easy to think about because we break our software development
+process into small bits of work.  Our attention can linger, jump to something
+else, then use the map to refocus on our task without much effort.  As this
+focused attention fixates on the part of the map, we can think hard about what
+is going on there.  Then we can improve the map by fixing the little naming
+issues or by making slight design alterations.
 
 Let's begin by writing the callbacks for the defeat_in_detail_tactic state:
 
@@ -1186,17 +1202,31 @@ Let's begin by writing the callbacks for the defeat_in_detail_tactic state:
     '''Load up on arrows and start tracking time within this tactic'''
     archer.arrows = HorseArcher.MAXIMUM_ARROW_CAPACITY
     archer.ticks  = 0
+    archer.post_fifo(
+      Event(signal=signals.Second),
+      times=0,
+      period=archer.to_time(1.0),
+      deferred=True)
     return return_status.HANDLED
+
+  def didt_exit(archer, e):
+    '''Load up on arrows and start tracking time within this tactic'''
+    archer.cancel_events(Event(signal=signals.Second))
+    return return_status.HANDLED
+
+  def didt_init(archer, e):
+    '''Immediately advance'''
+    return archer.trans(advance)
 
   def didt_second(archer, e):
     '''A second within the tactic has passed'''
-    archer.tick += 1
+    archer.ticks += 1
     return return_status.HANDLED
 
   def didt_senior_advance_war_cry(archer, e):
     '''A Horse archer heard a command from a senior officer.  They give this
        senior officer's war cry to themselves as if they thought of it'''
-    archer.post_fifo(e)
+    archer.post_fifo(Event(signal=signals.Advance_War_Cry))
     return return_status.HANDLED
 
   def didt_advance_war_cry(archer, e):
@@ -1205,10 +1235,10 @@ Let's begin by writing the callbacks for the defeat_in_detail_tactic state:
     archer.yell(e)
     for ip, other in archer.others.items():
       other.dispatch(e)
-    return return_status.HANDLED
+    return archer.trans(advance)
 
   def didt_other_advance_war_cry(archer, e):
-    '''A horse archer heard another's Advance_War_Cry, so so they 
+    '''A horse archer heard another's Advance_War_Cry, so so they
        give the command to and introspect on the state of their unit'''
     archer.post_fifo(Event(signal=signals.Advance_War_Cry))
     ip = e.payload['ip']
@@ -1221,7 +1251,7 @@ Let's begin by writing the callbacks for the defeat_in_detail_tactic state:
     return archer.trans(skirmish)
 
   def didt_other_skirmish_war_cry(archer, e):
-    '''A horse archer heard another's Skirmish_War_Cry, so so they 
+    '''A horse archer heard another's Skirmish_War_Cry, so they
        give the command to and introspect on the state of their unit'''
     archer.post_fifo(Event(signal=signals.Skirmish_War_Cry))
     ip = e.payload['ip']
@@ -1249,8 +1279,14 @@ Now lets write the callbacks for the "Advance" state:
     archer.post_fifo(
       Event(signal=signals.Close_Enough_For_Circle),
       times=1,
-      period=3.0,
+      period=archer.to_time(3.0),
       deferred=True)
+    return return_status.HANDLED
+
+  def advance_exit(archer, e):
+    '''Upon entering the advanced state wait 3 seconds then issue
+       Close_Enough_For_Circle war cry'''
+    archer.cancel_events(Event(signal=signals.Close_Enough_For_Circle))
     return return_status.HANDLED
 
   def advance_senior_advanced_war_cry(archer, e):
@@ -1281,15 +1317,14 @@ Now lets write the callbacks for the "Circle and Fire" state:
     '''A horse archer can fire 1 to 3 arrows at a time in this maneuver,
        how they behave is up to them and how they respond
        to their local conditions'''
-    if(archer.tick % 8 == 0):
-      archer.arrow -= random.randint(1, 3)
-
+    if(archer.ticks % 6 == 0):
+      archer.arrows -= random.randint(1, 3)
+      archer.scribble('arrows left {}'.format(archer.arrows))
     if archer.arrows < 20:
       archer.post_fifo(
         Event(signal=
           signals.Skirmish_War_Cry))
-
-    archer.tick += 1
+    archer.ticks += 1
     return return_status.HANDLED
 
 Now lets write the callbacks for the "Skirmish" state:
@@ -1302,32 +1337,52 @@ Now lets write the callbacks for the "Skirmish" state:
   # Skirmish state callbacks
   def skirmish_entry(archer, e):
     '''The Horse Archer will trigger an Ammunition_Low event if he
-       has less than 10 arrows when he begins skirmishing'''
-    if archer.arrow < 10:
+       has less than 10 arrows when he begins skirmishing
+
+       An knight can charge at this horse archer at some time between 40 and 200
+       seconds after entering the skirmish state of the maneuver.
+    '''
+
+    archer.post_fifo(
+      Event(signal=signals.Officer_Lured),
+      times=1,
+      period=archer.to_time(random.randint(40, 200)),
+      deferred=True)
+
+    if archer.arrows < 10:
       archer.post_fifo(Event(signal=signals.Ammunition_Low))
+    return return_status.HANDLED
+
+  def skirmish_exit(archer, e):
+    archer.cancel_events(Event(signal=signals.Retreat_War_Cry))
+    archer.cancel_events(Event(signal=signals.Officer_Lured))
     return return_status.HANDLED
 
   def skirmish_second(archer, e):
     '''Every 3 seconds the horse archer fires an arrow, if he has
        less than 10 arrows he will trigger an Ammunition_Low event'''
-    if archer.tick % 3 == 0:
+    if archer.ticks % 3 == 0:
       if random.randint(1, 10) <= 4:
         archer.arrows -= 1
+        archer.scribble('arrows left {}'.format(archer.arrows))
     if archer.arrows < 10:
       archer.post_fifo(Event(signal=signals.Ammunition_Low))
     archer.ticks += 1
+    return return_status.HANDLED
 
   def skirmish_officer_lured(archer, e):
     '''If Horse Archer lures an enemy officer they issue a
-       Retreat_War_Cry'''
+       Retreat_War_Cry event.'''
+    print("Knight Charging")
+    archer.scribble("Knight Charging")
     archer.post_fifo(
       Event(signal=signals.Retreat_War_Cry))
     return return_status.HANDLED
 
   def skirmish_ammunition_low(archer, e):
-    '''If Horse Archer is low on low on ammunition they will give
+    '''If Horse Archer is low ammunition they will give
        a Retreat_War_Cry'''
-    archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
+    archer.post_fifo(Event(signal=signals.Retreat_Ready_War_Cry))
     return return_status.HANDLED
 
   def skirmish_senior_squirmish_war_cry(archer, e):
@@ -1340,14 +1395,20 @@ Now lets write the callbacks for the "Skirmish" state:
 
   def skirmish_retreat_ready_war_cry(archer, e):
     '''If all other horse archers are ready for a return, issue a
-       Retreat_War_Cry, if not or either way, transition into the
+       Retreat_War_Cry, if not or either way transition into the
        waiting_to_lure state'''
     ready = True
-    for ip, other in archer.other.items():
+    for ip, other in archer.others.items():
       if other.state_name != 'dead':
         ready &= other.state_name == 'waiting'
     if ready:
-      archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
+      # let's make sure Gandbold isn't a chicken
+      delay_time = random.randint(10, 30)
+      archer.post_fifo(
+        Event(signal=signals.Retreat_War_Cry),
+        times=1,
+        period=archer.to_time(delay_time),
+        deferred=True)
     return archer.trans(waiting_to_lure)
 
 
@@ -1363,18 +1424,16 @@ Here are the callbacks for the "Waiting to Lure" state:
     archer.scribble('put away bow')
     archer.scribble('pull scimitar')
     archer.scribble('act scared')
-    archer.post_fifo(
-      Event(signal=signals.Officer_Lured),
-      times=1,
-      period=random.randint(30, 120),
-      deferred=True)
+    return return_status.HANDLED
+
+  def wtl_second(archer, e):
+    archer.ticks += 1
     return return_status.HANDLED
 
   def wtl_exit(archer, e):
     archer.scribble('stash scimitar')
     archer.scribble('pull bow')
     archer.scribble('stop acting')
-    archer.cancel_events(Event(signal=signals.Officer_Lured))
     return return_status.HANDLED
 
 Lets write the callbacks for the "Feigned Retreat" state:
@@ -1399,9 +1458,10 @@ Lets write the callbacks for the "Feigned Retreat" state:
     return return_status.HANDLED
 
   def fr_second(archer, e):
-    if archer.tick % 3 == 0:
+    if archer.ticks % 3 == 0:
       if random.randint(1, 10) <= 8:
         archer.arrows -= 1
+        archer.scribble('arrows left {}'.format(archer.arrows))
       if archer.arrows == 0:
         archer.post_fifo(
           Event(signal=signals.Out_Of_Arrows))
@@ -1413,6 +1473,9 @@ Lets write the callbacks for the "Feigned Retreat" state:
 
   def fr_other_retreat_war_cry(archer, e):
     return return_status.HANDLED
+
+  def fr_out_of_arrows(archer, e):
+    return archer.trans(marshal)
 
 The "Marshal" state callbacks:
 
@@ -1430,7 +1493,7 @@ The "Marshal" state callbacks:
     archer.post_fifo(
       Event(signal=signals.Ready),
       times=1,
-      period=3,
+      period=archer.to_time(3),
       deferred=True)
     return return_status.HANDLED
 
@@ -1457,8 +1520,12 @@ Now we write the callbacks for our last state, "Waiting to Advance":
 
     archer.post_fifo(Event(signal=signals.Advance_War_Cry),
       times=1,
-      period=random.randint(30, 120),
+      period=archer.to_time(random.randint(30, 120)),
       deferred=True)
+    return return_status.HANDLED
+
+  def wta_exit(archer, e):
+    archer.cancel_events(Event(signal=signals.Advance_War_Cry))
     return return_status.HANDLED
 
 Here is the latest iteration of our design:
@@ -1510,6 +1577,9 @@ callbacks into its states:
       signal=signals.ENTRY_SIGNAL,
       handler=advance_entry).  \
     catch(
+      signal=signals.EXIT_SIGNAL,
+      handler=advance_exit).  \
+    catch(
       signal=signals.Senior_Advance_War_Cry,
       handler=advance_senior_advanced_war_cry).  \
     catch(
@@ -1530,6 +1600,9 @@ callbacks into its states:
     catch(
       signal=signals.ENTRY_SIGNAL,
       handler=skirmish_entry). \
+    catch(
+      signal=signals.EXIT_SIGNAL,
+      handler=skirmish_exit). \
     catch(
       signal=signals.Second,
       handler=skirmish_second). \
@@ -1557,6 +1630,9 @@ callbacks into its states:
     catch(
       signal=signals.EXIT_SIGNAL,
       handler=wtl_exit). \
+    catch(
+      signal=signals.Second,
+      handler=wtl_second). \
     to_method()
 
   feigned_retreat = archer.create(state='feigned_retreat'). \
@@ -1569,6 +1645,9 @@ callbacks into its states:
     catch(
       signal=signals.Second,
       handler=fr_second). \
+    catch(
+      signal=signals.Out_Of_Arrows,
+      handler=fr_out_of_arrows). \
     catch(
       signal=signals.Retreat_War_Cry,
       handler=fr_retreat_war_cry). \
@@ -1590,6 +1669,9 @@ callbacks into its states:
     catch(
       signal=signals.ENTRY_SIGNAL,
       handler=wta_entry). \
+    catch(
+      signal=signals.EXIT_SIGNAL,
+      handler=wta_exit). \
     to_method()
 
 Using the ``nest`` method we add the design's hierarchy:

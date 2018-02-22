@@ -80,12 +80,12 @@ soldier, they reduce that soldier’s ability to think for themselves.</p>
 much to send up the chain of command.  If they could act upon it independently,
 it could be done for the significant advantage of their army.  This is the
 paradox of leadership: when a leader exerts too much control over their
-subordinates, they limit the effective-intelligence of the group to their mental
+subordinates, they limit the effective-intelligence of the group to their own mental
 ability and the limited information they are receiving.</p>
 <p>The chain of command is like an extremely slow nervous system. Limited and
-bottle-necked by the cognitive load and biases of each officer as they transmit
-orders to their soldiers and the results of those orders back up to their own
-ranking officer.</p>
+bottle-necked by the cognitive load and cognitive biases of each officer as they
+transmit orders to their soldiers and the results of those orders back up to
+their own ranking officer.</p>
 <p>But without officers providing decisions in battle, the group would break down
 into a set of unorganized individuals who at best, would default to their
 training and at the worst would run from the enemy exposing themselves to
@@ -318,7 +318,7 @@ it, Deceit_in_Detail_Tactic (marshalled), because I want to express that the
 horse archers are meeting and that this is one tactic of many.</p>
 <div align="center" class="align-center"><img alt="_images/ergotic_mongol_11.svg" src="_images/ergotic_mongol_11.svg" /></div>
 <p><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_11.pgn">ergotic_mongol_11</a></p>
-<p>Immediately after filling their arrows, they attack.  This may not be
+<p>Immediately after filling their arrows, they attack.  This action may not be
 historically accurate, but let’s have our botnet just attack right away.</p>
 <p>Once the horse archers advance close enough to the mass of their enemy, they
 would circle and fire.  How do we express this in software?  If we were building
@@ -941,43 +941,58 @@ standard, to your CPU, it’s all exposed and compromised.</p>
 <p>Let’s reference our previous design and create the first horseman, Gandbold.</p>
 <div align="center" class="align-center"><img alt="_images/ergotic_mongol_51.svg" src="_images/ergotic_mongol_51.svg" /></div>
 <p>Scanning the design diagram we see he can carry 60 arrows, he should have an
-internal counter, <code class="docutils literal"><span class="pre">tick</span></code>, some <code class="docutils literal"><span class="pre">arrows</span></code> and the ability to <code class="docutils literal"><span class="pre">yell</span></code>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+internal counter, <code class="docutils literal"><span class="pre">tick</span></code>, some <code class="docutils literal"><span class="pre">arrows</span></code> and the ability to <code class="docutils literal"><span class="pre">yell</span></code>.</p>
+<p>Gandbold moves around the battlefield slowly; and as developers, we don’t want
+to wait around and see what he does while we are trying to debug his program.
+So I will add the ability to compress time in Gandbold’s universe, this way we
+can speed him up.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">pp</span>
 <span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">Factory</span>
 <span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
 
 <span class="k">class</span> <span class="nc">HorseArcher</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+
   <span class="n">MAXIMUM_ARROW_CAPACITY</span> <span class="o">=</span> <span class="mi">60</span>
 
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Gandbold&#39;</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Gandbold&#39;</span><span class="p">,</span> <span class="n">time_compression</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">arrows</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">ticks</span>  <span class="o">=</span> <span class="mi">0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">time_compression</span> <span class="o">=</span> <span class="n">time_compression</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">others</span> <span class="o">=</span> <span class="p">{}</span>
 
   <span class="k">def</span> <span class="nf">yell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
     <span class="k">pass</span>
+
+  <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_in_seconds</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">time_in_seconds</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_compression</span>
+
+  <span class="k">def</span> <span class="nf">to_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_in_seconds</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">time_in_seconds</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Let’s implement Gandbold’s statechart using the Factory class.  We don’t <em>have to
-use this</em>, we could implement it using flat methods instead.  Or, we could
-implement it with the Factory, then run the <code class="docutils literal"><span class="pre">to_code</span></code> method to see what our
-factory methods would look like if they were written using the flat method
-technique, then drop these methods into our code.  We have options.</p>
-<p>When using a Factory class we create statecharts by first writing callbacks.
+<p>Let’s implement Gandbold’s statechart using the Factory class.  We don’t <em>have
+to use this</em>; we could write the code using flat methods instead.  Or, we could
+program it with the Factory class, then run the <code class="docutils literal"><span class="pre">to_code</span></code> method to see what
+our factory methods would look like if they were written using the flat method
+technique, then drop these resulting methods into our code.  We have options.</p>
+<p>When using a Factory class, we create statecharts by first writing callbacks.
 Then we create states and link the callbacks to their states.  Finally, we layer
-the states into a hierarchy.</p>
+these states into a hierarchy.</p>
 <p>So, let’s begin by writing the state callbacks.</p>
 <p>Starting with the outer Deceit_in_Detail_Tactic state, we scan the top left
-corner of it’s state rectangle and write those callbacks.  Then we look for
-arrows connecting it’s state rectangle to other rectangles and write those
-callbacks, finally, we look for the big black dot and write its callback.</p>
+corner of its state rectangle and write those callbacks.  Then we look for
+arrows connecting its state rectangle to other rectangles and write those
+callbacks. Finally, we look for the big black dot and write its callback.</p>
 <p>We will follow this same workflow for each state.</p>
-<p>By breaking our software development into these small units of work, it becomes
-easy to think about.  Our attention can linger, jump to something else, then
-come back to refocus on our task without much effort.  As this attention is
-focus on each of the small spots on the map, we can improve the design by fixing
-it’s little naming issues or other small mistakes.</p>
+<p>Our program is easy to think about because we break our software development
+process into small bits of work.  Our attention can linger, jump to something
+else, then use the map to refocus on our task without much effort.  As this
+focused attention fixates on the part of the map, we can think hard about what
+is going on there.  Then we can improve the map by fixing the little naming
+issues or by making slight design alterations.</p>
 <p>Let’s begin by writing the callbacks for the defeat_in_detail_tactic state:</p>
 <div align="center" class="align-center"><img alt="_images/ergotic_mongol_61.svg" src="_images/ergotic_mongol_61.svg" /></div>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Deceit-In-Detail-Tactic state callbacks</span>
@@ -985,17 +1000,31 @@ it’s little naming issues or other small mistakes.</p>
   <span class="sd">&#39;&#39;&#39;Load up on arrows and start tracking time within this tactic&#39;&#39;&#39;</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">arrows</span> <span class="o">=</span> <span class="n">HorseArcher</span><span class="o">.</span><span class="n">MAXIMUM_ARROW_CAPACITY</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">ticks</span>  <span class="o">=</span> <span class="mi">0</span>
+  <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+    <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Second</span><span class="p">),</span>
+    <span class="n">times</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">period</span><span class="o">=</span><span class="n">archer</span><span class="o">.</span><span class="n">to_time</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span>
+    <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+<span class="k">def</span> <span class="nf">didt_exit</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39;Load up on arrows and start tracking time within this tactic&#39;&#39;&#39;</span>
+  <span class="n">archer</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Second</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+<span class="k">def</span> <span class="nf">didt_init</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39;Immediately advance&#39;&#39;&#39;</span>
+  <span class="k">return</span> <span class="n">archer</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">advance</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">didt_second</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39;A second within the tactic has passed&#39;&#39;&#39;</span>
-  <span class="n">archer</span><span class="o">.</span><span class="n">tick</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="n">archer</span><span class="o">.</span><span class="n">ticks</span> <span class="o">+=</span> <span class="mi">1</span>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 
 <span class="k">def</span> <span class="nf">didt_senior_advance_war_cry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39;A Horse archer heard a command from a senior officer.  They give this</span>
 <span class="sd">     senior officer&#39;s war cry to themselves as if they thought of it&#39;&#39;&#39;</span>
-  <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+  <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Advance_War_Cry</span><span class="p">))</span>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 
 <span class="k">def</span> <span class="nf">didt_advance_war_cry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -1004,7 +1033,7 @@ it’s little naming issues or other small mistakes.</p>
   <span class="n">archer</span><span class="o">.</span><span class="n">yell</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
   <span class="k">for</span> <span class="n">ip</span><span class="p">,</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="n">other</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">return</span> <span class="n">archer</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">advance</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">didt_other_advance_war_cry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39;A horse archer heard another&#39;s Advance_War_Cry, so so they</span>
@@ -1020,7 +1049,7 @@ it’s little naming issues or other small mistakes.</p>
   <span class="k">return</span> <span class="n">archer</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">skirmish</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">didt_other_skirmish_war_cry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39;A horse archer heard another&#39;s Skirmish_War_Cry, so so they</span>
+  <span class="sd">&#39;&#39;&#39;A horse archer heard another&#39;s Skirmish_War_Cry, so they</span>
 <span class="sd">     give the command to and introspect on the state of their unit&#39;&#39;&#39;</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Skirmish_War_Cry</span><span class="p">))</span>
   <span class="n">ip</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="p">[</span><span class="s1">&#39;ip&#39;</span><span class="p">]</span>
@@ -1044,8 +1073,14 @@ it’s little naming issues or other small mistakes.</p>
   <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
     <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Close_Enough_For_Circle</span><span class="p">),</span>
     <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">period</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+    <span class="n">period</span><span class="o">=</span><span class="n">archer</span><span class="o">.</span><span class="n">to_time</span><span class="p">(</span><span class="mf">3.0</span><span class="p">),</span>
     <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+<span class="k">def</span> <span class="nf">advance_exit</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39;Upon entering the advanced state wait 3 seconds then issue</span>
+<span class="sd">     Close_Enough_For_Circle war cry&#39;&#39;&#39;</span>
+  <span class="n">archer</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Close_Enough_For_Circle</span><span class="p">))</span>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 
 <span class="k">def</span> <span class="nf">advance_senior_advanced_war_cry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -1072,15 +1107,14 @@ it’s little naming issues or other small mistakes.</p>
   <span class="sd">&#39;&#39;&#39;A horse archer can fire 1 to 3 arrows at a time in this maneuver,</span>
 <span class="sd">     how they behave is up to them and how they respond</span>
 <span class="sd">     to their local conditions&#39;&#39;&#39;</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">tick</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-    <span class="n">archer</span><span class="o">.</span><span class="n">arrow</span> <span class="o">-=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-
+  <span class="k">if</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">ticks</span> <span class="o">%</span> <span class="mi">6</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="n">archer</span><span class="o">.</span><span class="n">arrows</span> <span class="o">-=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s1">&#39;arrows left {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">arrows</span><span class="p">))</span>
   <span class="k">if</span> <span class="n">archer</span><span class="o">.</span><span class="n">arrows</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
     <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
       <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span>
         <span class="n">signals</span><span class="o">.</span><span class="n">Skirmish_War_Cry</span><span class="p">))</span>
-
-  <span class="n">archer</span><span class="o">.</span><span class="n">tick</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="n">archer</span><span class="o">.</span><span class="n">ticks</span> <span class="o">+=</span> <span class="mi">1</span>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </pre></div>
 </div>
@@ -1089,32 +1123,52 @@ it’s little naming issues or other small mistakes.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Skirmish state callbacks</span>
 <span class="k">def</span> <span class="nf">skirmish_entry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39;The Horse Archer will trigger an Ammunition_Low event if he</span>
-<span class="sd">     has less than 10 arrows when he begins skirmishing&#39;&#39;&#39;</span>
-  <span class="k">if</span> <span class="n">archer</span><span class="o">.</span><span class="n">arrow</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+<span class="sd">     has less than 10 arrows when he begins skirmishing</span>
+
+<span class="sd">     An knight can charge at this horse archer at some time between 40 and 200</span>
+<span class="sd">     seconds after entering the skirmish state of the maneuver.</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+
+  <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+    <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Officer_Lured</span><span class="p">),</span>
+    <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">period</span><span class="o">=</span><span class="n">archer</span><span class="o">.</span><span class="n">to_time</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">200</span><span class="p">)),</span>
+    <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="n">archer</span><span class="o">.</span><span class="n">arrows</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
     <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Ammunition_Low</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+<span class="k">def</span> <span class="nf">skirmish_exit</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">archer</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">))</span>
+  <span class="n">archer</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Officer_Lured</span><span class="p">))</span>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 
 <span class="k">def</span> <span class="nf">skirmish_second</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39;Every 3 seconds the horse archer fires an arrow, if he has</span>
 <span class="sd">     less than 10 arrows he will trigger an Ammunition_Low event&#39;&#39;&#39;</span>
-  <span class="k">if</span> <span class="n">archer</span><span class="o">.</span><span class="n">tick</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+  <span class="k">if</span> <span class="n">archer</span><span class="o">.</span><span class="n">ticks</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">4</span><span class="p">:</span>
       <span class="n">archer</span><span class="o">.</span><span class="n">arrows</span> <span class="o">-=</span> <span class="mi">1</span>
+      <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s1">&#39;arrows left {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">arrows</span><span class="p">))</span>
   <span class="k">if</span> <span class="n">archer</span><span class="o">.</span><span class="n">arrows</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
     <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Ammunition_Low</span><span class="p">))</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">ticks</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 
 <span class="k">def</span> <span class="nf">skirmish_officer_lured</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39;If Horse Archer lures an enemy officer they issue a</span>
-<span class="sd">     Retreat_War_Cry&#39;&#39;&#39;</span>
+<span class="sd">     Retreat_War_Cry event.&#39;&#39;&#39;</span>
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Knight Charging&quot;</span><span class="p">)</span>
+  <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;Knight Charging&quot;</span><span class="p">)</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
     <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">))</span>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 
 <span class="k">def</span> <span class="nf">skirmish_ammunition_low</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39;If Horse Archer is low on low on ammunition they will give</span>
+  <span class="sd">&#39;&#39;&#39;If Horse Archer is low ammunition they will give</span>
 <span class="sd">     a Retreat_War_Cry&#39;&#39;&#39;</span>
-  <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">))</span>
+  <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_Ready_War_Cry</span><span class="p">))</span>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 
 <span class="k">def</span> <span class="nf">skirmish_senior_squirmish_war_cry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -1127,14 +1181,20 @@ it’s little naming issues or other small mistakes.</p>
 
 <span class="k">def</span> <span class="nf">skirmish_retreat_ready_war_cry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39;If all other horse archers are ready for a return, issue a</span>
-<span class="sd">     Retreat_War_Cry, if not or either way, transition into the</span>
+<span class="sd">     Retreat_War_Cry, if not or either way transition into the</span>
 <span class="sd">     waiting_to_lure state&#39;&#39;&#39;</span>
   <span class="n">ready</span> <span class="o">=</span> <span class="bp">True</span>
-  <span class="k">for</span> <span class="n">ip</span><span class="p">,</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">archer</span><span class="o">.</span><span class="n">other</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+  <span class="k">for</span> <span class="n">ip</span><span class="p">,</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">state_name</span> <span class="o">!=</span> <span class="s1">&#39;dead&#39;</span><span class="p">:</span>
       <span class="n">ready</span> <span class="o">&amp;=</span> <span class="n">other</span><span class="o">.</span><span class="n">state_name</span> <span class="o">==</span> <span class="s1">&#39;waiting&#39;</span>
   <span class="k">if</span> <span class="n">ready</span><span class="p">:</span>
-    <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">))</span>
+    <span class="c1"># let&#39;s make sure Gandbold isn&#39;t a chicken</span>
+    <span class="n">delay_time</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+    <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">),</span>
+      <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">period</span><span class="o">=</span><span class="n">archer</span><span class="o">.</span><span class="n">to_time</span><span class="p">(</span><span class="n">delay_time</span><span class="p">),</span>
+      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">archer</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">waiting_to_lure</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1145,18 +1205,16 @@ it’s little naming issues or other small mistakes.</p>
   <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s1">&#39;put away bow&#39;</span><span class="p">)</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s1">&#39;pull scimitar&#39;</span><span class="p">)</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s1">&#39;act scared&#39;</span><span class="p">)</span>
-  <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
-    <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Officer_Lured</span><span class="p">),</span>
-    <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">period</span><span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">120</span><span class="p">),</span>
-    <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+<span class="k">def</span> <span class="nf">wtl_second</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">archer</span><span class="o">.</span><span class="n">ticks</span> <span class="o">+=</span> <span class="mi">1</span>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 
 <span class="k">def</span> <span class="nf">wtl_exit</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s1">&#39;stash scimitar&#39;</span><span class="p">)</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s1">&#39;pull bow&#39;</span><span class="p">)</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s1">&#39;stop acting&#39;</span><span class="p">)</span>
-  <span class="n">archer</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Officer_Lured</span><span class="p">))</span>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </pre></div>
 </div>
@@ -1177,9 +1235,10 @@ it’s little naming issues or other small mistakes.</p>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 
 <span class="k">def</span> <span class="nf">fr_second</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="k">if</span> <span class="n">archer</span><span class="o">.</span><span class="n">tick</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+  <span class="k">if</span> <span class="n">archer</span><span class="o">.</span><span class="n">ticks</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">8</span><span class="p">:</span>
       <span class="n">archer</span><span class="o">.</span><span class="n">arrows</span> <span class="o">-=</span> <span class="mi">1</span>
+      <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s1">&#39;arrows left {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">arrows</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">archer</span><span class="o">.</span><span class="n">arrows</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
       <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
         <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Out_Of_Arrows</span><span class="p">))</span>
@@ -1191,6 +1250,9 @@ it’s little naming issues or other small mistakes.</p>
 
 <span class="k">def</span> <span class="nf">fr_other_retreat_war_cry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+<span class="k">def</span> <span class="nf">fr_out_of_arrows</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">archer</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">marshal</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The “Marshal” state callbacks:</p>
@@ -1204,7 +1266,7 @@ it’s little naming issues or other small mistakes.</p>
   <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
     <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Ready</span><span class="p">),</span>
     <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">period</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">period</span><span class="o">=</span><span class="n">archer</span><span class="o">.</span><span class="n">to_time</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
     <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 
@@ -1227,8 +1289,12 @@ it’s little naming issues or other small mistakes.</p>
 
   <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Advance_War_Cry</span><span class="p">),</span>
     <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">period</span><span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">120</span><span class="p">),</span>
+    <span class="n">period</span><span class="o">=</span><span class="n">archer</span><span class="o">.</span><span class="n">to_time</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">120</span><span class="p">)),</span>
     <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+<span class="k">def</span> <span class="nf">wta_exit</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">archer</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Advance_War_Cry</span><span class="p">))</span>
   <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </pre></div>
 </div>
@@ -1275,6 +1341,9 @@ callbacks into its states:</p>
     <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
     <span class="n">handler</span><span class="o">=</span><span class="n">advance_entry</span><span class="p">)</span><span class="o">.</span>  \
   <span class="n">catch</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+    <span class="n">handler</span><span class="o">=</span><span class="n">advance_exit</span><span class="p">)</span><span class="o">.</span>  \
+  <span class="n">catch</span><span class="p">(</span>
     <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Senior_Advance_War_Cry</span><span class="p">,</span>
     <span class="n">handler</span><span class="o">=</span><span class="n">advance_senior_advanced_war_cry</span><span class="p">)</span><span class="o">.</span>  \
   <span class="n">catch</span><span class="p">(</span>
@@ -1295,6 +1364,9 @@ callbacks into its states:</p>
   <span class="n">catch</span><span class="p">(</span>
     <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
     <span class="n">handler</span><span class="o">=</span><span class="n">skirmish_entry</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">catch</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+    <span class="n">handler</span><span class="o">=</span><span class="n">skirmish_exit</span><span class="p">)</span><span class="o">.</span> \
   <span class="n">catch</span><span class="p">(</span>
     <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Second</span><span class="p">,</span>
     <span class="n">handler</span><span class="o">=</span><span class="n">skirmish_second</span><span class="p">)</span><span class="o">.</span> \
@@ -1322,6 +1394,9 @@ callbacks into its states:</p>
   <span class="n">catch</span><span class="p">(</span>
     <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
     <span class="n">handler</span><span class="o">=</span><span class="n">wtl_exit</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">catch</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Second</span><span class="p">,</span>
+    <span class="n">handler</span><span class="o">=</span><span class="n">wtl_second</span><span class="p">)</span><span class="o">.</span> \
   <span class="n">to_method</span><span class="p">()</span>
 
 <span class="n">feigned_retreat</span> <span class="o">=</span> <span class="n">archer</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;feigned_retreat&#39;</span><span class="p">)</span><span class="o">.</span> \
@@ -1334,6 +1409,9 @@ callbacks into its states:</p>
   <span class="n">catch</span><span class="p">(</span>
     <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Second</span><span class="p">,</span>
     <span class="n">handler</span><span class="o">=</span><span class="n">fr_second</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">catch</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Out_Of_Arrows</span><span class="p">,</span>
+    <span class="n">handler</span><span class="o">=</span><span class="n">fr_out_of_arrows</span><span class="p">)</span><span class="o">.</span> \
   <span class="n">catch</span><span class="p">(</span>
     <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">,</span>
     <span class="n">handler</span><span class="o">=</span><span class="n">fr_retreat_war_cry</span><span class="p">)</span><span class="o">.</span> \
@@ -1355,6 +1433,9 @@ callbacks into its states:</p>
   <span class="n">catch</span><span class="p">(</span>
     <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
     <span class="n">handler</span><span class="o">=</span><span class="n">wta_entry</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">catch</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+    <span class="n">handler</span><span class="o">=</span><span class="n">wta_exit</span><span class="p">)</span><span class="o">.</span> \
   <span class="n">to_method</span><span class="p">()</span>
 </pre></div>
 </div>
