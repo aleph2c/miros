@@ -131,7 +131,7 @@ def caf_second(archer, e):
   '''A horse archer can fire 1 to 3 arrows at a time in this maneuver,
      how they behave is up to them and how they respond
      to their local conditions'''
-  if(archer.ticks % 6 == 0):
+  if(archer.ticks % 6 == 0):  # second attack already!
     archer.arrows -= random.randint(1, 3)
     archer.scribble('arrows left {}'.format(archer.arrows))
   if archer.arrows < 20:
@@ -144,12 +144,9 @@ def caf_second(archer, e):
 # Skirmish state callbacks
 def skirmish_entry(archer, e):
   '''The Horse Archer will trigger an Ammunition_Low event if he
-     has less than 10 arrows when he begins skirmishing
-
-     An knight can charge at this horse archer at some time between 40 and 200
-     seconds after entering the skirmish state of the maneuver.
-  '''
-
+     has less than 10 arrows when he begins skirmishing'''
+  # a Knight could charge at him sometime between 40-120 sec
+  # once he enters the skirmish state
   archer.post_fifo(
     Event(signal=signals.Officer_Lured),
     times=1,
@@ -168,6 +165,8 @@ def skirmish_exit(archer, e):
 def skirmish_second(archer, e):
   '''Every 3 seconds the horse archer fires an arrow, if he has
      less than 10 arrows he will trigger an Ammunition_Low event'''
+  # While skirmishing, he makes directed attacks on his enemy
+  # 40 percent chance of making a shot every 3 seconds
   if archer.ticks % 3 == 0:
     if random.randint(1, 10) <= 4:
       archer.arrows -= 1
@@ -455,6 +454,8 @@ archer.nest(deceit_in_detail, parent=None). \
 if __name__ == '__main__':
   print(archer.name)
   archer.live_trace = True
-  archer.time_compression = 100.0
+  archer.time_compression = 100
   archer.start_at(deceit_in_detail)
+  archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
   time.sleep(6.0)
+  pp('')

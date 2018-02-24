@@ -46,9 +46,9 @@ An officer must exert their plan onto an army of men who would rather be at
 home, feeding their families. When an officer exercises their power over a
 soldier, they reduce that soldier’s ability to think for themselves.
 
-But each battling soldier consumes tremendous amounts of information; far too
+But each soldier in battle consumes tremendous amounts of information; far too
 much to send up the chain of command.  If they could act upon it independently,
-it could be done for the significant advantage of their army.  This is the
+it could be to the significant advantage of their army.  This is the
 paradox of leadership: when a leader exerts too much control over their
 subordinates, they limit the effective-intelligence of the group to their own mental
 ability and the limited information they are receiving.
@@ -1183,12 +1183,13 @@ callbacks. Finally, we look for the big black dot and write its callback.
 
 We will follow this same workflow for each state.
 
+
 Our program is easy to think about because we break our software development
 process into small bits of work.  Our attention can linger, jump to something
 else, then use the map to refocus on our task without much effort.  As this
 focused attention fixates on the part of the map, we can think hard about what
-is going on there.  Then we can improve the map by fixing the little naming
-issues or by making slight design alterations.
+is going on there, and we can improve it by fixing the little naming issues or
+by making slight design alterations.
 
 Let's begin by writing the callbacks for the defeat_in_detail_tactic state:
 
@@ -1688,11 +1689,99 @@ Using the ``nest`` method we add the design's hierarchy:
     nest(marshal, parent=deceit_in_detail). \
     nest(waiting_to_advance, parent=marshal)
 
+Now that we have programmed Gandbold, let's have him run through his tactic and
+watch his behavior in real time:
+
+.. code-block:: python
+  :emphasize-lines: 2, 3, 7
+
+  if __name__ == '__main__':
+    print(archer.name)
+    archer.live_spy = True
+    archer.time_compression = 1.0
+    archer.start_at(deceit_in_detail)
+    archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
+    time.sleep(300.0)  # five minutes
+    pp('')
+
+Notice that I have set the live spy to true.  This will cause the state chart
+instrumentation to output the event processor's behaviour to the screen.  I have
+set the time compression to 1, which will allow our horse archer to share the same
+time reference as us.  The full cycle will take about five minutes.
+
+Watch it here:
+
+.. raw:: html
+
+  <center>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/bXaoY7-dxdE" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </center>
+
+The spy is very useful for debugging intricate issues, but it can drown us in
+detail.  If we would rather see our horse archer's maneuver in broad-strokes, we
+could use the trace instrumentation instead.  This trace instrumentation will
+only output state transitions and the events that caused them.  For this reason,
+it will not output hooks or any other actions done by the event processor that
+are important to our design.  No matter, if we have to look at it with greater
+precision, we can use the spy instead.
+
+The horse archer's 'deceit in detail' cycle takes about 3-5 minutes.  If you are
+trying to debug this; such slow feedback could harm your ability to concentrate.
+So to speed up our debugging process, and improve our ability to think about the
+problem, we compress Gandbold's time:
+
+.. code-block:: python
+  :emphasize-lines: 3,4 
+
+  if __name__ == '__main__':
+    print(archer.name)
+    archer.live_trace = True
+    archer.time_compression = 100
+    archer.start_at(deceit_in_detail)
+    archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
+    time.sleep(6.0)
+    pp('')
+
+In this video, I show Gandbold's trace running 100 times faster than our time reference:
+
 .. raw:: html
 
   <center>
   <iframe width="560" height="315" src="https://www.youtube.com/embed/K1A2xZwgryw" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
   </center>
+
+
+In this video I demonstrate how to generate sequence diagrams from the output of
+the trace information:
+
+.. raw:: html
+
+  <center>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/sagOiSn8LJs" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </center>
+
+As a technical person, you would use the diagram, the code and the
+instrumentation to think about and 'see' your design.  But, to help other people
+comprehend your efforts, you could use a sequence diagram generated from the trace
+output: 
+
+.. code-block:: python
+
+  [2018-02-24 06:53:18.711127] [Gandbold] e->start_at() top->advance
+  [2018-02-24 06:53:18.741241] [Gandbold] e->Close_Enough_For_Circle() \
+    advance->circle_and_fire
+
+  [ Chart: Gandbold ] (?)
+               top                    advance                  circle_and_fire       
+                +------start_at()------->|                            |
+                |          (?)           |                            |
+                |                        +-Close_Enough_For_Circle()->|
+                |                        |            (?)             |
+
+
+In this way, you can have your statechart instrumentation write part of your
+documentation for you.  This becomes especially useful when you start writing
+multi-chart systems, or when your designs change quickly.
 
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:
 
