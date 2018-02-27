@@ -128,7 +128,7 @@ individual group of Mongol horse archers.
 Their commander’s intent: lure the enemy away from its protecting mass and kill
 as many officers as possible.
 
-Each horse archer started a fight with 60 arrows and a scimitar.  The arrows
+Each horse archer started a fight with sixty arrows and a scimitar.  The arrows
 could be used to damage the enemy from a distance while avoiding personal risk.
 
 They would only pull their scimitar while close to their prey. But the point of
@@ -542,7 +542,7 @@ uselessly circles and then will issue a Skirmish_War_Cry.  Good, he can escape
 the "Advance" state.
 
 Notice that some code was added to the entry state of the "Skirmish" state.  Now
-if a horse archer has less than 10 arrows or no arrows, he will end up in the
+if a horse archer has less than ten arrows or no arrows, he will end up in the
 "Waiting to Lure" state.  This is good, he is no longer just uselessly riding
 around because he can start to bait knights and he can escape the "Skirmish"
 state event if he doesn't have arrows.
@@ -1128,7 +1128,7 @@ Let's reference our previous design and create the first horseman, Gandbold.
 .. image:: _static/ergotic_mongol_51.svg
     :align: center
 
-Scanning the design diagram we see he can carry 60 arrows, he should have an
+Scanning the design diagram we see he can carry sixty arrows, he should have an
 internal counter, ``tick``, some ``arrows`` and the ability to ``yell``.
 
 Gandbold moves around the battlefield slowly; and as developers, we don't want
@@ -1182,7 +1182,6 @@ arrows connecting its state rectangle to other rectangles and write those
 callbacks. Finally, we look for the big black dot and write its callback.  
 
 We will follow this same workflow for each state.
-
 
 Our program is easy to think about because we break our software development
 process into small bits of work.  Our attention can linger, jump to something
@@ -1782,6 +1781,240 @@ output:
 In this way, you can have your statechart instrumentation write part of your
 documentation for you.  This becomes especially useful when you start writing
 multi-chart systems, or when your designs change quickly.
+
+Gandbold can ride his horse around and shoot arrows, but if you added him to a
+unit of horse archer's he would get them all killed.  Let's fix this by giving
+him empathy:
+
+.. image:: _static/empathy.svg
+    :align: center
+
+This HSM shows how he could empathize with the other members in his unit, but
+how will this tie into his specific statechart?  We could create ten different
+empathy statecharts, each running in their own thread and have Gandbold publish
+his events to them and subscribe to events from them.  This would be an easy way
+to proceed even if it is kind of contemptuous of the CPU's resources and memory.
+
+Instead, I will use Gandbold's thread to drive the processing of his empathy
+state machine using the orthogonal component pattern.
+
+.. image:: _static/empathy_1.svg
+    :align: center
+
+I'll write the empathy state machine using a flat method technique then have ten
+different empathy-objects, derived from the OtherHorseArcher class, link to it
+and use it as a behavioral map.
+
+.. code-block:: python
+
+  from miros.hsm import HsmWithQueues, spy_on
+  
+  @spy_on
+  def empathy(other, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.INIT_SIGNAL):
+      status = other.trans(not_waiting)
+    elif(e.signal == signals.Other_Advance_War_Cry):
+      status = other.trans(not_waiting)
+    elif(e.signal == signals.Other_Retreat_Ready_War_Cry):
+      status = other.trans(waiting)
+    else:
+      status, other.temp.fun = return_status.SUPER, other.top
+    return status
+
+  @spy_on
+  def not_waiting(other, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.Retreat_War_Cry):
+      status = other.trans(dead)
+    elif(e.signal == signals.Advance_War_Cry):
+      status = other.trans(dead)
+    else:
+      status, other.temp.fun = return_status.SUPER, empathy
+    return status
+
+  @spy_on
+  def dead(other, e):
+    status = return_status.UNHANDLED
+    status, other.temp.fun = return_status.SUPER, empathy
+    return status
+
+  @spy_on
+  def waiting(other, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.Advance_War_Cry):
+      status = other.trans(not_waiting)
+    elif(e.signal == signals.Retreat_War_Cry):
+      status = other.trans(not_waiting)
+    else:
+      status, other.temp.fun = return_status.SUPER, not_waiting
+    return status
+
+  class OtherHorseArcher(HsmWithQueues):
+
+    def __init__(self, name='other', ip=None, time_compression=1.0):
+      super().__init__(name)
+      self.name = name
+      self.ip   = ip
+
+    def dead(self):
+      result = self.state_name == 'dead'
+      return result
+
+    def waiting(self):
+      result = self.state_name == 'waiting'
+      return result
+
+    def not_waiting(self):
+      result = self.state_name == 'not_waiting'
+      return result
+
+Above is an empathy state machine and a class, whose objects would like to link
+to this state machine.  But, the actual linking doesn't happen until you take the
+event processor within an object derived from the OtherHorseArcher class and
+tell it which HSM to use.  This is done with the ``start_at`` method:
+
+.. code-block:: python
+
+  oha_1 = OtherHorseArcher('Hulagu')
+  oha_1.start_at(empathy)
+
+How do these empathy statecharts build up Gandbold's concept of his military
+unit?  The construction of this currently isn't in his 'defeat in detail
+tactic'; it doesn't belong there.  There must be some outer, yet-to-be-defined
+state, which builds up his ideas about how he fits in with the overall horde.
+
+Let's write some code that could do this; remember that our botnet will be on a
+network, so each node will already have a name: it's IP address.
+
+Let's wrap our "deceit in detail tactic" state with something that can be used
+to capture this discovery process.  Here is a UML diagram the describes our new
+design.
+
+.. image:: _static/ergotic_mongol_8.svg
+    :align: center
+
+A horse archer object contains 10 "other horse archer" objects which are each
+tied to the empathy state chart.  When a horse archer enters battle he takes
+note of who is going into battle with him; then tracks their state.  Then he
+begins the "deceit in detail tactic".
+
+.. note::
+
+  To see how the HorseArcher and OtherHorseArcher object's relate to each other in
+  the object inheritance hierarchy I have included the generalization arrows.  The
+  HorseArcher is a generalization of the Factory (allows callbacks), which is a
+  generalization of the ActiveObject (which provides threads) which is a
+  generalization of the HsmWithQueues.  The OtherHorseArcher class only derives
+  itself from the HsmWithQueues class because it doesn't need callbacks or a
+  thread; the horse archer will provide the thread of operation for each object
+  tracking other horse archer's within him (remember that we are using the
+  orthogonal component state chart pattern).  Callbacks are not required because
+  we are using the flat method of writing HSMs for the empathy state machine.
+
+To add this outer state to our previous design, we would create two battle
+callbacks, a battle state, adjust the nesting and how the 'others' items are
+being called within code that we wrote before:
+
+To skip to the other side of this code listing, click :ref:`here<other_size_of_empathy_listing>`.
+
+.. include:: i_mongol_with_empathy_code_listing.rst
+
+.. _other_size_of_empathy_listing:
+
+We see that the listing does more than just add an empathy statechart.  It fixes
+some missing items in the original horse archer statechart.  
+
+The previous empathy design features were added using hand waving and
+imagination, rather than testing.  To confirm that the orthogonal component of
+the statechart was working I had to first test it's individual HSM, then
+ensure that the horse archer's main statechart was feeding in the correct
+signals to run each empathy state machine.
+
+In doing this, I found a bunch of design and software bugs.  These issues were
+corrected, and you can see them in the above diff.  We are making mistakes in
+the right direction.
+
+To test the empathy state machine, I build up a other horse archer empathy
+object and tied it to the outer state of the empathy HSM.  The I started it, and
+sent a bunch of signals to it; and confirmed that that matched behavior drawing
+to the diagram by referencing the trace instrumentation:
+
+.. code-block:: python
+
+  oha = OtherHorseArcher()
+  oha.start_at(empathy)
+  oha.post_fifo(Event(signal=signals.Other_Retreat_Ready_War_Cry))
+  oha.post_fifo(Event(signal=signals.Retreat_War_Cry))
+  oha.post_fifo(Event(signal=signals.Advance_War_Cry))
+  oha.post_fifo(Event(signal=signals.Advance_War_Cry))
+  oha.post_fifo(Event(signal=signals.Other_Advance_War_Cry))
+  oha.post_fifo(Event(signal=signals.Other_Retreat_Ready_War_Cry))
+  oha.post_fifo(Event(signal=signals.Advance_War_Cry))
+  oha.post_fifo(Event(signal=signals.Advance_War_Cry))
+  oha.complete_circuit() # no thread drives this, so we force it run
+  time.sleep(0.2)
+
+  print(oha.trace())
+
+This produced the following a trace.  It wasn't what I wanted.  I wrestled with
+the empathy HSM until it looked like what I wanted; and it's trace looked
+something like this:
+
+.. code-block:: python
+
+  [10:59:17.592835] [other] e->start_at() top->not_waiting
+  [10:59:17.593095] [other] e->Other_Retreat_Ready_War_Cry() not_waiting->waiting
+  [10:59:17.593384] [other] e->Retreat_War_Cry() waiting->not_waiting
+  [10:59:17.593570] [other] e->Advance_War_Cry() not_waiting->dead
+  [10:59:17.593886] [other] e->Other_Advance_War_Cry() dead->not_waiting
+  [10:59:17.594120] [other] e->Other_Retreat_Ready_War_Cry() not_waiting->waiting
+  [10:59:17.594381] [other] e->Advance_War_Cry() waiting->not_waiting
+  [10:59:17.594557] [other] e->Advance_War_Cry() not_waiting->dead
+
+I compared the output of this trace against the diagram, and concluded that it
+was what I wanted.
+
+To lock this into a regression test, we can use the ``stripped`` context manager:
+
+.. code-block:: python
+
+  oha = OtherHorseArcher()
+  oha.start_at(empathy)
+  oha.post_fifo(Event(signal=signals.Other_Retreat_Ready_War_Cry))
+  oha.post_fifo(Event(signal=signals.Retreat_War_Cry))
+  oha.post_fifo(Event(signal=signals.Advance_War_Cry))
+  oha.post_fifo(Event(signal=signals.Advance_War_Cry))
+  oha.post_fifo(Event(signal=signals.Other_Advance_War_Cry))
+  oha.post_fifo(Event(signal=signals.Other_Retreat_Ready_War_Cry))
+  oha.post_fifo(Event(signal=signals.Advance_War_Cry))
+  oha.post_fifo(Event(signal=signals.Advance_War_Cry))
+  oha.complete_circuit()
+  expected_empathy_trace = \
+  '''
+  [17.592835] [other] e->start_at() top->not_waiting
+  [17.593095] [other] e->Other_Retreat_Ready_War_Cry() not_waiting->waiting
+  [17.593384] [other] e->Retreat_War_Cry() waiting->not_waiting
+  [17.593570] [other] e->Advance_War_Cry() not_waiting->dead
+  [17.593886] [other] e->Other_Advance_War_Cry() dead->not_waiting
+  [17.594120] [other] e->Other_Retreat_Ready_War_Cry() not_waiting->waiting
+  [17.594381] [other] e->Advance_War_Cry() waiting->not_waiting
+  [17.594557] [other] e->Advance_War_Cry() not_waiting->dead
+  '''
+  time.sleep(1.0)
+  with stripped(expected_empathy_trace) as stripped_target, \
+       stripped(oha.trace()) as stripped_trace_result:
+  
+    for target, result in zip(stripped_target, stripped_trace_result):
+      assert(target == result)
+
+This rips out the datetime stamp and compares the tail part of each trace line.
+Now we trust the horse archer's ability to ride around on the field and it's
+individual empathy HSM; but we do not trust that the horse archer's statechart
+will feel the required signals into each one of it's empathy HSMs.
+
+Here is how I tested that this empathy HSM was being fed it's required signals by the horse
+archer statechart.
 
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:
 
