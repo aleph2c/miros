@@ -1963,14 +1963,14 @@ something like this:
 
 .. code-block:: python
 
-  [10:59:17.592835] [other] e->start_at() top->not_waiting
-  [10:59:17.593095] [other] e->Other_Retreat_Ready_War_Cry() not_waiting->waiting
-  [10:59:17.593384] [other] e->Retreat_War_Cry() waiting->not_waiting
-  [10:59:17.593570] [other] e->Advance_War_Cry() not_waiting->dead
-  [10:59:17.593886] [other] e->Other_Advance_War_Cry() dead->not_waiting
-  [10:59:17.594120] [other] e->Other_Retreat_Ready_War_Cry() not_waiting->waiting
-  [10:59:17.594381] [other] e->Advance_War_Cry() waiting->not_waiting
-  [10:59:17.594557] [other] e->Advance_War_Cry() not_waiting->dead
+  [17.592835] [other] e->start_at() top->not_waiting
+  [17.593095] [other] e->Other_Retreat_Ready_War_Cry() not_waiting->waiting
+  [17.593384] [other] e->Retreat_War_Cry() waiting->not_waiting
+  [17.593570] [other] e->Advance_War_Cry() not_waiting->dead
+  [17.593886] [other] e->Other_Advance_War_Cry() dead->not_waiting
+  [17.594120] [other] e->Other_Retreat_Ready_War_Cry() not_waiting->waiting
+  [17.594381] [other] e->Advance_War_Cry() waiting->not_waiting
+  [17.594557] [other] e->Advance_War_Cry() not_waiting->dead
 
 I compared the output of this trace against the diagram, and concluded that it
 was what I wanted.
@@ -2013,8 +2013,8 @@ Now we trust the horse archer's ability to ride around on the field and it's
 individual empathy HSM; but we do not trust that the horse archer's statechart
 will feel the required signals into each one of it's empathy HSMs.
 
-Here is how I tested that this empathy HSM was being fed it's required signals by the horse
-archer statechart.
+Here is how I tested that this empathy HSM was being fed it's required signals
+by the horse archer statechart.
 
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:
 
