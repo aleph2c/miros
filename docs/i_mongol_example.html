@@ -59,7 +59,7 @@ one node remains.</p>
 <p><strong>Example Background:</strong></p>
 <ul class="simple">
 <li><a class="reference internal" href="#i-mongol-example-historical-context"><span class="std std-ref">Historical Context</span></a></li>
-<li><span class="xref std std-ref">Deceit in Detail</span></li>
+<li><a class="reference internal" href="#i-mongol-example-distributed-officers"><span class="std std-ref">Deceit in Detail</span></a></li>
 <li><a class="reference internal" href="#i-mongol-example-modelling-the-mongol-mind"><span class="std std-ref">Modelling the Mongol Mind</span></a></li>
 </ul>
 <p><strong>Example Software:</strong></p>
@@ -135,11 +135,10 @@ opposing force lacked to mobility to catch or surround the Mongols.</p>
 terrain. The opposing force would be lead away from their strong point, exposing
 a supply line and become small enough that the Mongols could attack them en
 masse with numerical superiority.</p>
-<p>This tactic is called “Defeat in Detail”.
-.. _i_mongol_example-distributed-officers:</p>
+<p>This tactic is called “Defeat in Detail”.</p>
 </div>
 <div class="section" id="deceit-in-detail">
-<h2>Deceit in Detail<a class="headerlink" href="#deceit-in-detail" title="Permalink to this headline">¶</a></h2>
+<span id="i-mongol-example-distributed-officers"></span><h2>Deceit in Detail<a class="headerlink" href="#deceit-in-detail" title="Permalink to this headline">¶</a></h2>
 <p>Now let’s talk about a specific “Defeat in Detail” set of tactics used by an
 individual group of Mongol horse archers.</p>
 <p>Their commander’s intent: lure the enemy away from its protecting mass and kill
@@ -1615,25 +1614,25 @@ to capture this discovery process.  Here is a UML diagram the describes our new
 design.</p>
 <div align="center" class="align-center"><img alt="_images/ergotic_mongol_8.svg" src="_images/ergotic_mongol_8.svg" /></div>
 <p>A horse archer object contains 10 “other horse archer” objects which are each
-tied to the empathy state chart.  When a horse archer enters battle he takes
-note of who is going into battle with him; then tracks their state.  Then he
-begins the “deceit in detail tactic”.</p>
+tied to the empathy statechart.  When a horse archer enters battle he takes note
+of who is going into battle with him; then tracks their state.  Then he begins
+his “deceit in detail tactic.”</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">To see how the HorseArcher and OtherHorseArcher object’s relate to each other in
-the object inheritance hierarchy I have included the generalization arrows.  The
+the object inheritance hierarchy I have included the generalization arrows. The
 HorseArcher is a generalization of the Factory (allows callbacks), which is a
 generalization of the ActiveObject (which provides threads) which is a
-generalization of the HsmWithQueues.  The OtherHorseArcher class only derives
+generalization of the HsmWithQueues. The OtherHorseArcher class only derives
 itself from the HsmWithQueues class because it doesn’t need callbacks or a
 thread; the horse archer will provide the thread of operation for each object
 tracking other horse archer’s within him (remember that we are using the
-orthogonal component state chart pattern).  Callbacks are not required because
-we are using the flat method of writing HSMs for the empathy state machine.</p>
+orthogonal component state chart pattern). Callbacks are not required because we
+are using the flat method of writing HSMs for the empathy state machine.</p>
 </div>
 <p>To add this outer state to our previous design, we would create two battle
 callbacks, a battle state, adjust the nesting and how the ‘others’ items are
-being called within code that we wrote before:</p>
+being called within the code that we wrote before.</p>
 <p>To skip to the other side of this code listing, click <a class="reference internal" href="#other-size-of-empathy-listing"><span class="std std-ref">here</span></a>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">random</span>
@@ -2247,22 +2246,31 @@ being called within code that we wrote before:</p>
   <span class="n">nest</span><span class="p">(</span><span class="n">waiting_to_advance</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">marshal</span><span class="p">)</span>
 </pre></div>
 </div>
-<p id="other-size-of-empathy-listing">We see that the listing does more than just add an empathy statechart.  It fixes
-some missing items in the original horse archer statechart.</p>
+<p id="other-size-of-empathy-listing">We see that the above listing does more than just add an empathy statechart.  It
+fixes some missing items in the original horse archer statechart.</p>
 <p>The previous empathy design features were added using hand waving and
-imagination, rather than testing.  To confirm that the orthogonal component of
-the statechart was working I had to first test it’s individual HSM, then
-ensure that the horse archer’s main statechart was feeding in the correct
-signals to run each empathy state machine.</p>
+imagination, rather than testing.  So, it was pretty much guaranteed not to work.</p>
+<p>To see how the orthogonal components were behaving, I first had to test it’s
+individual HSM, then ensure that the horse archer’s main statechart was feeding
+in the correct set of events to run each of the empathy state machines.</p>
 <p>In doing this, I found a bunch of design and software bugs.  These issues were
-corrected, and you can see them in the above diff.  We are making mistakes in
-the right direction.</p>
-<p>To test the empathy state machine, I build up a other horse archer empathy
-object and tied it to the outer state of the empathy HSM.  The I started it, and
-sent a bunch of signals to it; and confirmed that that matched behavior drawing
-to the diagram by referencing the trace instrumentation:</p>
+corrected, and you can see them in the above diff (the highlighted code in the
+above listing).</p>
+<p>To test the empathy state machine, I built up another-horse-archer empathy
+object (oha) and tied it to the outer state of the empathy HSM.  Then I started
+it and sent it all of the events pictured in the empathy HSM diagram.  I used
+its trace instrumentation to see how it reacted to these events; by comparing
+this reaction to the HSM diagram, I confirmed that the HSM in the code was
+matching the HSM in the picture.</p>
+<div align="center" class="align-center"><img alt="_images/empathy_1.svg" src="_images/empathy_1.svg" /></div>
+<p>Notice the use of the <code class="docutils literal"><span class="pre">complete_circuit</span></code> method in the following code listing.
+The oha object doesn’t have its own thread; it’s derived from the HsmWithQueues
+class.  With no thread to drive the next run-to-completion event, the oha object
+can’t pull events from its queue and force it’s HSM to react to them.  The
+<code class="docutils literal"><span class="pre">complete_circuit</span></code> method, uses the main operating thread to drive events from
+the empathy FIFO into its HSM.  It will run until its FIFO is empty.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">oha</span> <span class="o">=</span> <span class="n">OtherHorseArcher</span><span class="p">()</span>
-<span class="n">oha</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">empathy</span><span class="p">)</span>
+<span class="n">oha</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">empathy</span><span class="p">)</span>  <span class="c1"># tie oha to outer state of empathy hsm</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">))</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">))</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Advance_War_Cry</span><span class="p">))</span>
@@ -2277,9 +2285,8 @@ to the diagram by referencing the trace instrumentation:</p>
 <span class="k">print</span><span class="p">(</span><span class="n">oha</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>This produced the following a trace.  It wasn’t what I wanted.  I wrestled with
-the empathy HSM until it looked like what I wanted; and it’s trace looked
-something like this:</p>
+<p>This code created the feedback I needed to fix my empathy HSM.  To begin with it
+was completely wrong, so I changed the HSM code until it matched what I was expecting:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">17.592835</span><span class="p">]</span> <span class="p">[</span><span class="n">other</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
 <span class="p">[</span><span class="mf">17.593095</span><span class="p">]</span> <span class="p">[</span><span class="n">other</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">()</span> <span class="n">not_waiting</span><span class="o">-&gt;</span><span class="n">waiting</span>
 <span class="p">[</span><span class="mf">17.593384</span><span class="p">]</span> <span class="p">[</span><span class="n">other</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Retreat_War_Cry</span><span class="p">()</span> <span class="n">waiting</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
@@ -2290,11 +2297,15 @@ something like this:</p>
 <span class="p">[</span><span class="mf">17.594557</span><span class="p">]</span> <span class="p">[</span><span class="n">other</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Advance_War_Cry</span><span class="p">()</span> <span class="n">not_waiting</span><span class="o">-&gt;</span><span class="n">dead</span>
 </pre></div>
 </div>
-<p>I compared the output of this trace against the diagram, and concluded that it
-was what I wanted.</p>
-<p>To lock this into a regression test, we can use the <code class="docutils literal"><span class="pre">stripped</span></code> context manager:</p>
+<p>I would like to convert this instrumentation output into a code snippet so that
+a regression test could use it as a specification.  But the trace output
+contains date-time information, so if I compared it with another trace they
+would never match, because they are logging different times.</p>
+<p>The <code class="docutils literal"><span class="pre">stripped</span></code> context manager, pulls off all date-time information and allows
+test code to compare old trace outputs, to new trace outputs.  So I used the
+<code class="docutils literal"><span class="pre">stripped</span></code> context manager to build up the following test code:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">oha</span> <span class="o">=</span> <span class="n">OtherHorseArcher</span><span class="p">()</span>
-<span class="n">oha</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">empathy</span><span class="p">)</span>
+<span class="n">oha</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">empathy</span>  <span class="c1"># tie oha to outer state of empathy hsm)</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">))</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">))</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Advance_War_Cry</span><span class="p">))</span>
@@ -2303,7 +2314,7 @@ was what I wanted.</p>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">))</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Advance_War_Cry</span><span class="p">))</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Advance_War_Cry</span><span class="p">))</span>
-<span class="n">oha</span><span class="o">.</span><span class="n">complete_circuit</span><span class="p">()</span>
+<span class="n">oha</span><span class="o">.</span><span class="n">complete_circuit</span><span class="p">()</span> <span class="c1"># no thread drives this, so we force it run</span>
 <span class="n">expected_empathy_trace</span> <span class="o">=</span> \
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">[17.592835] [other] e-&gt;start_at() top-&gt;not_waiting</span>
@@ -2323,15 +2334,217 @@ was what I wanted.</p>
     <span class="k">assert</span><span class="p">(</span><span class="n">target</span> <span class="o">==</span> <span class="n">result</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This rips out the datetime stamp and compares the tail part of each trace line.
-Now we trust the horse archer’s ability to ride around on the field and it’s
-individual empathy HSM; but we do not trust that the horse archer’s statechart
-will feel the required signals into each one of it’s empathy HSMs.</p>
-<p>Here is how I tested that this empathy HSM was being fed it’s required signals
-by the horse archer statechart.</p>
+<p>The horse archer can now empathize, but he can’t link what he experiences on the
+field of battle with this ability.  He can’t track the members of his unit in
+his head yet.</p>
+<p>Gandbold’s statechart has a thread which came from his ActiveObject
+ancestral-class.  This thread will continuously pluck events from his queues and
+react to these events by driving them through his battle and empathy state
+machines.  The battle state machine uses the <code class="docutils literal"><span class="pre">dispatch</span></code> method to push a
+subset of its experiences into his empathy HSMs.  The thread does the work of
+pulling items off of his queues, so we do not need to use the
+<code class="docutils literal"><span class="pre">complete_circuit</span></code> method anymore.  You will only need to use
+<code class="docutils literal"><span class="pre">complete_circuit</span></code> when you have an event processor derived from an
+HsmWithQueues class or any of its ancestors.</p>
+<p>We need to confirm that his battle HSM dispatches the events required to drive
+his empathy.</p>
+<p>To test that Gandbold could send his experienced events into his empathy HSM, I
+first looked at the empathy HSM picture and decided what events had to be sent
+to it.  Then, I plucked a single empathy HSM out of Gandbold’s mind so that I
+could see how it was working.</p>
+<p>It would be hard to understand what Gandbold was thinking and empathizing about
+while in the heat of battle, so I stopped time for him.  Then I send him the
+events that I wanted him to dispatch into his empathy HSM.  Upon doing this I
+could look at the empathy object and use trace instrumentation to see if it was
+behaving properly.</p>
+<p>We already know the empathy HSM is working, so if it wasn’t working properly in
+this test it was because Gandbold wasn’t dispatching to it.</p>
+<div align="center" class="align-center"><img alt="_images/empathy_1.svg" src="_images/empathy_1.svg" /></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># stop time for the horse archer so that we can test his empathy reactions</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Second</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c1">#  stop looking at his reactions</span>
+
+<span class="c1"># get the name of his first and last brother in arms</span>
+<span class="n">others</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">others</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+<span class="n">first_brothers_name</span> <span class="o">=</span> <span class="n">others</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">empathy_for_first_brother</span> <span class="o">=</span> \
+  <span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">first_brothers_name</span><span class="p">]</span>
+<span class="n">last_brothers_name</span> <span class="o">=</span> <span class="n">others</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">last_brothers_name</span><span class="p">]</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">first_brothers_name</span><span class="p">]</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+
+<span class="c1"># confirm paths in empathy chart</span>
+<span class="c1"># confirm not_waiting paths</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Advance_War_Cry</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Skirmish_War_Cry</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Retreat_War_Cry</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+
+<span class="c1"># confirm path to dead</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Advance_War_Cry</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Advance_War_Cry</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+
+<span class="c1"># confirm path to waiting</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Ready_War_Cry</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+
+<span class="c1"># confirm paths from waiting to not waiting</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Advance_War_Cry</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">empathy_for_first_brother</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>This will output the following empathy trace:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">18</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
+<span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Other_Advance_War_Cry</span><span class="p">()</span> <span class="n">not_waiting</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
+<span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Other_Skirmish_War_Cry</span><span class="p">()</span> <span class="n">not_waiting</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
+<span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Other_Retreat_War_Cry</span><span class="p">()</span> <span class="n">not_waiting</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
+<span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Advance_War_Cry</span><span class="p">()</span> <span class="n">not_waiting</span><span class="o">-&gt;</span><span class="n">dead</span>
+<span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Other_Advance_War_Cry</span><span class="p">()</span> <span class="n">dead</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
+<span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Retreat_War_Cry</span><span class="p">()</span> <span class="n">not_waiting</span><span class="o">-&gt;</span><span class="n">dead</span>
+<span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">()</span> <span class="n">dead</span><span class="o">-&gt;</span><span class="n">waiting</span>
+<span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Other_Ready_War_Cry</span><span class="p">()</span> <span class="n">waiting</span><span class="o">-&gt;</span><span class="n">waiting</span>
+<span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">()</span> <span class="n">waiting</span><span class="o">-&gt;</span><span class="n">waiting</span>
+<span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Advance_War_Cry</span><span class="p">()</span> <span class="n">waiting</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
+<span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">()</span> <span class="n">not_waiting</span><span class="o">-&gt;</span><span class="n">waiting</span>
+<span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Retreat_War_Cry</span><span class="p">()</span> <span class="n">waiting</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
+</pre></div>
+</div>
+<p>So Gandbold can track Altan’s shouts and make reasonable guesses about what he
+is doing on the battlefield.  The code listing below demonstrates how to turn
+this trace and lock in Gandbold’s expected behaviour, as a regression test:</p>
+<p>To skip to the other side of this code listing, click <a class="reference internal" href="#other-size-of-regression-test"><span class="std std-ref">here</span></a>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># start time</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ResetTactic</span><span class="p">))</span>
+
+<span class="c1"># wait a bit</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># stop time</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Second</span><span class="p">))</span>
+
+<span class="c1"># get first brother</span>
+<span class="n">others</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">others</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+<span class="n">first_brothers_name</span> <span class="o">=</span> <span class="n">others</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">empathy_for_first_brother</span> <span class="o">=</span> \
+  <span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">first_brothers_name</span><span class="p">]</span>
+
+<span class="c1"># prime the pump and clear the trace of the first brother</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Advance_War_Cry</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">empathy_for_first_brother</span><span class="o">.</span><span class="n">clear_trace</span><span class="p">()</span>
+
+<span class="c1"># confirm paths in empathy chart</span>
+
+<span class="c1"># confirm not_waiting paths</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Advance_War_Cry</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Skirmish_War_Cry</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Retreat_War_Cry</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+
+<span class="c1"># confirm path to dead</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Advance_War_Cry</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Advance_War_Cry</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+
+<span class="c1"># confirm path to waiting</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Ready_War_Cry</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+
+<span class="c1"># confirm paths from waiting to not waiting</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Advance_War_Cry</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+<span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span>
+    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">first_brothers_name</span><span class="p">))</span>
+
+<span class="c1"># wait a bit</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.1</span><span class="p">)</span>
+
+<span class="c1"># compare trace output with expected output (remove name)</span>
+<span class="n">expected_empathy_target_trace</span> <span class="o">=</span> \
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">[07:06:53.42] [Altan_192.168.0.10] e-&gt;Other_Advance_War_Cry() not_waiting-&gt;not_waiting</span>
+<span class="sd">[07:06:53.42] [Altan_192.168.0.10] e-&gt;Other_Skirmish_War_Cry() not_waiting-&gt;not_waiting</span>
+<span class="sd">[07:06:53.43] [Altan_192.168.0.10] e-&gt;Other_Retreat_War_Cry() not_waiting-&gt;not_waiting</span>
+<span class="sd">[07:06:53.44] [Altan_192.168.0.10] e-&gt;Advance_War_Cry() not_waiting-&gt;dead</span>
+<span class="sd">[07:06:53.45] [Altan_192.168.0.10] e-&gt;Other_Advance_War_Cry() dead-&gt;not_waiting</span>
+<span class="sd">[07:06:53.45] [Altan_192.168.0.10] e-&gt;Retreat_War_Cry() not_waiting-&gt;dead</span>
+<span class="sd">[07:06:53.45] [Altan_192.168.0.10] e-&gt;Other_Retreat_Ready_War_Cry() dead-&gt;waiting</span>
+<span class="sd">[07:06:53.45] [Altan_192.168.0.10] e-&gt;Other_Ready_War_Cry() waiting-&gt;waiting</span>
+<span class="sd">[07:06:53.45] [Altan_192.168.0.10] e-&gt;Other_Retreat_Ready_War_Cry() waiting-&gt;waiting</span>
+<span class="sd">[07:06:53.45] [Altan_192.168.0.10] e-&gt;Advance_War_Cry() waiting-&gt;not_waiting</span>
+<span class="sd">[07:06:53.45] [Altan_192.168.0.10] e-&gt;Other_Retreat_Ready_War_Cry() not_waiting-&gt;waiting</span>
+<span class="sd">[07:06:53.45] [Altan_192.168.0.10] e-&gt;Retreat_War_Cry() waiting-&gt;not_waiting</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="k">with</span> <span class="n">stripped</span><span class="p">(</span><span class="n">expected_empathy_target_trace</span><span class="p">)</span> <span class="k">as</span> <span class="n">stripped_target</span><span class="p">,</span> \
+     <span class="n">stripped</span><span class="p">(</span><span class="n">empathy_for_first_brother</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="k">as</span> <span class="n">stripped_trace_result</span><span class="p">:</span>
+  <span class="k">for</span> <span class="n">target</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">stripped_target</span><span class="p">,</span> <span class="n">stripped_trace_result</span><span class="p">):</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">target</span> <span class="o">==</span> <span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="instrumenting-to-debug-the-mongol-botnet">
-<span id="i-mongol-example-instrumenting-to-debug-the-botnet"></span><h2>Instrumenting to Debug the Mongol Botnet<a class="headerlink" href="#instrumenting-to-debug-the-mongol-botnet" title="Permalink to this headline">¶</a></h2>
+<span id="i-mongol-example-instrumenting-to-debug-the-botnet"></span><span id="other-size-of-regression-test"></span><h2>Instrumenting to Debug the Mongol Botnet<a class="headerlink" href="#instrumenting-to-debug-the-mongol-botnet" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="implementing-the-mongol-in-miros">
 <span id="i-mongol-example-implementing-the-mongol-in-miros"></span><h2>Implementing the Mongol in miros<a class="headerlink" href="#implementing-the-mongol-in-miros" title="Permalink to this headline">¶</a></h2>

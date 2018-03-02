@@ -118,6 +118,7 @@ a supply line and become small enough that the Mongols could attack them en
 masse with numerical superiority.
 
 This tactic is called “Defeat in Detail”.
+
 .. _i_mongol_example-distributed-officers:
 
 Deceit in Detail
@@ -1895,26 +1896,26 @@ design.
     :align: center
 
 A horse archer object contains 10 "other horse archer" objects which are each
-tied to the empathy state chart.  When a horse archer enters battle he takes
-note of who is going into battle with him; then tracks their state.  Then he
-begins the "deceit in detail tactic".
+tied to the empathy statechart.  When a horse archer enters battle he takes note
+of who is going into battle with him; then tracks their state.  Then he begins
+his "deceit in detail tactic."
 
 .. note::
 
-  To see how the HorseArcher and OtherHorseArcher object's relate to each other in
-  the object inheritance hierarchy I have included the generalization arrows.  The
+  To see how the HorseArcher and OtherHorseArcher object’s relate to each other in
+  the object inheritance hierarchy I have included the generalization arrows. The
   HorseArcher is a generalization of the Factory (allows callbacks), which is a
   generalization of the ActiveObject (which provides threads) which is a
-  generalization of the HsmWithQueues.  The OtherHorseArcher class only derives
-  itself from the HsmWithQueues class because it doesn't need callbacks or a
+  generalization of the HsmWithQueues. The OtherHorseArcher class only derives
+  itself from the HsmWithQueues class because it doesn’t need callbacks or a
   thread; the horse archer will provide the thread of operation for each object
-  tracking other horse archer's within him (remember that we are using the
-  orthogonal component state chart pattern).  Callbacks are not required because
-  we are using the flat method of writing HSMs for the empathy state machine.
+  tracking other horse archer’s within him (remember that we are using the
+  orthogonal component state chart pattern). Callbacks are not required because we
+  are using the flat method of writing HSMs for the empathy state machine.
 
 To add this outer state to our previous design, we would create two battle
 callbacks, a battle state, adjust the nesting and how the 'others' items are
-being called within code that we wrote before:
+being called within the code that we wrote before.
 
 To skip to the other side of this code listing, click :ref:`here<other_size_of_empathy_listing>`.
 
@@ -1922,28 +1923,41 @@ To skip to the other side of this code listing, click :ref:`here<other_size_of_e
 
 .. _other_size_of_empathy_listing:
 
-We see that the listing does more than just add an empathy statechart.  It fixes
-some missing items in the original horse archer statechart.  
+We see that the above listing does more than just add an empathy statechart.  It
+fixes some missing items in the original horse archer statechart.  
 
 The previous empathy design features were added using hand waving and
-imagination, rather than testing.  To confirm that the orthogonal component of
-the statechart was working I had to first test it's individual HSM, then
-ensure that the horse archer's main statechart was feeding in the correct
-signals to run each empathy state machine.
+imagination, rather than testing.  So, it was pretty much guaranteed not to work.
+
+To see how the orthogonal components were behaving, I first had to test it's
+individual HSM, then ensure that the horse archer's main statechart was feeding
+in the correct set of events to run each of the empathy state machines.
 
 In doing this, I found a bunch of design and software bugs.  These issues were
-corrected, and you can see them in the above diff.  We are making mistakes in
-the right direction.
+corrected, and you can see them in the above diff (the highlighted code in the
+above listing).
 
-To test the empathy state machine, I build up a other horse archer empathy
-object and tied it to the outer state of the empathy HSM.  The I started it, and
-sent a bunch of signals to it; and confirmed that that matched behavior drawing
-to the diagram by referencing the trace instrumentation:
+To test the empathy state machine, I built up another-horse-archer empathy
+object (oha) and tied it to the outer state of the empathy HSM.  Then I started
+it and sent it all of the events pictured in the empathy HSM diagram.  I used
+its trace instrumentation to see how it reacted to these events; by comparing
+this reaction to the HSM diagram, I confirmed that the HSM in the code was
+matching the HSM in the picture.
+
+.. image:: _static/empathy_1.svg
+    :align: center
+
+Notice the use of the ``complete_circuit`` method in the following code listing.
+The oha object doesn't have its own thread; it's derived from the HsmWithQueues
+class.  With no thread to drive the next run-to-completion event, the oha object
+can't pull events from its queue and force it's HSM to react to them.  The
+``complete_circuit`` method, uses the main operating thread to drive events from
+the empathy FIFO into its HSM.  It will run until its FIFO is empty.
 
 .. code-block:: python
 
   oha = OtherHorseArcher()
-  oha.start_at(empathy)
+  oha.start_at(empathy)  # tie oha to outer state of empathy hsm
   oha.post_fifo(Event(signal=signals.Other_Retreat_Ready_War_Cry))
   oha.post_fifo(Event(signal=signals.Retreat_War_Cry))
   oha.post_fifo(Event(signal=signals.Advance_War_Cry))
@@ -1957,9 +1971,8 @@ to the diagram by referencing the trace instrumentation:
 
   print(oha.trace())
 
-This produced the following a trace.  It wasn't what I wanted.  I wrestled with
-the empathy HSM until it looked like what I wanted; and it's trace looked
-something like this:
+This code created the feedback I needed to fix my empathy HSM.  To begin with it
+was completely wrong, so I changed the HSM code until it matched what I was expecting:
 
 .. code-block:: python
 
@@ -1972,15 +1985,19 @@ something like this:
   [17.594381] [other] e->Advance_War_Cry() waiting->not_waiting
   [17.594557] [other] e->Advance_War_Cry() not_waiting->dead
 
-I compared the output of this trace against the diagram, and concluded that it
-was what I wanted.
+I would like to convert this instrumentation output into a code snippet so that
+a regression test could use it as a specification.  But the trace output
+contains date-time information, so if I compared it with another trace they
+would never match, because they are logging different times.
 
-To lock this into a regression test, we can use the ``stripped`` context manager:
+The ``stripped`` context manager, pulls off all date-time information and allows
+test code to compare old trace outputs, to new trace outputs.  So I used the
+``stripped`` context manager to build up the following test code:
 
 .. code-block:: python
 
   oha = OtherHorseArcher()
-  oha.start_at(empathy)
+  oha.start_at(empathy  # tie oha to outer state of empathy hsm)
   oha.post_fifo(Event(signal=signals.Other_Retreat_Ready_War_Cry))
   oha.post_fifo(Event(signal=signals.Retreat_War_Cry))
   oha.post_fifo(Event(signal=signals.Advance_War_Cry))
@@ -1989,7 +2006,7 @@ To lock this into a regression test, we can use the ``stripped`` context manager
   oha.post_fifo(Event(signal=signals.Other_Retreat_Ready_War_Cry))
   oha.post_fifo(Event(signal=signals.Advance_War_Cry))
   oha.post_fifo(Event(signal=signals.Advance_War_Cry))
-  oha.complete_circuit()
+  oha.complete_circuit() # no thread drives this, so we force it run
   expected_empathy_trace = \
   '''
   [17.592835] [other] e->start_at() top->not_waiting
@@ -2008,13 +2025,229 @@ To lock this into a regression test, we can use the ``stripped`` context manager
     for target, result in zip(stripped_target, stripped_trace_result):
       assert(target == result)
 
-This rips out the datetime stamp and compares the tail part of each trace line.
-Now we trust the horse archer's ability to ride around on the field and it's
-individual empathy HSM; but we do not trust that the horse archer's statechart
-will feel the required signals into each one of it's empathy HSMs.
+The horse archer can now empathize, but he can't link what he experiences on the
+field of battle with this ability.  He can't track the members of his unit in
+his head yet.
 
-Here is how I tested that this empathy HSM was being fed it's required signals
-by the horse archer statechart.
+Gandbold's statechart has a thread which came from his ActiveObject
+ancestral-class.  This thread will continuously pluck events from his queues and
+react to these events by driving them through his battle and empathy state
+machines.  The battle state machine uses the ``dispatch`` method to push a
+subset of its experiences into his empathy HSMs.  The thread does the work of
+pulling items off of his queues, so we do not need to use the
+``complete_circuit`` method anymore.  You will only need to use
+``complete_circuit`` when you have an event processor derived from an
+HsmWithQueues class or any of its ancestors.
+
+We need to confirm that his battle HSM dispatches the events required to drive
+his empathy.
+
+To test that Gandbold could send his experienced events into his empathy HSM, I
+first looked at the empathy HSM picture and decided what events had to be sent
+to it.  Then, I plucked a single empathy HSM out of Gandbold's mind so that I
+could see how it was working.
+
+It would be hard to understand what Gandbold was thinking and empathizing about
+while in the heat of battle, so I stopped time for him.  Then I send him the
+events that I wanted him to dispatch into his empathy HSM.  Upon doing this I
+could look at the empathy object and use trace instrumentation to see if it was
+behaving properly.
+
+We already know the empathy HSM is working, so if it wasn't working properly in
+this test it was because Gandbold wasn't dispatching to it.
+
+.. image:: _static/empathy_1.svg
+    :align: center
+
+.. code-block:: python
+
+  # stop time for the horse archer so that we can test his empathy reactions
+  archer.cancel_events(Event(signal=signals.Second))
+  time.sleep(1.0)
+  archer.live_trace = False  #  stop looking at his reactions
+
+  # get the name of his first and last brother in arms
+  others = list(archer.others.keys())
+  others.sort()
+  first_brothers_name = others[0]
+  empathy_for_first_brother = \
+    archer.others[first_brothers_name]
+  last_brothers_name = others[-1]
+  print(archer.others[last_brothers_name].trace())
+  print(archer.others[first_brothers_name].trace())
+
+  # confirm paths in empathy chart
+  # confirm not_waiting paths
+  archer.post_fifo(
+    Event(signal=signals.Other_Advance_War_Cry, payload=first_brothers_name))
+  archer.post_fifo(
+    Event(signal=signals.Other_Skirmish_War_Cry, payload=first_brothers_name))
+  archer.post_fifo(
+    Event(signal=signals.Other_Retreat_War_Cry, payload=first_brothers_name))
+
+  # confirm path to dead
+  archer.post_fifo(
+    Event(signal=signals.Advance_War_Cry, payload=first_brothers_name))
+  archer.post_fifo(
+    Event(signal=signals.Other_Advance_War_Cry, payload=first_brothers_name))
+  archer.post_fifo(
+    Event(signal=signals.Retreat_War_Cry, payload=first_brothers_name))
+
+  # confirm path to waiting
+  archer.post_fifo(
+    Event(signal=signals.Other_Retreat_Ready_War_Cry, payload=first_brothers_name))
+  archer.post_fifo(
+    Event(signal=signals.Other_Ready_War_Cry, payload=first_brothers_name))
+
+  # confirm paths from waiting to not waiting
+  archer.post_fifo(
+    Event(signal=signals.Other_Retreat_Ready_War_Cry, payload=first_brothers_name))
+  archer.post_fifo(
+    Event(signal=signals.Advance_War_Cry, payload=first_brothers_name))
+  archer.post_fifo(
+    Event(signal=signals.Other_Retreat_Ready_War_Cry, payload=first_brothers_name))
+  archer.post_fifo(
+    Event(signal=signals.Retreat_War_Cry, payload=first_brothers_name))
+
+  time.sleep(1.0)
+  print(empathy_for_first_brother.trace())
+
+This will output the following empathy trace:
+
+.. code-block:: python
+  
+  [18] [Altan_192.168.0.10] e->start_at() top->not_waiting
+  [20] [Altan_192.168.0.10] e->Other_Advance_War_Cry() not_waiting->not_waiting
+  [20] [Altan_192.168.0.10] e->Other_Skirmish_War_Cry() not_waiting->not_waiting
+  [20] [Altan_192.168.0.10] e->Other_Retreat_War_Cry() not_waiting->not_waiting
+  [20] [Altan_192.168.0.10] e->Advance_War_Cry() not_waiting->dead
+  [20] [Altan_192.168.0.10] e->Other_Advance_War_Cry() dead->not_waiting
+  [20] [Altan_192.168.0.10] e->Retreat_War_Cry() not_waiting->dead
+  [20] [Altan_192.168.0.10] e->Other_Retreat_Ready_War_Cry() dead->waiting
+  [20] [Altan_192.168.0.10] e->Other_Ready_War_Cry() waiting->waiting
+  [20] [Altan_192.168.0.10] e->Other_Retreat_Ready_War_Cry() waiting->waiting
+  [20] [Altan_192.168.0.10] e->Advance_War_Cry() waiting->not_waiting
+  [20] [Altan_192.168.0.10] e->Other_Retreat_Ready_War_Cry() not_waiting->waiting
+  [20] [Altan_192.168.0.10] e->Retreat_War_Cry() waiting->not_waiting
+  
+So Gandbold can track Altan's shouts and make reasonable guesses about what he
+is doing on the battlefield.  The code listing below demonstrates how to turn
+this trace and lock in Gandbold's expected behaviour, as a regression test:
+
+To skip to the other side of this code listing, click :ref:`here<other_size_of_regression_test>`.
+
+.. code-block:: python
+
+  # start time
+  archer.post_fifo(
+    Event(signal=signals.ResetTactic))
+
+  # wait a bit
+  archer.live_trace = True
+  time.sleep(3)
+
+  # stop time
+  archer.cancel_events(
+    Event(signal=signals.Second))
+
+  # get first brother
+  others = list(archer.others.keys())
+  others.sort()
+  first_brothers_name = others[0]
+  empathy_for_first_brother = \
+    archer.others[first_brothers_name]
+
+  # prime the pump and clear the trace of the first brother
+  archer.post_fifo(
+    Event(
+      signal=signals.Other_Advance_War_Cry,
+      payload=first_brothers_name))
+  time.sleep(1.0)
+  empathy_for_first_brother.clear_trace()
+
+  # confirm paths in empathy chart
+
+  # confirm not_waiting paths
+  archer.post_fifo(
+    Event(
+      signal=signals.Other_Advance_War_Cry,
+      payload=first_brothers_name))
+  archer.post_fifo(
+    Event(
+      signal=signals.Other_Skirmish_War_Cry,
+      payload=first_brothers_name))
+  archer.post_fifo(
+    Event(
+      signal=signals.Other_Retreat_War_Cry,
+      payload=first_brothers_name))
+
+  # confirm path to dead
+  archer.post_fifo(
+    Event(
+      signal=signals.Advance_War_Cry,
+      payload=first_brothers_name))
+  archer.post_fifo(
+    Event(
+      signal=signals.Other_Advance_War_Cry,
+      payload=first_brothers_name))
+  archer.post_fifo(
+    Event(
+      signal=signals.Retreat_War_Cry,
+      payload=first_brothers_name))
+
+  # confirm path to waiting
+  archer.post_fifo(
+    Event(
+      signal=signals.Other_Retreat_Ready_War_Cry,
+      payload=first_brothers_name))
+  archer.post_fifo(
+    Event(
+      signal=signals.Other_Ready_War_Cry,
+      payload=first_brothers_name))
+
+  # confirm paths from waiting to not waiting
+  archer.post_fifo(
+    Event(
+      signal=signals.Other_Retreat_Ready_War_Cry,
+      payload=first_brothers_name))
+  archer.post_fifo(
+    Event(
+      signal=signals.Advance_War_Cry,
+      payload=first_brothers_name))
+  archer.post_fifo(
+    Event(
+      signal=signals.Other_Retreat_Ready_War_Cry,
+      payload=first_brothers_name))
+  archer.post_fifo(
+    Event(
+      signal=signals.Retreat_War_Cry,
+      payload=first_brothers_name))
+
+  # wait a bit
+  time.sleep(1.1)
+
+  # compare trace output with expected output (remove name)
+  expected_empathy_target_trace = \
+  '''
+  [07:06:53.42] [Altan_192.168.0.10] e->Other_Advance_War_Cry() not_waiting->not_waiting
+  [07:06:53.42] [Altan_192.168.0.10] e->Other_Skirmish_War_Cry() not_waiting->not_waiting
+  [07:06:53.43] [Altan_192.168.0.10] e->Other_Retreat_War_Cry() not_waiting->not_waiting
+  [07:06:53.44] [Altan_192.168.0.10] e->Advance_War_Cry() not_waiting->dead
+  [07:06:53.45] [Altan_192.168.0.10] e->Other_Advance_War_Cry() dead->not_waiting
+  [07:06:53.45] [Altan_192.168.0.10] e->Retreat_War_Cry() not_waiting->dead
+  [07:06:53.45] [Altan_192.168.0.10] e->Other_Retreat_Ready_War_Cry() dead->waiting
+  [07:06:53.45] [Altan_192.168.0.10] e->Other_Ready_War_Cry() waiting->waiting
+  [07:06:53.45] [Altan_192.168.0.10] e->Other_Retreat_Ready_War_Cry() waiting->waiting
+  [07:06:53.45] [Altan_192.168.0.10] e->Advance_War_Cry() waiting->not_waiting
+  [07:06:53.45] [Altan_192.168.0.10] e->Other_Retreat_Ready_War_Cry() not_waiting->waiting
+  [07:06:53.45] [Altan_192.168.0.10] e->Retreat_War_Cry() waiting->not_waiting
+  '''
+  with stripped(expected_empathy_target_trace) as stripped_target, \
+       stripped(empathy_for_first_brother.trace()) as stripped_trace_result:
+    for target, result in zip(stripped_target, stripped_trace_result):
+      assert(target == result)
+
+.. _other_size_of_regression_test:
 
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:
 
