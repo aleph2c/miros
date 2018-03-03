@@ -837,13 +837,7 @@ if __name__ == '__main__':
   with stripped(expected_empathy_target_trace) as stripped_target, \
        stripped(empathy_for_first_brother.trace()) as stripped_trace_result:
     for target, result in zip(stripped_target, stripped_trace_result):
-      try:
-        assert(target == result)
-        #print(target)
-        #print(result)
-      except:
-        print(target)
-        print(result)
+      assert(target == result)
 
 # empathy_for_first_brother
 
