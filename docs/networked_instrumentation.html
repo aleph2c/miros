@@ -363,7 +363,7 @@ statechart emits an item to its spy instrumentation it will send this to the
 <code class="docutils literal"><span class="pre">broadcast_spy</span></code> function instead.</p>
 <p>The <code class="docutils literal"><span class="pre">broadcast_spy</span></code> function is defined within the <code class="docutils literal"><span class="pre">__init__</span></code> method scope
 to enclose the <code class="docutils literal"><span class="pre">self.channel</span></code> object.  I wrote it this way because the
-callback signature only has one argument, the <code class="docutils literal"><span class="pre">spy_live</span></code> argument.  It doesn’t
+<code class="docutils literal"><span class="pre">pika</span></code> callback signature only has one argument, the <code class="docutils literal"><span class="pre">spy_live</span></code> argument.  It doesn’t
 accept <code class="docutils literal"><span class="pre">self</span></code>, and I need access to the <code class="docutils literal"><span class="pre">self</span></code> attribute to gain access to
 the network.  I’m sure there is a neat way to get around this limitation, but I
 didn’t think about it too hard since I knew I could solve the issue with a
@@ -623,30 +623,23 @@ method.</p>
 rabbitMq server and thereby it has access to the whole internet.</p>
 <p>Now it is time to start our chart and watch it change its state.  We will start
 it in the producer_outer state, wait, then send a <code class="docutils literal"><span class="pre">B</span></code> signal to it.</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># RabbitMq chart construction above</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># RabbitMq chart construction above</span>
 <span class="hll"><span class="n">chart</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">producer_outer</span><span class="p">)</span>
 </span><span class="hll"><span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">))</span>
 </span><span class="hll"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 </span><span class="hll"><span class="n">pp</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
 </span><span class="hll"><span class="k">print</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
 </span></pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="close-the-connection">
 <span id="networked-instrumentation-close-the-connection"></span><h3>Close the Connection<a class="headerlink" href="#close-the-connection" title="Permalink to this headline">¶</a></h3>
 <p>To close our connection:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># RabbitMq chart construction above</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># RabbitMq chart construction above</span>
 <span class="c1"># Chart start code and B signal injection above</span>
 <span class="hll"><span class="n">chart</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </span></pre></div>
-</td></tr></table></div>
+</div>
 <p>The code to build our designed producer is complete.  Now let’s see it’s
 terminal output on the raspberry pi:</p>
 <div class="highlight-guess" id="producer-output"><div class="highlight"><pre><span></span>[&#39;START&#39;,
@@ -824,7 +817,7 @@ string.</p>
 ‘spy’ and ‘trace,’ both using a ‘fanout’ strategy.  We create two new queues
 that will destroy themselves one the program stops running, identify the name of
 these queues and bind the exchange to the queue name.</p>
-<p>This boilerplate code needs to know the local IP address.  This information
+<p>This boilerplate code needs to know the local IP address.  This information is
 obtained from the get_ip static method of the LocalConsumer class.</p>
 <div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2

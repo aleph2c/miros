@@ -49,21 +49,21 @@ across the Internet, or just to different processes running on your machine.</p>
 <p>Even though it is written in Erlang, RabbitMQ supports many different
 programming languages, including Python.  It does this with the <code class="docutils literal"><span class="pre">pika</span></code>
 library.</p>
-<p>Bernhard Wenzel provides a great introduction to RabbitMQ here:</p>
+<p>Bernhard Wenzel provides an excellent introduction to RabbitMQ here:</p>
 <center>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/deG25y_r6OY" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
-</center><p>I found the installation documentation on the RabbitMQ website to be largely
+</center><p>I found the installation documentation on the RabbitMQ website to be mostly
 illegible to me as a new user, so I wrote this guide to save you the pain which
 I went through.</p>
 <div class="section" id="installing-on-linux-with-ansible">
 <span id="setting-up-rabbit-mq-installing-on-linux-with-ansible"></span><h2>Installing On Linux with Ansible<a class="headerlink" href="#installing-on-linux-with-ansible" title="Permalink to this headline">¶</a></h2>
-<p>To get your RabbitMQ server working over a network with Python requires at
-least 10 steps, so I have automated them using Ansible.</p>
-<p>If you haven’t seen Ansible before it is a tool for automatically deploying
+<p>To get your RabbitMQ server working over a network with Python requires at least
+ten steps, so I have automated them using Ansible.</p>
+<p>If you haven’t seen Ansible before, it is a tool for automatically deploying
 software onto Linux systems.  It makes sense to use Ansible for two different
-reasons, it turns your program installation into source code that you can keep
-under revision control and it is scalable; with very little effort you can
-deploy things onto multiple machines.</p>
+reasons; it turns your program installation into source code that you can keep
+under revision control, and it is scalable; with minimal effort, you can deploy
+things onto multiple machines.</p>
 <p>To install Ansible:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">ansible</span>
 </pre></div>
@@ -84,22 +84,23 @@ hostname.</p>
 <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span>
 </pre></div>
 </div>
-<p>Save (write-out) and exit the file.  What I have done is to link my hostname, <code class="docutils literal"><span class="pre">scotty</span></code> to
-my IP address.  127.0.0.1 is always the IP of your local machine.  This is
-telling Ansible that I want to do a deployment to this machine when I reference
-<code class="docutils literal"><span class="pre">scotty</span></code> in the Ansible file (which we will talk about shortly).</p>
+<p>Save (write-out) and exit the file.  What I have done is to link my hostname,
+<code class="docutils literal"><span class="pre">scotty</span></code> to my IP address.  127.0.0.1 is always the IP of your local machine.
+By writing this into the <code class="docutils literal"><span class="pre">/etc/ansible/hosts</span></code> file I am telling Ansible that I
+want to do a deployment to <em>this</em> machine when I reference <code class="docutils literal"><span class="pre">scotty</span></code> in the
+Ansible file (which we will talk about shortly).</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">If you want to have Ansible deploy RabbitMQ to other IP addresses, you can add
-them below the 127.0.0.1 address.  In this way you can have rabbitMq install
-everywhere you need it, all at once.</p>
+them below the 127.0.0.1 address in the <code class="docutils literal"><span class="pre">/etc/ansible/hosts</span></code> file.  In this
+way you can have rabbitMq install everywhere you need it, all at once.</p>
 </div>
-<p>Ansible does it’s deployments using ssh.  This means that we have to setup ssh
+<p>Ansible does its deployments using ssh.  So to use Ansible we have to setup ssh
 for our computer.</p>
 <p>To do this, we generate a public and private key, then concatenate our public
 key into our <code class="docutils literal"><span class="pre">authorized_keys</span></code>.  If you don’t have a <code class="docutils literal"><span class="pre">id_rsa</span></code> or a
-<code class="docutils literal"><span class="pre">id_rsa.pub</span></code> in your <code class="docutils literal"><span class="pre">~/.ssh/</span></code> directory, then you need to make them.  To
-do this:</p>
+<code class="docutils literal"><span class="pre">id_rsa.pub</span></code> in your <code class="docutils literal"><span class="pre">~/.ssh/</span></code> directory, then you need to make them.  To do
+this:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">mkdir</span> <span class="o">~/.</span><span class="n">ssh</span>
 <span class="o">&gt;</span> <span class="n">cd</span> <span class="o">~/.</span><span class="n">ssh</span>
 <span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">ssh</span><span class="o">-</span><span class="n">keygen</span>
@@ -130,7 +131,7 @@ using ssh:</p>
 <p>Now that I can login to this computer using ssh, Ansible can perform automatic
 deployments for me.</p>
 <p>Ansible uses a set of <a class="reference internal" href="glossary.html#term-yaml"><span class="xref std std-term">yml</span></a> files to hold instructions on how to deploy
-something.  These files are pretty straightforward to read and are largely self
+something.  These files are pretty straightforward to read and are mostly self
 documenting.</p>
 <p>Since I only want to deploy RabbitMQ, I have written just one Ansible
 <a class="reference internal" href="glossary.html#term-yaml"><span class="xref std std-term">yml</span></a> file to do this job.  But a RabbitMQ server is configured
@@ -144,7 +145,7 @@ that you have marked up with <a class="reference internal" href="glossary.html#t
 defined in your <a class="reference internal" href="glossary.html#term-yaml"><span class="xref std std-term">yml</span></a> file, then place these newly constructed
 configuration files in the directory where they need to be with the correct
 permissions.</p>
-<p>So to deploy a networkable RabbitMQ setup I have created three files which will
+<p>So to deploy a networkable RabbitMQ setup, I have created three files which will
 be used by Ansible:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -202,7 +203,7 @@ on the <a class="reference external" href="https://www.rabbitmq.com/getstarted.h
 <p>The only problem with these tutorials is that they do not show you how to
 network RabbitMQ.  I wrestled with their example code for a while and got them
 working across my network.</p>
-<p>If you want to code by example I recommend that you work through their
+<p>If you want to code by example, I recommend that you work through their
 tutorials, then use my code to see how to make it work across your own network:</p>
 <table border="1" class="docutils">
 <colgroup>

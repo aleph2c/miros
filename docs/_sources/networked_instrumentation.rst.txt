@@ -264,7 +264,7 @@ statechart emits an item to its spy instrumentation it will send this to the
 
 The ``broadcast_spy`` function is defined within the ``__init__`` method scope
 to enclose the ``self.channel`` object.  I wrote it this way because the
-callback signature only has one argument, the ``spy_live`` argument.  It doesn't
+``pika`` callback signature only has one argument, the ``spy_live`` argument.  It doesn't
 accept ``self``, and I need access to the ``self`` attribute to gain access to
 the network.  I'm sure there is a neat way to get around this limitation, but I
 didn't think about it too hard since I knew I could solve the issue with a
@@ -434,7 +434,6 @@ it in the producer_outer state, wait, then send a ``B`` signal to it.
 
 .. code-block:: python
   :emphasize-lines: 2-6
-  :linenos:
   
   # RabbitMq chart construction above 
   chart.start_at(producer_outer)
@@ -450,7 +449,6 @@ Close the Connection
 To close our connection:
 
 .. code-block:: python
-  :linenos:
   :emphasize-lines: 3
 
   # RabbitMq chart construction above 
@@ -612,7 +610,7 @@ Now we fill in the boilerplate RabbitMq code required to build two exchanges,
 that will destroy themselves one the program stops running, identify the name of
 these queues and bind the exchange to the queue name. 
 
-This boilerplate code needs to know the local IP address.  This information
+This boilerplate code needs to know the local IP address.  This information is
 obtained from the get_ip static method of the LocalConsumer class.
 
 .. code-block:: python
