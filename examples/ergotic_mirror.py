@@ -235,21 +235,17 @@ class Connection():
 
 class ReceiveConnections():
   '''
-  Receives connections on this IP address from port 5672
-  It creates a 'mirror' exchange using direct routing where the routing key is this IP address as a string.
+  Receives connections on this ip address from port 5672
+  It creates a 'mirror' exchange using direct routing where the routing key is
+  this ip address as a string.
 
-  The interface to this class should be constructed through the RabbitDirectReceiver
+  The interface to this class should be done through the RabbitDirectReceiver
 
   Example:
     rx = ReceiveConnections(user="bob", password="dobbs")
+
   '''
-  def __init__(self, user, password, port=5672, routing_key=None):
-
-    if routing_key is None:
-      self.routing_key = Connection.get_ip()
-    else:
-      self.routing_key = routing_key
-
+  def __init__(self, user, password, port=5672):
     # create a connection and a direct exchange called 'mirror' on this ip
     self.connection = Connection.get_blocking_connection(user, password, Connection.get_ip(), port)
     self.channel = self.connection.channel()
@@ -258,9 +254,8 @@ class ReceiveConnections():
     # destroy the rabbitmq queue when done
     result          = self.channel.queue_declare(exclusive=True)
     self.queue_name = result.method.queue
-
     # create a channel with a direct routing key, the key is our ip address
-    self.channel.queue_bind(exchange='mirror', queue=self.queue_name, routing_key=self.routing_key)
+    self.channel.queue_bind(exchange='mirror', queue=self.queue_name, routing_key=Connection.get_ip())
 
     # The 'start_consuming' method of the pika library will block the program.
     # for this reason we will put it in it's own thread so that it does not harm
@@ -367,10 +362,7 @@ class EmitConnections():
     tx = EmitConnections(user, password)
 
   '''
-  def __init__(self, user, password, port=5672, routing_key=None):
-
-    self.routing_key = routing_key
-
+  def __init__(self, user, password, port=5672):
     possible_ips  = Connection.ip_addresses_on_lan()
     targets       = EmitConnections.scout_targets(possible_ips, user, password)
     self.channels = EmitConnections.get_channels(targets, user, password, port)
@@ -383,13 +375,8 @@ class EmitConnections():
     '''
     for channel in self.channels:
       ip = channel.extension.ip_address
-
-      if self.routing_key is None:
-        routing_key = ip
-      else:
-        routing_key = self.routing_key
-
-      channel.basic_publish(exchange='mirror', routing_key=routing_key, body=message)
+      channel.basic_publish(exchange='mirror',
+          routing_key=ip, body=message)
       print(" [x] Sent \"{}\" to {}".format(message, ip))
 
   @staticmethod
@@ -481,17 +468,11 @@ class RabbitDirectReceiver():
     rx.stop_consuming()  # kills consuming task
     rx.start_consuming() # launches a consuming task with same custom_rx_callback
   '''
-  def __init__(self, user, password, port=5672, routing_key=None):
-
-    if routing_key is None:
-      self.routing_key = Connection.get_ip()
-    else:
-      self.routing_key = routing_key
-
+  def __init__(self, user, password, port=5672):
     self.user     = user
     self.password = password
     self.port     = port
-    self.rx = ReceiveConnections(user, password, port, self.routing_key)
+    self.rx = ReceiveConnections(user, password, port)
 
   def start_consuming(self):
     self.rx.start_consuming()
@@ -516,7 +497,7 @@ class RabbitDirectReceiver():
   def stop_consuming(self):
     self.rx.stop_consuming()
     del(self.rx)
-    self.rx = ReceiveConnections(self.user, self.password, self.port, self.routing_key)
+    self.rx = ReceiveConnections(self.user, self.password, self.port)
     # re-register our live callback with the next instantiation
     if hasattr(self, 'live_callback') is True:
       if self.live_callback is not None:
@@ -524,8 +505,8 @@ class RabbitDirectReceiver():
 
 
 class RabbitDirectTransmitter(EmitConnections):
-  def __init__(self, user, password, routing_key=None):
-    super().__init__(user, password, routing_key)
+  def __init__(self, user, password):
+    super().__init__(user, password)
 
 tranceiver_type = sys.argv[1:]
 if not tranceiver_type:
@@ -537,7 +518,7 @@ def custom_rx_callback(ch, method, properties, body):
 
 if __name__ == "__main__":
   if tranceiver_type[0] == 'rx':
-    rx = RabbitDirectReceiver(user='bob', password='dobbs', port=5672, routing_key="peaky")
+    rx = RabbitDirectReceiver(user='bob', password='dobbs', port=5672)
     rx.register_live_callback(custom_rx_callback)
     rx.start_consuming()
     time.sleep(100)
@@ -546,11 +527,11 @@ if __name__ == "__main__":
     time.sleep(10)
     rx.stop_consuming()
   elif tranceiver_type[0] == 'tx':
-    tx = RabbitDirectTransmitter(user="bob", password="dobbs", routing_key="peaky")
+    tx = RabbitDirectTransmitter(user="bob", password="dobbs")
     tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
     tx.message_to_other_channels([1, 2, 3, 4])
   elif tranceiver_type[0] == 'ergotic':
     print("running ergotic demo")
   else:
     sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
-
+  
