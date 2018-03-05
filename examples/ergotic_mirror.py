@@ -370,7 +370,11 @@ class EmitConnections():
     * They can descrypt the message we are sending to them
     '''
     possible_targets = targets[:]
-    possible_targets.remove(Connection.get_ip())
+
+    try:
+      possible_targets.remove(Connection.get_ip())
+    except:
+      pass
     # some random message so that our encryption isn't easily broken
     message = uuid.uuid4().hex.upper()[0:12]
 
