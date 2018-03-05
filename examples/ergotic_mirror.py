@@ -184,7 +184,7 @@ class Connection():
     return _pickle_loads
 
   @staticmethod
-  def candidate_ip_address_on_lan():
+  def ip_addresses_on_lan():
     '''
     The Windows Linux Subsystem is currently broken, it does not support a lot
     of Linux networking commands - so, we can't use the nice tooling provided
@@ -194,6 +194,9 @@ class Connection():
     The 'grep -Po 192\.\d+\.\d+\.\d+' applies the Perl regular expression
     with matching output only to our stream.  This will return all of the IP
     addresses in the class C family (192.xxx.xxx.xxx)
+
+    Example:
+      ip_addresses = Connection.ip_addresses_on_lan()
     '''
     wsl_cmd   = 'cmd.exe /C arp.exe -a'
     linux_cmd = 'arp -a'
@@ -225,6 +228,9 @@ class ReceiveConnections():
   this ip address as a string.
 
   The interface to this class should be done through the RabbitDirectReceiver
+
+  Example:
+    rx = ReceiveConnections(user="bob", password="dobbs")
 
   '''
   def __init__(self, user, password):
@@ -328,21 +334,24 @@ class ReceiveConnections():
 
 class EmitConnections():
   '''
-  Scouts a range of ip addresses, creates a 'mirror' exchange which can dispatch
-  messages to any rabbitmq server it has detected in the ip range.  It uses a
-  direct routing strategy where the routing_key is the ip address of the node it
+  Scouts a range of IP addresses, creates a 'mirror' exchange which can dispatch
+  messages to any RabbitMq server it has detected in the IP range.  It uses a
+  direct routing strategy where the routing_key is the IP address of the node it
   wishes to communicate with.
 
   Once it has access to a number of network nodes, it provide a method to
   communicate with them, 'message_to_other_channels'.  Any object that is sent
   to this message is serialized into bytes then encrypted prior to being
-  dispatched accross the network.
+  dispatched across the network.
 
   This class should be accessed through the RabbitDirectTransmitter object
 
+  Example:
+    tx = EmitConnections(user, password)
+
   '''
-  def __init__(self, base, user, password):
-    possible_ips  = Connection.candidate_ip_address_on_lan()
+  def __init__(self, user, password):
+    possible_ips  = Connection.ip_addresses_on_lan()
     targets       = EmitConnections.scout_targets(possible_ips, user, password)
     self.channels = EmitConnections.get_channels(targets, user, password)
 
@@ -368,6 +377,12 @@ class EmitConnections():
     * They need to be able to respond to a message with a routing_key that is
       the same as their ip address
     * They can descrypt the message we are sending to them
+
+    Example:
+      # assumptions, user and password or correct
+      #              possible_ips is a list of IP addresses to check
+      targets = EmitConnections.scout_targets(possible_ips, user, password)
+
     '''
     possible_targets = targets[:]
 
@@ -375,6 +390,7 @@ class EmitConnections():
       possible_targets.remove(Connection.get_ip())
     except:
       pass
+
     # some random message so that our encryption isn't easily broken
     message = uuid.uuid4().hex.upper()[0:12]
 
@@ -458,7 +474,7 @@ class RabbitDirectReceiver():
       def custom_rx_callback(ch, method, properties, body):
         print(" [+] {}:{}".format(method.routing_key, body))
 
-      rx = RabbitDirectReceiver('bob', 'dobbs')
+      rx = RabbitDirectReceiver(user='bob', password='dobbs')
       rx.register_live_callback(custom_rx_callback)
 
     '''
@@ -475,161 +491,17 @@ class RabbitDirectReceiver():
         self.rx.register_live_callback(self.live_callback)
 
 
-class RabbitDirectTransmitter():
-  '''
-  Scans addresses 192.168.1.70-192.168.1.73 looking for rabbitmq receivers.  If
-  it finds them, they will be accessible through the message_to_other_channels
-  method provided by the class.
-
-  Example:
-    tx = RabbitDirectTransmitter(user="bob", password="dobbs")
-    tx.message_to_other_channels("an actual message")
-
-    # Note, to send a miros event across the network you will have to encode it
-    # first:
-    tx.message_to_other_channels(Event.dumps(Event(signal=signals.Mirror, payload=[1,2,3])))
-
-    # To decode this event:
-    event = Event.loads(event_as_json)
-    print(event) #=> Mirror::<[1,2,3]>
-
-  '''
+class RabbitDirectTransmitter(EmitConnections):
   def __init__(self, user, password):
-    self.tx = EmitConnections(base="192.168.1.",
-                user=user,
-                password=password)
-
-  def message_to_other_channels(self, message):
-    self.tx.message_to_other_channels(message)
-
+    super().__init__(user, password)
 
 tranceiver_type = sys.argv[1:]
 if not tranceiver_type:
   sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
 
-
 def custom_rx_callback(ch, method, properties, body):
   print(" [+] {}:{}".format(method.routing_key, body))
 
-
-def charger_bulk(chart, e):
-  # run some custom code
-  status = chart.trans(engaging_bulk)
-  return status
-
-def charger_n_bulk(chart, e):
-  # run some custom code
-  status = chart.trans(engaging_bulk)
-  return status
-
-def charger_init(chart, e):
-  # run some custom code
-  status = chart.trans(engaging_bulk)
-  return status
-
-def engaging_bulk_entry(chart, e):
-  chart.post_fifo(
-      Event(signal=signals.engage_bulk_timeout),
-      times=1,
-      period=1.0,
-      deferred=True)
-  return return_status.HANDLED
-
-def engage_bulk_exit(chart, e):
-  chart.cancel_events(signals.engage_bulk_timeout)
-  return return_status.HANDLED
-
-def engage_bulk_timeout(chart, e):
-  status = chart.trans(bulk)
-  return status
-
-def bulk_absorption(chart, e):
-  # run some custom code
-  status = chart.trans(absorption)
-  return status
-
-def absorption_absorption_end(chart, e):
-  # run some custom code
-  status = chart.trans(absorption_pending)
-  return status
-
-def absorption_pending_entry(chart, e):
-  status = return_status.HANDLED
-  # run some custom code
-  return status
-
-def absorption_pending_n_absorption_end(chart, e):
-  # some custom code
-  status = chart.trans(absorption_pending)
-  return status
-
-def absorption_pending_absorption_timeout(chart, e):
-  # some custom code
-  status = chart.trans(float)
-  return status
-
-def absorption_pending_n_float(chart, e):
-  # some custom code
-  status = chart.trans(float)
-  return status
-
-def absorption_pending_float(chart, e):
-  # some custom code
-  status = chart.trans(float)
-  return status
-
-def empathy_my_bulk(chart, e):
-  status = return_status.HANDLED
-  # send out bulk signal to all
-  return status
-
-def empathy_my_float(chart, e):
-  status = return_status.HANDLED
-  # send out float signal to all
-  return status
-
-def empathy_bulk_from_them(chart, e):
-  status = chart.trans(other_absorption)
-  return status
-
-def empathy_float_from_them(chart, e):
-  status = chart.trans(other_absorption)
-  return status
-
-def other_absorption_absorption_end_from_them(chart, e):
-  status = chart.trans(other_absorption_pending)
-  return status
-
-
-class ErgoticCharger(Factory):
-  def __init__(self, name, tx, rx):
-    super().__init__(name)
-    self.name = name
-
-ec = ErgoticCharger(
-    name = 'erotic_charger',
-    tx = RabbitDirectTransmitter(user='bob', password='dobbs'),
-    rx = RabbitDirectReceiver(user='bob', password='dobbs'))
-
-charger = ec.create(state='charger'). \
-    catch(signal=signals.INIT_SIGNAL, handler=charger_n_bulk). \
-    catch(signal=signals.bulk, handler=charger_bulk). \
-    catch(signal=signals.n_bulk, handler=charger_n_bulk). \
-    to_method()
-
-engaging_bulk = ec.create(state='engaging_bulk'). \
-    catch(signal=signals.ENTRY_SIGNAL, handler=engaging_bulk_entry)
-
-
-class HorseArcher(Factory):
-
-  def __init__(self, name):
-    super().__init__(name)
-    self.arrows = 0
-    self.ticks  = 0
-
-  def yell(self, event):
-    pass
 
 if __name__ == "__main__":
   if tranceiver_type[0] == 'rx':
