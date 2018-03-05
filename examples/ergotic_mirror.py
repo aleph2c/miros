@@ -215,6 +215,7 @@ class Connection():
       except:
         # our windows command did not work on Linux
         pass
+    return list(filter(None, candidates))
 
 class ReceiveConnections():
   '''
@@ -646,4 +647,4 @@ if __name__ == "__main__":
   #  else:
   #    sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
   #
-  Connection.candidate_ip_address_on_lan()
+  print(Connection.candidate_ip_address_on_lan())
