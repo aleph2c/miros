@@ -197,9 +197,10 @@ class Connection():
     '''
     wsl_cmd = 'cmd.exe /C arp.exe -a'
     linux_cmd = 'arp -a'
-    grep_cmd = 'grep -Po 192\.\d+\.\d+\.\d+'
 
+    grep_cmd = 'grep -Po 192\.\d+\.\d+\.\d+'
     candidates = []
+
     for cmd in [wsl_cmd, linux_cmd]:
       cmd_as_list = cmd.split(" ")
       grep_as_list = grep_cmd.split(" ")
@@ -215,7 +216,7 @@ class Connection():
       except:
         # our windows command did not work on Linux
         pass
-    return list(filter(None, candidates))
+    return list(filter(None, candidates)
 
 class ReceiveConnections():
   '''
