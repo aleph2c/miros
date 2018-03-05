@@ -216,7 +216,7 @@ class Connection():
       except:
         # our windows command did not work on Linux
         pass
-    return list(filter(None, candidates)
+    return list(filter(None, candidates))
 
 class ReceiveConnections():
   '''
