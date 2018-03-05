@@ -11,9 +11,7 @@ from threading import Thread
 from types import SimpleNamespace
 from cryptography.fernet import Fernet
 from threading import Event as ThreadingEvent
-
-from miros.activeobject import Factory
-from miros.event import signals, Event, return_status
+from miros.event import signals, Event
 
 
 class Connection():
@@ -233,9 +231,9 @@ class ReceiveConnections():
     rx = ReceiveConnections(user="bob", password="dobbs")
 
   '''
-  def __init__(self, user, password):
+  def __init__(self, user, password, port=5672):
     # create a connection and a direct exchange called 'mirror' on this ip
-    self.connection = Connection.get_blocking_connection(user, password, Connection.get_ip(), 5672)
+    self.connection = Connection.get_blocking_connection(user, password, Connection.get_ip(), port)
     self.channel = self.connection.channel()
     self.channel.exchange_declare(exchange='mirror', exchange_type='direct')
 
@@ -350,10 +348,10 @@ class EmitConnections():
     tx = EmitConnections(user, password)
 
   '''
-  def __init__(self, user, password):
+  def __init__(self, user, password, port=5672):
     possible_ips  = Connection.ip_addresses_on_lan()
     targets       = EmitConnections.scout_targets(possible_ips, user, password)
-    self.channels = EmitConnections.get_channels(targets, user, password)
+    self.channels = EmitConnections.get_channels(targets, user, password, port)
 
   @Connection.serialize  # pickle.dumps
   @Connection.encrypt
@@ -368,7 +366,7 @@ class EmitConnections():
       print(" [x] Sent \"{}\" to {}".format(message, ip))
 
   @staticmethod
-  def scout_targets(targets, user, password):
+  def scout_targets(targets, user, password, port=5672):
     '''
     Returns a subset of ip address from the targets.  The common feature of
     these subsets is that they can you can connect to the via rabbitmq.  To do
@@ -396,7 +394,7 @@ class EmitConnections():
 
     for target in possible_targets[:]:
       try:
-        connection = Connection.get_blocking_connection(user, password, target, 5672)
+        connection = Connection.get_blocking_connection(user, password, target, port)
         channel = connection.channel()
         channel.exchange_declare(exchange='mirror', exchange_type='direct')
 
@@ -413,7 +411,7 @@ class EmitConnections():
     return possible_targets
 
   @staticmethod
-  def get_channels(targets, user, password):
+  def get_channels(targets, user, password, port=5672):
     '''
     Get a set of rabbitmq channels given a list of ip addresses and the user
     name and password of the local rabbitmq server.
@@ -421,7 +419,7 @@ class EmitConnections():
     channels = []
     for target in targets:
       try:
-        connection = Connection.get_blocking_connection(user, password, target, 5672)
+        connection = Connection.get_blocking_connection(user, password, target, port)
         channel = connection.channel()
         channel.exchange_declare(exchange='mirror', exchange_type='direct')
         channel.extension = SimpleNamespace()
@@ -456,10 +454,11 @@ class RabbitDirectReceiver():
     rx.stop_consuming()  # kills consuming task
     rx.start_consuming() # launches a consuming task with same custom_rx_callback
   '''
-  def __init__(self, user, password):
+  def __init__(self, user, password, port=5672):
     self.user     = user
     self.password = password
-    self.rx = ReceiveConnections(user, password)
+    self.port     = port
+    self.rx = ReceiveConnections(user, password, port)
 
   def start_consuming(self):
     self.rx.start_consuming()
@@ -484,7 +483,7 @@ class RabbitDirectReceiver():
   def stop_consuming(self):
     self.rx.stop_consuming()
     del(self.rx)
-    self.rx = ReceiveConnections(self.user, self.password)
+    self.rx = ReceiveConnections(self.user, self.password, self.port)
     # re-register our live callback with the next instantiation
     if hasattr(self, 'live_callback') is True:
       if self.live_callback is not None:
@@ -505,7 +504,7 @@ def custom_rx_callback(ch, method, properties, body):
 
 if __name__ == "__main__":
   if tranceiver_type[0] == 'rx':
-    rx = RabbitDirectReceiver('bob', 'dobbs')
+    rx = RabbitDirectReceiver(user='bob', password='dobbs', port=5672)
     rx.register_live_callback(custom_rx_callback)
     rx.start_consuming()
     time.sleep(100)
