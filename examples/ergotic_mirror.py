@@ -5,6 +5,7 @@ import time
 import uuid
 import socket
 import pickle
+import subprocess
 from functools import wraps
 from threading import Thread
 from types import SimpleNamespace
@@ -182,6 +183,30 @@ class Connection():
       fn(ch, method, properties, plain_text)
     return _pickle_loads
 
+  @staticmethod
+  def candidate_ip_address_on_lan():
+    '''
+    The Windows Linux Subsystem is currently broken, it does not support a lot
+    of Linux networking commands - so, we can't use the nice tooling provided
+    by the community.  Instead I call out to the cmd.exe file of DOS and send it
+    the DOS version of arp to get a list of IP addresses on the LAN.
+
+    The 'grep -Po 192\.\d+\.\d+\.\d+' applies the Perl regular expression
+    with matching output only to our stream.  This will return all of the IP
+    addresses in the class C family (192.xxx.xxx.xxx)
+    '''
+    wsl_cmd = 'cmd.exe /C arp.exe -a | grep -Po 192\.\d+\.\d+\.\d+'
+    linux_cmd = 'arp -a | grep -Po 192\.\d+\.\d+\.\d+'
+
+    candidates = []
+    for cmd in [wsl_cmd, linux_cmd]:
+      cmd_as_list = cmd.split(" ")
+      cp = subprocess.run(cmd_as_list, stdout=subprocess.PIPE)
+      if cp.stdout is not '':
+        candidates = cp.stdout.decode('utf-8').split('\n')
+        if len(candidates) > 0:
+          break
+    import pdb; pdb.set_trace()
 
 class ReceiveConnections():
   '''
@@ -595,21 +620,22 @@ class HorseArcher(Factory):
     pass
 
 if __name__ == "__main__":
-  if tranceiver_type[0] == 'rx':
-    rx = RabbitDirectReceiver('bob', 'dobbs')
-    rx.register_live_callback(custom_rx_callback)
-    rx.start_consuming()
-    time.sleep(100)
-    rx.stop_consuming()
-    rx.start_consuming()
-    time.sleep(10)
-    rx.stop_consuming()
-  elif tranceiver_type[0] == 'tx':
-    tx = RabbitDirectTransmitter(user="bob", password="dobbs")
-    tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
-    tx.message_to_other_channels([1, 2, 3, 4])
-  elif tranceiver_type[0] == 'ergotic':
-    print("running ergotic demo")
-  else:
-    sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
-
+  #  if tranceiver_type[0] == 'rx':
+  #    rx = RabbitDirectReceiver('bob', 'dobbs')
+  #    rx.register_live_callback(custom_rx_callback)
+  #    rx.start_consuming()
+  #    time.sleep(100)
+  #    rx.stop_consuming()
+  #    rx.start_consuming()
+  #    time.sleep(10)
+  #    rx.stop_consuming()
+  #  elif tranceiver_type[0] == 'tx':
+  #    tx = RabbitDirectTransmitter(user="bob", password="dobbs")
+  #    tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
+  #    tx.message_to_other_channels([1, 2, 3, 4])
+  #  elif tranceiver_type[0] == 'ergotic':
+  #    print("running ergotic demo")
+  #  else:
+  #    sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
+  #
+  Connection.candidate_ip_address_on_lan()

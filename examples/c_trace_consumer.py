@@ -31,9 +31,9 @@ from functools import wraps
 class LocalConsumer():
   '''
   The Local Consumer looks like this:
-                
+
                |---> LocalConsumer spans this part of pic--->|
-                
+
                   +----------------+  +----------------------+
      +-----+   +->| spy exchange   +->| queue (random name)  |
      |     |   |  +----------------+  +------+---------------+
