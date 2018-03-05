@@ -195,16 +195,17 @@ class Connection():
     with matching output only to our stream.  This will return all of the IP
     addresses in the class C family (192.xxx.xxx.xxx)
     '''
-    wsl_cmd = 'cmd.exe /C arp.exe -a'
+    wsl_cmd   = 'cmd.exe /C arp.exe -a'
     linux_cmd = 'arp -a'
-    grep_cmd = 'grep -Po 192\.\d+\.\d+\.\d+'
 
+    grep_cmd = 'grep -Po 192\.\d+\.\d+\.\d+'
     candidates = []
+
     for cmd in [wsl_cmd, linux_cmd]:
       cmd_as_list = cmd.split(" ")
       grep_as_list = grep_cmd.split(" ")
       output = ''
-      try: 
+      try:
         ps = subprocess.Popen(cmd_as_list, stdout=subprocess.PIPE)
         output = subprocess.check_output(grep_as_list, stdin=ps.stdout)
         ps.wait()
@@ -340,8 +341,8 @@ class EmitConnections():
   This class should be accessed through the RabbitDirectTransmitter object
 
   '''
-  def __init__(self, base, start, end, user, password):
-    possible_ips  = [base + str(i) for i in [*range(start, end + 1)]]
+  def __init__(self, base, user, password):
+    possible_ips  = Connection.candidate_ip_address_on_lan()
     targets       = EmitConnections.scout_targets(possible_ips, user, password)
     self.channels = EmitConnections.get_channels(targets, user, password)
 
@@ -491,8 +492,6 @@ class RabbitDirectTransmitter():
   '''
   def __init__(self, user, password):
     self.tx = EmitConnections(base="192.168.1.",
-                start=69,
-                end=75,
                 user=user,
                 password=password)
 
@@ -629,22 +628,21 @@ class HorseArcher(Factory):
     pass
 
 if __name__ == "__main__":
-  #  if tranceiver_type[0] == 'rx':
-  #    rx = RabbitDirectReceiver('bob', 'dobbs')
-  #    rx.register_live_callback(custom_rx_callback)
-  #    rx.start_consuming()
-  #    time.sleep(100)
-  #    rx.stop_consuming()
-  #    rx.start_consuming()
-  #    time.sleep(10)
-  #    rx.stop_consuming()
-  #  elif tranceiver_type[0] == 'tx':
-  #    tx = RabbitDirectTransmitter(user="bob", password="dobbs")
-  #    tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
-  #    tx.message_to_other_channels([1, 2, 3, 4])
-  #  elif tranceiver_type[0] == 'ergotic':
-  #    print("running ergotic demo")
-  #  else:
-  #    sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
-  #
-  print(Connection.candidate_ip_address_on_lan())
+  if tranceiver_type[0] == 'rx':
+    rx = RabbitDirectReceiver('bob', 'dobbs')
+    rx.register_live_callback(custom_rx_callback)
+    rx.start_consuming()
+    time.sleep(100)
+    rx.stop_consuming()
+    rx.start_consuming()
+    time.sleep(10)
+    rx.stop_consuming()
+  elif tranceiver_type[0] == 'tx':
+    tx = RabbitDirectTransmitter(user="bob", password="dobbs")
+    tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
+    tx.message_to_other_channels([1, 2, 3, 4])
+  elif tranceiver_type[0] == 'ergotic':
+    print("running ergotic demo")
+  else:
+    sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
+  
