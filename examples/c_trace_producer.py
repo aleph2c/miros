@@ -156,7 +156,7 @@ chart = RabbitProducer(
   chart_name="producer",
   rabbit_user="bob",
   rabbit_password="dobbs",
-  ip="192.168.1.72",
+  ip="192.168.1.75",
   port=5672
 )
 

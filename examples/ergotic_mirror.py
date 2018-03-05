@@ -195,18 +195,26 @@ class Connection():
     with matching output only to our stream.  This will return all of the IP
     addresses in the class C family (192.xxx.xxx.xxx)
     '''
-    wsl_cmd = 'cmd.exe /C arp.exe -a | grep -Po 192\.\d+\.\d+\.\d+'
-    linux_cmd = 'arp -a | grep -Po 192\.\d+\.\d+\.\d+'
+    wsl_cmd = 'cmd.exe /C arp.exe -a'
+    linux_cmd = 'arp -a'
+    grep_cmd = 'grep -Po 192\.\d+\.\d+\.\d+'
 
     candidates = []
     for cmd in [wsl_cmd, linux_cmd]:
       cmd_as_list = cmd.split(" ")
-      cp = subprocess.run(cmd_as_list, stdout=subprocess.PIPE)
-      if cp.stdout is not '':
-        candidates = cp.stdout.decode('utf-8').split('\n')
-        if len(candidates) > 0:
-          break
-    import pdb; pdb.set_trace()
+      grep_as_list = grep_cmd.split(" ")
+      output = ''
+      try: 
+        ps = subprocess.Popen(cmd_as_list, stdout=subprocess.PIPE)
+        output = subprocess.check_output(grep_as_list, stdin=ps.stdout)
+        ps.wait()
+        if output is not '':
+          candidates = output.decode('utf-8').split('\n')
+          if len(candidates) > 0:
+            break
+      except:
+        # our windows command did not work on Linux
+        pass
 
 class ReceiveConnections():
   '''
