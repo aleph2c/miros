@@ -236,6 +236,7 @@ class Connection():
 class ReceiveConnections():
   '''
   Receives connections on this ip address from port 5672
+
   It creates a 'mirror' exchange using direct routing where the routing key is
   this ip address as a string.
 
@@ -254,6 +255,7 @@ class ReceiveConnections():
     # destroy the rabbitmq queue when done
     result          = self.channel.queue_declare(exclusive=True)
     self.queue_name = result.method.queue
+
     # create a channel with a direct routing key, the key is our ip address
     self.channel.queue_bind(exchange='mirror', queue=self.queue_name, routing_key=Connection.get_ip())
 
@@ -276,7 +278,8 @@ class ReceiveConnections():
     def callback(ch, method, properties, body):
       self.live_callback(ch, method, properties, body)
 
-    # Register the above callback with the queue
+    # Register the above callback with the queue, turn off message
+    # acknowledgements
     self.channel.basic_consume(callback, queue=self.queue_name, no_ack=True)
 
   def default_callback(self, ch, method, properties, body):
@@ -328,6 +331,7 @@ class ReceiveConnections():
 
       # We are within our own thread, we arm a timeout callback
       self.connection.add_timeout(deadline=10, callback_method=timeout_callback)
+
       # This process will block forever, with the exception of calling the
       # timeout_callback every 10 seconds.
       self.channel.start_consuming()
@@ -371,7 +375,7 @@ class EmitConnections():
   @Connection.encrypt
   def message_to_other_channels(self, message):
     '''
-    Send messages to all of confirmed channels
+    Send messages to all of confirmed channels, messages are not persistent
     '''
     for channel in self.channels:
       ip = channel.extension.ip_address
@@ -397,11 +401,7 @@ class EmitConnections():
 
     '''
     possible_targets = targets[:]
-
-    try:
-      possible_targets.remove(Connection.get_ip())
-    except:
-      pass
+    possible_targets.append(Connection.get_ip())
 
     # some random message so that our encryption isn't easily broken
     message = uuid.uuid4().hex.upper()[0:12]
@@ -505,8 +505,8 @@ class RabbitDirectReceiver():
 
 
 class RabbitDirectTransmitter(EmitConnections):
-  def __init__(self, user, password):
-    super().__init__(user, password)
+  def __init__(self, user, password, port):
+    super().__init__(user, password, port)
 
 tranceiver_type = sys.argv[1:]
 if not tranceiver_type:
@@ -531,7 +531,14 @@ if __name__ == "__main__":
     tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
     tx.message_to_other_channels([1, 2, 3, 4])
   elif tranceiver_type[0] == 'ergotic':
-    print("running ergotic demo")
+    tx = RabbitDirectTransmitter(user="bob", password="dobbs", port=5672)
+    rx = RabbitDirectReceiver(user='bob', password='dobbs', port=5672)
+    rx.register_live_callback(custom_rx_callback)
+    rx.start_consuming()
+    for i in range(0, 10):
+      tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[i]))
+      time.sleep(2)
+    rx.stop_consuming()
   else:
     sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
-  
+
