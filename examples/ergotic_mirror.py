@@ -505,7 +505,7 @@ class RabbitDirectReceiver():
 
 
 class RabbitDirectTransmitter(EmitConnections):
-  def __init__(self, user, password, port):
+  def __init__(self, user, password, port=5672):
     super().__init__(user, password, port)
 
 tranceiver_type = sys.argv[1:]
@@ -521,7 +521,7 @@ if __name__ == "__main__":
     rx = RabbitDirectReceiver(user='bob', password='dobbs', port=5672)
     rx.register_live_callback(custom_rx_callback)
     rx.start_consuming()
-    time.sleep(100)
+    time.sleep(500)
     rx.stop_consuming()
     rx.start_consuming()
     time.sleep(10)
