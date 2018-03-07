@@ -22,6 +22,14 @@ I found the installation documentation on the RabbitMQ website to be mostly
 illegible to me as a new user, so I wrote this guide to save you the pain which
 I went through.
 
+: note::
+
+  Most of the documentation on the RabbitMq website is illegible (except their
+  tutorials section).  There are a lot of words written but think of their
+  documents as a collection of open secrets; they are a consulting company after
+  all. (their docs remind me of the Noam Chomsky bot that can write you pages
+  and pages of gibberish).
+
 .. _setting_up_rabbit_mq-installing-on-linux-with-ansible:
 
 Installing On Linux with Ansible

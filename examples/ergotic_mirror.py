@@ -13,7 +13,6 @@ from cryptography.fernet import Fernet
 from threading import Event as ThreadingEvent
 from miros.event import signals, Event
 
-
 class Connection():
   '''
   A set of networking static methods used by different objects within this
@@ -98,13 +97,15 @@ class Connection():
 
     '''
     @wraps(fn)
-    def _pickle_dumps(*args):
+    def _pickle_dumps(*args, **kwargs):
+      routing_key = None
+      if 'routing_key' in kwargs:
+        routing_key = kwargs['routing_key']
+
       if len(args) == 1:
         message = args[0]
-      elif len(args) == 2:
-        message = args[1]
       else:
-        assert(False)
+        message = args[1]
 
       # The event object is dynamically constructed and can't be serialized by
       # pickle, so we call it's custom serializer prior to pickling it
@@ -116,7 +117,11 @@ class Connection():
       if len(args) == 1:
         fn(pmessage)
       else:
-        fn(args[0], pmessage)
+        if routing_key is None:
+          fn(args[0], pmessage)
+        else:
+          fn(args[0], pmessage, routing_key=routing_key)
+
     return _pickle_dumps
 
   @staticmethod
@@ -136,23 +141,29 @@ class Connection():
 
     '''
     @wraps(fn)
-    def _encrypt(*args):
+    def _encrypt(*args, **kwargs):
       '''
       encrypt a byte stream
       '''
+      routing_key = None
+      if 'routing_key' in kwargs:
+        routing_key = kwargs['routing_key']
       # To get around the self as the first argument issue
       if len(args) == 1:
         plain_text = args[0]
-      elif len(args) == 2:
-        plain_text = args[1]
       else:
-        assert(False)
+        plain_text = args[1]
+
       f = Fernet(Connection.key())
       cyphertext = f.encrypt(plain_text)
       if len(args) == 1:
         fn(cyphertext)
       else:
-        fn(args[0], cyphertext)
+        if routing_key is None:
+          # args[0] is self
+          fn(args[0], cyphertext)
+        else:
+          fn(args[0], cyphertext, routing_key=routing_key)
     return _encrypt
 
   @staticmethod
@@ -240,24 +251,29 @@ class ReceiveConnections():
   It creates a 'mirror' exchange using direct routing where the routing key is
   this ip address as a string.
 
-  The interface to this class should be done through the RabbitDirectReceiver
+  The interface to this class should be done through the RabbitReceiver
 
   Example:
     rx = ReceiveConnections(user="bob", password="dobbs")
 
   '''
-  def __init__(self, user, password, port=5672):
+  def __init__(self, user, password, port=5672, routing_key=None):
     # create a connection and a direct exchange called 'mirror' on this ip
     self.connection = Connection.get_blocking_connection(user, password, Connection.get_ip(), port)
     self.channel = self.connection.channel()
-    self.channel.exchange_declare(exchange='mirror', exchange_type='direct')
+    self.channel.exchange_declare(exchange='mirror', exchange_type='topic')
 
     # destroy the rabbitmq queue when done
     result          = self.channel.queue_declare(exclusive=True)
     self.queue_name = result.method.queue
 
     # create a channel with a direct routing key, the key is our ip address
-    self.channel.queue_bind(exchange='mirror', queue=self.queue_name, routing_key=Connection.get_ip())
+    if routing_key is None:
+      routing_key = Connection.get_ip()
+    else:
+      routing_key = Connection.get_ip() + routing_key
+
+    self.channel.queue_bind(exchange='mirror', queue=self.queue_name, routing_key=routing_key)
 
     # The 'start_consuming' method of the pika library will block the program.
     # for this reason we will put it in it's own thread so that it does not harm
@@ -299,7 +315,7 @@ class ReceiveConnections():
       def custom_rx_callback(ch, method, properties, body):
         print(" [+] {}:{}".format(method.routing_key, body))
 
-      rx = RabbitDirectReceiver('bob', 'dobbs')
+      rx = RabbitReceiver('bob', 'dobbs')
       rx.register_live_callback(custom_rx_callback)
 
     '''
@@ -360,7 +376,7 @@ class EmitConnections():
   to this message is serialized into bytes then encrypted prior to being
   dispatched across the network.
 
-  This class should be accessed through the RabbitDirectTransmitter object
+  This class should be accessed through the RabbitTransmitter object
 
   Example:
     tx = EmitConnections(user, password)
@@ -373,15 +389,19 @@ class EmitConnections():
 
   @Connection.serialize  # pickle.dumps
   @Connection.encrypt
-  def message_to_other_channels(self, message):
+  def message_to_other_channels(self, message, routing_key=None):
     '''
     Send messages to all of confirmed channels, messages are not persistent
     '''
+
+    # create a channel with a direct routing key, the key is our ip address
+    if routing_key is None:
+      routing_key = ''
+
     for channel in self.channels:
       ip = channel.extension.ip_address
-      channel.basic_publish(exchange='mirror',
-          routing_key=ip, body=message)
-      print(" [x] Sent \"{}\" to {}".format(message, ip))
+      channel.basic_publish(exchange='mirror', routing_key=ip + routing_key, body=message)
+      #  print(" [x] Sent \"{}\" to {}".format(message, ip))
 
   @staticmethod
   def scout_targets(targets, user, password, port=5672):
@@ -410,7 +430,7 @@ class EmitConnections():
       try:
         connection = Connection.get_blocking_connection(user, password, target, port)
         channel = connection.channel()
-        channel.exchange_declare(exchange='mirror', exchange_type='direct')
+        channel.exchange_declare(exchange='mirror', exchange_type='topic')
 
         @Connection.serialize
         @Connection.encrypt
@@ -435,7 +455,7 @@ class EmitConnections():
       try:
         connection = Connection.get_blocking_connection(user, password, target, port)
         channel = connection.channel()
-        channel.exchange_declare(exchange='mirror', exchange_type='direct')
+        channel.exchange_declare(exchange='mirror', exchange_type='topic')
         channel.extension = SimpleNamespace()
         setattr(channel.extension, 'ip_address', target)
         channels.append(channel)
@@ -444,7 +464,7 @@ class EmitConnections():
     return channels
 
 
-class RabbitDirectReceiver():
+class RabbitReceiver():
   '''
   Creates a rabbitmq receiver.  You can register a live callback which will be
   called when a message is received, then start consuming.  You can stop
@@ -461,18 +481,19 @@ class RabbitDirectReceiver():
       else:
         print(" [+] {}:{}".format(method.routing_key, body))
 
-    rx = RabbitDirectReceiver(user='bob', password='dobbs')
+    rx = RabbitReceiver(user='bob', password='dobbs')
     rx.register_live_callback(custom_rx_callback)
     rx.start_consuming() # launches a consuming task
     time.sleep(10)
     rx.stop_consuming()  # kills consuming task
     rx.start_consuming() # launches a consuming task with same custom_rx_callback
   '''
-  def __init__(self, user, password, port=5672):
+  def __init__(self, user, password, port=5672, routing_key=None):
     self.user     = user
     self.password = password
     self.port     = port
-    self.rx = ReceiveConnections(user, password, port)
+    self.routing_key = routing_key
+    self.rx = ReceiveConnections(user, password, port, routing_key)
 
   def start_consuming(self):
     self.rx.start_consuming()
@@ -487,7 +508,7 @@ class RabbitDirectReceiver():
       def custom_rx_callback(ch, method, properties, body):
         print(" [+] {}:{}".format(method.routing_key, body))
 
-      rx = RabbitDirectReceiver(user='bob', password='dobbs')
+      rx = RabbitReceiver(user='bob', password='dobbs')
       rx.register_live_callback(custom_rx_callback)
 
     '''
@@ -497,20 +518,20 @@ class RabbitDirectReceiver():
   def stop_consuming(self):
     self.rx.stop_consuming()
     del(self.rx)
-    self.rx = ReceiveConnections(self.user, self.password, self.port)
+    self.rx = ReceiveConnections(self.user, self.password, self.port, self.routing_key)
     # re-register our live callback with the next instantiation
     if hasattr(self, 'live_callback') is True:
       if self.live_callback is not None:
         self.rx.register_live_callback(self.live_callback)
 
 
-class RabbitDirectTransmitter(EmitConnections):
+class RabbitTransmitter(EmitConnections):
   def __init__(self, user, password, port=5672):
     super().__init__(user, password, port)
 
 tranceiver_type = sys.argv[1:]
 if not tranceiver_type:
-  sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
+  sys.stderr.write("Usage: {} [rx]/[tx]/[er]\n".format(sys.argv[0]))
 
 def custom_rx_callback(ch, method, properties, body):
   print(" [+] {}:{}".format(method.routing_key, body))
@@ -518,7 +539,7 @@ def custom_rx_callback(ch, method, properties, body):
 
 if __name__ == "__main__":
   if tranceiver_type[0] == 'rx':
-    rx = RabbitDirectReceiver(user='bob', password='dobbs', port=5672)
+    rx = RabbitReceiver(user='bob', password='dobbs', port=5672, routing_key='.archer.#')
     rx.register_live_callback(custom_rx_callback)
     rx.start_consuming()
     time.sleep(500)
@@ -527,18 +548,30 @@ if __name__ == "__main__":
     time.sleep(10)
     rx.stop_consuming()
   elif tranceiver_type[0] == 'tx':
-    tx = RabbitDirectTransmitter(user="bob", password="dobbs")
-    tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
-    tx.message_to_other_channels([1, 2, 3, 4])
-  elif tranceiver_type[0] == 'ergotic':
-    tx = RabbitDirectTransmitter(user="bob", password="dobbs", port=5672)
-    rx = RabbitDirectReceiver(user='bob', password='dobbs', port=5672)
-    rx.register_live_callback(custom_rx_callback)
+    tx = RabbitTransmitter(user="bob", password="dobbs")
+    tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]), routing_key = '.archer.mary')
+    tx.message_to_other_channels([1, 2, 3, 4], routing_key = '.archer.jane')
+  elif tranceiver_type[0] == 'er':
+
+    tx = RabbitTransmitter(user="bob", password="dobbs", port=5672)
+    rx = RabbitReceiver(user='bob', password='dobbs', port=5672, routing_key='.archer.#')
+
+    def ergotic_rx_callback(ch, method, properties, body):
+      print(" [+e] {}:{}".format(method.routing_key, body))
+
+    # Set up the receiver
+    rx.register_live_callback(ergotic_rx_callback)
     rx.start_consuming()
-    for i in range(0, 10):
-      tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[i]))
+
+    # Now start transmitting to the mesh
+    message = uuid.uuid4().hex.upper()[0:12]
+    for i in range(0, 100):
+      tx.message_to_other_channels(
+        Event(signal = signals.Mirror, payload=(message + '_' + str(i))),
+        routing_key = '.archer.bob')
       time.sleep(2)
     rx.stop_consuming()
+
   else:
-    sys.stderr.write("Usage: {} [rx]/[tx]\n".format(sys.argv[0]))
+    sys.stderr.write("Usage: {} [rx]/[tx]/[er]\n".format(sys.argv[0]))
 
