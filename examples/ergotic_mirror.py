@@ -5,6 +5,7 @@ import time
 import uuid
 import socket
 import pickle
+import netifaces
 import subprocess
 from functools import wraps
 from threading import Thread
@@ -13,13 +14,17 @@ from cryptography.fernet import Fernet
 from threading import Event as ThreadingEvent
 from miros.event import signals, Event
 
+import pprint
+def pp(item):
+  pprint.pprint(item)
+
 class Connection():
   '''
   A set of networking static methods used by different objects within this
   module.
 
   API:
-    Connection.get_ip()                  -> get your own ip address
+    Connection.get_working_ip_address()  -> get your own ip address
     Connection.ip_addresses_on_lan       -> get all IP addresses on LAN
 
     Connection.serialize                 -> serialization decorator
@@ -33,12 +38,12 @@ class Connection():
                                             RabbitMq server
   '''
   @staticmethod
-  def get_ip():
+  def get_working_ip_address():
     '''
     Get the ip of this computer:
 
     Example:
-      Connection.get_ip()
+      Connection.get_working_ip_address()
     '''
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
@@ -244,6 +249,22 @@ class Connection():
         pass
     return list(filter(None, candidates))
 
+  @staticmethod
+  def ip_addresses_on_this_machine():
+    '''
+    There are situations where we would like to know all of the IP addresses
+    connected to this one machine.
+    '''
+    interfaces = [interface for interface in netifaces.interfaces()]
+    local_ip_addresses = []
+    for interface in interfaces:
+      interface_network_types = netifaces.ifaddresses(interface)
+      if netifaces.AF_INET in interface_network_types:
+        ip_address = interface_network_types[netifaces.AF_INET][0]['addr']
+        local_ip_addresses.append(ip_address)
+    return local_ip_addresses
+
+
 class ReceiveConnections():
   '''
   Receives connections on this ip address from port 5672
@@ -259,7 +280,7 @@ class ReceiveConnections():
   '''
   def __init__(self, user, password, port=5672, routing_key=None):
     # create a connection and a direct exchange called 'mirror' on this ip
-    self.connection = Connection.get_blocking_connection(user, password, Connection.get_ip(), port)
+    self.connection = Connection.get_blocking_connection(user, password, Connection.get_working_ip_address(), port)
     self.channel = self.connection.channel()
     self.channel.exchange_declare(exchange='mirror', exchange_type='topic')
 
@@ -269,9 +290,9 @@ class ReceiveConnections():
 
     # create a channel with a direct routing key, the key is our ip address
     if routing_key is None:
-      routing_key = Connection.get_ip()
+      routing_key = Connection.get_working_ip_address()
     else:
-      routing_key = Connection.get_ip() + routing_key
+      routing_key = Connection.get_working_ip_address() + routing_key
 
     self.channel.queue_bind(exchange='mirror', queue=self.queue_name, routing_key=routing_key)
 
@@ -420,8 +441,14 @@ class EmitConnections():
       targets = EmitConnections.scout_targets(possible_ips, user, password)
 
     '''
-    possible_targets = targets[:]
-    possible_targets.append(Connection.get_ip())
+    # get all local ip address
+    local_ip_addresses = Connection.ip_addresses_on_this_machine()
+
+    # remove all local ip addresses from the targets
+    possible_targets = [item for item in targets if item not in local_ip_addresses]
+
+    # add our working ip address
+    possible_targets.append(Connection.get_working_ip_address())
 
     # some random message so that our encryption isn't easily broken
     message = uuid.uuid4().hex.upper()[0:12]
