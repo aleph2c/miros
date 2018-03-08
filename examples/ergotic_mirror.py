@@ -1,22 +1,23 @@
 #!/usr/bin/env python3
+
+# not in the standard library
+import pika       # pip3 install pika --user
+import netifaces  # pip3 install netifaces --user
+
+# in the standard library
 import sys
-import pika
 import time
 import uuid
 import socket
 import pickle
-import netifaces
 import subprocess
+from miros.hsm import pp
 from functools import wraps
 from threading import Thread
 from types import SimpleNamespace
 from cryptography.fernet import Fernet
-from threading import Event as ThreadingEvent
 from miros.event import signals, Event
-
-import pprint
-def pp(item):
-  pprint.pprint(item)
+from threading import Event as ThreadingEvent
 
 class Connection():
   '''
@@ -44,6 +45,7 @@ class Connection():
 
     Example:
       Connection.get_working_ip_address()
+
     '''
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
@@ -65,8 +67,9 @@ class Connection():
       key = Connection.key()
 
     Note:
-    To generate a new key: Fernet.generate_key()
-    A better way to do this is to get the key from your connected flash-drive.
+      To generate a new key: Fernet.generate_key()
+      A better way to do this is to get the key from your connected flash-drive.
+
     '''
     return b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
 
@@ -153,6 +156,7 @@ class Connection():
       routing_key = None
       if 'routing_key' in kwargs:
         routing_key = kwargs['routing_key']
+
       # To get around the self as the first argument issue
       if len(args) == 1:
         plain_text = args[0]
@@ -434,6 +438,7 @@ class EmitConnections():
     * They need to be able to respond to a message with a routing_key that is
       the same as their ip address
     * They can descrypt the message we are sending to them
+    * They need to be our working IP address
 
     Example:
       # assumptions, user and password or correct
@@ -565,6 +570,7 @@ def custom_rx_callback(ch, method, properties, body):
 
 
 if __name__ == "__main__":
+  pp('line to appease PEP8')
   if tranceiver_type[0] == 'rx':
     rx = RabbitReceiver(user='bob', password='dobbs', port=5672, routing_key='.archer.#')
     rx.register_live_callback(custom_rx_callback)
