@@ -276,7 +276,7 @@ class ReceiveConnections():
   It creates a 'mirror' exchange using direct routing where the routing key is
   this ip address as a string.
 
-  The interface to this class should be done through the RabbitReceiver
+  The interface to this class should be done through the MeshReceiver
 
   Example:
     rx = ReceiveConnections(user="bob", password="dobbs")
@@ -291,12 +291,6 @@ class ReceiveConnections():
     # destroy the rabbitmq queue when done
     result          = self.channel.queue_declare(exclusive=True)
     self.queue_name = result.method.queue
-
-    # create a channel with a direct routing key, the key is our ip address
-    if routing_key is None or routing_key == '':
-      routing_key = Connection.get_working_ip_address() + '.#'
-    else:
-      routing_key = Connection.get_working_ip_address() + routing_key
 
     self.channel.queue_bind(exchange='mirror', queue=self.queue_name, routing_key=routing_key)
 
@@ -343,7 +337,7 @@ class ReceiveConnections():
       def custom_rx_callback(ch, method, properties, body):
         print(" [+] {}:{}".format(method.routing_key, body))
 
-      rx = RabbitReceiver('bob', 'dobbs')
+      rx = MeshReceiver('bob', 'dobbs')
       rx.register_live_callback(custom_rx_callback)
 
     '''
@@ -404,7 +398,7 @@ class EmitConnections():
   to this message is serialized into bytes then encrypted prior to being
   dispatched across the network.
 
-  This class should be accessed through the RabbitTransmitter object
+  This class should be accessed through the MeshTransmitter object
 
   Example:
     tx = EmitConnections(user, password)
@@ -421,17 +415,8 @@ class EmitConnections():
     '''
     Send messages to all of confirmed channels, messages are not persistent
     '''
-
-    # create a channel with a direct routing key, the key is our ip address
-    if routing_key is None:
-      routing_key = '.'
-    else:
-      routing_key = '.' + routing_key
-
     for channel in self.channels:
-      ip = channel.extension.ip_address
-      channel.basic_publish(exchange='mirror', routing_key=ip + routing_key, body=message)
-      #  print(" [x] Sent \"{}\" to {}".format(message, ip))
+      channel.basic_publish(exchange='mirror', routing_key=routing_key, body=message)
 
   @staticmethod
   def scout_targets(targets, user, password, port=5672):
@@ -441,7 +426,7 @@ class EmitConnections():
     this:
     * They have have a mirror exchange
     * They need to be able to respond to a message with a routing_key that is
-      the same as their ip address 
+      the same as their ip address
     * They can descrypt the message we are sending to them
     * They need to be our working IP address
 
@@ -501,7 +486,7 @@ class EmitConnections():
     return channels
 
 
-class RabbitReceiver():
+class MeshReceiver():
   '''
   Creates a rabbitmq receiver.  You can register a live callback which will be
   called when a message is received, then start consuming.  You can stop
@@ -518,7 +503,7 @@ class RabbitReceiver():
       else:
         print(" [+] {}:{}".format(method.routing_key, body))
 
-    rx = RabbitReceiver(user='bob', password='dobbs')
+    rx = MeshReceiver(user='bob', password='dobbs')
     rx.register_live_callback(custom_rx_callback)
     rx.start_consuming() # launches a consuming task
     time.sleep(10)
@@ -529,6 +514,12 @@ class RabbitReceiver():
     self.user     = user
     self.password = password
     self.port     = port
+
+    # create a channel with a direct routing key, the key is our ip address
+    if routing_key is None or routing_key == '':
+      routing_key = Connection.get_working_ip_address() + '.#'
+    else:
+      routing_key = Connection.get_working_ip_address() + '.' + routing_key
     self.routing_key = routing_key
     self.rx = ReceiveConnections(user, password, port, routing_key)
 
@@ -545,7 +536,7 @@ class RabbitReceiver():
       def custom_rx_callback(ch, method, properties, body):
         print(" [+] {}:{}".format(method.routing_key, body))
 
-      rx = RabbitReceiver(user='bob', password='dobbs')
+      rx = MeshReceiver(user='bob', password='dobbs')
       rx.register_live_callback(custom_rx_callback)
 
     '''
@@ -562,9 +553,37 @@ class RabbitReceiver():
         self.rx.register_live_callback(self.live_callback)
 
 
-class RabbitTransmitter(EmitConnections):
+class MeshTransmitter(EmitConnections):
   def __init__(self, user, password, port=5672):
     super().__init__(user, password, port)
+
+  @Connection.serialize  # pickle.dumps
+  @Connection.encrypt
+  def message_to_other_channels(self, message, routing_key=None):
+    '''
+    Send messages to all of confirmed channels, messages are not persistent
+
+    Sets postpends the '<ip_address>.' to the front of the routing key provided
+    by the user.
+
+    Example:
+      # assume IP: 192.168.0.102
+      # the actual routing key for this transmission is '192.168.0.102.archer.mary'
+      tx = MeshTransmitter(user="bob", password="dobbs")
+      tx.message_to_other_channels(
+        Event(signal=signals.Mirror, payload=[1, 2, 3]),
+          routing_key = 'archer.mary')
+
+    '''
+    # create a channel with a direct routing key, the key is our ip address
+    if routing_key is None:
+      routing_key = '.'
+    else:
+      routing_key = '.' + routing_key
+
+    for channel in self.channels:
+      ip = channel.extension.ip_address
+      channel.basic_publish(exchange='mirror', routing_key=ip + routing_key, body=message)
 
 tranceiver_type = sys.argv[1:]
 if not tranceiver_type:
@@ -577,7 +596,7 @@ def custom_rx_callback(ch, method, properties, body):
 if __name__ == "__main__":
   pp('line to appease PEP8')
   if tranceiver_type[0] == 'rx':
-    rx = RabbitReceiver(user='bob', password='dobbs', port=5672, routing_key='')
+    rx = MeshReceiver(user='bob', password='dobbs', port=5672, routing_key='archer.#')
     rx.register_live_callback(custom_rx_callback)
     rx.start_consuming()
     time.sleep(500)
@@ -586,13 +605,13 @@ if __name__ == "__main__":
     time.sleep(10)
     rx.stop_consuming()
   elif tranceiver_type[0] == 'tx':
-    tx = RabbitTransmitter(user="bob", password="dobbs")
+    tx = MeshTransmitter(user="bob", password="dobbs")
     tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]), routing_key = 'archer.mary')
     tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
     tx.message_to_other_channels([1, 2, 3, 4], routing_key = 'archer.jane')
   elif tranceiver_type[0] == 'er':
-    tx = RabbitTransmitter(user="bob", password="dobbs", port=5672)
-    rx = RabbitReceiver(user='bob', password='dobbs', port=5672, routing_key='.archer.#')
+    tx = MeshTransmitter(user="bob", password="dobbs", port=5672)
+    rx = MeshReceiver(user='bob', password='dobbs', port=5672, routing_key='archer.#')
 
     def ergotic_rx_callback(ch, method, properties, body):
       print(" [+e] {}:{}".format(method.routing_key, body))
