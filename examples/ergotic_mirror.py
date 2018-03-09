@@ -11,6 +11,7 @@ import uuid
 import socket
 import pickle
 import subprocess
+import cryptography
 from miros.hsm import pp
 from functools import wraps
 from threading import Thread
@@ -22,10 +23,11 @@ from threading import Event as ThreadingEvent
 
 class NetworkTool():
   '''
-  A set of networking static methods used by different objects within this
-  module.
+  A collection of networking static methods used by different objects within this
+  package.
 
   API:
+    # Get information
     NetworkTool.get_working_ip_address()  -> get your own ip address
     NetworkTool.ip_addresses_on_lan       -> get all IP addresses on LAN
 
@@ -38,7 +40,14 @@ class NetworkTool():
 
     NetworkTool.get_blocking_connection() -> get a blocking connection to a
                                             RabbitMq server
+
+    # Set information
+    NetworkTool.encryption_key = <new_key>
+
   '''
+  # To generate a new key: Fernet.generate_key()
+  encryption_key = b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
+
   @staticmethod
   def get_working_ip_address():
     '''
@@ -72,7 +81,7 @@ class NetworkTool():
       A better way to do this is to get the key from your connected flash-drive.
 
     '''
-    return b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
+    return NetworkTool.encryption_key
 
   @staticmethod
   def get_blocking_connection(user, password, ip, port):
@@ -165,6 +174,7 @@ class NetworkTool():
 
       f = Fernet(NetworkTool.key())
       cyphertext = f.encrypt(plain_text)
+
       if len(args) == 1:
         fn(cyphertext)
       else:
@@ -190,7 +200,10 @@ class NetworkTool():
     def _decrypt(ch, method, properties, cyphertext):
       '''LocalConsumer.decrypt()'''
       f = Fernet(NetworkTool.key())
-      plain_text = f.decrypt(cyphertext)
+      try:
+        plain_text = f.decrypt(cyphertext)
+      except cryptography.fernet.InvalidToken:
+        plain_text = cyphertext
       fn(ch, method, properties, plain_text)
     return _decrypt
 
@@ -207,7 +220,11 @@ class NetworkTool():
     '''
     @wraps(fn)
     def _pickle_loads(ch, method, properties, p_plain_text):
-      plain_text = pickle.loads(p_plain_text)
+      try:
+        plain_text = pickle.loads(p_plain_text)
+      except ValueError:
+        plain_text = p_plain_text
+
       if isinstance(plain_text, Event):
         plain_text = Event.loads(plain_text)
       fn(ch, method, properties, plain_text)
@@ -594,14 +611,24 @@ class MeshTransmitter(EmitConnections):
       channel.basic_publish(exchange='mirror', routing_key=ip + routing_key, body=message)
 
 if __name__ == "__main__":
-  pp('line to appease PEP8/lint noise')
+  pp('line to appease PEP8/lint F401 noise')
+
+  # Set the encryption key for this session
+  NetworkTool.encryption_key = b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0='
+
+  # Custom receive callbacks
+  def custom_rx_callback(ch, method, properties, body):
+    print(" [+] {}:{}".format(method.routing_key, body))
+
+  def ergotic_rx_callback(ch, method, properties, body):
+    print(" [+e] {}:{}".format(method.routing_key, body))
+
+  # Get the user input
   tranceiver_type = sys.argv[1:]
   if not tranceiver_type:
     sys.stderr.write("Usage: {} [rx]/[tx]/[er]\n".format(sys.argv[0]))
 
-  def custom_rx_callback(ch, method, properties, body):
-    print(" [+] {}:{}".format(method.routing_key, body))
-
+  # The user wants to receive messages directed to this node in the mesh
   if tranceiver_type[0] == 'rx':
     rx = MeshReceiver(user='bob', password='dobbs', port=5672, routing_key='archer.#')
     rx.register_live_callback(custom_rx_callback)
@@ -611,17 +638,18 @@ if __name__ == "__main__":
     rx.start_consuming()
     time.sleep(10)
     rx.stop_consuming()
+  # The user want's to transmit to all nodes in mesh
   elif tranceiver_type[0] == 'tx':
     tx = MeshTransmitter(user="bob", password="dobbs")
     tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]), routing_key = 'archer.mary')
     tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
     tx.message_to_other_channels([1, 2, 3, 4], routing_key = 'archer.jane')
+
+  # The user wants to both transmit to all nodes in the mesh and receive all
+  # messeges sent to this node
   elif tranceiver_type[0] == 'er':
     tx = MeshTransmitter(user="bob", password="dobbs", port=5672)
     rx = MeshReceiver(user='bob', password='dobbs', port=5672, routing_key='archer.#')
-
-    def ergotic_rx_callback(ch, method, properties, body):
-      print(" [+e] {}:{}".format(method.routing_key, body))
 
     # Set up the receiver
     rx.register_live_callback(ergotic_rx_callback)
@@ -635,7 +663,7 @@ if __name__ == "__main__":
         routing_key = 'archer.bob')
       time.sleep(0.5)
     rx.stop_consuming()
-
+  # Typo
   else:
     sys.stderr.write("Usage: {} [rx]/[tx]/[er]\n".format(sys.argv[0]))
 
