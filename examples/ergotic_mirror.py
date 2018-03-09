@@ -1,8 +1,58 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+'''
+This package is used to link a miros statechart into a mesh network on a LAN.
+
+This mesh network is provided by RabbitMq.  Your RabbitMq server will have a
+username and a password, these and the encryption key will have to be common
+between all nodes in the mesh.
+
+To set up a transmitter:
+
+  tx = MeshTransmitter(user="bob", password="dobbs", port=5672)
+
+To use a transmitter:
+
+  tx.message_to_other_channels(
+    Event(
+      signal=signals.Mirror,
+      payload=[1, 2, 3]),
+      routing_key = 'archer.mary')
+
+To set up a receiver:
+
+  rx = MeshReceiver(
+    user='bob',
+    password='dobbs',
+    port=5672,
+    routing_key='archer.#')
+
+  # set up the callback which will receive the message
+  def custom_rx_callback(ch, method, properties, body):
+    print(" [+] {}:{}".format(method.routing_key, body))
+
+  # register the callback with your receiver
+  rx.register_live_callback(custom_rx_callback)
+
+  # start the receivers thread to consume messages
+  rx.start_consuming()
+
+  # to stop this thread
+  rx.stop_consuming()
+
+Notes:
+  To install RabbitMq use the ansible play book, and the templates found here:
+  https://github.com/aleph2c/miros/tree/master/experiment/rabbit/ansible
+
+  For specific instructions on how to use the files linked to above, read:
+  https://aleph2c.github.io/miros/setting_up_rabbit_mq.html
+'''
 
 # NOT in the standard library
-import pika       # pip3 install pika --user
-import netifaces  # pip3 install netifaces --user
+import pika               # pip3 install pika --user
+import netifaces          # pip3 install netifaces --user
+from miros.hsm import pp  # pip3 install miros --user
+from miros.event import signals, Event  # "
 
 # in the standard library
 import sys
@@ -12,12 +62,10 @@ import socket
 import pickle
 import subprocess
 import cryptography
-from miros.hsm import pp
 from functools import wraps
 from threading import Thread
 from types import SimpleNamespace
 from cryptography.fernet import Fernet
-from miros.event import signals, Event
 from threading import Event as ThreadingEvent
 
 
@@ -47,6 +95,7 @@ class NetworkTool():
   '''
   # To generate a new key: Fernet.generate_key()
   encryption_key = b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
+  exchange_name  = 'mirror'
 
   @staticmethod
   def get_working_ip_address():
@@ -109,7 +158,7 @@ class NetworkTool():
       def message_to_other_channels(self, message):
         for channel in self.channels:
           ip = channel.extension.ip_address
-          channel.basic_publish(exchange='mirror',
+          channel.basic_publish(exchange=NetworkTool.exchange_name,
               routing_key=ip, body=message)
           print(" [x] Sent \"{}\" to {}".format(message, ip))
 
@@ -153,7 +202,7 @@ class NetworkTool():
       def message_to_other_channels(self, message):
         for channel in self.channels:
           ip = channel.extension.ip_address
-          channel.basic_publish(exchange='mirror',
+          channel.basic_publish(exchange=NetworkTool.exchange_name,
               routing_key=ip, body=message)
           print(" [x] Sent \"{}\" to {}".format(message, ip))
     '''
@@ -291,8 +340,8 @@ class ReceiveConnections():
   '''
   Receives connections on this ip address from port 5672
 
-  It creates a 'mirror' exchange using direct routing where the routing key is
-  this ip address as a string.
+  It creates a NetworkTool.exchange_name exchange using direct routing where the
+  routing key is this ip address as a string.
 
   The interface to this class should be done through the MeshReceiver
 
@@ -301,16 +350,17 @@ class ReceiveConnections():
 
   '''
   def __init__(self, user, password, port=5672, routing_key=None):
-    # create a connection and a direct exchange called 'mirror' on this ip
+    # create a connection and a direct exchange called 'mirror', see
+    # NetworkTool.exchange_name on this ip
     self.connection = NetworkTool.get_blocking_connection(user, password, NetworkTool.get_working_ip_address(), port)
     self.channel = self.connection.channel()
-    self.channel.exchange_declare(exchange='mirror', exchange_type='topic')
+    self.channel.exchange_declare(exchange=NetworkTool.exchange_name, exchange_type='topic')
 
     # destroy the rabbitmq queue when done
     result          = self.channel.queue_declare(exclusive=True)
     self.queue_name = result.method.queue
 
-    self.channel.queue_bind(exchange='mirror', queue=self.queue_name, routing_key=routing_key)
+    self.channel.queue_bind(exchange=NetworkTool.exchange_name, queue=self.queue_name, routing_key=routing_key)
 
     # The 'start_consuming' method of the pika library will block the program.
     # for this reason we will put it in it's own thread so that it does not harm
@@ -406,10 +456,11 @@ class ReceiveConnections():
 
 class EmitConnections():
   '''
-  Scouts a range of IP addresses, creates a 'mirror' exchange which can dispatch
-  messages to any RabbitMq server it has detected in the IP range.  It uses a
-  direct routing strategy where the routing_key is the IP address of the node it
-  wishes to communicate with.
+  Scouts a range of IP addresses, creates a 'mirror' (see
+  NetworkTool.exchange_name) exchange which can dispatch messages to any RabbitMq
+  server it has detected in the IP range.  It uses a direct routing strategy
+  where the routing_key is the IP address of the node it wishes to communicate
+  with.
 
   Once it has access to a number of network nodes, it provide a method to
   communicate with them, 'message_to_other_channels'.  Any object that is sent
@@ -434,7 +485,7 @@ class EmitConnections():
     Send messages to all of confirmed channels, messages are not persistent
     '''
     for channel in self.channels:
-      channel.basic_publish(exchange='mirror', routing_key=routing_key, body=message)
+      channel.basic_publish(exchange=NetworkTool.exchange_name, routing_key=routing_key, body=message)
 
   @staticmethod
   def scout_targets(targets, user, password, port=5672):
@@ -442,7 +493,7 @@ class EmitConnections():
     Returns a subset of ip address from the targets.  The common feature of
     these subsets is that they can you can connect to the via rabbitmq.  To do
     this:
-    * They have have a mirror exchange
+    * They have have a NetworkTool.exchange_name exchange
     * They need to be able to respond to a message with a routing_key that is
       the same as their ip address
     * They can descrypt the message we are sending to them
@@ -470,12 +521,12 @@ class EmitConnections():
       try:
         connection = NetworkTool.get_blocking_connection(user, password, target, port)
         channel = connection.channel()
-        channel.exchange_declare(exchange='mirror', exchange_type='topic')
+        channel.exchange_declare(exchange=NetworkTool.exchange_name, exchange_type='topic')
 
         @NetworkTool.serialize
         @NetworkTool.encrypt
         def send(message):
-          channel.basic_publish(exchange='mirror', routing_key=target, body=message)
+          channel.basic_publish(exchange=NetworkTool.exchange_name, routing_key=target, body=message)
 
         send(message)
         print(" [x] Sent \"{}\" to {}".format(message, target))
@@ -495,7 +546,7 @@ class EmitConnections():
       try:
         connection = NetworkTool.get_blocking_connection(user, password, target, port)
         channel = connection.channel()
-        channel.exchange_declare(exchange='mirror', exchange_type='topic')
+        channel.exchange_declare(exchange=NetworkTool.exchange_name, exchange_type='topic')
         channel.extension = SimpleNamespace()
         setattr(channel.extension, 'ip_address', target)
         channels.append(channel)
@@ -608,7 +659,7 @@ class MeshTransmitter(EmitConnections):
 
     for channel in self.channels:
       ip = channel.extension.ip_address
-      channel.basic_publish(exchange='mirror', routing_key=ip + routing_key, body=message)
+      channel.basic_publish(exchange=NetworkTool.exchange_name, routing_key=ip + routing_key, body=message)
 
 if __name__ == "__main__":
   pp('line to appease PEP8/lint F401 noise')
@@ -628,9 +679,9 @@ if __name__ == "__main__":
   if not tranceiver_type:
     sys.stderr.write("Usage: {} [rx]/[tx]/[er]\n".format(sys.argv[0]))
 
-  # The user wants to receive messages directed to this node in the mesh
+  # The user wants to receive messages directed to this node in the mesh network
   if tranceiver_type[0] == 'rx':
-    rx = MeshReceiver(user='bob', password='dobbs', port=5672, routing_key='archer.#')
+    rx = MeshReceiver(user='bob', password='dobbs', port=5672, routing_key='#.jessica')
     rx.register_live_callback(custom_rx_callback)
     rx.start_consuming()
     time.sleep(500)
@@ -638,7 +689,8 @@ if __name__ == "__main__":
     rx.start_consuming()
     time.sleep(10)
     rx.stop_consuming()
-  # The user want's to transmit to all nodes in mesh
+
+  # The user want's to transmit to all nodes in mesh network
   elif tranceiver_type[0] == 'tx':
     tx = MeshTransmitter(user="bob", password="dobbs")
     tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]), routing_key = 'archer.mary')
@@ -660,10 +712,11 @@ if __name__ == "__main__":
     for i in range(0, 300):
       tx.message_to_other_channels(
         Event(signal = signals.Mirror, payload=(message + '_' + str(i))),
-        routing_key = 'archer.bob')
+        routing_key = 'archer.jessica')
       time.sleep(0.5)
     rx.stop_consuming()
-  # Typo
+
+  # User typo
   else:
     sys.stderr.write("Usage: {} [rx]/[tx]/[er]\n".format(sys.argv[0]))
 
