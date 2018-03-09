@@ -146,7 +146,6 @@ class Connection():
           channel.basic_publish(exchange='mirror',
               routing_key=ip, body=message)
           print(" [x] Sent \"{}\" to {}".format(message, ip))
-
     '''
     @wraps(fn)
     def _encrypt(*args, **kwargs):
@@ -185,7 +184,6 @@ class Connection():
       @Connection.deserialize
       def custom_rx_callback(ch, method, properties, body):
         print(" [+] {}:{}".format(method.routing_key, body))
-
     '''
     @wraps(fn)
     def _decrypt(ch, method, properties, cyphertext):
@@ -205,7 +203,6 @@ class Connection():
       @Connection.deserialize  # <- HERE: 'body' bytestream turn into object
       def custom_rx_callback(ch, method, properties, body):
         print(" [+] {}:{}".format(method.routing_key, body))
-
     '''
     @wraps(fn)
     def _pickle_loads(ch, method, properties, p_plain_text):
@@ -258,6 +255,9 @@ class Connection():
     '''
     There are situations where we would like to know all of the IP addresses
     connected to this one machine.
+
+    Example:
+      list_of_my_ips_address = Connection.ip_addresses_on_this_machine()
     '''
     interfaces = [interface for interface in netifaces.interfaces()]
     local_ip_addresses = []
@@ -293,8 +293,8 @@ class ReceiveConnections():
     self.queue_name = result.method.queue
 
     # create a channel with a direct routing key, the key is our ip address
-    if routing_key is None:
-      routing_key = Connection.get_working_ip_address()
+    if routing_key is None or routing_key == '':
+      routing_key = Connection.get_working_ip_address() + '.#'
     else:
       routing_key = Connection.get_working_ip_address() + routing_key
 
@@ -327,6 +327,9 @@ class ReceiveConnections():
     '''
     This default callback is provided out of the box, it will be ignored by the
     client since they will register their own callback
+
+    Example:
+      # not needed, you won't use this
     '''
     print(" [x] {}:{}".format(method.routing_key, body))
 
@@ -421,7 +424,9 @@ class EmitConnections():
 
     # create a channel with a direct routing key, the key is our ip address
     if routing_key is None:
-      routing_key = ''
+      routing_key = '.'
+    else:
+      routing_key = '.' + routing_key
 
     for channel in self.channels:
       ip = channel.extension.ip_address
@@ -436,7 +441,7 @@ class EmitConnections():
     this:
     * They have have a mirror exchange
     * They need to be able to respond to a message with a routing_key that is
-      the same as their ip address
+      the same as their ip address 
     * They can descrypt the message we are sending to them
     * They need to be our working IP address
 
@@ -572,7 +577,7 @@ def custom_rx_callback(ch, method, properties, body):
 if __name__ == "__main__":
   pp('line to appease PEP8')
   if tranceiver_type[0] == 'rx':
-    rx = RabbitReceiver(user='bob', password='dobbs', port=5672, routing_key='.archer.#')
+    rx = RabbitReceiver(user='bob', password='dobbs', port=5672, routing_key='')
     rx.register_live_callback(custom_rx_callback)
     rx.start_consuming()
     time.sleep(500)
@@ -582,10 +587,10 @@ if __name__ == "__main__":
     rx.stop_consuming()
   elif tranceiver_type[0] == 'tx':
     tx = RabbitTransmitter(user="bob", password="dobbs")
-    tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]), routing_key = '.archer.mary')
-    tx.message_to_other_channels([1, 2, 3, 4], routing_key = '.archer.jane')
+    tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]), routing_key = 'archer.mary')
+    tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
+    tx.message_to_other_channels([1, 2, 3, 4], routing_key = 'archer.jane')
   elif tranceiver_type[0] == 'er':
-
     tx = RabbitTransmitter(user="bob", password="dobbs", port=5672)
     rx = RabbitReceiver(user='bob', password='dobbs', port=5672, routing_key='.archer.#')
 
@@ -598,11 +603,11 @@ if __name__ == "__main__":
 
     # Now start transmitting to the mesh
     message = uuid.uuid4().hex.upper()[0:12]
-    for i in range(0, 100):
+    for i in range(0, 300):
       tx.message_to_other_channels(
         Event(signal = signals.Mirror, payload=(message + '_' + str(i))),
-        routing_key = '.archer.bob')
-      time.sleep(2)
+        routing_key = 'archer.bob')
+      time.sleep(0.5)
     rx.stop_consuming()
 
   else:
