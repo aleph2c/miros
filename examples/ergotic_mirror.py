@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# not in the standard library
+# NOT in the standard library
 import pika       # pip3 install pika --user
 import netifaces  # pip3 install netifaces --user
 
@@ -19,23 +19,24 @@ from cryptography.fernet import Fernet
 from miros.event import signals, Event
 from threading import Event as ThreadingEvent
 
-class Connection():
+
+class NetworkTool():
   '''
   A set of networking static methods used by different objects within this
   module.
 
   API:
-    Connection.get_working_ip_address()  -> get your own ip address
-    Connection.ip_addresses_on_lan       -> get all IP addresses on LAN
+    NetworkTool.get_working_ip_address()  -> get your own ip address
+    NetworkTool.ip_addresses_on_lan       -> get all IP addresses on LAN
 
-    Connection.serialize                 -> serialization decorator
-    Connection.deserialize               -> deserialization decorator
+    NetworkTool.serialize                 -> serialization decorator
+    NetworkTool.deserialize               -> deserialization decorator
 
-    Connection.key()                     -> get the encryption key
-    Connection.ecrypt                    -> encryption decorator
-    Connection.decrypt                   -> decryption decorator
+    NetworkTool.key()                     -> get the encryption key
+    NetworkTool.ecrypt                    -> encryption decorator
+    NetworkTool.decrypt                   -> decryption decorator
 
-    Connection.get_blocking_connection() -> get a blocking connection to a
+    NetworkTool.get_blocking_connection() -> get a blocking connection to a
                                             RabbitMq server
   '''
   @staticmethod
@@ -44,7 +45,7 @@ class Connection():
     Get the ip of this computer:
 
     Example:
-      Connection.get_working_ip_address()
+      NetworkTool.get_working_ip_address()
 
     '''
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -64,7 +65,7 @@ class Connection():
     and decryption.
 
     Example:
-      key = Connection.key()
+      key = NetworkTool.key()
 
     Note:
       To generate a new key: Fernet.generate_key()
@@ -80,7 +81,7 @@ class Connection():
     or another machine:
 
     Example:
-      connection = Connection.get_blocking_connection(
+      connection = NetworkTool.get_blocking_connection(
         'bob', 'dobbs', '192.168.1.72', 5672)
     '''
     credentials = pika.PlainCredentials(user, password)
@@ -94,8 +95,8 @@ class Connection():
     A decorator which will turn arguments into a byte stream prior to encryption:
 
     Example:
-      @Connection.serialize  # <- HERE: 'message' turned into byte stream
-      @Connection.encrypt
+      @NetworkTool.serialize  # <- HERE: 'message' turned into byte stream
+      @NetworkTool.encrypt
       def message_to_other_channels(self, message):
         for channel in self.channels:
           ip = channel.extension.ip_address
@@ -138,8 +139,8 @@ class Connection():
     A decorator which will encrypt a byte stream prior to transmission:
 
     Example:
-      @Connection.serialize
-      @Connection.encrypt   # <- HERE: 'message' bytestream encyrpted
+      @NetworkTool.serialize
+      @NetworkTool.encrypt   # <- HERE: 'message' bytestream encyrpted
       def message_to_other_channels(self, message):
         for channel in self.channels:
           ip = channel.extension.ip_address
@@ -162,7 +163,7 @@ class Connection():
       else:
         plain_text = args[1]
 
-      f = Fernet(Connection.key())
+      f = Fernet(NetworkTool.key())
       cyphertext = f.encrypt(plain_text)
       if len(args) == 1:
         fn(cyphertext)
@@ -180,15 +181,15 @@ class Connection():
     A decorator which will decrypt a received message into a byte stream.
 
     Example:
-      @Connection.decrypt  # <- HERE: 'body' decrypted into a byte stream
-      @Connection.deserialize
+      @NetworkTool.decrypt  # <- HERE: 'body' decrypted into a byte stream
+      @NetworkTool.deserialize
       def custom_rx_callback(ch, method, properties, body):
         print(" [+] {}:{}".format(method.routing_key, body))
     '''
     @wraps(fn)
     def _decrypt(ch, method, properties, cyphertext):
       '''LocalConsumer.decrypt()'''
-      f = Fernet(Connection.key())
+      f = Fernet(NetworkTool.key())
       plain_text = f.decrypt(cyphertext)
       fn(ch, method, properties, plain_text)
     return _decrypt
@@ -199,8 +200,8 @@ class Connection():
     A decorator turn a serialized byte stream into a python object
 
     Example:
-      @Connection.decrypt
-      @Connection.deserialize  # <- HERE: 'body' bytestream turn into object
+      @NetworkTool.decrypt
+      @NetworkTool.deserialize  # <- HERE: 'body' bytestream turn into object
       def custom_rx_callback(ch, method, properties, body):
         print(" [+] {}:{}".format(method.routing_key, body))
     '''
@@ -225,7 +226,7 @@ class Connection():
     addresses in the class C family (192.xxx.xxx.xxx)
 
     Example:
-      ip_addresses = Connection.ip_addresses_on_lan()
+      ip_addresses = NetworkTool.ip_addresses_on_lan()
     '''
     wsl_cmd   = 'cmd.exe /C arp.exe -a'
     linux_cmd = 'arp -a'
@@ -257,7 +258,7 @@ class Connection():
     connected to this one machine.
 
     Example:
-      list_of_my_ips_address = Connection.ip_addresses_on_this_machine()
+      list_of_my_ips_address = NetworkTool.ip_addresses_on_this_machine()
     '''
     interfaces = [interface for interface in netifaces.interfaces()]
     local_ip_addresses = []
@@ -284,7 +285,7 @@ class ReceiveConnections():
   '''
   def __init__(self, user, password, port=5672, routing_key=None):
     # create a connection and a direct exchange called 'mirror' on this ip
-    self.connection = Connection.get_blocking_connection(user, password, Connection.get_working_ip_address(), port)
+    self.connection = NetworkTool.get_blocking_connection(user, password, NetworkTool.get_working_ip_address(), port)
     self.channel = self.connection.channel()
     self.channel.exchange_declare(exchange='mirror', exchange_type='topic')
 
@@ -308,8 +309,8 @@ class ReceiveConnections():
 
     # We wrap the tunable callback with decryption and a serial decoder
     # this way the client doesn't have to know about this complexity
-    @Connection.decrypt
-    @Connection.deserialize
+    @NetworkTool.decrypt
+    @NetworkTool.deserialize
     def callback(ch, method, properties, body):
       self.live_callback(ch, method, properties, body)
 
@@ -405,12 +406,12 @@ class EmitConnections():
 
   '''
   def __init__(self, user, password, port=5672):
-    possible_ips  = Connection.ip_addresses_on_lan()
+    possible_ips  = NetworkTool.ip_addresses_on_lan()
     targets       = EmitConnections.scout_targets(possible_ips, user, password)
     self.channels = EmitConnections.get_channels(targets, user, password, port)
 
-  @Connection.serialize  # pickle.dumps
-  @Connection.encrypt
+  @NetworkTool.serialize  # pickle.dumps
+  @NetworkTool.encrypt
   def message_to_other_channels(self, message, routing_key=None):
     '''
     Send messages to all of confirmed channels, messages are not persistent
@@ -437,25 +438,25 @@ class EmitConnections():
 
     '''
     # get all local ip address
-    local_ip_addresses = Connection.ip_addresses_on_this_machine()
+    local_ip_addresses = NetworkTool.ip_addresses_on_this_machine()
 
     # remove all local ip addresses from the targets
     possible_targets = [item for item in targets if item not in local_ip_addresses]
 
     # add our working ip address
-    possible_targets.append(Connection.get_working_ip_address())
+    possible_targets.append(NetworkTool.get_working_ip_address())
 
     # some random message so that our encryption isn't easily broken
     message = uuid.uuid4().hex.upper()[0:12]
 
     for target in possible_targets[:]:
       try:
-        connection = Connection.get_blocking_connection(user, password, target, port)
+        connection = NetworkTool.get_blocking_connection(user, password, target, port)
         channel = connection.channel()
         channel.exchange_declare(exchange='mirror', exchange_type='topic')
 
-        @Connection.serialize
-        @Connection.encrypt
+        @NetworkTool.serialize
+        @NetworkTool.encrypt
         def send(message):
           channel.basic_publish(exchange='mirror', routing_key=target, body=message)
 
@@ -475,7 +476,7 @@ class EmitConnections():
     channels = []
     for target in targets:
       try:
-        connection = Connection.get_blocking_connection(user, password, target, port)
+        connection = NetworkTool.get_blocking_connection(user, password, target, port)
         channel = connection.channel()
         channel.exchange_declare(exchange='mirror', exchange_type='topic')
         channel.extension = SimpleNamespace()
@@ -503,12 +504,18 @@ class MeshReceiver():
       else:
         print(" [+] {}:{}".format(method.routing_key, body))
 
-    rx = MeshReceiver(user='bob', password='dobbs')
+    # Assuming IP: 192.168.0.103
+    # The routing key will be '192.168.0.103.archer.mary'
+    rx = MeshReceiver(user='bob',
+           password='dobbs',
+           routing_key='archer.mary')
+
     rx.register_live_callback(custom_rx_callback)
     rx.start_consuming() # launches a consuming task
     time.sleep(10)
     rx.stop_consuming()  # kills consuming task
     rx.start_consuming() # launches a consuming task with same custom_rx_callback
+
   '''
   def __init__(self, user, password, port=5672, routing_key=None):
     self.user     = user
@@ -517,9 +524,9 @@ class MeshReceiver():
 
     # create a channel with a direct routing key, the key is our ip address
     if routing_key is None or routing_key == '':
-      routing_key = Connection.get_working_ip_address() + '.#'
+      routing_key = NetworkTool.get_working_ip_address() + '.#'
     else:
-      routing_key = Connection.get_working_ip_address() + '.' + routing_key
+      routing_key = NetworkTool.get_working_ip_address() + '.' + routing_key
     self.routing_key = routing_key
     self.rx = ReceiveConnections(user, password, port, routing_key)
 
@@ -557,8 +564,8 @@ class MeshTransmitter(EmitConnections):
   def __init__(self, user, password, port=5672):
     super().__init__(user, password, port)
 
-  @Connection.serialize  # pickle.dumps
-  @Connection.encrypt
+  @NetworkTool.serialize  # pickle.dumps
+  @NetworkTool.encrypt
   def message_to_other_channels(self, message, routing_key=None):
     '''
     Send messages to all of confirmed channels, messages are not persistent
@@ -567,13 +574,14 @@ class MeshTransmitter(EmitConnections):
     by the user.
 
     Example:
-      # assume IP: 192.168.0.102
-      # the actual routing key for this transmission is '192.168.0.102.archer.mary'
+      # Assume confirmed connected IPs are: [192.168.0.102, 192.168.0.103]
+      # The actual routing keys for this transmission are:
+      #   '192.168.0.102.archer.mary'
+      #   '192.168.0.103.archer.mary'
       tx = MeshTransmitter(user="bob", password="dobbs")
       tx.message_to_other_channels(
         Event(signal=signals.Mirror, payload=[1, 2, 3]),
           routing_key = 'archer.mary')
-
     '''
     # create a channel with a direct routing key, the key is our ip address
     if routing_key is None:
@@ -585,16 +593,15 @@ class MeshTransmitter(EmitConnections):
       ip = channel.extension.ip_address
       channel.basic_publish(exchange='mirror', routing_key=ip + routing_key, body=message)
 
-tranceiver_type = sys.argv[1:]
-if not tranceiver_type:
-  sys.stderr.write("Usage: {} [rx]/[tx]/[er]\n".format(sys.argv[0]))
-
-def custom_rx_callback(ch, method, properties, body):
-  print(" [+] {}:{}".format(method.routing_key, body))
-
-
 if __name__ == "__main__":
-  pp('line to appease PEP8')
+  pp('line to appease PEP8/lint noise')
+  tranceiver_type = sys.argv[1:]
+  if not tranceiver_type:
+    sys.stderr.write("Usage: {} [rx]/[tx]/[er]\n".format(sys.argv[0]))
+
+  def custom_rx_callback(ch, method, properties, body):
+    print(" [+] {}:{}".format(method.routing_key, body))
+
   if tranceiver_type[0] == 'rx':
     rx = MeshReceiver(user='bob', password='dobbs', port=5672, routing_key='archer.#')
     rx.register_live_callback(custom_rx_callback)
