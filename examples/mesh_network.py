@@ -7,45 +7,59 @@ This mesh network is provided by RabbitMq.  Your RabbitMq server will have a
 username and a password, these and the encryption key will have to be common
 between all nodes in the mesh.
 
-To set up a transmitter:
+  To set up a transmitter:
 
-  tx = MeshTransmitter(user="bob", password="dobbs", port=5672)
+    tx = MeshTransmitter(user="bob", password="dobbs", port=5672)
 
-To use a transmitter:
+  To use a transmitter:
 
-  tx.message_to_other_channels(
-    Event(
-      signal=signals.Mirror,
-      payload=[1, 2, 3]),
-      routing_key = 'archer.mary')
+    tx.message_to_other_channels(
+      Event(
+        signal=signals.Mirror,
+        payload=[1, 2, 3]),
+        routing_key = 'archer.mary')
 
-To set up a receiver:
+  To set up a receiver:
 
-  rx = MeshReceiver(
-    user='bob',
-    password='dobbs',
-    port=5672,
-    routing_key='archer.#')
+    rx = MeshReceiver(
+      user='bob',
+      password='dobbs',
+      port=5672,
+      routing_key='archer.#')
 
-  # set up the callback which will receive the message
-  def custom_rx_callback(ch, method, properties, body):
-    print(" [+] {}:{}".format(method.routing_key, body))
+    # set up the callback which will receive the message
+    def custom_rx_callback(ch, method, properties, body):
+      print(" [+] {}:{}".format(method.routing_key, body))
 
-  # register the callback with your receiver
-  rx.register_live_callback(custom_rx_callback)
+    # register the callback with your receiver
+    rx.register_live_callback(custom_rx_callback)
 
-  # start the receivers thread to consume messages
-  rx.start_consuming()
+    # start the receivers thread to consume messages
+    rx.start_consuming()
 
-  # to stop this thread
-  rx.stop_consuming()
+    # to stop this thread
+    rx.stop_consuming()
 
-Notes:
-  To install RabbitMq use the ansible play book, and the templates found here:
-  https://github.com/aleph2c/miros/tree/master/experiment/rabbit/ansible
+  Examples:
+    To see specific examples of how to use this package see the bottom of the
+    file.
 
-  For specific instructions on how to use the files linked to above, read:
-  https://aleph2c.github.io/miros/setting_up_rabbit_mq.html
+  Notes:
+
+    RabbitMq setup:
+
+      To install RabbitMq use the ansible play book, and the templates found
+      here:
+      https://github.com/aleph2c/miros/tree/master/experiment/rabbit/ansible
+
+      For specific instructions on how to use the files linked to above, read:
+      https://aleph2c.github.io/miros/setting_up_rabbit_mq.html
+
+    Routing keys:
+      All routing keys have the destination IP address prepended to them
+
+
+
 '''
 
 # NOT in the standard library
@@ -103,7 +117,7 @@ class NetworkTool():
     Get the ip of this computer:
 
     Example:
-      NetworkTool.get_working_ip_address()
+      my_ip = NetworkTool.get_working_ip_address()
 
     '''
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
