@@ -695,7 +695,7 @@ if __name__ == "__main__":
 
   # The user wants to receive messages directed to this node in the mesh network
   if tranceiver_type[0] == 'rx':
-    rx = MeshReceiver(user='bob', password='dobbs', port=5672, routing_key='#.jessica')
+    rx = MeshReceiver(user='bob', password='dobbs', port=5672, routing_key='#')
     rx.register_live_callback(custom_rx_callback)
     rx.start_consuming()
     time.sleep(500)
