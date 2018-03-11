@@ -79,9 +79,9 @@ import cryptography
 from functools import wraps
 from threading import Thread
 from types import SimpleNamespace
+from miros.foreign import ForeignHsm
 from cryptography.fernet import Fernet
 from threading import Event as ThreadingEvent
-
 
 class NetworkTool():
   '''
@@ -467,6 +467,150 @@ class ReceiveConnections():
     '''
     self.task_run_event.clear()
 
+class ReceiveInstrumentation():
+  '''
+  Receive spy/trace information from another program's TransmitInstrumentation
+  object.
+  '''
+
+  def __init__(self, user, password, port=5672, encryption_key=None):
+    self.rabbit_user = user
+    self.rabbit_password = password
+
+    if encryption_key is None:
+      self.encryption_key = NetworkTool.encryption_key
+    else:
+      self.encryption_key = encryption_key
+
+    credentials = pika.PlainCredentials(user, password)
+
+    parameters = \
+      pika.ConnectionParameters(
+        NetworkTool.get_working_ip_address(), port, '/', credentials)
+
+    self.connection = pika.BlockingConnection(parameters=parameters)
+    self.channel = self.connection.channel()
+    self.channel.exchange_declare(exchange='spy',   exchange_type='fanout')
+    self.channel.exchange_declare(exchange='trace', exchange_type='fanout')
+
+    # create new queues, and ensure they destroy themselves when we disconnect
+    # from them
+    spy_rx   = self.channel.queue_declare(exclusive=True)
+    trace_rx = self.channel.queue_declare(exclusive=True)
+
+    # queue names are random, so we need to get their names
+    spy_queue_name   = spy_rx.method.queue
+    trace_queue_name = trace_rx.method.queue
+
+    # bind the exchanges to each of the queues
+    self.channel.queue_bind(exchange='spy', queue=spy_queue_name)
+    self.channel.queue_bind(exchange='trace', queue=trace_queue_name)
+
+    # The 'start_consuming' method of the pika library will block the program.
+    # for this reason we will put it in it's own thread so that it does not harm
+    # our program flow, to communicate to it we use an Event from the threading
+    # class
+    self.task_run_event = ThreadingEvent()
+    self.task_run_event.set()
+
+    # make a ForeignHsm to track activity on another machine
+    self.foreign_hsm = ForeignHsm()
+
+    self.live_spy_callback = self.default_spy_callback
+    self.live_trace_callback = self.default_trace_callback
+
+    @ReceiveInstrumentation.decrypt(self.encryption_key)
+    def spy_callback(ch, method, properties, body):
+      '''create a spy_callback function received messages in the queue'''
+      foreign_spy_item = body
+      self.foreign_hsm.append_to_spy(foreign_spy_item)
+      self.live_spy_callback(ch, method, properties, body)
+
+    @ReceiveInstrumentation.decrypt(self.encryption_key)
+    def trace_callback(ch, method, properties, body):
+      '''create a trace_callback function received messages in the queue'''
+      foreign_trace_item = body
+      self.foreign_hsm.append_to_trace(foreign_trace_item)
+      self.live_trace_callback(ch, method, properties, body)
+
+    # register the spy_callback and trace_callback with a queue
+    self.channel.basic_consume(spy_callback,
+        queue=spy_queue_name,
+        no_ack=True)
+
+    self.channel.basic_consume(trace_callback,
+        queue=trace_queue_name,
+        no_ack=True)
+
+  def default_spy_callback(self, ch, method, properties, body):
+    '''
+    '''
+    print(" [xs] {}:{}".format(method.routing_key, body))
+
+  def default_trace_callback(self, ch, method, properties, body):
+    '''
+    '''
+    print(" [xt] {}:{}".format(method.routing_key, body))
+
+  def register_live_spy_callback(self, live_callback):
+    '''
+    '''
+    self.live_spy_callback = live_callback
+
+  def register_live_trace_callback(self, live_callback):
+    '''
+    '''
+    self.live_trace_callback = live_callback
+
+  @staticmethod
+  def decrypt(encryption_key):
+    '''
+    '''
+    def _decrypt(fn):
+      @wraps(fn)
+      def __decrypt(ch, method, properties, cyphertext):
+        '''ReceiveInstrumentation.decrypt()'''
+        key = encryption_key
+        f = Fernet(key)
+        plain_text = f.decrypt(cyphertext).decode()
+        fn(ch, method, properties, plain_text)
+      return __decrypt
+    return _decrypt
+
+  def start_consuming(self):
+    def channel_consumer(self):
+      '''
+      This timeout_callback is the only way to communicate with a pika channel
+      once it has started consuming.  This time out checks to see if this
+      thread should die, if so, it calls stop_consuming, if not, it arms
+      another timeout callback.  (Working with the library)
+      '''
+      self.task_run_event.set()
+
+      def timeout_callback():
+        if self.task_run_event.is_set():
+          self.connection.add_timeout(deadline=10, callback_method=timeout_callback)
+        else:
+          self.channel.stop_consuming()
+          return
+
+      # We are within our own thread, we arm a timeout callback
+      self.connection.add_timeout(deadline=10, callback_method=timeout_callback)
+
+      # This process will block forever, with the exception of calling the
+      # timeout_callback every 10 seconds.
+      self.channel.start_consuming()
+
+    # Create and start the thread.  The thread can be stopped by clearing the
+    # task_run_event Event.
+    thread = Thread(target=channel_consumer, args=(self,), daemon=True)
+    thread.start()
+
+  def stop_consuming(self):
+    '''
+    This will kill the channel_consumer within the next 10 seconds
+    '''
+    self.task_run_event.clear()
 
 class EmitConnections():
   '''
@@ -568,6 +712,87 @@ class EmitConnections():
         pass
     return channels
 
+class TransmitInstrumentation():
+  '''
+  To use this:
+
+  Example:
+    tx_instrument = TransmitInstrumentation(
+      user='bob',
+      password='dobbs',
+      port=5672,
+      encryption_key=
+       b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0='
+    )
+
+    # where ao is a statechart object
+    ao.register_live_spy_callback(tx_instrument.broadcast_spy)
+    ao.register_live_trace_callback(tx_instrument.broadcast_trace)
+
+  '''
+  def __init__(self, user, password, port=5672, encryption_key=None):
+    possible_ips = NetworkTool.ip_addresses_on_lan()
+    # use the target information from EmitConnections.scout_targets
+    targets = EmitConnections.scout_targets(possible_ips, user, password)
+    self.spy_channels = TransmitInstrumentation.get_spy_channels(targets, user, password, port)
+    self.trace_channels = TransmitInstrumentation.get_trace_channels(targets, user, password, port)
+
+    @TransmitInstrumentation.encrypt(encryption_key)
+    def broadcast_spy(spy_information):
+      for channel in self.spy_channels:
+        channel.basic_publish(
+            exchange='spy',
+            routing_key='',
+            body=spy_information
+        )
+
+    @TransmitInstrumentation.encrypt(encryption_key)
+    def broadcast_trace(trace_information):
+      for channel in self.trace_channels:
+        channel.basic_publish(
+            exchange='trace',
+            routing_key='',
+            body=trace_information
+        )
+
+    self.broadcast_spy   = broadcast_spy
+    self.broadcast_trace = broadcast_trace
+
+  @staticmethod
+  def get_spy_channels(targets, user, password, port):
+    return TransmitInstrumentation.get_channels(targets, user, password, port, 'spy')
+
+  @staticmethod
+  def get_trace_channels(targets, user, password, port):
+    return TransmitInstrumentation.get_channels(targets, user, password, port, 'trace')
+
+  @staticmethod
+  def get_channels(targets, user, password, port, exchange_name):
+    channels = []
+    for target in targets:
+      try:
+        connection = NetworkTool.get_blocking_connection(user, password, target, port)
+        channel    = connection.channel()
+        channel.exchange_declare(exchange=exchange_name, exchange_type='fanout')
+        channel.extension = SimpleNamespace()
+        setattr(channel.extension, 'ip_address', target)
+        channels.append(channel)
+      except:
+        pass
+    return channels
+
+  @staticmethod
+  def encrypt(encryption_key):
+    '''
+    '''
+    def _encrypt(fn):
+      @wraps(fn)
+      def __encrypt(plain_text):
+        f = Fernet(encryption_key)
+        cyphertext = f.encrypt(plain_text.encode())
+        fn(cyphertext)
+      return __encrypt
+    return _encrypt
 
 class MeshReceiver():
   '''
@@ -687,11 +912,35 @@ if __name__ == "__main__":
 
   def ergotic_rx_callback(ch, method, properties, body):
     print(" [+e] {}:{}".format(method.routing_key, body))
-
   # Get the user input
   tranceiver_type = sys.argv[1:]
   if not tranceiver_type:
     sys.stderr.write("Usage: {} [rx]/[tx]/[er]\n".format(sys.argv[0]))
+
+  rx_instrumentation = ReceiveInstrumentation(
+    user='bob', password='dobbs', port=5672, encryption_key=b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
+  rx_instrumentation.start_consuming()
+
+  tx_instrument = TransmitInstrumentation(
+   user='bob',
+   password='dobbs',
+   port=5672,
+   encryption_key=
+    b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0='
+  )
+
+  def custom_spy_callback(ch, method, properties, body):
+    print(" [+s] {}:{}".format(method.routing_key, body))
+
+  def custom_trace_callback(ch, method, properties, body):
+    print(" [+t] {}:{}".format(method.routing_key, body))
+
+  # register spy instrumentation callback with your rx_instrumentation
+  rx_instrumentation.register_live_spy_callback(custom_spy_callback)
+
+  # register trace instrumentation callback with your rx_instrumentation
+  rx_instrumentation.register_live_trace_callback(custom_trace_callback)
+
 
   # The user wants to receive messages directed to this node in the mesh network
   if tranceiver_type[0] == 'rx':
@@ -710,6 +959,8 @@ if __name__ == "__main__":
     tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]), routing_key = 'archer.mary')
     tx.message_to_other_channels(Event(signal=signals.Mirror, payload=[1, 2, 3]))
     tx.message_to_other_channels([1, 2, 3, 4], routing_key = 'archer.jane')
+    tx_instrument.broadcast_spy("Spy information")
+    tx_instrument.broadcast_spy("Trace information")
 
   # The user wants to both transmit to all nodes in the mesh and receive all
   # messeges sent to this node
@@ -727,6 +978,8 @@ if __name__ == "__main__":
       tx.message_to_other_channels(
         Event(signal = signals.Mirror, payload=(message + '_' + str(i))),
         routing_key = 'archer.jessica')
+      tx_instrument.broadcast_spy("Spy information from {}".format(NetworkTool.get_working_ip_address()))
+      tx_instrument.broadcast_trace("Trace information from {}".format(NetworkTool.get_working_ip_address()))
       time.sleep(0.5)
     rx.stop_consuming()
 
