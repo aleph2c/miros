@@ -1,64 +1,123 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 '''
-This package is used to link a miros statechart into a mesh network on a LAN.
+This package is used to link a miros statechart into an encrypted mesh network
+on a LAN.
 
-This mesh network is provided by RabbitMq.  Your RabbitMq server will have a
-username and a password, these and the encryption key will have to be common
-between all nodes in the mesh.
+RabbitMq serves this mesh network so each node will have to run a RabbitMq
+server.  There are two different ways for this package to provide mesh
+communications.  The first way uses 'topic_routing' and serialization; which
+will allow any node to share any Python object, across the mesh network.  The
+second way to communicate is to provide an instrumentation channel using the
+'fanout' routing technique; this will allow the spy and trace outputs of each
+statechart to route to one machine for debugging purposes.
 
-  To set up a transmitter:
+The encryption keys used by the normal mesh will have to be common across all
+nodes.  Likewise, the encryption keys used by the instrumentation mesh will have
+to be common across all of its nodes.
 
-    tx = MeshTransmitter(user="bob", password="dobbs", port=5672)
+  Normal Mesh Examples:
 
-  To use a transmitter:
+    To set the normal mesh encrytion key:
+      NetworkTool.encryption_key = <new_key>
 
-    tx.message_to_other_channels(
-      Event(
-        signal=signals.Mirror,
-        payload=[1, 2, 3]),
-        routing_key = 'archer.mary')
+    To generate a new key:
+      Fernet.generate_key()
 
-  To set up a receiver:
+    To set up a normal mesh transmitter:
+      tx = MeshTransmitter(user="bob", password="dobbs", port=5672)
 
-    rx = MeshReceiver(
-      user='bob',
-      password='dobbs',
-      port=5672,
-      routing_key='archer.#')
+    To use a normal mesh transmitter:
+      tx.message_to_other_channels(
+        Event(
+          signal=signals.Mirror,
+          payload=[1, 2, 3]),
+          routing_key = 'archer.mary')
 
-    # set up the callback which will receive the message
-    def custom_rx_callback(ch, method, properties, body):
-      print(" [+] {}:{}".format(method.routing_key, body))
+    To set up a normal mesh receiver:
+      rx = MeshReceiver(
+        user='bob',
+        password='dobbs',
+        port=5672,
+        routing_key='archer.#')
 
-    # register the callback with your receiver
-    rx.register_live_callback(custom_rx_callback)
+      # set up the callback which will receive the message
+      def custom_rx_callback(ch, method, properties, body):
+        print(" [+] {}:{}".format(method.routing_key, body))
 
-    # start the receivers thread to consume messages
-    rx.start_consuming()
+      # register the callback with your receiver
+      rx.register_live_callback(custom_rx_callback)
 
-    # to stop this thread
-    rx.stop_consuming()
+      # start the receivers thread to consume messages
+      rx.start_consuming()
 
-  Examples:
+      # to stop this thread
+      rx.stop_consuming()
+
+  Instrumentation Mesh Examples:
+
+    To generate a new encyption key:
+      Fernet.generate_key()
+
+    To use an instrumentation mesh transmitter:
+      tx_instrument = TransmitInstrumentation(
+        user='bob',
+        password='dobbs',
+        port=5672,
+        encryption_key=
+          b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0='
+      )
+
+      # Given that ao is a statechart object you would register it's live
+      # spy/trace output with the tx_instrument broadcast_spy and
+      # broadcast_trace methods respectively:
+      ao.register_live_spy_callback(tx_instrument.broadcast_spy)
+      ao.register_live_trace_callback(tx_instrument.broadcast_trace)
+
+      # Or you can broadcast messages directly to the connected spy and trace
+      # exchanges:
+      tx_instrument.broadcast_spy("Spy information")
+      tx_instrument.broadcast_spy("Trace information")
+
+    To use an instrumentation mesh receiver:
+      rx_instrumentation = ReceiveInstrumentation(
+        user='bob',
+        password='dobbs',
+        port=5672,
+        encryption_key=
+          b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
+
+      rx_instrumentation.start_consuming()
+
+      def custom_spy_callback(ch, method, properties, body):
+        print(" [+s] {}:{}".format(method.routing_key, body))
+
+      def custom_trace_callback(ch, method, properties, body):
+        print(" [+t] {}:{}".format(method.routing_key, body))
+
+      # register spy instrumentation callback with your rx_instrumentation
+      rx_instrumentation.register_live_spy_callback(custom_spy_callback)
+
+      # register trace instrumentation callback with your rx_instrumentation
+      rx_instrumentation.register_live_trace_callback(custom_trace_callback)
+
+  More Examples:
     To see specific examples of how to use this package see the bottom of the
     file.
 
   Notes:
 
     RabbitMq setup:
-
-      To install RabbitMq use the ansible play book, and the templates found
+      To install RabbitMq use the ansible play book and the templates found
       here:
       https://github.com/aleph2c/miros/tree/master/experiment/rabbit/ansible
 
-      For specific instructions on how to use the files linked to above, read:
+      For specific instructions on how to use the ansible files linked to above,
+      read:
       https://aleph2c.github.io/miros/setting_up_rabbit_mq.html
 
     Routing keys:
-      All routing keys have the destination IP address prepended to them
-
-
+      All topic routing keys have the destination IP address prepended to them
 
 '''
 
@@ -371,7 +430,7 @@ class ReceiveConnections():
     self.channel.exchange_declare(exchange=NetworkTool.exchange_name, exchange_type='topic')
 
     # destroy the rabbitmq queue when done
-    result          = self.channel.queue_declare(exclusive=True)
+    result = self.channel.queue_declare(exclusive=True)
     self.queue_name = result.method.queue
 
     self.channel.queue_bind(exchange=NetworkTool.exchange_name, queue=self.queue_name, routing_key=routing_key)
@@ -467,10 +526,43 @@ class ReceiveConnections():
     '''
     self.task_run_event.clear()
 
-class ReceiveInstrumentation():
+class ReceiveInstrumentation(ReceiveConnections):
   '''
   Receive spy/trace information from another program's TransmitInstrumentation
-  object.
+  object.  This is useful for debugging statecharts working across a network.
+
+  This class creates a 'spy' and 'trace' exchange using a 'fanout' routing
+  strategy.
+
+  Example:
+
+    rx_instrumentation = ReceiveInstrumentation(
+      user='bob',
+      password='dobbs',
+      port=5672,
+      encryption_key=
+        b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
+
+    rx_instrumentation.start_consuming()
+
+    # The rx_instrumentationt will have a ForeignHsm object from which you can
+    # view all spy and trace information
+    pp(rx_instrumentation.spy())
+    print(rx_instrumentation.trace())
+
+    # You can also tie a live_spy and live_trace callback method:
+    def custom_spy_callback(ch, method, properties, body):
+      print(" [+s] {}:{}".format(method.routing_key, body))
+
+    def custom_trace_callback(ch, method, properties, body):
+      print(" [+t] {}:{}".format(method.routing_key, body))
+
+    # register spy instrumentation callback with your rx_instrumentation
+    rx_instrumentation.register_live_spy_callback(custom_spy_callback)
+
+    # register trace instrumentation callback with your rx_instrumentation
+    rx_instrumentation.register_live_trace_callback(custom_trace_callback)
+
   '''
 
   def __init__(self, user, password, port=5672, encryption_key=None):
@@ -544,27 +636,69 @@ class ReceiveInstrumentation():
 
   def default_spy_callback(self, ch, method, properties, body):
     '''
+    The default spy callback.  It will be called when an item is received by the
+    'spy' exchange and another callback has not been registered with this object
+    using the register_live_spy_callback method
     '''
     print(" [xs] {}:{}".format(method.routing_key, body))
 
   def default_trace_callback(self, ch, method, properties, body):
     '''
+    The default trace callback.  It will be called when an item is received by the
+    'trace' exchange and another callback has not been registered with this object
+    using the register_live_trace_callback method
     '''
     print(" [xt] {}:{}".format(method.routing_key, body))
 
   def register_live_spy_callback(self, live_callback):
     '''
+    This is used to register a callback method which will be called when we have
+    received spy information from a node in the mesh network.
+
+    Example:
+      rx_instrumentation = ReceiveInstrumentation(
+        user='bob', password='dobbs', port=5672, encryption_key=b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
+      rx_instrumentation.start_consuming()
+
+      def custom_spy_callback(ch, method, properties, body):
+        print(" [+s] {}:{}".format(method.routing_key, body))
+
+      # register spy instrumentation callback with your rx_instrumentation
+      rx_instrumentation.register_live_spy_callback(custom_spy_callback)
+
     '''
     self.live_spy_callback = live_callback
 
   def register_live_trace_callback(self, live_callback):
     '''
+    This is used to register a callback method which will be called when we have
+    received trace information from a node in the mesh network.
+
+    Example:
+      rx_instrumentation = ReceiveInstrumentation(
+        user='bob', password='dobbs', port=5672, encryption_key=b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
+      rx_instrumentation.start_consuming()
+
+      def custom_trace_callback(ch, method, properties, body):
+        print(" [+s] {}:{}".format(method.routing_key, body))
+
+      # register trace instrumentation callback with your rx_instrumentation
+      rx_instrumentation.register_live_trace_callback(custom_trace_callback)
+
     '''
     self.live_trace_callback = live_callback
 
   @staticmethod
   def decrypt(encryption_key):
     '''
+    Parameterized descryption decorator.
+
+    Example:
+      @ReceiveInstrumentation.decrypt(self.encryption_key)
+      def spy_callback(ch, method, properties, body):
+        foreign_spy_item = body
+        self.foreign_hsm.append_to_spy(foreign_spy_item)
+        self.live_spy_callback(ch, method, properties, body)
     '''
     def _decrypt(fn):
       @wraps(fn)
@@ -577,40 +711,6 @@ class ReceiveInstrumentation():
       return __decrypt
     return _decrypt
 
-  def start_consuming(self):
-    def channel_consumer(self):
-      '''
-      This timeout_callback is the only way to communicate with a pika channel
-      once it has started consuming.  This time out checks to see if this
-      thread should die, if so, it calls stop_consuming, if not, it arms
-      another timeout callback.  (Working with the library)
-      '''
-      self.task_run_event.set()
-
-      def timeout_callback():
-        if self.task_run_event.is_set():
-          self.connection.add_timeout(deadline=10, callback_method=timeout_callback)
-        else:
-          self.channel.stop_consuming()
-          return
-
-      # We are within our own thread, we arm a timeout callback
-      self.connection.add_timeout(deadline=10, callback_method=timeout_callback)
-
-      # This process will block forever, with the exception of calling the
-      # timeout_callback every 10 seconds.
-      self.channel.start_consuming()
-
-    # Create and start the thread.  The thread can be stopped by clearing the
-    # task_run_event Event.
-    thread = Thread(target=channel_consumer, args=(self,), daemon=True)
-    thread.start()
-
-  def stop_consuming(self):
-    '''
-    This will kill the channel_consumer within the next 10 seconds
-    '''
-    self.task_run_event.clear()
 
 class EmitConnections():
   '''
@@ -714,7 +814,11 @@ class EmitConnections():
 
 class TransmitInstrumentation():
   '''
-  To use this:
+  Transmit spy/trace information from this computer to all other computers using
+  the mesh network.
+
+  You could create an instance of the object with the RabbitMq credentials then
+  register your statechart's spy and trace instrumentation with it.
 
   Example:
     tx_instrument = TransmitInstrumentation(
@@ -725,10 +829,15 @@ class TransmitInstrumentation():
        b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0='
     )
 
-    # where ao is a statechart object
+    # Given that ao is a statechart object you would register it's live
+    # spy/trace output with the tx_instrument broadcast_spy and broadcast_trace
+    # methods respectively:
     ao.register_live_spy_callback(tx_instrument.broadcast_spy)
     ao.register_live_trace_callback(tx_instrument.broadcast_trace)
 
+    # Or you can broadcast messages directly to the connected spy and trace exchanges
+    tx_instrument.broadcast_spy("Spy information")
+    tx_instrument.broadcast_spy("Trace information")
   '''
   def __init__(self, user, password, port=5672, encryption_key=None):
     possible_ips = NetworkTool.ip_addresses_on_lan()
@@ -760,14 +869,26 @@ class TransmitInstrumentation():
 
   @staticmethod
   def get_spy_channels(targets, user, password, port):
+    '''
+    Get all spy channels associated with different working IP addresses that
+    have a 'spy' fanout exchange
+    '''
     return TransmitInstrumentation.get_channels(targets, user, password, port, 'spy')
 
   @staticmethod
   def get_trace_channels(targets, user, password, port):
+    '''
+    Get all trace channels associated with different working IP addresses that
+    have a 'trace' fanout exchange
+    '''
     return TransmitInstrumentation.get_channels(targets, user, password, port, 'trace')
 
   @staticmethod
   def get_channels(targets, user, password, port, exchange_name):
+    '''
+    Get all channels associated with different working IP addresses that
+    have an 'exchange_name' fanout exchange
+    '''
     channels = []
     for target in targets:
       try:
@@ -784,6 +905,17 @@ class TransmitInstrumentation():
   @staticmethod
   def encrypt(encryption_key):
     '''
+    Parameterized encryption decorator.
+
+    Example:
+      @TransmitInstrumentation.encrypt(encryption_key)
+      def broadcast_spy(spy_information):
+        for channel in self.spy_channels:
+          channel.basic_publish(
+              exchange='spy',
+              routing_key='',
+              body=spy_information
+          )
     '''
     def _encrypt(fn):
       @wraps(fn)
@@ -921,14 +1053,6 @@ if __name__ == "__main__":
     user='bob', password='dobbs', port=5672, encryption_key=b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
   rx_instrumentation.start_consuming()
 
-  tx_instrument = TransmitInstrumentation(
-   user='bob',
-   password='dobbs',
-   port=5672,
-   encryption_key=
-    b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0='
-  )
-
   def custom_spy_callback(ch, method, properties, body):
     print(" [+s] {}:{}".format(method.routing_key, body))
 
@@ -941,6 +1065,13 @@ if __name__ == "__main__":
   # register trace instrumentation callback with your rx_instrumentation
   rx_instrumentation.register_live_trace_callback(custom_trace_callback)
 
+  tx_instrument = TransmitInstrumentation(
+   user='bob',
+   password='dobbs',
+   port=5672,
+   encryption_key=
+    b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0='
+  )
 
   # The user wants to receive messages directed to this node in the mesh network
   if tranceiver_type[0] == 'rx':
