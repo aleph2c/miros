@@ -66,10 +66,10 @@ one node remains.</p>
 <ul class="simple">
 <li><a class="reference internal" href="#i-mongol-example-technical-oveview"><span class="std std-ref">Technical Overview</span></a></li>
 <li><a class="reference internal" href="#i-mongol-example-designing-the-mongol-in-its-tactic"><span class="std std-ref">Designing the Mongol in its Tactic</span></a></li>
-<li><a class="reference internal" href="#i-mongol-example-encrypted-communications"><span class="std std-ref">Encrypted Commnications</span></a></li>
 <li><a class="reference internal" href="#i-mongol-example-the-first-horseman"><span class="std std-ref">The First Horseman</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-encrypted-communications"><span class="std std-ref">Encrypted Communications</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-building-a-mesh-network"><span class="std std-ref">Building a Mesh Network</span></a></li>
 <li><a class="reference internal" href="#i-mongol-example-instrumenting-to-debug-the-botnet"><span class="std std-ref">Instrumenting to Debug a Horse Archer</span></a></li>
-<li><a class="reference internal" href="#i-mongol-example-implementing-the-mongol-in-miros"><span class="std std-ref">Implementing the Mogol in miros</span></a></li>
 </ul>
 <div class="section" id="some-historical-context-for-the-example">
 <span id="i-mongol-example-historical-context"></span><h2>Some Historical Context For the Example<a class="headerlink" href="#some-historical-context-for-the-example" title="Permalink to this headline">¶</a></h2>
@@ -293,7 +293,7 @@ demonstrate that it is working.</p>
 <li><a class="reference internal" href="#i-mongol-example-designing-the-mongol-in-its-tactic"><span class="std std-ref">Designing the Mongol in its Tactic</span></a></li>
 <li><a class="reference internal" href="#i-mongol-example-encrypted-communications"><span class="std std-ref">Encrypted Commnications</span></a></li>
 <li><a class="reference internal" href="#i-mongol-example-instrumenting-to-debug-the-botnet"><span class="std std-ref">Instrumenting to Debug the Mongol Botnet</span></a></li>
-<li><a class="reference internal" href="#i-mongol-example-implementing-the-mongol-in-miros"><span class="std std-ref">Implementing the Mogol in miros</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-building-a-mesh-network"><span class="std std-ref">Building a Mesh Network</span></a></li>
 </ul>
 </div>
 <div class="section" id="designing-the-mongol-in-its-tactic">
@@ -682,258 +682,6 @@ each step are also unexceptional.  They are simple things that a horse archer
 already knows how to do.  Once we explain Harel formalism and this basic tactic
 to our troops and their junior officers, watch out; they will innovate and
 improve it until we get something truly remarkable.</p>
-</div>
-<div class="section" id="encrypted-communications">
-<h2>Encrypted Communications<a class="headerlink" href="#encrypted-communications" title="Permalink to this headline">¶</a></h2>
-<p>The ergodic nature of are war-bot has a downside.  Once you know how to defeat
-one node, you know how to defeat all of them.  Furthermore, the communications
-between the bots are fundamental to its system design; if you can inject your
-own messaging between them, you will <em>PWN</em> this bot net.</p>
-<p>A 13th century European would have not spoken Mongolian, so a Mongol horse
-archer would have no problem with intercepted communications.  But, what would
-have happened if they had to fight another unit of horse archers?  They would
-know what the other side was up to and vise versa.</p>
-<p>So it would make sense if each Mongol unit had their own set of war cries.  This
-way they could act on an instruction without doubt or hesitation.</p>
-<p>The horse archer communications need to be encrypted.  There are many different
-ways to do this; it can happen at the communications layer using SSL, or it can
-be handled within our war bot directly.</p>
-<p>I have opted to use a symmetric encryption scheme with the Fernet library within
-our war bot.  I did this after investigating pycryto; which does not
-have windows support and has been largely abandon by it’s maintainer.  Don’t use
-pycrypt.</p>
-<p>Let’s just use Fernet.</p>
-<p>Fernet takes a lot of pain out of encryption, but you still need a key.
-Encryption is really about key management; how do you keep your key hidden from
-your opponent?  Well for now we will hide our key as highlighted plain text on
-this website so that everyone on the Internet can see it:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cryptography.fernet</span> <span class="kn">import</span> <span class="n">Fernet</span>
-
-<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
-  <span class="nd">@staticmethod</span>
-  <span class="k">def</span> <span class="nf">key</span><span class="p">():</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Get the encryption key for this connection.  This key is used for encryption</span>
-<span class="sd">    and decryption.</span>
-
-<span class="sd">    Example:</span>
-<span class="sd">      key = Connection.key()</span>
-
-<span class="sd">    Note:</span>
-<span class="sd">    To generate a new key: Fernet.generate_key()</span>
-<span class="sd">    A better way to do this is to get the key from your connected flash-drive.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-<span class="hll">    <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=&#39;</span>
-</span></pre></div>
-</div>
-<p>Feeling better already.</p>
-<p>To encrypt our data we will use a Python decorator:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cryptography.fernet</span> <span class="kn">import</span> <span class="n">Fernet</span>
-
-<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
-  <span class="c1"># ..</span>
-  <span class="c1"># ..</span>
-  <span class="nd">@staticmethod</span>
-  <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    A decorator which will encrypt a byte stream prior to transmission:</span>
-
-<span class="sd">    Example:</span>
-<span class="sd">      @Connection.serialize</span>
-<span class="sd">      @Connection.encrypt   # &lt;- HERE: &#39;message&#39; (encrypted bytestream)</span>
-<span class="sd">      def message_to_other_channels(self, message):</span>
-<span class="sd">        for channel in self.channels:</span>
-<span class="sd">          ip = channel.extension.ip_address</span>
-<span class="sd">          channel.basic_publish(exchange=&#39;mirror&#39;,</span>
-<span class="sd">              routing_key=ip, body=message)</span>
-<span class="sd">          print(&quot; [x] Sent \&quot;{}\&quot; to {}&quot;.format(message, ip))</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_encrypt</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-      <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">      encrypt a byte stream</span>
-<span class="sd">      &#39;&#39;&#39;</span>
-
-      <span class="c1"># To get around the &#39;self-as-the-first-argument&#39; issue</span>
-      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">plain_text</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-      <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">plain_text</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-      <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-<span class="hll">      <span class="n">f</span> <span class="o">=</span> <span class="n">Fernet</span><span class="p">(</span><span class="n">Connection</span><span class="o">.</span><span class="n">key</span><span class="p">())</span>
-</span><span class="hll">      <span class="n">cyphertext</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">plain_text</span><span class="p">)</span>
-</span>
-      <span class="c1"># To get around the &#39;self-as-the-first-argument&#39; issue</span>
-      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<span class="hll">        <span class="n">fn</span><span class="p">(</span><span class="n">cyphertext</span><span class="p">)</span>
-</span>      <span class="k">else</span><span class="p">:</span>
-<span class="hll">        <span class="n">fn</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cyphertext</span><span class="p">)</span>
-</span>    <span class="k">return</span> <span class="n">_encrypt</span>
-</pre></div>
-</div>
-<p>To decrypt we make another decorator:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cryptography.fernet</span> <span class="kn">import</span> <span class="n">Fernet</span>
-
-<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
-  <span class="c1"># ..</span>
-  <span class="c1"># ..</span>
-  <span class="nd">@staticmethod</span>
-  <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    A decorator which will decrypt a received message into a byte stream.</span>
-
-<span class="sd">    Example:</span>
-<span class="sd">      @Connection.decrypt  # &lt;- HERE: &#39;body&#39; decrypted into a byte stream</span>
-<span class="sd">      @Connection.deserialize</span>
-<span class="sd">      def custom_rx_callback(ch, method, properties, body):</span>
-<span class="sd">        print(&quot; [+] {}:{}&quot;.format(method.routing_key, body))</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_decrypt</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">cyphertext</span><span class="p">):</span>
-      <span class="sd">&#39;&#39;&#39;LocalConsumer.decrypt()&#39;&#39;&#39;</span>
-<span class="hll">      <span class="n">f</span> <span class="o">=</span> <span class="n">Fernet</span><span class="p">(</span><span class="n">Connection</span><span class="o">.</span><span class="n">key</span><span class="p">())</span>
-</span><span class="hll">      <span class="n">plain_text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">cyphertext</span><span class="p">)</span>
-</span><span class="hll">      <span class="n">fn</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">plain_text</span><span class="p">)</span>
-</span>    <span class="k">return</span> <span class="n">_decrypt</span>
-</pre></div>
-</div>
-<p>So, we can get a key, we can encrypt and decrypt.  Now, what can we send?  There
-is a process in python called pickling which serializes an object into a
-collection of bytes.  This collection of bytes can be sent across a network.</p>
-<p>Serialization will allow our horse archers to transmit anything within their war
-cries.  “Hey Ганболд (Gandbold), do you want one of my extra horses?”, “yes”,
-“OK here you go, lala-bee-boop”.  This concept expands on the notion of a war
-cry; but it is really cool that we can transmit the objects of working programs,
-between the nodes of our botnet.  Of course this is a security nightmare, so if we
-are going to serialize and de-serialize messages <em>we will have to use an
-encrypted channel</em>.</p>
-<p>Now let’s show the serialization technique, it is also implemented using a
-decorator:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">miros.event</span> <span class="nn">import</span> <span class="nn">Event</span>
-
-<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
-  <span class="c1"># ..</span>
-  <span class="c1"># ..</span>
-
-  <span class="nd">@staticmethod</span>
-  <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    A decorator which will turn arguments into a byte stream prior to encryption:</span>
-
-<span class="sd">    Example:</span>
-<span class="sd">      @Connection.serialize  # &lt;- HERE: &#39;message&#39; turned into byte stream</span>
-<span class="sd">      @Connection.encrypt</span>
-<span class="sd">      def message_to_other_channels(self, message):</span>
-<span class="sd">        for channel in self.channels:</span>
-<span class="sd">          ip = channel.extension.ip_address</span>
-<span class="sd">          channel.basic_publish(exchange=&#39;mirror&#39;,</span>
-<span class="sd">              routing_key=ip, body=message)</span>
-<span class="sd">          print(&quot; [x] Sent \&quot;{}\&quot; to {}&quot;.format(message, ip))</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_pickle_dumps</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">message</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-      <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">message</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-      <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-
-      <span class="c1"># The event object is dynamically constructed and can&#39;t be serialized by</span>
-      <span class="c1"># pickle, so we call it&#39;s custom serializer prior to pickling it</span>
-<span class="hll">      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">Event</span><span class="p">):</span>
-</span><span class="hll">        <span class="n">message</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-</span>
-<span class="hll">      <span class="n">pmessage</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-</span>
-      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">fn</span><span class="p">(</span><span class="n">pmessage</span><span class="p">)</span>
-      <span class="k">else</span><span class="p">:</span>
-        <span class="n">fn</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pmessage</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_pickle_dumps</span>
-</pre></div>
-</div>
-<p>The highlighted text in our serialization code demonstrates where the actual
-pickling happens.  We see that there is a custom <code class="docutils literal"><span class="pre">dumps</span></code> method written for a
-miros Event.  The Event object can’t be serialized with a pickle object because
-it uses a simple metaprogramming technique for making new signal names.  No
-problem, we just call the Event <code class="docutils literal"><span class="pre">dumps</span></code> method first, then call the pickle
-<code class="docutils literal"><span class="pre">dumps</span></code> method on its result.</p>
-<p>Now we have a byte stream we can feed our encryption decorator.</p>
-<p>How do we turn it back to an object after it has been decrypted?  Well, we
-call the <code class="docutils literal"><span class="pre">deserialize</span></code> decorator.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">miros.event</span> <span class="nn">import</span> <span class="nn">Event</span>
-
-<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
-  <span class="c1"># ..</span>
-  <span class="c1"># ..</span>
-  <span class="nd">@staticmethod</span>
-  <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    A decorator used to turn a serialized byte stream into a python object</span>
-
-<span class="sd">    Example:</span>
-<span class="sd">      @Connection.decrypt</span>
-<span class="sd">      @Connection.deserialize  # &lt;- HERE: &#39;body&#39; bytestream turn into object</span>
-<span class="sd">      def custom_rx_callback(ch, method, properties, body):</span>
-<span class="sd">        print(&quot; [+] {}:{}&quot;.format(method.routing_key, body))</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_pickle_loads</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">p_plain_text</span><span class="p">):</span>
-<span class="hll">      <span class="n">plain_text</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">p_plain_text</span><span class="p">)</span>
-</span><span class="hll">      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plain_text</span><span class="p">,</span> <span class="n">Event</span><span class="p">):</span>
-</span><span class="hll">        <span class="n">plain_text</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">plain_text</span><span class="p">)</span>
-</span>      <span class="n">fn</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">plain_text</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_pickle_loads</span>
-</pre></div>
-</div>
-<p>The de-serialization is just the reverse of the serialization.  We call the
-pickle <code class="docutils literal"><span class="pre">loads</span></code> method on the pickled object, then if it is a serialized Event,
-we call the custom <code class="docutils literal"><span class="pre">loads</span></code> method of the Event object to get a version of the
-event made by the bot that sent it to us in the first place.</p>
-<p>Let’s go over everything again from a high level.  If a node in our war bot
-wants to share one of its objects with another node, it turns that object into a
-byte-stream using the <code class="docutils literal"><span class="pre">serialize</span></code> decorator, encrypts the byte stream with the
-<code class="docutils literal"><span class="pre">encrypt</span></code> decorator  and spits some  garbled data onto the network layer.  The
-node receiving the data decrypts the stream using the <code class="docutils literal"><span class="pre">decrypt</span></code> decorator,
-then turns the byte stream back into the intended Python object using the
-<code class="docutils literal"><span class="pre">deserialize</span></code> decorator.</p>
-<p>Ok, now what do we do about our secret key?</p>
-<p>Our Mongol unit will have a lot of shared experience.  If they don’t follow each
-other in their advances and their retreats; they will be killed by their senior
-officers.  Maybe we could use this path of actions and the common time
-experienced while advancing and retreating to modulate their original secret
-key.  In this way we could literally post the key on the Internet for everyone
-to see and it wouldn’t matter.  If you wanted to the <em>PWN</em> the bot you would
-have to know every action they had taken, when they took it and their modulation
-algorithm.</p>
-<p>This would be like the Mongol unit making up a new war language every time they
-finished a loop.  They would know that if one of their members became
-de-synchronized they would never find one another again.</p>
-<p>I’m not going to write this into the example; but it is how I would start up my
-thinking about this annoying key issue.  I would do the work well after I was
-sure the original code was running well.  Then we would have to provide some way
-for the botnet to share a common time signal; otherwise NTP poisoning could blow
-the entire thing apart.  Also, I’m not sure how the commanding officer would
-send messages to our unit either; we have yet another key issue.  Maybe the
-botnet could look out at thousands upon thousands of websites, knowing only one
-actually has a message from the commanding officer (on craiglist?).  Then inject a
-random delay prior to acting on the message.</p>
-<p>In this example I demonstrated how to encrypt the data but I exposed the key.
-What we have here is security theater, I’m pretending that the system is secure.
-It is not; I haven’t solved the key issue.</p>
-<p>To give myself a bit more credit; it’s a good start.</p>
-<p>Security is hard, the attacker has the advantage; you can’t know when you have
-been compromised and you can’t trust anything, from your GPU, to the encryption
-standard, to your CPU, it’s all exposed and compromised.</p>
-<p>The attacker has the advantage, so when in doubt, attack!</p>
 </div>
 <div class="section" id="the-first-horseman">
 <span id="i-mongol-example-the-first-horseman"></span><h2>The First Horseman<a class="headerlink" href="#the-first-horseman" title="Permalink to this headline">¶</a></h2>
@@ -2543,11 +2291,295 @@ this trace and lock in Gandbold’s expected behaviour, as a regression test:</p
 </pre></div>
 </div>
 </div>
-<div class="section" id="instrumenting-to-debug-the-mongol-botnet">
-<span id="i-mongol-example-instrumenting-to-debug-the-botnet"></span><span id="other-size-of-regression-test"></span><h2>Instrumenting to Debug the Mongol Botnet<a class="headerlink" href="#instrumenting-to-debug-the-mongol-botnet" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="encrypted-communications">
+<span id="i-mongol-example-encrypted-communications"></span><span id="other-size-of-regression-test"></span><h2>Encrypted Communications<a class="headerlink" href="#encrypted-communications" title="Permalink to this headline">¶</a></h2>
+<p>The ergodic nature of are war-bot has a downside. Once you know how to defeat
+one node, you know how to overcome all of them. Furthermore, the communications
+between the bots are fundamental to its system design; if you can inject your
+own messaging between them, you will PWN this botnet.</p>
+<p>A 13th century European would not have spoken Mongolian so that a Mongol horse
+archer would have no problem with intercepted communications. But, what would
+have happened if they had to fight another unit of horse archers? They would
+know what the other side was up to and vice versa.</p>
+<p>So it would make sense if each Mongol unit had their own set of war cries. This
+way they could act on instruction without doubt or hesitation.</p>
+<p>The horse archer communications need to be encrypted. There are many different
+ways to do this; it can happen at the communications layer using SSL, or it can
+be handled by our war bot directly.</p>
+<p>I have opted to use a symmetric encryption scheme with the Fernet library within
+our war bot. I did this after investigating pycryto; which does not have windows
+support and has mainly been abandon by its maintainer. Don’t use pycrypt.</p>
+<p>Let’s just use Fernet.</p>
+<p>Fernet takes a lot of pain out of encryption, but you still need a key.
+Encryption is really about key management; how do you keep your key hidden from
+your opponent? Well, for now, we will hide our key as highlighted plain text on
+this website so that everyone on the Internet can see it:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cryptography.fernet</span> <span class="kn">import</span> <span class="n">Fernet</span>
+
+<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">key</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Get the encryption key for this connection.  This key is used for encryption</span>
+<span class="sd">    and decryption.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">      key = Connection.key()</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">    To generate a new key: Fernet.generate_key()</span>
+<span class="sd">    A better way to do this is to get the key from your connected flash-drive.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<span class="hll">    <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=&#39;</span>
+</span></pre></div>
 </div>
-<div class="section" id="implementing-the-mongol-in-miros">
-<span id="i-mongol-example-implementing-the-mongol-in-miros"></span><h2>Implementing the Mongol in miros<a class="headerlink" href="#implementing-the-mongol-in-miros" title="Permalink to this headline">¶</a></h2>
+<p>Feeling better already.</p>
+<p>To encrypt our data we will use a Python decorator:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cryptography.fernet</span> <span class="kn">import</span> <span class="n">Fernet</span>
+
+<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
+  <span class="c1"># ..</span>
+  <span class="c1"># ..</span>
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A decorator which will encrypt a byte stream prior to transmission:</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">      @Connection.serialize</span>
+<span class="sd">      @Connection.encrypt   # &lt;- HERE: &#39;message&#39; (encrypted bytestream)</span>
+<span class="sd">      def message_to_other_channels(self, message):</span>
+<span class="sd">        for channel in self.channels:</span>
+<span class="sd">          ip = channel.extension.ip_address</span>
+<span class="sd">          channel.basic_publish(exchange=&#39;mirror&#39;,</span>
+<span class="sd">              routing_key=ip, body=message)</span>
+<span class="sd">          print(&quot; [x] Sent \&quot;{}\&quot; to {}&quot;.format(message, ip))</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_encrypt</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+      <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">      encrypt a byte stream</span>
+<span class="sd">      &#39;&#39;&#39;</span>
+
+      <span class="c1"># To get around the &#39;self-as-the-first-argument&#39; issue</span>
+      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">plain_text</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">plain_text</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+<span class="hll">      <span class="n">f</span> <span class="o">=</span> <span class="n">Fernet</span><span class="p">(</span><span class="n">Connection</span><span class="o">.</span><span class="n">key</span><span class="p">())</span>
+</span><span class="hll">      <span class="n">cyphertext</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">plain_text</span><span class="p">)</span>
+</span>
+      <span class="c1"># To get around the &#39;self-as-the-first-argument&#39; issue</span>
+      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+<span class="hll">        <span class="n">fn</span><span class="p">(</span><span class="n">cyphertext</span><span class="p">)</span>
+</span>      <span class="k">else</span><span class="p">:</span>
+<span class="hll">        <span class="n">fn</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cyphertext</span><span class="p">)</span>
+</span>    <span class="k">return</span> <span class="n">_encrypt</span>
+</pre></div>
+</div>
+<p>To decrypt we make another decorator:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cryptography.fernet</span> <span class="kn">import</span> <span class="n">Fernet</span>
+
+<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
+  <span class="c1"># ..</span>
+  <span class="c1"># ..</span>
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A decorator which will decrypt a received message into a byte stream.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">      @Connection.decrypt  # &lt;- HERE: &#39;body&#39; decrypted into a byte stream</span>
+<span class="sd">      @Connection.deserialize</span>
+<span class="sd">      def custom_rx_callback(ch, method, properties, body):</span>
+<span class="sd">        print(&quot; [+] {}:{}&quot;.format(method.routing_key, body))</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_decrypt</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">cyphertext</span><span class="p">):</span>
+      <span class="sd">&#39;&#39;&#39;LocalConsumer.decrypt()&#39;&#39;&#39;</span>
+<span class="hll">      <span class="n">f</span> <span class="o">=</span> <span class="n">Fernet</span><span class="p">(</span><span class="n">Connection</span><span class="o">.</span><span class="n">key</span><span class="p">())</span>
+</span><span class="hll">      <span class="n">plain_text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">cyphertext</span><span class="p">)</span>
+</span><span class="hll">      <span class="n">fn</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">plain_text</span><span class="p">)</span>
+</span>    <span class="k">return</span> <span class="n">_decrypt</span>
+</pre></div>
+</div>
+<p>So, we can get a key; we can encrypt and decrypt.  Now, what can we send?  There
+is a process in python called pickling which serializes an object into a
+collection of bytes.  This collection of bytes can be transmitted across a
+network.</p>
+<p>Serialization will allow our horse archers to transmit anything within their war
+cries.  “Hey Ганболд (Gandbold), do you want one of my extra horses?”, “yes”,
+“OK here you go, lala-bee-boop”.  This concept expands on the notion of a war
+cry; but it is cool that we can transmit the objects of working programs,
+between the nodes of our botnet.  Of course, this is a security nightmare, so if
+we are going to serialize and de-serialize messages <em>we will have to use an
+encrypted channel</em>.</p>
+<p>Now let’s show the serialization technique, it is also implemented using a
+decorator:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">miros.event</span> <span class="nn">import</span> <span class="nn">Event</span>
+
+<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
+  <span class="c1"># ..</span>
+  <span class="c1"># ..</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A decorator which will turn arguments into a byte stream prior to encryption:</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">      @Connection.serialize  # &lt;- HERE: &#39;message&#39; turned into byte stream</span>
+<span class="sd">      @Connection.encrypt</span>
+<span class="sd">      def message_to_other_channels(self, message):</span>
+<span class="sd">        for channel in self.channels:</span>
+<span class="sd">          ip = channel.extension.ip_address</span>
+<span class="sd">          channel.basic_publish(exchange=&#39;mirror&#39;,</span>
+<span class="sd">              routing_key=ip, body=message)</span>
+<span class="sd">          print(&quot; [x] Sent \&quot;{}\&quot; to {}&quot;.format(message, ip))</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_pickle_dumps</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+
+      <span class="c1"># The event object is dynamically constructed and can&#39;t be serialized by</span>
+      <span class="c1"># pickle, so we call it&#39;s custom serializer prior to pickling it</span>
+<span class="hll">      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">Event</span><span class="p">):</span>
+</span><span class="hll">        <span class="n">message</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</span>
+<span class="hll">      <span class="n">pmessage</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</span>
+      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">fn</span><span class="p">(</span><span class="n">pmessage</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">fn</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pmessage</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_pickle_dumps</span>
+</pre></div>
+</div>
+<p>The highlighted text in our serialization code demonstrates where the actual
+pickling happens.  We see that there is a custom <code class="docutils literal"><span class="pre">dumps</span></code> method written for a
+miros Event.  The miros Event object can’t be serialized with pickle because it
+uses a simple metaprogramming technique for making new signal names.  No
+problem, we just call the Event <code class="docutils literal"><span class="pre">dumps</span></code> method first, then call the pickle
+<code class="docutils literal"><span class="pre">dumps</span></code> method on its result.</p>
+<p>Now we have a byte stream we can feed our encryption decorator.</p>
+<p>How do we turn it back to an object after it has been decrypted?  Well, we call
+the <code class="docutils literal"><span class="pre">deserialize</span></code> decorator.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">miros.event</span> <span class="nn">import</span> <span class="nn">Event</span>
+
+<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
+  <span class="c1"># ..</span>
+  <span class="c1"># ..</span>
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A decorator used to turn a serialized byte stream into a python object</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">      @Connection.decrypt</span>
+<span class="sd">      @Connection.deserialize  # &lt;- HERE: &#39;body&#39; bytestream turn into object</span>
+<span class="sd">      def custom_rx_callback(ch, method, properties, body):</span>
+<span class="sd">        print(&quot; [+] {}:{}&quot;.format(method.routing_key, body))</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_pickle_loads</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">p_plain_text</span><span class="p">):</span>
+<span class="hll">      <span class="n">plain_text</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">p_plain_text</span><span class="p">)</span>
+</span><span class="hll">      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plain_text</span><span class="p">,</span> <span class="n">Event</span><span class="p">):</span>
+</span><span class="hll">        <span class="n">plain_text</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">plain_text</span><span class="p">)</span>
+</span>      <span class="n">fn</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">plain_text</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_pickle_loads</span>
+</pre></div>
+</div>
+<p>The de-serialization is just the reverse of the serialization.  We call the
+pickle <code class="docutils literal"><span class="pre">loads</span></code> method on the pickled object, then if it is a serialized Event,
+we call the custom <code class="docutils literal"><span class="pre">loads</span></code> method of the Event object to get a version of the
+event made by the bot that sent it to us in the first place.</p>
+<p>Let’s go over everything again from a high level.  If a node in our warbot wants
+to share one of its objects with another node, it turns that object into a
+byte-stream using the <code class="docutils literal"><span class="pre">serialize</span></code> decorator, encrypts the byte stream with the
+<code class="docutils literal"><span class="pre">encrypt</span></code> decorator and spits some garbled data onto the network layer.  The
+node receiving the data decrypts the stream using the <code class="docutils literal"><span class="pre">decrypt</span></code> decorator,
+then turns the byte stream back into the intended Python object using the
+<code class="docutils literal"><span class="pre">deserialize</span></code> decorator.</p>
+<p>Ok, now what do we do about our secret key?</p>
+<p>Our Mongol unit will have a lot of shared experience.  If they don’t follow each
+other in their advances and their retreats; their senior officers will kill
+them.  Maybe we could use this path of actions and the common time experienced
+while advancing and retreating to modulate their original secret key.  In this
+way, we could obnoxiously post the key (see above) on the Internet for everyone
+to look at and it wouldn’t matter.  If you wanted to the <em>PWN</em> the bot you would
+have to know every action they had taken, when they made it and their modulation
+algorithm.</p>
+<p>This would be like the Mongol unit making up a new war language every time they
+finished a loop.  They would know that if one of their members became
+de-synchronized, they would never find one another again.</p>
+<p>I’m not going to write this into the example, but it is how I would start-up my
+thinking about this annoying key issue.  I would do the work well after I was
+sure the original code was running well.  Then we would have to provide some way
+for the botnet to get orders from its commanding officer; we have yet another
+key issue.  Maybe the botnet could look out at thousands upon thousands of
+websites, knowing that only one has a message from the commanding officer (on
+craigslist?).  Then inject a random delay before acting on the news.</p>
+<p>In this example I demonstrated how to encrypt the data but I exposed the key.
+So, what we have here is security theater, I’m pretending that the system is
+secure.  It is not; I haven’t solved the key issue.</p>
+<p>Security is hard; the attacker has the advantage; you can’t know when you have
+been compromised and you can’t trust anything, from your GPU to the encryption
+standard, to your CPU, it’s all exposed and compromised.</p>
+<p>The attacker has the advantage, so when in doubt, attack!</p>
+<p>Well that was dramatic.  But where do we attack and whom?  What good is a botnet without
+a network?</p>
+</div>
+</div>
+<div class="section" id="building-a-mesh-network">
+<span id="i-mongol-example-building-a-mesh-network"></span><h1>Building a Mesh Network<a class="headerlink" href="#building-a-mesh-network" title="Permalink to this headline">¶</a></h1>
+<p>We need to imagine the terrain on which the warbot will roam.  I vote that we
+keep them in the lab; Mongol horse archers are far too dangerous to let loose on
+an unsuspecting Internet.</p>
+<p>Our network should consist of one-or-more programs running on one computer and
+one-or-more programs running on one-or-more <em>other</em> computers.  Statecharts
+should be able to work together even if they are deployed across the entire
+world.</p>
+<p>Networking is a solved problem.  So I knew I could just find a technology that
+could be used for sending messages between computers.</p>
+<p>But, which technology to pick?  I wanted simple things to be simple and hard
+things to be possible.</p>
+<p>Right or wrong I picked RabbitMq.  RabbitMq is free, it is written in Erlang
+which was designed by Ericsson to solve <em>the hard concurrency problems in</em>
+embedded systems.  It is old; it first appeared in 1986, one year before David
+Harel’s paper on statecharts and five years before Python was invented.  So I
+trust that Erlang has a well thought out and proven architecture.</p>
+<p>RabbitMq stays true to the underlying Erlang structures and moreover, it
+provides a polyglot platform: they have written many different libraries for
+other programming languages to control RabbitMq.  In Python, RabbitMq is
+accessed using the <code class="docutils literal"><span class="pre">pika</span></code> library.</p>
+<p>RabbitMq is heavy duty.  You can scale it up to handle <em>a lot of messaging</em>.
+Our horse archers aren’t going to yell that much, but it’s nice to know we could
+support their entire horde.</p>
+<p>What kind of network should we build?  How about this, everything that can
+connect is connected to everything that can connect.  Let’s create a mesh
+network.</p>
+<p>Our lab will exist behind a router; so all of the bots will live on the same
+ethernet bus.  This means that the ARP table on each of the computers on the LAN
+will have all of the LAN’s IP addresses.</p>
+<p>We can use these IP addresses to send out encrypted messages to a RabbitMq port,
+with a username and a password and see if there is a sensible response.  If
+there is, we add this IP to our mesh network.  This means that our horse archers
+won’t yell at our router or our printer or our phone.  Oora!</p>
+<div class="section" id="instrumenting-to-debug-the-mongol-botnet">
+<span id="i-mongol-example-instrumenting-to-debug-the-botnet"></span><h2>Instrumenting to Debug the Mongol Botnet<a class="headerlink" href="#instrumenting-to-debug-the-mongol-botnet" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
 </div>
@@ -2568,10 +2600,12 @@ this trace and lock in Gandbold’s expected behaviour, as a regression test:</p
 <li><a class="reference internal" href="#modelling-the-mongol-mind">Modelling the Mongol Mind</a></li>
 <li><a class="reference internal" href="#technical-overview">Technical Overview</a></li>
 <li><a class="reference internal" href="#designing-the-mongol-in-its-tactic">Designing the Mongol in its Tactic</a></li>
-<li><a class="reference internal" href="#encrypted-communications">Encrypted Communications</a></li>
 <li><a class="reference internal" href="#the-first-horseman">The First Horseman</a></li>
+<li><a class="reference internal" href="#encrypted-communications">Encrypted Communications</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-a-mesh-network">Building a Mesh Network</a><ul>
 <li><a class="reference internal" href="#instrumenting-to-debug-the-mongol-botnet">Instrumenting to Debug the Mongol Botnet</a></li>
-<li><a class="reference internal" href="#implementing-the-mongol-in-miros">Implementing the Mongol in miros</a></li>
 </ul>
 </li>
 </ul>
@@ -2611,7 +2645,7 @@ this trace and lock in Gandbold’s expected behaviour, as a regression test:</p
       &copy;2018, Scott Volk.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |

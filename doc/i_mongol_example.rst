@@ -31,12 +31,10 @@ one node remains.
 
 * :ref:`Technical Overview<i_mongol_example-technical-oveview>`
 * :ref:`Designing the Mongol in its Tactic<i_mongol_example-designing-the-mongol-in-its-tactic>`
-* :ref:`Encrypted Commnications<i_mongol_example-encrypted-communications>`
 * :ref:`The First Horseman<i_mongol_example-the-first-horseman>`
+* :ref:`Encrypted Communications<i_mongol_example-encrypted-communications>`
+* :ref:`Building a Mesh Network<i_mongol_example-building-a-mesh-network>`
 * :ref:`Instrumenting to Debug a Horse Archer<i_mongol_example-instrumenting-to-debug-the-botnet>`
-* :ref:`Implementing the Mogol in miros<i_mongol_example-implementing-the-mongol-in-miros>`
-
-
 
 .. _i_mongol_example-historical-context:
 
@@ -317,7 +315,7 @@ Here are the steps:
 * :ref:`Designing the Mongol in its Tactic<i_mongol_example-designing-the-mongol-in-its-tactic>`
 * :ref:`Encrypted Commnications<i_mongol_example-encrypted-communications>`
 * :ref:`Instrumenting to Debug the Mongol Botnet<i_mongol_example-instrumenting-to-debug-the-botnet>`
-* :ref:`Implementing the Mogol in miros<i_mongol_example-implementing-the-mongol-in-miros>`
+* :ref:`Building a Mesh Network<i_mongol_example-building-a-mesh-network>`
 
 .. _i_mongol_example-designing-the-mongol-in-its-tactic:
 
@@ -832,293 +830,6 @@ already knows how to do.  Once we explain Harel formalism and this basic tactic
 to our troops and their junior officers, watch out; they will innovate and
 improve it until we get something truly remarkable.
 
-.. _i_mongol_example-encrypted-communications:
-Encrypted Communications
-------------------------
-The ergodic nature of are war-bot has a downside.  Once you know how to defeat
-one node, you know how to defeat all of them.  Furthermore, the communications
-between the bots are fundamental to its system design; if you can inject your
-own messaging between them, you will *PWN* this bot net.
-
-A 13th century European would have not spoken Mongolian, so a Mongol horse
-archer would have no problem with intercepted communications.  But, what would
-have happened if they had to fight another unit of horse archers?  They would
-know what the other side was up to and vise versa.
-
-So it would make sense if each Mongol unit had their own set of war cries.  This
-way they could act on an instruction without doubt or hesitation.
-
-The horse archer communications need to be encrypted.  There are many different
-ways to do this; it can happen at the communications layer using SSL, or it can
-be handled within our war bot directly.
-
-I have opted to use a symmetric encryption scheme with the Fernet library within
-our war bot.  I did this after investigating pycryto; which does not
-have windows support and has been largely abandon by it's maintainer.  Don't use
-pycrypt.
-
-Let's just use Fernet.
-
-Fernet takes a lot of pain out of encryption, but you still need a key.
-Encryption is really about key management; how do you keep your key hidden from
-your opponent?  Well for now we will hide our key as highlighted plain text on
-this website so that everyone on the Internet can see it:
-
-.. code-block:: python
-  :emphasize-lines: 17
-  
-  from cryptography.fernet import Fernet 
-
-  class Connection():
-    @staticmethod
-    def key():
-      '''
-      Get the encryption key for this connection.  This key is used for encryption
-      and decryption.
-    
-      Example:
-        key = Connection.key()
-    
-      Note:
-      To generate a new key: Fernet.generate_key()
-      A better way to do this is to get the key from your connected flash-drive.
-      '''
-      return b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
-
-Feeling better already.
-
-To encrypt our data we will use a Python decorator:
-
-.. code-block:: python
-  :emphasize-lines: 35,36, 40, 42
-
-  from cryptography.fernet import Fernet 
-
-  class Connection():
-    # ..
-    # ..
-    @staticmethod
-    def encrypt(fn):
-      '''
-      A decorator which will encrypt a byte stream prior to transmission:
-    
-      Example:
-        @Connection.serialize
-        @Connection.encrypt   # <- HERE: 'message' (encrypted bytestream)
-        def message_to_other_channels(self, message):
-          for channel in self.channels:
-            ip = channel.extension.ip_address
-            channel.basic_publish(exchange='mirror',
-                routing_key=ip, body=message)
-            print(" [x] Sent \"{}\" to {}".format(message, ip))
-    
-      '''
-      @wraps(fn)
-      def _encrypt(*args):
-        '''
-        encrypt a byte stream
-        '''
-
-        # To get around the 'self-as-the-first-argument' issue
-        if len(args) == 1:
-          plain_text = args[0]
-        elif len(args) == 2:
-          plain_text = args[1]
-        else:
-          assert(False)
-        f = Fernet(Connection.key())
-        cyphertext = f.encrypt(plain_text)
-
-        # To get around the 'self-as-the-first-argument' issue
-        if len(args) == 1:
-          fn(cyphertext)
-        else:
-          fn(args[0], cyphertext)
-      return _encrypt
-
-To decrypt we make another decorator:
-
-.. code-block:: python
-  :emphasize-lines: 21-23
-
-  from cryptography.fernet import Fernet 
-
-  class Connection():
-    # ..
-    # ..
-    @staticmethod
-    def decrypt(fn):
-      '''
-      A decorator which will decrypt a received message into a byte stream.
-    
-      Example:
-        @Connection.decrypt  # <- HERE: 'body' decrypted into a byte stream
-        @Connection.deserialize
-        def custom_rx_callback(ch, method, properties, body):
-          print(" [+] {}:{}".format(method.routing_key, body))
-    
-      '''
-      @wraps(fn)
-      def _decrypt(ch, method, properties, cyphertext):
-        '''LocalConsumer.decrypt()'''
-        f = Fernet(Connection.key())
-        plain_text = f.decrypt(cyphertext)
-        fn(ch, method, properties, plain_text)
-      return _decrypt
-
-So, we can get a key, we can encrypt and decrypt.  Now, what can we send?  There
-is a process in python called pickling which serializes an object into a
-collection of bytes.  This collection of bytes can be sent across a network.
-
-Serialization will allow our horse archers to transmit anything within their war
-cries.  "Hey Ганболд (Gandbold), do you want one of my extra horses?", "yes",
-"OK here you go, lala-bee-boop".  This concept expands on the notion of a war
-cry; but it is really cool that we can transmit the objects of working programs,
-between the nodes of our botnet.  Of course this is a security nightmare, so if we
-are going to serialize and de-serialize messages *we will have to use an
-encrypted channel*.
-
-Now let's show the serialization technique, it is also implemented using a
-decorator:
-
-.. code-block:: python
-  :emphasize-lines: 35, 36, 38
-
-  import pickle
-  import miros.event import Event
-
-  class Connection():
-    # ..
-    # ..
-
-    @staticmethod
-    def serialize(fn):
-      '''
-      A decorator which will turn arguments into a byte stream prior to encryption:
-    
-      Example:
-        @Connection.serialize  # <- HERE: 'message' turned into byte stream
-        @Connection.encrypt
-        def message_to_other_channels(self, message):
-          for channel in self.channels:
-            ip = channel.extension.ip_address
-            channel.basic_publish(exchange='mirror',
-                routing_key=ip, body=message)
-            print(" [x] Sent \"{}\" to {}".format(message, ip))
-    
-      '''
-      @wraps(fn)
-      def _pickle_dumps(*args):
-        if len(args) == 1:
-          message = args[0]
-        elif len(args) == 2:
-          message = args[1]
-        else:
-          assert(False)
-    
-        # The event object is dynamically constructed and can't be serialized by
-        # pickle, so we call it's custom serializer prior to pickling it
-        if isinstance(message, Event):
-          message = Event.dumps(message)
-    
-        pmessage = pickle.dumps(message)
-    
-        if len(args) == 1:
-          fn(pmessage)
-        else:
-          fn(args[0], pmessage)
-      return _pickle_dumps
-
-The highlighted text in our serialization code demonstrates where the actual
-pickling happens.  We see that there is a custom ``dumps`` method written for a
-miros Event.  The Event object can't be serialized with a pickle object because
-it uses a simple metaprogramming technique for making new signal names.  No
-problem, we just call the Event ``dumps`` method first, then call the pickle
-``dumps`` method on its result.
-
-Now we have a byte stream we can feed our encryption decorator.  
-
-How do we turn it back to an object after it has been decrypted?  Well, we
-call the ``deserialize`` decorator.
-
-.. code-block:: python
-  :emphasize-lines: 21,22,23
-
-  import pickle
-  import miros.event import Event
-
-  class Connection():
-    # ..
-    # ..
-    @staticmethod
-    def deserialize(fn):
-      '''
-      A decorator used to turn a serialized byte stream into a python object
-    
-      Example:
-        @Connection.decrypt
-        @Connection.deserialize  # <- HERE: 'body' bytestream turn into object
-        def custom_rx_callback(ch, method, properties, body):
-          print(" [+] {}:{}".format(method.routing_key, body))
-    
-      '''
-      @wraps(fn)
-      def _pickle_loads(ch, method, properties, p_plain_text):
-        plain_text = pickle.loads(p_plain_text)
-        if isinstance(plain_text, Event):
-          plain_text = Event.loads(plain_text)
-        fn(ch, method, properties, plain_text)
-      return _pickle_loads
-
-The de-serialization is just the reverse of the serialization.  We call the
-pickle ``loads`` method on the pickled object, then if it is a serialized Event,
-we call the custom ``loads`` method of the Event object to get a version of the
-event made by the bot that sent it to us in the first place.
-
-Let's go over everything again from a high level.  If a node in our war bot
-wants to share one of its objects with another node, it turns that object into a
-byte-stream using the ``serialize`` decorator, encrypts the byte stream with the
-``encrypt`` decorator  and spits some  garbled data onto the network layer.  The
-node receiving the data decrypts the stream using the ``decrypt`` decorator,
-then turns the byte stream back into the intended Python object using the
-``deserialize`` decorator.  
-
-Ok, now what do we do about our secret key?
-
-Our Mongol unit will have a lot of shared experience.  If they don't follow each
-other in their advances and their retreats; they will be killed by their senior
-officers.  Maybe we could use this path of actions and the common time
-experienced while advancing and retreating to modulate their original secret
-key.  In this way we could literally post the key on the Internet for everyone
-to see and it wouldn't matter.  If you wanted to the *PWN* the bot you would
-have to know every action they had taken, when they took it and their modulation
-algorithm.
-
-This would be like the Mongol unit making up a new war language every time they
-finished a loop.  They would know that if one of their members became
-de-synchronized they would never find one another again.
-
-I'm not going to write this into the example; but it is how I would start up my
-thinking about this annoying key issue.  I would do the work well after I was
-sure the original code was running well.  Then we would have to provide some way
-for the botnet to share a common time signal; otherwise NTP poisoning could blow
-the entire thing apart.  Also, I'm not sure how the commanding officer would
-send messages to our unit either; we have yet another key issue.  Maybe the
-botnet could look out at thousands upon thousands of websites, knowing only one
-actually has a message from the commanding officer (on craiglist?).  Then inject a
-random delay prior to acting on the message.
-
-In this example I demonstrated how to encrypt the data but I exposed the key.
-What we have here is security theater, I'm pretending that the system is secure.
-It is not; I haven't solved the key issue.
-
-To give myself a bit more credit; it's a good start.
-
-Security is hard, the attacker has the advantage; you can't know when you have
-been compromised and you can't trust anything, from your GPU, to the encryption
-standard, to your CPU, it's all exposed and compromised.
-
-The attacker has the advantage, so when in doubt, attack!
 
 .. _i_mongol_example-the-first-horseman:
 
@@ -2249,15 +1960,345 @@ To skip to the other side of this code listing, click :ref:`here<other_size_of_r
 
 .. _other_size_of_regression_test:
 
+.. _i_mongol_example-encrypted-communications:
+
+Encrypted Communications
+------------------------
+The ergodic nature of are war-bot has a downside. Once you know how to defeat
+one node, you know how to overcome all of them. Furthermore, the communications
+between the bots are fundamental to its system design; if you can inject your
+own messaging between them, you will PWN this botnet.
+
+A 13th century European would not have spoken Mongolian so that a Mongol horse
+archer would have no problem with intercepted communications. But, what would
+have happened if they had to fight another unit of horse archers? They would
+know what the other side was up to and vice versa.
+
+So it would make sense if each Mongol unit had their own set of war cries. This
+way they could act on instruction without doubt or hesitation.
+
+The horse archer communications need to be encrypted. There are many different
+ways to do this; it can happen at the communications layer using SSL, or it can
+be handled by our war bot directly.
+
+I have opted to use a symmetric encryption scheme with the Fernet library within
+our war bot. I did this after investigating pycryto; which does not have windows
+support and has mainly been abandon by its maintainer. Don’t use pycrypt.
+
+Let’s just use Fernet.
+
+Fernet takes a lot of pain out of encryption, but you still need a key.
+Encryption is really about key management; how do you keep your key hidden from
+your opponent? Well, for now, we will hide our key as highlighted plain text on
+this website so that everyone on the Internet can see it:
+
+.. code-block:: python
+  :emphasize-lines: 17
+  
+  from cryptography.fernet import Fernet 
+
+  class Connection():
+    @staticmethod
+    def key():
+      '''
+      Get the encryption key for this connection.  This key is used for encryption
+      and decryption.
+    
+      Example:
+        key = Connection.key()
+    
+      Note:
+      To generate a new key: Fernet.generate_key()
+      A better way to do this is to get the key from your connected flash-drive.
+      '''
+      return b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
+
+Feeling better already.
+
+To encrypt our data we will use a Python decorator:
+
+.. code-block:: python
+  :emphasize-lines: 35,36, 40, 42
+
+  from cryptography.fernet import Fernet 
+
+  class Connection():
+    # ..
+    # ..
+    @staticmethod
+    def encrypt(fn):
+      '''
+      A decorator which will encrypt a byte stream prior to transmission:
+    
+      Example:
+        @Connection.serialize
+        @Connection.encrypt   # <- HERE: 'message' (encrypted bytestream)
+        def message_to_other_channels(self, message):
+          for channel in self.channels:
+            ip = channel.extension.ip_address
+            channel.basic_publish(exchange='mirror',
+                routing_key=ip, body=message)
+            print(" [x] Sent \"{}\" to {}".format(message, ip))
+    
+      '''
+      @wraps(fn)
+      def _encrypt(*args):
+        '''
+        encrypt a byte stream
+        '''
+
+        # To get around the 'self-as-the-first-argument' issue
+        if len(args) == 1:
+          plain_text = args[0]
+        elif len(args) == 2:
+          plain_text = args[1]
+        else:
+          assert(False)
+        f = Fernet(Connection.key())
+        cyphertext = f.encrypt(plain_text)
+
+        # To get around the 'self-as-the-first-argument' issue
+        if len(args) == 1:
+          fn(cyphertext)
+        else:
+          fn(args[0], cyphertext)
+      return _encrypt
+
+To decrypt we make another decorator:
+
+.. code-block:: python
+  :emphasize-lines: 21-23
+
+  from cryptography.fernet import Fernet 
+
+  class Connection():
+    # ..
+    # ..
+    @staticmethod
+    def decrypt(fn):
+      '''
+      A decorator which will decrypt a received message into a byte stream.
+    
+      Example:
+        @Connection.decrypt  # <- HERE: 'body' decrypted into a byte stream
+        @Connection.deserialize
+        def custom_rx_callback(ch, method, properties, body):
+          print(" [+] {}:{}".format(method.routing_key, body))
+    
+      '''
+      @wraps(fn)
+      def _decrypt(ch, method, properties, cyphertext):
+        '''LocalConsumer.decrypt()'''
+        f = Fernet(Connection.key())
+        plain_text = f.decrypt(cyphertext)
+        fn(ch, method, properties, plain_text)
+      return _decrypt
+
+So, we can get a key; we can encrypt and decrypt.  Now, what can we send?  There
+is a process in python called pickling which serializes an object into a
+collection of bytes.  This collection of bytes can be transmitted across a
+network.
+
+Serialization will allow our horse archers to transmit anything within their war
+cries.  "Hey Ганболд (Gandbold), do you want one of my extra horses?", "yes",
+"OK here you go, lala-bee-boop".  This concept expands on the notion of a war
+cry; but it is cool that we can transmit the objects of working programs,
+between the nodes of our botnet.  Of course, this is a security nightmare, so if
+we are going to serialize and de-serialize messages *we will have to use an
+encrypted channel*.
+
+Now let's show the serialization technique, it is also implemented using a
+decorator:
+
+.. code-block:: python
+  :emphasize-lines: 35, 36, 38
+
+  import pickle
+  import miros.event import Event
+
+  class Connection():
+    # ..
+    # ..
+
+    @staticmethod
+    def serialize(fn):
+      '''
+      A decorator which will turn arguments into a byte stream prior to encryption:
+    
+      Example:
+        @Connection.serialize  # <- HERE: 'message' turned into byte stream
+        @Connection.encrypt
+        def message_to_other_channels(self, message):
+          for channel in self.channels:
+            ip = channel.extension.ip_address
+            channel.basic_publish(exchange='mirror',
+                routing_key=ip, body=message)
+            print(" [x] Sent \"{}\" to {}".format(message, ip))
+    
+      '''
+      @wraps(fn)
+      def _pickle_dumps(*args):
+        if len(args) == 1:
+          message = args[0]
+        elif len(args) == 2:
+          message = args[1]
+        else:
+          assert(False)
+    
+        # The event object is dynamically constructed and can't be serialized by
+        # pickle, so we call it's custom serializer prior to pickling it
+        if isinstance(message, Event):
+          message = Event.dumps(message)
+    
+        pmessage = pickle.dumps(message)
+    
+        if len(args) == 1:
+          fn(pmessage)
+        else:
+          fn(args[0], pmessage)
+      return _pickle_dumps
+
+The highlighted text in our serialization code demonstrates where the actual
+pickling happens.  We see that there is a custom ``dumps`` method written for a
+miros Event.  The miros Event object can't be serialized with pickle because it
+uses a simple metaprogramming technique for making new signal names.  No
+problem, we just call the Event ``dumps`` method first, then call the pickle
+``dumps`` method on its result.
+
+Now we have a byte stream we can feed our encryption decorator.  
+
+How do we turn it back to an object after it has been decrypted?  Well, we call
+the ``deserialize`` decorator.
+
+.. code-block:: python
+  :emphasize-lines: 21,22,23
+
+  import pickle
+  import miros.event import Event
+
+  class Connection():
+    # ..
+    # ..
+    @staticmethod
+    def deserialize(fn):
+      '''
+      A decorator used to turn a serialized byte stream into a python object
+    
+      Example:
+        @Connection.decrypt
+        @Connection.deserialize  # <- HERE: 'body' bytestream turn into object
+        def custom_rx_callback(ch, method, properties, body):
+          print(" [+] {}:{}".format(method.routing_key, body))
+    
+      '''
+      @wraps(fn)
+      def _pickle_loads(ch, method, properties, p_plain_text):
+        plain_text = pickle.loads(p_plain_text)
+        if isinstance(plain_text, Event):
+          plain_text = Event.loads(plain_text)
+        fn(ch, method, properties, plain_text)
+      return _pickle_loads
+
+The de-serialization is just the reverse of the serialization.  We call the
+pickle ``loads`` method on the pickled object, then if it is a serialized Event,
+we call the custom ``loads`` method of the Event object to get a version of the
+event made by the bot that sent it to us in the first place.
+
+Let's go over everything again from a high level.  If a node in our warbot wants
+to share one of its objects with another node, it turns that object into a
+byte-stream using the ``serialize`` decorator, encrypts the byte stream with the
+``encrypt`` decorator and spits some garbled data onto the network layer.  The
+node receiving the data decrypts the stream using the ``decrypt`` decorator,
+then turns the byte stream back into the intended Python object using the
+``deserialize`` decorator.  
+
+Ok, now what do we do about our secret key?
+
+Our Mongol unit will have a lot of shared experience.  If they don't follow each
+other in their advances and their retreats; their senior officers will kill
+them.  Maybe we could use this path of actions and the common time experienced
+while advancing and retreating to modulate their original secret key.  In this
+way, we could obnoxiously post the key (see above) on the Internet for everyone
+to look at and it wouldn't matter.  If you wanted to the *PWN* the bot you would
+have to know every action they had taken, when they made it and their modulation
+algorithm.
+
+This would be like the Mongol unit making up a new war language every time they
+finished a loop.  They would know that if one of their members became
+de-synchronized, they would never find one another again.
+
+I'm not going to write this into the example, but it is how I would start-up my
+thinking about this annoying key issue.  I would do the work well after I was
+sure the original code was running well.  Then we would have to provide some way
+for the botnet to get orders from its commanding officer; we have yet another
+key issue.  Maybe the botnet could look out at thousands upon thousands of
+websites, knowing that only one has a message from the commanding officer (on
+craigslist?).  Then inject a random delay before acting on the news.
+
+In this example I demonstrated how to encrypt the data but I exposed the key.
+So, what we have here is security theater, I'm pretending that the system is
+secure.  It is not; I haven't solved the key issue.
+
+Security is hard; the attacker has the advantage; you can't know when you have
+been compromised and you can't trust anything, from your GPU to the encryption
+standard, to your CPU, it's all exposed and compromised.
+
+The attacker has the advantage, so when in doubt, attack!
+
+Well that was dramatic.  But where do we attack and whom?  What good is a botnet without
+a network?
+
+.. _i_mongol_example-building-a-mesh-network:
+
+Building a Mesh Network
+=======================
+We need to imagine the terrain on which the warbot will roam.  I vote that we
+keep them in the lab; Mongol horse archers are far too dangerous to let loose on
+an unsuspecting Internet.
+
+Our network should consist of one-or-more programs running on one computer and
+one-or-more programs running on one-or-more *other* computers.  Statecharts
+should be able to work together even if they are deployed across the entire
+world.
+
+Networking is a solved problem.  So I knew I could just find a technology that
+could be used for sending messages between computers.
+
+But, which technology to pick?  I wanted simple things to be simple and hard
+things to be possible.
+
+Right or wrong I picked RabbitMq.  RabbitMq is free, it is written in Erlang
+which was designed by Ericsson to solve *the hard concurrency problems in*
+embedded systems.  It is old; it first appeared in 1986, one year before David
+Harel's paper on statecharts and five years before Python was invented.  So I
+trust that Erlang has a well thought out and proven architecture.
+
+RabbitMq stays true to the underlying Erlang structures and moreover, it
+provides a polyglot platform: they have written many different libraries for
+other programming languages to control RabbitMq.  In Python, RabbitMq is
+accessed using the ``pika`` library.
+
+RabbitMq is heavy duty.  You can scale it up to handle *a lot of messaging*.
+Our horse archers aren't going to yell that much, but it's nice to know we could
+support their entire horde.
+
+What kind of network should we build?  How about this, everything that can
+connect is connected to everything that can connect.  Let's create a mesh
+network.
+
+Our lab will exist behind a router; so all of the bots will live on the same
+ethernet bus.  This means that the ARP table on each of the computers on the LAN
+will have all of the LAN's IP addresses.
+
+We can use these IP addresses to send out encrypted messages to a RabbitMq port,
+with a username and a password and see if there is a sensible response.  If
+there is, we add this IP to our mesh network.  This means that our horse archers
+won't yell at our router or our printer or our phone.  Oora!
+
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:
 
 Instrumenting to Debug the Mongol Botnet
 ----------------------------------------
-
-.. _i_mongol_example-implementing-the-mongol-in-miros:
-
-Implementing the Mongol in miros
---------------------------------
 
 .. _ergotic_mongol_11: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_11.pgn
 .. _ergotic_mongol_12: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_12.pgn
