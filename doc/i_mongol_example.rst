@@ -381,7 +381,7 @@ Upon making the Skirmish_War_Cry are horse archer charges into close enough
 range to make individual attacks with their arrows.  This type of fighting is
 called a skirmish to show that we do not want them to stick around.
 
-Our war bot would have some client code connected to the entry condition of the
+Our warbot would have some client code connected to the entry condition of the
 skirmish state.  It might be the initialization of a specific targeting and
 attack control system, whatever it is it would have to issue the Ammunition_Low
 event when it was done firing upon specific targets.  This Ammunition_Low event
@@ -811,7 +811,7 @@ seconds but only 40 percent of the time does he feel it is worth while to loose
 an arrow.  It becomes easier to make a shot during the feigned retreat, so we
 say that there is an 80 percent chance to take the shot, every 3 seconds.
 
-Of course these numbers are arbitrary.  Your war bot would be hooked into a set
+Of course these numbers are arbitrary.  Your warbot would be hooked into a set
 of sensors and controllers and the feedback would be based on a greater
 semblance of reality.  I am putting in these times and probabilities to inject a
 bit of chaos into our group tactic, to see if it can hold together in its
@@ -1964,25 +1964,26 @@ To skip to the other side of this code listing, click :ref:`here<other_size_of_r
 
 Encrypted Communications
 ------------------------
-The ergodic nature of are war-bot has a downside. Once you know how to defeat
-one node, you know how to overcome all of them. Furthermore, the communications
+The ergodic nature of our warbot has a downside. Once you know how to defeat
+one node, you know how to beat all of them. Furthermore, the communications
 between the bots are fundamental to its system design; if you can inject your
-own messaging between them, you will PWN this botnet.
+own messaging between them, you will *PWN* this botnet.
 
-A 13th century European would not have spoken Mongolian so that a Mongol horse
-archer would have no problem with intercepted communications. But, what would
-have happened if they had to fight another unit of horse archers? They would
-know what the other side was up to and vice versa.
+A 13th century European would not have spoken Mongolian so an invading horde
+would have no problem with intercepted communications. But, what would have
+happened if they had to fight another unit of horse archers? Each group would
+know what the other side was up to; they could yell distracting calls into the
+side's string of commands to jam up the other team's manoeuvre.
 
 So it would make sense if each Mongol unit had their own set of war cries. This
 way they could act on instruction without doubt or hesitation.
 
 The horse archer communications need to be encrypted. There are many different
 ways to do this; it can happen at the communications layer using SSL, or it can
-be handled by our war bot directly.
+be handled by our warbot directly.
 
 I have opted to use a symmetric encryption scheme with the Fernet library within
-our war bot. I did this after investigating pycryto; which does not have windows
+our warbot. I did this after investigating pycryto; which does not have windows
 support and has mainly been abandon by its maintainer. Don’t use pycrypt.
 
 Let’s just use Fernet.
@@ -2104,7 +2105,7 @@ cries.  "Hey Ганболд (Gandbold), do you want one of my extra horses?", "y
 "OK here you go, lala-bee-boop".  This concept expands on the notion of a war
 cry; but it is cool that we can transmit the objects of working programs,
 between the nodes of our botnet.  Of course, this is a security nightmare, so if
-we are going to serialize and de-serialize messages *we will have to use an
+we are going to serialize and deserialize messages *we will have to use an
 encrypted channel*.
 
 Now let's show the serialization technique, it is also implemented using a
@@ -2199,7 +2200,7 @@ the ``deserialize`` decorator.
         fn(ch, method, properties, plain_text)
       return _pickle_loads
 
-The de-serialization is just the reverse of the serialization.  We call the
+The deserialization is just the reverse of the serialization.  We call the
 pickle ``loads`` method on the pickled object, then if it is a serialized Event,
 we call the custom ``loads`` method of the Event object to get a version of the
 event made by the bot that sent it to us in the first place.
@@ -2219,7 +2220,7 @@ other in their advances and their retreats; their senior officers will kill
 them.  Maybe we could use this path of actions and the common time experienced
 while advancing and retreating to modulate their original secret key.  In this
 way, we could obnoxiously post the key (see above) on the Internet for everyone
-to look at and it wouldn't matter.  If you wanted to the *PWN* the bot you would
+to look at and it wouldn't matter.  If you wanted to *PWN* the bot you would
 have to know every action they had taken, when they made it and their modulation
 algorithm.
 
@@ -2256,13 +2257,15 @@ We need to imagine the terrain on which the warbot will roam.  I vote that we
 keep them in the lab; Mongol horse archers are far too dangerous to let loose on
 an unsuspecting Internet.
 
+.. image:: _static/InLab.jpg
+    :align: center
+
 Our network should consist of one-or-more programs running on one computer and
 one-or-more programs running on one-or-more *other* computers.  Statecharts
 should be able to work together even if they are deployed across the entire
-world.
+world; networking is a solved problem.
 
-Networking is a solved problem.  So I knew I could just find a technology that
-could be used for sending messages between computers.
+So we just have to pick a technology that can send messages between computers.
 
 But, which technology to pick?  I wanted simple things to be simple and hard
 things to be possible.
@@ -2286,6 +2289,9 @@ What kind of network should we build?  How about this, everything that can
 connect is connected to everything that can connect.  Let's create a mesh
 network.
 
+.. image:: _static/Partial_Mesh_Diagram.svg
+    :align: center
+
 Our lab will exist behind a router; so all of the bots will live on the same
 ethernet bus.  This means that the ARP table on each of the computers on the LAN
 will have all of the LAN's IP addresses.
@@ -2295,6 +2301,170 @@ with a username and a password and see if there is a sensible response.  If
 there is, we add this IP to our mesh network.  This means that our horse archers
 won't yell at our router or our printer or our phone.  Oora!
 
+Things get a little tricky when a computer has more than one working IP address
+connected to a RabbitMq server.  Any transmitted message would be received two
+or more times by all of the RabbitMq connected Python programs running on that
+computer.  To address this, I adjusted the code to only connect to one working
+IP address on each machine.
+
+Two different kinds of networking will affect our Mongols.  One that they need
+and one that *we need* to understand and debug their programs.  The first kind
+of networking will let them yell to one another, and it will use the RabbitMq
+*topic* routing strategy.  The second, instrumentation kind of networking will
+use the RabbitMq *fanout* strategy.  Each layer will have a different encryption
+key.  Debugging an encrypted blob can be frustrating; so we want to make sure we
+can *see* our design while we play with the encryption key for the first type of
+mesh networking.  When we are happy with the design; we will turn off the
+instrumentation and release the horde (in a lab).
+
+By using RabbitMq, every running Horse Archer program on any connected computer
+will look like a node in our mesh network.  This is great; it means we can
+significantly simplify our code.
+
+But what are the specifics?  How is a horse archer explicitly connected to the
+network?  Well, he has two transmitters one for his yells and one to send out
+his instrumentation, and he has two receivers, one to hear cries and one to
+receive all of the instrumentation sent out by every other horse archer.  This
+means that as a developer, you can hook into any individual horse archer and
+start debugging all other connected horse archers.
+
+Writing networked code that runs in Python while on Windows and Linux is kind of
+tricky.  To simplify things I ran my Windows code from the Window's Linux
+Subsystem (WLS).  Unfortunately the WLS isn't done yet, so it's missing a lot of
+standard Linux networking commands, like arp.  However, windows has it's own
+``arp.exe`` command and the WLS can call out to DOS.  So the code I wrote is
+filled with weird little corner cases to deal with the current short comings of
+the WLS.  I'll be changing it a lot, so there is no point in writing it out and
+explaining it in this example; you can find the code in its entirety here:
+`mesh_network`_
+
+Instead, I will talk about its network API.  To begin with I'll talk about the horse
+archer's topic network.  This is the network that will be used for them to
+communicate with each other, not the debugging network.
+
+To build a standard mesh transmitter:
+
+.. code-block:: python
+  :linenos:
+
+  from mesh_network import MeshTransmitter
+  from miros.events import Event, signals
+
+  # Assume confirmed connected IPs are: [192.168.0.102, 192.168.0.103]
+  # The actual routing keys for this transmission are:
+  #   '192.168.0.102.archer.mary'
+  #   '192.168.0.103.archer.mary'
+  tx = MeshTransmitter(user="bob", password="dobbs")
+  tx.message_to_other_channels(
+    Event(signal=signals.Mirror, payload=[1, 2, 3]),
+      routing_key = 'archer.mary')
+
+After importing the mesh_network package that contains all of the RabbitMq
+networking code we see something about 'confirmed' connected IP addresses (line
+4).  A confirmed IP address belongs to a computer that successfully received and
+decrypted an automatic scouting message sent out by our program.  This comment
+is suggesting that 192.168.0.102 and 192.168.0.103 both are connected.  Say this
+was true, that means that the computer on which this code is written has one of
+these IP addresses as it's IP address.
+
+The same comment informs us about the routing keys.  If we let our eyes jump to
+line 11 we see that we are setting a routing key to ``archer.mary``.  So, the
+comment is trying to tell us that the IP address of the computer is
+automatically pre-pended to the routing key we set in the call to
+``message_to_other_channels``.  We will learn more about topic routing keys when
+we look at the receiver.
+
+On line 8 we see how to construct a mesh transmitter; we have to pass in a user
+and password.  These are the credentials for your RabbitMq server.  If these
+aren't right the code will not run.
+
+Finally, on lines 9 to 11 we see how to send a statechart event to all other
+programs in our mesh, programmed to receive the routing keys:
+``192.168.0.102.archer.mary`` and ``192.168.0.103.archer.mary``.  This
+``message_to_other_channels`` call will serialize the Event object with it's
+payload into a bytestream then encrypt it prior to dispatching it out across the
+network.
+
+To build a standard mesh receiver:
+
+.. code-block:: python
+  :linenos:
+
+  import time
+  from mesh_network import MeshReceiver
+  from miros.events import Event, signals
+
+  def custom_rx_callback(ch, method, properties, body):
+    print(" [+] {}:{}".format(method.routing_key, body))
+
+  # Assuming IP: 192.168.0.103
+  # The routing key will be '192.168.0.103.archer.mary'
+  rx = MeshReceiver(user='bob',
+         password='dobbs',
+         routing_key='archer.mary')
+
+  rx.register_live_callback(custom_rx_callback)
+  rx.start_consuming() # launches a consuming task
+  time.sleep(10)
+  rx.stop_consuming()  # kills consuming task
+  rx.start_consuming() # launches a consuming task with same custom_rx_callback
+
+First we import our required packages.  Then on lines 5-6 we create a callback
+function.  We will want to register this callback function with the underlying
+framework, see line 14. This callback function will be called if, and only if, a
+message is received by RabbitMq that has the correct topic routing key.  This
+routing key is specified on line 12, where we construct the mesh receiver
+object, rx.  
+
+The comments on lines 8 and 9 describe some routing key specifics.  We see that
+for the code on lines 9-11, the routing key will be
+``192.168.0.103.archer.mary``.  So like the transmitter API, the receiver API
+pre-pends an IP address to its routing key.
+
+Before we talk more about the routing key,  let's fire up and run our receiver.
+On lines 10 through 12 we see how to build a rx object.  We need to know the
+RabbitMq username and password and we specify the routing_key.
+
+On line 14 we register our ``custom_rx_callback`` with the receiver.  The ``rx``
+object will take care of the decryption and deserialization, much like we
+described in the encryption section.
+
+The ``pika`` Python library that reaches into the RabbitMq server will be doing
+the real work to receive messages.  For it to run, we have to call it's
+``start_consuming`` method, which will hang the program forever; it is a
+blocking call.  We want ``pika`` to dispatch received messages but would also
+like to be able to do other things with our program too.  For this reason, the
+MeshReceiver class will spin up a separate task for the ``pika`` receiver code
+to run and block.  We see the API for this on line 15: the MeshReceiver also has
+a ``start_consuming.`` method, which calls the ``pika`` ``start_consuming``
+method within it's own separate thread.  In this way, it can greedily block on
+messages without harming the rest of the Python program.  To stop this thread,
+and to stop it from dispatching any received messages we would call the
+``stop_consuming`` method, as seen on line 17.  If we wanted to restart the
+thread, we would call ``start_consuming`` as seen on line 18.
+
+In our transmitter example, we sent a message with a routing key of
+``192.168.0.103.archer.mary``.  If this code was run on this, or the other
+computer the callback function on line 5-6 would run, and we would print the
+contents of the event.
+
+Now let's talk about routing keys.  Just because every node is connected to
+every node in our mesh network doesn't mean that we would want to 'hear' all of
+the transmitted messages.  The routing key is the way in which we can match
+transmitted messages to specific receiving callback functions through the use of
+patterns.  RabbitMq supports a very lightweight glob pattern matching language.
+``*`` means to substitute exactly one word and ``#`` means to substitute zero or
+more words.  That's it. 
+
+So if we wanted our receiver to match all messages to its IP address, we would
+have set it's routing key to ``#`` (this is the default value).  If we wanted
+the receiver to match all archers addressed to it's IP address we the routing
+key would be ``archer.*`` or ``archer#``.  In RabbitMq the routing key can be no
+more than 255 characters.
+
+We probably aren't going to need this for our example, but it is a simple and
+powerful bonus feature.
+
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:
 
 Instrumenting to Debug the Mongol Botnet
@@ -2303,5 +2473,7 @@ Instrumenting to Debug the Mongol Botnet
 .. _ergotic_mongol_11: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_11.pgn
 .. _ergotic_mongol_12: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_12.pgn
 .. _ergotic_mongol_13: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_13.pgn
+
+.. _mesh_network: https://github.com/aleph2c/miros/blob/master/examples/mesh_network.py
 
 :ref:`back to examples <examples>`

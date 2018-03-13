@@ -936,12 +936,7 @@ class MeshReceiver():
     import time
 
     def custom_rx_callback(ch, method, properties, body):
-      if "signal_name" in body:
-        # turn our event json object back into an event
-        event = Event.loads(body)
-        print(" [+] {}:{}".format(method.routing_key, event))
-      else:
-        print(" [+] {}:{}".format(method.routing_key, body))
+      print(" [+] {}:{}".format(method.routing_key, body))
 
     # Assuming IP: 192.168.0.103
     # The routing key will be '192.168.0.103.archer.mary'
