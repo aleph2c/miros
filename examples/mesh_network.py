@@ -60,7 +60,7 @@ to be common across all of its nodes.
       Fernet.generate_key()
 
     To use an instrumentation mesh transmitter:
-      tx_instrument = TransmitInstrumentation(
+      tx_instrument = SnoopTransmitter(
         user='bob',
         password='dobbs',
         port=5672,
@@ -80,7 +80,7 @@ to be common across all of its nodes.
       tx_instrument.broadcast_spy("Trace information")
 
     To use an instrumentation mesh receiver:
-      rx_instrumentation = ReceiveInstrumentation(
+      rx_instrumentation = SnoopReceiver(
         user='bob',
         password='dobbs',
         port=5672,
@@ -526,9 +526,9 @@ class ReceiveConnections():
     '''
     self.task_run_event.clear()
 
-class ReceiveInstrumentation(ReceiveConnections):
+class SnoopReceiver(ReceiveConnections):
   '''
-  Receive spy/trace information from another program's TransmitInstrumentation
+  Receive spy/trace information from another program's SnoopTransmitter
   object.  This is useful for debugging statecharts working across a network.
 
   This class creates a 'spy' and 'trace' exchange using a 'fanout' routing
@@ -536,7 +536,7 @@ class ReceiveInstrumentation(ReceiveConnections):
 
   Example:
 
-    rx_instrumentation = ReceiveInstrumentation(
+    rx_instrumentation = SnoopReceiver(
       user='bob',
       password='dobbs',
       port=5672,
@@ -611,14 +611,14 @@ class ReceiveInstrumentation(ReceiveConnections):
     self.live_spy_callback = self.default_spy_callback
     self.live_trace_callback = self.default_trace_callback
 
-    @ReceiveInstrumentation.decrypt(self.encryption_key)
+    @SnoopReceiver.decrypt(self.encryption_key)
     def spy_callback(ch, method, properties, body):
       '''create a spy_callback function received messages in the queue'''
       foreign_spy_item = body
       self.foreign_hsm.append_to_spy(foreign_spy_item)
       self.live_spy_callback(ch, method, properties, body)
 
-    @ReceiveInstrumentation.decrypt(self.encryption_key)
+    @SnoopReceiver.decrypt(self.encryption_key)
     def trace_callback(ch, method, properties, body):
       '''create a trace_callback function received messages in the queue'''
       foreign_trace_item = body
@@ -656,7 +656,7 @@ class ReceiveInstrumentation(ReceiveConnections):
     received spy information from a node in the mesh network.
 
     Example:
-      rx_instrumentation = ReceiveInstrumentation(
+      rx_instrumentation = SnoopReceiver(
         user='bob', password='dobbs', port=5672, encryption_key=b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
       rx_instrumentation.start_consuming()
 
@@ -675,7 +675,7 @@ class ReceiveInstrumentation(ReceiveConnections):
     received trace information from a node in the mesh network.
 
     Example:
-      rx_instrumentation = ReceiveInstrumentation(
+      rx_instrumentation = SnoopReceiver(
         user='bob', password='dobbs', port=5672, encryption_key=b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
       rx_instrumentation.start_consuming()
 
@@ -694,7 +694,7 @@ class ReceiveInstrumentation(ReceiveConnections):
     Parameterized descryption decorator.
 
     Example:
-      @ReceiveInstrumentation.decrypt(self.encryption_key)
+      @SnoopReceiver.decrypt(self.encryption_key)
       def spy_callback(ch, method, properties, body):
         foreign_spy_item = body
         self.foreign_hsm.append_to_spy(foreign_spy_item)
@@ -703,7 +703,7 @@ class ReceiveInstrumentation(ReceiveConnections):
     def _decrypt(fn):
       @wraps(fn)
       def __decrypt(ch, method, properties, cyphertext):
-        '''ReceiveInstrumentation.decrypt()'''
+        '''SnoopReceiver.decrypt()'''
         key = encryption_key
         f = Fernet(key)
         plain_text = f.decrypt(cyphertext).decode()
@@ -812,7 +812,7 @@ class EmitConnections():
         pass
     return channels
 
-class TransmitInstrumentation():
+class SnoopTransmitter():
   '''
   Transmit spy/trace information from this computer to all other computers using
   the mesh network.
@@ -821,7 +821,7 @@ class TransmitInstrumentation():
   register your statechart's spy and trace instrumentation with it.
 
   Example:
-    tx_instrument = TransmitInstrumentation(
+    tx_instrument = SnoopTransmitter(
       user='bob',
       password='dobbs',
       port=5672,
@@ -843,10 +843,10 @@ class TransmitInstrumentation():
     possible_ips = NetworkTool.ip_addresses_on_lan()
     # use the target information from EmitConnections.scout_targets
     targets = EmitConnections.scout_targets(possible_ips, user, password)
-    self.spy_channels = TransmitInstrumentation.get_spy_channels(targets, user, password, port)
-    self.trace_channels = TransmitInstrumentation.get_trace_channels(targets, user, password, port)
+    self.spy_channels = SnoopTransmitter.get_spy_channels(targets, user, password, port)
+    self.trace_channels = SnoopTransmitter.get_trace_channels(targets, user, password, port)
 
-    @TransmitInstrumentation.encrypt(encryption_key)
+    @SnoopTransmitter.encrypt(encryption_key)
     def broadcast_spy(spy_information):
       for channel in self.spy_channels:
         channel.basic_publish(
@@ -855,7 +855,7 @@ class TransmitInstrumentation():
             body=spy_information
         )
 
-    @TransmitInstrumentation.encrypt(encryption_key)
+    @SnoopTransmitter.encrypt(encryption_key)
     def broadcast_trace(trace_information):
       for channel in self.trace_channels:
         channel.basic_publish(
@@ -873,7 +873,7 @@ class TransmitInstrumentation():
     Get all spy channels associated with different working IP addresses that
     have a 'spy' fanout exchange
     '''
-    return TransmitInstrumentation.get_channels(targets, user, password, port, 'spy')
+    return SnoopTransmitter.get_channels(targets, user, password, port, 'spy')
 
   @staticmethod
   def get_trace_channels(targets, user, password, port):
@@ -881,7 +881,7 @@ class TransmitInstrumentation():
     Get all trace channels associated with different working IP addresses that
     have a 'trace' fanout exchange
     '''
-    return TransmitInstrumentation.get_channels(targets, user, password, port, 'trace')
+    return SnoopTransmitter.get_channels(targets, user, password, port, 'trace')
 
   @staticmethod
   def get_channels(targets, user, password, port, exchange_name):
@@ -908,7 +908,7 @@ class TransmitInstrumentation():
     Parameterized encryption decorator.
 
     Example:
-      @TransmitInstrumentation.encrypt(encryption_key)
+      @SnoopTransmitter.encrypt(encryption_key)
       def broadcast_spy(spy_information):
         for channel in self.spy_channels:
           channel.basic_publish(
@@ -1044,7 +1044,7 @@ if __name__ == "__main__":
   if not tranceiver_type:
     sys.stderr.write("Usage: {} [rx]/[tx]/[er]\n".format(sys.argv[0]))
 
-  rx_instrumentation = ReceiveInstrumentation(
+  rx_instrumentation = SnoopReceiver(
     user='bob', password='dobbs', port=5672, encryption_key=b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
   rx_instrumentation.start_consuming()
 
@@ -1060,7 +1060,7 @@ if __name__ == "__main__":
   # register trace instrumentation callback with your rx_instrumentation
   rx_instrumentation.register_live_trace_callback(custom_trace_callback)
 
-  tx_instrument = TransmitInstrumentation(
+  tx_instrument = SnoopTransmitter(
    user='bob',
    password='dobbs',
    port=5672,

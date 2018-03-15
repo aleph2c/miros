@@ -1973,7 +1973,7 @@ A 13th century European would not have spoken Mongolian so an invading horde
 would have no problem with intercepted communications. But, what would have
 happened if they had to fight another unit of horse archers? Each group would
 know what the other side was up to; they could yell distracting calls into the
-side's string of commands to jam up the other team's manoeuvre.
+other side's string of commands to jam up the other team's manoeuvre.
 
 So it would make sense if each Mongol unit had their own set of war cries. This
 way they could act on instruction without doubt or hesitation.
@@ -1983,8 +1983,8 @@ ways to do this; it can happen at the communications layer using SSL, or it can
 be handled by our warbot directly.
 
 I have opted to use a symmetric encryption scheme with the Fernet library within
-our warbot. I did this after investigating pycryto; which does not have windows
-support and has mainly been abandon by its maintainer. Don’t use pycrypt.
+our warbot. I did this after investigating pycrypto; which does not have windows
+support and has mainly been abandon by its maintainer. Don’t use pycrypto.
 
 Let’s just use Fernet.
 
@@ -2314,8 +2314,10 @@ of networking will let them yell to one another, and it will use the RabbitMq
 use the RabbitMq *fanout* strategy.  Each layer will have a different encryption
 key.  Debugging an encrypted blob can be frustrating; so we want to make sure we
 can *see* our design while we play with the encryption key for the first type of
-mesh networking.  When we are happy with the design; we will turn off the
-instrumentation and release the horde (in a lab).
+mesh networking.  To distinguish between the two different types of networking,
+I will call one the mesh and the other the snoop network.  When we are happy
+with the design; we will turn off the instrumentation, remove our ability to
+snoop and release the horde (in a lab).
 
 By using RabbitMq, every running Horse Archer program on any connected computer
 will look like a node in our mesh network.  This is great; it means we can
@@ -2359,13 +2361,15 @@ To build a standard mesh transmitter:
     Event(signal=signals.Mirror, payload=[1, 2, 3]),
       routing_key = 'archer.mary')
 
+Let's consider the above code listing.
+
 After importing the mesh_network package that contains all of the RabbitMq
 networking code we see something about 'confirmed' connected IP addresses (line
 4).  A confirmed IP address belongs to a computer that successfully received and
 decrypted an automatic scouting message sent out by our program.  This comment
 is suggesting that 192.168.0.102 and 192.168.0.103 both are connected.  Say this
 was true, that means that the computer on which this code is written has one of
-these IP addresses as it's IP address.
+these IP addresses.
 
 The same comment informs us about the routing keys.  If we let our eyes jump to
 line 11 we see that we are setting a routing key to ``archer.mary``.  So, the
@@ -2409,15 +2413,17 @@ To build a standard mesh receiver:
   rx.stop_consuming()  # kills consuming task
   rx.start_consuming() # launches a consuming task with same custom_rx_callback
 
-First we import our required packages.  Then on lines 5-6 we create a callback
-function.  We will want to register this callback function with the underlying
-framework, see line 14. This callback function will be called if, and only if, a
-message is received by RabbitMq that has the correct topic routing key.  This
-routing key is specified on line 12, where we construct the mesh receiver
-object, rx.  
+Let's consider the above code listing.
+
+First we import our required packages (lines 1-3).  Then on lines 5-6 we create
+a callback function.  We will want to register this callback function with the
+underlying framework, see line 14. This callback function will be called if, and
+only if, a message is received by RabbitMq that has the correct topic routing
+key.  This routing key is specified on line 12, where we construct the mesh
+receiver object, rx.  
 
 The comments on lines 8 and 9 describe some routing key specifics.  We see that
-for the code on lines 9-11, the routing key will be
+for the code on lines 10-12, the routing key will be
 ``192.168.0.103.archer.mary``.  So like the transmitter API, the receiver API
 pre-pends an IP address to its routing key.
 
@@ -2465,6 +2471,140 @@ more than 255 characters.
 We probably aren't going to need this for our example, but it is a simple and
 powerful bonus feature.
 
+The instrumentation part of the network is very similar to the mesh network we
+have written about already.  There will be an instrumentation receiver and an
+instrumentation transmitter.  It too is a mesh network; in fact, it is even more
+*meshy* about it, there is no routing key, every node is connected to every
+other node; you get everyone's messages whether you want them or not.  It's like
+the old `telephone party line
+<https://en.wikipedia.org/wiki/Party_line_(telephony)>`_ in the country, where
+everyone's phone would ring for any call on the network.  The old ladies in the
+community would quietly snoop on all calls and pretend that they weren't there;
+you could hear their breathing on the line while you talked to your friends
+about the upcoming orgy.
+
+If you think that is juicy, listen to this, you can hear the entire Mongol horde
+using our party line.
+
+Let's build the instrumentation transmitter:
+
+.. code-block:: python
+  :linenos:
+
+  from mesh_network import SnoopTransmitter
+  from miros.events import Event, signals
+
+  tx_instrument = SnoopTransmitter(
+   user='bob',
+   password='dobbs',
+   port=5672,
+   encryption_key=
+    b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0='
+  )
+
+  # Given that ao is a statechart object you would register it's live
+  # spy/trace output with the tx_instrument broadcast_spy and broadcast_trace
+  # methods respectively:
+  ao.register_live_spy_callback(tx_instrument.broadcast_spy)
+  ao.register_live_trace_callback(tx_instrument.broadcast_trace)
+
+  # Or you can broadcast messages directly to the connected spy and trace exchanges
+  tx_instrument.broadcast_spy("Spy information")
+  tx_instrument.broadcast_trace("Trace information")
+
+On lines 1-2 we import the required packages.
+
+On lines 4-10 we build the instrumentation transmission object.  The class
+which it is derived from is called SnoopTransmitter, in honour of the old
+lady on our imagined party line.  It needs the RabbitMq username and password,
+an optional port number and an encryption key.  This key can be different from
+the key used by our other mesh network.
+
+Line 15-16 might cause some confusion until you realize that the ``ao`` object
+is just an imagined statechart.  If we were going to debug this statechart on
+this machine, we could turn on it's live_spy and the live_trace.  This would
+spit out debugging information to our screen as the statechart reacted to
+different events.  The code on line 15-16 is just telling the statechart to spit
+out its live information into the snoop transmitter instead.  By doing this, the
+imagined ``ao`` object will transmit out all of its live spy and trace
+information to every other connected statechart across the mesh, to every Snoop
+receiver.
+
+Line 19 and 20 is showing us how to send out information directly to all other
+connected nodes on the Snoop network.  
+
+To build an instrumentation, Snoop receiver:
+
+.. code-block:: python
+  :linenos:
+
+  from mesh_network import SnoopReceiver
+
+  rx_instrumentation = SnoopReceiver(
+    user='bob',
+    password='dobbs',
+    port=5672,
+    encryption_key=
+      b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
+
+  rx_instrumentation.start_consuming()
+
+  # You can also tie a live_spy and live_trace callback method:
+  def custom_spy_callback(ch, method, properties, body):
+    print(" [+s] {}:{}".format(method.routing_key, body))
+
+  def custom_trace_callback(ch, method, properties, body):
+    print(" [+t] {}:{}".format(method.routing_key, body))
+
+  # register spy instrumentation callback with your rx_instrumentation
+  rx_instrumentation.register_live_spy_callback(custom_spy_callback)
+
+  # register trace instrumentation callback with your rx_instrumentation
+  rx_instrumentation.register_live_trace_callback(custom_trace_callback)
+
+  # The rx_instrumentationt will have a ForeignHsm object from which you can
+  # view all spy and trace information
+  pp(rx_instrumentation.spy())
+  print(rx_instrumentation.trace())
+
+The Snoop receiver can tie two callbacks, a spy and trace callback, to *all of
+the* spy and trace information coming back from your botnet.
+
+On line 1 we import the SnoopReceiver class.  On lines 3 through 4 we construct
+an object of the SnoopReceiver class, providing the RabbitMq server's username
+and password, the port connecting the server to the network and its encryption
+key.  This encryption key must match the encryption keys used by all of the
+linked SnoopTransmitters, or we will just receive a stream of useless encrypted
+data.  The Snoop receiver is connected to a RabbitMq 'fanout' exchange, so every
+message sent into this exchange will be received by every other receiver
+connected across the whole network.
+
+On line 10, we start a thread within the SnoopReceiver to listen for received
+messages.
+
+On lines 19 through 23 we see how to connect the callbacks defined on lines
+12-17 to the snoop receiver.  In this example, we will just print out the spy
+and trace information coming from this and all other connected snoop
+transmitters in our network.
+
+Lines 25 through 28 demonstrate that if we wanted to access the spy or trace
+logs in their entirety, we could by calling the ``spy`` and ``trace`` methods on
+the Snoop receiver.  These methods link to a ForeignHsm object embedded in the
+Snoop Receiver object.  The ForeignHsm doesn't have an Hsm, nor can it access
+one, it just provides the same ``spy`` and ``trace`` debugging interfaces that
+you would use if you were dealing with an actual HSM; within a Factory, Active
+Object or an HsmWithQueues derived object.
+
+To summarize, we can build two different mesh networks.  One with routing keys
+and one for debugging all of the connected state charts spy and trace streams.
+To connect transmit and receive to these networks a statechart will need build
+build two different transmitters and two different receivers.  Each receiver
+will run in it own thread and dispatch the received messages into the connected
+callbacks.
+
+In the next section we will connect Gandbold to his brethren using these
+networks.
+
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:
 
 Instrumenting to Debug the Mongol Botnet
@@ -2475,5 +2615,5 @@ Instrumenting to Debug the Mongol Botnet
 .. _ergotic_mongol_13: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_13.pgn
 
 .. _mesh_network: https://github.com/aleph2c/miros/blob/master/examples/mesh_network.py
-
+.. _party_line: https://en.wikipedia.org/wiki/Party_line_(telephony)
 :ref:`back to examples <examples>`

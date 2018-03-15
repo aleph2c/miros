@@ -2301,15 +2301,15 @@ own messaging between them, you will <em>PWN</em> this botnet.</p>
 would have no problem with intercepted communications. But, what would have
 happened if they had to fight another unit of horse archers? Each group would
 know what the other side was up to; they could yell distracting calls into the
-side’s string of commands to jam up the other team’s manoeuvre.</p>
+other side’s string of commands to jam up the other team’s manoeuvre.</p>
 <p>So it would make sense if each Mongol unit had their own set of war cries. This
 way they could act on instruction without doubt or hesitation.</p>
 <p>The horse archer communications need to be encrypted. There are many different
 ways to do this; it can happen at the communications layer using SSL, or it can
 be handled by our warbot directly.</p>
 <p>I have opted to use a symmetric encryption scheme with the Fernet library within
-our warbot. I did this after investigating pycryto; which does not have windows
-support and has mainly been abandon by its maintainer. Don’t use pycrypt.</p>
+our warbot. I did this after investigating pycrypto; which does not have windows
+support and has mainly been abandon by its maintainer. Don’t use pycrypto.</p>
 <p>Let’s just use Fernet.</p>
 <p>Fernet takes a lot of pain out of encryption, but you still need a key.
 Encryption is really about key management; how do you keep your key hidden from
@@ -2592,8 +2592,10 @@ of networking will let them yell to one another, and it will use the RabbitMq
 use the RabbitMq <em>fanout</em> strategy.  Each layer will have a different encryption
 key.  Debugging an encrypted blob can be frustrating; so we want to make sure we
 can <em>see</em> our design while we play with the encryption key for the first type of
-mesh networking.  When we are happy with the design; we will turn off the
-instrumentation and release the horde (in a lab).</p>
+mesh networking.  To distinguish between the two different types of networking,
+I will call one the mesh and the other the snoop network.  When we are happy
+with the design; we will turn off the instrumentation, remove our ability to
+snoop and release the horde (in a lab).</p>
 <p>By using RabbitMq, every running Horse Archer program on any connected computer
 will look like a node in our mesh network.  This is great; it means we can
 significantly simplify our code.</p>
@@ -2639,13 +2641,14 @@ communicate with each other, not the debugging network.</p>
     <span class="n">routing_key</span> <span class="o">=</span> <span class="s1">&#39;archer.mary&#39;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
+<p>Let’s consider the above code listing.</p>
 <p>After importing the mesh_network package that contains all of the RabbitMq
 networking code we see something about ‘confirmed’ connected IP addresses (line
 4).  A confirmed IP address belongs to a computer that successfully received and
 decrypted an automatic scouting message sent out by our program.  This comment
 is suggesting that 192.168.0.102 and 192.168.0.103 both are connected.  Say this
 was true, that means that the computer on which this code is written has one of
-these IP addresses as it’s IP address.</p>
+these IP addresses.</p>
 <p>The same comment informs us about the routing keys.  If we let our eyes jump to
 line 11 we see that we are setting a routing key to <code class="docutils literal"><span class="pre">archer.mary</span></code>.  So, the
 comment is trying to tell us that the IP address of the computer is
@@ -2699,14 +2702,15 @@ network.</p>
 <span class="n">rx</span><span class="o">.</span><span class="n">start_consuming</span><span class="p">()</span> <span class="c1"># launches a consuming task with same custom_rx_callback</span>
 </pre></div>
 </td></tr></table></div>
-<p>First we import our required packages.  Then on lines 5-6 we create a callback
-function.  We will want to register this callback function with the underlying
-framework, see line 14. This callback function will be called if, and only if, a
-message is received by RabbitMq that has the correct topic routing key.  This
-routing key is specified on line 12, where we construct the mesh receiver
-object, rx.</p>
+<p>Let’s consider the above code listing.</p>
+<p>First we import our required packages (lines 1-3).  Then on lines 5-6 we create
+a callback function.  We will want to register this callback function with the
+underlying framework, see line 14. This callback function will be called if, and
+only if, a message is received by RabbitMq that has the correct topic routing
+key.  This routing key is specified on line 12, where we construct the mesh
+receiver object, rx.</p>
 <p>The comments on lines 8 and 9 describe some routing key specifics.  We see that
-for the code on lines 9-11, the routing key will be
+for the code on lines 10-12, the routing key will be
 <code class="docutils literal"><span class="pre">192.168.0.103.archer.mary</span></code>.  So like the transmitter API, the receiver API
 pre-pends an IP address to its routing key.</p>
 <p>Before we talk more about the routing key,  let’s fire up and run our receiver.
@@ -2746,6 +2750,166 @@ key would be <code class="docutils literal"><span class="pre">archer.*</span></c
 more than 255 characters.</p>
 <p>We probably aren’t going to need this for our example, but it is a simple and
 powerful bonus feature.</p>
+<p>The instrumentation part of the network is very similar to the mesh network we
+have written about already.  There will be an instrumentation receiver and an
+instrumentation transmitter.  It too is a mesh network; in fact, it is even more
+<em>meshy</em> about it, there is no routing key, every node is connected to every
+other node; you get everyone’s messages whether you want them or not.  It’s like
+the old <a class="reference external" href="https://en.wikipedia.org/wiki/Party_line_(telephony)">telephone party line</a> in the country, where
+everyone’s phone would ring for any call on the network.  The old ladies in the
+community would quietly snoop on all calls and pretend that they weren’t there;
+you could hear their breathing on the line while you talked to your friends
+about the upcoming orgy.</p>
+<p>If you think that is juicy, listen to this, you can hear the entire Mongol horde
+using our party line.</p>
+<p>Let’s build the instrumentation transmitter:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mesh_network</span> <span class="kn">import</span> <span class="n">SnoopTransmitter</span>
+<span class="kn">from</span> <span class="nn">miros.events</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">signals</span>
+
+<span class="n">tx_instrument</span> <span class="o">=</span> <span class="n">SnoopTransmitter</span><span class="p">(</span>
+ <span class="n">user</span><span class="o">=</span><span class="s1">&#39;bob&#39;</span><span class="p">,</span>
+ <span class="n">password</span><span class="o">=</span><span class="s1">&#39;dobbs&#39;</span><span class="p">,</span>
+ <span class="n">port</span><span class="o">=</span><span class="mi">5672</span><span class="p">,</span>
+ <span class="n">encryption_key</span><span class="o">=</span>
+  <span class="sa">b</span><span class="s1">&#39;lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=&#39;</span>
+<span class="p">)</span>
+
+<span class="c1"># Given that ao is a statechart object you would register it&#39;s live</span>
+<span class="c1"># spy/trace output with the tx_instrument broadcast_spy and broadcast_trace</span>
+<span class="c1"># methods respectively:</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_live_spy_callback</span><span class="p">(</span><span class="n">tx_instrument</span><span class="o">.</span><span class="n">broadcast_spy</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_live_trace_callback</span><span class="p">(</span><span class="n">tx_instrument</span><span class="o">.</span><span class="n">broadcast_trace</span><span class="p">)</span>
+
+<span class="c1"># Or you can broadcast messages directly to the connected spy and trace exchanges</span>
+<span class="n">tx_instrument</span><span class="o">.</span><span class="n">broadcast_spy</span><span class="p">(</span><span class="s2">&quot;Spy information&quot;</span><span class="p">)</span>
+<span class="n">tx_instrument</span><span class="o">.</span><span class="n">broadcast_trace</span><span class="p">(</span><span class="s2">&quot;Trace information&quot;</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>On lines 1-2 we import the required packages.</p>
+<p>On lines 4-10 we build the instrumentation transmission object.  The class
+which it is derived from is called SnoopTransmitter, in honour of the old
+lady on our imagined party line.  It needs the RabbitMq username and password,
+an optional port number and an encryption key.  This key can be different from
+the key used by our other mesh network.</p>
+<p>Line 15-16 might cause some confusion until you realize that the <code class="docutils literal"><span class="pre">ao</span></code> object
+is just an imagined statechart.  If we were going to debug this statechart on
+this machine, we could turn on it’s live_spy and the live_trace.  This would
+spit out debugging information to our screen as the statechart reacted to
+different events.  The code on line 15-16 is just telling the statechart to spit
+out its live information into the snoop transmitter instead.  By doing this, the
+imagined <code class="docutils literal"><span class="pre">ao</span></code> object will transmit out all of its live spy and trace
+information to every other connected statechart across the mesh, to every Snoop
+receiver.</p>
+<p>Line 19 and 20 is showing us how to send out information directly to all other
+connected nodes on the Snoop network.</p>
+<p>To build an instrumentation, Snoop receiver:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mesh_network</span> <span class="kn">import</span> <span class="n">SnoopReceiver</span>
+
+<span class="n">rx_instrumentation</span> <span class="o">=</span> <span class="n">SnoopReceiver</span><span class="p">(</span>
+  <span class="n">user</span><span class="o">=</span><span class="s1">&#39;bob&#39;</span><span class="p">,</span>
+  <span class="n">password</span><span class="o">=</span><span class="s1">&#39;dobbs&#39;</span><span class="p">,</span>
+  <span class="n">port</span><span class="o">=</span><span class="mi">5672</span><span class="p">,</span>
+  <span class="n">encryption_key</span><span class="o">=</span>
+    <span class="sa">b</span><span class="s1">&#39;lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=&#39;</span><span class="p">)</span>
+
+<span class="n">rx_instrumentation</span><span class="o">.</span><span class="n">start_consuming</span><span class="p">()</span>
+
+<span class="c1"># You can also tie a live_spy and live_trace callback method:</span>
+<span class="k">def</span> <span class="nf">custom_spy_callback</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot; [+s] {}:{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">routing_key</span><span class="p">,</span> <span class="n">body</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">custom_trace_callback</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot; [+t] {}:{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">routing_key</span><span class="p">,</span> <span class="n">body</span><span class="p">))</span>
+
+<span class="c1"># register spy instrumentation callback with your rx_instrumentation</span>
+<span class="n">rx_instrumentation</span><span class="o">.</span><span class="n">register_live_spy_callback</span><span class="p">(</span><span class="n">custom_spy_callback</span><span class="p">)</span>
+
+<span class="c1"># register trace instrumentation callback with your rx_instrumentation</span>
+<span class="n">rx_instrumentation</span><span class="o">.</span><span class="n">register_live_trace_callback</span><span class="p">(</span><span class="n">custom_trace_callback</span><span class="p">)</span>
+
+<span class="c1"># The rx_instrumentationt will have a ForeignHsm object from which you can</span>
+<span class="c1"># view all spy and trace information</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">rx_instrumentation</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">rx_instrumentation</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+</pre></div>
+</td></tr></table></div>
+<p>The Snoop receiver can tie two callbacks, a spy and trace callback, to <em>all of
+the</em> spy and trace information coming back from your botnet.</p>
+<p>On line 1 we import the SnoopReceiver class.  On lines 3 through 4 we construct
+an object of the SnoopReceiver class, providing the RabbitMq server’s username
+and password, the port connecting the server to the network and its encryption
+key.  This encryption key must match the encryption keys used by all of the
+linked SnoopTransmitters, or we will just receive a stream of useless encrypted
+data.  The Snoop receiver is connected to a RabbitMq ‘fanout’ exchange, so every
+message sent into this exchange will be received by every other receiver
+connected across the whole network.</p>
+<p>On line 10, we start a thread within the SnoopReceiver to listen for received
+messages.</p>
+<p>On lines 19 through 23 we see how to connect the callbacks defined on lines
+12-17 to the snoop receiver.  In this example, we will just print out the spy
+and trace information coming from this and all other connected snoop
+transmitters in our network.</p>
+<p>Lines 25 through 28 demonstrate that if we wanted to access the spy or trace
+logs in their entirety, we could by calling the <code class="docutils literal"><span class="pre">spy</span></code> and <code class="docutils literal"><span class="pre">trace</span></code> methods on
+the Snoop receiver.  These methods link to a ForeignHsm object embedded in the
+Snoop Receiver object.  The ForeignHsm doesn’t have an Hsm, nor can it access
+one, it just provides the same <code class="docutils literal"><span class="pre">spy</span></code> and <code class="docutils literal"><span class="pre">trace</span></code> debugging interfaces that
+you would use if you were dealing with an actual HSM; within a Factory, Active
+Object or an HsmWithQueues derived object.</p>
+<p>To summarize, we can build two different mesh networks.  One with routing keys
+and one for debugging all of the connected state charts spy and trace streams.
+To connect transmit and receive to these networks a statechart will need build
+build two different transmitters and two different receivers.  Each receiver
+will run in it own thread and dispatch the received messages into the connected
+callbacks.</p>
+<p>In the next section we will connect Gandbold to his brethren using these
+networks.</p>
 <div class="section" id="instrumenting-to-debug-the-mongol-botnet">
 <span id="i-mongol-example-instrumenting-to-debug-the-botnet"></span><h2>Instrumenting to Debug the Mongol Botnet<a class="headerlink" href="#instrumenting-to-debug-the-mongol-botnet" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
