@@ -96,12 +96,25 @@ class HorseArcher(Factory):
 
   MAXIMUM_ARROW_CAPACITY = 60
 
-  def __init__(self, name='Gandbold', time_compression=1.0):
+  def __init__(self, name=None, time_compression=1.0):
+    this_ip = mesh_network.NetworkTool.get_working_ip_address()
+    if name is None:
+      name = this_ip
+    else:
+      name = name + '_' + this_ip
     super().__init__(name)
     self.arrows = 0
     self.ticks  = 0
     self.time_compression = time_compression
     self.others = {}
+
+
+    self.snoop_tx = mesh_network.SnoopTransmitter(
+      user='bob',
+      password='dobbs',
+      port=5672,
+      encryption_key=
+      b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
 
     # You can also tie a live_spy and live_trace callback method:
     def custom_spy_callback(ch, method, properties, body):
@@ -110,13 +123,6 @@ class HorseArcher(Factory):
     def custom_trace_callback(ch, method, properties, body):
       body = body.replace('\n', '')
       print(" [+t] {}".format(body))
-
-    self.snoop_tx = mesh_network.SnoopTransmitter(
-      user='bob',
-      password='dobbs',
-      port=5672,
-      encryption_key=
-      b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
 
     self.snoop_rx = mesh_network.SnoopReceiver(
       user='bob',
@@ -128,6 +134,25 @@ class HorseArcher(Factory):
     self.snoop_rx.register_live_spy_callback(custom_spy_callback)
     self.snoop_rx.register_live_trace_callback(custom_trace_callback)
     self.snoop_rx.start_consuming()
+
+    self.mesh_tx = mesh_network.MeshTransmitter(
+      user='bob',
+      password='dobbs',
+      port=5672)
+    # self.mesh_tx.message_to_other_channel(
+    #  Event(signal=signals.Mirror, payload=[1,2,3]), routing_key='archer.gandbold')
+
+    def mesh_rx_callback(ch, method, properties, body):
+      print(" [+] {}:{}".format(method.routing_key, body))
+
+    self.mesh_rx = mesh_network.MeshReceiver(
+      user='bob',
+      password='dobbs',
+      port=5672,
+      routing_key='archer#')
+
+    self.mesh_rx.register_live_callback(mesh_rx_callback)
+    self.mesh_rx.start_consuming()
 
 # Setup the snoop rece
 
@@ -478,7 +503,7 @@ def wta_exit(archer, e):
   return return_status.HANDLED
 
 # Create the archer
-archer = HorseArcher()
+archer = HorseArcher("Gandbold")
 
 # Create the archer states
 battle = archer.create(state='battle'). \
