@@ -103,6 +103,34 @@ class HorseArcher(Factory):
     self.time_compression = time_compression
     self.others = {}
 
+    # You can also tie a live_spy and live_trace callback method:
+    def custom_spy_callback(ch, method, properties, body):
+      print(" [+s] {}".format(body))
+
+    def custom_trace_callback(ch, method, properties, body):
+      body = body.replace('\n', '')
+      print(" [+t] {}".format(body))
+
+    self.snoop_tx = mesh_network.SnoopTransmitter(
+      user='bob',
+      password='dobbs',
+      port=5672,
+      encryption_key=
+      b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
+
+    self.snoop_rx = mesh_network.SnoopReceiver(
+      user='bob',
+      password='dobbs',
+      port=5672,
+      encryption_key=
+      b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
+
+    self.snoop_rx.register_live_spy_callback(custom_spy_callback)
+    self.snoop_rx.register_live_trace_callback(custom_trace_callback)
+    self.snoop_rx.start_consuming()
+
+# Setup the snoop rece
+
   def yell(self, event):
     pass
 
@@ -616,30 +644,17 @@ archer.nest(battle, parent=None). \
   nest(marshal, parent=deceit_in_detail). \
   nest(waiting_to_advance, parent=marshal)
 
-# Setup the snoop receiver
-rx_instrumentation = mesh_network.SnoopReceiver(
-  user='bob',
-  password='dobbs',
-  port=5672,
-  encryption_key=
-  b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
-
-# You can also tie a live_spy and live_trace callback method:
-def custom_spy_callback(ch, method, properties, body):
-  print(" [+s] {}:{}".format(method.routing_key, body))
-
-def custom_trace_callback(ch, method, properties, body):
-  print(" [+t] {}:{}".format(method.routing_key, body))
-
 if __name__ == '__main__':
-
   # build a horse archer and rev his time by 100
   print(archer.name)
   archer.live_trace = True
+  # archer.live_spy = True
+  archer.register_live_spy_callback(archer.snoop_tx.broadcast_spy)
+  archer.register_live_trace_callback(archer.snoop_tx.broadcast_trace)
   archer.time_compression = 100
   archer.start_at(battle)
   archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
-  time.sleep(4.0)
+  time.sleep(5.0)
 
 # empathy_for_first_brother
 
