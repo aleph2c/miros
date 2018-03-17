@@ -2597,12 +2597,12 @@ Object or an HsmWithQueues derived object.
 
 To summarize, we can build two different mesh networks.  One with routing keys
 and one for debugging all of the connected state charts spy and trace streams.
-To connect transmit and receive to these networks a statechart will need build
+To connect, transmit and receive with these networks a statechart will need to
 build two different transmitters and two different receivers.  Each receiver
-will run in it own thread and dispatch the received messages into the connected
-callbacks.
+will run in its own thread and dispatch the received messages into their connected
+callback functions.
 
-In the next section we will connect Gandbold to his brethren using these
+In the next section, we will connect Gandbold to his brethren using these
 networks.
 
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:

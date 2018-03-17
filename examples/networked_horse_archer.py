@@ -96,33 +96,63 @@ class HorseArcher(Factory):
 
   MAXIMUM_ARROW_CAPACITY = 60
 
-  def __init__(self, name=None, time_compression=1.0):
+  def __init__(self, name=None, time_compression=1.0, rabbit_user=None, rabbit_password=None, rabbit_port=None):
+
+    if rabbit_user is None or rabbit_password is None:
+      raise("need to provide RabbitMq server credentials")
+
+    if rabbit_port is None:
+      rabbit_port = 5672
+
     this_ip = mesh_network.NetworkTool.get_working_ip_address()
     if name is None:
       name = this_ip
     else:
       name = name + '_' + this_ip
+
+    self.routing_key = 'archer.{}'.format(name)
+
     super().__init__(name)
     self.arrows = 0
     self.ticks  = 0
     self.time_compression = time_compression
     self.others = {}
 
+    self.mesh_tx = mesh_network.MeshTransmitter(
+      user=rabbit_user,
+      password=rabbit_password,
+      port=rabbit_port)
+    # self.mesh_tx.message_to_other_channel(
+    #  Event(signal=signals.Mirror, payload=[1,2,3]), routing_key='archer.gandbold')
 
+    def mesh_rx_callback(ch, method, properties, body):
+      print(" [+] {}:{}".format(method.routing_key, body))
+      if isinstance(body, Event):
+        self.post_fifo(body)
+
+    self.mesh_rx = mesh_network.MeshReceiver(
+      user=rabbit_user,
+      password=rabbit_password,
+      port=rabbit_port,
+      routing_key='archer.#'
+    )
+
+    self.mesh_rx.register_live_callback(mesh_rx_callback)
+    self.mesh_rx.start_consuming()
+
+  def enable_snoop(self, live_trace=True, live_spy=False):
+    '''
+    Attach this node to the snoop mesh network.  Connect it's spy and trace
+    output to the spy and trace 'fanout' exchanges
+
+    Start consuming other spy and trace messaging
+    '''
     self.snoop_tx = mesh_network.SnoopTransmitter(
       user='bob',
       password='dobbs',
       port=5672,
       encryption_key=
       b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
-
-    # You can also tie a live_spy and live_trace callback method:
-    def custom_spy_callback(ch, method, properties, body):
-      print(" [+s] {}".format(body))
-
-    def custom_trace_callback(ch, method, properties, body):
-      body = body.replace('\n', '')
-      print(" [+t] {}".format(body))
 
     self.snoop_rx = mesh_network.SnoopReceiver(
       user='bob',
@@ -131,33 +161,36 @@ class HorseArcher(Factory):
       encryption_key=
       b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
 
+    #  You can also tie a live_spy and live_trace callback method:
+    def custom_spy_callback(ch, method, properties, body):
+      print(" [+s] {}".format(body))
+
+    def custom_trace_callback(ch, method, properties, body):
+      body = body.replace('\n', '')
+      print(" [+t] {}".format(body))
+
     self.snoop_rx.register_live_spy_callback(custom_spy_callback)
     self.snoop_rx.register_live_trace_callback(custom_trace_callback)
+
+    self.live_trace = live_trace
+    self.live_spy = live_spy
+    self.register_live_spy_callback(archer.snoop_tx.broadcast_spy)
+    self.register_live_trace_callback(archer.snoop_tx.broadcast_trace)
+
     self.snoop_rx.start_consuming()
 
-    self.mesh_tx = mesh_network.MeshTransmitter(
-      user='bob',
-      password='dobbs',
-      port=5672)
-    # self.mesh_tx.message_to_other_channel(
-    #  Event(signal=signals.Mirror, payload=[1,2,3]), routing_key='archer.gandbold')
+  def disable_snoop(self):
 
-    def mesh_rx_callback(ch, method, properties, body):
-      print(" [+] {}:{}".format(method.routing_key, body))
+    self.snoop_rx.stop_consuming()
 
-    self.mesh_rx = mesh_network.MeshReceiver(
-      user='bob',
-      password='dobbs',
-      port=5672,
-      routing_key='archer#')
+    self.register_live_spy_callback(
+      HsmWithQueues.live_spy_callback_default)
 
-    self.mesh_rx.register_live_callback(mesh_rx_callback)
-    self.mesh_rx.start_consuming()
-
-# Setup the snoop rece
+    self.register_live_trace_callback(
+      HsmWithQueues.live_spy_callback_default)
 
   def yell(self, event):
-    pass
+    self.mesh_tx.message_to_other_channels(event, routing_key=self.routing_key)
 
   def compress(self, time_in_seconds):
     return 1.0 * time_in_seconds / self.time_compression
@@ -503,7 +536,10 @@ def wta_exit(archer, e):
   return return_status.HANDLED
 
 # Create the archer
-archer = HorseArcher("Gandbold")
+archer = HorseArcher("Gandbold", 
+    rabbit_user='bob', 
+    rabbit_password='dobbs',
+    rabbit_port=5672)
 
 # Create the archer states
 battle = archer.create(state='battle'). \
@@ -672,10 +708,6 @@ archer.nest(battle, parent=None). \
 if __name__ == '__main__':
   # build a horse archer and rev his time by 100
   print(archer.name)
-  archer.live_trace = True
-  # archer.live_spy = True
-  archer.register_live_spy_callback(archer.snoop_tx.broadcast_spy)
-  archer.register_live_trace_callback(archer.snoop_tx.broadcast_trace)
   archer.time_compression = 100
   archer.start_at(battle)
   archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
