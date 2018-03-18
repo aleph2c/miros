@@ -347,8 +347,12 @@ class NetworkTool():
       except ValueError:
         plain_text = p_plain_text
 
-      if isinstance(plain_text, Event):
+      try:
         plain_text = Event.loads(plain_text)
+      except:
+        print("failing")
+        pass
+
       fn(ch, method, properties, plain_text)
     return _pickle_loads
 
