@@ -1,3 +1,4 @@
+import uuid
 import time
 import random
 from miros.hsm import pp
@@ -104,12 +105,6 @@ class HorseArcher(Factory):
     if rabbit_port is None:
       rabbit_port = 5672
 
-    this_ip = mesh_network.NetworkTool.get_working_ip_address()
-    if name is None:
-      name = this_ip
-    else:
-      name = name + '_' + this_ip
-
     self.routing_key = 'archer.{}'.format(name)
 
     super().__init__(name)
@@ -198,6 +193,17 @@ class HorseArcher(Factory):
   def to_time(self, time_in_seconds):
     return self.compress(time_in_seconds)
 
+  @staticmethod
+  def get_a_name():
+    archer_root = random.choice([
+      'Hulagu', 'Hadan', 'Gantulga', 'Ganbaatar',
+      'Narankhuu', 'Ihbarhasvad', 'Nergui',
+      'Narantuyaa', 'Altan', 'Gandbold'])
+    archer_name = "{}.{}".format(
+      archer_root,
+      str(uuid.uuid5(uuid.NAMESPACE_DNS, archer_root))[0:5])
+    return archer_name
+
 def battle_entry(archer, e):
   # this will be adjusted to actual discovered ip addresses once we build up
   # the network part of the code
@@ -208,11 +214,11 @@ def battle_entry(archer, e):
           '192.168.0.10']
 
   # horse archer names
-  names = ['Hulagu', 'Hadan',
-           'Gantulga', 'Ganbaatar',
+  names = ['Hulagu',    'Hadan',
+           'Gantulga',  'Ganbaatar',
            'Narankhuu', 'Ihbarhasvad',
-           'Nergui', 'Narantuyaa',
-           'Altan']
+           'Nergui',    'Narantuyaa',
+           'Altan',     'Gandbold']
 
   # append the ip address to each name
   empathy_names = list(map(str.__add__, [name + '_' for name in names], ips))
@@ -536,10 +542,12 @@ def wta_exit(archer, e):
   return return_status.HANDLED
 
 # Create the archer
-archer = HorseArcher("Gandbold", 
-    rabbit_user='bob', 
-    rabbit_password='dobbs',
-    rabbit_port=5672)
+archer = HorseArcher(
+  name = HorseArcher.get_a_name(),
+  rabbit_user='bob',
+  rabbit_password='dobbs',
+  rabbit_port=5672
+)
 
 # Create the archer states
 battle = archer.create(state='battle'). \
