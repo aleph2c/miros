@@ -122,8 +122,9 @@ class HorseArcher(Factory):
     def mesh_rx_callback(ch, method, properties, body):
       if isinstance(body, Event):
         name_of_other = body.payload
+        self.add_member_if_needed(name_of_other)
         if name_of_other != self.name:
-          print(" [+] {}:{}".format(method.routing_key, body))
+          #  print(" [+] {}:{}".format(method.routing_key, body))
           self.post_fifo(body)
 
     self.mesh_rx = mesh_network.MeshReceiver(
@@ -194,6 +195,13 @@ class HorseArcher(Factory):
   def to_time(self, time_in_seconds):
     return self.compress(time_in_seconds)
 
+  def add_member_if_needed(self, other_archer_name):
+    if self.name != other_archer_name:
+      if other_archer_name not in self.others:
+        oha = OtherHorseArcher(other_archer_name)
+        oha.start_at(empathy)
+        self.others[other_archer_name] = oha
+
   @staticmethod
   def get_a_name():
     archer_root = random.choice([
@@ -211,11 +219,7 @@ def battle_entry(archer, e):
 
 def battle_field_announcement(archer, e):
   other_archer_name = e.payload
-  if archer.name != other_archer_name:
-    if other_archer_name not in archer.others:
-      oha = OtherHorseArcher(other_archer_name)
-      oha.start_at(empathy)
-      archer.others[other_archer_name] = oha
+  archer.add_member_if_needed(other_archer_name)
   return return_status.HANDLED
 
 def battle_init(archer, e):
@@ -715,7 +719,7 @@ if __name__ == '__main__':
   archer.live_trace = True
   archer.start_at(battle)
   archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
-  time.sleep(10.0)
+  time.sleep(15.0)
   archer.enable_snoop()
 
 # empathy_for_first_brother
