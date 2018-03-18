@@ -1071,7 +1071,7 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
   def append_to_full_trace(fn):
     @wraps(fn)
     def is_signal_hooked(self):
-      signal_name, hooked = "", False
+      signal_name, hooked, dt = "", False, None
       for sr in self.rtc.tuples:
         if sr.internal is False and sr.recall is False:
           signal_name = sr.signal
