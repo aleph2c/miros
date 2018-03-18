@@ -105,6 +105,7 @@ class HorseArcher(Factory):
     if rabbit_port is None:
       rabbit_port = 5672
 
+    self.name = name
     self.routing_key = 'archer.{}'.format(name)
 
     super().__init__(name)
@@ -117,13 +118,13 @@ class HorseArcher(Factory):
       user=rabbit_user,
       password=rabbit_password,
       port=rabbit_port)
-    # self.mesh_tx.message_to_other_channel(
-    #  Event(signal=signals.Mirror, payload=[1,2,3]), routing_key='archer.gandbold')
 
     def mesh_rx_callback(ch, method, properties, body):
-      print(" [+] {}:{}".format(method.routing_key, body))
       if isinstance(body, Event):
-        self.post_fifo(body)
+        name_of_other = body.payload
+        if name_of_other != self.name:
+          print(" [+] {}:{}".format(method.routing_key, body))
+          self.post_fifo(body)
 
     self.mesh_rx = mesh_network.MeshReceiver(
       user=rabbit_user,
@@ -205,30 +206,16 @@ class HorseArcher(Factory):
     return archer_name
 
 def battle_entry(archer, e):
-  # this will be adjusted to actual discovered ip addresses once we build up
-  # the network part of the code
-  ips =  ['192.168.0.2', '192.168.0.3',
-          '192.168.0.4', '192.168.0.5',
-          '192.168.0.6', '192.168.0.7',
-          '192.168.0.8', '192.168.0.9',
-          '192.168.0.10']
+  archer.yell(Event(signal=signals.Annouce_Arrival_To_Unit, payload=archer.name))
+  return return_status.HANDLED
 
-  # horse archer names
-  names = ['Hulagu',    'Hadan',
-           'Gantulga',  'Ganbaatar',
-           'Narankhuu', 'Ihbarhasvad',
-           'Nergui',    'Narantuyaa',
-           'Altan',     'Gandbold']
-
-  # append the ip address to each name
-  empathy_names = list(map(str.__add__, [name + '_' for name in names], ips))
-
-  # build up individual empathy HSMs and start them in the correct state
-  ohas = [OtherHorseArcher(empathy_name) for empathy_name in empathy_names]
-  for oha in ohas:
-    oha.start_at(empathy)
-    archer.others[oha.name] = oha
-
+def battle_field_announcement(archer, e):
+  other_archer_name = e.payload
+  if archer.name != other_archer_name:
+    if other_archer_name not in archer.others:
+      oha = OtherHorseArcher(other_archer_name)
+      oha.start_at(empathy)
+      archer.others[other_archer_name] = oha
   return return_status.HANDLED
 
 def battle_init(archer, e):
@@ -269,7 +256,7 @@ def didt_senior_advance_war_cry(archer, e):
 def didt_advance_war_cry(archer, e):
   '''Yell out "advance war cry" to others and introspect on the state of the
      unit'''
-  archer.yell(e)
+  archer.yell(Event(signal=signals.Other_Advance_War_Cry, payload=archer.name))
   for name, other in archer.others.items():
     other.dispatch(e)
   return archer.trans(advance)
@@ -289,7 +276,7 @@ def didt_other_retreat_war_cry(archer, e):
 
 def didt_skirmish_war_cry(archer, e):
   '''Yell out "skirmish war cry" to others'''
-  archer.yell(e)
+  archer.yell(Event(signal=signals.Other_Skirmish_War_Cry, payload=archer.name))
   return archer.trans(skirmish)
 
 def didt_other_skirmish_war_cry(archer, e):
@@ -302,7 +289,7 @@ def didt_other_skirmish_war_cry(archer, e):
 
 def didt_retreat_war_cry(archer, e):
   '''Yell out the "retreat war cry" and introspect on the state of the unit'''
-  archer.yell(e)
+  archer.yell(Event(signal=signals.Other_Retreat_War_Cry, payload=archer.name))
   for name, other in archer.others.items():
     other.dispatch(e)
   return archer.trans(feigned_retreat)
@@ -435,6 +422,8 @@ def skirmish_retreat_ready_war_cry(archer, e):
      Retreat_War_Cry, if not or either way transition into the
      waiting_to_lure state'''
   ready = True
+  archer.yell(Event(signal=signals.Other_Retreat_Ready_War_Cry,
+    payload=archer.name))
   for name, other in archer.others.items():
     if other.dead() is not True:
       ready &= other.waiting()
@@ -519,6 +508,9 @@ def marshal_entry(archer, e):
 
 def marshal_ready(archer, e):
   ready = True
+  archer.yell(
+    Event(signal=signals.Other_Ready_War_Cry,
+    payload=archer.name))
   for name, other in archer.others.items():
     if other.dead() is not True:
       ready &= other.waiting()
@@ -557,6 +549,9 @@ battle = archer.create(state='battle'). \
   catch(
     signal=signals.INIT_SIGNAL,
     handler=battle_init). \
+  catch(
+    signal=signals.Annouce_Arrival_To_Unit,
+    handler=battle_field_announcement). \
   to_method()
 
 deceit_in_detail = archer.create(state='deceit_in_detail'). \
@@ -717,9 +712,11 @@ if __name__ == '__main__':
   # build a horse archer and rev his time by 100
   print(archer.name)
   archer.time_compression = 100
+  archer.live_trace = True
   archer.start_at(battle)
   archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
-  time.sleep(5.0)
+  time.sleep(10.0)
+  archer.enable_snoop()
 
 # empathy_for_first_brother
 
