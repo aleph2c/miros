@@ -715,7 +715,7 @@ archer.nest(battle, parent=None). \
 if __name__ == '__main__':
   # build a horse archer and rev his time by 100
   print(archer.name)
-  archer.time_compression = 100
+  archer.time_compression = 50
   archer.start_at(battle)
   archer.enable_snoop(live_trace=True)
   archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
