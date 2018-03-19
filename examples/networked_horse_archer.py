@@ -451,6 +451,8 @@ def skirmish_retreat_ready_war_cry(archer, e):
   for name, other in archer.others.items():
     if other.dead() is not True:
       ready &= other.waiting()
+    else:
+      archer.snoop_tx.broadcast_trace("{} thinks {} is dead".format(archer.name, name))
   if ready:
     # let's make sure Gandbold isn't a chicken
     delay_time = random.randint(10, 30)
@@ -537,6 +539,8 @@ def marshal_ready(archer, e):
   for name, other in archer.others.items():
     if other.dead() is not True:
       ready &= other.waiting()
+    else:
+      archer.snoop_tx.broadcast_trace("{} thinks {} is dead".format(archer.name, name))
   if ready:
     archer.post_fifo(
       Event(signal=signals.Advance_War_Cry))
