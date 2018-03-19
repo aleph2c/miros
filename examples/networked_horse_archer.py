@@ -517,7 +517,7 @@ def marshal_entry(archer, e):
   archer.post_fifo(
     Event(signal=signals.Ready),
     times=1,
-    period=archer.to_time(3),
+    period=archer.to_time(12),
     deferred=True)
   return return_status.HANDLED
 
