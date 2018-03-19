@@ -204,6 +204,10 @@ class HorseArcher(Factory):
         oha.start_at(empathy)
         self.others[other_archer_name] = oha
 
+  def dispatch_to_all_empathy(self, event):
+    for name, other in self.others.items():
+      other.dispatch(event)
+
   @staticmethod
   def get_a_name():
     archer_root = random.choice([
@@ -263,8 +267,7 @@ def didt_advance_war_cry(archer, e):
   '''Yell out "advance war cry" to others and introspect on the state of the
      unit'''
   archer.yell(Event(signal=signals.Other_Advance_War_Cry, payload=archer.name))
-  for name, other in archer.others.items():
-    other.dispatch(e)
+  archer.dispatch_to_all_empathy(e)
   return archer.trans(advance)
 
 def didt_other_advance_war_cry(archer, e):
@@ -296,8 +299,7 @@ def didt_other_skirmish_war_cry(archer, e):
 def didt_retreat_war_cry(archer, e):
   '''Yell out the "retreat war cry" and introspect on the state of the unit'''
   archer.yell(Event(signal=signals.Other_Retreat_War_Cry, payload=archer.name))
-  for name, other in archer.others.items():
-    other.dispatch(e)
+  archer.dispatch_to_all_empathy(e)
   return archer.trans(feigned_retreat)
 
 def didt_other_retreat_ready_war_cry(archer, e):
@@ -342,6 +344,10 @@ def advance_other_advanced_war_cry(archer, e):
      order.'''
   name = e.payload
   archer.others[name].dispatch(e)
+  return return_status.HANDLED
+
+def advance_advance_war_cry(archer, e):
+  archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
 def advance_close_enough_for_circle(archer, e):
@@ -423,6 +429,10 @@ def skirmish_other_squirmish_war_cry(archer, e):
   archer.others[name].dispatch(e)
   return return_status.HANDLED
 
+def skirmish_skirmish_war_cry(archer, e):
+  archer.dispatch_to_all_empathy(e)
+  return return_status.HANDLED
+
 def skirmish_retreat_ready_war_cry(archer, e):
   '''If all other horse archers are ready for a return, issue a
      Retreat_War_Cry, if not or either way transition into the
@@ -487,8 +497,7 @@ def fr_second(archer, e):
   return return_status.HANDLED
 
 def fr_retreat_war_cry(archer, e):
-  name = e.payload
-  archer.others[name].dispatch(e)
+  archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
 def fr_other_retreat_war_cry(archer, e):
@@ -616,6 +625,9 @@ advance = archer.create(state='advance'). \
     signal=signals.Other_Advance_War_Cry,
     handler=advance_other_advanced_war_cry).  \
   catch(
+    signal=signals.Advance_War_Cry,
+    handler=advance_advance_war_cry).  \
+  catch(
     signal=signals.Close_Enough_For_Circle,
     handler=advance_close_enough_for_circle). \
   to_method()
@@ -648,6 +660,9 @@ skirmish = archer.create(state='skirmish'). \
   catch(
     signal=signals.Other_Skirmish_War_Cry,
     handler=skirmish_other_squirmish_war_cry). \
+  catch(
+    signal=signals.Skirmish_War_Cry,
+    handler=skirmish_skirmish_war_cry). \
   catch(
     signal=signals.Retreat_Ready_War_Cry,
     handler=skirmish_retreat_ready_war_cry). \
@@ -717,7 +732,7 @@ archer.nest(battle, parent=None). \
 if __name__ == '__main__':
   # build a horse archer and rev his time by 100
   print(archer.name)
-  archer.time_compression = 10
+  archer.time_compression = 20
   archer.start_at(battle)
   archer.enable_snoop(live_trace=True)
   archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
