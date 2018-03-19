@@ -229,6 +229,14 @@ def battle_field_announcement(archer, e):
   return return_status.HANDLED
 
 def battle_init(archer, e):
+  archer.post_fifo(
+    Event(signal=signals.Ready_For_Battle),
+    times=1,
+    period=4,
+    deferred=True)
+
+def battle_ready_for_battle(archer, e):
+  archer.yell(Event(signal=signals.Annouce_Arrival_To_Unit, payload=archer.name))
   return archer.trans(deceit_in_detail)
 
 # Deceit-In-Detail-Tactic state callbacks
@@ -564,6 +572,9 @@ battle = archer.create(state='battle'). \
   catch(
     signal=signals.INIT_SIGNAL,
     handler=battle_init). \
+  catch(
+    signal=signals.Ready_For_Battle,
+    handler=battle_ready_for_battle). \
   catch(
     signal=signals.Annouce_Arrival_To_Unit,
     handler=battle_field_announcement). \
