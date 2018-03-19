@@ -126,6 +126,8 @@ class HorseArcher(Factory):
         if name_of_other != self.name:
           #  print(" [+] {}:{}".format(method.routing_key, body))
           self.post_fifo(body)
+      else:
+        print(" [+t] {}".format(body))
 
     self.mesh_rx = mesh_network.MeshReceiver(
       user=rabbit_user,
@@ -399,7 +401,7 @@ def skirmish_second(archer, e):
 def skirmish_officer_lured(archer, e):
   '''If Horse Archer lures an enemy officer they issue a
      Retreat_War_Cry event.'''
-  print("Knight Charging")
+  archer.snoop_tx.broadcast_trace("Knight Charging at {}".format(archer.name))
   archer.scribble("Knight Charging")
   archer.post_fifo(
     Event(signal=signals.Retreat_War_Cry))
