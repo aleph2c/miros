@@ -221,6 +221,7 @@ class HorseArcher(Factory):
 
 def battle_entry(archer, e):
   archer.yell(Event(signal=signals.Annouce_Arrival_To_Unit, payload=archer.name))
+  print("I am {}".format(archer.name))
   return return_status.HANDLED
 
 def battle_field_announcement(archer, e):
