@@ -288,6 +288,7 @@ def didt_other_advance_war_cry(archer, e):
   return archer.trans(advance)
 
 def didt_other_retreat_war_cry(archer, e):
+  archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
   name = e.payload
   archer.others[name].dispatch(e)
   return archer.trans(feigned_retreat)
