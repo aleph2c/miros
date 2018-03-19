@@ -2605,6 +2605,7 @@ callback functions.
 In the next section, we will connect Gandbold to his brethren using these
 networks.
 
+uuid
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:
 
 Instrumenting to Debug the Mongol Botnet

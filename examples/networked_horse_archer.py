@@ -221,7 +221,6 @@ class HorseArcher(Factory):
 
 def battle_entry(archer, e):
   archer.yell(Event(signal=signals.Annouce_Arrival_To_Unit, payload=archer.name))
-  print("I am {}".format(archer.name))
   return return_status.HANDLED
 
 def battle_field_announcement(archer, e):
@@ -285,13 +284,12 @@ def didt_other_advance_war_cry(archer, e):
   archer.post_fifo(Event(signal=signals.Advance_War_Cry))
   name = e.payload
   archer.others[name].dispatch(e)
-  return return_status.HANDLED
+  return archer.trans(advance)
 
 def didt_other_retreat_war_cry(archer, e):
-  archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
   name = e.payload
   archer.others[name].dispatch(e)
-  return return_status.HANDLED
+  return archer.trans(feigned_retreat)
 
 def didt_skirmish_war_cry(archer, e):
   '''Yell out "skirmish war cry" to others'''
@@ -302,9 +300,10 @@ def didt_other_skirmish_war_cry(archer, e):
   '''A horse archer heard another's Skirmish_War_Cry, so they
      give the command to and introspect on the state of their unit'''
   archer.post_fifo(Event(signal=signals.Skirmish_War_Cry))
+  archer.yell(Event(signal=signals.Other_Skirmish_War_Cry, payload=archer.name))
   name = e.payload
   archer.others[name].dispatch(e)
-  return return_status.HANDLED
+  return archer.trans(skirmish)
 
 def didt_retreat_war_cry(archer, e):
   '''Yell out the "retreat war cry" and introspect on the state of the unit'''
@@ -346,6 +345,14 @@ def advance_senior_advanced_war_cry(archer, e):
   '''Stop Senior_Advance_War_Cry events from being handled outside of this
      state, the horse archer is already in the process of performing the
      order.'''
+  return return_status.HANDLED
+
+def advance_other_advanced_war_cry(archer, e):
+  '''Stop Other_Advance_War_Cry events from being handled outside of this
+     state, the horse archer is already in the process of performing the
+     order.'''
+  name = e.payload
+  archer.others[name].dispatch(e)
   return return_status.HANDLED
 
 def advance_advance_war_cry(archer, e):
@@ -425,6 +432,12 @@ def skirmish_senior_squirmish_war_cry(archer, e):
   '''Ignore skirmish war cries from other while skirmishing'''
   return return_status.HANDLED
 
+def skirmish_other_squirmish_war_cry(archer, e):
+  '''Ignore skirmish war cries from other while skirmishing'''
+  name = e.payload
+  archer.others[name].dispatch(e)
+  return return_status.HANDLED
+
 def skirmish_skirmish_war_cry(archer, e):
   archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
@@ -496,6 +509,11 @@ def fr_second(archer, e):
 
 def fr_retreat_war_cry(archer, e):
   archer.dispatch_to_all_empathy(e)
+  return return_status.HANDLED
+
+def fr_other_retreat_war_cry(archer, e):
+  name = e.payload
+  archer.others[name].dispatch(e)
   return return_status.HANDLED
 
 def fr_out_of_arrows(archer, e):
@@ -620,6 +638,9 @@ advance = archer.create(state='advance'). \
     signal=signals.Senior_Advance_War_Cry,
     handler=advance_senior_advanced_war_cry).  \
   catch(
+    signal=signals.Other_Advance_War_Cry,
+    handler=advance_other_advanced_war_cry).  \
+  catch(
     signal=signals.Advance_War_Cry,
     handler=advance_advance_war_cry).  \
   catch(
@@ -652,6 +673,9 @@ skirmish = archer.create(state='skirmish'). \
   catch(
     signal=signals.Senior_Skirmish_War_Cry,
     handler=skirmish_senior_squirmish_war_cry). \
+  catch(
+    signal=signals.Other_Skirmish_War_Cry,
+    handler=skirmish_other_squirmish_war_cry). \
   catch(
     signal=signals.Skirmish_War_Cry,
     handler=skirmish_skirmish_war_cry). \
@@ -688,6 +712,9 @@ feigned_retreat = archer.create(state='feigned_retreat'). \
   catch(
     signal=signals.Retreat_War_Cry,
     handler=fr_retreat_war_cry). \
+  catch(
+    signal=signals.Other_Retreat_War_Cry,
+    handler=fr_other_retreat_war_cry). \
   to_method()
 
 marshal = archer.create(state='marshal'). \
