@@ -209,7 +209,15 @@ class HorseArcher(Factory):
 
   def dispatch_to_all_empathy(self, event):
     for name, other in self.others.items():
+      self.add_member_if_needed(name)
       other.dispatch(event)
+
+  def dispatch_to_empathy(self, event, other_archer_name=None):
+    if other_archer_name is None:
+      other_archer_name = event.payload
+    self.add_member_if_needed(other_archer_name)
+    self.others[other_archer_name].dispatch(event)
+
 
   @staticmethod
   def get_a_name():
@@ -223,7 +231,7 @@ class HorseArcher(Factory):
     return archer_name
 
 def battle_entry(archer, e):
-  archer.yell(Event(signal=signals.Annouce_Arrival_To_Unit, payload=archer.name))
+  archer.yell(Event(signal=signals.Announce_Arrival_On_Field, payload=archer.name))
   return return_status.HANDLED
 
 def battle_field_announcement(archer, e):
@@ -239,7 +247,7 @@ def battle_init(archer, e):
     deferred=True)
 
 def battle_ready_for_battle(archer, e):
-  archer.yell(Event(signal=signals.Annouce_Arrival_To_Unit, payload=archer.name))
+  archer.yell(Event(signal=signals.Announce_Arrival_On_Field, payload=archer.name))
   return archer.trans(deceit_in_detail)
 
 # Deceit-In-Detail-Tactic state callbacks
@@ -285,13 +293,11 @@ def didt_other_advance_war_cry(archer, e):
   '''A horse archer heard another's Advance_War_Cry, so so they
      give the command to and introspect on the state of their unit'''
   archer.post_fifo(Event(signal=signals.Advance_War_Cry))
-  name = e.payload
-  archer.others[name].dispatch(e)
+  archer.dispatch_to_empathy(e)
   return archer.trans(advance)
 
 def didt_other_retreat_war_cry(archer, e):
-  name = e.payload
-  archer.others[name].dispatch(e)
+  archer.dispatch_to_empathy(e)
   return archer.trans(feigned_retreat)
 
 def didt_skirmish_war_cry(archer, e):
@@ -304,8 +310,7 @@ def didt_other_skirmish_war_cry(archer, e):
      give the command to and introspect on the state of their unit'''
   archer.post_fifo(Event(signal=signals.Skirmish_War_Cry))
   archer.yell(Event(signal=signals.Other_Skirmish_War_Cry, payload=archer.name))
-  name = e.payload
-  archer.others[name].dispatch(e)
+  archer.dispatch_to_empathy(e)
   return archer.trans(skirmish)
 
 def didt_retreat_war_cry(archer, e):
@@ -316,13 +321,11 @@ def didt_retreat_war_cry(archer, e):
 
 def didt_other_retreat_ready_war_cry(archer, e):
   #archer.yell(Event(signal=signals.Other_Retreat_Ready_War_Cry, payload=archer.name))
-  name = e.payload
-  archer.others[name].dispatch(e)
+  archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
 def didt_other_ready_war_cry(archer, e):
-  name = e.payload
-  archer.others[name].dispatch(e)
+  archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
 def didt_other_reset_tactic(archer, e):
@@ -366,8 +369,7 @@ def advance_other_advanced_war_cry(archer, e):
      state, the horse archer is already in the process of performing the
      order.'''
   archer.yell(Event(signal=signals.Other_Advance_War_Cry, payload=archer.name))
-  name = e.payload
-  archer.others[name].dispatch(e)
+  archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
 def advance_advance_war_cry(archer, e):
@@ -457,8 +459,7 @@ def skirmish_senior_squirmish_war_cry(archer, e):
 
 def skirmish_other_squirmish_war_cry(archer, e):
   '''Ignore skirmish war cries from other while skirmishing'''
-  name = e.payload
-  archer.others[name].dispatch(e)
+  archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
 def skirmish_skirmish_war_cry(archer, e):
@@ -548,8 +549,7 @@ def fr_retreat_war_cry(archer, e):
   return return_status.HANDLED
 
 def fr_other_retreat_war_cry(archer, e):
-  name = e.payload
-  archer.others[name].dispatch(e)
+  archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
 def fr_out_of_arrows(archer, e):
@@ -626,7 +626,7 @@ battle = archer.create(state='battle'). \
     signal=signals.Ready_For_Battle,
     handler=battle_ready_for_battle). \
   catch(
-    signal=signals.Annouce_Arrival_To_Unit,
+    signal=signals.Announce_Arrival_On_Field,
     handler=battle_field_announcement). \
   to_method()
 
@@ -792,7 +792,7 @@ archer.nest(battle, parent=None). \
 
 if __name__ == '__main__':
   print(archer.name)
-  archer.time_compression = 10
+  archer.time_compression = 40
   archer.start_at(battle)
 
   snoop_type = sys.argv[1:]
@@ -806,7 +806,7 @@ if __name__ == '__main__':
 
   # build a horse archer and rev his time by 100
   archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
-  time.sleep(300)
+  time.sleep(30)
 
 # empathy_for_first_brother
 
