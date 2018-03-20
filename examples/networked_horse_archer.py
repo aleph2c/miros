@@ -1,6 +1,8 @@
+import sys
 import uuid
 import time
 import random
+from collections import OrderedDict
 from miros.hsm import pp
 from miros.hsm import HsmWithQueues, spy_on, stripped
 from miros.activeobject import Factory
@@ -112,7 +114,7 @@ class HorseArcher(Factory):
     self.arrows = 0
     self.ticks  = 0
     self.time_compression = time_compression
-    self.others = {}
+    self.others = {} #OrderedDict()
 
     self.mesh_tx = mesh_network.MeshTransmitter(
       user=rabbit_user,
@@ -139,6 +141,13 @@ class HorseArcher(Factory):
     self.mesh_rx.register_live_callback(mesh_rx_callback)
     self.mesh_rx.start_consuming()
 
+    self.snoop_tx = mesh_network.SnoopTransmitter(
+      user='bob',
+      password='dobbs',
+      port=5672,
+      encryption_key=
+      b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
+
   def enable_snoop(self, live_trace=True, live_spy=False):
     '''
     Attach this node to the snoop mesh network.  Connect it's spy and trace
@@ -146,12 +155,6 @@ class HorseArcher(Factory):
 
     Start consuming other spy and trace messaging
     '''
-    self.snoop_tx = mesh_network.SnoopTransmitter(
-      user='bob',
-      password='dobbs',
-      port=5672,
-      encryption_key=
-      b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
 
     self.snoop_rx = mesh_network.SnoopReceiver(
       user='bob',
@@ -162,7 +165,7 @@ class HorseArcher(Factory):
 
     #  You can also tie a live_spy and live_trace callback method:
     def custom_spy_callback(ch, method, properties, body):
-      print(" [+s] {}".format(body))
+      print("{} [+s] {}".format(self.name, body))
 
     def custom_trace_callback(ch, method, properties, body):
       body = body.replace('\n', '')
@@ -312,6 +315,7 @@ def didt_retreat_war_cry(archer, e):
   return archer.trans(feigned_retreat)
 
 def didt_other_retreat_ready_war_cry(archer, e):
+  #archer.yell(Event(signal=signals.Other_Retreat_Ready_War_Cry, payload=archer.name))
   name = e.payload
   archer.others[name].dispatch(e)
   return return_status.HANDLED
@@ -328,6 +332,16 @@ def didt_other_reset_tactic(archer, e):
 def advance_entry(archer, e):
   '''Upon entering the advanced state wait 3 seconds then issue
      Close_Enough_For_Circle war cry'''
+
+  #first_name_of_others = list(archer.others)[0]
+  first_name_of_others = next(iter(archer.others))
+  print(archer.others[first_name_of_others].trace())
+  archer.others[first_name_of_others].clear_trace()
+  try:
+    archer.snoop_tx.broadcast_trace("{} has {} arrows".format(archer.name, archer.arrows))
+  except:
+    pass
+
   archer.post_fifo(
     Event(signal=signals.Close_Enough_For_Circle),
     times=1,
@@ -351,6 +365,7 @@ def advance_other_advanced_war_cry(archer, e):
   '''Stop Other_Advance_War_Cry events from being handled outside of this
      state, the horse archer is already in the process of performing the
      order.'''
+  archer.yell(Event(signal=signals.Other_Advance_War_Cry, payload=archer.name))
   name = e.payload
   archer.others[name].dispatch(e)
   return return_status.HANDLED
@@ -382,6 +397,10 @@ def caf_second(archer, e):
 def skirmish_entry(archer, e):
   '''The Horse Archer will trigger an Ammunition_Low event if he
      has less than 10 arrows when he begins skirmishing'''
+  try:
+    archer.snoop_tx.broadcast_trace("{} has {} arrows".format(archer.name, archer.arrows))
+  except:
+    pass
   # a Knight could charge at him sometime between 40-120 sec
   # once he enters the skirmish state
   archer.post_fifo(
@@ -416,7 +435,11 @@ def skirmish_second(archer, e):
 def skirmish_officer_lured(archer, e):
   '''If Horse Archer lures an enemy officer they issue a
      Retreat_War_Cry event.'''
-  archer.snoop_tx.broadcast_trace("Knight Charging at {}".format(archer.name))
+  try:
+    archer.snoop_tx.broadcast_trace("Knight Charging at {}".format(archer.name))
+  except:
+    pass
+
   archer.scribble("Knight Charging")
   archer.post_fifo(
     Event(signal=signals.Retreat_War_Cry))
@@ -453,7 +476,10 @@ def skirmish_retreat_ready_war_cry(archer, e):
     if other.dead() is not True:
       ready &= other.waiting()
     else:
-      archer.snoop_tx.broadcast_trace("{} thinks {} is dead".format(archer.name, name))
+      try:
+        archer.snoop_tx.broadcast_trace("{} thinks {} is dead".format(archer.name, name))
+      except:
+        pass
   if ready:
     # let's make sure Gandbold isn't a chicken
     delay_time = random.randint(10, 30)
@@ -467,6 +493,12 @@ def skirmish_retreat_ready_war_cry(archer, e):
 
 # Waiting-to-Lure callbacks
 def wtl_entry(archer, e):
+
+  try:
+    archer.snoop_tx.broadcast_trace("{} has {} arrows".format(archer.name, archer.arrows))
+  except:
+    pass
+
   archer.scribble('put away bow')
   archer.scribble('pull scimitar')
   archer.scribble('act scared')
@@ -484,6 +516,10 @@ def wtl_exit(archer, e):
 
 # Feigned-Retreat callbacks
 def fr_entry(archer, e):
+  try:
+    archer.snoop_tx.broadcast_trace("{} has {} arrows".format(archer.name, archer.arrows))
+  except:
+    pass
   archer.scribble('fire on knights')
   archer.scribble('fire on footman')
   if archer.arrows == 0:
@@ -541,7 +577,10 @@ def marshal_ready(archer, e):
     if other.dead() is not True:
       ready &= other.waiting()
     else:
-      archer.snoop_tx.broadcast_trace("{} thinks {} is dead".format(archer.name, name))
+      try:
+        archer.snoop_tx.broadcast_trace("{} thinks {} is dead".format(archer.name, name))
+      except:
+        pass
   if ready:
     archer.post_fifo(
       Event(signal=signals.Advance_War_Cry))
@@ -549,7 +588,13 @@ def marshal_ready(archer, e):
 
 # Waiting-to-Advance callbacks
 def wta_entry(archer, e):
+
   archer.arrows = HorseArcher.MAXIMUM_ARROW_CAPACITY
+
+  try:
+    archer.snoop_tx.broadcast_trace("{} has {} arrows".format(archer.name, archer.arrows))
+  except:
+    pass
 
   archer.post_fifo(Event(signal=signals.Advance_War_Cry),
     times=1,
@@ -746,11 +791,20 @@ archer.nest(battle, parent=None). \
   nest(waiting_to_advance, parent=marshal)
 
 if __name__ == '__main__':
-  # build a horse archer and rev his time by 100
   print(archer.name)
-  archer.time_compression = 5
+  archer.time_compression = 10
   archer.start_at(battle)
-  archer.enable_snoop(live_trace=True)
+
+  snoop_type = sys.argv[1:]
+  if len(snoop_type) >= 1:
+    if snoop_type[0] == 'trace':
+      archer.enable_snoop(live_trace=True)
+    elif snoop_type[0] == 'spy':
+      archer.enable_snoop(live_spy=True)
+  else:
+    archer.live_trace = True
+
+  # build a horse archer and rev his time by 100
   archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
   time.sleep(300)
 
