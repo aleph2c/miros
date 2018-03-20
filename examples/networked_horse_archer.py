@@ -285,7 +285,7 @@ def didt_senior_advance_war_cry(archer, e):
 def didt_advance_war_cry(archer, e):
   '''Yell out "advance war cry" to others and introspect on the state of the
      unit'''
-  archer.yell(Event(signal=signals.Other_Advance_War_Cry, payload=archer.name))
+  #archer.yell(Event(signal=signals.Other_Advance_War_Cry, payload=archer.name))
   archer.dispatch_to_all_empathy(e)
   return archer.trans(advance)
 
@@ -302,20 +302,20 @@ def didt_other_retreat_war_cry(archer, e):
 
 def didt_skirmish_war_cry(archer, e):
   '''Yell out "skirmish war cry" to others'''
-  archer.yell(Event(signal=signals.Other_Skirmish_War_Cry, payload=archer.name))
+  #archer.yell(Event(signal=signals.Other_Skirmish_War_Cry, payload=archer.name))
   return archer.trans(skirmish)
 
 def didt_other_skirmish_war_cry(archer, e):
   '''A horse archer heard another's Skirmish_War_Cry, so they
      give the command to and introspect on the state of their unit'''
-  archer.post_fifo(Event(signal=signals.Skirmish_War_Cry))
-  archer.yell(Event(signal=signals.Other_Skirmish_War_Cry, payload=archer.name))
+  #archer.post_fifo(Event(signal=signals.Skirmish_War_Cry))
+  #archer.yell(Event(signal=signals.Other_Skirmish_War_Cry, payload=archer.name))
   archer.dispatch_to_empathy(e)
   return archer.trans(skirmish)
 
 def didt_retreat_war_cry(archer, e):
   '''Yell out the "retreat war cry" and introspect on the state of the unit'''
-  archer.yell(Event(signal=signals.Other_Retreat_War_Cry, payload=archer.name))
+  #archer.yell(Event(signal=signals.Other_Retreat_War_Cry, payload=archer.name))
   archer.dispatch_to_all_empathy(e)
   return archer.trans(feigned_retreat)
 
@@ -337,6 +337,7 @@ def advance_entry(archer, e):
      Close_Enough_For_Circle war cry'''
 
   #first_name_of_others = list(archer.others)[0]
+  archer.yell(Event(signal=signals.Other_Advance_War_Cry, payload=archer.name))
   first_name_of_others = next(iter(archer.others))
   print(archer.others[first_name_of_others].trace())
   archer.others[first_name_of_others].clear_trace()
@@ -368,7 +369,7 @@ def advance_other_advanced_war_cry(archer, e):
   '''Stop Other_Advance_War_Cry events from being handled outside of this
      state, the horse archer is already in the process of performing the
      order.'''
-  archer.yell(Event(signal=signals.Other_Advance_War_Cry, payload=archer.name))
+  #archer.yell(Event(signal=signals.Other_Advance_War_Cry, payload=archer.name))
   archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
@@ -399,6 +400,7 @@ def caf_second(archer, e):
 def skirmish_entry(archer, e):
   '''The Horse Archer will trigger an Ammunition_Low event if he
      has less than 10 arrows when he begins skirmishing'''
+  archer.yell(Event(signal=signals.Other_Skirmish_War_Cry, payload=archer.name))
   try:
     archer.snoop_tx.broadcast_trace("{} has {} arrows".format(archer.name, archer.arrows))
   except:
@@ -494,7 +496,7 @@ def skirmish_retreat_ready_war_cry(archer, e):
 
 # Waiting-to-Lure callbacks
 def wtl_entry(archer, e):
-
+  archer.yell(Event(signal=signals.Other_Retreat_War_Cry, payload=archer.name))
   try:
     archer.snoop_tx.broadcast_trace("{} has {} arrows".format(archer.name, archer.arrows))
   except:
@@ -517,6 +519,7 @@ def wtl_exit(archer, e):
 
 # Feigned-Retreat callbacks
 def fr_entry(archer, e):
+  archer.yell(Event(signal=signals.Other_Retreat_War_Cry, payload=archer.name))
   try:
     archer.snoop_tx.broadcast_trace("{} has {} arrows".format(archer.name, archer.arrows))
   except:
@@ -549,6 +552,7 @@ def fr_retreat_war_cry(archer, e):
   return return_status.HANDLED
 
 def fr_other_retreat_war_cry(archer, e):
+  #archer.yell(Event(signal=signals.Other_Retreat_War_Cry, payload=archer.name))
   archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
@@ -561,6 +565,7 @@ def marshal_entry(archer, e):
   archer.scribble("identify next marshal point")
   archer.scribble("field wrap wounds on self and horse")
   archer.scribble("drink water")
+  archer.arrows = HorseArcher.MAXIMUM_ARROW_CAPACITY
   archer.post_fifo(
     Event(signal=signals.Ready),
     times=1,
@@ -588,18 +593,35 @@ def marshal_ready(archer, e):
 
 # Waiting-to-Advance callbacks
 def wta_entry(archer, e):
-
-  archer.arrows = HorseArcher.MAXIMUM_ARROW_CAPACITY
+  archer.yell(Event(signal=signals.Other_Ready_War_Cry, payload=archer.name))
+  ready = True
 
   try:
     archer.snoop_tx.broadcast_trace("{} has {} arrows".format(archer.name, archer.arrows))
   except:
     pass
+  time_to_wait = random.randint(10, 20)
+  for name, other in archer.others.items():
+    if other.dead() is not True:
+      ready &= other.waiting()
+    else:
+      try:
+        archer.snoop_tx.broadcast_trace("{} thinks {} is dead".format(archer.name, name))
+      except:
+        pass
 
-  archer.post_fifo(Event(signal=signals.Advance_War_Cry),
-    times=1,
-    period=archer.to_time(random.randint(30, 120)),
-    deferred=True)
+  if ready is False:
+    archer.snoop_tx.broadcast_trace(
+      "{} is impatient he will attack in {} seconds".format(archer.name, time_to_wait))
+    archer.post_fifo(Event(signal=signals.Advance_War_Cry),
+      times=1,
+      period=archer.to_time(time_to_wait),
+      deferred=True)
+  else:
+    archer.snoop_tx.broadcast_trace("{} thinks everyone is ready".format(archer.name))
+    archer.post_fifo(
+      Event(signal=signals.Advance_War_Cry))
+
   return return_status.HANDLED
 
 def wta_exit(archer, e):
@@ -791,7 +813,7 @@ archer.nest(battle, parent=None). \
   nest(waiting_to_advance, parent=marshal)
 
 if __name__ == '__main__':
-  print(archer.name)
+  print("I am {}".format(archer.name))
   archer.time_compression = 40
   archer.start_at(battle)
 
