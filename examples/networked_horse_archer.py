@@ -2,9 +2,8 @@ import sys
 import uuid
 import time
 import random
-from collections import OrderedDict
 from miros.hsm import pp
-from miros.hsm import HsmWithQueues, spy_on, stripped
+from miros.hsm import HsmWithQueues, spy_on
 from miros.activeobject import Factory
 from miros.event import signals, Event, return_status
 import mesh_network
@@ -114,7 +113,7 @@ class HorseArcher(Factory):
     self.arrows = 0
     self.ticks  = 0
     self.time_compression = time_compression
-    self.others = {} #OrderedDict()
+    self.others = {}
 
     self.mesh_tx = mesh_network.MeshTransmitter(
       user=rabbit_user,
@@ -131,6 +130,7 @@ class HorseArcher(Factory):
       else:
         print(" [+t] {}".format(body))
 
+    self.snoop_enabled = False
     self.mesh_rx = mesh_network.MeshReceiver(
       user=rabbit_user,
       password=rabbit_password,
@@ -155,7 +155,7 @@ class HorseArcher(Factory):
 
     Start consuming other spy and trace messaging
     '''
-
+    self.snoop_enabled = True
     self.snoop_rx = mesh_network.SnoopReceiver(
       user='bob',
       password='dobbs',
@@ -183,6 +183,7 @@ class HorseArcher(Factory):
 
   def disable_snoop(self):
 
+    self.snoop_enabled = False
     self.snoop_rx.stop_consuming()
 
     self.register_live_spy_callback(
@@ -217,6 +218,13 @@ class HorseArcher(Factory):
       other_archer_name = event.payload
     self.add_member_if_needed(other_archer_name)
     self.others[other_archer_name].dispatch(event)
+
+  def broadcast(self, message):
+    if self.snoop_enabled is True:
+      if self.live_trace is True:
+        archer.snoop_tx.broadcast_trace(message)
+    else:
+      self.scribble(message)
 
 
   @staticmethod
@@ -285,7 +293,6 @@ def didt_senior_advance_war_cry(archer, e):
 def didt_advance_war_cry(archer, e):
   '''Yell out "advance war cry" to others and introspect on the state of the
      unit'''
-  #archer.yell(Event(signal=signals.Other_Advance_War_Cry, payload=archer.name))
   archer.dispatch_to_all_empathy(e)
   return archer.trans(advance)
 
@@ -302,25 +309,20 @@ def didt_other_retreat_war_cry(archer, e):
 
 def didt_skirmish_war_cry(archer, e):
   '''Yell out "skirmish war cry" to others'''
-  #archer.yell(Event(signal=signals.Other_Skirmish_War_Cry, payload=archer.name))
   return archer.trans(skirmish)
 
 def didt_other_skirmish_war_cry(archer, e):
   '''A horse archer heard another's Skirmish_War_Cry, so they
      give the command to and introspect on the state of their unit'''
-  #archer.post_fifo(Event(signal=signals.Skirmish_War_Cry))
-  #archer.yell(Event(signal=signals.Other_Skirmish_War_Cry, payload=archer.name))
   archer.dispatch_to_empathy(e)
   return archer.trans(skirmish)
 
 def didt_retreat_war_cry(archer, e):
   '''Yell out the "retreat war cry" and introspect on the state of the unit'''
-  #archer.yell(Event(signal=signals.Other_Retreat_War_Cry, payload=archer.name))
   archer.dispatch_to_all_empathy(e)
   return archer.trans(feigned_retreat)
 
 def didt_other_retreat_ready_war_cry(archer, e):
-  #archer.yell(Event(signal=signals.Other_Retreat_Ready_War_Cry, payload=archer.name))
   archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
@@ -336,15 +338,12 @@ def advance_entry(archer, e):
   '''Upon entering the advanced state wait 3 seconds then issue
      Close_Enough_For_Circle war cry'''
 
-  #first_name_of_others = list(archer.others)[0]
   archer.yell(Event(signal=signals.Other_Advance_War_Cry, payload=archer.name))
-  first_name_of_others = next(iter(archer.others))
-  print(archer.others[first_name_of_others].trace())
-  archer.others[first_name_of_others].clear_trace()
-  try:
-    archer.snoop_tx.broadcast_trace("{} has {} arrows".format(archer.name, archer.arrows))
-  except:
-    pass
+  if len(archer.others) >= 1:
+    first_name_of_others = next(iter(archer.others))
+    print(archer.others[first_name_of_others].trace())
+    archer.others[first_name_of_others].clear_trace()
+  archer.broadcast("{} has {} arrows".format(archer.name, archer.arrows))
 
   archer.post_fifo(
     Event(signal=signals.Close_Enough_For_Circle),
@@ -369,7 +368,6 @@ def advance_other_advanced_war_cry(archer, e):
   '''Stop Other_Advance_War_Cry events from being handled outside of this
      state, the horse archer is already in the process of performing the
      order.'''
-  #archer.yell(Event(signal=signals.Other_Advance_War_Cry, payload=archer.name))
   archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
@@ -401,10 +399,8 @@ def skirmish_entry(archer, e):
   '''The Horse Archer will trigger an Ammunition_Low event if he
      has less than 10 arrows when he begins skirmishing'''
   archer.yell(Event(signal=signals.Other_Skirmish_War_Cry, payload=archer.name))
-  try:
-    archer.snoop_tx.broadcast_trace("{} has {} arrows".format(archer.name, archer.arrows))
-  except:
-    pass
+  #  archer.broadcast("{} has {} arrows".format(archer.name, archer.arrows))
+
   # a Knight could charge at him sometime between 40-120 sec
   # once he enters the skirmish state
   archer.post_fifo(
@@ -439,12 +435,7 @@ def skirmish_second(archer, e):
 def skirmish_officer_lured(archer, e):
   '''If Horse Archer lures an enemy officer they issue a
      Retreat_War_Cry event.'''
-  try:
-    archer.snoop_tx.broadcast_trace("Knight Charging at {}".format(archer.name))
-  except:
-    pass
-
-  archer.scribble("Knight Charging")
+  archer.broadcast("Knight Charging at {}".format(archer.name))
   archer.post_fifo(
     Event(signal=signals.Retreat_War_Cry))
   return return_status.HANDLED
@@ -479,10 +470,7 @@ def skirmish_retreat_ready_war_cry(archer, e):
     if other.dead() is not True:
       ready &= other.waiting()
     else:
-      try:
-        archer.snoop_tx.broadcast_trace("{} thinks {} is dead".format(archer.name, name))
-      except:
-        pass
+      archer.broadcast("{} thinks {} is dead".format(archer.name, name))
   if ready:
     # let's make sure Gandbold isn't a chicken
     delay_time = random.randint(10, 30)
@@ -496,15 +484,11 @@ def skirmish_retreat_ready_war_cry(archer, e):
 
 # Waiting-to-Lure callbacks
 def wtl_entry(archer, e):
-  archer.yell(Event(signal=signals.Other_Retreat_War_Cry, payload=archer.name))
-  try:
-    archer.snoop_tx.broadcast_trace("{} has {} arrows".format(archer.name, archer.arrows))
-  except:
-    pass
-
+  archer.yell(Event(signal=signals.Other_Retreat_Ready_War_Cry, payload=archer.name))
+  archer.broadcast("{} has {} arrows".format(archer.name, archer.arrows))
   archer.scribble('put away bow')
   archer.scribble('pull scimitar')
-  archer.scribble('act scared')
+  archer.broadcast("{} acts scared".format(archer.name))
   return return_status.HANDLED
 
 def wtl_second(archer, e):
@@ -520,10 +504,7 @@ def wtl_exit(archer, e):
 # Feigned-Retreat callbacks
 def fr_entry(archer, e):
   archer.yell(Event(signal=signals.Other_Retreat_War_Cry, payload=archer.name))
-  try:
-    archer.snoop_tx.broadcast_trace("{} has {} arrows".format(archer.name, archer.arrows))
-  except:
-    pass
+  #  archer.broadcast("{} has {} arrows".format(archer.name, archer.arrows))
   archer.scribble('fire on knights')
   archer.scribble('fire on footman')
   if archer.arrows == 0:
@@ -552,7 +533,6 @@ def fr_retreat_war_cry(archer, e):
   return return_status.HANDLED
 
 def fr_other_retreat_war_cry(archer, e):
-  #archer.yell(Event(signal=signals.Other_Retreat_War_Cry, payload=archer.name))
   archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
@@ -582,10 +562,7 @@ def marshal_ready(archer, e):
     if other.dead() is not True:
       ready &= other.waiting()
     else:
-      try:
-        archer.snoop_tx.broadcast_trace("{} thinks {} is dead".format(archer.name, name))
-      except:
-        pass
+      archer.broadcast("{} thinks {} is dead".format(archer.name, name))
   if ready:
     archer.post_fifo(
       Event(signal=signals.Advance_War_Cry))
@@ -596,29 +573,23 @@ def wta_entry(archer, e):
   archer.yell(Event(signal=signals.Other_Ready_War_Cry, payload=archer.name))
   ready = True
 
-  try:
-    archer.snoop_tx.broadcast_trace("{} has {} arrows".format(archer.name, archer.arrows))
-  except:
-    pass
+  archer.broadcast("{} has {} arrows".format(archer.name, archer.arrows))
   time_to_wait = random.randint(10, 20)
   for name, other in archer.others.items():
     if other.dead() is not True:
       ready &= other.waiting()
     else:
-      try:
-        archer.snoop_tx.broadcast_trace("{} thinks {} is dead".format(archer.name, name))
-      except:
-        pass
+      archer.broadcast("{} thinks {} is dead".format(archer.name, name))
 
   if ready is False:
-    archer.snoop_tx.broadcast_trace(
+    archer.broadcast(
       "{} is impatient he will attack in {} seconds".format(archer.name, time_to_wait))
     archer.post_fifo(Event(signal=signals.Advance_War_Cry),
       times=1,
       period=archer.to_time(time_to_wait),
       deferred=True)
   else:
-    archer.snoop_tx.broadcast_trace("{} thinks everyone is ready".format(archer.name))
+    archer.broadcast("{} thinks everyone is ready".format(archer.name))
     archer.post_fifo(
       Event(signal=signals.Advance_War_Cry))
 
