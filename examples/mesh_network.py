@@ -382,7 +382,7 @@ class NetworkTool():
       output = ''
       try:
         ps = subprocess.Popen(cmd_as_list, stdout=subprocess.PIPE)
-        output = subprocess.check_output(grep_as_list, stdin=ps.stdout)
+        output = subprocess.check_output(grep_as_list, stdin=ps.stdout, timeout=0.5)
         ps.wait()
         if output is not '':
           candidates = output.decode('utf-8').split('\n')
