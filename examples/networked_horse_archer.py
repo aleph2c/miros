@@ -143,7 +143,6 @@ class HorseArcher(Factory):
     )
 
     self.mesh_rx.register_live_callback(mesh_rx_callback)
-    self.mesh_rx.start_consuming()
 
     self.snoop_tx = mesh_network.SnoopTransmitter(
       user='bob',
@@ -151,6 +150,11 @@ class HorseArcher(Factory):
       port=5672,
       encryption_key=
       b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
+
+  def start_at(self, initial_state):
+    super().start_at(initial_state)
+    time.sleep(0.1)
+    self.mesh_rx.start_consuming()
 
   def enable_snoop(self, live_trace=True, live_spy=False):
     '''
@@ -256,7 +260,7 @@ def battle_init(archer, e):
   archer.post_fifo(
     Event(signal=signals.Ready_For_Battle),
     times=1,
-    period=4,
+    period=1,
     deferred=True)
 
 def battle_ready_for_battle(archer, e):
@@ -391,6 +395,7 @@ def caf_second(archer, e):
      to their local conditions'''
   if(archer.ticks % 6 == 0):  # second attack already!
     archer.arrows -= random.randint(1, 3)
+    archer.arrows = 0 if archer.arrows < 0  else archer.arrows
     archer.scribble('arrows left {}'.format(archer.arrows))
   if archer.arrows < 20:
     archer.post_fifo(
@@ -430,7 +435,7 @@ def skirmish_second(archer, e):
   # 40 percent chance of making a shot every 3 seconds
   if archer.ticks % 3 == 0:
     if random.randint(1, 10) <= 4:
-      archer.arrows -= 1
+      archer.arrows = archer.arrows - 1 if archer.arrows >= 1  else 0
       archer.scribble('arrows left {}'.format(archer.arrows))
   if archer.arrows < 10:
     archer.post_fifo(Event(signal=signals.Ammunition_Low))
@@ -478,12 +483,14 @@ def skirmish_retreat_ready_war_cry(archer, e):
       archer.broadcast("{} thinks {} is dead".format(archer.name, name))
   if ready:
     # let's make sure Gandbold isn't a chicken
-    delay_time = random.randint(10, 30)
-    archer.post_fifo(
-      Event(signal=signals.Retreat_War_Cry),
-      times=1,
-      period=archer.to_time(delay_time),
-      deferred=True)
+    delay_time = random.randint(10, 50)
+  else:
+    delay_time = random.randint(30, 60)
+  archer.post_fifo(
+    Event(signal=signals.Retreat_War_Cry),
+    times=1,
+    period=archer.to_time(delay_time),
+    deferred=True)
   return archer.trans(waiting_to_lure)
 
 
@@ -498,6 +505,9 @@ def wtl_entry(archer, e):
 
 def wtl_second(archer, e):
   archer.ticks += 1
+  return return_status.HANDLED
+
+def wtl_ammunition_low(archer, e):
   return return_status.HANDLED
 
 def wtl_exit(archer, e):
@@ -525,7 +535,7 @@ def fr_exit(archer, e):
 def fr_second(archer, e):
   if archer.ticks % 3 == 0:
     if random.randint(1, 10) <= 8:
-      archer.arrows -= 1
+      archer.arrows = archer.arrows - 1 if archer.arrows >= 1  else 0
       archer.scribble('arrows left {}'.format(archer.arrows))
     if archer.arrows == 0:
       archer.post_fifo(
@@ -737,6 +747,9 @@ waiting_to_lure = archer.create(state='waiting_to_lure'). \
   catch(
     signal=signals.Second,
     handler=wtl_second). \
+  catch(
+    signal=signals.Ammunition_Low,
+    handler=wtl_ammunition_low). \
   to_method()
 
 feigned_retreat = archer.create(state='feigned_retreat'). \
