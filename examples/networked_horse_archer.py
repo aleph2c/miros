@@ -125,8 +125,12 @@ class HorseArcher(Factory):
         name_of_other = body.payload
         self.add_member_if_needed(name_of_other)
         if name_of_other != self.name:
-          #  print(" [+] {}:{}".format(method.routing_key, body))
-          self.post_fifo(body)
+          try:
+            self.post_fifo(body)
+          except:
+            # you are probably late to the party and haven't started your
+            # statechart yet, just ignore events until you can handle them
+            pass
       else:
         print(" [+t] {}".format(body))
 
@@ -202,7 +206,7 @@ class HorseArcher(Factory):
     return self.compress(time_in_seconds)
 
   def add_member_if_needed(self, other_archer_name):
-    if self.name != other_archer_name:
+    if self.name != other_archer_name and other_archer_name is not None:
       if other_archer_name not in self.others:
         oha = OtherHorseArcher(other_archer_name)
         oha.start_at(empathy)
@@ -216,8 +220,9 @@ class HorseArcher(Factory):
   def dispatch_to_empathy(self, event, other_archer_name=None):
     if other_archer_name is None:
       other_archer_name = event.payload
-    self.add_member_if_needed(other_archer_name)
-    self.others[other_archer_name].dispatch(event)
+    if other_archer_name is not None:
+      self.add_member_if_needed(other_archer_name)
+      self.others[other_archer_name].dispatch(event)
 
   def broadcast(self, message):
     if self.snoop_enabled is True:
@@ -319,15 +324,15 @@ def didt_other_skirmish_war_cry(archer, e):
 
 def didt_retreat_war_cry(archer, e):
   '''Yell out the "retreat war cry" and introspect on the state of the unit'''
-  archer.dispatch_to_all_empathy(e)
+  archer.dispatch_to_empathy(e)
   return archer.trans(feigned_retreat)
 
 def didt_other_retreat_ready_war_cry(archer, e):
-  archer.dispatch_to_all_empathy(e)
+  archer.dispatch_to_empathy(e)
   return return_status.HANDLED
 
 def didt_other_ready_war_cry(archer, e):
-  archer.dispatch_to_all_empathy(e)
+  archer.dispatch_to_empathy(e)
   return return_status.HANDLED
 
 def didt_other_reset_tactic(archer, e):
@@ -368,7 +373,7 @@ def advance_other_advanced_war_cry(archer, e):
   '''Stop Other_Advance_War_Cry events from being handled outside of this
      state, the horse archer is already in the process of performing the
      order.'''
-  archer.dispatch_to_all_empathy(e)
+  archer.dispatch_to_empathy(e)
   return return_status.HANDLED
 
 def advance_advance_war_cry(archer, e):
@@ -452,7 +457,7 @@ def skirmish_senior_squirmish_war_cry(archer, e):
 
 def skirmish_other_squirmish_war_cry(archer, e):
   '''Ignore skirmish war cries from other while skirmishing'''
-  archer.dispatch_to_all_empathy(e)
+  archer.dispatch_to_empathy(e)
   return return_status.HANDLED
 
 def skirmish_skirmish_war_cry(archer, e):
@@ -464,8 +469,8 @@ def skirmish_retreat_ready_war_cry(archer, e):
      Retreat_War_Cry, if not or either way transition into the
      waiting_to_lure state'''
   ready = True
-  archer.yell(Event(signal=signals.Other_Retreat_Ready_War_Cry,
-    payload=archer.name))
+  #archer.yell(Event(signal=signals.Other_Retreat_Ready_War_Cry,
+  #  payload=archer.name))
   for name, other in archer.others.items():
     if other.dead() is not True:
       ready &= other.waiting()
@@ -533,7 +538,7 @@ def fr_retreat_war_cry(archer, e):
   return return_status.HANDLED
 
 def fr_other_retreat_war_cry(archer, e):
-  archer.dispatch_to_all_empathy(e)
+  archer.dispatch_to_empathy(e)
   return return_status.HANDLED
 
 def fr_out_of_arrows(archer, e):
@@ -555,9 +560,9 @@ def marshal_entry(archer, e):
 
 def marshal_ready(archer, e):
   ready = True
-  archer.yell(
-    Event(signal=signals.Other_Ready_War_Cry,
-    payload=archer.name))
+  #archer.yell(
+  #  Event(signal=signals.Other_Ready_War_Cry,
+  #  payload=archer.name))
   for name, other in archer.others.items():
     if other.dead() is not True:
       ready &= other.waiting()
@@ -589,7 +594,7 @@ def wta_entry(archer, e):
       period=archer.to_time(time_to_wait),
       deferred=True)
   else:
-    archer.broadcast("{} thinks everyone is ready".format(archer.name))
+    archer.broadcast("{} thinks the living are ready to attack".format(archer.name))
     archer.post_fifo(
       Event(signal=signals.Advance_War_Cry))
 
