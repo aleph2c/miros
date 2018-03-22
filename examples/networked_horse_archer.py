@@ -184,8 +184,8 @@ class HorseArcher(Factory):
 
     self.live_trace = live_trace
     self.live_spy = live_spy
-    self.register_live_spy_callback(archer.snoop_tx.broadcast_spy)
-    self.register_live_trace_callback(archer.snoop_tx.broadcast_trace)
+    self.register_live_spy_callback(self.snoop_tx.broadcast_spy)
+    self.register_live_trace_callback(self.snoop_tx.broadcast_trace)
 
     self.snoop_rx.start_consuming()
 
