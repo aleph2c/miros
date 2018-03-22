@@ -474,8 +474,8 @@ def skirmish_retreat_ready_war_cry(archer, e):
      Retreat_War_Cry, if not or either way transition into the
      waiting_to_lure state'''
   ready = True
-  #archer.yell(Event(signal=signals.Other_Retreat_Ready_War_Cry,
-  #  payload=archer.name))
+  # archer.yell(Event(signal=signals.Other_Retreat_Ready_War_Cry,
+  #   payload=archer.name))
   for name, other in archer.others.items():
     if other.dead() is not True:
       ready &= other.waiting()
