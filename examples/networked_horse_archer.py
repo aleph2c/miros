@@ -589,7 +589,7 @@ def wta_entry(archer, e):
   ready = True
 
   archer.broadcast("{} has {} arrows".format(archer.name, archer.arrows))
-  time_to_wait = random.randint(10, 20)
+  time_to_wait = random.randint(30, 40)
   for name, other in archer.others.items():
     if other.dead() is not True:
       ready &= other.waiting()
@@ -803,7 +803,7 @@ archer.nest(battle, parent=None). \
 
 if __name__ == '__main__':
   print("I am {}".format(archer.name))
-  archer.time_compression = 40
+  archer.time_compression = 5
   archer.start_at(battle)
 
   snoop_type = sys.argv[1:]
