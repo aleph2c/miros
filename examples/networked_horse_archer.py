@@ -817,7 +817,7 @@ if __name__ == '__main__':
 
   # build a horse archer and rev his time by 100
   archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
-  time.sleep(30)
+  time.sleep(300)
 
 # empathy_for_first_brother
 
