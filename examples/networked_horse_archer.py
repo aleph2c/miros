@@ -589,7 +589,7 @@ def wta_entry(archer, e):
   ready = True
 
   archer.broadcast("{} has {} arrows".format(archer.name, archer.arrows))
-  time_to_wait = random.randint(30, 40)
+  time_to_wait = random.randint(130, 300)
   for name, other in archer.others.items():
     if other.dead() is not True:
       ready &= other.waiting()
