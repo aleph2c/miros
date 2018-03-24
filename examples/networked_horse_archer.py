@@ -8,31 +8,58 @@ from miros.activeobject import Factory
 from miros.event import signals, Event, return_status
 import mesh_network
 
-
 '''
-[ Chart: empathy (ip) ] (10 per horse archer)
+  +------------empathy----------------+  Legend:
+  |                                   |  a: Other_Advance_War_Cry
+  |                         +-dead-+  |  b: Other_Skirmish_War_Cry
+  |   +---not_waiting---+   |      |  |  c: Other_Retreat_Ready_War_Cry
+  |   |                 |   |      |  |  d: Advance_War_Cry
+  |   |   +-waiting-+   |   |      |  |  e: Retreat_War_Cry
+  |   |   |         |   +-d->      |  |  f: Other_Retreat_Ready_War_Cry
+  |   |   |         |   |   |      |  |  g: Other_Ready_War_Cry
+  |   |   |         |   +-e->      |  |  N: Number of other horse archers
+  +-a->   |         |   |   |      |  |     detected in the mesh network
+  |   |   |         +-d->   |      |  |
+  +-b->   |         |   |   |      |  |
+  |   |   |         |   |   |      |  |
+  +-c->   |         +-e->   |      |  |
+  |   |   |         |   |   +------+  |
+  |   |   +---------+   |             |
+  |   |                 <------f------+
+  | *->                 |             |
+  |   |                 <------g------+
+  |   |                 |             |
+  |   +-----------------+             |
+  +-----------------------------------+
+
+[ Chart: empathy ] (N per horse archer)
   top     not_waiting                        waiting                       dead
    +-start_at->|                                |                            |
-   |     (?)   |                                |                            |
+   |           |                                |                            |
    |           +-Other_Retreat_Ready_War_Cry()->|                            |
-   |           |              (?)               |                            |
+   |           |              (c)               |                            |
    |           |                                +<----Retreat_War_Cry()------|
-   |           |                                |            (?)             |
+   |           |                                |            (e)             |
    |           +-------Advance_War_Cry()--------+--------------------------->|
-   |           |              (?)               |                            |
+   |           |              (d)               |                            |
    |           +<-------------------------------+--Other_Advance_War_Cry()---|
-   |           |                                |            (?)             |
+   |           |                                |            (a)             |
    |           +-Other_Retreat_Ready_War_Cry()->|                            |
-   |           |              (?)               |                            |
+   |           |              (f)               |                            |
    |           |                                +<----Advance_War_Cry()------|
-   |           |                                |            (?)             |
+   |           |                                |            (d)             |
    |           +-------Advance_War_Cry()--------+--------------------------->|
-   |           |              (?)               |                            |
+   |           |              (d)               |                            |
    |           +<-------------------------------+--Other_Advance_War_Cry()---|
-   |           |                                |            (?)             |
+   |           |                                |            (a)             |
+
 '''
+
 @spy_on
 def empathy(other, e):
+  '''
+  empathy HSM outer state
+  '''
   status = return_status.UNHANDLED
   if(e.signal == signals.INIT_SIGNAL):
     status = other.trans(not_waiting)
@@ -49,6 +76,10 @@ def empathy(other, e):
 
 @spy_on
 def not_waiting(other, e):
+  '''
+  'empathy' HSM inner state
+          empathy state is the state's parent
+  '''
   status = return_status.UNHANDLED
   if(e.signal == signals.Retreat_War_Cry):
     status = other.trans(dead)
@@ -60,12 +91,20 @@ def not_waiting(other, e):
 
 @spy_on
 def dead(other, e):
+  '''
+  'empathy' HSM inner state
+          empathy state is the state's parent
+  '''
   status = return_status.UNHANDLED
   status, other.temp.fun = return_status.SUPER, empathy
   return status
 
 @spy_on
 def waiting(other, e):
+  '''
+  'empathy' HSM inner state
+          not_waiting state is the state's parent
+  '''
   status = return_status.UNHANDLED
   if(e.signal == signals.Advance_War_Cry):
     status = other.trans(not_waiting)
@@ -77,10 +116,9 @@ def waiting(other, e):
 
 class OtherHorseArcher(HsmWithQueues):
 
-  def __init__(self, name='other', ip=None, time_compression=1.0):
+  def __init__(self, name='other', time_compression=1.0):
     super().__init__(name)
     self.name = name
-    self.ip   = ip
 
   def dead(self):
     result = self.state_name == 'dead'
@@ -213,7 +251,7 @@ class HorseArcher(Factory):
     if self.name != other_archer_name and other_archer_name is not None:
       if other_archer_name not in self.others:
         oha = OtherHorseArcher(other_archer_name)
-        oha.start_at(empathy)
+        oha.start_at(not_waiting)
         self.others[other_archer_name] = oha
 
   def dispatch_to_all_empathy(self, event):
@@ -570,9 +608,9 @@ def marshal_entry(archer, e):
 
 def marshal_ready(archer, e):
   ready = True
-  #archer.yell(
-  #  Event(signal=signals.Other_Ready_War_Cry,
-  #  payload=archer.name))
+  # archer.yell(
+  #   Event(signal=signals.Other_Ready_War_Cry,
+  #   payload=archer.name))
   for name, other in archer.others.items():
     if other.dead() is not True:
       ready &= other.waiting()
@@ -803,7 +841,7 @@ archer.nest(battle, parent=None). \
 
 if __name__ == '__main__':
   print("I am {}".format(archer.name))
-  archer.time_compression = 5
+  archer.time_compression = 20
   archer.start_at(battle)
 
   snoop_type = sys.argv[1:]
@@ -818,33 +856,5 @@ if __name__ == '__main__':
   # build a horse archer and rev his time by 100
   archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
   time.sleep(300)
-
-# empathy_for_first_brother
-
-  # time.sleep(1.0)
-  # with stripped(expected_empathy_target_trace) as stripped_target, \
-  #      stripped(oha.trace()) as stripped_trace_result:
-
-  #   for target, result in zip(stripped_target, stripped_trace_result):
-  #     assert(target == result)
-  # time.sleep(200)
-
-  # ips =  ['192.168.0.2', '192.168.0.3',
-  #         '192.168.0.4', '192.168.0.5',
-  #         '192.168.0.6', '192.168.0.7',
-  #         '192.168.0.8', '192.168.0.9',
-  #         '192.168.0.10']
-
-  # names = ['Hulagu', 'Hadan',
-  #          'Gantulga', 'Ganbaatar',
-  #          'Narankhuu', 'Ihbarhasvad',
-  #          'Nergui', 'Narantuyaa',
-  #          'Altan']
-
-  # empathy_names = list(map(str.__add__, [name + '_' for name in names], ips))
-
-  # ohas = [OtherHorseArcher(empathy_name) for empathy_name in empathy_names]
-  # for oha in ohas:
-  #   oha.start_at(empathy)
 
 
