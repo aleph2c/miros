@@ -1,54 +1,40 @@
 *Feature Guide*
 = Observe =
   *What defines Success?*
-    
-    Finish the botnet example
-    
-      * Gandbold can send his trace from the windows box to a pi
-      * Add some sort of IP discovery code outside of the battle chart
-      * Gandbold can make war cries across the network which can be heard by
-        others
-      * Gandbold and Altan start fighting together as a unit
-      * Add a third pi as a horse archer
-      * Add more than one horse archer per IP address
-      * Demonstrate the power of a multichart sequence
-      * Re-factor the writing (make it easier to navigate)
-        * Break it into a small set of examples each becoming more sophisticated
+    The instrumentation on the pi will detect transitions in window
 
   *What is the problem?*
+  The windows bots can see each other and the pi, but the pi cannot see the
+  windows bots
 
   *Evidence that contradicts Assumptions:*
   
 = Orient =
   *Symptoms of current issue:*
-  * I'm trying to describe everything
-  * I am not describing trade offs
-  * Every word is harm to the reader
+  * windows bots can see each other
+  * pi can see 'other' messages on the first network
+  * pi can not see instrumentation coming from windows
 
   *Questions regarding current issue:*
-
+    Can a pi bot see other pi bots
+    What changed recently, what caused this bug?
+    Can a windows bot see multiple pi bots?
+    
   *Assumptions:*
 
 = Decide =
   *Problem*
-   * [ ] Add advanced routing to ergotic_mirror.py file
+   * [ ] Fix the multichart pend pattern
   
   *Idea/Hypothesizes/Plan(>=5):*
-    * [ ] re-read advanced routing tutorial
-    * [ ] find the pika api for the routing key
-          (rx: queue_bind, tx: basic_publish)
-          <ip.archer.name>
-          <ip.superior.name>
-          
-          ip.archer#
-          ip.superior#
-          
-    * [ ] adjust to work on windows
-    * [ ] push to linux
-    * [ ] test
-    * [ ] update docstrings
+    * [ ] Find a way to view the orthogonal trace/spy while broadcasting
+    * [ ] Turn on, then turn off a trace/spy dump of a single empathy chart
+    * [ ] Identify issues in the orthogonal empathy chart
+    * [ ] Use the broadcast spy to find how it is breaking
+    * [ ] If you find a cool way to do this add it to the recipes
+  
   *Chosen Idea/Hypothesis*
-  * [ ] 
+    * [ ] Turn on, then turn off a trace/spy dump of a single empathy chart
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
   Write down name ideas
@@ -58,7 +44,6 @@
 = Up Coming =
 
   *Backlog*
-    * [ ] Add botnet example
     * [ ] Move all examples into the examples directory
     * [ ] Fix and verify all examples
     * [ ] Multi-Chart Race pattern
@@ -66,14 +51,12 @@
     * [ ] diagram semantics writing
     * [ ] Spec to diagram writing
     * [ ] Add factory examples to the state recipes
-  *Weird and Fun Ideas*
+  *Someday Maybe*
     * [ ] Add statistics
     * [ ] Add Markov Chains
     * [ ] Create a sampler
     * [ ] Self organizing criticality
     * [ ] The devil's staircase
-
-  *Someday Maybe*
     * [ ] Find a simple way of linking IP addresses to URLs for next to nothing
 
   *Project Workflows:*
@@ -109,3 +92,6 @@
       > ptw
     
     *Automation of documentation:*
+    
+      > cd doc
+      > python3 automake.py &
