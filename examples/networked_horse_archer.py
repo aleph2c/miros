@@ -132,6 +132,192 @@ class OtherHorseArcher(HsmWithQueues):
     result = self.state_name == 'not_waiting'
     return result
 
+class RabbitFactory(Factory):
+  '''
+  The RabbitFactory provides the miros Factory class with two mesh networks, a
+  statechart network and a snoop network (for debugging).
+
+  The RabbitFactory is intended to be inherited from, so it is an interface.
+
+  Example of inheriting from the RabbitFactory:
+
+    class HorseArcher(RabbitFactory):
+      def __init__(self,
+        name=None,
+        rabbit_user=None,
+        rabbit_password=None,
+        rabbit_port=None):
+
+      # This will build this object up with the RabbitFactory interface
+      super().__init__(name=name,
+            rabbit_user=rabbit_user,
+            rabbit_password=rabbit_password,
+            tx_routing_key='archer.{}'.format(name),
+            rx_routing_key='archer.#',
+            snoop_key=
+              b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=',
+            rabbit_port=rabbit_port)
+
+      # code continues below
+
+  By inheriting from the RabbitFactory you will get access to the miros Factory
+  api as well as a whole lot of networking features provided by RabbitMq and the
+  pika library for controlling RabbitMq from Python.
+
+  To transmit to another statechart that is running on another computer (or the
+  same computer), you can use the `transmit` api:
+
+  Example of using an object with the RabbitFactory interface:
+
+    archer = HorseArcher(
+      name = 'Gandbold',
+      rabbit_user='bob',
+      rabbit_password='dobbs',
+      rabbit_port=5672)
+
+    # send out a message using the tx_routing_key to all connected RabbitMq
+    # servers on the local area network
+    archer.transmit(
+      Event(signal=signals.Announce_Arrival_On_Field, payload=archer.name))
+
+    # Any message that is received from another statechart on the network
+    # will be posted into the archer fifo statechart queue if that object was an
+    # event and it passed the RabbitFactory decryption process.
+
+    # To turn on instrumentation, to get access to all trace information being
+    # sent out by each of the connected statecharts across the network:
+    archer.enable_snoop(live_trace=True)
+
+    # If you care to look at the spy information of all connected statecharts
+    # (this will be a lot of information) you can do this:
+    archer.enable_snoop(live_spy=True)
+
+  '''
+  def __init__(self,
+        name=None,
+        rabbit_user=None,
+        rabbit_password=None,
+        tx_routing_key=None,
+        rx_routing_key=None,
+        snoop_key=None,
+        rabbit_port=None):
+
+    super().__init__(name)
+
+    if snoop_key is None:
+      raise("you need to provide a snoop key for debugging -- Fernet.generate_key()")
+
+    if rabbit_user is None or rabbit_password is None:
+      raise("need to provide RabbitMq server credentials")
+
+    if rabbit_port is None:
+      rabbit_port = 5672
+
+    # This is the statechart name
+    self.name            = name
+
+    # RabbitMq (pika) related items
+    self.rabbit_user     = rabbit_user
+    self.rabbit_password = rabbit_password
+    self.rabbit_port     = rabbit_port
+    self.rx_routing_key  = rx_routing_key
+    self.tx_routing_key  = tx_routing_key
+    self.snoop_key       = snoop_key
+
+    self.mesh_tx = mesh_network.MeshTransmitter(
+      user=self.rabbit_user,
+      password=self.rabbit_password,
+      port=self.rabbit_port)
+
+    def mesh_rx_callback(ch, method, properties, body):
+      if isinstance(body, Event):
+        name_of_other = body.payload
+        self.add_member_if_needed(name_of_other)
+        if name_of_other != self.name:
+          try:
+            self.post_fifo(body)
+          except:
+            # you are probably late to the party and haven't started your
+            # statechart yet, just ignore events until you can handle them
+            pass
+      else:
+        print(" [+t] {}".format(body))
+
+    self.snoop_enabled = False
+    self.mesh_rx = mesh_network.MeshReceiver(
+      user=self.rabbit_user,
+      password=self.rabbit_password,
+      port=self.rabbit_port,
+      routing_key=self.rx_routing_key,
+    )
+    self.mesh_rx.register_live_callback(mesh_rx_callback)
+
+    self.snoop_tx = mesh_network.SnoopTransmitter(
+      user=self.rabbit_user,
+      password=self.rabbit_password,
+      port=self.rabbit_port,
+      encryption_key= self.snoop_key)
+
+  def start_at(self, initial_state):
+    super().start_at(initial_state)
+    time.sleep(0.1)
+    self.mesh_rx.start_consuming()
+
+  def enable_snoop(self, live_trace=True, live_spy=False):
+    '''
+    Attach this node to the snoop mesh network.  Connect it's spy and trace
+    output to the spy and trace 'fanout' exchanges
+
+    Start consuming other spy and trace messaging
+    '''
+    self.snoop_enabled = True
+    self.snoop_rx = mesh_network.SnoopReceiver(
+      user=self.rabbit_user,
+      password=self.rabbit_password,
+      port=self.rabbit_port,
+      encryption_key=self.snoop_key)
+
+    #  You can also tie a live_spy and live_trace callback method:
+    def custom_spy_callback(ch, method, properties, body):
+      print("{} [+s] {}".format(self.name, body))
+
+    def custom_trace_callback(ch, method, properties, body):
+      body = body.replace('\n', '')
+      print(" [+t] {}".format(body))
+
+    self.snoop_rx.register_live_spy_callback(custom_spy_callback)
+    self.snoop_rx.register_live_trace_callback(custom_trace_callback)
+
+    self.live_trace = live_trace
+    self.live_spy = live_spy
+    self.register_live_spy_callback(self.snoop_tx.broadcast_spy)
+    self.register_live_trace_callback(self.snoop_tx.broadcast_trace)
+
+    self.snoop_rx.start_consuming()
+
+  def disable_snoop(self):
+
+    self.snoop_enabled = False
+    self.snoop_rx.stop_consuming()
+
+    self.register_live_spy_callback(
+      HsmWithQueues.live_spy_callback_default)
+
+    self.register_live_trace_callback(
+      HsmWithQueues.live_spy_callback_default)
+
+  def transmit(self, event):
+    self.mesh_tx.message_to_other_channels(event, routing_key=self.tx_routing_key)
+
+  def snoop_broadcast(self, message):
+    if self.snoop_enabled is True:
+      if self.live_trace is True:
+        self.snoop_tx.broadcast_trace(message)
+      if self.live_spy is True:
+        self.snoop_tx.broadcast_spy(message)
+    else:
+      self.scribble(message)
+
 class HorseArcher(Factory):
 
   MAXIMUM_ARROW_CAPACITY = 60
@@ -143,6 +329,15 @@ class HorseArcher(Factory):
 
     if rabbit_port is None:
       rabbit_port = 5672
+    # self.name = name
+    # super().__init__(name=name,
+    #       rabbit_user=rabbit_user,
+    #       rabbit_password=rabbit_password,
+    #       tx_routing_key='archer.{}'.format(name),
+    #       rx_routing_key='archer.#',
+    #       snoop_key=
+    #         b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=',
+    #       rabbit_port=rabbit_port)
 
     self.name = name
     self.routing_key = 'archer.{}'.format(name)
@@ -273,6 +468,49 @@ class HorseArcher(Factory):
     else:
       self.scribble(message)
 
+
+  @staticmethod
+  def get_a_name():
+    archer_root = random.choice([
+      'Hulagu', 'Hadan', 'Gantulga', 'Ganbaatar',
+      'Narankhuu', 'Ihbarhasvad', 'Nergui',
+      'Narantuyaa', 'Altan', 'Gandbold'])
+    archer_name = "{}.{}".format(
+      archer_root,
+      str(uuid.uuid5(uuid.NAMESPACE_DNS, archer_root))[0:5])
+    return archer_name
+    self.arrows = 0
+    self.ticks  = 0
+    self.time_compression = time_compression
+    self.others = {}
+
+  def yell(self, event):
+    self.mesh_tx.message_to_other_channels(event, routing_key=self.routing_key)
+
+  def compress(self, time_in_seconds):
+    return 1.0 * time_in_seconds / self.time_compression
+
+  def to_time(self, time_in_seconds):
+    return self.compress(time_in_seconds)
+
+  def add_member_if_needed(self, other_archer_name):
+    if self.name != other_archer_name and other_archer_name is not None:
+      if other_archer_name not in self.others:
+        oha = OtherHorseArcher(other_archer_name)
+        oha.start_at(not_waiting)
+        self.others[other_archer_name] = oha
+
+  def dispatch_to_all_empathy(self, event):
+    for name, other in self.others.items():
+      self.add_member_if_needed(name)
+      other.dispatch(event)
+
+  def dispatch_to_empathy(self, event, other_archer_name=None):
+    if other_archer_name is None:
+      other_archer_name = event.payload
+    if other_archer_name is not None:
+      self.add_member_if_needed(other_archer_name)
+      self.others[other_archer_name].dispatch(event)
 
   @staticmethod
   def get_a_name():
@@ -530,7 +768,6 @@ def skirmish_retreat_ready_war_cry(archer, e):
     period=archer.to_time(delay_time),
     deferred=True)
   return archer.trans(waiting_to_lure)
-
 
 # Waiting-to-Lure callbacks
 def wtl_entry(archer, e):
