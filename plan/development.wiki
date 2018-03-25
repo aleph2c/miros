@@ -3,61 +3,30 @@
 = Observe =
   
   *What defines Success?*
-    The instrumentation on the pi will not detect transitions from the windows bot
-    The WLS would actually work within TMUX. (arp would work in WLS)
 
   *What is the problem?*
-    The Windows bots can see each other and the pi, but the pi cannot see the
-    windows bots.  This is because the windows bot does not send its instrumentation
-    to the bots.  The call to 'cmd.exe /C arp.exe -a' is just hanging (where the
-    window bot can find the pi IP address).
-    
-    The WLS does not support the arp command.  The Windows WSL program manager
-    (Rich Turner - bitcrazed) decided that they would not support a lot of basic
-    networking tools.  To access the windows version of these tools, you can
-    call the windows command line:
-    
-    > cmd.exe /C <windows command here>
-    
-    Unfortunately, this sometimes locks up in TMUX.  I need to run the command within
-    TMUX because I need to access multiple shells to test the mesh network.
-    
-    So now to test my software I have to deal with some sort of WSL/Linux/Tmux
-    interoperability bug.
-    
-    So Windows still doesn't really have Linux support yet.  The frustration
-    with this OS continues. (so many wasted hours fighting windows/posix
-    interoperability).
 
   *Evidence that contradicts Assumptions:*
-    Sometimes the system works.
   
 = Orient =
   *Symptoms of current issue:*
-  * windows bots can see each other
-  * pi can see 'other' messages on the first network
-  * pi can not see instrumentation coming from windows
-  * running TMUX then cmd.exe /C <command> hangs forever
+  * 
 
   *Questions regarding current issue:*
-    How did you get the system to ever work?
-    Is there another way to get local IP addresses without calling the arp
-    command?
+    What has recently changed?
+    Can you baseline?
     
   *Assumptions:*
-    Upon system reset, it will work.  Once you quit out of the WLS or the ubuntu
-    app, TMUX will never work properly again.
 
 = Decide =
   *Problem*
-   * [ ] Fix the instrumentation network issue (WSL work around)
+   * [ ] 
   
   *Idea/Hypothesizes/Plan(>=5):*
-    * [ ] Find way to reproduce the issue
-    * [ ] Find way to solve the issue with a procedural work around
+    * [ ] 
   
   *Chosen Idea/Hypothesis*
-    * [ ] Turn on, then turn off a trace/spy dump of a single empathy chart
+    * [ ] 
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
   Write down name ideas
