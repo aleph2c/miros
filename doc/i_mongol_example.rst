@@ -2471,7 +2471,34 @@ more than 255 characters.
 We probably aren't going to need this for our example, but it is a simple and
 powerful bonus feature.
 
-The instrumentation part of the network is very similar to the mesh network we
+Now let's try to draw the RabbitMq style producer and consumer diagram for our
+mesh network so that we can understand how things are connected:
+
+.. image:: _static/mesh_network_1.svg
+    :align: center
+
+In the above diagram we see the two classes MeshTransmitter and the MeshReceiver
+and below them the RabbitMq-style description of their network collaboration.
+It is important to understand that only one of these structures exists on each
+machine in our mesh network.
+
+If you place your eyes on the "statechart producer" you can see how a statechart
+starts the information flow by producing messages in the form of Event objects.
+These messages will be sent to the "mirror exchange" which is accessed by both
+the MeshTransmitter and MeshReceiver.  This message is branded with the routing
+key provided by the user and pushed into a RabbitMq queue (the red box).  It is
+serialized and encrypted and then pushed out onto the network.
+
+To see how a statechart can consume events from the network, look at the
+"Network" arrow to the left of the "Deserialized/Decrypted" bubble.  Any message
+coming from the network is decrypted then deserialized and passed into the
+mirror exchange.  If the decryption process worked, the exchange will compare
+the <IP>.<rx_routing_key> against the message's, <IP>.<tx_routing_key>.  If
+these match it will pass the message into a RabbitMq queue.  Eventually, the
+RabbitMq server will post this information into a statechart linked to the
+MeshReceiver.
+
+The snoop network is very similar to the mesh network we
 have written about already.  There will be an instrumentation receiver and an
 instrumentation transmitter.  It too is a mesh network; in fact, it is even more
 *meshy* about it, there is no routing key, every node is connected to every
@@ -2595,17 +2622,62 @@ one, it just provides the same ``spy`` and ``trace`` debugging interfaces that
 you would use if you were dealing with an actual HSM; within a Factory, Active
 Object or an HsmWithQueues derived object.
 
-To summarize, we can build two different mesh networks.  One with routing keys
-and one for debugging all of the connected state charts spy and trace streams.
-To connect, transmit and receive with these networks a statechart will need to
-build two different transmitters and two different receivers.  Each receiver
-will run in its own thread and dispatch the received messages into their connected
-callback functions.
+Now let's try to draw the RabbitMq style producer and consumer diagram for our
+snoop network:
+
+.. image:: _static/snoop_network_1.svg
+    :align: center
+
+The SnoopTransmitter and SnoopReciever collaborate to build the RabbitMq snoop
+architecture in the bottom part of the picture.
+
+The diagram looks more cluttered than that for the mesh network, despite this,
+it is a more straightforward structure: The snoop network doesn’t serialize or
+deserialize. Instead of using a topic network with routing keys, it uses two
+fanout exchanges.  So, any message sent to the spy or trace exchanges will be
+dispatched to every other spy or trace exchange on the network.
+
+It will be up to the consumer of this spy and trace information to decide how
+much instrumentation they want to look at.
+
+Our example has become a lot more complicated because of the network.  To manage
+this complexity, I have created a class called RabbitFactory.  The miros package
+has no dependencies outside of the standard python library.  However, if we
+would like to get the RabbitFactory to work we will need to include at the very
+least *pika* and have RabbitMq installed on the system.  Not every user of
+*miros* will want to use RabbitMq.  For this reason I have separated all of the
+RabbitMq code into it's own miros plugin package: miros-rabbitmq.  If you would
+like to learn more about it, look here.
+
+For now, let's just consider what the RabbitFactory looks like and what it will
+do for us:
+
+.. image:: _static/rabbit_factory_1.svg
+    :align: center
+
+The RabbitFactory gives us all of the networking features that we have described
+so far with a simple interface.  In fact, it is intended to be an interface
+class or a class from which another class inherits.  This way the inheriting
+class just gets all of the features and the API of the RabbitFactory without
+having to concern themselves with the details of how the networks are set up.
+
+From the diagram, we see that the RabbitFactory will need the RabbitMq
+credentials, a tx and an rx routing key for the mesh network and a snoop_key
+(encryption key) for the snoop network.  It will provide the ``start_at``,
+``enable_snoop``, ``disable_snoop``, ``transit`` and ``snoop_scribble`` methods
+for access to the mesh and the snoop networks.  The user doesn't have to worry
+about the networking details.  If they build a statechart from a class which
+inherits from the RabbitFactory most of the networking complexity will disappear
+from view.
+
+To summarize, we can build two different mesh networks. One with routing keys
+and one for debugging all of the relevant state charts spy and trace streams. To
+connect, transmit and receive with these networks a statechart just has to be a
+descendant of the RabbitFactory class.
 
 In the next section, we will connect Gandbold to his brethren using these
 networks.
 
-uuid
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:
 
 Instrumenting to Debug the Mongol Botnet
