@@ -161,7 +161,7 @@ class HorseArcher(RabbitFactory):
       'Narantuyaa', 'Altan', 'Gandbold'])
     archer_name = "{}.{}".format(
       archer_root,
-      str(uuid.uuid5(uuid.NAMESPACE_DNS, archer_root))[0:5])
+      str(uuid.uuid4())[0:5])
     return archer_name
 
   def yell(self, event):
