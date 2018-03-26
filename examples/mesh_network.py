@@ -126,6 +126,7 @@ import pika               # pip3 install pika --user
 import netifaces          # pip3 install netifaces --user
 from miros.hsm import pp  # pip3 install miros --user
 from miros.event import signals, Event  # "
+from miros.hsm import HsmWithQueues, spy_on
 
 # in the standard library
 import sys
@@ -139,6 +140,7 @@ from functools import wraps
 from threading import Thread
 from types import SimpleNamespace
 from miros.foreign import ForeignHsm
+from miros.activeobject import Factory
 from cryptography.fernet import Fernet
 from threading import Event as ThreadingEvent
 
@@ -1116,3 +1118,208 @@ if __name__ == "__main__":
   else:
     sys.stderr.write("Usage: {} [rx]/[tx]/[er]\n".format(sys.argv[0]))
 
+class RabbitFactory(Factory):
+  '''
+  The RabbitFactory provides the miros Factory class with two mesh networks, a
+  statechart network and a snoop network (for debugging).
+
+  The RabbitFactory is intended to be inherited from, so it is an interface.
+
+  Example of inheriting from the RabbitFactory:
+
+    class HorseArcher(RabbitFactory):
+      def __init__(self,
+        name=None,
+        rabbit_user=None,
+        rabbit_password=None,
+        rabbit_port=None):
+
+      # This will build this object up with the RabbitFactory interface
+      super().__init__(name=name,
+            rabbit_user=rabbit_user,
+            rabbit_password=rabbit_password,
+            tx_routing_key='archer.{}'.format(name),
+            rx_routing_key='archer.#',
+            snoop_key=
+              b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=',
+            rabbit_port=rabbit_port)
+
+      # code continues below
+
+  By inheriting from the RabbitFactory you will get access to the miros Factory
+  api as well as a whole lot of networking features provided by RabbitMq and the
+  pika library for controlling RabbitMq from Python.
+
+  To transmit to another statechart that is running on another computer (or the
+  same computer), you can use the `transmit` api:
+
+  Example of using an object with the RabbitFactory interface:
+
+    archer = HorseArcher(
+      name = 'Gandbold',
+      rabbit_user='bob',
+      rabbit_password='dobbs',
+      rabbit_port=5672)
+
+    # send out a message using the tx_routing_key to all connected RabbitMq
+    # servers on the local area network
+    archer.transmit(
+      Event(signal=signals.Announce_Arrival_On_Field, payload=archer.name))
+
+    # Any message that is received from another statechart on the network
+    # will be posted into the archer fifo statechart queue if that object was an
+    # event and it passed the RabbitFactory decryption process.
+
+    # To turn on instrumentation, to get access to all trace information being
+    # sent out by each of the connected statecharts across the network:
+    archer.enable_snoop(live_trace=True)
+
+    # If you care to look at the spy information of all connected statecharts
+    # (this will be a lot of information) you can do this:
+    archer.enable_snoop(live_spy=True)
+
+    # To transmit something that isn't trace or spy information onto the network
+    archer.snoop_scribble(
+        "{} thinks the living are ready to attack".format(archer.name))
+
+  '''
+  def __init__(self,
+        name=None,
+        rabbit_user=None,
+        rabbit_password=None,
+        tx_routing_key=None,
+        rx_routing_key=None,
+        snoop_key=None,
+        rabbit_port=None):
+
+    super().__init__(name)
+
+    if snoop_key is None:
+      raise("you need to provide a snoop key for debugging -- Fernet.generate_key()")
+
+    if rabbit_user is None or rabbit_password is None:
+      raise("need to provide RabbitMq server credentials")
+
+    if rabbit_port is None:
+      rabbit_port = 5672
+
+    # This is the statechart name
+    self.name = name
+
+    # RabbitMq (pika) related items
+    self.rabbit_user     = rabbit_user
+    self.rabbit_password = rabbit_password
+    self.rabbit_port     = rabbit_port
+    self.rx_routing_key  = rx_routing_key
+    self.tx_routing_key  = tx_routing_key
+    self.snoop_key       = snoop_key
+
+    self.mesh_tx = MeshTransmitter(
+      user=self.rabbit_user,
+      password=self.rabbit_password,
+      port=self.rabbit_port)
+
+    def mesh_rx_callback(ch, method, properties, body):
+      if isinstance(body, Event):
+        name_of_other = body.payload
+        self.add_member_if_needed(name_of_other)
+        if name_of_other != self.name:
+          try:
+            self.post_fifo(body)
+          except:
+            # you are probably late to the party and haven't started your
+            # statechart yet, just ignore events until you can handle them
+            pass
+      else:
+        print(" [+t] {}".format(body))
+
+    self.snoop_enabled = False
+    self.mesh_rx = MeshReceiver(
+      user=self.rabbit_user,
+      password=self.rabbit_password,
+      port=self.rabbit_port,
+      routing_key=self.rx_routing_key,
+    )
+    self.mesh_rx.register_live_callback(mesh_rx_callback)
+
+    self.snoop_tx = SnoopTransmitter(
+      user=self.rabbit_user,
+      password=self.rabbit_password,
+      port=self.rabbit_port,
+      encryption_key= self.snoop_key)
+
+  def start_at(self, initial_state):
+    '''
+    start the linked statechart wait a moment to let its thread spin up, the
+    enable it's ability to receive events sent to it from other connected
+    statecharts.
+    '''
+    super().start_at(initial_state)
+    time.sleep(0.1)
+    self.mesh_rx.start_consuming()
+
+  def enable_snoop(self, live_trace=True, live_spy=False):
+    '''
+    Attach this node to the snoop mesh network.  Connect it's spy and trace
+    output to the spy and trace 'fanout' exchanges
+
+    Start consuming other spy and trace messaging
+    '''
+    self.snoop_enabled = True
+    self.snoop_rx = SnoopReceiver(
+      user=self.rabbit_user,
+      password=self.rabbit_password,
+      port=self.rabbit_port,
+      encryption_key=self.snoop_key)
+
+    #  You can also tie a live_spy and live_trace callback method:
+    def custom_spy_callback(ch, method, properties, body):
+      print("{} [+s] {}".format(self.name, body))
+
+    def custom_trace_callback(ch, method, properties, body):
+      body = body.replace('\n', '')
+      print(" [+t] {}".format(body))
+
+    self.snoop_rx.register_live_spy_callback(custom_spy_callback)
+    self.snoop_rx.register_live_trace_callback(custom_trace_callback)
+
+    self.live_trace = live_trace
+    self.live_spy = live_spy
+    self.register_live_spy_callback(self.snoop_tx.broadcast_spy)
+    self.register_live_trace_callback(self.snoop_tx.broadcast_trace)
+
+    self.snoop_rx.start_consuming()
+
+  def disable_snoop(self):
+    '''
+    Disable this botnet's ability to snoop on the network, also quiet it's
+    output so other's can't snoop on it
+    '''
+    self.snoop_enabled = False
+    self.snoop_rx.stop_consuming()
+
+    self.register_live_spy_callback(
+      HsmWithQueues.live_spy_callback_default)
+
+    self.register_live_trace_callback(
+      HsmWithQueues.live_spy_callback_default)
+
+  def transmit(self, event):
+    '''
+    Transmit this event to all statecharts on this network which are registered
+    to our routing key.
+    '''
+    self.mesh_tx.message_to_other_channels(event, routing_key=self.tx_routing_key)
+
+  def snoop_scribble(self, message):
+    '''
+    scribble a message onto the trace/spy snoop messages for any node that is
+    listening to this botnet
+    '''
+    if self.snoop_enabled is True:
+      if self.live_trace is True:
+        self.snoop_tx.broadcast_trace(message)
+      if self.live_spy is True:
+        self.snoop_tx.broadcast_spy(message)
+    else:
+      self.scribble(message)
