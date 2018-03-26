@@ -28,7 +28,7 @@ import sys
 
 '''
 credentials = pika.PlainCredentials('bob', 'dobbs')
-parameters = pika.ConnectionParameters('192.168.1.73', 5672, '/', credentials)
+parameters = pika.ConnectionParameters('192.168.1.69', 5672, '/', credentials)
 connection = pika.BlockingConnection(parameters=parameters)
 channel = connection.channel()
 
