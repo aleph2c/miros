@@ -192,6 +192,10 @@ class RabbitFactory(Factory):
     # (this will be a lot of information) you can do this:
     archer.enable_snoop(live_spy=True)
 
+    # To transmit something that isn't trace or spy information onto the network
+    archer.snoop_scribble(
+        "{} thinks the living are ready to attack".format(archer.name))
+
   '''
   def __init__(self,
         name=None,
@@ -214,7 +218,7 @@ class RabbitFactory(Factory):
       rabbit_port = 5672
 
     # This is the statechart name
-    self.name            = name
+    self.name = name
 
     # RabbitMq (pika) related items
     self.rabbit_user     = rabbit_user
@@ -259,6 +263,11 @@ class RabbitFactory(Factory):
       encryption_key= self.snoop_key)
 
   def start_at(self, initial_state):
+    '''
+    start the linked statechart wait a moment to let its thread spin up, the
+    enable it's ability to receive events sent to it from other connected
+    statecharts.
+    '''
     super().start_at(initial_state)
     time.sleep(0.1)
     self.mesh_rx.start_consuming()
@@ -296,7 +305,10 @@ class RabbitFactory(Factory):
     self.snoop_rx.start_consuming()
 
   def disable_snoop(self):
-
+    '''
+    Disable this botnet's ability to snoop on the network, also quiet it's
+    output so other's can't snoop on it
+    '''
     self.snoop_enabled = False
     self.snoop_rx.stop_consuming()
 
@@ -307,9 +319,17 @@ class RabbitFactory(Factory):
       HsmWithQueues.live_spy_callback_default)
 
   def transmit(self, event):
+    '''
+    Transmit this event to all statecharts on this network which are registered
+    to our routing key.
+    '''
     self.mesh_tx.message_to_other_channels(event, routing_key=self.tx_routing_key)
 
-  def snoop_broadcast(self, message):
+  def snoop_scribble(self, message):
+    '''
+    scribble a message onto the trace/spy snoop messages for any node that is
+    listening to this botnet
+    '''
     if self.snoop_enabled is True:
       if self.live_trace is True:
         self.snoop_tx.broadcast_trace(message)
@@ -318,123 +338,40 @@ class RabbitFactory(Factory):
     else:
       self.scribble(message)
 
-class HorseArcher(Factory):
+class HorseArcher(RabbitFactory):
 
   MAXIMUM_ARROW_CAPACITY = 60
 
   def __init__(self, name=None, time_compression=1.0, rabbit_user=None, rabbit_password=None, rabbit_port=None):
 
-    if rabbit_user is None or rabbit_password is None:
-      raise("need to provide RabbitMq server credentials")
-
-    if rabbit_port is None:
-      rabbit_port = 5672
-    # self.name = name
-    # super().__init__(name=name,
-    #       rabbit_user=rabbit_user,
-    #       rabbit_password=rabbit_password,
-    #       tx_routing_key='archer.{}'.format(name),
-    #       rx_routing_key='archer.#',
-    #       snoop_key=
-    #         b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=',
-    #       rabbit_port=rabbit_port)
-
     self.name = name
-    self.routing_key = 'archer.{}'.format(name)
+    super().__init__(name=name,
+          rabbit_user=rabbit_user,
+          rabbit_password=rabbit_password,
+          tx_routing_key='archer.{}'.format(name),
+          rx_routing_key='archer.#',
+          snoop_key=
+            b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=',
+          rabbit_port=rabbit_port)
 
-    super().__init__(name)
     self.arrows = 0
     self.ticks  = 0
     self.time_compression = time_compression
     self.others = {}
 
-    self.mesh_tx = mesh_network.MeshTransmitter(
-      user=rabbit_user,
-      password=rabbit_password,
-      port=rabbit_port)
-
-    def mesh_rx_callback(ch, method, properties, body):
-      if isinstance(body, Event):
-        name_of_other = body.payload
-        self.add_member_if_needed(name_of_other)
-        if name_of_other != self.name:
-          try:
-            self.post_fifo(body)
-          except:
-            # you are probably late to the party and haven't started your
-            # statechart yet, just ignore events until you can handle them
-            pass
-      else:
-        print(" [+t] {}".format(body))
-
-    self.snoop_enabled = False
-    self.mesh_rx = mesh_network.MeshReceiver(
-      user=rabbit_user,
-      password=rabbit_password,
-      port=rabbit_port,
-      routing_key='archer.#'
-    )
-
-    self.mesh_rx.register_live_callback(mesh_rx_callback)
-
-    self.snoop_tx = mesh_network.SnoopTransmitter(
-      user='bob',
-      password='dobbs',
-      port=5672,
-      encryption_key=
-      b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
-
-  def start_at(self, initial_state):
-    super().start_at(initial_state)
-    time.sleep(0.1)
-    self.mesh_rx.start_consuming()
-
-  def enable_snoop(self, live_trace=True, live_spy=False):
-    '''
-    Attach this node to the snoop mesh network.  Connect it's spy and trace
-    output to the spy and trace 'fanout' exchanges
-
-    Start consuming other spy and trace messaging
-    '''
-    self.snoop_enabled = True
-    self.snoop_rx = mesh_network.SnoopReceiver(
-      user='bob',
-      password='dobbs',
-      port=5672,
-      encryption_key=
-      b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
-
-    #  You can also tie a live_spy and live_trace callback method:
-    def custom_spy_callback(ch, method, properties, body):
-      print("{} [+s] {}".format(self.name, body))
-
-    def custom_trace_callback(ch, method, properties, body):
-      body = body.replace('\n', '')
-      print(" [+t] {}".format(body))
-
-    self.snoop_rx.register_live_spy_callback(custom_spy_callback)
-    self.snoop_rx.register_live_trace_callback(custom_trace_callback)
-
-    self.live_trace = live_trace
-    self.live_spy = live_spy
-    self.register_live_spy_callback(self.snoop_tx.broadcast_spy)
-    self.register_live_trace_callback(self.snoop_tx.broadcast_trace)
-
-    self.snoop_rx.start_consuming()
-
-  def disable_snoop(self):
-
-    self.snoop_enabled = False
-    self.snoop_rx.stop_consuming()
-
-    self.register_live_spy_callback(
-      HsmWithQueues.live_spy_callback_default)
-
-    self.register_live_trace_callback(
-      HsmWithQueues.live_spy_callback_default)
+  @staticmethod
+  def get_a_name():
+    archer_root = random.choice([
+      'Hulagu', 'Hadan', 'Gantulga', 'Ganbaatar',
+      'Narankhuu', 'Ihbarhasvad', 'Nergui',
+      'Narantuyaa', 'Altan', 'Gandbold'])
+    archer_name = "{}.{}".format(
+      archer_root,
+      str(uuid.uuid5(uuid.NAMESPACE_DNS, archer_root))[0:5])
+    return archer_name
 
   def yell(self, event):
-    self.mesh_tx.message_to_other_channels(event, routing_key=self.routing_key)
+    self.transmit(event)
 
   def compress(self, time_in_seconds):
     return 1.0 * time_in_seconds / self.time_compression
@@ -460,68 +397,6 @@ class HorseArcher(Factory):
     if other_archer_name is not None:
       self.add_member_if_needed(other_archer_name)
       self.others[other_archer_name].dispatch(event)
-
-  def broadcast(self, message):
-    if self.snoop_enabled is True:
-      if self.live_trace is True:
-        archer.snoop_tx.broadcast_trace(message)
-    else:
-      self.scribble(message)
-
-
-  @staticmethod
-  def get_a_name():
-    archer_root = random.choice([
-      'Hulagu', 'Hadan', 'Gantulga', 'Ganbaatar',
-      'Narankhuu', 'Ihbarhasvad', 'Nergui',
-      'Narantuyaa', 'Altan', 'Gandbold'])
-    archer_name = "{}.{}".format(
-      archer_root,
-      str(uuid.uuid5(uuid.NAMESPACE_DNS, archer_root))[0:5])
-    return archer_name
-    self.arrows = 0
-    self.ticks  = 0
-    self.time_compression = time_compression
-    self.others = {}
-
-  def yell(self, event):
-    self.mesh_tx.message_to_other_channels(event, routing_key=self.routing_key)
-
-  def compress(self, time_in_seconds):
-    return 1.0 * time_in_seconds / self.time_compression
-
-  def to_time(self, time_in_seconds):
-    return self.compress(time_in_seconds)
-
-  def add_member_if_needed(self, other_archer_name):
-    if self.name != other_archer_name and other_archer_name is not None:
-      if other_archer_name not in self.others:
-        oha = OtherHorseArcher(other_archer_name)
-        oha.start_at(not_waiting)
-        self.others[other_archer_name] = oha
-
-  def dispatch_to_all_empathy(self, event):
-    for name, other in self.others.items():
-      self.add_member_if_needed(name)
-      other.dispatch(event)
-
-  def dispatch_to_empathy(self, event, other_archer_name=None):
-    if other_archer_name is None:
-      other_archer_name = event.payload
-    if other_archer_name is not None:
-      self.add_member_if_needed(other_archer_name)
-      self.others[other_archer_name].dispatch(event)
-
-  @staticmethod
-  def get_a_name():
-    archer_root = random.choice([
-      'Hulagu', 'Hadan', 'Gantulga', 'Ganbaatar',
-      'Narankhuu', 'Ihbarhasvad', 'Nergui',
-      'Narantuyaa', 'Altan', 'Gandbold'])
-    archer_name = "{}.{}".format(
-      archer_root,
-      str(uuid.uuid5(uuid.NAMESPACE_DNS, archer_root))[0:5])
-    return archer_name
 
 def battle_entry(archer, e):
   archer.yell(Event(signal=signals.Announce_Arrival_On_Field, payload=archer.name))
@@ -628,7 +503,7 @@ def advance_entry(archer, e):
     first_name_of_others = next(iter(archer.others))
     print(archer.others[first_name_of_others].trace())
     archer.others[first_name_of_others].clear_trace()
-  archer.broadcast("{} has {} arrows".format(archer.name, archer.arrows))
+  archer.snoop_scribble("{} has {} arrows".format(archer.name, archer.arrows))
 
   archer.post_fifo(
     Event(signal=signals.Close_Enough_For_Circle),
@@ -685,7 +560,7 @@ def skirmish_entry(archer, e):
   '''The Horse Archer will trigger an Ammunition_Low event if he
      has less than 10 arrows when he begins skirmishing'''
   archer.yell(Event(signal=signals.Other_Skirmish_War_Cry, payload=archer.name))
-  #  archer.broadcast("{} has {} arrows".format(archer.name, archer.arrows))
+  #  archer.snoop_scribble("{} has {} arrows".format(archer.name, archer.arrows))
 
   # a Knight could charge at him sometime between 40-120 sec
   # once he enters the skirmish state
@@ -721,7 +596,7 @@ def skirmish_second(archer, e):
 def skirmish_officer_lured(archer, e):
   '''If Horse Archer lures an enemy officer they issue a
      Retreat_War_Cry event.'''
-  archer.broadcast("Knight Charging at {}".format(archer.name))
+  archer.snoop_scribble("Knight Charging at {}".format(archer.name))
   archer.post_fifo(
     Event(signal=signals.Retreat_War_Cry))
   return return_status.HANDLED
@@ -756,7 +631,7 @@ def skirmish_retreat_ready_war_cry(archer, e):
     if other.dead() is not True:
       ready &= other.waiting()
     else:
-      archer.broadcast("{} thinks {} is dead".format(archer.name, name))
+      archer.snoop_scribble("{} thinks {} is dead".format(archer.name, name))
   if ready:
     # let's make sure Gandbold isn't a chicken
     delay_time = random.randint(10, 50)
@@ -772,10 +647,10 @@ def skirmish_retreat_ready_war_cry(archer, e):
 # Waiting-to-Lure callbacks
 def wtl_entry(archer, e):
   archer.yell(Event(signal=signals.Other_Retreat_Ready_War_Cry, payload=archer.name))
-  archer.broadcast("{} has {} arrows".format(archer.name, archer.arrows))
+  archer.snoop_scribble("{} has {} arrows".format(archer.name, archer.arrows))
   archer.scribble('put away bow')
   archer.scribble('pull scimitar')
-  archer.broadcast("{} acts scared".format(archer.name))
+  archer.snoop_scribble("{} acts scared".format(archer.name))
   return return_status.HANDLED
 
 def wtl_second(archer, e):
@@ -794,7 +669,7 @@ def wtl_exit(archer, e):
 # Feigned-Retreat callbacks
 def fr_entry(archer, e):
   archer.yell(Event(signal=signals.Other_Retreat_War_Cry, payload=archer.name))
-  #  archer.broadcast("{} has {} arrows".format(archer.name, archer.arrows))
+  #  archer.snoop_scribble("{} has {} arrows".format(archer.name, archer.arrows))
   archer.scribble('fire on knights')
   archer.scribble('fire on footman')
   if archer.arrows == 0:
@@ -852,7 +727,7 @@ def marshal_ready(archer, e):
     if other.dead() is not True:
       ready &= other.waiting()
     else:
-      archer.broadcast("{} thinks {} is dead".format(archer.name, name))
+      archer.snoop_scribble("{} thinks {} is dead".format(archer.name, name))
   if ready:
     archer.post_fifo(
       Event(signal=signals.Advance_War_Cry))
@@ -863,23 +738,23 @@ def wta_entry(archer, e):
   archer.yell(Event(signal=signals.Other_Ready_War_Cry, payload=archer.name))
   ready = True
 
-  archer.broadcast("{} has {} arrows".format(archer.name, archer.arrows))
+  archer.snoop_scribble("{} has {} arrows".format(archer.name, archer.arrows))
   time_to_wait = random.randint(130, 300)
   for name, other in archer.others.items():
     if other.dead() is not True:
       ready &= other.waiting()
     else:
-      archer.broadcast("{} thinks {} is dead".format(archer.name, name))
+      archer.snoop_scribble("{} thinks {} is dead".format(archer.name, name))
 
   if ready is False:
-    archer.broadcast(
+    archer.snoop_scribble(
       "{} is impatient he will attack in {} seconds".format(archer.name, time_to_wait))
     archer.post_fifo(Event(signal=signals.Advance_War_Cry),
       times=1,
       period=archer.to_time(time_to_wait),
       deferred=True)
   else:
-    archer.broadcast("{} thinks the living are ready to attack".format(archer.name))
+    archer.snoop_scribble("{} thinks the living are ready to attack".format(archer.name))
     archer.post_fifo(
       Event(signal=signals.Advance_War_Cry))
 
