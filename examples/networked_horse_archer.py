@@ -193,23 +193,15 @@ class HorseArcher(RabbitFactory):
       self.others[other_archer_name].dispatch(event)
 
 def battle_entry(archer, e):
-  archer.yell(Event(signal=signals.Announce_Arrival_On_Field, payload=archer.name))
+  archer.yell(Event(signal=signals.Other_Announce_Arrival_On_Field, payload=archer.name))
   return return_status.HANDLED
 
-def battle_field_announcement(archer, e):
+def battle_other_arrival_on_field(archer, e):
   other_archer_name = e.payload
   archer.add_member_if_needed(other_archer_name)
   return return_status.HANDLED
 
 def battle_init(archer, e):
-  archer.post_fifo(
-    Event(signal=signals.Ready_For_Battle),
-    times=1,
-    period=1,
-    deferred=True)
-
-def battle_ready_for_battle(archer, e):
-  archer.yell(Event(signal=signals.Announce_Arrival_On_Field, payload=archer.name))
   return archer.trans(deceit_in_detail)
 
 # Deceit-In-Detail-Tactic state callbacks
@@ -284,7 +276,7 @@ def didt_other_ready_war_cry(archer, e):
   archer.dispatch_to_empathy(e)
   return return_status.HANDLED
 
-def didt_other_reset_tactic(archer, e):
+def didt_reset_tactic(archer, e):
   return archer.trans(deceit_in_detail)
 
 # Advance callbacks
@@ -575,11 +567,8 @@ battle = archer.create(state='battle'). \
     signal=signals.INIT_SIGNAL,
     handler=battle_init). \
   catch(
-    signal=signals.Ready_For_Battle,
-    handler=battle_ready_for_battle). \
-  catch(
-    signal=signals.Announce_Arrival_On_Field,
-    handler=battle_field_announcement). \
+    signal=signals.Other_Arrival_On_Field,
+    handler=battle_other_arrival_on_field). \
   to_method()
 
 deceit_in_detail = archer.create(state='deceit_in_detail'). \
@@ -620,8 +609,8 @@ deceit_in_detail = archer.create(state='deceit_in_detail'). \
     signal=signals.Other_Ready_War_Cry,
     handler=didt_other_ready_war_cry). \
   catch(
-    signal=signals.ResetTactic,
-    handler=didt_other_reset_tactic). \
+    signal=signals.Reset_Tactic,
+    handler=didt_reset_tactic). \
   to_method()
 
 advance = archer.create(state='advance'). \
