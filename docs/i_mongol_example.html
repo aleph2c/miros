@@ -2967,6 +2967,68 @@ descendant of the RabbitFactory class.</p>
 networks and the RabbitFactory API.</p>
 <div class="section" id="instrumenting-to-debug-the-mongol-botnet">
 <span id="i-mongol-example-instrumenting-to-debug-the-botnet"></span><h2>Instrumenting to Debug the Mongol Botnet<a class="headerlink" href="#instrumenting-to-debug-the-mongol-botnet" title="Permalink to this headline">¶</a></h2>
+<div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_1.svg" src="_images/n_ergotic_mongol_1.svg" /></div>
+<p>Reducing the resolution on the RabbitFactory while increasing the detail on the
+battle HSM:</p>
+<div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_2.svg" src="_images/n_ergotic_mongol_2.svg" /></div>
+<p>Full deceit in detail chart to work in N instances:</p>
+<div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_3.svg" src="_images/n_ergotic_mongol_3.svg" /></div>
+<p>Something compacted and legible:</p>
+<div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_4.svg" src="_images/n_ergotic_mongol_4.svg" /></div>
+<p>Empathy reconsidered:</p>
+<div align="center" class="align-center"><img alt="_images/empathy_1.svg" src="_images/empathy_1.svg" /></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">add_member_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_archer_name</span><span class="p">):</span>
+  <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">other_archer_name</span> <span class="ow">and</span> <span class="n">other_archer_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">other_archer_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">:</span>
+      <span class="n">oha</span> <span class="o">=</span> <span class="n">OtherHorseArcher</span><span class="p">(</span><span class="n">other_archer_name</span><span class="p">)</span>
+      <span class="n">oha</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">not_waiting</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">other_archer_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">oha</span>
+</pre></div>
+</div>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="hll"><span class="k">def</span> <span class="nf">dispatch_to_all_empathy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+</span>  <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">other</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_member_if_needed</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">other</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">dispatch_to_empathy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">other_archer_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="k">if</span> <span class="n">other_archer_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">other_archer_name</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">payload</span>
+  <span class="k">if</span> <span class="n">other_archer_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_member_if_needed</span><span class="p">(</span><span class="n">other_archer_name</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">other_archer_name</span><span class="p">]</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>Advance and Circle and Fire:</p>
+<div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_advance.svg" src="_images/n_ergotic_mongol_advance.svg" /></div>
+<p>To test the orthogonal component:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># in the advance entry state</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+  <span class="n">first_name_of_others</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="p">))</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">first_name_of_others</span><span class="p">]</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+  <span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">first_name_of_others</span><span class="p">]</span><span class="o">.</span><span class="n">clear_trace</span><span class="p">()</span>
+</pre></div>
+</td></tr></table></div>
+<p>Skirmish and Ready for Retreat</p>
+<div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_skirmish.svg" src="_images/n_ergotic_mongol_skirmish.svg" /></div>
+<p>Skirmish and Ready for Retreat</p>
+<div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_retreat.svg" src="_images/n_ergotic_mongol_retreat.svg" /></div>
+<p>Marshal</p>
+<div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_marshal.svg" src="_images/n_ergotic_mongol_marshal.svg" /></div>
+<p>Diagrams should be present</p>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
 </div>

@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>7</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>42</x>
+      <y>56</y>
+      <w>868</w>
+      <h>602</h>
+    </coordinates>
+    <panel_attributes>*deceit_in_detail*
+--
+entry / 
+  # load up on arrows and start tracking time within this tactic
+  archer.arrows = HorseArcher.MAXIMUM_ARROW_CAPACITY
+  archer.ticks = 0
+  archer.post_fifo(Event(signal=signals.Second, times=0, period=archer.to_time(1.0), deferred=True)
+  
+second / archer.ticks += 1
+
+Senior_Advance_War_Cry / archer.post_fifo(Event(signal=signals.Advance_War_Cry))
+Senior_Skirmish_War_Cry / archer.post_fifo(Event(signal=signals.Skirmish_War_Cry))
+Senior_Retreat_War_Cry / archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
+
+Other_Ready as e / archer.dispatch_to_empath(e)
+Other_Retreat_Ready as e / archer.dispatch_to_empathy(e)
+
+exit / archer.cancel_event(Event(signal=signals.Second))
+
+valign=top
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>35</x>
+      <y>315</y>
+      <w>210</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+
+bg=blue
+fg=black</panel_attributes>
+    <additional_attributes>10.0;20.0;280.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>308</x>
+      <y>462</y>
+      <w>14</w>
+      <h>14</h>
+    </coordinates>
+    <panel_attributes>type=initial
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>315</x>
+      <y>413</y>
+      <w>105</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+fg=black</panel_attributes>
+    <additional_attributes>10.0;80.0;130.0;80.0;130.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>658</x>
+      <y>525</y>
+      <w>266</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+bg=black
+fg=black</panel_attributes>
+    <additional_attributes>360.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>378</x>
+      <y>532</y>
+      <w>133</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Out_Of_Arrows
+fg=black</panel_attributes>
+    <additional_attributes>170.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>679</x>
+      <y>336</y>
+      <w>245</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Skirmish_War_Cry 
+
+fg=black</panel_attributes>
+    <additional_attributes>330.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>42</x>
+      <y>294</y>
+      <w>175</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>Advance_War_Cry as e /
+  archer.dispatch_to_all_empathy(e)
+
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>700</x>
+      <y>511</y>
+      <w>175</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>Retreat_War_Cry as e /
+  archer.dispatch_to_all_empathy(e)
+  
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>546</x>
+      <y>616</y>
+      <w>161</w>
+      <h>42</h>
+    </coordinates>
+    <panel_attributes>Other_Retreat_War_Cry as e /
+  archer.dispatch_to_empathy(e)
+
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>532</x>
+      <y>602</y>
+      <w>21</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+fg=black</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>525</x>
+      <y>413</y>
+      <w>399</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+
+fg=black</panel_attributes>
+    <additional_attributes>550.0;60.0;10.0;60.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>539</x>
+      <y>427</y>
+      <w>175</w>
+      <h>42</h>
+    </coordinates>
+    <panel_attributes>Other_Skirmish_War_Cry as e \
+  archer.dispatch_to_empathy(e)
+  
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>42</x>
+      <y>378</y>
+      <w>175</w>
+      <h>98</h>
+    </coordinates>
+    <panel_attributes>Other_Advance_War_Cry as e /
+  archer.post_fifo(
+    Event(
+      signal=signals.Advance_War_Cry))
+  archer.dispatch_to_empathy(e)
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>35</x>
+      <y>413</y>
+      <w>266</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+  
+
+bg=blue
+fg=black</panel_attributes>
+    <additional_attributes>10.0;50.0;360.0;50.0;360.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>231</x>
+      <y>294</y>
+      <w>231</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>*advance*
+symbol=substate</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>490</x>
+      <y>294</y>
+      <w>196</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>*skirmish*
+symbol=substate</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>497</x>
+      <y>483</y>
+      <w>168</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>*feigned_retreat*
+symbol=substate</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>203</x>
+      <y>490</y>
+      <w>182</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>*marsal*
+symbol=substate</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>602</x>
+      <y>112</y>
+      <w>217</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>def dispatch_to_all_empathy(self, event):
+  for name, other in self.others.items():
+    self.add_member_if_needed(name)
+    other.dispatch(event)
+
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>602</x>
+      <y>168</y>
+      <w>308</w>
+      <h>98</h>
+    </coordinates>
+    <panel_attributes>def dispatch_to_empathy(self, event, other_archer_name=None):
+  if other_archer_name is None:
+    other_archer_name = event.payload
+  if other_archer_name is not None:
+    self.add_member_if_needed(other_archer_name)
+    self.others[other_archer_name].dispatch(event)
+
+
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>483</x>
+      <y>105</y>
+      <w>98</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>*Pattern*
+ local events</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>483</x>
+      <y>175</y>
+      <w>98</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>*Pattern*
+ remote events</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>574</x>
+      <y>126</y>
+      <w>49</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>574</x>
+      <y>196</y>
+      <w>49</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>595</x>
+      <y>84</y>
+      <w>308</w>
+      <h>175</h>
+    </coordinates>
+    <panel_attributes>*HorseArcher*
+--
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

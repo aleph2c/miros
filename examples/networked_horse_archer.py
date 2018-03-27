@@ -236,6 +236,14 @@ def didt_senior_advance_war_cry(archer, e):
   archer.post_fifo(Event(signal=signals.Advance_War_Cry))
   return return_status.HANDLED
 
+def didt_senior_skirmish_war_cry(archer, e):
+  archer.post_fifo(Event(signal=signals.Skirmish_War_Cry))
+  return return_status.HANDLED
+
+def didt_senior_retreat_war_cry(archer, e):
+  archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
+  return return_status.HANDLED
+
 def didt_advance_war_cry(archer, e):
   '''Yell out "advance war cry" to others and introspect on the state of the
      unit'''
@@ -243,18 +251,20 @@ def didt_advance_war_cry(archer, e):
   return archer.trans(advance)
 
 def didt_other_advance_war_cry(archer, e):
-  '''A horse archer heard another's Advance_War_Cry, so so they
-     give the command to and introspect on the state of their unit'''
+  '''A horse archer heard another's Advance_War_Cry, so they give the command to
+     and introspect on the state of their unit'''
   archer.post_fifo(Event(signal=signals.Advance_War_Cry))
   archer.dispatch_to_empathy(e)
   return archer.trans(advance)
 
 def didt_other_retreat_war_cry(archer, e):
+  '''Another horse archer has yelled out that he is retreating, update your
+     empathy with this information'''
   archer.dispatch_to_empathy(e)
   return archer.trans(feigned_retreat)
 
 def didt_skirmish_war_cry(archer, e):
-  '''Yell out "skirmish war cry" to others'''
+  '''Transition to the skirmish state'''
   return archer.trans(skirmish)
 
 def didt_other_skirmish_war_cry(archer, e):
@@ -264,8 +274,9 @@ def didt_other_skirmish_war_cry(archer, e):
   return archer.trans(skirmish)
 
 def didt_retreat_war_cry(archer, e):
-  '''Yell out the "retreat war cry" and introspect on the state of the unit'''
-  archer.dispatch_to_empathy(e)
+  '''You are retreating, so update all of your empathy charts with this
+     information'''
+  archer.dispatch_to_all_empathy(e)
   return archer.trans(feigned_retreat)
 
 def didt_other_retreat_ready_war_cry(archer, e):
@@ -330,7 +341,7 @@ def caf_second(archer, e):
   '''A horse archer can fire 1 to 3 arrows at a time in this maneuver,
      how they behave is up to them and how they respond
      to their local conditions'''
-  if(archer.ticks % 6 == 0):  # second attack already!
+  if(archer.ticks % 6 == 0):
     archer.arrows -= random.randint(1, 3)
     archer.arrows = 0 if archer.arrows < 0  else archer.arrows
     archer.scribble('arrows left {}'.format(archer.arrows))
@@ -411,15 +422,13 @@ def skirmish_retreat_ready_war_cry(archer, e):
      Retreat_War_Cry, if not or either way transition into the
      waiting_to_lure state'''
   ready = True
-  # archer.yell(Event(signal=signals.Other_Retreat_Ready_War_Cry,
-  #   payload=archer.name))
   for name, other in archer.others.items():
     if other.dead() is not True:
       ready &= other.waiting()
     else:
       archer.snoop_scribble("{} thinks {} is dead".format(archer.name, name))
   if ready:
-    # let's make sure Gandbold isn't a chicken
+    # let's make sure the horse archer's isn't a chicken
     delay_time = random.randint(10, 50)
   else:
     delay_time = random.randint(30, 60)
@@ -506,9 +515,6 @@ def marshal_entry(archer, e):
 
 def marshal_ready(archer, e):
   ready = True
-  # archer.yell(
-  #   Event(signal=signals.Other_Ready_War_Cry,
-  #   payload=archer.name))
   for name, other in archer.others.items():
     if other.dead() is not True:
       ready &= other.waiting()
@@ -523,7 +529,6 @@ def marshal_ready(archer, e):
 def wta_entry(archer, e):
   archer.yell(Event(signal=signals.Other_Ready_War_Cry, payload=archer.name))
   ready = True
-
   archer.snoop_scribble("{} has {} arrows".format(archer.name, archer.arrows))
   time_to_wait = random.randint(130, 300)
   for name, other in archer.others.items():
@@ -540,7 +545,7 @@ def wta_entry(archer, e):
       period=archer.to_time(time_to_wait),
       deferred=True)
   else:
-    archer.snoop_scribble("{} thinks the living are ready to attack".format(archer.name))
+    archer.snoop_scribble("{} thinks unit is ready to attack".format(archer.name))
     archer.post_fifo(
       Event(signal=signals.Advance_War_Cry))
 
@@ -584,6 +589,12 @@ deceit_in_detail = archer.create(state='deceit_in_detail'). \
   catch(
     signal=signals.Senior_Advance_War_Cry,
     handler=didt_senior_advance_war_cry). \
+  catch(
+    signal=signals.Senior_Skirmish_War_Cry,
+    handler=didt_senior_skirmish_war_cry). \
+  catch(
+    signal=signals.Senior_Retreat_War_Cry,
+    handler=didt_senior_retreat_war_cry). \
   catch(
     signal=signals.Advance_War_Cry,
     handler=didt_advance_war_cry). \

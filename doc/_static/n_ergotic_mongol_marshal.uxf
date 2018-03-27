@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>30</x>
+      <y>20</y>
+      <w>690</w>
+      <h>810</h>
+    </coordinates>
+    <panel_attributes>*marshal*
+--
+entry / 
+  archer.scribble("halt horse")
+  archer.scribble("identify next marshal point")
+  archer.scribble("field wrap wounds on self and horse")
+  archer.scribble("drink water")
+  archer.arrows = HorseArcher.MAXIMUM_ARROW_CAPACITY
+  chart.post_fifo(
+    Event(signal=signals.READY),
+      times=1,
+      period=archer.to_time(60),
+      deferred=True)
+
+valign=top
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>20</x>
+      <y>240</y>
+      <w>320</w>
+      <h>210</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+
+bg=blue
+fg=black</panel_attributes>
+    <additional_attributes>10.0;190.0;280.0;190.0;280.0;10.0;300.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>320</x>
+      <y>160</y>
+      <w>370</w>
+      <h>650</h>
+    </coordinates>
+    <panel_attributes>*waiting_to_advance*
+--
+entry /
+  archer.yell(Event(
+    signal=signals.Other_Ready_War_Cry,
+    payload=archer.name))
+
+  ready = True
+  archer.snoop_scribbel("{} has {} arrows". \
+    format(archer.name, archer.arrows)
+  time_to_wait = random.randint(130,300)
+  
+  for name, other in archer.others.items():
+    if other.dead() is not True:
+      ready &amp;= other.waiting()
+    else:
+      archer.snoop_scribble(
+        "{} thinks {} is dead".
+        format(archer.name, name)
+  if ready is False:      
+    archer.snoop_scribble(
+      "{} is impatient he will attack in {} seconds".
+      format(archer.name, time_to_wait)
+    archer.post_fifo(
+      Event(
+        signal=signals.Advance_War_Cry),
+      times=1,
+      period=random.randint(time_to_wait),
+      deferred=True)
+  else:
+    archer.snoop_scribble(
+      "{} thinks unit is ready to attack". \
+      format(archer.name))
+    archer.post_fifo(
+      Event(signal=signals.Advance_War_Cry))
+  
+exit /
+  archer.cancel_events(
+    Event(signal=signals.Advance_War_Cry))
+  
+
+valign=top
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>30</x>
+      <y>240</y>
+      <w>330</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>Ready /
+  ready = True
+  for name, other in archer.others.items():
+    if other.dead() is not True:
+      ready &amp;= other.state_name == 'waiting'
+    else:
+      archer.snoop_scribble(
+        "{} thinks {} is dead".
+        format(archer.name, name)
+  if ready:
+    archer.post_fifo(Advance_War_Cry)
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

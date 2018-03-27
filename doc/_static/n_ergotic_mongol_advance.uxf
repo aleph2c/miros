@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>7</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>273</x>
+      <y>217</y>
+      <w>308</w>
+      <h>406</h>
+    </coordinates>
+    <panel_attributes>*Advance*
+--
+entry /
+  archer.yell(Event(signal=signals.Other_Advance_War_Cry,
+    payload=archer.name))
+  # othogonoal component debug code here
+  chart.post_fifo(
+    Event(signal=signals.Close_Enough_for_Circle),
+      times=1,
+      period=archer.to_time(3.0),
+      deferred=True)
+      
+exit/ archer.cancel_events(
+  Event(signal=signals.Close_Enough_for_Circle))
+  
+Senior_Advance_War_Cry / {}
+Other_Advance_War_Cry as e / archer.dispatch_to_empthy(e)
+Advance_War_Cry as e / archer.dispatch_to_all_empathy(e)
+
+valign=top
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>301</x>
+      <y>427</y>
+      <w>266</w>
+      <h>147</h>
+    </coordinates>
+    <panel_attributes>*Circle and Fire*
+--
+   
+second /
+  if archer.ticks % 6 == 0:
+    archer.arrow -= random.randint(1,3)
+    archer.arrows = 0 if archer.arrows &lt; 0 else archer.arrows
+    if archer.arrows &lt; 20:
+      archer.post_fifo(
+      Event(signal=signals.Skirmish_War_Cry))
+  archer.ticks += 1  
+valign=top
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>350</x>
+      <y>567</y>
+      <w>196</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Close_Enough_For_Circle
+fg=black</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;40.0;260.0;40.0;260.0;10.0</additional_attributes>
+  </element>
+</diagram>

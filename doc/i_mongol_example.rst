@@ -2683,6 +2683,89 @@ networks and the RabbitFactory API.
 Instrumenting to Debug the Mongol Botnet
 ----------------------------------------
 
+.. image:: _static/n_ergotic_mongol_1.svg
+    :align: center
+
+Reducing the resolution on the RabbitFactory while increasing the detail on the
+battle HSM:
+
+.. image:: _static/n_ergotic_mongol_2.svg
+    :align: center
+
+Full deceit in detail chart to work in N instances:
+
+.. image:: _static/n_ergotic_mongol_3.svg
+    :align: center
+
+Something compacted and legible:
+
+.. image:: _static/n_ergotic_mongol_4.svg
+    :align: center
+
+Empathy reconsidered:
+
+.. image:: _static/empathy_1.svg
+    :align: center
+
+.. code-block:: python
+  
+  def add_member_if_needed(self, other_archer_name):
+    if self.name != other_archer_name and other_archer_name is not None:
+      if other_archer_name not in self.others:
+        oha = OtherHorseArcher(other_archer_name)
+        oha.start_at(not_waiting)
+        self.others[other_archer_name] = oha
+
+.. code-block:: python
+  :emphasize-lines: 1
+  :linenos:
+
+  def dispatch_to_all_empathy(self, event):
+    for name, other in self.others.items():
+      self.add_member_if_needed(name)
+      other.dispatch(event)
+
+  def dispatch_to_empathy(self, event, other_archer_name=None):
+    if other_archer_name is None:
+      other_archer_name = event.payload
+    if other_archer_name is not None:
+      self.add_member_if_needed(other_archer_name)
+      self.others[other_archer_name].dispatch(event)
+
+Advance and Circle and Fire:
+
+.. image:: _static/n_ergotic_mongol_advance.svg
+    :align: center
+
+To test the orthogonal component:
+
+.. code-block:: python
+  :linenos:
+
+  # in the advance entry state
+  if len(archer.others) >= 1:
+    first_name_of_others = next(iter(archer.others))
+    print(archer.others[first_name_of_others].trace())
+    archer.others[first_name_of_others].clear_trace()
+
+
+Skirmish and Ready for Retreat
+
+.. image:: _static/n_ergotic_mongol_skirmish.svg
+    :align: center
+
+Skirmish and Ready for Retreat
+
+.. image:: _static/n_ergotic_mongol_retreat.svg
+    :align: center
+
+Marshal
+
+.. image:: _static/n_ergotic_mongol_marshal.svg
+    :align: center
+
+Diagrams should be present
+
 .. _ergotic_mongol_11: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_11.pgn
 .. _ergotic_mongol_12: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_12.pgn
 .. _ergotic_mongol_13: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_13.pgn

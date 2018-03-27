@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>7</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>308</x>
+      <y>140</y>
+      <w>504</w>
+      <h>700</h>
+    </coordinates>
+    <panel_attributes>*kkirmish*
+--
+entry /
+  archer.yell(
+    Event(signal=signals.Other_Skirmish_War_Cry,
+      payload=archer.name))
+  archer.post_fifo(
+    Event(signal=signals.Officer_Lured),
+    times=1,
+    period=archer.to_time(
+      random.randint(40, 200)),
+    deferred=True)
+  if archer.arrow &lt; 10:
+    archer.post_fifo(Event(signal=signals.Ammunition_Low))
+Officer_Lured /
+  chart.post_fifo(Retreat_War_Cry)
+Senior_Skirmish_War_Cry / {}
+Other_Skirmish_War_Cry as e / archer.dispatch_to_empathy(e)
+Skirmish_War_Cry as e /  archer.dispatch_to_all_empathy(e)
+
+second /
+  if archer.tick % 3 == 0:
+    if random.randint(1, 10) &lt;= 4:
+      archer.arrow = archer.arrow - 1 if archer.arrows &gt;= 1 else 0
+    if archer.arrows &lt; 10:
+      archer.post_fifo(
+      Event(
+        signal=signals.Ammunition_Low))
+  archer.ticks += 1  
+
+exit /
+  archer.cancel_events(Event(signal=signals.Retreat_War_Cry))
+  archer.cancel_events(Event(signal=signals.Officer_Lured))
+valign=top
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>539</x>
+      <y>511</y>
+      <w>259</w>
+      <h>308</h>
+    </coordinates>
+    <panel_attributes>*waiting_to_lure*
+--
+entry /
+  archer.yell(
+    Event(signal=signals.Other_Retreat_Ready_War_Cry,
+          payload=archer.name))
+  archer.snoop_scribble('{} has {} arrows'. \
+    format(archer.name, archer.arrows))
+  archer.scribble('put away bow')
+  archer.scribble('pull scimitar')
+  archer.snoop_scribble('{} acts scared'. \
+    format(archer.name))
+
+Ammunition_Low / {}
+
+exit /
+  archer.scribble('stash scimitar')
+  archer.scribble('pull bow')
+  archer.scribble('stop acting')
+  
+second /
+  archer.ticks += 1
+  
+exit /
+  archer.scribble('stash scimitar')
+  archer.scribble('pull bow')
+  archer.scribble('stop acting')
+
+  
+
+
+valign=top
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>301</x>
+      <y>567</y>
+      <w>252</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+fg=black</panel_attributes>
+    <additional_attributes>10.0;20.0;340.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>308</x>
+      <y>539</y>
+      <w>224</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>Ammunition_Low / 
+ chart.post_fifo(
+  Event(signal=signals.Retreat_Ready_War_Cry))
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>301</x>
+      <y>644</y>
+      <w>252</w>
+      <h>189</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+
+fg=black</panel_attributes>
+    <additional_attributes>10.0;250.0;320.0;250.0;320.0;10.0;340.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>308</x>
+      <y>588</y>
+      <w>224</w>
+      <h>231</h>
+    </coordinates>
+    <panel_attributes>Retreat_Ready_War_Cry /
+  ready = True
+  for name, other archer.others.items():
+    if other.dead() is not True:
+      ready &amp;= other.waiting()
+    else:
+      archer.snoop_scribble(
+        "{} thinks {} is dead".
+        format(archer.name, name))
+  if ready:
+    # let's make sure the archer isn't a chicken
+    delay_time = random.randint(10,50)
+  else:
+    delay_time = random.randint(30,60)
+  archer.post_fifo(
+    Event(signal=signals.Retreat_War_Cry),
+    times=1,
+    period=archer.to_time(
+      delay_time),
+    deferred=True)
+
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>567</x>
+      <y>252</y>
+      <w>245</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>Officer_Lured /
+  archer.snoop_scribble("Knight Charging")
+  archer.post_fifo(
+    Event(signal=signals.Retreate_Ready_War_Cry))
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>602</x>
+      <y>301</y>
+      <w>224</w>
+      <h>224</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+fg=black</panel_attributes>
+    <additional_attributes>300.0;10.0;10.0;10.0;10.0;210.0;110.0;210.0;110.0;300.0</additional_attributes>
+  </element>
+</diagram>

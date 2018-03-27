@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>20</x>
+      <y>20</y>
+      <w>410</w>
+      <h>390</h>
+    </coordinates>
+    <panel_attributes>*feigned_retreat*
+--
+entry / 
+  archer.yell(Event(signal=
+    signals.Other_Retreat_War_Cry, payload=archer.name))
+  archer.scribble('fire on Knights')
+  archer.scribble('fire on footman')
+  if archer.arrows == 0
+    archer.post_fifo(Event(signal=signals.Out_Of_Arrows))
+      
+second /
+  if archer.tick % 3 == 0:
+    if random.randint(1, 10) &lt;= 8:
+    archer.arrow -= 1
+    if archer.arrows == 0:
+      archer.post_fifo(Event(signal=signals.Out_Of_Arrows))
+  archer.ticks += 1          
+
+Retreat_War_Cry / {}
+Other_Retreat_War_Cry / {}
+
+exit /
+  archer.cancel_events(Event(signal=signals.Out_Of_Arrows))
+  archer.scribble("full gallop")
+valign=top
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
