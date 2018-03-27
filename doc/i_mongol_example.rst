@@ -2676,7 +2676,7 @@ connect, transmit and receive with these networks a statechart just has to be a
 descendant of the RabbitFactory class.
 
 In the next section, we will connect Gandbold to his brethren using these
-networks.
+networks and the RabbitFactory API.
 
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:
 
