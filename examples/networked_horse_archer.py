@@ -165,15 +165,29 @@ class HorseArcher(RabbitFactory):
     return archer_name
 
   def yell(self, event):
+    '''
+    Yell out this event to the connected network
+    '''
     self.transmit(event)
 
   def compress(self, time_in_seconds):
+    '''
+    Using the time_compression provided as an input to the constructor we
+    convert real seconds into compressed seconds
+    '''
     return 1.0 * time_in_seconds / self.time_compression
 
   def to_time(self, time_in_seconds):
+    '''convert real time into horse-archer time'''
     return self.compress(time_in_seconds)
 
   def add_member_if_needed(self, other_archer_name):
+    '''
+    If we have not seen this horse archer's name before, then we build an
+    empathy statechart for him and place it into the not-waiting state. We add
+    this empathy statechart into a dict tracking all other horse archers in
+    our unit, the key to access his empathy statechart being his name
+    '''
     if self.name != other_archer_name and other_archer_name is not None:
       if other_archer_name not in self.others:
         oha = OtherHorseArcher(other_archer_name)
@@ -181,11 +195,21 @@ class HorseArcher(RabbitFactory):
         self.others[other_archer_name] = oha
 
   def dispatch_to_all_empathy(self, event):
+    '''
+    If we are issuing an event that provide us with information about the
+    other's in our unit we call this method to update ALL of the empathy
+    statecharts that we are tracking.
+    '''
     for name, other in self.others.items():
       self.add_member_if_needed(name)
       other.dispatch(event)
 
   def dispatch_to_empathy(self, event, other_archer_name=None):
+    '''
+    If we hear an event on the network that provides us with information
+    about a specific unit that we are tracking, we update it's empathy
+    statechart with this information.
+    '''
     if other_archer_name is None:
       other_archer_name = event.payload
     if other_archer_name is not None:
@@ -193,15 +217,24 @@ class HorseArcher(RabbitFactory):
       self.others[other_archer_name].dispatch(event)
 
 def battle_entry(archer, e):
+  '''What our horse archer does when he enters the battlefield'''
   archer.yell(Event(signal=signals.Other_Announce_Arrival_On_Field, payload=archer.name))
   return return_status.HANDLED
 
 def battle_other_arrival_on_field(archer, e):
+  '''
+  A hook method which allows a horse archer to hear another other horse
+  archer who has entered the battlefield.  It will be called when the
+  'Other_Announce_Arrival_On_Field' event is seen on the network.  If this horse
+  archer has not been seen before, a notion of him will be added to this horse
+  archer.
+  '''
   other_archer_name = e.payload
   archer.add_member_if_needed(other_archer_name)
   return return_status.HANDLED
 
 def battle_init(archer, e):
+  '''Immediately begin the deceit in detail tactic'''
   return archer.trans(deceit_in_detail)
 
 # Deceit-In-Detail-Tactic state callbacks
@@ -231,35 +264,49 @@ def didt_second(archer, e):
   return return_status.HANDLED
 
 def didt_senior_advance_war_cry(archer, e):
-  '''A Horse archer heard a command from a senior officer.  They give this
-     senior officer's war cry to themselves as if they thought of it'''
+  '''
+  A Horse archer heard a command from a senior officer.  They give this
+  senior officer's war cry to themselves as if they thought of it
+  '''
   archer.post_fifo(Event(signal=signals.Advance_War_Cry))
   return return_status.HANDLED
 
 def didt_senior_skirmish_war_cry(archer, e):
+  '''
+  A Horse archer heard a command from a senior officer.  They give this
+  senior officer's war cry to themselves as if they thought of it
+  '''
   archer.post_fifo(Event(signal=signals.Skirmish_War_Cry))
   return return_status.HANDLED
 
 def didt_senior_retreat_war_cry(archer, e):
+  '''
+  A Horse archer heard a command from a senior officer.  They give this
+  senior officer's war cry to themselves as if they thought of it
+  '''
   archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
   return return_status.HANDLED
 
 def didt_advance_war_cry(archer, e):
-  '''Yell out "advance war cry" to others and introspect on the state of the
-     unit'''
+  '''Update the empathy state charts with this information then advance.'''
   archer.dispatch_to_all_empathy(e)
   return archer.trans(advance)
 
 def didt_other_advance_war_cry(archer, e):
-  '''A horse archer heard another's Advance_War_Cry, so they give the command to
-     and introspect on the state of their unit'''
+  '''
+  Heard another's Advance_War_Cry, so we give the advance command, to ourself,
+  then update our belief about the state of the unit that gave the call.
+  '''
   archer.post_fifo(Event(signal=signals.Advance_War_Cry))
   archer.dispatch_to_empathy(e)
   return archer.trans(advance)
 
 def didt_other_retreat_war_cry(archer, e):
-  '''Another horse archer has yelled out that he is retreating, update your
-     empathy with this information'''
+  '''
+  Heard another's Retreat_War_Cry, so we give the retreat command to ourself,
+  then update our belief about the state of the unit that gave the call.
+  '''
+  archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
   archer.dispatch_to_empathy(e)
   return archer.trans(feigned_retreat)
 
