@@ -17,15 +17,16 @@ symbol=substate</panel_attributes>
     <id>UMLState</id>
     <coordinates>
       <x>225</x>
-      <y>504</y>
+      <y>495</y>
       <w>351</w>
-      <h>279</h>
+      <h>288</h>
     </coordinates>
     <panel_attributes>*battle*
 --
 entry /
   archer.yell(
-    Event(signal=signals.Other_Arrival_On_Field))
+    Event(signal=signals.Other_Arrival_On_Field,
+       payload=archer.name))
 
 Other_Arrival_On_Field as e /
   archer.add_member_if_needed(name=e.payload)
@@ -86,7 +87,7 @@ valign=top
     <id>Relation</id>
     <coordinates>
       <x>441</x>
-      <y>477</y>
+      <y>468</y>
       <w>27</w>
       <h>54</h>
     </coordinates>
@@ -99,10 +100,10 @@ valign=top
       <x>432</x>
       <y>405</y>
       <w>45</w>
-      <h>90</h>
+      <h>81</h>
     </coordinates>
     <panel_attributes>lt=[^]-(</panel_attributes>
-    <additional_attributes>20.0;10.0;20.0;70.0</additional_attributes>
+    <additional_attributes>20.0;10.0;20.0;60.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
@@ -362,7 +363,7 @@ Event Processor</panel_attributes>
     <id>Text</id>
     <coordinates>
       <x>414</x>
-      <y>468</y>
+      <y>459</y>
       <w>36</w>
       <h>36</h>
     </coordinates>

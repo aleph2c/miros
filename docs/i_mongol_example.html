@@ -69,7 +69,8 @@ one node remains.</p>
 <li><a class="reference internal" href="#i-mongol-example-the-first-horseman"><span class="std std-ref">The First Horseman</span></a></li>
 <li><a class="reference internal" href="#i-mongol-example-encrypted-communications"><span class="std std-ref">Encrypted Communications</span></a></li>
 <li><a class="reference internal" href="#i-mongol-example-building-a-mesh-network"><span class="std std-ref">Building a Mesh Network</span></a></li>
-<li><a class="reference internal" href="#i-mongol-example-instrumenting-to-debug-the-botnet"><span class="std std-ref">Instrumenting to Debug a Horse Archer</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-attaching-the-mongol-to-the-mesh"><span class="std std-ref">Attaching the Mongol to the Mesh</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-building-a-mongol-unit"><span class="std std-ref">Building a Mongol Unit</span></a></li>
 </ul>
 <div class="section" id="some-historical-context-for-the-example">
 <span id="i-mongol-example-historical-context"></span><h2>Some Historical Context For the Example<a class="headerlink" href="#some-historical-context-for-the-example" title="Permalink to this headline">¶</a></h2>
@@ -291,9 +292,11 @@ demonstrate that it is working.</p>
 <p>Here are the steps:</p>
 <ul class="simple">
 <li><a class="reference internal" href="#i-mongol-example-designing-the-mongol-in-its-tactic"><span class="std std-ref">Designing the Mongol in its Tactic</span></a></li>
-<li><a class="reference internal" href="#i-mongol-example-encrypted-communications"><span class="std std-ref">Encrypted Commnications</span></a></li>
-<li><a class="reference internal" href="#i-mongol-example-instrumenting-to-debug-the-botnet"><span class="std std-ref">Instrumenting to Debug the Mongol Botnet</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-the-first-horseman"><span class="std std-ref">The First Horseman</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-encrypted-communications"><span class="std std-ref">Encrypted Communications</span></a></li>
 <li><a class="reference internal" href="#i-mongol-example-building-a-mesh-network"><span class="std std-ref">Building a Mesh Network</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-attaching-the-mongol-to-the-mesh"><span class="std std-ref">Attaching the Mongol to the Mesh</span></a></li>
+<li><a class="reference internal" href="#i-mongol-example-building-a-mongol-unit"><span class="std std-ref">Building a Mongol Unit</span></a></li>
 </ul>
 </div>
 <div class="section" id="designing-the-mongol-in-its-tactic">
@@ -2053,7 +2056,7 @@ would never match, because they are logging different times.</p>
 test code to compare old trace outputs, to new trace outputs.  So I used the
 <code class="docutils literal"><span class="pre">stripped</span></code> context manager to build up the following test code:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">oha</span> <span class="o">=</span> <span class="n">OtherHorseArcher</span><span class="p">()</span>
-<span class="n">oha</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">empathy</span>  <span class="c1"># tie oha to outer state of empathy hsm)</span>
+<span class="n">oha</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">empathy</span><span class="p">)</span>  <span class="c1"># tie oha to outer state of empathy hsm)</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">))</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">))</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Advance_War_Cry</span><span class="p">))</span>
@@ -2965,18 +2968,137 @@ connect, transmit and receive with these networks a statechart just has to be a
 descendant of the RabbitFactory class.</p>
 <p>In the next section, we will connect Gandbold to his brethren using these
 networks and the RabbitFactory API.</p>
-<div class="section" id="instrumenting-to-debug-the-mongol-botnet">
-<span id="i-mongol-example-instrumenting-to-debug-the-botnet"></span><h2>Instrumenting to Debug the Mongol Botnet<a class="headerlink" href="#instrumenting-to-debug-the-mongol-botnet" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="attaching-the-mongol-to-the-mesh">
+<span id="i-mongol-example-attaching-the-mongol-to-the-mesh"></span><span id="i-mongol-example-instrumenting-to-debug-the-botnet"></span><h1>Attaching the Mongol to the Mesh<a class="headerlink" href="#attaching-the-mongol-to-the-mesh" title="Permalink to this headline">¶</a></h1>
+<p>The Mongols in our warbot will run on different processes on many different
+computers, or, within many processes on one machine.  It doesn’t matter, if they
+are running somewhere on a LAN they should find one another and start to work
+together.</p>
+<p>As a statechart designer, you want to be able to focus your attention on the
+Mongol statechart structure without being bogged down by networking.</p>
+<p>So we would like our horse archers to be able to yell commands back and forth,
+and we want to be able to see what their botnet is doing from one machine.  To
+do all of this we will squeeze the RabbitFactory class (with all of it’s
+networking features) between the HorseArcher class and it’s Factory ancestor.
+The RabbitFactory abstracts away large parts of the network, and it provides a
+way to build up a statechart which can access the mesh and snoop networks.</p>
+<p>To understand the networking part of the statechart abstraction, we will have to
+know how it relates to our statechart architecture, how to build it up and how
+to use its API.</p>
+<p>Here is a sketch of the new architecture.</p>
 <div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_1.svg" src="_images/n_ergotic_mongol_1.svg" /></div>
-<p>Reducing the resolution on the RabbitFactory while increasing the detail on the
-battle HSM:</p>
+<p>The HsmWithQueues class provides the event dispatcher, the trace and the spy
+instrumentation features.  The ActiveObject provides the threading that our HSMs
+can run in.  An HSM running in it’s own thread is called a statechart; so the
+ActiveObject provides us with the ability to make statecharts.  The Factory
+class gives us the ability to build up statecharts by writing callbacks,
+constructing state objects, linking these then imposing a hierarchy on the
+states.  As of now, between the Factory class and the HorseArcher we place the
+RabbitFactory.</p>
+<p>The RabbitFactory will include all of the required network dependencies and link
+all of the statechart features to other statecharts across two different types
+of networks:  It will allow us to extend our spy and trace instrumentation
+across every connected statechart using a snoop-network and it will provide a
+publish/subscription routing model for event messaging with a mesh-network.</p>
+<p>Now that we know more about the architecture, how do we build up networked statechart?</p>
+<p>Here is how we would build a networkable archer object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">archer</span> <span class="o">=</span> <span class="n">HorseArcher</span><span class="p">(</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="n">HorseArcher</span><span class="o">.</span><span class="n">get_a_name</span><span class="p">(),</span>
+<span class="hll">  <span class="n">rabbit_user</span><span class="o">=</span><span class="s1">&#39;bob&#39;</span><span class="p">,</span>
+</span><span class="hll">  <span class="n">rabbit_password</span><span class="o">=</span><span class="s1">&#39;dobbs&#39;</span><span class="p">,</span>
+</span><span class="hll">  <span class="n">rabbit_port</span><span class="o">=</span><span class="mi">5672</span>
+</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The highlighted lines in the above listing show what information is required to
+connect to the network.  We need a RabbitMq username, password and which port
+the service will be connected to on all of our machines.   The rabbit_port
+argument is optional; it will default to 5672.</p>
+<p>Inside the HorseArcher class, it’s RabbitFactory object is constructed with a
+bit more detail:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># . code inside the __init__ method of the HorseArcher</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+<span class="c1"># super would be RabbitFactory</span>
+<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+<span class="hll">      <span class="n">rabbit_user</span><span class="o">=</span><span class="n">rabbit_user</span><span class="p">,</span>
+</span><span class="hll">      <span class="n">rabbit_password</span><span class="o">=</span><span class="n">rabbit_password</span><span class="p">,</span>
+</span><span class="hll">      <span class="n">tx_routing_key</span><span class="o">=</span><span class="s1">&#39;archer.{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
+</span><span class="hll">      <span class="n">rx_routing_key</span><span class="o">=</span><span class="s1">&#39;archer.#&#39;</span><span class="p">,</span>
+</span><span class="hll">      <span class="n">snoop_key</span><span class="o">=</span>
+</span><span class="hll">        <span class="sa">b</span><span class="s1">&#39;lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=&#39;</span><span class="p">,</span>
+</span><span class="hll">      <span class="n">rabbit_port</span><span class="o">=</span><span class="n">rabbit_port</span><span class="p">)</span>
+</span><span class="c1"># .</span>
+</pre></div>
+</td></tr></table></div>
+<p>Lines 5-11 are arguments that are required by the RabbitFactory class which were
+not required by the Factory class.  Lines 7 and 8 are RabbitMq topic routing
+keys for the mesh network.  Lines 9-10 describe the snoop network’s encryption
+key.  This will have to be the same for all connected bots in our botnet.</p>
+<p>Now that we can build a networked horse archer, how do we use it?</p>
+<p>Well, to start with we can <code class="docutils literal"><span class="pre">yell</span></code> events across the mesh network.  The <code class="docutils literal"><span class="pre">yell</span></code>
+method takes an Event as an input and posts it into the FIFO inbox of all
+connected statecharts.  The <code class="docutils literal"><span class="pre">yell</span></code> method calls the <code class="docutils literal"><span class="pre">transmit</span></code> method of the
+RabbitFactory.</p>
+<p>The <code class="docutils literal"><span class="pre">enable_snoop</span></code> method acts on the other network, the snoop network.  It
+turns on the ability to debug every connected statechart on one machine.  The
+only other method that we will want is <code class="docutils literal"><span class="pre">snoop_scribble</span></code>. Think of this as a
+networked print statement that will write your messages into the snoop network.</p>
+<p>So to use our networks: we will <code class="docutils literal"><span class="pre">yell</span></code> out events on the mesh network and
+watch the collective instrumentation on the snoop network.</p>
+</div>
+<div class="section" id="building-a-mongol-unit">
+<span id="i-mongol-example-building-a-mongol-unit"></span><h1>Building a Mongol Unit<a class="headerlink" href="#building-a-mongol-unit" title="Permalink to this headline">¶</a></h1>
+<p>Now that we know enough about networking, let’s Reduce the resolution on the
+RabbitFactory part of our architectural diagram while increasing the detail on
+the battle HSM:</p>
 <div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_2.svg" src="_images/n_ergotic_mongol_2.svg" /></div>
-<p>Full deceit in detail chart to work in N instances:</p>
-<div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_3.svg" src="_images/n_ergotic_mongol_3.svg" /></div>
-<p>Something compacted and legible:</p>
-<div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_4.svg" src="_images/n_ergotic_mongol_4.svg" /></div>
-<p>Empathy reconsidered:</p>
-<div align="center" class="align-center"><img alt="_images/empathy_1.svg" src="_images/empathy_1.svg" /></div>
+<p>The classes that linger above our battle statechart and the empathy HSM are
+containers of features that these behavioral maps will need access to, to work.
+The names of these methods and features are not expressed on the diagram.  They
+are assumed.</p>
+<p>The named methods on the HorseArcher and OtherHorseArcher classes were made from
+common code that appeared over and over again in the battle statechart and the
+empathy HSM.  To simplify the diagrams and to DRY up the design; the common code
+was named and then sucked up into the class as a set of methods.  More will be
+said about the details of these methods later in the section.</p>
+<p>We also see that the HorseArcher provides a static method to construct a horse archer
+name.  This is different from how we imagined things before, we were going to
+reference the other horse archer’s by their IP addresses.  If we did that, we
+could not run more than one horse archer process per machine without breaking the
+design.  I don’t have ten machines in my LAN; so I will have to test multiple
+processes per machine to get the design working.  The HorseArcher.get_name
+static method will provide unique names so that we can create horse archers on
+the same machine or across the network.</p>
+<p>Now let’s talk about the battle statechart.  Things have become quite complex,
+and we are starting to face the limitations of the Umlet tool used to describe
+our picture.  The diagram is too big to fit on this page, so we compact a large
+part of it into the deceit_in_detail statechart abstraction glyph.  This
+basically means, there is something else here, but we have hidden it from view.</p>
+<p>The first thing our horse archer will do when they begin battle is to yell out
+that they have arrived on the field.  This is done with the
+Other_Arrival_On_Field event. The horse archer will provide it’s name as the
+payload to this event.  As a convention I will pre-pend ‘Other’ in front of any
+event intended to be sent on the network.  By doing this, our debug information
+will be less confusing.</p>
+<p>Our statechart is ergotic; so not only does it need to yell out events it must
+also receive those same events from others in the mesh network.  We see what a
+horse archer does when it hears another yell out that they have arrived.  There
+is a Other_Arrival_On_Field hook which calls the <code class="docutils literal"><span class="pre">add_member_if_needed</span></code>
+method.  The name of the other horse archer is in the payload.</p>
+<p>Let’s look inside of the <code class="docutils literal"><span class="pre">add_member_if_needed</span></code> and see what a horse archer
+does when he hears his brethren arrive on the battle field.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">add_member_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_archer_name</span><span class="p">):</span>
   <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">other_archer_name</span> <span class="ow">and</span> <span class="n">other_archer_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">other_archer_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">:</span>
@@ -2985,6 +3107,18 @@ battle HSM:</p>
       <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">other_archer_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">oha</span>
 </pre></div>
 </div>
+<p>He checks to see if he is just listening to himself and if he can identify a
+name with the shout.  Then he checks to see if he is already mentally tracking
+this person is his collection of ‘others’.  If this person doesn’t exist inside
+of his notion of his unit, he creates an empathy object for them using their
+name, starts it then adds this object to his ‘others’ data dictionary, using
+that other horse archer’s name as the key to access their empathy.</p>
+<p>Full deceit in detail chart to work in N instances:</p>
+<div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_3.svg" src="_images/n_ergotic_mongol_3.svg" /></div>
+<p>Something compacted and legible:</p>
+<div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_4.svg" src="_images/n_ergotic_mongol_4.svg" /></div>
+<p>Empathy reconsidered:</p>
+<div align="center" class="align-center"><img alt="_images/empathy_1.svg" src="_images/empathy_1.svg" /></div>
 <div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -3031,7 +3165,6 @@ battle HSM:</p>
 <p>Diagrams should be present</p>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
-</div>
 
 
           </div>
@@ -3053,10 +3186,9 @@ battle HSM:</p>
 <li><a class="reference internal" href="#encrypted-communications">Encrypted Communications</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#building-a-mesh-network">Building a Mesh Network</a><ul>
-<li><a class="reference internal" href="#instrumenting-to-debug-the-mongol-botnet">Instrumenting to Debug the Mongol Botnet</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#building-a-mesh-network">Building a Mesh Network</a></li>
+<li><a class="reference internal" href="#attaching-the-mongol-to-the-mesh">Attaching the Mongol to the Mesh</a></li>
+<li><a class="reference internal" href="#building-a-mongol-unit">Building a Mongol Unit</a></li>
 </ul>
 <div class="relations">
 <h3>Related Topics</h3>

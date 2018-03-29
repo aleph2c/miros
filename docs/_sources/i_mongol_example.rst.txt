@@ -34,7 +34,8 @@ one node remains.
 * :ref:`The First Horseman<i_mongol_example-the-first-horseman>`
 * :ref:`Encrypted Communications<i_mongol_example-encrypted-communications>`
 * :ref:`Building a Mesh Network<i_mongol_example-building-a-mesh-network>`
-* :ref:`Instrumenting to Debug a Horse Archer<i_mongol_example-instrumenting-to-debug-the-botnet>`
+* :ref:`Attaching the Mongol to the Mesh<i_mongol_example-attaching-the-mongol-to-the-mesh>`
+* :ref:`Building a Mongol Unit<i_mongol_example-building-a-mongol-unit>`
 
 .. _i_mongol_example-historical-context:
 
@@ -313,9 +314,11 @@ demonstrate that it is working.
 Here are the steps:
 
 * :ref:`Designing the Mongol in its Tactic<i_mongol_example-designing-the-mongol-in-its-tactic>`
-* :ref:`Encrypted Commnications<i_mongol_example-encrypted-communications>`
-* :ref:`Instrumenting to Debug the Mongol Botnet<i_mongol_example-instrumenting-to-debug-the-botnet>`
+* :ref:`The First Horseman<i_mongol_example-the-first-horseman>`
+* :ref:`Encrypted Communications<i_mongol_example-encrypted-communications>`
 * :ref:`Building a Mesh Network<i_mongol_example-building-a-mesh-network>`
+* :ref:`Attaching the Mongol to the Mesh<i_mongol_example-attaching-the-mongol-to-the-mesh>`
+* :ref:`Building a Mongol Unit<i_mongol_example-building-a-mongol-unit>`
 
 .. _i_mongol_example-designing-the-mongol-in-its-tactic:
 
@@ -1708,7 +1711,7 @@ test code to compare old trace outputs, to new trace outputs.  So I used the
 .. code-block:: python
 
   oha = OtherHorseArcher()
-  oha.start_at(empathy  # tie oha to outer state of empathy hsm)
+  oha.start_at(empathy)  # tie oha to outer state of empathy hsm)
   oha.post_fifo(Event(signal=signals.Other_Retreat_Ready_War_Cry))
   oha.post_fifo(Event(signal=signals.Retreat_War_Cry))
   oha.post_fifo(Event(signal=signals.Advance_War_Cry))
@@ -2680,17 +2683,176 @@ networks and the RabbitFactory API.
 
 .. _i_mongol_example-instrumenting-to-debug-the-botnet:
 
-Instrumenting to Debug the Mongol Botnet
-----------------------------------------
+.. _i_mongol_example-attaching-the-mongol-to-the-mesh:
+
+Attaching the Mongol to the Mesh
+================================
+The Mongols in our warbot will run on different processes on many different
+computers, or, within many processes on one machine.  It doesn't matter, if they
+are running somewhere on a LAN they should find one another and start to work
+together.
+
+As a statechart designer, you want to be able to focus your attention on the
+Mongol statechart structure without being bogged down by networking.
+
+So we would like our horse archers to be able to yell commands back and forth,
+and we want to be able to see what their botnet is doing from one machine.  To
+do all of this we will squeeze the RabbitFactory class (with all of it's
+networking features) between the HorseArcher class and it's Factory ancestor.
+The RabbitFactory abstracts away large parts of the network, and it provides a
+way to build up a statechart which can access the mesh and snoop networks.
+
+To understand the networking part of the statechart abstraction, we will have to
+know how it relates to our statechart architecture, how to build it up and how
+to use its API.
+
+Here is a sketch of the new architecture.
 
 .. image:: _static/n_ergotic_mongol_1.svg
     :align: center
 
-Reducing the resolution on the RabbitFactory while increasing the detail on the
-battle HSM:
+The HsmWithQueues class provides the event dispatcher, the trace and the spy
+instrumentation features.  The ActiveObject provides the threading that our HSMs
+can run in.  An HSM running in it's own thread is called a statechart; so the
+ActiveObject provides us with the ability to make statecharts.  The Factory
+class gives us the ability to build up statecharts by writing callbacks,
+constructing state objects, linking these then imposing a hierarchy on the
+states.  As of now, between the Factory class and the HorseArcher we place the
+RabbitFactory.
+
+The RabbitFactory will include all of the required network dependencies and link
+all of the statechart features to other statecharts across two different types
+of networks:  It will allow us to extend our spy and trace instrumentation
+across every connected statechart using a snoop-network and it will provide a
+publish/subscription routing model for event messaging with a mesh-network.
+
+Now that we know more about the architecture, how do we build up networked statechart?
+
+Here is how we would build a networkable archer object:
+
+.. code-block:: python
+  :emphasize-lines: 3-5
+  
+  archer = HorseArcher(
+    name = HorseArcher.get_a_name(),
+    rabbit_user='bob',
+    rabbit_password='dobbs',
+    rabbit_port=5672
+  )
+
+The highlighted lines in the above listing show what information is required to
+connect to the network.  We need a RabbitMq username, password and which port
+the service will be connected to on all of our machines.   The rabbit_port
+argument is optional; it will default to 5672.
+
+Inside the HorseArcher class, it's RabbitFactory object is constructed with a
+bit more detail:
+
+.. code-block:: python
+  :emphasize-lines: 5-11
+  :linenos:
+
+  # . code inside the __init__ method of the HorseArcher
+  self.name = name
+  # super would be RabbitFactory
+  super().__init__(name=name,
+        rabbit_user=rabbit_user,
+        rabbit_password=rabbit_password,
+        tx_routing_key='archer.{}'.format(name),
+        rx_routing_key='archer.#',
+        snoop_key=
+          b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=',
+        rabbit_port=rabbit_port)
+  # .
+
+Lines 5-11 are arguments that are required by the RabbitFactory class which were
+not required by the Factory class.  Lines 7 and 8 are RabbitMq topic routing
+keys for the mesh network.  Lines 9-10 describe the snoop network's encryption
+key.  This will have to be the same for all connected bots in our botnet.
+
+Now that we can build a networked horse archer, how do we use it?  
+
+Well, to start with we can ``yell`` events across the mesh network.  The ``yell``
+method takes an Event as an input and posts it into the FIFO inbox of all
+connected statecharts.  The ``yell`` method calls the ``transmit`` method of the
+RabbitFactory.
+
+The ``enable_snoop`` method acts on the other network, the snoop network.  It
+turns on the ability to debug every connected statechart on one machine.  The
+only other method that we will want is ``snoop_scribble``. Think of this as a
+networked print statement that will write your messages into the snoop network.
+
+So to use our networks: we will ``yell`` out events on the mesh network and
+watch the collective instrumentation on the snoop network.
+
+.. _i_mongol_example-building-a-mongol-unit:
+
+Building a Mongol Unit
+======================
+Now that we know enough about networking, let's Reduce the resolution on the
+RabbitFactory part of our architectural diagram while increasing the detail on
+the battle HSM:
 
 .. image:: _static/n_ergotic_mongol_2.svg
     :align: center
+
+The classes that linger above our battle statechart and the empathy HSM are
+containers of features that these behavioral maps will need access to, to work.
+The names of these methods and features are not expressed on the diagram.  They
+are assumed.
+
+The named methods on the HorseArcher and OtherHorseArcher classes were made from
+common code that appeared over and over again in the battle statechart and the
+empathy HSM.  To simplify the diagrams and to DRY up the design; the common code
+was named and then sucked up into the class as a set of methods.  More will be
+said about the details of these methods later in the section.
+
+We also see that the HorseArcher provides a static method to construct a horse archer
+name.  This is different from how we imagined things before, we were going to
+reference the other horse archer's by their IP addresses.  If we did that, we
+could not run more than one horse archer process per machine without breaking the
+design.  I don't have ten machines in my LAN; so I will have to test multiple
+processes per machine to get the design working.  The HorseArcher.get_name
+static method will provide unique names so that we can create horse archers on
+the same machine or across the network.
+
+Now let's talk about the battle statechart.  Things have become quite complex,
+and we are starting to face the limitations of the Umlet tool used to describe
+our picture.  The diagram is too big to fit on this page, so we compact a large
+part of it into the deceit_in_detail statechart abstraction glyph.  This
+basically means, there is something else here, but we have hidden it from view.
+
+The first thing our horse archer will do when they begin battle is to yell out
+that they have arrived on the field.  This is done with the
+Other_Arrival_On_Field event. The horse archer will provide it's name as the
+payload to this event.  As a convention I will pre-pend 'Other' in front of any
+event intended to be sent on the network.  By doing this, our debug information
+will be less confusing.
+
+Our statechart is ergotic; so not only does it need to yell out events it must
+also receive those same events from others in the mesh network.  We see what a
+horse archer does when it hears another yell out that they have arrived.  There
+is a Other_Arrival_On_Field hook which calls the ``add_member_if_needed``
+method.  The name of the other horse archer is in the payload.
+
+Let's look inside of the ``add_member_if_needed`` and see what a horse archer
+does when he hears his brethren arrive on the battle field.
+
+.. code-block:: python
+  
+  def add_member_if_needed(self, other_archer_name):
+    if self.name != other_archer_name and other_archer_name is not None:
+      if other_archer_name not in self.others:
+        oha = OtherHorseArcher(other_archer_name)
+        oha.start_at(not_waiting)
+        self.others[other_archer_name] = oha
+
+He checks to see if he is just listening to himself and if he can identify a
+name with the shout.  Then he checks to see if he is already mentally tracking
+this person is his collection of 'others'.  If this person doesn't exist inside
+of his notion of his unit, he creates an empathy object for them using their
+name, starts it then adds this object to his 'others' data dictionary, using
+that other horse archer's name as the key to access their empathy.
 
 Full deceit in detail chart to work in N instances:
 
@@ -2707,14 +2869,6 @@ Empathy reconsidered:
 .. image:: _static/empathy_1.svg
     :align: center
 
-.. code-block:: python
-  
-  def add_member_if_needed(self, other_archer_name):
-    if self.name != other_archer_name and other_archer_name is not None:
-      if other_archer_name not in self.others:
-        oha = OtherHorseArcher(other_archer_name)
-        oha.start_at(not_waiting)
-        self.others[other_archer_name] = oha
 
 .. code-block:: python
   :emphasize-lines: 1
