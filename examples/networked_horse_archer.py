@@ -196,12 +196,11 @@ class HorseArcher(RabbitFactory):
 
   def dispatch_to_all_empathy(self, event):
     '''
-    If we are issuing an event that provide us with information about the
+    If we are issuing an event that provides us with information about the
     other's in our unit we call this method to update ALL of the empathy
     statecharts that we are tracking.
     '''
     for name, other in self.others.items():
-      self.add_member_if_needed(name)
       other.dispatch(event)
 
   def dispatch_to_empathy(self, event, other_archer_name=None):
@@ -297,7 +296,6 @@ def didt_other_advance_war_cry(archer, e):
   Heard another's Advance_War_Cry, so we give the advance command, to ourself,
   then update our belief about the state of the unit that gave the call.
   '''
-  archer.post_fifo(Event(signal=signals.Advance_War_Cry))
   archer.dispatch_to_empathy(e)
   return archer.trans(advance)
 
@@ -306,7 +304,6 @@ def didt_other_retreat_war_cry(archer, e):
   Heard another's Retreat_War_Cry, so we give the retreat command to ourself,
   then update our belief about the state of the unit that gave the call.
   '''
-  archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
   archer.dispatch_to_empathy(e)
   return archer.trans(feigned_retreat)
 

@@ -347,6 +347,7 @@ it, Deceit_in_Detail_Tactic (marshalled), because I want to express that the
 horse archers are meeting and that this is one tactic of many.
 
 .. image:: _static/ergotic_mongol_11.svg
+    :target: _static/ergotic_mongol_11.pdf
     :align: center
 
 `ergotic_mongol_11`_
@@ -376,6 +377,7 @@ To do this, they would issue a Skirmish_War_Cry and charge into the enemy's
 disorganized front to make individual attacks.
 
 .. image:: _static/ergotic_mongol_12.svg
+    :target: _static/ergotic_mongol_12.pdf
     :align: center
 
 `ergotic_mongol_12`_
@@ -412,6 +414,7 @@ might look down at his massive warhorse and compare it to the strange little
 ponies these horse archers are riding.
 
 .. image:: _static/horsearcher.jpg
+    :target: _static/horsearcher.pdf
     :align: center
 
 What he doesn't know is that he is the quarry.  They are on a hunting trip; not
@@ -437,6 +440,7 @@ state.  This will have the horse archer put away his scimitar and arm his bow
 with an arrow.
 
 .. image:: _static/ergotic_mongol_13.svg
+    :target: _static/ergotic_mongol_13.pdf
     :align: center
 
 `ergotic_mongol_13`_
@@ -457,6 +461,7 @@ So they leave them in any other pursuing soldiers, then ride full gallop back to
 the marshal point.
 
 .. image:: _static/ergotic_mongol_14.svg
+    :target: _static/ergotic_mongol_14.pdf
     :align: center
 
 The final stage of our tactic would have the horse archers meet at their marshal
@@ -503,6 +508,7 @@ reach into this unit, tweak its behaviour, then let it run autonomously again.
 Let's improve the design:
 
 .. image:: _static/ergotic_mongol_2.svg
+    :target: _static/ergotic_mongol_2.pdf
     :align: center
 
 As a statechart designer, you might look at the Advance_War_Cry event connecting
@@ -577,6 +583,7 @@ Skirmish_War_Cry and Retreat_War_Cry.
   the state indicated on their map.
 
 .. image:: _static/ergotic_mongol_31.svg
+    :target: _static/ergotic_mongol_31.pdf
     :align: center
 
 Let's turn each of these commands into three distinct events so that we can tell
@@ -608,6 +615,7 @@ Likewise, a horse archer would ignore any order to advance, coming from someone
 else, if they are already advancing or engaged in the circle and fire maneuver.
 
 .. image:: _static/ergotic_mongol_32.svg
+    :target: _static/ergotic_mongol_32.pdf
     :align: center
 
 Battle is a noisy affair.  There is a good chance that one horse archer might
@@ -653,6 +661,7 @@ Here is a first shot at it's design:
 
 
 .. image:: _static/empathyfull.svg
+    :target: _static/empathyfull.pdf
     :align: center
 
 A horse archer will have one of these statecharts for each member of his unit.
@@ -740,6 +749,7 @@ weakening the unit by filling their head with over complicated maps.
 So let's make things easier on them:
 
 .. image:: _static/empathypartial.svg
+    :target: _static/empathypartial.pdf
     :align: center
 
 Now they are less precise in how they model the other members of their unit; yet
@@ -749,6 +759,7 @@ who is dead.
 Let's layer in a Mongol's empathy into his tactical statechart:
 
 .. image:: _static/ergotic_mongol_41.svg
+    :target: _static/ergotic_mongol_41.pdf
     :align: center
 
 The point of this design iteration is to add the two different unit-wait states.
@@ -795,6 +806,7 @@ avoid it anymore, a horse archer needs to experience time and they need to fire
 arrows:
 
 .. image:: _static/ergotic_mongol_51.svg
+    :target: _static/ergotic_mongol_51.pdf
     :align: center
 
 To track time a horse archer will have a tick attribute which will increment
@@ -807,6 +819,7 @@ together with his unit, they break their circle formation and charge into the
 enemy front.
 
 .. image:: _static/mongol-warrior.jpg
+    :target: _static/mongol-warrior.pdf
     :align: center
 
 While skirmishing the horse archer is given a chance to make a shot every 3
@@ -841,6 +854,7 @@ The First Horseman
 Let's reference our previous design and create the first horseman, Gandbold.
 
 .. image:: _static/ergotic_mongol_51.svg
+    :target: _static/ergotic_mongol_51.pdf
     :align: center
 
 Scanning the design diagram we see he can carry sixty arrows, he should have an
@@ -908,6 +922,7 @@ by making slight design alterations.
 Let's begin by writing the callbacks for the defeat_in_detail_tactic state:
 
 .. image:: _static/ergotic_mongol_61.svg
+    :target: _static/ergotic_mongol_61.pdf
     :align: center
 
 .. code-block:: python
@@ -983,6 +998,7 @@ Let's begin by writing the callbacks for the defeat_in_detail_tactic state:
 Now lets write the callbacks for the "Advance" state:
 
 .. image:: _static/ergotic_mongol_62.svg
+    :target: _static/ergotic_mongol_62.pdf
     :align: center
 
 .. code-block:: python
@@ -1128,6 +1144,7 @@ Now lets write the callbacks for the "Skirmish" state:
 Here are the callbacks for the "Waiting to Lure" state:
 
 .. image:: _static/ergotic_mongol_65.svg
+    :target: _static/ergotic_mongol_65.pdf
     :align: center
 
 .. code-block:: python
@@ -1152,6 +1169,7 @@ Here are the callbacks for the "Waiting to Lure" state:
 Lets write the callbacks for the "Feigned Retreat" state:
 
 .. image:: _static/ergotic_mongol_66.svg
+    :target: _static/ergotic_mongol_66.pdf
     :align: center
 
 .. code-block:: python
@@ -1247,6 +1265,7 @@ Now we write the callbacks for our last state, "Waiting to Advance":
 Here is the latest iteration of our design:
 
 .. image:: _static/ergotic_mongol_7.svg
+    :target: _static/ergotic_mongol_7.pdf
     :align: center
 
 Now that the callbacks are written, let's make a statechart, and wire these
@@ -1514,6 +1533,7 @@ Instead, I will use Gandbold's thread to drive the processing of his empathy
 state machine using the orthogonal component pattern.
 
 .. image:: _static/empathy_1.svg
+    :target: _static/empathy_1.pdf
     :align: center
 
 I'll write the empathy state machine using a flat method technique then have ten
@@ -1607,6 +1627,7 @@ to capture this discovery process.  Here is a UML diagram the describes our new
 design.
 
 .. image:: _static/ergotic_mongol_8.svg
+    :target: _static/ergotic_mongol_8.pdf
     :align: center
 
 A horse archer object contains 10 "other horse archer" objects which are each
@@ -1659,6 +1680,7 @@ this reaction to the HSM diagram, I confirmed that the HSM in the code was
 matching the HSM in the picture.
 
 .. image:: _static/empathy_1.svg
+    :target: _static/empathy_1.pdf
     :align: center
 
 Notice the use of the ``complete_circuit`` method in the following code listing.
@@ -1771,6 +1793,7 @@ We already know the empathy HSM is working, so if it wasn't working properly in
 this test it was because Gandbold wasn't dispatching to it.
 
 .. image:: _static/empathy_1.svg
+    :target: _static/empathy_1.pdf
     :align: center
 
 .. code-block:: python
@@ -2293,6 +2316,7 @@ connect is connected to everything that can connect.  Let's create a mesh
 network.
 
 .. image:: _static/Partial_Mesh_Diagram.svg
+    :target: _static/Partial_Mesh_Diagram.pdf
     :align: center
 
 Our lab will exist behind a router; so all of the bots will live on the same
@@ -2478,6 +2502,7 @@ Now let's try to draw the RabbitMq style producer and consumer diagram for our
 mesh network so that we can understand how things are connected:
 
 .. image:: _static/mesh_network_1.svg
+    :target: _static/mesh_network_1.pdf
     :align: center
 
 In the above diagram we see the two classes MeshTransmitter and the MeshReceiver
@@ -2629,6 +2654,7 @@ Now let's try to draw the RabbitMq style producer and consumer diagram for our
 snoop network:
 
 .. image:: _static/snoop_network_1.svg
+    :target: _static/snoop_network_1.pdf
     :align: center
 
 The SnoopTransmitter and SnoopReciever collaborate to build the RabbitMq snoop
@@ -2656,6 +2682,7 @@ For now, let's just consider what the RabbitFactory looks like and what it will
 do for us:
 
 .. image:: _static/rabbit_factory_1.svg
+    :target: _static/rabbit_factory_1.pdf
     :align: center
 
 The RabbitFactory gives us all of the networking features that we have described
@@ -2709,6 +2736,7 @@ to use its API.
 Here is a sketch of the new architecture.
 
 .. image:: _static/n_ergotic_mongol_1.svg
+    :target: _static/n_ergotic_mongol_1.pdf
     :align: center
 
 The HsmWithQueues class provides the event dispatcher, the trace and the spy
@@ -2794,6 +2822,7 @@ RabbitFactory part of our architectural diagram while increasing the detail on
 the battle HSM:
 
 .. image:: _static/n_ergotic_mongol_2.svg
+    :target: _static/n_ergotic_mongol_2.pdf
     :align: center
 
 The named methods in the HorserArcher and OtherHorseArcher classes represent
@@ -2860,6 +2889,7 @@ are intended to work together.
 Now let's look at the networked deceit_in_detail part of the battle statechart:
 
 .. image:: _static/n_ergotic_mongol_3.svg
+    :target: _static/n_ergotic_mongol_3.pdf
     :align: center
 
 The map has gotten too big.  So we will break it into five different diagrams
@@ -2868,6 +2898,7 @@ and talk about the new parts of the design in each region.
 First, we look at the deceit_in_detail state:
 
 .. image:: _static/n_ergotic_mongol_4.svg
+    :target: _static/n_ergotic_mongol_4.pdf
     :align: center
 
 The horse archer must send various events into his empathy HSMs so he can track
@@ -2886,6 +2917,7 @@ But what signals need to be fed into these empathy methods?
 To answer that, we look at the empathy HSM diagram:
 
 .. image:: _static/empathy_1.svg
+    :target: _static/empathy_1.pdf
     :align: center
 
 The pattern described on the previous diagram will save us from getting lost in
@@ -2926,6 +2958,7 @@ We iterate over all of the empathy objects and dispatch the event into them.
 Now let's look at the networked advance and circle_and_fire part of the design:
 
 .. image:: _static/n_ergotic_mongol_advance.svg
+    :target: _static/n_ergotic_mongol_advance.pdf
     :align: center
 
 We see some new things here, first, we yell out when we enter the state.  It
@@ -2986,6 +3019,7 @@ loop's empathy information when we print it out on the next pass.
 Now let's look at the networked Skirmish and Ready for Retreat states:
 
 .. image:: _static/n_ergotic_mongol_skirmish.svg
+    :target: _static/n_ergotic_mongol_skirmish.pdf
     :align: center
 
 In the entry states of the skirmish and waiting_to_lure states, we see that the
@@ -3020,11 +3054,13 @@ happening across the botnet.
 
 
 .. image:: _static/n_ergotic_mongol_retreat.svg
+    :target: _static/n_ergotic_mongol_retreat.pdf
     :align: center
 
 Marshal
 
 .. image:: _static/n_ergotic_mongol_marshal.svg
+    :target: _static/n_ergotic_mongol_marshal.pdf
     :align: center
 
 Diagrams should be present
