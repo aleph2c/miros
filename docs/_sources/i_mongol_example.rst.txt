@@ -3029,10 +3029,9 @@ Marshal
 
 Diagrams should be present
 
-.. _ergotic_mongol_11: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_11.pdf
-.. _ergotic_mongol_12: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_12.pdf
-.. _ergotic_mongol_13: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_13.pdf
-
+.. _ergotic_mongol_11: https://aleph2c.github.io/miros/_static/ergotic_mongol_11.pdf
+.. _ergotic_mongol_12: https://aleph2c.github.io/miros/_static/ergotic_mongol_12.pdf
+.. _ergotic_mongol_13: https://aleph2c.github.io/miros/_static/ergotic_mongol_13.pdf
 .. _mesh_network: https://github.com/aleph2c/miros/blob/master/examples/mesh_network.py
 .. _party_line: https://en.wikipedia.org/wiki/Party_line_(telephony)
 :ref:`back to examples <examples>`
