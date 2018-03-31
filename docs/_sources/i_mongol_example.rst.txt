@@ -3019,7 +3019,6 @@ information in their debug stream.  This is very useful for seeing what is
 happening across the botnet.
 
 
-
 .. image:: _static/n_ergotic_mongol_retreat.svg
     :align: center
 
@@ -3030,9 +3029,9 @@ Marshal
 
 Diagrams should be present
 
-.. _ergotic_mongol_11: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_11.pgn
-.. _ergotic_mongol_12: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_12.pgn
-.. _ergotic_mongol_13: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_13.pgn
+.. _ergotic_mongol_11: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_11.pdf
+.. _ergotic_mongol_12: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_12.pdf
+.. _ergotic_mongol_13: https://github.com/aleph2c/miros/blob/master/doc/_static/ergotic_mongol_13.pdf
 
 .. _mesh_network: https://github.com/aleph2c/miros/blob/master/examples/mesh_network.py
 .. _party_line: https://en.wikipedia.org/wiki/Party_line_(telephony)
