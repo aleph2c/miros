@@ -59,7 +59,8 @@
 <img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
 when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?</p>
 <p>If you are unfamiliar with UML, this part of the diagram:</p>
-<div align="center" class="align-center"><img alt="_images/guard.svg" src="_images/guard.svg" /></div>
+<a class="reference external image-reference" href="_static/guard.pdf"><div align="center" class="align-center"><img alt="_images/guard.svg" src="_images/guard.svg" /></div>
+</a>
 <p>contains a <strong>guard</strong>.  Specifically, the code:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">g</span><span class="p">()]</span>
 </pre></div>
@@ -69,7 +70,8 @@ when would each of the functions, <code class="docutils literal"><span class="pr
 the event on the arrow pass through</cite>.  The code that is after the guard on the
 diagram, <code class="docutils literal"><span class="pre">t()</span></code>, runs if the guard doesn’t block it.  Now that we know how a
 guard works, we can infer that:</p>
-<div align="center" class="align-center"><img alt="_images/guard2.svg" src="_images/guard2.svg" /></div>
+<a class="reference external image-reference" href="_static/guard2.pdf"><div align="center" class="align-center"><img alt="_images/guard2.svg" src="_images/guard2.svg" /></div>
+</a>
 <p>means:</p>
 <ol class="arabic simple">
 <li>When I see a <cite>T</cite> event, ask for permission from the guard to see if it can pass.</li>
@@ -83,7 +85,9 @@ guard works, we can infer that:</p>
 <p>Now that we understand that, let’s re-ask the question:</p>
 <p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
 when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
-<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>Well, if we start in <code class="docutils literal"><span class="pre">s11</span></code>, then we receive a <code class="docutils literal"><span class="pre">T</span></code>, <code class="docutils literal"><span class="pre">s11</span></code> wouldn’t know
+<a class="reference external image-reference" href="_static/scribble.pdf"><div align="center" class="align-center"><img alt="_images/scribble.svg" src="_images/scribble.svg" /></div>
+</a>
+<p>Well, if we start in <code class="docutils literal"><span class="pre">s11</span></code>, then we receive a <code class="docutils literal"><span class="pre">T</span></code>, <code class="docutils literal"><span class="pre">s11</span></code> wouldn’t know
 what to do with <code class="docutils literal"><span class="pre">T</span></code>, so it would pass it out to <code class="docutils literal"><span class="pre">s1</span></code>.  <code class="docutils literal"><span class="pre">s1</span></code> <em>does know</em>
 what to do with <code class="docutils literal"><span class="pre">T</span></code>, it would try to pass it to <code class="docutils literal"><span class="pre">s2</span></code>.</p>
 <p>Ok, now how do we get from <code class="docutils literal"><span class="pre">s11</span></code> to <code class="docutils literal"><span class="pre">s2</span></code>?  We need to exit, <code class="docutils literal"><span class="pre">s11</span></code>,
@@ -102,7 +106,9 @@ to run <code class="docutils literal"><span class="pre">g</span></code> and <cod
 <p>Now that we have a partial answer, let’s re-ask the question:</p>
 <p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
 when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
-<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>If we look at the <code class="docutils literal"><span class="pre">s2</span></code> state, we see that it has an initialization event
+<a class="reference external image-reference" href="_static/scribble.pdf"><div align="center" class="align-center"><img alt="_images/scribble.svg" src="_images/scribble.svg" /></div>
+</a>
+<p>If we look at the <code class="docutils literal"><span class="pre">s2</span></code> state, we see that it has an initialization event
 (black dot) with another function <code class="docutils literal"><span class="pre">d</span></code> hanging on it .  After <code class="docutils literal"><span class="pre">s2</span></code> is
 entered, we would expect the next thing to be a transition into the <code class="docutils literal"><span class="pre">s21</span></code>
 state, but first we would run the <code class="docutils literal"><span class="pre">d</span></code> function on the arrow tied to the black
@@ -122,7 +128,9 @@ Let’s add this to our working theory:</p>
 <h2>Our First Working Hypothesis<a class="headerlink" href="#our-first-working-hypothesis" title="Permalink to this headline">¶</a></h2>
 <p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
 when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
-<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>Ok, our thinking is a bit clearer now but let’s tighten up our answer.  There are
+<a class="reference external image-reference" href="_static/scribble.pdf"><div align="center" class="align-center"><img alt="_images/scribble.svg" src="_images/scribble.svg" /></div>
+</a>
+<p>Ok, our thinking is a bit clearer now but let’s tighten up our answer.  There are
 actually two parts, because the guard can return True or False.  We will start with the
 easy part of the answer, then explain the longer part of the answer:</p>
 <ol class="arabic simple">
@@ -537,7 +545,8 @@ it has received an instruction.</p>
 <span id="scribbleexample-from-diagram-to-code-ninth-pass"></span><h2>Code, Add the guard and t function<a class="headerlink" href="#code-add-the-guard-and-t-function" title="Permalink to this headline">¶</a></h2>
 <p>Now lets add the guard function <code class="docutils literal"><span class="pre">g</span></code> and the <code class="docutils literal"><span class="pre">t</span></code> function into s1_state,
 this will build this part of the picture:</p>
-<div align="center" class="align-center"><img alt="_images/guard.svg" src="_images/guard.svg" /></div>
+<a class="reference external image-reference" href="_static/guard.pdf"><div align="center" class="align-center"><img alt="_images/guard.svg" src="_images/guard.svg" /></div>
+</a>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">+----------------------------- s -------------------------------+</span>
 <span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
@@ -915,7 +924,9 @@ function to <code class="docutils literal"><span class="pre">e_function</span></
 about it again:</p>
 <p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
 when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
-<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>Our answer:
+<a class="reference external image-reference" href="_static/scribble.pdf"><div align="center" class="align-center"><img alt="_images/scribble.svg" src="_images/scribble.svg" /></div>
+</a>
+<p>Our answer:
 <code class="docutils literal"><span class="pre">if</span> <span class="pre">g()</span> <span class="pre">returns</span> <span class="pre">True,</span> <span class="pre">then</span> <span class="pre">the</span> <span class="pre">function</span> <span class="pre">order</span> <span class="pre">will</span> <span class="pre">be:</span></code> <code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code></p>
 <p>Let’s examine my own personal psychological state.  I have been taking tiny
 steps to keep my cognitive load light, and right now I’m feeling pretty good.
@@ -964,7 +975,9 @@ maybe you feel this too.</p>
 <p>Now that we understand that, let’s re-ask the question:</p>
 <p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
 when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
-<img alt="_images/scribble.svg" src="_images/scribble.svg" /><ol class="arabic simple">
+<a class="reference external image-reference" href="_static/scribble.pdf"><div align="center" class="align-center"><img alt="_images/scribble.svg" src="_images/scribble.svg" /></div>
+</a>
+<ol class="arabic simple">
 <li>If g() returns False, only <code class="docutils literal"><span class="pre">g</span></code> is called</li>
 <li>If g() returns True, then <code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>.</li>
 </ol>
@@ -976,7 +989,9 @@ when would each of the functions, <code class="docutils literal"><span class="pr
 see that our observed behavior is an infraction.  The original answer was
 supposed to describe the behavior.  The good news is that this event processor
 algorithm is based on the work of Miros Samek.</p>
-<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>On pages 80-81 of his book titled <a class="reference external" href="https://www.amazon.ca/Practical-UML-Statecharts-Event-Driven-Programming/dp/0750687061/ref=sr_1_1?s=books&amp;ie=UTF8&amp;qid=1510515714&amp;sr=1-1&amp;dpID=51Uq%252BHZ9L-L&amp;preST=_SX198_BO1,204,203,200_QL40_&amp;dpSrc=srch">Practical UML Statecharts in C/C++ Second
+<a class="reference external image-reference" href="_static/scribble.pdf"><div align="center" class="align-center"><img alt="_images/scribble.svg" src="_images/scribble.svg" /></div>
+</a>
+<p>On pages 80-81 of his book titled <a class="reference external" href="https://www.amazon.ca/Practical-UML-Statecharts-Event-Driven-Programming/dp/0750687061/ref=sr_1_1?s=books&amp;ie=UTF8&amp;qid=1510515714&amp;sr=1-1&amp;dpID=51Uq%252BHZ9L-L&amp;preST=_SX198_BO1,204,203,200_QL40_&amp;dpSrc=srch">Practical UML Statecharts in C/C++ Second
 Edition</a> he wrote:</p>
 <blockquote>
 <div><p>One big problem with UML transition sequence is that it requires executing
@@ -1000,9 +1015,13 @@ question and considering how we could approach it the next time we see
 something like it.</p>
 <p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
 when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
-<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>Knowing that the source state of our <code class="docutils literal"><span class="pre">T</span></code> event was <strong>s11</strong> you would first
+<a class="reference external image-reference" href="_static/scribble.pdf"><div align="center" class="align-center"><img alt="_images/scribble.svg" src="_images/scribble.svg" /></div>
+</a>
+<p>Knowing that the source state of our <code class="docutils literal"><span class="pre">T</span></code> event was <strong>s11</strong> you would first
 re-imagine the diagram as:</p>
-<img alt="_images/scribble2.svg" src="_images/scribble2.svg" /><p>Then the answer to the question would just reveal itself from your imagined diagram:</p>
+<a class="reference external image-reference" href="_static/scribble2.pdf"><div align="center" class="align-center"><img alt="_images/scribble2.svg" src="_images/scribble2.svg" /></div>
+</a>
+<p>Then the answer to the question would just reveal itself from your imagined diagram:</p>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code> if <code class="docutils literal"><span class="pre">g</span></code> returns True</li>
 <li><code class="docutils literal"><span class="pre">g</span></code> if <code class="docutils literal"><span class="pre">g</span></code> returns False</li>

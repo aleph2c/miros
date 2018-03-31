@@ -3052,7 +3052,6 @@ information into the snoop stream.  Any snooping horse archer will see this
 information in their debug stream.  This is very useful for seeing what is
 happening across the botnet.
 
-
 .. image:: _static/n_ergotic_mongol_retreat.svg
     :target: _static/n_ergotic_mongol_retreat.pdf
     :align: center

@@ -8,6 +8,7 @@ Simple Posting Example
 ======================
 
 .. image:: _static/posting_example.svg
+    :target: _static/posting_example.pdf
     :align: center
 
 Here we see an active object.  To understand it, lets take the following steps:
@@ -337,6 +338,8 @@ happens if I start this chart in the **middle** state, then what happens if I
 wait about 4 seconds and then send an event named **D**?
 
 .. image:: _static/posting_example.svg
+    :target: _static/posting_example.pdf
+    :align: center
 
 *Hint: I modeled the diagram on a tazor.*
 
@@ -509,6 +512,8 @@ have look like this:
 .. _examples-tazor-example:
 
 .. image:: _static/tazor.svg
+    :target: _static/tazor.pdf
+    :align: center
 
 This diagram is almost topologically the same as the one described at the
 beginning of our :ref:`examples-simple-posting-example`.  The only adjustment

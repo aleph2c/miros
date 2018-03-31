@@ -115,6 +115,7 @@ then let us move on and design the producer:
 .. _producer_design:
 
 .. image:: _static/rabbit_chart_producer_1.svg
+    :target: _static/rabbit_chart_producer_1.pdf
     :align: center
 
 Above we see the UML diagram for the RabbitProducer.  It is mostly just a

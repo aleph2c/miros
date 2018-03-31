@@ -9,6 +9,8 @@ Active Object Example
 =====================
 
 .. image:: _static/simple_example_1.svg
+    :target: _static/simple_example_1.pdf
+    :align: center
 
 In this example we will show how to build the statechart structure described
 above using an `ActiveObject`.  We will then learn how to create some events

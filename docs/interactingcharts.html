@@ -202,7 +202,8 @@ event.  That’s it.</p>
 shared variables.  It is up to you not to busy weight within your state methods
 or callback methods.</p>
 <p>Here is a very simple example:</p>
-<div align="center" class="align-center"><img alt="_images/concurrency1.svg" src="_images/concurrency1.svg" /></div>
+<a class="reference external image-reference" href="_static/concurrency1.pdf"><div align="center" class="align-center"><img alt="_images/concurrency1.svg" src="_images/concurrency1.svg" /></div>
+</a>
 <p>Let’s begin by importing the required libraries:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="hll"><span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">Factory</span>
 </span><span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
@@ -690,7 +691,8 @@ so that we can write the <code class="docutils literal"><span class="pre">BB</sp
 <p>Here start the <code class="docutils literal"><span class="pre">c_chart</span></code> at it’s <code class="docutils literal"><span class="pre">fc</span></code> state and start the <code class="docutils literal"><span class="pre">b_chart</span></code> on
 it’s <code class="docutils literal"><span class="pre">fb</span></code> state, then we post an event with an <code class="docutils literal"><span class="pre">a</span></code> signal to <code class="docutils literal"><span class="pre">chart_b</span></code>.
 Let’s look at the picture again so we can see what should happen.</p>
-<div align="center" class="align-center"><img alt="_images/concurrency1.svg" src="_images/concurrency1.svg" /></div>
+<a class="reference external image-reference" href="_static/concurrency1.pdf"><div align="center" class="align-center"><img alt="_images/concurrency1.svg" src="_images/concurrency1.svg" /></div>
+</a>
 <p>From visual inspection of the <code class="docutils literal"><span class="pre">b_chart</span></code> we would expect an <code class="docutils literal"><span class="pre">a</span></code> signal to
 cause a transition into the <code class="docutils literal"><span class="pre">fb1</span></code> state, then run it’s <code class="docutils literal"><span class="pre">init</span></code> signal.  This
 would cause the <code class="docutils literal"><span class="pre">chart.publish(Event(signal=signals.BB,</span> <span class="pre">payload=&quot;information</span>

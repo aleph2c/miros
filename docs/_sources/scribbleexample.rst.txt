@@ -26,6 +26,7 @@ when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and 
 If you are unfamiliar with UML, this part of the diagram:
 
 .. image:: _static/guard.svg
+    :target: _static/guard.pdf
     :align: center
 
 contains a **guard**.  Specifically, the code:
@@ -42,6 +43,7 @@ diagram, ``t()``, runs if the guard doesn't block it.  Now that we know how a
 guard works, we can infer that:
 
 .. image:: _static/guard2.svg
+    :target: _static/guard2.pdf
     :align: center
 
 means:
@@ -60,6 +62,8 @@ Now that we understand that, let's re-ask the question:
 when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and ``t`` happen?"
 
 .. image:: _static/scribble.svg
+    :target: _static/scribble.pdf
+    :align: center
 
 Well, if we start in ``s11``, then we receive a ``T``, ``s11`` wouldn't know
 what to do with ``T``, so it would pass it out to ``s1``.  ``s1`` *does know*
@@ -83,6 +87,8 @@ Now that we have a partial answer, let's re-ask the question:
 when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and ``t`` happen?"
 
 .. image:: _static/scribble.svg
+    :target: _static/scribble.pdf
+    :align: center
 
 If we look at the ``s2`` state, we see that it has an initialization event
 (black dot) with another function ``d`` hanging on it .  After ``s2`` is
@@ -105,6 +111,8 @@ Our First Working Hypothesis
 when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and ``t`` happen?"
 
 .. image:: _static/scribble.svg
+    :target: _static/scribble.pdf
+    :align: center
 
 Ok, our thinking is a bit clearer now but let's tighten up our answer.  There are
 actually two parts, because the guard can return True or False.  We will start with the
@@ -663,6 +671,7 @@ Now lets add the guard function ``g`` and the ``t`` function into s1_state,
 this will build this part of the picture:
 
 .. image:: _static/guard.svg
+    :target: _static/guard.pdf
     :align: center
 
 .. code-block:: python
@@ -928,6 +937,8 @@ about it again:
 when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and ``t`` happen?"
 
 .. image:: _static/scribble.svg
+    :target: _static/scribble.pdf
+    :align: center
 
 Our answer:
 ``if g() returns True, then the function order will be:`` ``g``, ``a``, ``b``, ``t``, ``c``, ``d``, ``e``
@@ -992,6 +1003,8 @@ Now that we understand that, let's re-ask the question:
 when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and ``t`` happen?"
 
 .. image:: _static/scribble.svg
+    :target: _static/scribble.pdf
+    :align: center
 
 1. If g() returns False, only ``g`` is called
 2. If g() returns True, then ``g``, ``t``, ``a``, ``b``, ``c``, ``d``, ``e``.
@@ -1007,6 +1020,8 @@ supposed to describe the behavior.  The good news is that this event processor
 algorithm is based on the work of Miros Samek.
 
 .. image:: _static/scribble.svg
+    :target: _static/scribble.pdf
+    :align: center
 
 On pages 80-81 of his book titled `Practical UML Statecharts in C/C++ Second
 Edition`_ he wrote:
@@ -1037,11 +1052,15 @@ something like it.
 when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and ``t`` happen?"
 
 .. image:: _static/scribble.svg
+    :target: _static/scribble.pdf
+    :align: center
 
 Knowing that the source state of our ``T`` event was **s11** you would first
 re-imagine the diagram as:
 
 .. image:: _static/scribble2.svg
+    :target: _static/scribble2.pdf
+    :align: center
 
 Then the answer to the question would just reveal itself from your imagined diagram:
 

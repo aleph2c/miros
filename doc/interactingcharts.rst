@@ -192,6 +192,7 @@ or callback methods.
 Here is a very simple example:
 
 .. image:: _static/concurrency1.svg
+    :target: _static/concurrency1.pdf
     :align: center
 
 Let's begin by importing the required libraries:
@@ -579,6 +580,7 @@ it's ``fb`` state, then we post an event with an ``a`` signal to ``chart_b``.
 Let's look at the picture again so we can see what should happen.
 
 .. image:: _static/concurrency1.svg
+    :target: _static/concurrency1.pdf
     :align: center
 
 From visual inspection of the ``b_chart`` we would expect an ``a`` signal to

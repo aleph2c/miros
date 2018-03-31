@@ -49,7 +49,8 @@ also makes it look like the language was made for the problem.</em></p>
 </div></blockquote>
 <div class="section" id="using-and-unwinding-a-factory">
 <span id="towardsthefactoryexample-towards-a-factory"></span><h1>Using and Unwinding a Factory<a class="headerlink" href="#using-and-unwinding-a-factory" title="Permalink to this headline">¶</a></h1>
-<div align="center" class="align-center"><img alt="_images/factory1.svg" src="_images/factory1.svg" /></div>
+<a class="reference external image-reference" href="_static/factory1.pdf"><div align="center" class="align-center"><img alt="_images/factory1.svg" src="_images/factory1.svg" /></div>
+</a>
 <div class="section" id="example-summary">
 <span id="towardsthefactoryexample-example-summary"></span><h2>Example Summary<a class="headerlink" href="#example-summary" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
@@ -108,7 +109,8 @@ than it would be for something that is auto-generated.</p>
 </div>
 <div class="section" id="standard-approach-to-writing-state-methods">
 <span id="towardsthefactoryexample-standard-approach"></span><h2>Standard Approach to Writing State Methods<a class="headerlink" href="#standard-approach-to-writing-state-methods" title="Permalink to this headline">¶</a></h2>
-<div align="center" class="align-center"><img alt="_images/factory1.svg" src="_images/factory1.svg" /></div>
+<a class="reference external image-reference" href="_static/factory1.pdf"><div align="center" class="align-center"><img alt="_images/factory1.svg" src="_images/factory1.svg" /></div>
+</a>
 <p>To create the above diagram we would define three state methods, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">c1</span></code>
 and <code class="docutils literal"><span class="pre">c2</span></code> and an active object.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
@@ -222,7 +224,8 @@ managers that the answers are made.</p>
 object so that these context managers have something to answer with we can use the
 <code class="docutils literal"><span class="pre">register_signal_callback</span></code> and the <code class="docutils literal"><span class="pre">register_parent</span></code> of the active object.</p>
 <p>Things should become a bit clearer with an example, reconsider our previous design:</p>
-<div align="center" class="align-center"><img alt="_images/factory3.svg" src="_images/factory3.svg" /></div>
+<a class="reference external image-reference" href="_static/factory3.pdf"><div align="center" class="align-center"><img alt="_images/factory3.svg" src="_images/factory3.svg" /></div>
+</a>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">tc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 
@@ -372,7 +375,8 @@ it with some instrumentation.</p>
 event callbacks and parent states.</p>
 <p>Let’s re-create our example, this time using this <code class="docutils literal"><span class="pre">state_method_template</span></code>
 method:</p>
-<div align="center" class="align-center"><img alt="_images/factory4.svg" src="_images/factory4.svg" /></div>
+<a class="reference external image-reference" href="_static/factory4.pdf"><div align="center" class="align-center"><img alt="_images/factory4.svg" src="_images/factory4.svg" /></div>
+</a>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># create the specific behavior we want in our state chart</span>
 <span class="k">def</span> <span class="nf">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
@@ -444,7 +448,8 @@ methods, but it also extends the other API with <code class="docutils literal"><
 <code class="docutils literal"><span class="pre">register_parent</span></code> described in the <a class="reference internal" href="#towardsthefactoryexample-registering-a-parent-to-a-state-method"><span class="std std-ref">previous
 section</span></a>
 making syntax that is a bit more concise.</p>
-<div align="center" class="align-center"><img alt="_images/factory5.svg" src="_images/factory5.svg" /></div>
+<a class="reference external image-reference" href="_static/factory5.pdf"><div align="center" class="align-center"><img alt="_images/factory5.svg" src="_images/factory5.svg" /></div>
+</a>
 <p>Here is how you could implement this statechart with the <code class="docutils literal"><span class="pre">Factory</span></code> class:</p>
 <div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
@@ -547,7 +552,8 @@ see their code.  If you find that you have an issue with such a state method, yo
 can unwind it into flat code using the <code class="docutils literal"><span class="pre">to_code</span></code> method.  This method outputs a
 string that you can use as a hand written state method.</p>
 <p>In the following example, I’ll show how we can ‘unwind’ a design.</p>
-<div align="center" class="align-center"><img alt="_images/factory4.svg" src="_images/factory4.svg" /></div>
+<a class="reference external image-reference" href="_static/factory4.pdf"><div align="center" class="align-center"><img alt="_images/factory4.svg" src="_images/factory4.svg" /></div>
+</a>
 <p>First we repeat the work of the last section:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># create the specific behavior we want in our state chart</span>
 <span class="k">def</span> <span class="nf">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>

@@ -10,6 +10,7 @@ Using and Unwinding a Factory
 =============================
 
 .. image:: _static/factory1.svg
+    :target: _static/factory1.pdf
     :align: center
 
 .. _towardsthefactoryexample-example-summary:
@@ -84,6 +85,7 @@ Standard Approach to Writing State Methods
 ------------------------------------------
 
 .. image:: _static/factory1.svg
+    :target: _static/factory1.pdf
     :align: center
 
 To create the above diagram we would define three state methods, ``c``, ``c1``
@@ -216,6 +218,7 @@ object so that these context managers have something to answer with we can use t
 Things should become a bit clearer with an example, reconsider our previous design:
 
 .. image:: _static/factory3.svg
+    :target: _static/factory3.pdf
     :align: center
 
 
@@ -389,6 +392,7 @@ Let's re-create our example, this time using this ``state_method_template``
 method:
 
 .. image:: _static/factory4.svg
+    :target: _static/factory4.pdf
     :align: center
 
 .. code-block:: python
@@ -472,6 +476,7 @@ section<towardsthefactoryexample-registering-a-parent-to-a-state-method>`
 making syntax that is a bit more concise.
 
 .. image:: _static/factory5.svg
+    :target: _static/factory5.pdf
     :align: center
 
 Here is how you could implement this statechart with the ``Factory`` class:
@@ -551,6 +556,7 @@ string that you can use as a hand written state method.
 In the following example, I'll show how we can 'unwind' a design.
 
 .. image:: _static/factory4.svg
+    :target: _static/factory4.pdf
     :align: center
 
 First we repeat the work of the last section:
