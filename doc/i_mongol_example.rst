@@ -2796,47 +2796,43 @@ the battle HSM:
 .. image:: _static/n_ergotic_mongol_2.svg
     :align: center
 
-The classes that linger above our battle statechart and the empathy HSM are
-containers of features that these behavioral maps will need access to, to work.
-The names of these methods and features are not expressed on the diagram.  They
-are assumed.
+The named methods in the HorserArcher and OtherHorseArcher classes represent
+code that used to exist in the HSMs:  Upon scanning the design, I noticed there
+was a lot of code repetition.  To DRY my Python up, while also simplifying the
+diagram, I thought of names for what the different snippets of code were doing,
+then wrapped those pieces of code into their own methods.
 
-The named methods on the HorseArcher and OtherHorseArcher classes were made from
-common code that appeared over and over again in the battle statechart and the
-empathy HSM.  To simplify the diagrams and to DRY up the design; the common code
-was named and then sucked up into the class as a set of methods.  More will be
-said about the details of these methods later in the section.
+The HorseArcher class provides a static method, ``HorseArcher.get_name``, to
+construct a horse archer name.  Previously, we were going to reference the other
+horse archer's by their IP addresses.  If we did that, we could not run more
+than one horse archer process per machine without breaking the design.  I don't
+have ten computers in my LAN; so I will have to test multiple processes per
+device confirm that the design is working.  The ``HorseArcher.get_name`` static
+method will provide *unique* names so that we can create horse archers on the
+same machine or different machines across the network.
 
-We also see that the HorseArcher provides a static method to construct a horse archer
-name.  This is different from how we imagined things before, we were going to
-reference the other horse archer's by their IP addresses.  If we did that, we
-could not run more than one horse archer process per machine without breaking the
-design.  I don't have ten machines in my LAN; so I will have to test multiple
-processes per machine to get the design working.  The HorseArcher.get_name
-static method will provide unique names so that we can create horse archers on
-the same machine or across the network.
+Now let's talk about the battle statechart.  Things have become quite
+complicated, and we are starting to face the limitations of the Umlet tool used
+to describe our picture.  The diagram is too big to fit on this page, so we
+compact a large part of it into the deceit_in_detail substate glyph.  This
+means, there is something else here, but we have hidden it from view.  We will
+talk about it soon enough.
 
-Now let's talk about the battle statechart.  Things have become quite complex,
-and we are starting to face the limitations of the Umlet tool used to describe
-our picture.  The diagram is too big to fit on this page, so we compact a large
-part of it into the deceit_in_detail statechart abstraction glyph.  This
-basically means, there is something else here, but we have hidden it from view.
+Let's look at the exposed parts of the networked battle statechart.
 
-The first thing our horse archer will do when they begin battle is to yell out
-that they have arrived on the field.  This is done with the
-Other_Arrival_On_Field event. The horse archer will provide it's name as the
-payload to this event.  As a convention I will pre-pend 'Other' in front of any
-event intended to be sent on the network.  By doing this, our debug information
-will be less confusing.
+We see that the first thing our horse archer will do when they begin battle is
+to yell out that they have arrived on the field.  They yell the
+Other_Arrival_On_Field event using their name as a payload.
+
+As a convention, I will pre-pend 'Other' in front of any event that is intended
+to be sent out over the mesh.  By doing this, our system will be a lot easier to
+debug.
 
 Our statechart is ergotic; so not only does it need to yell out events it must
-also receive those same events from others in the mesh network.  We see what a
-horse archer does when it hears another yell out that they have arrived.  There
-is a Other_Arrival_On_Field hook which calls the ``add_member_if_needed``
-method.  The name of the other horse archer is in the payload.
-
-Let's look inside of the ``add_member_if_needed`` and see what a horse archer
-does when he hears his brethren arrive on the battle field.
+also receive those same events from others in the mesh.  We see what a horse
+archer does when it hears another has arrived on the field: there is an
+Other_Arrival_On_Field event hook, which calls the ``add_member_if_needed``
+method:
 
 .. code-block:: python
   
@@ -2847,37 +2843,63 @@ does when he hears his brethren arrive on the battle field.
         oha.start_at(not_waiting)
         self.others[other_archer_name] = oha
 
-He checks to see if he is just listening to himself and if he can identify a
-name with the shout.  Then he checks to see if he is already mentally tracking
-this person is his collection of 'others'.  If this person doesn't exist inside
-of his notion of his unit, he creates an empathy object for them using their
-name, starts it then adds this object to his 'others' data dictionary, using
-that other horse archer's name as the key to access their empathy.
+Consider what a horse archer does when his ``add_member_if_needed`` method is
+called.
 
-Full deceit in detail chart to work in N instances:
+He checks to see if he is just listening to himself and if he can identify a
+name within the shout.  Then he checks to see if he is already mentally tracking
+this person in his collection of 'others'.  If he wasn't already thinking about
+this person as being a part of his unit, he creates an empathy object for them,
+starts it up then adds this object to his 'others' data dictionary.
+
+With this method, there is no limit to the size of a horse archer unit.  Also,
+the horse archers don't need to know about each other before they begin to fight
+as a team.  Their shared mesh encryption key is enough for them to know that they
+are intended to work together.
+
+Now let's look at the networked deceit_in_detail part of the battle statechart:
 
 .. image:: _static/n_ergotic_mongol_3.svg
     :align: center
 
-Something compacted and legible:
+The map has gotten too big.  So we will break it into five different diagrams
+and talk about the new parts of the design in each region.
+
+First, we look at the deceit_in_detail state:
 
 .. image:: _static/n_ergotic_mongol_4.svg
     :align: center
 
-Empathy reconsidered:
+The horse archer must send various events into his empathy HSMs so he can track
+what his unit is doing.  This code which used to be peppered all over the previous
+version of the statechart is now wrapped up into two different HorseArcher
+methods, ``dispatch_to_all_empathy`` and ``dispatch_to_empathy``.
+
+On the diagram we see that there are two patterns that will help us avoid making
+mistakes.  The events that are intended for our local consumption, like the
+Advance_War_Cry and the Retreat_War_Cry need to be sent to all empathy
+statecharts.  The events that have been received from another horse archer only
+go to that horse archer's empathy HSM.
+
+But what signals need to be fed into these empathy methods?
+
+To answer that, we look at the empathy HSM diagram:
 
 .. image:: _static/empathy_1.svg
     :align: center
 
+The pattern described on the previous diagram will save us from getting lost in
+details.  All ``Other`` pre-pended events in the above empathy diagram need to
+use the ``dispatch_to_empathy`` method when referenced anywhere in the
+deceit_in_detail statechart.  Likewise all personal events, like the
+Advance_War_Cry and the Retreat_War_Cry need to use the
+``dispatch_to_all_empathy`` methods.  By generalizing our thinking, imposing
+simple rules and following these rules we can save ourselves from adding bugs to
+our design.
+
+Let's look at how ``dispatch_to_empathy`` method works.
 
 .. code-block:: python
-  :emphasize-lines: 1
-  :linenos:
-
-  def dispatch_to_all_empathy(self, event):
-    for name, other in self.others.items():
-      self.add_member_if_needed(name)
-      other.dispatch(event)
 
   def dispatch_to_empathy(self, event, other_archer_name=None):
     if other_archer_name is None:
@@ -2886,15 +2908,69 @@ Empathy reconsidered:
       self.add_member_if_needed(other_archer_name)
       self.others[other_archer_name].dispatch(event)
 
-Advance and Circle and Fire:
+The method determines what the name of the other horse archer is.  If it hasn't
+heard from this horse archer before, it is added to the ``others`` object.
+Then, because our empathy HSM doesn't have it's own thread, we call its
+``dispatch`` method.
+
+The ``dispatch_to_all_empathy`` is even simpler:
+
+.. code-block:: python
+
+  def dispatch_to_all_empathy(self, event):
+    for name, other in self.others.items():
+      other.dispatch(event)
+
+We iterate over all of the empathy objects and dispatch the event into them.
+
+Now let's look at the networked advance and circle_and_fire part of the design:
 
 .. image:: _static/n_ergotic_mongol_advance.svg
     :align: center
 
-To test the orthogonal component:
+We see some new things here, first, we yell out when we enter the state.  It
+would be simple to create infinite oscillations between our networked
+statecharts if one were to yell out, only to have another yell out which would
+cause us to yell out again.  Next thing you know,  we are 
+`attacked by smurfs <https://www.cloudflare.com/learning/ddos/smurf-ddos-attack/>`_.
+
+To avoid this kind of trouble I follow a general heuristic, I place these kinds
+of broadcast messages into the entry state where they belong.  For instance, it
+is truthful for this horse archer to yell that he is advancing to all other
+members of his team at the entry point of this advance state.  By doing things
+this way, we can hook these broadcast messages in the same state that they
+originate from, to stop them from escaping out into the outer parts of the chart
+where they might trigger an oscillation avalanche.  See how we have the
+Other_Advance_War_Cry hook linking this call to the empathy chart, while still
+stopping it from propagating outward?  
+
+If you look back at the deceit in detail part of the design, you will see that
+the Other_Advance_War_Cry will cause us to enter this state.  This means that if
+we hear someone else shout out an Other_Advance_War_Cry while we aren't
+advancing, will yell out our own Other_Advance_War_Cry, but we will only do this
+once.
+
+The second new thing we see in this design is an innocuous little comment,
+``orthogonal component debug code here``.  The orthogonal component pattern was
+invented by Miro Samek to be a faster, drop-in replacement of the orthogonal
+region pattern imagined by David Harel.  We are using the orthogonal component
+pattern to build unit empathy.  The only problem is that the instrumentation
+within these orthogonal HSMs is not included in the trace and spy information of
+the main battle statechart.  So our empathy orthogonal component information is
+in the dark.
+
+How will we know if it works?
+
+Well, we can just print it's trace information onto the screen every time a
+horse archer finishes a loop.  But there might be lots of horse archers, how
+will we know if they all work as they were intended?  We will test
+the first one.  If it works, we can have confidence that the others will work
+too.
+
+Here is some orthogonal component debug code that could be put into the
+'advance' state's entry condition to test to see if our empathy design works:
 
 .. code-block:: python
-  :linenos:
 
   # in the advance entry state
   if len(archer.others) >= 1:
@@ -2902,13 +2978,47 @@ To test the orthogonal component:
     print(archer.others[first_name_of_others].trace())
     archer.others[first_name_of_others].clear_trace()
 
+The above code will only run if there is another horse archer in the mesh.  We
+get the first empathy orthogonal component.  We print it's trace information to
+the screen, then we clear it's trace log so that we will only capture the next
+loop's empathy information when we print it out on the next pass.
 
-Skirmish and Ready for Retreat
+Now let's look at the networked Skirmish and Ready for Retreat states:
 
 .. image:: _static/n_ergotic_mongol_skirmish.svg
     :align: center
 
-Skirmish and Ready for Retreat
+In the entry states of the skirmish and waiting_to_lure states, we see that the
+horse archer yells out to the mesh.
+
+The Other_Skirmish_War_Cry follows a very similar pattern as to the
+Other_Advance_War_Cry event in the advanced state:  The 'Other' call is made in
+the state's entry condition, caught as a hook in that same state and used to cause a
+transition into this state from an outside state.
+
+This pattern is broken with the Other_Retreat_Ready_War_Cry in the
+waiting_to_lure state.  This is because the Other_Retreat_Ready_War_Cry is not
+intended to force the archers to race one another around the field.  Instead, it
+is used to let all of the other archers know that another archer is waiting.  If
+you look out to the deceit_in_detail chart, you will see that there is a hook
+for this signal which will feed the empathy statechart tracking the archer that
+made the call.
+
+The whole point of the global tactic is happening in this part of the map, we
+are trying to lure a knight.  When a horse archer's ammunition runs low, he makes a
+Retreat_Ready_War cry.  Upon reacting to this event, he reflects upon all of his
+living teammates to determine if they are all waiting for him.  If they are he
+will still enter the waiting to lure state, but for a shorter period than he
+would if there was another team member was still skirmishing.   In this way he
+isn't a coward, he joins his brethren in the dangerous waiting_to_lure state.
+
+We see something else here, when the Officer_Lured event occurs, the archer
+calls the ``snoop_scribble`` method with "Knight Charging".  This will put this
+information into the snoop stream.  Any snooping horse archer will see this
+information in their debug stream.  This is very useful for seeing what is
+happening across the botnet.
+
+
 
 .. image:: _static/n_ergotic_mongol_retreat.svg
     :align: center

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="14.2">
-  <zoom_level>7</zoom_level>
+  <zoom_level>9</zoom_level>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>308</x>
-      <y>140</y>
-      <w>504</w>
-      <h>700</h>
+      <x>369</x>
+      <y>27</y>
+      <w>648</w>
+      <h>900</h>
     </coordinates>
-    <panel_attributes>*kkirmish*
+    <panel_attributes>*skirmish*
 --
 entry /
   archer.yell(
@@ -50,10 +50,10 @@ fg=black</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>539</x>
-      <y>511</y>
-      <w>259</w>
-      <h>308</h>
+      <x>666</x>
+      <y>504</y>
+      <w>333</w>
+      <h>396</h>
     </coordinates>
     <panel_attributes>*waiting_to_lure*
 --
@@ -94,10 +94,10 @@ fg=black</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>301</x>
-      <y>567</y>
-      <w>252</w>
-      <h>28</h>
+      <x>360</x>
+      <y>576</y>
+      <w>324</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 
@@ -107,10 +107,10 @@ fg=black</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>308</x>
-      <y>539</y>
-      <w>224</w>
-      <h>63</h>
+      <x>369</x>
+      <y>540</y>
+      <w>288</w>
+      <h>81</h>
     </coordinates>
     <panel_attributes>Ammunition_Low / 
  chart.post_fifo(
@@ -122,10 +122,10 @@ fg=black</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>301</x>
-      <y>644</y>
-      <w>252</w>
-      <h>189</h>
+      <x>360</x>
+      <y>675</y>
+      <w>324</w>
+      <h>243</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 
@@ -136,10 +136,10 @@ fg=black</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>308</x>
-      <y>588</y>
-      <w>224</w>
-      <h>231</h>
+      <x>369</x>
+      <y>603</y>
+      <w>288</w>
+      <h>297</h>
     </coordinates>
     <panel_attributes>Retreat_Ready_War_Cry /
   ready = True
@@ -169,15 +169,15 @@ fg=black</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>567</x>
-      <y>252</y>
-      <w>245</w>
-      <h>56</h>
+      <x>702</x>
+      <y>171</y>
+      <w>315</w>
+      <h>72</h>
     </coordinates>
     <panel_attributes>Officer_Lured /
   archer.snoop_scribble("Knight Charging")
   archer.post_fifo(
-    Event(signal=signals.Retreate_Ready_War_Cry))
+    Event(signal=signals.Retreat_War_Cry))
 style=wordwrap
 fg=black</panel_attributes>
     <additional_attributes/>
@@ -185,14 +185,136 @@ fg=black</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>602</x>
-      <y>301</y>
-      <w>224</w>
-      <h>224</h>
+      <x>747</x>
+      <y>234</y>
+      <w>288</w>
+      <h>288</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 
 fg=black</panel_attributes>
     <additional_attributes>300.0;10.0;10.0;10.0;10.0;210.0;110.0;210.0;110.0;300.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>117</x>
+      <y>162</y>
+      <w>162</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=.
+&lt;&lt;state pattern&gt;
+Multichart Race
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>243</x>
+      <y>63</y>
+      <w>144</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;120.0;140.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>198</x>
+      <y>207</y>
+      <w>27</w>
+      <h>261</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;270.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>243</x>
+      <y>198</y>
+      <w>144</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>140.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>153</x>
+      <y>450</y>
+      <w>342</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>Other_Skirmish_War_Cry as e /
+  archer.dispatch_to_empathy(e)
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>153</x>
+      <y>486</y>
+      <w>234</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;240.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>1035</x>
+      <y>477</y>
+      <w>162</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=.
+&lt;&lt;state pattern&gt;
+Multichart Pend
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>945</x>
+      <y>513</y>
+      <w>135</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;50.0;130.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1026</x>
+      <y>558</y>
+      <w>216</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes># Outer state hook:
+Other_Retreat_Ready_War_Cry
+  archer.dispatch_to_empathy(e)
+
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1098</x>
+      <y>522</y>
+      <w>63</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;40.0;50.0;10.0</additional_attributes>
   </element>
 </diagram>
