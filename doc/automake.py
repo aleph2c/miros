@@ -11,7 +11,6 @@ import watchdog.observers
 with open("automakeconfig.yaml") as f:
   config = yaml.load(f)
 
-
 class Handler(watchdog.events.PatternMatchingEventHandler):
 
   def __init__(self):
