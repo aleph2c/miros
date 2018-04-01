@@ -3269,10 +3269,18 @@ information in their debug stream.  This is very useful for seeing what is
 happening across the botnet.</p>
 <a class="reference external image-reference" href="_static/n_ergotic_mongol_retreat.pdf"><div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_retreat.svg" src="_images/n_ergotic_mongol_retreat.svg" /></div>
 </a>
-<p>Marshal</p>
+<p>We see the multichart race pattern pattern again applied to the
+Other_Ready_War_Cry.  An outer state will catch this signal and transition into
+the feigned_retreat state; the entry condition of the feigned_retreat issues the
+Other_Retreat_War_Cry and their is a hook to ensure that we only do this once.</p>
 <a class="reference external image-reference" href="_static/n_ergotic_mongol_marshal.pdf"><div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_marshal.svg" src="_images/n_ergotic_mongol_marshal.svg" /></div>
 </a>
-<p>Diagrams should be present</p>
+<p>The marshal state has a lot of topological similarities with the skirmish state.
+Both of these states hold a pending state, so it is no surprise that we see the
+Mulitchart pending pattern within the marshal state.  When a horse archer enters
+the waiting_to_advance state, they yell out their Other_Ready_War_Cry.  An outer
+state hooks this cry coming from other members; using the information to update
+the empathy chart for whomever made the call.</p>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
 

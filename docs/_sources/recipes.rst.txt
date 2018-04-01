@@ -105,6 +105,7 @@ state method's can be used by many different event processors, they're
 polyamorous:
 
 .. image:: _static/eventprocessors.svg
+    :target: _static/eventprocessors.pdf
     :align: center
 
 In the diagram above we see that two different active objects can use the same
@@ -159,6 +160,7 @@ To make an arrow is fairly straight forward.  You just use the ``trans``
 method with your target state as an argument.  This is easy to code.
 
 .. image:: _static/stateapplicationcode3.svg
+    :target: _static/stateapplicationcode3.pdf
     :align: center
 
 To describe the hierarchy is a little bit more subtle.
@@ -172,6 +174,7 @@ react to, to the next-outer-most-state.  In this ``else`` clause it:
 2.  return the value of ``return_status.SUPER``
 
 .. image:: _static/stateapplicationcode1.svg
+    :target: _static/stateapplicationcode1.pdf
     :align: center
 
 For the outermost state of your state chart you set the parent  to ``self.top``.
@@ -182,6 +185,7 @@ If your parent state isn't the outer most state, you would just set the
 ``self.temp.fun`` to whatever state is:
 
 .. image:: _static/stateapplicationcode2.svg
+    :target: _static/stateapplicationcode2.pdf
     :align: center
 
 Now that we understand how state methods relate to each other and to event
@@ -189,6 +193,7 @@ processors let's look at a simple example to see how the pictures relate to
 working code.
 
 .. image:: _static/eventprocessors.svg
+    :target: _static/eventprocessors.pdf
     :align: center
 
 First you would describe state's ``c``, ``c1`` and ``c2``:
@@ -653,6 +658,7 @@ clause) returned ``return_status.HANDLED``.  Upon seeing this value, the event
 processor determined that no transition is needed and it stopped running.
 
 .. image:: _static/hook1.svg
+    :target: _static/hook1.pdf
     :align: center
 
 In this way hook code is run in the search phase of the search-then-transition
@@ -676,6 +682,7 @@ returns an ``UNHANDLED`` status.  This causes the event processor, to query it
 again to find its parent, then dispatch the event to that state method.
 
 .. image:: _static/catchandrelease1.svg
+    :target: _static/catchandrelease1.pdf
     :align: center
 
 Here we create the state in the picture, notice that ``inner`` and ``middle``
@@ -761,6 +768,7 @@ transition between two states if a condition is true.  This is called a guard,
 in UML it looks like this:
 
 .. image:: _static/guard.svg
+    :target: _static/guard.pdf
     :align: center
 
 The logic between the square brackets must be true for this event to work.  In
@@ -802,6 +810,7 @@ To have the library create your state methods for you:
 
 
 .. image:: _static/factory2.svg
+    :target: _static/factory2.pdf
     :align: center
 
 .. _recipes-template-1:
@@ -910,6 +919,7 @@ To have the library create your state methods for you:
 7. :ref:`Debugging a state method made from a factory<recipes-factory-7>`
 
 .. image:: _static/factory5.svg
+    :target: _static/factory5.pdf
     :align: center
 
 .. _recipes-factory-1:

@@ -3056,13 +3056,22 @@ happening across the botnet.
     :target: _static/n_ergotic_mongol_retreat.pdf
     :align: center
 
-Marshal
+We see the multichart race pattern pattern again applied to the
+Other_Ready_War_Cry.  An outer state will catch this signal and transition into
+the feigned_retreat state; the entry condition of the feigned_retreat issues the
+Other_Retreat_War_Cry and their is a hook to ensure that we only do this once.
+
 
 .. image:: _static/n_ergotic_mongol_marshal.svg
     :target: _static/n_ergotic_mongol_marshal.pdf
     :align: center
 
-Diagrams should be present
+The marshal state has a lot of topological similarities with the skirmish state.
+Both of these states hold a pending state, so it is no surprise that we see the
+Mulitchart pending pattern within the marshal state.  When a horse archer enters
+the waiting_to_advance state, they yell out their Other_Ready_War_Cry.  An outer
+state hooks this cry coming from other members; using the information to update
+the empathy chart for whomever made the call.
 
 .. _ergotic_mongol_11: https://aleph2c.github.io/miros/_static/ergotic_mongol_11.pdf
 .. _ergotic_mongol_12: https://aleph2c.github.io/miros/_static/ergotic_mongol_12.pdf

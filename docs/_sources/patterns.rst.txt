@@ -95,6 +95,7 @@ your :term:`client code<Client Code>` and returns the ``return_state.HANDLED``
 value.
 
 .. image:: _static/ultimate_hook1.svg
+    :target: _static/ultimate_hook1.pdf
     :align: center
 
 Here is a simple example which demonstrates a hook.  In this example we will
@@ -159,6 +160,7 @@ we see the result of this in the :ref:`spy<recipes-using-the-spy>` log.
 Furthermore, no state transition occurred.
 
 .. image:: _static/ultimate_hook2.svg
+    :target: _static/ultimate_hook2.pdf
     :align: center
 
 Now suppose we add another state within the outer state and start our active
@@ -226,6 +228,7 @@ Ok, no surprises.  The inner_state hooked the BEHAVIOR_NAME signal and
 ran some :term:`client code<Client Code>`.
 
 .. image:: _static/ultimate_hook3.svg
+    :target: _static/ultimate_hook3.pdf
     :align: center
 
 Now let's remove the handling of the BEHAVIOR_NAME from our
@@ -315,6 +318,7 @@ most state contains the ultimate hook; this is why the :term:`pattern<Pattern>` 
 it is.
 
 .. image:: _static/ultimate_hook4.svg
+    :target: _static/ultimate_hook4.pdf
     :align: center
 
 .. note::
@@ -335,6 +339,7 @@ specifically handle the event in their state methods.
 
 
 .. image:: _static/ultimate_hook5.svg
+    :target: _static/ultimate_hook5.pdf
     :align: center
 
 You would place generic reactions to events in your outer states and place the
@@ -475,6 +480,7 @@ We will begin with some specifications:
 Here is a first shot at implementing this specification:
 
 .. image:: _static/reminder1.svg
+    :target: _static/reminder1.pdf
     :align: center
 
 We create a polling state which upon entry poles something.  Any time there is
@@ -613,17 +619,20 @@ PROCESS event:
 Now that we know how to do that let's redesign our statechart:
 
 .. image:: _static/reminder2.svg
+    :target: _static/reminder2.pdf
     :align: center
 
 This introduces a new :term:`glyph<Pseudostate>` called the final state:
 
 .. image:: _static/reminder3.svg
+    :target: _static/reminder3.pdf
     :align: center
 
 When you see this :term:`glyph<Pseudostate>` on a diagram it means, stop running.  So:
 
 
 .. image:: _static/reminder4.svg
+    :target: _static/reminder4.pdf
     :align: center
 
 Would look like this as code:
@@ -659,6 +668,7 @@ our specification and our proposed design, then implement it in code:
   polling mode.
 
 .. image:: _static/reminder2.svg
+    :target: _static/reminder2.pdf
     :align: center
 
 Here is the code for this design with highlights for the :term:`artificial
@@ -841,6 +851,7 @@ Lets introduce the reminder :term:`pattern<Pattern>` with a new design:
 .. _patterns-reminder-here:
 
 .. image:: _static/reminder6.svg
+    :target: _static/reminder6.pdf
     :align: center
 
 Let's discuss this diagram.
@@ -1038,6 +1049,7 @@ our statechart when it's timing is more convenient.
 
 
 .. image:: _static/deferred1.svg
+    :target: _static/deferred1.pdf
     :align: center
 
 Here is an example of a chart using the deferred event :term:`pattern<Pattern>`.  
@@ -1080,6 +1092,7 @@ use the spy and scribble when timed events hit the chart.
 Now let's redraw the diagram and then write it's code:
 
 .. image:: _static/deferred1.svg
+    :target: _static/deferred1.pdf
     :align: center
 
 .. code-block:: python
@@ -1371,6 +1384,7 @@ formalism needs to capture requirements like "[The] gearbox change of state is
 'orthogonal region':
 
 .. image:: _static/orthogonal_region1.svg
+    :target: _static/orthogonal_region1.pdf
     :align: center
 
 The two different areas in the above chart separated by the dotted line are
@@ -1570,6 +1584,7 @@ we define it as this:
 Here is the high level UML class diagram for our approach:
 
 .. image:: _static/orthogonal_region3.svg
+    :target: _static/orthogonal_region3.pdf
     :align: center
 
 The FusionReactor class will be a subclass of the Factory.  It will aggregate
@@ -1594,6 +1609,7 @@ implement the 255 pistons.  Instead of having a separate piston_active
 just one :term:`HSM<Hsm>` and share it between all of them. (saving on memory)
 
 .. image:: _static/orthogonal_region4.svg
+    :target: _static/orthogonal_region4.pdf
     :align: center
 
 Let's start writing the code.  Here is the Piston Class:
@@ -1759,6 +1775,7 @@ Now that we can build and run a piston, let's design the FusionReactor class
 that it belongs to:
 
 .. image:: _static/orthogonal_region5.svg
+    :target: _static/orthogonal_region5.pdf
     :align: center
 
 From a high level, the FusionReactor is a subclass of the
@@ -1776,6 +1793,7 @@ through all of the pistons, injecting each of them with the TIME_OUT
 look at it's state chart:
 
 .. image:: _static/orthogonal_region4.svg
+    :target: _static/orthogonal_region4.pdf
     :align: center
 
 So what happens with the first TIME_OUT event?  We see from inspection that
@@ -1811,6 +1829,7 @@ The piston behavior described above is shared by all of the fusion pistons.
 Now that we understand how they work let's look at the fusion reactor again:
 
 .. image:: _static/orthogonal_region5.svg
+    :target: _static/orthogonal_region5.pdf
     :align: center
 
 We were talking about the pending_on_pistons TIME_OUT event handler prior to
@@ -2004,6 +2023,7 @@ diagram, then I'll write some documentation that I would post to the General
 Fusion wiki so that other people could understand my code.
 
 .. image:: _static/orthogonal_region5.svg
+    :target: _static/orthogonal_region5.pdf
     :align: center
 
 .. code-block:: python
@@ -2054,6 +2074,7 @@ it's design diagram.  Then I'll add the comments I would use to describe this
 design to the rest of engineering.
 
 .. image:: _static/orthogonal_region4.svg
+    :target: _static/orthogonal_region4.pdf
     :align: center
 
 .. code-block:: python
@@ -2475,6 +2496,7 @@ To describe this pattern I will re-use the toaster oven example.  If you have re
 Miro Samek's book this should seem familiar because it is his.  
 
 .. image:: _static/history_1.svg
+    :target: _static/history_1.pdf
     :align: center
 
 In the above design we see that we have built a ToasterOven class which inherits
@@ -2519,6 +2541,7 @@ syntactical convenience.
 Here is how you can add deep history to your toaster oven:
 
 .. image:: _static/history_2.svg
+    :target: _static/history_2.pdf
     :align: center
 
 When we enter baking, toasting or off we just take it's state method and store

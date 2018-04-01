@@ -124,7 +124,8 @@ pass.  It always searches them as it reacts to whatever event you have provided
 it.  So, your design is discovered as the event processor reacts to events.  Your
 state method’s can be used by many different event processors, they’re
 polyamorous:</p>
-<div align="center" class="align-center"><img alt="_images/eventprocessors.svg" src="_images/eventprocessors.svg" /></div>
+<a class="reference external image-reference" href="_static/eventprocessors.pdf"><div align="center" class="align-center"><img alt="_images/eventprocessors.svg" src="_images/eventprocessors.svg" /></div>
+</a>
 <p>In the diagram above we see that two different active objects can use the same
 statechart structure.  Each active object can be in a different state, even
 though they are using the same diagram.   <code class="docutils literal"><span class="pre">ao1</span></code> starts it’s interpretation of
@@ -167,7 +168,8 @@ need to take your picture and turn it into code.  This is done by writing one
 state method at a time; linking them together with hierarchy and arrows.</p>
 <p>To make an arrow is fairly straight forward.  You just use the <code class="docutils literal"><span class="pre">trans</span></code>
 method with your target state as an argument.  This is easy to code.</p>
-<div align="center" class="align-center"><img alt="_images/stateapplicationcode3.svg" src="_images/stateapplicationcode3.svg" /></div>
+<a class="reference external image-reference" href="_static/stateapplicationcode3.pdf"><div align="center" class="align-center"><img alt="_images/stateapplicationcode3.svg" src="_images/stateapplicationcode3.svg" /></div>
+</a>
 <p>To describe the hierarchy is a little bit more subtle.</p>
 <p>All state methods must reveal their parent information.  They do this by using
 an if-elif-else and placing the parent information in the <code class="docutils literal"><span class="pre">else</span></code> clause.  It
@@ -177,17 +179,20 @@ react to, to the next-outer-most-state.  In this <code class="docutils literal">
 <li>sets <code class="docutils literal"><span class="pre">self.temp.fun</span></code> of the event processor to point to it’s parent state method</li>
 <li>return the value of <code class="docutils literal"><span class="pre">return_status.SUPER</span></code></li>
 </ol>
-<div align="center" class="align-center"><img alt="_images/stateapplicationcode1.svg" src="_images/stateapplicationcode1.svg" /></div>
+<a class="reference external image-reference" href="_static/stateapplicationcode1.pdf"><div align="center" class="align-center"><img alt="_images/stateapplicationcode1.svg" src="_images/stateapplicationcode1.svg" /></div>
+</a>
 <p>For the outermost state of your state chart you set the parent  to <code class="docutils literal"><span class="pre">self.top</span></code>.
 This state method is actually defined within the event processor and when it
 sees this state it knows that it is about to fall of the edge of your map.</p>
 <p>If your parent state isn’t the outer most state, you would just set the
 <code class="docutils literal"><span class="pre">self.temp.fun</span></code> to whatever state is:</p>
-<div align="center" class="align-center"><img alt="_images/stateapplicationcode2.svg" src="_images/stateapplicationcode2.svg" /></div>
+<a class="reference external image-reference" href="_static/stateapplicationcode2.pdf"><div align="center" class="align-center"><img alt="_images/stateapplicationcode2.svg" src="_images/stateapplicationcode2.svg" /></div>
+</a>
 <p>Now that we understand how state methods relate to each other and to event
 processors let’s look at a simple example to see how the pictures relate to
 working code.</p>
-<div align="center" class="align-center"><img alt="_images/eventprocessors.svg" src="_images/eventprocessors.svg" /></div>
+<a class="reference external image-reference" href="_static/eventprocessors.pdf"><div align="center" class="align-center"><img alt="_images/eventprocessors.svg" src="_images/eventprocessors.svg" /></div>
+</a>
 <p>First you would describe state’s <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">c1</span></code> and <code class="docutils literal"><span class="pre">c2</span></code>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span>
 <span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
@@ -596,7 +601,8 @@ to do with.  So the event processor searched the parent state and saw that there
 handler for this event in <code class="docutils literal"><span class="pre">c1</span></code>.  The <code class="docutils literal"><span class="pre">MY_HOOK</span></code> handler (the if-elif
 clause) returned <code class="docutils literal"><span class="pre">return_status.HANDLED</span></code>.  Upon seeing this value, the event
 processor determined that no transition is needed and it stopped running.</p>
-<div align="center" class="align-center"><img alt="_images/hook1.svg" src="_images/hook1.svg" /></div>
+<a class="reference external image-reference" href="_static/hook1.pdf"><div align="center" class="align-center"><img alt="_images/hook1.svg" src="_images/hook1.svg" /></div>
+</a>
 <p>In this way hook code is run in the search phase of the search-then-transition
 part of the event processor algorithm.</p>
 <p>The <code class="docutils literal"><span class="pre">c1</span></code> state method, “hooks” the <code class="docutils literal"><span class="pre">MY_HOOK</span></code> event, by capturing it, running
@@ -612,7 +618,8 @@ phase of the event processor algorithm to run your code.</p>
 <p>Instead of hooking the code with an <code class="docutils literal"><span class="pre">HANDLED</span></code> response, your state method
 returns an <code class="docutils literal"><span class="pre">UNHANDLED</span></code> status.  This causes the event processor, to query it
 again to find its parent, then dispatch the event to that state method.</p>
-<div align="center" class="align-center"><img alt="_images/catchandrelease1.svg" src="_images/catchandrelease1.svg" /></div>
+<a class="reference external image-reference" href="_static/catchandrelease1.pdf"><div align="center" class="align-center"><img alt="_images/catchandrelease1.svg" src="_images/catchandrelease1.svg" /></div>
+</a>
 <p>Here we create the state in the picture, notice that <code class="docutils literal"><span class="pre">inner</span></code> and <code class="docutils literal"><span class="pre">middle</span></code>
 do not return <code class="docutils literal"><span class="pre">HANDLED</span></code> when they see the <code class="docutils literal"><span class="pre">BUBBLED</span></code> signal.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">outer</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -789,7 +796,8 @@ reaction to it.</p>
 <p>There will be situations where you only would like an event to cause a
 transition between two states if a condition is true.  This is called a guard,
 in UML it looks like this:</p>
-<div align="center" class="align-center"><img alt="_images/guard.svg" src="_images/guard.svg" /></div>
+<a class="reference external image-reference" href="_static/guard.pdf"><div align="center" class="align-center"><img alt="_images/guard.svg" src="_images/guard.svg" /></div>
+</a>
 <p>The logic between the square brackets must be true for this event to work.  In
 this case the <code class="docutils literal"><span class="pre">T</span></code> event is guarded, it can only cause a transition if the the
 function <code class="docutils literal"><span class="pre">g()</span></code> returns <code class="docutils literal"><span class="pre">True</span></code>, otherwise nothing will happen.</p>
@@ -819,7 +827,8 @@ if statement:</p>
 <li><a class="reference internal" href="#recipes-template-7"><span class="std std-ref">Start up the active object in the desired state</span></a></li>
 <li><a class="reference internal" href="#recipes-template-8"><span class="std std-ref">Debugging a templated state method</span></a></li>
 </ol>
-<div align="center" class="align-center"><img alt="_images/factory2.svg" src="_images/factory2.svg" /></div>
+<a class="reference external image-reference" href="_static/factory2.pdf"><div align="center" class="align-center"><img alt="_images/factory2.svg" src="_images/factory2.svg" /></div>
+</a>
 <p id="recipes-template-1">Import the correct items from the miros library:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">state_method_template</span>
 <span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
@@ -890,7 +899,8 @@ if statement:</p>
 <li><a class="reference internal" href="#recipes-factory-6"><span class="std std-ref">Start your statechart in the desired state</span></a></li>
 <li><a class="reference internal" href="#recipes-factory-7"><span class="std std-ref">Debugging a state method made from a factory</span></a></li>
 </ol>
-<div align="center" class="align-center"><img alt="_images/factory5.svg" src="_images/factory5.svg" /></div>
+<a class="reference external image-reference" href="_static/factory5.pdf"><div align="center" class="align-center"><img alt="_images/factory5.svg" src="_images/factory5.svg" /></div>
+</a>
 <p id="recipes-factory-1">Import the correct items from the miros library:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">Factory</span>
 <span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>

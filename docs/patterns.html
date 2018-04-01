@@ -124,7 +124,8 @@ event processor, no state transition will occur.  This is how you make a hook.
 You make sure that part of your if-elif clause catches the event signal, runs
 your <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client code</span></a> and returns the <code class="docutils literal"><span class="pre">return_state.HANDLED</span></code>
 value.</p>
-<div align="center" class="align-center"><img alt="_images/ultimate_hook1.svg" src="_images/ultimate_hook1.svg" /></div>
+<a class="reference external image-reference" href="_static/ultimate_hook1.pdf"><div align="center" class="align-center"><img alt="_images/ultimate_hook1.svg" src="_images/ultimate_hook1.svg" /></div>
+</a>
 <p>Here is a simple example which demonstrates a hook.  In this example we will
 show that we can get some client code to run when we post an event with the
 signal name of BEHAVIOR_NAME to your statechart:</p>
@@ -185,7 +186,8 @@ the <a class="reference internal" href="glossary.html#term-client-code"><span cl
 <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a> log so we can see what happened.  On line 7
 we see the result of this in the <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a> log.
 Furthermore, no state transition occurred.</p>
-<div align="center" class="align-center"><img alt="_images/ultimate_hook2.svg" src="_images/ultimate_hook2.svg" /></div>
+<a class="reference external image-reference" href="_static/ultimate_hook2.pdf"><div align="center" class="align-center"><img alt="_images/ultimate_hook2.svg" src="_images/ultimate_hook2.svg" /></div>
+</a>
 <p>Now suppose we add another state within the outer state and start our active
 object there.</p>
 <div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
@@ -285,7 +287,8 @@ object there.</p>
 </td></tr></table></div>
 <p>Ok, no surprises.  The inner_state hooked the BEHAVIOR_NAME signal and
 ran some <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client code</span></a>.</p>
-<div align="center" class="align-center"><img alt="_images/ultimate_hook3.svg" src="_images/ultimate_hook3.svg" /></div>
+<a class="reference external image-reference" href="_static/ultimate_hook3.pdf"><div align="center" class="align-center"><img alt="_images/ultimate_hook3.svg" src="_images/ultimate_hook3.svg" /></div>
+</a>
 <p>Now let’s remove the handling of the BEHAVIOR_NAME from our
 inner state and see what happens when we start the active object in the
 inner_state then send it an event with the BEHAVIOR_NAME.</p>
@@ -407,7 +410,8 @@ your <a class="reference internal" href="glossary.html#term-hierarchical-state-m
 method will automatically inherit the hook code of any outer state.  The outer
 most state contains the ultimate hook; this is why the <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> is called what
 it is.</p>
-<div align="center" class="align-center"><img alt="_images/ultimate_hook4.svg" src="_images/ultimate_hook4.svg" /></div>
+<a class="reference external image-reference" href="_static/ultimate_hook4.pdf"><div align="center" class="align-center"><img alt="_images/ultimate_hook4.svg" src="_images/ultimate_hook4.svg" /></div>
+</a>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">To show that there is some sort of explicit design feature occuring on your
@@ -422,7 +426,8 @@ inheritance and overloading in object oriented programming.</p>
 in the outer states of charts, and all of your inner states would get this
 behavior for free.  If they needed to overwrite this behavior they would
 specifically handle the event in their state methods.</p>
-<div align="center" class="align-center"><img alt="_images/ultimate_hook5.svg" src="_images/ultimate_hook5.svg" /></div>
+<a class="reference external image-reference" href="_static/ultimate_hook5.pdf"><div align="center" class="align-center"><img alt="_images/ultimate_hook5.svg" src="_images/ultimate_hook5.svg" /></div>
+</a>
 <p>You would place generic reactions to events in your outer states and place the
 specific responses in your inner states. Let’s build out the above diagram:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
@@ -534,8 +539,8 @@ processing are not quite independent.” <a class="footnote-reference" href="#id
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">If you find yourself drawing two separate states with a lot of arrows
-connecting them, remind yourself of this <a class="reference internal" href="#patterns-reminder-here"><span class="std std-ref">reminder
-pattern</span></a>.</p>
+connecting them, remind yourself of this <span class="xref std std-ref">reminder
+pattern</span>.</p>
 </div>
 <p>The reminder <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> uses the <a class="reference internal" href="#patterns-ultimate-hook"><span class="std std-ref">ultimate hook</span></a>
 <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> mixed with <a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial event</span></a> injection.  It’s
@@ -543,8 +548,8 @@ an <a class="reference internal" href="glossary.html#term-artificial-event"><spa
 statechart and injected to itself rather than being invented and injected by an
 outside caller.</p>
 <p>I’ll try to explain this idea by showing a bad, but working design, show how it
-is expensive and then refactor the design using the <a class="reference internal" href="#patterns-reminder-here"><span class="std std-ref">reminder
-pattern</span></a>.</p>
+is expensive and then refactor the design using the <span class="xref std std-ref">reminder
+pattern</span>.</p>
 <p>We will begin with some specifications:</p>
 <ul class="simple">
 <li>Part of the system will poll a sensor based on a system clock running with
@@ -558,7 +563,8 @@ input.</li>
 polling mode.</li>
 </ul>
 <p>Here is a first shot at implementing this specification:</p>
-<div align="center" class="align-center"><img alt="_images/reminder1.svg" src="_images/reminder1.svg" /></div>
+<a class="reference external image-reference" href="_static/reminder1.pdf"><div align="center" class="align-center"><img alt="_images/reminder1.svg" src="_images/reminder1.svg" /></div>
+</a>
 <p>We create a polling state which upon entry poles something.  Any time there is
 a time out it will re-enter the state making this happen.</p>
 <p>Then when it initializes it transitions into the processing state.  Upon
@@ -679,11 +685,14 @@ PROCESS event:</p>
 </pre></div>
 </div>
 <p>Now that we know how to do that let’s redesign our statechart:</p>
-<div align="center" class="align-center"><img alt="_images/reminder2.svg" src="_images/reminder2.svg" /></div>
+<a class="reference external image-reference" href="_static/reminder2.pdf"><div align="center" class="align-center"><img alt="_images/reminder2.svg" src="_images/reminder2.svg" /></div>
+</a>
 <p>This introduces a new <a class="reference internal" href="glossary.html#term-pseudostate"><span class="xref std std-term">glyph</span></a> called the final state:</p>
-<div align="center" class="align-center"><img alt="_images/reminder3.svg" src="_images/reminder3.svg" /></div>
+<a class="reference external image-reference" href="_static/reminder3.pdf"><div align="center" class="align-center"><img alt="_images/reminder3.svg" src="_images/reminder3.svg" /></div>
+</a>
 <p>When you see this <a class="reference internal" href="glossary.html#term-pseudostate"><span class="xref std std-term">glyph</span></a> on a diagram it means, stop running.  So:</p>
-<div align="center" class="align-center"><img alt="_images/reminder4.svg" src="_images/reminder4.svg" /></div>
+<a class="reference external image-reference" href="_static/reminder4.pdf"><div align="center" class="align-center"><img alt="_images/reminder4.svg" src="_images/reminder4.svg" /></div>
+</a>
 <p>Would look like this as code:</p>
 <blockquote>
 <div><div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">processing_init</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -716,7 +725,8 @@ input.</li>
 <li>After the busy process is completed the system should go back into it’s
 polling mode.</li>
 </ul>
-<div align="center" class="align-center"><img alt="_images/reminder2.svg" src="_images/reminder2.svg" /></div>
+<a class="reference external image-reference" href="_static/reminder2.pdf"><div align="center" class="align-center"><img alt="_images/reminder2.svg" src="_images/reminder2.svg" /></div>
+</a>
 <p>Here is the code for this design with highlights for the <a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial
 events</span></a>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
@@ -885,7 +895,8 @@ comments in the spy log are the thoughts I would have while viewing it.</p>
 signal.  Our design of having the TIME_OUT start the system in the polling and
 end up in the processing/busy state cost us a lot of CPU time.</p>
 <p>Lets introduce the reminder <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> with a new design:</p>
-<div align="center" class="align-center"><img alt="_images/reminder6.svg" id="patterns-reminder-here" src="_images/reminder6.svg" /></div>
+<a class="reference external image-reference" href="_static/reminder6.pdf" id="patterns-reminder-here"><div align="center" class="align-center"><img alt="_images/reminder6.svg" src="_images/reminder6.svg" /></div>
+</a>
 <p>Let’s discuss this diagram.</p>
 <p>We use INIT_SIGNAL events to climb into the idle state.</p>
 <p>We create a TIME_OUT ultimate hook, which is a method that can be used by any
@@ -1063,7 +1074,8 @@ an inconveniently timed request would be difficult to program.</p>
 <p>Instead of coming up with some complicated scheme for shelving our work to
 process new requests, we just defer the event, then re-inject the event into
 our statechart when it’s timing is more convenient.</p>
-<div align="center" class="align-center"><img alt="_images/deferred1.svg" src="_images/deferred1.svg" /></div>
+<a class="reference external image-reference" href="_static/deferred1.pdf"><div align="center" class="align-center"><img alt="_images/deferred1.svg" src="_images/deferred1.svg" /></div>
+</a>
 <p>Here is an example of a chart using the deferred event <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a>.</p>
 <p>To begin with the chart climbs into the idle state.  Upon receiving it’s first
 NEW_REQUEST it transitions into the receiving state.  After a second of
@@ -1095,7 +1107,8 @@ trace to see if our chart state transitions remains steady despite the chaos we
 are sending at it.  To confirm that we aren’t just fooling ourselves we will
 use the spy and scribble when timed events hit the chart.</p>
 <p>Now let’s redraw the diagram and then write it’s code:</p>
-<div align="center" class="align-center"><img alt="_images/deferred1.svg" src="_images/deferred1.svg" /></div>
+<a class="reference external image-reference" href="_static/deferred1.pdf"><div align="center" class="align-center"><img alt="_images/deferred1.svg" src="_images/deferred1.svg" /></div>
+</a>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
@@ -1391,7 +1404,8 @@ spy only takes a little effort; use the scribble method with a
 formalism needs to capture requirements like “[The] gearbox change of state is
 <em>independent</em> of [the] braking system”.  For this he invented something called a
 ‘orthogonal region’:</p>
-<div align="center" class="align-center"><img alt="_images/orthogonal_region1.svg" src="_images/orthogonal_region1.svg" /></div>
+<a class="reference external image-reference" href="_static/orthogonal_region1.pdf"><div align="center" class="align-center"><img alt="_images/orthogonal_region1.svg" src="_images/orthogonal_region1.svg" /></div>
+</a>
 <p>The two different areas in the above chart separated by the dotted line are
 <strong>orthogonal regions</strong>.  They represent two separate state machines that act
 independent of one another but are both turned on when the truck state is
@@ -1580,7 +1594,8 @@ we define it as this:</p>
 </pre></div>
 </div>
 <p>Here is the high level UML class diagram for our approach:</p>
-<div align="center" class="align-center"><img alt="_images/orthogonal_region3.svg" src="_images/orthogonal_region3.svg" /></div>
+<a class="reference external image-reference" href="_static/orthogonal_region3.pdf"><div align="center" class="align-center"><img alt="_images/orthogonal_region3.svg" src="_images/orthogonal_region3.svg" /></div>
+</a>
 <p>The FusionReactor class will be a subclass of the Factory.  It will aggregate
 255 objects of the Piston class.  The FusionReactor object will connect to the
 reactor_on state machine and each of the piston objects will use the same
@@ -1597,7 +1612,8 @@ nature</span></a> of state methods to
 implement the 255 pistons.  Instead of having a separate piston_active
 <a class="reference internal" href="glossary.html#term-hierarchical-state-machine"><span class="xref std std-term">HSMs</span></a> defined for each of the 255 active objects we will instead define
 just one <a class="reference internal" href="glossary.html#term-hsm"><span class="xref std std-term">HSM</span></a> and share it between all of them. (saving on memory)</p>
-<div align="center" class="align-center"><img alt="_images/orthogonal_region4.svg" src="_images/orthogonal_region4.svg" /></div>
+<a class="reference external image-reference" href="_static/orthogonal_region4.pdf"><div align="center" class="align-center"><img alt="_images/orthogonal_region4.svg" src="_images/orthogonal_region4.svg" /></div>
+</a>
 <p>Let’s start writing the code.  Here is the Piston Class:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Piston</span><span class="p">(</span><span class="n">HsmWithQueues</span><span class="p">):</span>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
@@ -1744,7 +1760,8 @@ It will be changed before we actually turn on the reactor.  We will remove the
 and temperature transducers.  For now, it will let us test and tune our design.</p>
 <p>Now that we can build and run a piston, let’s design the FusionReactor class
 that it belongs to:</p>
-<div align="center" class="align-center"><img alt="_images/orthogonal_region5.svg" src="_images/orthogonal_region5.svg" /></div>
+<a class="reference external image-reference" href="_static/orthogonal_region5.pdf"><div align="center" class="align-center"><img alt="_images/orthogonal_region5.svg" src="_images/orthogonal_region5.svg" /></div>
+</a>
 <p>From a high level, the FusionReactor is a subclass of the
 <a class="reference internal" href="glossary.html#term-factory"><span class="xref std std-term">Factory</span></a> which means it has a thread and it can use the factory
 syntax to build up its HSM.  Since there will be only one reactor with 255
@@ -1756,7 +1773,8 @@ pending_on_pistons state.  This state captures the TIME_OUT event and iterates
 through all of the pistons, injecting each of them with the TIME_OUT
 <a class="reference internal" href="glossary.html#term-event"><span class="xref std std-term">event</span></a>.  To see how a fusion piston deals with a TIME_OUT we will
 look at it’s state chart:</p>
-<div align="center" class="align-center"><img alt="_images/orthogonal_region4.svg" src="_images/orthogonal_region4.svg" /></div>
+<a class="reference external image-reference" href="_static/orthogonal_region4.pdf"><div align="center" class="align-center"><img alt="_images/orthogonal_region4.svg" src="_images/orthogonal_region4.svg" /></div>
+</a>
 <p>So what happens with the first TIME_OUT event?  We see from inspection that
 each of the pistons will start in the relaxing state.  There is an assumption
 that when the fusion reactor is starting up, it lets its pistons relax into
@@ -1783,7 +1801,8 @@ to transition into the contract state and then the next TIME_OUT event will
 cause it to transition back into the relaxing state.</p>
 <p>The piston behavior described above is shared by all of the fusion pistons.
 Now that we understand how they work let’s look at the fusion reactor again:</p>
-<div align="center" class="align-center"><img alt="_images/orthogonal_region5.svg" src="_images/orthogonal_region5.svg" /></div>
+<a class="reference external image-reference" href="_static/orthogonal_region5.pdf"><div align="center" class="align-center"><img alt="_images/orthogonal_region5.svg" src="_images/orthogonal_region5.svg" /></div>
+</a>
 <p>We were talking about the pending_on_pistons TIME_OUT event handler prior to
 looking at the piston behavior.</p>
 <p>The orthogonal component <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> allows one active object to
@@ -1958,7 +1977,8 @@ seconds and then output the results:</p>
 <p>Let’s run the first trace through sequence and compare it to its design
 diagram, then I’ll write some documentation that I would post to the General
 Fusion wiki so that other people could understand my code.</p>
-<div align="center" class="align-center"><img alt="_images/orthogonal_region5.svg" src="_images/orthogonal_region5.svg" /></div>
+<a class="reference external image-reference" href="_static/orthogonal_region5.pdf"><div align="center" class="align-center"><img alt="_images/orthogonal_region5.svg" src="_images/orthogonal_region5.svg" /></div>
+</a>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span> <span class="n">Chart</span><span class="p">:</span> <span class="n">fusion_reactor</span> <span class="p">]</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
            <span class="n">top</span>              <span class="n">pending_on_pistons</span>    <span class="n">fusion_and_heat_transfer</span>
             <span class="o">+------</span><span class="n">start_at</span><span class="p">()</span><span class="o">-------&gt;|</span>                        <span class="o">|</span>
@@ -2004,7 +2024,8 @@ reported that they are armed and ready to go.</p>
 <p>Let’s run the second trace (a piston trace) through sequence and compare it to
 it’s design diagram.  Then I’ll add the comments I would use to describe this
 design to the rest of engineering.</p>
-<div align="center" class="align-center"><img alt="_images/orthogonal_region4.svg" src="_images/orthogonal_region4.svg" /></div>
+<a class="reference external image-reference" href="_static/orthogonal_region4.pdf"><div align="center" class="align-center"><img alt="_images/orthogonal_region4.svg" src="_images/orthogonal_region4.svg" /></div>
+</a>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Chart</span><span class="p">:</span> <span class="n">piston_1</span><span class="p">]</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">top</span>           <span class="n">relaxing</span>   <span class="n">pending_optimal_conditions</span> <span class="n">ready</span>         <span class="n">triggered</span>
  <span class="o">+--</span><span class="n">start_at</span><span class="p">()</span><span class="o">---&gt;|</span>                 <span class="o">|</span>                 <span class="o">|</span>               <span class="o">|</span>
@@ -2413,7 +2434,8 @@ state.  <a class="footnote-reference" href="#id9" id="id5">[8]</a></p>
 </div></blockquote>
 <p>To describe this pattern I will re-use the toaster oven example.  If you have read
 Miro Samek’s book this should seem familiar because it is his.</p>
-<div align="center" class="align-center"><img alt="_images/history_1.svg" src="_images/history_1.svg" /></div>
+<a class="reference external image-reference" href="_static/history_1.pdf"><div align="center" class="align-center"><img alt="_images/history_1.svg" src="_images/history_1.svg" /></div>
+</a>
 <p>In the above design we see that we have built a ToasterOven class which inherits
 from the Factory.  This means that it will have it’s own thread, queues and we
 will get the convenient syntax for building up the statechart.  The ToasterOven class
@@ -2447,7 +2469,8 @@ way that you can design it into your statechart without relying upon the
 framework.  The engineering trade off was to favor speed and simplicity over
 syntactical convenience.</p>
 <p>Here is how you can add deep history to your toaster oven:</p>
-<div align="center" class="align-center"><img alt="_images/history_2.svg" src="_images/history_2.svg" /></div>
+<a class="reference external image-reference" href="_static/history_2.pdf"><div align="center" class="align-center"><img alt="_images/history_2.svg" src="_images/history_2.svg" /></div>
+</a>
 <p>When we enter baking, toasting or off we just take it’s state method and store
 it in the history attribute.  If the statechart ever finds itself
 in the door_open state, the CLOSE event will transition to the last mode of

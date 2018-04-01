@@ -609,15 +609,6 @@ def marshal_ready(archer, e):
   '''
   If all of the living members are waiting for us; then 
   '''
-  #ready = True
-  #for name, other in archer.others.items():
-  #  if other.dead() is not True:
-  #    ready &= other.waiting()
-  #  else:
-  #    archer.snoop_scribble("{} thinks {} is dead".format(archer.name, name))
-  #if ready:
-  #  archer.post_fifo(
-  #    Event(signal=signals.Advance_War_Cry))
   return archer.trans(waiting_to_advance)
 
 # Waiting-to-Advance callbacks
