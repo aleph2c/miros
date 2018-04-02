@@ -4,7 +4,6 @@ import time
 import random
 from miros.hsm import pp
 from miros.hsm import HsmWithQueues, spy_on
-from miros.activeobject import Factory
 from miros.event import signals, Event, return_status
 from mesh_network import RabbitFactory
 
@@ -155,6 +154,9 @@ class HorseArcher(RabbitFactory):
 
   @staticmethod
   def get_a_name():
+    '''
+    Provide a unique horse archer name
+    '''
     archer_root = random.choice([
       'Hulagu', 'Hadan', 'Gantulga', 'Ganbaatar',
       'Narankhuu', 'Ihbarhasvad', 'Nergui',
@@ -166,7 +168,7 @@ class HorseArcher(RabbitFactory):
 
   def yell(self, event):
     '''
-    Yell out this event to the connected network
+    Yell out this event to the connected mesh network
     '''
     self.transmit(event)
 
@@ -197,8 +199,11 @@ class HorseArcher(RabbitFactory):
   def dispatch_to_all_empathy(self, event):
     '''
     If we are issuing an event that provides us with information about the
-    other's in our unit we call this method to update ALL of the empathy
+    others in our unit we call this method to update ALL of the empathy
     statecharts that we are tracking.
+
+    Note:
+      Use this for local events only
     '''
     for name, other in self.others.items():
       other.dispatch(event)
@@ -208,6 +213,9 @@ class HorseArcher(RabbitFactory):
     If we hear an event on the network that provides us with information
     about a specific unit that we are tracking, we update it's empathy
     statechart with this information.
+
+    Note:
+      Use this for event from OTHERS in the mesh network
     '''
     if other_archer_name is None:
       other_archer_name = event.payload
@@ -216,29 +224,19 @@ class HorseArcher(RabbitFactory):
       self.others[other_archer_name].dispatch(event)
 
 def battle_entry(archer, e):
-  '''What our horse archer does when he enters the battlefield'''
   archer.yell(Event(signal=signals.Other_Announce_Arrival_On_Field, payload=archer.name))
   return return_status.HANDLED
 
 def battle_other_arrival_on_field(archer, e):
-  '''
-  A hook method which allows a horse archer to hear another other horse
-  archer who has entered the battlefield.  It will be called when the
-  'Other_Announce_Arrival_On_Field' event is seen on the network.  If this horse
-  archer has not been seen before, a notion of him will be added to this horse
-  archer.
-  '''
   other_archer_name = e.payload
   archer.add_member_if_needed(other_archer_name)
   return return_status.HANDLED
 
 def battle_init(archer, e):
-  '''Immediately begin the deceit in detail tactic'''
   return archer.trans(deceit_in_detail)
 
 # Deceit-In-Detail-Tactic state callbacks
 def didt_entry(archer, e):
-  '''Load up on arrows and start tracking time within this tactic'''
   archer.arrows = HorseArcher.MAXIMUM_ARROW_CAPACITY
   archer.ticks  = 0
   archer.post_fifo(
@@ -248,88 +246,56 @@ def didt_entry(archer, e):
     deferred=True)
   return return_status.HANDLED
 
-def didt_exit(archer, e):
-  '''Load up on arrows and start tracking time within this tactic'''
   archer.cancel_events(Event(signal=signals.Second))
   return return_status.HANDLED
 
 def didt_init(archer, e):
-  '''Immediately advance'''
   return archer.trans(advance)
 
 def didt_second(archer, e):
-  '''A second within the tactic has passed'''
   archer.ticks += 1
   return return_status.HANDLED
 
 def didt_senior_advance_war_cry(archer, e):
-  '''
-  A Horse archer heard a command from a senior officer.  They give this
-  senior officer's war cry to themselves as if they thought of it
-  '''
   archer.post_fifo(Event(signal=signals.Advance_War_Cry))
   return return_status.HANDLED
 
 def didt_senior_skirmish_war_cry(archer, e):
-  '''
-  A Horse archer heard a command from a senior officer.  They give this
-  senior officer's war cry to themselves as if they thought of it
-  '''
   archer.post_fifo(Event(signal=signals.Skirmish_War_Cry))
   return return_status.HANDLED
 
 def didt_senior_retreat_war_cry(archer, e):
-  '''
-  A Horse archer heard a command from a senior officer.  They give this
-  senior officer's war cry to themselves as if they thought of it
-  '''
   archer.post_fifo(Event(signal=signals.Retreat_War_Cry))
   return return_status.HANDLED
 
 def didt_advance_war_cry(archer, e):
-  '''Update the empathy state charts with this information then advance.'''
   archer.dispatch_to_all_empathy(e)
   return archer.trans(advance)
 
 def didt_other_advance_war_cry(archer, e):
-  '''
-  Heard another's Advance_War_Cry, so we give the advance command, to ourself,
-  then update our belief about the state of the unit that gave the call.
-  '''
   archer.dispatch_to_empathy(e)
   return archer.trans(advance)
 
 def didt_other_retreat_war_cry(archer, e):
-  '''
-  Heard another's Retreat_War_Cry, so we give the retreat command to ourself,
-  then update our belief about the state of the unit that gave the call.
-  '''
   archer.dispatch_to_empathy(e)
   return archer.trans(feigned_retreat)
 
 def didt_skirmish_war_cry(archer, e):
-  '''Transition to the skirmish state'''
   return archer.trans(skirmish)
 
 def didt_other_skirmish_war_cry(archer, e):
-  '''A horse archer heard another's Skirmish_War_Cry, so they
-     give the command to and introspect on the state of their unit'''
   archer.dispatch_to_empathy(e)
   return archer.trans(skirmish)
 
 def didt_retreat_war_cry(archer, e):
-  '''You are retreating, so update all of your empathy charts with this
-     information'''
   archer.dispatch_to_all_empathy(e)
   return archer.trans(feigned_retreat)
 
 def didt_other_retreat_ready_war_cry(archer, e):
-  '''Update the our empathy for the horse archer making this call'''
   archer.dispatch_to_empathy(e)
   return return_status.HANDLED
 
 def didt_other_ready_war_cry(archer, e):
-  '''Update the our empathy for the horse archer making this call'''
   archer.dispatch_to_empathy(e)
   return return_status.HANDLED
 
@@ -339,10 +305,6 @@ def didt_reset_tactic(archer, e):
 
 # Advance callbacks
 def advance_entry(archer, e):
-  '''
-  Yell out that we are advancing to others
-  Then wait 3 seconds then issue the Close_Enough_For_Circle event
-  '''
   archer.yell(Event(signal=signals.Other_Advance_War_Cry, payload=archer.name))
   if len(archer.others) >= 1:
     first_name_of_others = next(iter(archer.others))
@@ -358,44 +320,25 @@ def advance_entry(archer, e):
   return return_status.HANDLED
 
 def advance_exit(archer, e):
-  '''We are leaving this state, cancel our one-shot'''
   archer.cancel_events(Event(signal=signals.Close_Enough_For_Circle))
   return return_status.HANDLED
 
 def advance_senior_advanced_war_cry(archer, e):
-  '''
-  Stop Senior_Advance_War_Cry events from being handled outside of this state,
-  the horse archer is already in the process of performing the order.
-  '''
   return return_status.HANDLED
 
 def advance_other_advanced_war_cry(archer, e):
-  '''
-  Stop Other_Advance_War_Cry events from being handled outside of this
-  state, the horse archer is already in the process of performing the order.
-  '''
   archer.dispatch_to_empathy(e)
   return return_status.HANDLED
 
 def advance_advance_war_cry(archer, e):
-  '''
-  We just yelled an Advance_War_Cry; this changes how we think about the other
-  members in our unit.
-  '''
   archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
 def advance_close_enough_for_circle(archer, e):
-  '''The horse archer is close enough to begin a Circle and Fire maneuver'''
   return archer.trans(circle_and_fire)
 
 # Circle-And-Fire callbacks
 def caf_second(archer, e):
-  '''
-  A horse archer can fire 1 to 3 arrows at a time in this maneuver,
-  how they behave is up to them and how they respond to their local conditions
-  (simulated)
-  '''
   if(archer.ticks % 6 == 0):
     archer.arrows -= random.randint(1, 3)
     archer.arrows = 0 if archer.arrows < 0  else archer.arrows
@@ -409,8 +352,6 @@ def caf_second(archer, e):
 
 # Skirmish state callbacks
 def skirmish_entry(archer, e):
-  '''The Horse Archer will trigger an Ammunition_Low event if he
-     has less than 10 arrows when he begins skirmishing'''
   archer.yell(Event(signal=signals.Other_Skirmish_War_Cry, payload=archer.name))
 
   # a Knight could charge at him sometime between 40-120 sec
@@ -426,17 +367,11 @@ def skirmish_entry(archer, e):
   return return_status.HANDLED
 
 def skirmish_exit(archer, e):
-  '''We are exiting this state, cancel it's one-shots'''
   archer.cancel_events(Event(signal=signals.Retreat_War_Cry))
   archer.cancel_events(Event(signal=signals.Officer_Lured))
   return return_status.HANDLED
 
 def skirmish_second(archer, e):
-  '''
-  Every 3 seconds the horse archer is ready to fire an arrow, if he has
-  less than 10 arrows he will trigger an Ammunition_Low event
-  '''
-
   # While skirmishing, he makes directed attacks on his enemy
   # 40 percent chance of making a shot every 3 seconds
   if archer.ticks % 3 == 0:
@@ -449,42 +384,27 @@ def skirmish_second(archer, e):
   return return_status.HANDLED
 
 def skirmish_officer_lured(archer, e):
-  '''If Horse Archer lures an enemy officer they issue a Retreat_War_Cry event.'''
   archer.snoop_scribble("Knight Charging at {}".format(archer.name))
   archer.post_fifo(
     Event(signal=signals.Retreat_War_Cry))
   return return_status.HANDLED
 
 def skirmish_ammunition_low(archer, e):
-  '''If Horse Archer is low ammunition they will give a Retreat_War_Cry'''
   archer.post_fifo(Event(signal=signals.Retreat_Ready_War_Cry))
   return return_status.HANDLED
 
 def skirmish_senior_squirmish_war_cry(archer, e):
-  '''Ignore skirmish war cries from other while skirmishing'''
   return return_status.HANDLED
 
 def skirmish_other_squirmish_war_cry(archer, e):
-  '''
-  Ignore skirmish war cries from other while skirmishing
-  But update their empathy HSM with this information
-  '''
   archer.dispatch_to_empathy(e)
   return return_status.HANDLED
 
 def skirmish_skirmish_war_cry(archer, e):
-  '''
-  Ignore our own skirmish war cry, but update all empathy HSMs with this
-  information
-  '''
   archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
 def skirmish_retreat_ready_war_cry(archer, e):
-  '''
-  If all other horse archers are ready for a return, issue a Retreat_War_Cry, if
-  not or either way transition into the waiting_to_lure state
-  '''
   ready = True
   for name, other in archer.others.items():
     if other.dead() is not True:
@@ -505,10 +425,6 @@ def skirmish_retreat_ready_war_cry(archer, e):
 
 # Waiting-to-Lure callbacks
 def wtl_entry(archer, e):
-  '''
-  The horse archer yells out an Other_Retreat_Ready_War_Cry to the other members
-  of his unit, then tries to lure a Knight
-  '''
   archer.yell(Event(signal=signals.Other_Retreat_Ready_War_Cry, payload=archer.name))
   archer.snoop_scribble("{} has {} arrows".format(archer.name, archer.arrows))
   archer.scribble('put away bow')
@@ -517,16 +433,13 @@ def wtl_entry(archer, e):
   return return_status.HANDLED
 
 def wtl_second(archer, e):
-  '''Increment time, but block this event from escaping to an outer state'''
   archer.ticks += 1
   return return_status.HANDLED
 
 def wtl_ammunition_low(archer, e):
-  '''Ignore the ammunition low event'''
   return return_status.HANDLED
 
 def wtl_exit(archer, e):
-  '''Outputs some debug information to help with the story in the logs'''
   archer.scribble('stash scimitar')
   archer.scribble('pull bow')
   archer.scribble('stop acting')
@@ -534,12 +447,6 @@ def wtl_exit(archer, e):
 
 # Feigned-Retreat callbacks
 def fr_entry(archer, e):
-  '''
-  Yell out a Other_Retreat_Ready_War_Cry to the other members of to the unit
-  Then prioritize arrows on chasing officers and then to footman
-
-  If we are out of arrows issue the Out_Of_Arrows event
-  '''
   archer.yell(Event(signal=signals.Other_Retreat_War_Cry, payload=archer.name))
   #  archer.snoop_scribble("{} has {} arrows".format(archer.name, archer.arrows))
   archer.scribble('fire on knights')
@@ -550,13 +457,11 @@ def fr_entry(archer, e):
   return return_status.HANDLED
 
 def fr_exit(archer, e):
-  '''We are exiting this state, cancel all oneshot events'''
   archer.cancel_events(Event(signal=signals.Out_Of_Arrows))
   archer.scribble("full gallop")
   return return_status.HANDLED
 
 def fr_second(archer, e):
-  '''Fire on those chasing, when out of arrows issue the Out_Of_Arrows event'''
   if archer.ticks % 3 == 0:
     if random.randint(1, 10) <= 8:
       archer.arrows = archer.arrows - 1 if archer.arrows >= 1  else 0
@@ -568,31 +473,18 @@ def fr_second(archer, e):
   return return_status.HANDLED
 
 def fr_retreat_war_cry(archer, e):
-  '''
-  If we receive another Retreat_War_Cry while retreating... ignore it, but feed
-  it to all of our empathy HSMs
-  '''
   archer.dispatch_to_all_empathy(e)
   return return_status.HANDLED
 
 def fr_other_retreat_war_cry(archer, e):
-  '''
-  If we hear another call out that they are retreating, we feed this information
-  into their empathy HSM.
-  '''
   archer.dispatch_to_empathy(e)
   return return_status.HANDLED
 
 def fr_out_of_arrows(archer, e):
-  '''If we are out of arrows transition to the marshal state'''
   return archer.trans(marshal)
 
 # Marshal callbacks
 def marshal_entry(archer, e):
-  '''
-  Reload with arrrows and take a little break.
-  Setup a one-shot to indicate when we are ready to proceed.
-  '''
   archer.scribble("halt horse")
   archer.scribble("identify next marshal point")
   archer.scribble("field wrap wounds on self and horse")
@@ -606,9 +498,6 @@ def marshal_entry(archer, e):
   return return_status.HANDLED
 
 def marshal_ready(archer, e):
-  '''
-  If all of the living members are waiting for us; then 
-  '''
   return archer.trans(waiting_to_advance)
 
 # Waiting-to-Advance callbacks
