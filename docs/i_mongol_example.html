@@ -3187,6 +3187,13 @@ Advance_War_Cry and the Retreat_War_Cry need to use the
 <code class="docutils literal"><span class="pre">dispatch_to_all_empathy</span></code> methods.  By generalizing our thinking, imposing
 simple rules and following these rules we can save ourselves from adding bugs to
 our design.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">These policy heuristics should be implemented within the code.  The yell to
+others and a war cry to themselves could be split into separate methods; then
+a policy could be set without expecting the developer to be vigilent.  This
+would be an obvious refactoring objective for the next design iteration.</p>
+</div>
 <p>Let’s look at how the <code class="docutils literal"><span class="pre">dispatch_to_empathy</span></code> method works.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">dispatch_to_empathy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">other_archer_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
   <span class="k">if</span> <span class="n">other_archer_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>

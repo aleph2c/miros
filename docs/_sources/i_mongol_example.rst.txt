@@ -2947,6 +2947,13 @@ Advance_War_Cry and the Retreat_War_Cry need to use the
 simple rules and following these rules we can save ourselves from adding bugs to
 our design.
 
+.. note::
+
+  These policy heuristics should be implemented within the code.  The yell to
+  others and a war cry to themselves could be split into separate methods; then
+  a policy could be set without expecting the developer to be vigilent.  This
+  would be an obvious refactoring objective for the next design iteration.
+
 Let's look at how the ``dispatch_to_empathy`` method works.
 
 .. code-block:: python
