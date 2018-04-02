@@ -320,7 +320,6 @@ it, Deceit_in_Detail_Tactic (marshalled), because I want to express that the
 horse archers are meeting and that this is one tactic of many.</p>
 <a class="reference external image-reference" href="_static/ergotic_mongol_11.pdf"><div align="center" class="align-center"><img alt="_images/ergotic_mongol_11.svg" src="_images/ergotic_mongol_11.svg" /></div>
 </a>
-<p><a class="reference external" href="https://aleph2c.github.io/miros/_static/ergotic_mongol_11.pdf">ergotic_mongol_11</a></p>
 <p>Immediately after filling their arrows, they attack.  This action may not be
 historically accurate, but let’s have our botnet just attack right away.</p>
 <p>Once the horse archers advance close enough to the mass of their enemy, they
@@ -343,7 +342,6 @@ To do this, they would issue a Skirmish_War_Cry and charge into the enemy’s
 disorganized front to make individual attacks.</p>
 <a class="reference external image-reference" href="_static/ergotic_mongol_12.pdf"><div align="center" class="align-center"><img alt="_images/ergotic_mongol_12.svg" src="_images/ergotic_mongol_12.svg" /></div>
 </a>
-<p><a class="reference external" href="https://aleph2c.github.io/miros/_static/ergotic_mongol_12.pdf">ergotic_mongol_12</a></p>
 <p>Upon making the Skirmish_War_Cry are horse archer charges into close enough
 range to make individual attacks with their arrows.  This type of fighting is
 called a skirmish to show that we do not want them to stick around.</p>
@@ -390,7 +388,6 @@ state.  This will have the horse archer put away his scimitar and arm his bow
 with an arrow.</p>
 <a class="reference external image-reference" href="_static/ergotic_mongol_13.pdf"><div align="center" class="align-center"><img alt="_images/ergotic_mongol_13.svg" src="_images/ergotic_mongol_13.svg" /></div>
 </a>
-<p><a class="reference external" href="https://aleph2c.github.io/miros/_static/ergotic_mongol_13.pdf">ergotic_mongol_13</a></p>
 <p>The Retreat_War_Cry causes the horse to enter the “Feigned Retreat” state.  In
 this state, a different control system would come into play.  The horse archer
 would let the Knight close the distance to him so that he can comfortably make
@@ -654,7 +651,7 @@ cry events in the chart.</p>
 <p>We also have to feed all of our empathy charts with information anytime we issue
 the Advance_War_Cry or the Retreat_Ready_War_Cry.  This is done using an
 iterator on the <code class="docutils literal"><span class="pre">other</span></code> object.</p>
-<p>Now we get to the meat of the multichart pending pattern.  The horse archers
+<p>Now we get to the meat of the multi-chart pending pattern.  The horse archers
 have to wait until the last of their members have entered the “waiting to lure”
 state before they can all perform the false retreat.  So in plain English, when
 a horse archer yells that they are ready to retreat, they mentally check to see
@@ -2590,17 +2587,24 @@ trust that Erlang has a well thought out and proven architecture.</p>
 provides a polyglot platform: they have written many different libraries for
 other programming languages to control RabbitMq.  In Python, RabbitMq is
 accessed using the <code class="docutils literal"><span class="pre">pika</span></code> library.</p>
-<p>RabbitMq is heavy duty.  You can scale it up to handle <em>a lot of messaging</em>.
+<p>RabbitMq is heavy duty.  You can scale it up to handle a lot of messaging.
 Our horse archers aren’t going to yell that much, but it’s nice to know we could
 support their entire horde.</p>
-<p>What kind of network should we build?  How about this, everything that can
-connect is connected to everything that can connect.  Let’s create a mesh
-network.</p>
+<p>What kind of network should we build?  How about this, everything that <em>can</em>
+connect is connected.  Let’s create a mesh network.</p>
 <a class="reference external image-reference" href="_static/Partial_Mesh_Diagram.pdf"><div align="center" class="align-center"><img alt="_images/Partial_Mesh_Diagram.svg" src="_images/Partial_Mesh_Diagram.svg" /></div>
 </a>
 <p>Our lab will exist behind a router; so all of the bots will live on the same
-ethernet bus.  This means that the ARP table on each of the computers on the LAN
-will have all of the LAN’s IP addresses.</p>
+Ethernet bus.  This means that the ARP table on
+each of the computers on the LAN will have all of the LAN’s IP addresses.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>ARP stands for Address Resolution Protocol.</p>
+<p class="last">An ARP table contains information about how each machine on your LAN maps it’s
+IP address to its physical machine address (MAC address). This table is
+needed for Ethernet to work.  We aren’t interested how this works, we only use
+it to get a list of the IP addresses on our LAN.</p>
+</div>
 <p>We can use these IP addresses to send out encrypted messages to a RabbitMq port,
 with a username and a password and see if there is a sensible response.  If
 there is, we add this IP to our mesh network.  This means that our horse archers
@@ -2620,10 +2624,10 @@ can <em>see</em> our design while we play with the encryption key for the first 
 mesh networking.  To distinguish between the two different types of networking,
 I will call one the mesh and the other the snoop network.  When we are happy
 with the design; we will turn off the instrumentation, remove our ability to
-snoop and release the horde (in a lab).</p>
+snoop and release the horde.</p>
 <p>By using RabbitMq, every running Horse Archer program on any connected computer
-will look like a node in our mesh network.  This is great; it means we can
-significantly simplify our code.</p>
+in our LAN will look like a node in our mesh network.  This is great; it means
+we can significantly simplify our code.</p>
 <p>But what are the specifics?  How is a horse archer explicitly connected to the
 network?  Well, he has two transmitters one for his yells and one to send out
 his instrumentation, and he has two receivers, one to hear cries and one to
@@ -3001,34 +3005,41 @@ computers, or, within many processes on one machine.  It doesn’t matter, if th
 are running somewhere on a LAN they should find one another and start to work
 together.</p>
 <p>As a statechart designer, you want to be able to focus your attention on the
-Mongol statechart structure without being bogged down by networking.</p>
+networked Mongol statechart structure without being bogged down by the details
+of networking.</p>
 <p>So we would like our horse archers to be able to yell commands back and forth,
-and we want to be able to see what their botnet is doing from one machine.  To
-do all of this we will squeeze the RabbitFactory class (with all of it’s
-networking features) between the HorseArcher class and it’s Factory ancestor.
-The RabbitFactory abstracts away large parts of the network, and it provides a
+and we want to be able to monitor what their botnet is doing from one machine.  To
+do all of this we will insert the RabbitFactory class (with all of it’s
+networking features) between the HorseArcher class and it’s Factory ancestor in
+our class inheritance hierarchy.</p>
+<p>The RabbitFactory abstracts away large parts of the network, and it provides a
 way to build up a statechart which can access the mesh and snoop networks.</p>
 <p>To understand the networking part of the statechart abstraction, we will have to
 know how it relates to our statechart architecture, how to build it up and how
 to use its API.</p>
-<p>Here is a sketch of the new architecture.</p>
+<p>Here is a sketch of the new networked statechart architecture:</p>
 <a class="reference external image-reference" href="_static/n_ergotic_mongol_1.pdf"><div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_1.svg" src="_images/n_ergotic_mongol_1.svg" /></div>
 </a>
+<p>The generalization arrows between the ancestor UML rectangles shows us which of
+the ancestral classes, gives our HorseArcher what set of features.  Most of the
+time this can be handwaved away with a “yes I trust that part works,” but it is
+good to consider what is happening from time to time:</p>
 <p>The HsmWithQueues class provides the event dispatcher, the trace and the spy
-instrumentation features.  The ActiveObject provides the threading that our HSMs
-can run in.  An HSM running in it’s own thread is called a statechart; so the
+instrumentation features.  The ActiveObject delivers the threading that our HSMs
+can run in.  An HSM running in its thread is called a statechart; so the
 ActiveObject provides us with the ability to make statecharts.  The Factory
 class gives us the ability to build up statecharts by writing callbacks,
 constructing state objects, linking these then imposing a hierarchy on the
-states.  As of now, between the Factory class and the HorseArcher we place the
+states.  As of now, between the Factory class and the HorseArcher, we place the
 RabbitFactory.</p>
-<p>The RabbitFactory will include all of the required network dependencies and link
-all of the statechart features to other statecharts across two different types
-of networks:  It will allow us to extend our spy and trace instrumentation
-across every connected statechart using a snoop-network and it will provide a
-publish/subscription routing model for event messaging with a mesh-network.</p>
-<p>Now that we know more about the architecture, how do we build up networked statechart?</p>
-<p>Here is how we would build a networkable archer object:</p>
+<p>The RabbitFactory will include all of the required network dependencies.   It
+will link all of the statechart features to other statecharts across two
+different types of networks:  It will allow us to extend our spy and trace
+instrumentation across every connected statechart using a snoop-network, and it
+will provide a publish/subscription routing model for event messaging with a
+mesh network.</p>
+<p>Now that we know more about the architecture, how do we syntactical construct a
+networked statechart?  Here is how we would build a networked archer object:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">archer</span> <span class="o">=</span> <span class="n">HorseArcher</span><span class="p">(</span>
   <span class="n">name</span> <span class="o">=</span> <span class="n">HorseArcher</span><span class="o">.</span><span class="n">get_a_name</span><span class="p">(),</span>
 <span class="hll">  <span class="n">rabbit_user</span><span class="o">=</span><span class="s1">&#39;bob&#39;</span><span class="p">,</span>
@@ -3038,9 +3049,8 @@ publish/subscription routing model for event messaging with a mesh-network.</p>
 </pre></div>
 </div>
 <p>The highlighted lines in the above listing show what information is required to
-connect to the network.  We need a RabbitMq username, password and which port
-the service will be connected to on all of our machines.   The rabbit_port
-argument is optional; it will default to 5672.</p>
+connect to the network.  We need a RabbitMq username, password and port
+information.   The rabbit_port argument is optional; it will default to 5672.</p>
 <p>Inside the HorseArcher class, it’s RabbitFactory object is constructed with a
 bit more detail:</p>
 <div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
@@ -3092,18 +3102,19 @@ the battle HSM:</p>
 <a class="reference external image-reference" href="_static/n_ergotic_mongol_2.pdf"><div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_2.svg" src="_images/n_ergotic_mongol_2.svg" /></div>
 </a>
 <p>The named methods in the HorserArcher and OtherHorseArcher classes represent
-code that used to exist in the HSMs:  Upon scanning the design, I noticed there
-was a lot of code repetition.  To DRY my Python up, while also simplifying the
-diagram, I thought of names for what the different snippets of code were doing,
-then wrapped those pieces of code into their own methods.</p>
-<p>The HorseArcher class provides a static method, <code class="docutils literal"><span class="pre">HorseArcher.get_name</span></code>, to
-construct a horse archer name.  Previously, we were going to reference the other
-horse archer’s by their IP addresses.  If we did that, we could not run more
-than one horse archer process per machine without breaking the design.  I don’t
-have ten computers in my LAN; so I will have to test multiple processes per
-device confirm that the design is working.  The <code class="docutils literal"><span class="pre">HorseArcher.get_name</span></code> static
-method will provide <em>unique</em> names so that we can create horse archers on the
-same machine or different machines across the network.</p>
+code that used to exist in their HSMs.  Upon scanning the design, I noticed
+there was a lot of code repetition.  To DRY my Python up, while also simplifying
+the diagram, I thought of names to describe the actions of these repetitive code
+snippets. Then I sucked this repetitive code up out of the HSMs, into named
+methods in the HorseArcher and OtherHorseArcher classes.</p>
+<p>The HorseArcher class also has a static method: <code class="docutils literal"><span class="pre">HorseArcher.get_name</span></code>.
+Previously, we were going to reference the other horse archer’s by their IP
+addresses.  But if we named them this way, we could not run more than one horse
+archer process per machine without breaking the design.  I don’t have ten
+computers in my LAN; so I will have to test multiple processes per device to
+confirm that the design is working.  The <code class="docutils literal"><span class="pre">HorseArcher.get_name</span></code> static method
+will provide <em>unique</em> names so that we can create horse archers on the same
+machine.</p>
 <p>Now let’s talk about the battle statechart.  Things have become quite
 complicated, and we are starting to face the limitations of the Umlet tool used
 to describe our picture.  The diagram is too big to fit on this page, so we
@@ -3111,17 +3122,19 @@ compact a large part of it into the deceit_in_detail substate glyph.  This
 means, there is something else here, but we have hidden it from view.  We will
 talk about it soon enough.</p>
 <p>Let’s look at the exposed parts of the networked battle statechart.</p>
-<p>We see that the first thing our horse archer will do when they begin battle is
-to yell out that they have arrived on the field.  They yell the
-Other_Arrival_On_Field event using their name as a payload.</p>
-<p>As a convention, I will pre-pend ‘Other’ in front of any event that is intended
+<p>We see that the first thing our horse archers do when they begin battle is to
+yell out that they have arrived.  They yell the Other_Arrival_On_Field event,
+using their name as a payload.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">As a convention, I will pre-pend ‘Other’ in front of any event that is intended
 to be sent out over the mesh.  By doing this, our system will be a lot easier to
 debug.</p>
+</div>
 <p>Our statechart is ergotic; so not only does it need to yell out events it must
-also receive those same events from others in the mesh.  We see what a horse
-archer does when it hears another has arrived on the field: there is an
-Other_Arrival_On_Field event hook, which calls the <code class="docutils literal"><span class="pre">add_member_if_needed</span></code>
-method:</p>
+also receive those same events from others in the mesh.</p>
+<p>The following method, called from the Other_Arrival_On_Field hook, is used to
+add members to a horse archer’s unit:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">add_member_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_archer_name</span><span class="p">):</span>
   <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">other_archer_name</span> <span class="ow">and</span> <span class="n">other_archer_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">other_archer_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">:</span>
@@ -3130,47 +3143,51 @@ method:</p>
       <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">other_archer_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">oha</span>
 </pre></div>
 </div>
-<p>Consider what a horse archer does when his <code class="docutils literal"><span class="pre">add_member_if_needed</span></code> method is
-called.</p>
+<p>Consider what a horse archer does when he calls his <code class="docutils literal"><span class="pre">add_member_if_needed</span></code>
+method:</p>
 <p>He checks to see if he is just listening to himself and if he can identify a
 name within the shout.  Then he checks to see if he is already mentally tracking
-this person in his collection of ‘others’.  If he wasn’t already thinking about
-this person as being a part of his unit, he creates an empathy object for them,
-starts it up then adds this object to his ‘others’ data dictionary.</p>
-<p>With this method, there is no limit to the size of a horse archer unit.  Also,
-the horse archers don’t need to know about each other before they begin to fight
-as a team.  Their shared mesh encryption key is enough for them to know that they
-are intended to work together.</p>
+this person in his collection of ‘others.’  If he hasn’t been, he creates an
+empathy object for them, starts it up then adds this object to his ‘others’ data
+dictionary.  He can now mentally track that other person on the battlefield.</p>
+<p>With this method, there is no upper bound for members in a horse archer unit.
+Also, the horse archers don’t need to know about each other before they begin to
+fight as a team.  Their shared mesh encryption key is enough for them to see
+that they are intended to work together.</p>
 <p>Now let’s look at the networked deceit_in_detail part of the battle statechart:</p>
 <a class="reference external image-reference" href="_static/n_ergotic_mongol_3.pdf"><div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_3.svg" src="_images/n_ergotic_mongol_3.svg" /></div>
 </a>
-<p>The map has gotten too big.  So we will break it into five different diagrams
+<p>The map has gotten too big!  So we will break it into five different diagrams
 and talk about the new parts of the design in each region.</p>
-<p>First, we look at the deceit_in_detail state:</p>
+<p>First, we will look at the deceit_in_detail state in high resolution while
+blurring out its inner states:</p>
 <a class="reference external image-reference" href="_static/n_ergotic_mongol_4.pdf"><div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_4.svg" src="_images/n_ergotic_mongol_4.svg" /></div>
 </a>
+<p>On the top right of the diagram we see some notes linked to a small subset of
+the HorseArcher class diagram.  These notes describe a heuristic, a pattern
+hint, for helping us program this design:</p>
 <p>The horse archer must send various events into his empathy HSMs so he can track
-what his unit is doing.  This code which used to be peppered all over the previous
-version of the statechart is now wrapped up into two different HorseArcher
-methods, <code class="docutils literal"><span class="pre">dispatch_to_all_empathy</span></code> and <code class="docutils literal"><span class="pre">dispatch_to_empathy</span></code>.</p>
-<p>On the diagram we see that there are two patterns that will help us avoid making
-mistakes.  The events that are intended for our local consumption, like the
-Advance_War_Cry and the Retreat_War_Cry need to be sent to all empathy
-statecharts.  The events that have been received from another horse archer only
-go to that horse archer’s empathy HSM.</p>
+what his unit is doing.  This code, which used to be peppered all over our
+previous HSMs, is now wrapped up into two different HorseArcher methods,
+<code class="docutils literal"><span class="pre">dispatch_to_all_empathy</span></code> and <code class="docutils literal"><span class="pre">dispatch_to_empathy</span></code>.</p>
+<p>The pattern hints are explicitly written down to help us avoid making mistakes.
+The events that are intended for our local consumption, like the
+Advance_War_Cry, need to be sent to all empathy statecharts.  The events that
+have been received from another horse archer only go to that horse archer’s
+empathy HSM.</p>
 <p>But what signals need to be fed into these empathy methods?</p>
-<p>To answer that, we look at the empathy HSM diagram:</p>
+<p>To answer that, we look back to our empathy HSM diagram:</p>
 <a class="reference external image-reference" href="_static/empathy_1.pdf"><div align="center" class="align-center"><img alt="_images/empathy_1.svg" src="_images/empathy_1.svg" /></div>
 </a>
-<p>The pattern described on the previous diagram will save us from getting lost in
-details.  All <code class="docutils literal"><span class="pre">Other</span></code> pre-pended events in the above empathy diagram need to
-use the <code class="docutils literal"><span class="pre">dispatch_to_empathy</span></code> method when referenced anywhere in the
-deceit_in_detail statechart.  Likewise all personal events, like the
+<p>So these design hints, and their policies, are intended to save us from getting
+lost in details.  All <code class="docutils literal"><span class="pre">Other</span></code> pre-pended events in listed in the empathy
+diagram need to use the <code class="docutils literal"><span class="pre">dispatch_to_empathy</span></code> method when referenced anywhere
+in the deceit_in_detail statechart.  Likewise all personal events, like the
 Advance_War_Cry and the Retreat_War_Cry need to use the
 <code class="docutils literal"><span class="pre">dispatch_to_all_empathy</span></code> methods.  By generalizing our thinking, imposing
 simple rules and following these rules we can save ourselves from adding bugs to
 our design.</p>
-<p>Let’s look at how <code class="docutils literal"><span class="pre">dispatch_to_empathy</span></code> method works.</p>
+<p>Let’s look at how the <code class="docutils literal"><span class="pre">dispatch_to_empathy</span></code> method works.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">dispatch_to_empathy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">other_archer_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
   <span class="k">if</span> <span class="n">other_archer_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
     <span class="n">other_archer_name</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">payload</span>
@@ -3179,10 +3196,10 @@ our design.</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">other_archer_name</span><span class="p">]</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The method determines what the name of the other horse archer is.  If it hasn’t
-heard from this horse archer before, it is added to the <code class="docutils literal"><span class="pre">others</span></code> object.
-Then, because our empathy HSM doesn’t have it’s own thread, we call its
-<code class="docutils literal"><span class="pre">dispatch</span></code> method.</p>
+<p>It seems simple enough.  The method determines what the name of the other horse
+archer is.  If it hasn’t heard from this horse archer before, it is added to the
+<code class="docutils literal"><span class="pre">others</span></code> object.  Then, because our empathy HSM doesn’t have it’s own thread,
+we call its <code class="docutils literal"><span class="pre">dispatch</span></code> method.</p>
 <p>The <code class="docutils literal"><span class="pre">dispatch_to_all_empathy</span></code> is even simpler:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">dispatch_to_all_empathy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
   <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">other</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -3193,25 +3210,43 @@ Then, because our empathy HSM doesn’t have it’s own thread, we call its
 <p>Now let’s look at the networked advance and circle_and_fire part of the design:</p>
 <a class="reference external image-reference" href="_static/n_ergotic_mongol_advance.pdf"><div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_advance.svg" src="_images/n_ergotic_mongol_advance.svg" /></div>
 </a>
-<p>We see some new things here, first, we yell out when we enter the state.  It
-would be simple to create infinite oscillations between our networked
-statecharts if one were to yell out, only to have another yell out which would
-cause us to yell out again.  Next thing you know,  we are
-<a class="reference external" href="https://www.cloudflare.com/learning/ddos/smurf-ddos-attack/">attacked by smurfs</a>.</p>
-<p>To avoid this kind of trouble I follow a general heuristic, I place these kinds
-of broadcast messages into the entry state where they belong.  For instance, it
-is truthful for this horse archer to yell that he is advancing to all other
-members of his team at the entry point of this advance state.  By doing things
-this way, we can hook these broadcast messages in the same state that they
-originate from, to stop them from escaping out into the outer parts of the chart
-where they might trigger an oscillation avalanche.  See how we have the
-Other_Advance_War_Cry hook linking this call to the empathy chart, while still
-stopping it from propagating outward?</p>
-<p>If you look back at the deceit in detail part of the design, you will see that
-the Other_Advance_War_Cry will cause us to enter this state.  This means that if
-we hear someone else shout out an Other_Advance_War_Cry while we aren’t
-advancing, will yell out our own Other_Advance_War_Cry, but we will only do this
-once.</p>
+<p>We see some new things here, first, we yell out when we enter the state.  Why do
+we do this?  Well, we know that this Other_Advance_War_Cry is intended to be a
+horse archer’s expression of local officer-ship in his unit.  If the other horse
+archers are not advancing, they will advance if they hear his call.</p>
+<p>But, it would be simple to create infinite oscillations between our networked
+statecharts: if one were to yell out, only to have another yell out which would
+cause us to yell out again.  Next thing you know,  we are <a class="reference external" href="https://www.cloudflare.com/learning/ddos/smurf-ddos-attack/">attacked by smurfs</a>.</p>
+<p>To avoid this kind of trouble I follow the multi-chart race pattern, before
+describing how it is implemented let’s consider what we are trying to do.  We
+want the horse archers to race each other into the next state.  If one decides
+it is time to advance, we want them all to advance.  So when we look at this
+part of the diagram we need to think about more than one chart at the same time.</p>
+<p>If the first horse archer in our unit decided it was time to advance, he would
+yell out the Advance_War_Cry and enter the advance state.  Then he would yell
+out the Other_Advance_War_Cry.  When another horse archer hears this, he would
+transition into the Other_Advance_War_Cry and yell out his own
+Other_Advance_War_Cry.  When such a race is happening between nodes there will
+be a burst of traffic on the mesh network.</p>
+<p>But there would be an <em>infinite burst of traffic</em> without the last part of this
+pattern, the event block within the target state.  Notice that when our horse
+archer is in the advance state he will not act when he hears the
+Other_Advance_War_Cry event.  <em>This is very important</em>.  It is this block that
+stops an avalanche of oscillations across the mesh.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Suppose you wanted a quieter multi-chart race and you <em>really</em> trusted your
+network to deliver messages.  Instead of yelling out the Other_Advance_War_Cry
+in the entry state, you could place it on the Advance_War_Cry event.  The
+first advancing horse archer would notify all other members that he is
+advancing and everyone would follow.  If you didn’t block there wouldn’t be an
+infinite oscillation (it’s still a good idea to block though).</p>
+<p class="last">The problem with this approach is that you can’t trust your network.  For it
+to work, every path between the first advancing horse archer and every other
+unit would have to be clear.  With the approach followed in the example, you
+take advantage of the redundant network paths to ensure messages are
+transmitted out to all units.  It’s an automatic feature.</p>
+</div>
 <p>The second new thing we see in this design is an innocuous little comment,
 <code class="docutils literal"><span class="pre">orthogonal</span> <span class="pre">component</span> <span class="pre">debug</span> <span class="pre">code</span> <span class="pre">here</span></code>.  The orthogonal component pattern was
 invented by Miro Samek to be a faster, drop-in replacement of the orthogonal
@@ -3235,52 +3270,90 @@ too.</p>
   <span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">first_name_of_others</span><span class="p">]</span><span class="o">.</span><span class="n">clear_trace</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The above code will only run if there is another horse archer in the mesh.  We
+<p>The above code would appear under the <code class="docutils literal"><span class="pre">orthogonal</span> <span class="pre">component</span> <span class="pre">debug</span> <span class="pre">code</span> <span class="pre">here</span></code>
+comment.  It will only run if there is another horse archer in the mesh.  We
 get the first empathy orthogonal component.  We print it’s trace information to
 the screen, then we clear it’s trace log so that we will only capture the next
 loop’s empathy information when we print it out on the next pass.</p>
 <p>Now let’s look at the networked Skirmish and Ready for Retreat states:</p>
 <a class="reference external image-reference" href="_static/n_ergotic_mongol_skirmish.pdf"><div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_skirmish.svg" src="_images/n_ergotic_mongol_skirmish.svg" /></div>
 </a>
-<p>In the entry states of the skirmish and waiting_to_lure states, we see that the
-horse archer yells out to the mesh.</p>
-<p>The Other_Skirmish_War_Cry follows a very similar pattern as to the
-Other_Advance_War_Cry event in the advanced state:  The ‘Other’ call is made in
-the state’s entry condition, caught as a hook in that same state and used to cause a
-transition into this state from an outside state.</p>
-<p>This pattern is broken with the Other_Retreat_Ready_War_Cry in the
-waiting_to_lure state.  This is because the Other_Retreat_Ready_War_Cry is not
-intended to force the archers to race one another around the field.  Instead, it
-is used to let all of the other archers know that another archer is waiting.  If
-you look out to the deceit_in_detail chart, you will see that there is a hook
-for this signal which will feed the empathy statechart tracking the archer that
-made the call.</p>
-<p>The whole point of the global tactic is happening in this part of the map, we
-are trying to lure a knight.  When a horse archer’s ammunition runs low, he makes a
-Retreat_Ready_War cry.  Upon reacting to this event, he reflects upon all of his
-living teammates to determine if they are all waiting for him.  If they are he
-will still enter the waiting to lure state, but for a shorter period than he
-would if there was another team member was still skirmishing.   In this way he
-isn’t a coward, he joins his brethren in the dangerous waiting_to_lure state.</p>
-<p>We see something else here, when the Officer_Lured event occurs, the archer
-calls the <code class="docutils literal"><span class="pre">snoop_scribble</span></code> method with “Knight Charging”.  This will put this
+<p>Here the horse archers engage in another multi-chart race.</p>
+<p>Instead of racing each other into the ‘advance’ state, they race each other into
+the ‘skirmish’ state.</p>
+<p>Furthermore, the whole point of the global tactic is happening inside of this part of the
+map; we are trying to lure a knight while maintaining group cohesion.  When a
+horse archer’s ammunition runs low, he makes a Retreat_Ready_War cry.  Upon
+reacting to this event, he reflects upon all of his living teammates to
+determine if they are waiting for him.  If they are he will still enter the
+waiting to lure state, but for a shorter period than he would if there was
+another team member that was still skirmishing.   In this way he isn’t a coward,
+he joins his brethren in the dangerous ‘waiting_to_lure’ state before yelling
+out the Retreat_War_Cry.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This also makes the map holographic:  If all other horse archers are dead, the
+global tactic will look the same for the last horse archer.</p>
+</div>
+<p>So the last horse archer who enters the feigned_retreat state determines when
+all other members can leave this state.  This is the opposite situation from the
+multi-chart race pattern.  For lack of a better description, I call it the “multi-chart
+pend pattern,” since all of the charts are pending on the last statechart for their next
+action.</p>
+<p>In fact all of the trouble caused by building up the empathy orthogonal
+components, and then feeding these components with the various
+events around the map were done to serve this “multi-chart pend” pattern.</p>
+<p>I tried to draw a lot of that information onto this part of the diagram:</p>
+<a class="reference external image-reference" href="_static/n_ergotic_mongol_skirmish_2.pdf"><div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_skirmish_2.svg" src="_images/n_ergotic_mongol_skirmish_2.svg" /></div>
+</a>
+<p>We see that the “multi-chart pend” pattern uses the empathy structures, that the
+<code class="docutils literal"><span class="pre">dispatch_to_empathy</span></code> and <code class="docutils literal"><span class="pre">dispatch_to_all_empathy</span></code> methods were used to
+feed these empathy orthogonal components with the information they need to
+settle into their correct states.  We also see that the iterator on the
+Retreat_Ready_War_Cry event was there to determine if we were the last living,
+waiting, horse archer.  If so, to set our time before yelling our retreat to a
+smaller value than it would be otherwise.</p>
+<p>To stay consistent, we yell out this multi-unit signal upon entering the state
+where it is truthful to do so.  This yell will not cause oscillations like it
+would for the multi-chart race pattern.  In fact, we use a hook in an external
+state to catch this call made by other horse archers; we don’t block it in the
+waiting_to_lure state.  The Other_Retreat_Ready_War_Cry is only used to feed the
+empathy charts, to update information about if another horse archer is waiting,
+not waiting or dead.  It can’t cause an oscillation.</p>
+<p>We see something else here too, when a horse archer thinks another one is dead
+he calls the <code class="docutils literal"><span class="pre">snoop_scribble</span></code> method to write about it.  This will put this
 information into the snoop stream.  Any snooping horse archer will see this
-information in their debug stream.  This is very useful for seeing what is
-happening across the botnet.</p>
+information on their snoop network.  This is very useful for understanding what
+is happening across the whole of the botnet.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal"><span class="pre">snoop_scribble</span></code> will print information out onto the snoop network.  If
+this network has been set to track the trace instrumentation it will be
+written in to that stream, if it has been set to track the spy information, it
+will be written into that stream.  The local, <code class="docutils literal"><span class="pre">scribble</span></code> method will still work,
+but it will only write information into the local statechart’s spy stream.</p>
+</div>
+<p>Let’s see what new networking code I added to the feigned_retreat state.</p>
 <a class="reference external image-reference" href="_static/n_ergotic_mongol_retreat.pdf"><div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_retreat.svg" src="_images/n_ergotic_mongol_retreat.svg" /></div>
 </a>
-<p>We see the multichart race pattern pattern again applied to the
-Other_Ready_War_Cry.  An outer state will catch this signal and transition into
-the feigned_retreat state; the entry condition of the feigned_retreat issues the
-Other_Retreat_War_Cry and their is a hook to ensure that we only do this once.</p>
+<p>Here we see what happens when a horse archer finally lures a knight, or when
+they decide they have spent enough time in the waiting_to_lure state.  A
+Retreat_Ready_War_Cry causes all horse archers to retreat using a multi-chart
+race pattern.</p>
+<p>Finally, when a horse archer has run out of arrows they independently marshal
+and wait.</p>
 <a class="reference external image-reference" href="_static/n_ergotic_mongol_marshal.pdf"><div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_marshal.svg" src="_images/n_ergotic_mongol_marshal.svg" /></div>
 </a>
-<p>The marshal state has a lot of topological similarities with the skirmish state.
-Both of these states hold a pending state, so it is no surprise that we see the
-Mulitchart pending pattern within the marshal state.  When a horse archer enters
-the waiting_to_advance state, they yell out their Other_Ready_War_Cry.  An outer
-state hooks this cry coming from other members; using the information to update
-the empathy chart for whomever made the call.</p>
+<p>When they begin to marshal, they refill their quiver and after 60 seconds
+transition into the waiting_to_advance state.</p>
+<p>The waiting_to_advance state is like the waiting_to_lure state: it is only when
+the last horse archer is ready that all of the members can begin their next
+action.</p>
+<p>But we also see that a horse archer might get impatient and attack before all of
+his teammates are marshaled from their previous attack cycle.  If this happens,
+he will prematurely shout out and Advance_War_Cry.  His Advance_War_Cry will
+cause a multi-unit race to the advance state, which will have all of the horse
+archer’s charge towards their enemies front line, with or without arrows.</p>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
 

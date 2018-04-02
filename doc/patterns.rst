@@ -56,7 +56,7 @@ Ultimate Hook
 ^^^^^^^^^^^^^
 Formal description:
 
-    [The Ultimate Hook Pattern provides a] common facilities and policies for
+    [The Ultimate Hook Pattern provides] common facilities and policies for
     handling events but let clients override and specialize every aspect of the
     system's behavior.
 
@@ -71,12 +71,13 @@ Formal description:
 
 Makes sense to me.  Keep up! ;)
 
-To understand the ultimate hook :term:`pattern<Pattern>`, you first have to understand what a
-hook is.  It is just some code in an ``if-elif`` clause.   A hook is just some
-code that catches an event, runs your :term:`client code<Client Code>` and then
-returns something which tells the event processor to stop searching.  **A hook
-doesn't cause a state transition**.  It is a way to get the event processor's
-search algorithm to do work for you without changing state.
+To understand the ultimate hook :term:`pattern<Pattern>`, you first have to
+understand what a hook is.  It is just some code in an ``if-elif`` clause.   A
+hook is just some code that catches an event, runs your :term:`client
+code<Client Code>` and then returns something which tells the event processor to
+stop searching.  **A hook doesn't cause a state transition**.  It is a way to
+get the event processor's search algorithm to do work for you without changing
+state.
 
 You see, anytime the event processor is trying to figure out what to do with an
 event it needs to :ref:`search your

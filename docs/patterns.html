@@ -91,7 +91,7 @@ quotes from his book, then write about it within the context of this work.</p>
 <span id="patterns-ultimate-hook"></span><h2>Ultimate Hook<a class="headerlink" href="#ultimate-hook" title="Permalink to this headline">¶</a></h2>
 <p>Formal description:</p>
 <blockquote>
-<div><p>[The Ultimate Hook Pattern provides a] common facilities and policies for
+<div><p>[The Ultimate Hook Pattern provides] common facilities and policies for
 handling events but let clients override and specialize every aspect of the
 system’s behavior.</p>
 <p>The semantics of state nesting provide the desired mechanism of handling
@@ -104,12 +104,13 @@ superstate handle it (the [child state] inherits behavior from the
 superstate) <a class="footnote-reference" href="#id6" id="id2">[5]</a></p>
 </div></blockquote>
 <p>Makes sense to me.  Keep up! ;)</p>
-<p>To understand the ultimate hook <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a>, you first have to understand what a
-hook is.  It is just some code in an <code class="docutils literal"><span class="pre">if-elif</span></code> clause.   A hook is just some
-code that catches an event, runs your <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client code</span></a> and then
-returns something which tells the event processor to stop searching.  <strong>A hook
-doesn’t cause a state transition</strong>.  It is a way to get the event processor’s
-search algorithm to do work for you without changing state.</p>
+<p>To understand the ultimate hook <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a>, you first have to
+understand what a hook is.  It is just some code in an <code class="docutils literal"><span class="pre">if-elif</span></code> clause.   A
+hook is just some code that catches an event, runs your <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client
+code</span></a> and then returns something which tells the event processor to
+stop searching.  <strong>A hook doesn’t cause a state transition</strong>.  It is a way to
+get the event processor’s search algorithm to do work for you without changing
+state.</p>
 <p>You see, anytime the event processor is trying to figure out what to do with an
 event it needs to <a class="reference internal" href="recipes.html#recipes-what-a-state-does-and-how-to-structure-it"><span class="std std-ref">search your
 statechart</span></a>.  If it finds

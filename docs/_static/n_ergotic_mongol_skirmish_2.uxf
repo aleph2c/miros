@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>200</x>
+      <y>190</y>
+      <w>180</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=.
+&lt;&lt;state pattern&gt;&gt;
+Multichart Pend
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>370</x>
+      <y>190</y>
+      <w>430</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;370.0;20.0;410.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>370</x>
+      <y>220</y>
+      <w>100</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>80.0;60.0;10.0;12.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>280</x>
+      <y>380</y>
+      <w>120</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>empathies
+symbol=substate</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>280</x>
+      <y>230</y>
+      <w>30</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;100.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>220</x>
+      <y>230</y>
+      <w>90</w>
+      <h>320</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;300.0;10.0;40.0;70.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>260</x>
+      <y>330</y>
+      <w>170</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>dispatch_to_empathy
+dispatch_to_all_empathy</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>190</x>
+      <y>530</y>
+      <w>240</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes># Outer state hook:
+Other_Retreat_Ready_War_Cry
+  archer.dispatch_to_empathy(e)
+
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>440</x>
+      <y>230</y>
+      <w>320</w>
+      <h>330</h>
+    </coordinates>
+    <panel_attributes>Retreat_Ready_War_Cry /
+  ready = True
+  for name, other archer.others.items():
+    if other.dead() is not True:
+      ready &amp;= other.waiting()
+    else:
+      archer.snoop_scribble(
+        "{} thinks {} is dead".
+        format(archer.name, name))
+  if ready:
+    # let's make sure the archer isn't a chicken
+    delay_time = random.randint(10,50)
+  else:
+    delay_time = random.randint(30,60)
+  archer.post_fifo(
+    Event(signal=signals.Retreat_War_Cry),
+    times=1,
+    period=archer.to_time(
+      delay_time),
+    deferred=True)
+
+style=wordwrap
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>430</x>
+      <y>380</y>
+      <w>360</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+
+
+fg=black</panel_attributes>
+    <additional_attributes>10.0;180.0;320.0;180.0;320.0;10.0;340.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>770</x>
+      <y>190</y>
+      <w>370</w>
+      <h>480</h>
+    </coordinates>
+    <panel_attributes>*waiting_to_lure*
+--
+entry /
+  archer.yell(
+    Event(signal=signals.Other_Retreat_Ready_War_Cry,
+          payload=archer.name))
+  .
+  .
+  .
+  
+
+valign=top
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>430</x>
+      <y>90</y>
+      <w>30</w>
+      <h>610</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;590.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>
