@@ -3161,11 +3161,39 @@ The waiting_to_advance state is like the waiting_to_lure state: it is only when
 the last horse archer is ready that all of the members can begin their next
 action.
 
-But we also see that a horse archer might get impatient and attack before all of
-his teammates are marshaled from their previous attack cycle.  If this happens,
-he will prematurely shout out and Advance_War_Cry.  His Advance_War_Cry will
-cause a multi-unit race to the advance state, which will have all of the horse
-archer's charge towards their enemies front line, with or without arrows.
+But we also see that a horse archer might get impatient, and attack before all
+of his teammates marshal from their previous attack cycle.  If this happens, he
+will prematurely shout out and Advance_War_Cry.  His Advance_War_Cry will cause
+a multi-unit race to the 'advance' state, which will have all of the horse
+archers charge towards their enemies front line, with or without arrows.
+
+Imagine yourself charging toward an enemy without any arrows.  What would you
+do?  Well, you wouldn't shoot, but you wouldn't be helpless either.  You could
+yell out commands to your team, and they would listen to you, and you could wave
+your scimitar, and there would be at least one armed horse archer covering your
+flank.  So instead of stopping to argue with the guy who got you into this mess,
+you would charge in, circle then quickly call out a Skirmish_War_Cry.
+Immediately upon closing the distance to the front line, you would yell out that
+you are ready for a retreat and pull your scimitar to bait knights.  If you
+survive you will be the first back to the marshal point; so it is pretty much
+guaranteed that you will have arrows for the next attack.
+
+Now, suppose you were the commanding officer of this unit of horse archers.  You
+might notice that their attack throughput is exceptionally high.  They seem to
+always be engaged, adding to the chaos and bluster in the field.  The enemy's
+front line never seems to have a chance to re-organize.  You might not see that
+they aren't firing as many arrows, but according to the equivalent of your
+13th-century spreadsheet, they have been slaying more knights than your other
+teams.  Slaying knights is the strategic objective.  This unit's behaviour is an
+example of an emergent phenomenon.
+
+Emergence describes how complex, and often unforeseen global patterns arise from
+the interactions of individual parts of a system when they follow simple rules.
+Another way of saying this: the whole is greater than the sum of the parts.  It
+is hard to design foreseen emergent features into your multi-unit software, but
+as you play with ergotic state charts you will train up your intuition and
+discover new voodoo tricks.
+
 
 .. _mesh_network: https://github.com/aleph2c/miros/blob/master/examples/mesh_network.py
 .. _party_line: https://en.wikipedia.org/wiki/Party_line_(telephony)
