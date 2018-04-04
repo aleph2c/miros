@@ -393,7 +393,7 @@ I could have just used a single Ammunition_Low event to cause the transition
 from the Skirmish state into the "Waiting To Lure" state.  But, I often use two
 distinct events like this to make the debugging and reflection processes easier
 on myself, so that I can debug a statechart faster than I could with only one
-event that expresses two different semantic meanings.  (This will also give our
+event that expresses two different meanings.  (This will also give our
 design more flexibility, which we will see later in this example).
 
 After a horse archer issues the Retreat_Ready_War_Cry they enter the "Waiting to
@@ -568,14 +568,6 @@ archer or a senior officer.  In the deceit in detail there are three different
 war cries that have this type of characteristic: Advance_War_Cry,
 Skirmish_War_Cry and Retreat_War_Cry.
 
-.. note::
-
-  The "Let's do this thing right now!" variety of signaling between different
-  statechart can be generalized into the "multi-chart race pattern", since each
-  of the statecharts can be thought of racing each other to be the first to give
-  the command to another chart.  If given all of the statecharts will race to
-  the state indicated on their map.
-
 .. image:: _static/ergotic_mongol_31.svg
     :target: _static/ergotic_mongol_31.pdf
     :align: center
@@ -592,7 +584,7 @@ vantage point by war drums near the back of the Mongol horde.
 When a horse archer hears a command from a senior officer, they will give the
 cry themselves and then perform the action.  We implement this using the
 reminder pattern.  A hook is placed at the outer state for these commands; and
-it re-issues a new event as a response.  
+it re-issues a new event as a response.
 
 When a horse archer calls out, it can be heard by other horse archers through a
 mechanism we haven't programmed yet, but that doesn't mean we can't name these new
@@ -1631,16 +1623,17 @@ his "deceit in detail tactic."
 
 .. note::
 
-  To see how the HorseArcher and OtherHorseArcher object’s relate to each other in
-  the object inheritance hierarchy I have included the generalization arrows. The
-  HorseArcher is a generalization of the Factory (allows callbacks), which is a
-  generalization of the ActiveObject (which provides threads) which is a
+  To see how the HorseArcher and OtherHorseArcher object’s relate to each other
+  in the object inheritance hierarchy I have included the generalization arrows.
+  The HorseArcher is a generalization of the Factory (allows callbacks), which
+  is a generalization of the ActiveObject (which provides threads) which is a
   generalization of the HsmWithQueues. The OtherHorseArcher class only derives
   itself from the HsmWithQueues class because it doesn’t need callbacks or a
   thread; the horse archer will provide the thread of operation for each object
   tracking other horse archer’s within him (remember that we are using the
-  orthogonal component state chart pattern). Callbacks are not required because we
-  are using the flat method of writing HSMs for the empathy state machine.
+  orthogonal component state chart pattern). Callbacks are not used for the
+  empathy part of the design because we are using the flat method of writing
+  HSMs for the empathy state machine.
 
 To add this outer state to our previous design, we would create two battle
 callbacks, a battle state, adjust the nesting and how the 'others' items are
@@ -2122,7 +2115,7 @@ network.
 
 Serialization will allow our horse archers to transmit anything within their war
 cries.  "Hey Ганболд (Gandbold), do you want one of my extra horses?", "yes",
-"OK here you go, lala-bee-boop".  This concept expands on the notion of a war
+"OK here you go, `lala-bee-boop <https://www.youtube.com/watch?v=gsNaR6FRuO0>`_".  This concept expands on the notion of a war
 cry; but it is cool that we can transmit the objects of working programs,
 between the nodes of our botnet.  Of course, this is a security nightmare, so if
 we are going to serialize and deserialize messages *we will have to use an
@@ -2826,9 +2819,12 @@ watch the collective instrumentation on the snoop network.
 
 Building a Mongol Unit
 ======================
-Now that we know enough about networking, let's Reduce the resolution on the
-RabbitFactory part of our architectural diagram while increasing the detail on
-the battle HSM:
+Off camera, I re-wrote the horse archer to use the RabbitFactory and it's
+network.  In this section I will describe the new parts of the design and then
+present the code.
+
+To begin, let's Reduce the resolution on the RabbitFactory part of our
+architectural diagram while increasing the detail on the battle HSM:
 
 .. image:: _static/n_ergotic_mongol_2.svg
     :target: _static/n_ergotic_mongol_2.pdf
@@ -2836,24 +2832,23 @@ the battle HSM:
 
 The named methods in the HorserArcher and OtherHorseArcher classes represent
 code that used to exist in their HSMs.  Upon scanning the design, I noticed
-there was a lot of code repetition.  To DRY my Python up, while also simplifying
-the diagram, I thought of names to describe the actions of these repetitive code
-snippets. Then I sucked this repetitive code up out of the HSMs, into named
-methods in the HorseArcher and OtherHorseArcher classes.
+there was a lot of code repetition.  To DRY my Python up I sucked the repetitive
+code up out of the HSMs, into named methods in the HorseArcher and
+OtherHorseArcher classes.
 
-The HorseArcher class also has a static method: ``HorseArcher.get_name``.
-Previously, we were going to reference the other horse archer's by their IP
-addresses.  But if we named them this way, we could not run more than one horse
-archer process per machine without breaking the design.  I don't have ten
-computers in my LAN; so I will have to test multiple processes per device to
-confirm that the design is working.  The ``HorseArcher.get_name`` static method
-will provide *unique* names so that we can create horse archers on the same
-machine.
+The HorseArcher class also has a static method: ``HorseArcher.get_name``.  In
+our previous design, we were going to reference the other horse archer's by
+their IP addresses.  But if we named them this way, we could not run more than
+one horse archer process per machine without breaking the software.  I don't
+have ten computers in my LAN; so I will have to test multiple processes per
+device to confirm that the design is working.  The ``HorseArcher.get_name``
+static method will provide *unique* names so that we can create horse archers on
+the same machine.
 
 Now let's talk about the battle statechart.  Things have become quite
 complicated, and we are starting to face the limitations of the Umlet tool used
 to describe our picture.  The diagram is too big to fit on this page, so we
-compact a large part of it into the deceit_in_detail substate glyph.  This
+compact a large part of it into the deceit_in_detail 'substate' glyph.  This
 means, there is something else here, but we have hidden it from view.  We will
 talk about it soon enough.
 
@@ -2970,7 +2965,7 @@ archer is.  If it hasn't heard from this horse archer before, it is added to the
 ``others`` object.  Then, because our empathy HSM doesn't have it's own thread,
 we call its ``dispatch`` method.
 
-The ``dispatch_to_all_empathy`` is even simpler:
+The ``dispatch_to_all_empathy`` method is even simpler:
 
 .. code-block:: python
 
@@ -2991,7 +2986,7 @@ we do this?  Well, we know that this Other_Advance_War_Cry is intended to be a
 horse archer's expression of local officer-ship in his unit.  If the other horse
 archers are not advancing, they will advance if they hear his call.
 
-But, it would be simple to create infinite oscillations between our networked
+But, we could easily cause infinite oscillations between our networked
 statecharts: if one were to yell out, only to have another yell out which would
 cause us to yell out again.  Next thing you know,  we are `attacked by smurfs
 <https://www.cloudflare.com/learning/ddos/smurf-ddos-attack/>`_.
@@ -3075,15 +3070,15 @@ Here the horse archers engage in another multi-chart race.
 Instead of racing each other into the 'advance' state, they race each other into
 the 'skirmish' state.
 
-Furthermore, the whole point of the global tactic is happening inside of this part of the
-map; we are trying to lure a knight while maintaining group cohesion.  When a
-horse archer's ammunition runs low, he makes a Retreat_Ready_War cry.  Upon
-reacting to this event, he reflects upon all of his living teammates to
-determine if they are waiting for him.  If they are he will still enter the
-waiting to lure state, but for a shorter period than he would if there was
-another team member that was still skirmishing.   In this way he isn't a coward,
-he joins his brethren in the dangerous 'waiting_to_lure' state before yelling
-out the Retreat_War_Cry.
+Furthermore, the whole point of the global tactic is happening inside of this
+part of the map; we are trying to lure a knight while maintaining group
+cohesion.  When a horse archer's ammunition runs low, he makes a
+Retreat_Ready_War cry.  Upon reacting to this event, he reflects upon all of his
+living teammates to determine if they are waiting for him.  If they are he will
+still enter the waiting to lure state, but for a shorter period than he would if
+there was another team member that was still skirmishing.   In this way he isn't
+a coward, he joins his brethren in the dangerous 'waiting_to_lure' state before
+yelling out the Retreat_War_Cry.
 
 .. note:: 
 
@@ -3092,13 +3087,13 @@ out the Retreat_War_Cry.
 
 So the last horse archer who enters the feigned_retreat state determines when
 all other members can leave this state.  This is the opposite situation from the
-multi-chart race pattern.  For lack of a better description, I call it the "multi-chart
-pend pattern," since all of the charts are pending on the last statechart for their next
-action.
+multi-chart race pattern.  For lack of a better description, I call it the
+"multi-chart pend pattern," since all of the charts are pending on the last
+statechart for their next action.
 
 In fact all of the trouble caused by building up the empathy orthogonal
-components, and then feeding these components with the various
-events around the map were done to serve this "multi-chart pend" pattern.
+components, and then feeding these components with the various events around the
+map were done to serve this "multi-chart pend" pattern.
 
 I tried to draw a lot of that information onto this part of the diagram:
 
@@ -3162,19 +3157,19 @@ the last horse archer is ready that all of the members can begin their next
 action.
 
 But we also see that a horse archer might get impatient, and attack before all
-of his teammates marshal from their previous attack cycle.  If this happens, he
+of his teammates regroup from their previous attack cycle.  If this happens, he
 will prematurely shout out and Advance_War_Cry.  His Advance_War_Cry will cause
 a multi-unit race to the 'advance' state, which will have all of the horse
 archers charge towards their enemies front line, with or without arrows.
 
 Imagine yourself charging toward an enemy without any arrows.  What would you
-do?  Well, you wouldn't shoot, but you wouldn't be helpless either.  You could
+do?  Well, you couldn't shoot, but you wouldn't be helpless either.  You could
 yell out commands to your team, and they would listen to you, and you could wave
-your scimitar, and there would be at least one armed horse archer covering your
-flank.  So instead of stopping to argue with the guy who got you into this mess,
-you would charge in, circle then quickly call out a Skirmish_War_Cry.
-Immediately upon closing the distance to the front line, you would yell out that
-you are ready for a retreat and pull your scimitar to bait knights.  If you
+your scimitar and try and look menacing.  There would be at least one armed
+horse archer covering your flank.  So instead of stopping to argue with the guy
+who got you into this predicament, you would charge in, circle then quickly call out a
+Skirmish_War_Cry.  Immediately upon closing the distance to the front line, you
+would yell out that you are ready for a retreat and bait knights.  If you
 survive you will be the first back to the marshal point; so it is pretty much
 guaranteed that you will have arrows for the next attack.
 
@@ -3182,10 +3177,10 @@ Now, suppose you were the commanding officer of this unit of horse archers.  You
 might notice that their attack throughput is exceptionally high.  They seem to
 always be engaged, adding to the chaos and bluster in the field.  The enemy's
 front line never seems to have a chance to re-organize.  You might not see that
-they aren't firing as many arrows, but according to the equivalent of your
-13th-century spreadsheet, they have been slaying more knights than your other
-teams.  Slaying knights is the strategic objective.  This unit's behaviour is an
-example of an emergent phenomenon.
+they aren't firing as many arrows as your other units, but according to the
+equivalent of your 13th-century spreadsheet, they have been slaying more knights
+than your other teams.  Slaying knights is the strategic objective.  This unit's
+behaviour is an example of an emergent phenomenon.
 
 Emergence describes how complex, and often unforeseen global patterns arise from
 the interactions of individual parts of a system when they follow simple rules.
@@ -3193,6 +3188,16 @@ Another way of saying this: the whole is greater than the sum of the parts.  It
 is hard to design foreseen emergent features into your multi-unit software, but
 as you play with ergotic state charts you will train up your intuition and
 discover new voodoo tricks.
+
+.. note::
+
+  The interactions between the simple rules of your agents create the global
+  emergent patterns, so make it easy to change them while you are testing your
+  system.  In this example the impatience of one horse archer starts a emergent
+  oscillation.  The amount of this impatience could be turned into an attribute
+  of the Horse Archer class so that you can parametrize it, and tune it while
+  testing the team of horse archers.
+
 
 
 .. _mesh_network: https://github.com/aleph2c/miros/blob/master/examples/mesh_network.py
