@@ -300,7 +300,6 @@ def didt_other_ready_war_cry(archer, e):
   return return_status.HANDLED
 
 def didt_reset_tactic(archer, e):
-  '''Restart the whole tactic'''
   return archer.trans(deceit_in_detail)
 
 # Advance callbacks
@@ -310,7 +309,7 @@ def advance_entry(archer, e):
     first_name_of_others = next(iter(archer.others))
     print(archer.others[first_name_of_others].trace())
     archer.others[first_name_of_others].clear_trace()
-  archer.snoop_scribble("{} has {} arrows".format(archer.name, archer.arrows))
+  archer.snoop_scribble("{} advancing with {} arrows".format(archer.name, archer.arrows))
 
   archer.post_fifo(
     Event(signal=signals.Close_Enough_For_Circle),
@@ -448,7 +447,6 @@ def wtl_exit(archer, e):
 # Feigned-Retreat callbacks
 def fr_entry(archer, e):
   archer.yell(Event(signal=signals.Other_Retreat_War_Cry, payload=archer.name))
-  #  archer.snoop_scribble("{} has {} arrows".format(archer.name, archer.arrows))
   archer.scribble('fire on knights')
   archer.scribble('fire on footman')
   if archer.arrows == 0:
@@ -504,7 +502,7 @@ def marshal_ready(archer, e):
 def wta_entry(archer, e):
   archer.yell(Event(signal=signals.Other_Ready_War_Cry, payload=archer.name))
   ready = True
-  archer.snoop_scribble("{} has {} arrows".format(archer.name, archer.arrows))
+  archer.snoop_scribble("{} is waiting with {} arrows".format(archer.name, archer.arrows))
   time_to_wait = random.randint(130, 300)
   for name, other in archer.others.items():
     if other.dead() is not True:

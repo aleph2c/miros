@@ -450,7 +450,7 @@ class ReceiveConnections():
     # We provide a default message callback, but it is more than likely that the
     # client will register their own (why else use this class?)
     self.live_callback = self.default_callback
-    print(' [x] Waiting for messages. To exit press CTRL-C')
+    # print(' [x] Waiting for messages. To exit press CTRL-C')
 
     # We wrap the tunable callback with decryption and a serial decoder
     # this way the client doesn't have to know about this complexity
