@@ -218,7 +218,8 @@ class NetworkTool():
         'bob', 'dobbs', '192.168.1.72', 5672)
     '''
     credentials = pika.PlainCredentials(user, password)
-    parameters = pika.ConnectionParameters(ip, port, '/', credentials)
+    parameters = pika.ConnectionParameters(ip, port, '/', credentials,
+        heartbeat_interval=600, blocked_connection_timeout=300)
     connection = pika.BlockingConnection(parameters=parameters)
     return connection
 
@@ -583,7 +584,8 @@ class SnoopReceiver(ReceiveConnections):
 
     parameters = \
       pika.ConnectionParameters(
-        NetworkTool.get_working_ip_address(), port, '/', credentials)
+        NetworkTool.get_working_ip_address(), port, '/', credentials,
+        heartbeat_interval=600, blocked_connection_timeout=300)
 
     self.connection = pika.BlockingConnection(parameters=parameters)
     self.channel = self.connection.channel()
@@ -806,22 +808,23 @@ class EmitConnections():
     '''
     channels = []
 
-    def bullshit_callback(self, method_frame):
-      """This method is invoked by pika when the connection to RabbitMQ is
-      closed unexpectedly. Since it is unexpected, we will reconnect to
-      RabbitMQ if it disconnects.
-      :param pika.frame.Method method_frame: The method frame from RabbitMQ
-      """
-      print('Server closed connection, reopening: ({}) {}'.format(
-                     method_frame.method.reply_code,
-                     method_frame.method.reply_text))
-      time.sleep(0.5)
+    # pika strokes out a lot.. so we want this thing to call itself,
+    # reconstruct the connection which it is suddenly dropped (we will enclose
+    # the provided arguments to the get_channels function)
+    
+    def channel_construction(
+      connection = NetworkTool.get_blocking_connection(user, password, target, port)
+      connection.add_on_close_callback(channel_construction)
+      channel = connection.channel()
+      channel.exchange_declare(exchange=NetworkTool.exchange_name, exchange_type='topic')
+      channel.extension = SimpleNamespace()
+      setattr(channel.extension, 'ip_address', target)
 
 
     for target in targets:
       try:
         connection = NetworkTool.get_blocking_connection(user, password, target, port)
-        connection.add_on_close_callback(bullshit_callback)
+        #connection.add_on_close_callback(bullshit_callback)
         channel = connection.channel()
         channel.exchange_declare(exchange=NetworkTool.exchange_name, exchange_type='topic')
         channel.extension = SimpleNamespace()
