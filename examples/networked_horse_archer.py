@@ -720,7 +720,7 @@ archer.nest(battle, parent=None). \
 
 if __name__ == '__main__':
   print("I am {}".format(archer.name))
-  archer.time_compression = 5
+  archer.time_compression = 10
   archer.start_at(battle)
 
   snoop_type = sys.argv[1:]
