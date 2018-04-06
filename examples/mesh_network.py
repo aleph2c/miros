@@ -1030,7 +1030,12 @@ class MeshTransmitter(EmitConnections):
 
     for channel in self.channels:
       ip = channel.extension.ip_address
-      channel.basic_publish(exchange=NetworkTool.exchange_name, routing_key=ip + routing_key, body=message)
+      try:
+        channel.basic_publish(exchange=NetworkTool.exchange_name, routing_key=ip + routing_key, body=message)
+      except:
+        # RabbitMq is stroking out with illegible messages... lets see if our
+        # designs is robust against these (this is an experiment)
+        pass
 
 if __name__ == "__main__":
   pp('line to appease PEP8/lint F401 noise')
