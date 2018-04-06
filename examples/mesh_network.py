@@ -1031,10 +1031,16 @@ class MeshTransmitter(EmitConnections):
     for channel in self.channels:
       ip = channel.extension.ip_address
       try:
-        channel.basic_publish(exchange=NetworkTool.exchange_name, routing_key=ip + routing_key, body=message)
+        channel.basic_publish(
+          exchange=NetworkTool.exchange_name,
+          routing_key=ip + routing_key,
+          body=message,
+          mandatory=False,
+          immediate=False)
       except:
-        # RabbitMq is stroking out with illegible messages... lets see if our
-        # designs is robust against these (this is an experiment)
+        # RabbitMq is stroking out with illegible messages...
+        # online help suggests that their is a 'network issue' or the server
+        # hasn't started
         pass
 
 if __name__ == "__main__":
