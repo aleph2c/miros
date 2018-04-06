@@ -805,9 +805,23 @@ class EmitConnections():
     name and password of the local rabbitmq server.
     '''
     channels = []
+
+    def bullshit_callback(self, method_frame):
+      """This method is invoked by pika when the connection to RabbitMQ is
+      closed unexpectedly. Since it is unexpected, we will reconnect to
+      RabbitMQ if it disconnects.
+      :param pika.frame.Method method_frame: The method frame from RabbitMQ
+      """
+      print('Server closed connection, reopening: ({}) {}'.format(
+                     method_frame.method.reply_code,
+                     method_frame.method.reply_text))
+      time.sleep(0.5)
+
+
     for target in targets:
       try:
         connection = NetworkTool.get_blocking_connection(user, password, target, port)
+        connection.add_on_close_callback(bullshit_callback)
         channel = connection.channel()
         channel.exchange_declare(exchange=NetworkTool.exchange_name, exchange_type='topic')
         channel.extension = SimpleNamespace()
@@ -816,7 +830,17 @@ class EmitConnections():
       except:
         pass
     return channels
-
+#    def on_connection_closed(self, method_frame):
+#        """This method is invoked by pika when the connection to RabbitMQ is
+#        closed unexpectedly. Since it is unexpected, we will reconnect to
+#        RabbitMQ if it disconnects.
+#        :param pika.frame.Method method_frame: The method frame from RabbitMQ
+#        """
+#        LOGGER.warning('Server closed connection, reopening: (%s) %s',
+#                       method_frame.method.reply_code,
+#                       method_frame.method.reply_text)
+#        self._channel = None
+#        self._connection = self.connect()
 class SnoopTransmitter():
   '''
   Transmit spy/trace information from this computer to all other computers using
@@ -1030,18 +1054,12 @@ class MeshTransmitter(EmitConnections):
 
     for channel in self.channels:
       ip = channel.extension.ip_address
-      try:
-        channel.basic_publish(
-          exchange=NetworkTool.exchange_name,
-          routing_key=ip + routing_key,
-          body=message,
-          mandatory=False,
-          immediate=False)
-      except:
-        # RabbitMq is stroking out with illegible messages...
-        # online help suggests that their is a 'network issue' or the server
-        # hasn't started
-        pass
+      channel.basic_publish(
+        exchange=NetworkTool.exchange_name,
+        routing_key=ip + routing_key,
+        body=message,
+        mandatory=False,
+        immediate=False)
 
 if __name__ == "__main__":
   pp('line to appease PEP8/lint F401 noise')
