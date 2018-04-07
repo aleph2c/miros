@@ -10,6 +10,10 @@
     *Evidence that contradicts Assumptions:*
       * The SPY_RING_BUFFER_SIZE is set to 500 and the TRC_RING_BUFFER_SIZE is
         smaller.
+        
+      * When the TRC_RING_BUFFER_SIZE was set to 5, the trace death occured
+        after 3 trace outputs of the networked_horse_archer.py with time
+        compression set to 50:1
       
     *Evidence that does not contradicts Assumptions:*
       * When the TRC_RING_BUFFER_SIZE size was reduce from 150 to 50 the trace
@@ -46,14 +50,18 @@
   * [ ] Can you speed up the failure by shrinking the queue size?
   * [ ] The queue should be a ring buffer, is it?
   * [ ] The spy instrumentation is broken too
+  * [ ] The trace buffer determines the number of trace output events that will
+        occur prior to trace death
+  * [ ] The time compression is related to the trace death
 
   *Chosen Idea/Hypothesis*
-  Can you speed up the failure by shrink the queue size?    
+  The trace buffer determines the number of trace output events that will occur
+  prior to trace death
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
-  * find the location of the queue used by the trace output
-  * reduce the queue size by 1/3
-  * expect the failure to occur before 2:24 (around a minute)
+  * turn off the noisy spy
+  * reduce the queue size to 5
+  * confirm trace death occurs at the 5th trace
 
 = Act =
 
