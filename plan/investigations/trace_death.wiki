@@ -4,7 +4,7 @@
   The trace would always run despite how long the program runs
 
   *What is the problem?*
-  The trace dies after a prolonged period of testing
+  The trace instrumentation dies after the program runs for a long time.
 
   *Evidence that contradicts Assumptions:*
   
@@ -15,6 +15,7 @@
   
   *Questions for trace dead:*
     Can you simplify your test?
+    Can you baseline?
     Do you have enough information?
     What recently changed?
     Can you speed up the test?
@@ -29,10 +30,17 @@
   * [ ] It is the post event queue
   * [ ] You need more information
   * [ ] Why does this effect the trace and not the spy?
+  * [ ] It smells like a queue problem
+  * [ ] Can you speed up the failure by shrinking the queue size?
+  * [ ] The queue should be a ring buffer, is it?
+
   *Chosen Idea/Hypothesis*
-    
+  Can you speed up the failure by shrink the queue size?    
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
+  * find the location of the queue used by the trace output
+  * reduce the queue size, rerun the test
+  * expect the failure to occur before 2:24
 
 = Act =
 

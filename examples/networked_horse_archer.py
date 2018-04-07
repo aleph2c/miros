@@ -720,9 +720,10 @@ archer.nest(battle, parent=None). \
 
 if __name__ == '__main__':
   print("I am {}".format(archer.name))
-  archer.time_compression = 10
+  archer.time_compression = 50
   archer.start_at(battle)
-
+  archer.live_trace = True
+  archer.live_spy = True
   snoop_type = sys.argv[1:]
   if len(snoop_type) >= 1:
     if snoop_type[0] == 'trace':
