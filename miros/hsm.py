@@ -300,7 +300,7 @@ class HsmTopologyException(Exception):
 
 class HsmEventProcessor():
   SPY_RING_BUFFER_SIZE = 500
-  TRC_RING_BUFFER_SIZE = 150
+  TRC_RING_BUFFER_SIZE = 500
   RTC_RING_BUFFER_SIZE = 250
 
   def __init__(self):
@@ -1024,9 +1024,6 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
   '''
 
   '''
-  SPY_RING_BUFFER_SIZE = 500
-  TRC_RING_BUFFER_SIZE = 150
-  RTC_RING_BUFFER_SIZE = 250
 
   def __init__(self):
     super().__init__()
@@ -1129,7 +1126,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     self.live_spy_callback   = self.__class__.live_spy_callback_default
     self.live_trace_callback = self.__class__.live_trace_callback_default
 
-    self.last_live_trace_size = len(self.full.trace)
+    self.last_live_trace_datetime = len(self.full.trace)
 
   @staticmethod
   def live_spy_callback_default(spy_line):
@@ -1177,6 +1174,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def print_trace_after_at_start_if_live(fn):
     @wraps(fn)
     def _print_trace_if_live(self, initial_state):
+      tr = None
       # fn is next_rtc/start_at
       result = fn(self, initial_state)
       if self.instrumented and self.live_trace:
@@ -1184,7 +1182,8 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
         tr = self.full.trace[-1]
         strace  += self.trace_tuple_to_formatted_string(tr)
         self.live_trace_callback(strace)
-      self.last_live_trace_size = len(self.full.trace)
+      if tr is not None:
+        self.last_live_trace_datetime = tr.datetime
       return result
     return _print_trace_if_live
 
@@ -1202,15 +1201,17 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def print_trace_after_rtc_if_live(fn):
     @wraps(fn)
     def _print_trace_if_live(self):
+      tr = None
       # fn is next_rtc/start_at
       result = fn(self)
-      if(self.instrumented and self.live_trace and
-         len(self.full.trace) != self.last_live_trace_size):
-        strace = "\n"
+      if(self.instrumented and self.live_trace):
         tr = self.full.trace[-1]
-        strace += self.trace_tuple_to_formatted_string(tr)
-        self.live_trace_callback(strace)
-      self.last_live_trace_size = len(self.full.trace)
+        if tr.datetime != self.last_live_trace_datetime:
+          strace = "\n"
+          strace += self.trace_tuple_to_formatted_string(tr)
+          self.live_trace_callback(strace)
+      if tr is not None:
+        self.last_live_trace_datetime = tr.datetime
       return result
     return _print_trace_if_live
 
@@ -1338,7 +1339,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   def clear_trace(self):
     if self.instrumented:
       self.full.trace.clear()
-      self.last_live_trace_size = 0
+      self.last_live_trace_datetime = stdlib_datetime.now()
 
   def trace(self):
     '''Output state transition information only:
