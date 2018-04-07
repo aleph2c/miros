@@ -696,7 +696,7 @@ class ActiveObject(HsmWithQueues):
     active object.
 
     It constructs a task_event and a task, then starts the task.  The task will
-    run periodically posting events into either the fifo or the life of the
+    run periodically posting events into either the fifo or the lifo of the
     active object.
 
     Examples:
@@ -860,6 +860,7 @@ class ActiveObject(HsmWithQueues):
         # This could easily happen if the user creates posted_event items on
         # entry and doesn't cancel them upon exiting the same state (see
         # comment in this function's docstring)
+        pp(self.posted_events_queue)
         task_run_event.clear()
         raise(ActiveObjectOutOfPostedEventResources(
           "posted_events_queue size is too small for what you have asked for"))
