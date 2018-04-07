@@ -14,6 +14,9 @@
       * When the TRC_RING_BUFFER_SIZE was set to 5, the trace death occured
         after 3 trace outputs of the networked_horse_archer.py with time
         compression set to 50:1
+        
+      * At different time compressions the trace death occurs at the same number
+        of listings
       
     *Evidence that does not contradicts Assumptions:*
       * When the TRC_RING_BUFFER_SIZE size was reduce from 150 to 50 the trace
@@ -55,13 +58,13 @@
   * [ ] The time compression is related to the trace death
 
   *Chosen Idea/Hypothesis*
-  The trace buffer determines the number of trace output events that will occur
-  prior to trace death
+  The time compression is related to the trace death
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
-  * turn off the noisy spy
-  * reduce the queue size to 5
-  * confirm trace death occurs at the 5th trace
+  * reduce the time compression to 10:1 observe that trace death occurs for another
+    number other than 3
+  * increase  the time compression to 500:1 observe that trace death occurs for another
+    number other than 3
 
 = Act =
 
