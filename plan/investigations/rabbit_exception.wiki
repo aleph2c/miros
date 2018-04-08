@@ -1,0 +1,42 @@
+*Rabbit Disconnection Exception*
+= Observe =
+  *What defines Success?*
+  We could run the botnet at 1:1 or any time compression and the RabbitMq
+  library pika would not kill the program.
+
+  *What is the problem?*
+  It seems that pika is programmed this way.  It routinely disconnects and
+  issues exceptions.  A fast running program will work, but a slow running
+  program will fail.
+
+  *Evidence that informs Assumptions:*
+  
+= Orient =
+  *Symptoms:*
+  A fast running botnet will work; one set to 1:1 time compression will fail. 
+  
+  *Questions for Rabbit Disconnection Exception:*
+    Can you simplify your test?
+    Do you have enough information?
+    What recently changed?
+
+  *Assumptions:*
+  * This is a pika problem
+  * That a reconnection callback must be added to any pika program
+  * That there example was a hanging example (just enough rope to hang yourself)
+
+= Decide =
+  *Idea/Hypotheses for Rabbit Disconnection Exception: >=5*
+  * [ ] Reproduce the issue; time it
+  * [ ] Search the exception online; try their ideas
+  * [ ] Port any solution back into the miros_rabbit package
+  * [ ] Port solution back into the pika docs in your library
+  * [ ] Possible re-write of all networking code is required
+  
+  *Chosen Idea/Hypothesis*
+    
+
+  *Plan to Expand-on-Idea/Disprove-Hypothesis*
+
+= Act =
+
