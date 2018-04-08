@@ -22,7 +22,7 @@ class ExampleConsumer(object):
     commands that were issued and that should surface in the output as well.
 
     """
-    EXCHANGE = 'message'
+    EXCHANGE = 'pika_refactoring_effort'
     EXCHANGE_TYPE = 'topic'
     QUEUE = 'text'
     ROUTING_KEY = 'example.text'
