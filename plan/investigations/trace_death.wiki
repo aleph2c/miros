@@ -17,13 +17,14 @@
   * Because the trace buffer is a ring buffer, it could be filled and still be
     full of good trace information.
   * By using the buffer size to determine if an event was new, the code was
-    guarenteed to break once the ring buffer was filled.
+    guaranteed to break once the ring buffer was filled.
   * Noticed upon testing that duplicate readings were printed with the same
     datetime information.
   * Changed the broken code to use time stamps instead of the ring buffer size
     appears to have fixed the problem.
   * The regression tests are passing... going to wrap this investagation up and
     cut another release
+  
 
   *Evidence:*
     * When the TRC_RING_BUFFER_SIZE size was reduce from 150 to 50 the trace
