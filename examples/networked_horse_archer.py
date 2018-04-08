@@ -735,6 +735,8 @@ if __name__ == '__main__':
 
   # build a horse archer and rev his time by 100
   archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
+  time.sleep(10)
+  archer.live_trace = False
   time.sleep(1800)
 
 
