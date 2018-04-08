@@ -299,9 +299,7 @@ class ExamplePublisher(object):
         if self._stopping:
             return
 
-        message = {u'مفتاح': u' قيمة',
-                   u'键': u'值',
-                   u'キー': u'値'}
+        message = {u'json_key': u'message'}
         properties = pika.BasicProperties(app_id='example-publisher',
                                           content_type='application/json',
                                           headers=message)
