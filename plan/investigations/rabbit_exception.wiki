@@ -1,6 +1,8 @@
 *Rabbit Disconnection Exception*
 = Observe =
   *What defines Success?*
+  Make to problem appear sooner
+  
   We could run the botnet at 1:1 or any time compression and the RabbitMq
   library pika would not kill the program.
 
@@ -8,8 +10,20 @@
   It seems that pika is programmed this way.  It routinely disconnects and
   issues exceptions.  A fast running program will work, but a slow running
   program will fail.
+  
+  The problem takes too long to reproduce, so, we won't address it.  Instead we
+  will aim the investigation at making it occur sooner.
 
   *Evidence that informs Assumptions:*
+  The program fails after 13:28 minutes.  Yesterday it was failing sooner
+  A second test ran past 15 minutes
+  A second test broke at ~20 minutes
+  
+  One two bots (WSL):
+    pika.exceptions.ConnectionClosed: (-1, "ConnectionResetError(104, 'Connection reset by peer')")
+  
+  The other two bots:
+    pika.exceptions.ChannelClosed
   
 = Orient =
   *Symptoms:*
@@ -21,6 +35,7 @@
     What recently changed?
 
   *Assumptions:*
+  * The issue is partially masked by the previous bug fix.
   * This is a pika problem
   * That a reconnection callback must be added to any pika program
   * That there example was a hanging example (just enough rope to hang yourself)
@@ -28,12 +43,18 @@
 = Decide =
   *Idea/Hypotheses for Rabbit Disconnection Exception: >=5*
   * [ ] Reproduce the issue; time it
+  * [ ] To reproduce it, shut off the snoop network after a set amound of time
+        and wait for it to fail
+  * [ ] Try to speed time before the issue occurs
   * [ ] Search the exception online; try their ideas
   * [ ] Port any solution back into the miros_rabbit package
   * [ ] Port solution back into the pika docs in your library
   * [ ] Possible re-write of all networking code is required
   
   *Chosen Idea/Hypothesis*
+  Reproduce the issue and time it, faster this time.
+  * remove the time out changes made a couple of days back
+  * re-run test and see if you can get it to fail faster
     
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
