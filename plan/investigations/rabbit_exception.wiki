@@ -1,12 +1,18 @@
 *Rabbit Disconnection Exception*
 = Observe =
   *What defines Success?*
-  Make to problem appear sooner
+  We relay on the pika library so that it doesn't suddenly stroke-out with
+  exceptions (> 15 minutes to reproduce).
   
-  We could run the botnet at 1:1 or any time compression and the RabbitMq
-  library pika would not kill the program.
+  Make a new version of the networking software based on the examples provided
+  from the pika docs instead of the docs provided by RabbitMq
 
   *What is the problem?*
+  I might have made a big mistake picking pika (RabbitMq).  It seems that the
+  tutorial written in the RabbitMq docs and the code listed on the pika official
+  documentation are very different.  They have moved from an old way of writing
+  to a "new" way of writing RabbitMq code using callbacks.
+  
   It seems that pika is programmed this way.  It routinely disconnects and
   issues exceptions.  A fast running program will work, but a slow running
   program will fail.
@@ -16,7 +22,6 @@
 
   *Evidence that informs Assumptions:*
   The program fails after 13:28 minutes.  Yesterday it was failing sooner
-  A second test ran past 15 minutes
   A second test broke at ~20 minutes
   
   One two bots (WSL):
@@ -27,35 +32,34 @@
   
 = Orient =
   *Symptoms:*
-  A fast running botnet will work; one set to 1:1 time compression will fail. 
   
   *Questions for Rabbit Disconnection Exception:*
+    Can I understand their code?
+    Can I find a way to make the problem fail sooner. 
     Can you simplify your test?
     Do you have enough information?
     What recently changed?
 
   *Assumptions:*
-  * The issue is partially masked by the previous bug fix.
-  * This is a pika problem
-  * That a reconnection callback must be added to any pika program
-  * That there example was a hanging example (just enough rope to hang yourself)
+  * 
 
 = Decide =
   *Idea/Hypotheses for Rabbit Disconnection Exception: >=5*
-  * [ ] Reproduce the issue; time it
+  * [ ] Reproduce the issue; time it [too long]
   * [ ] To reproduce it, shut off the snoop network after a set amound of time
-        and wait for it to fail
-  * [ ] Try to speed time before the issue occurs
+        and wait for it to fail [didn't work]
   * [ ] Search the exception online; try their ideas
   * [ ] Port any solution back into the miros_rabbit package
   * [ ] Port solution back into the pika docs in your library
   * [ ] Possible re-write of all networking code is required
+  * [ ] It seems that the heartbeat_interval might be causing the issue
+  * [ ] Reproduce the pika examples from the pika docs, not the RabbitMq docs,
+        get something working, then roll out an entirely new network subsystem.
   
   *Chosen Idea/Hypothesis*
-  Reproduce the issue and time it, faster this time.
-  * remove the time out changes made a couple of days back
-  * re-run test and see if you can get it to fail faster
-    
+  Try to speed time before the issue occurs
+  * Reproduce the pika examples from the pika docs, not the RabbitMq docs,
+    get something working, then roll out an entirely new network subsystem.
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
 
