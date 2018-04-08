@@ -218,8 +218,9 @@ class NetworkTool():
         'bob', 'dobbs', '192.168.1.72', 5672)
     '''
     credentials = pika.PlainCredentials(user, password)
-    parameters = pika.ConnectionParameters(ip, port, '/', credentials,
-        heartbeat_interval=600, blocked_connection_timeout=300)
+    #parameters = pika.ConnectionParameters(ip, port, '/', credentials,
+    #    heartbeat_interval=600, blocked_connection_timeout=300)
+    parameters = pika.ConnectionParameters(ip, port, '/', credentials)
     connection = pika.BlockingConnection(parameters=parameters)
     return connection
 
@@ -584,8 +585,10 @@ class SnoopReceiver(ReceiveConnections):
 
     parameters = \
       pika.ConnectionParameters(
-        NetworkTool.get_working_ip_address(), port, '/', credentials,
-        heartbeat_interval=600, blocked_connection_timeout=300)
+        NetworkTool.get_working_ip_address(), port, '/', credentials)
+      #pika.ConnectionParameters(
+      #  NetworkTool.get_working_ip_address(), port, '/', credentials,
+      #  heartbeat_interval=600, blocked_connection_timeout=300)
 
     self.connection = pika.BlockingConnection(parameters=parameters)
     self.channel = self.connection.channel()
