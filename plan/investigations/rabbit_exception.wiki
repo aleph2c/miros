@@ -11,8 +11,8 @@
   work from their stable example.
 
   *Evidence that informs Assumptions:*
-  Previous issues:
   
+  Previous issues:
     One two bots (WSL):
       pika.exceptions.ConnectionClosed: (-1, "ConnectionResetError(104, 'Connection reset by peer')")
     
@@ -23,6 +23,10 @@
   The consumer will by on the pi
   The producer will be on the WLS
   The user/password will be the same as before
+  
+  The exchange is defined by the consumer, the producer's machine does not have the exchange
+  The pi exchange: http://192.168.1.69:15672/#/exchanges
+  The WLS exchange: http://127.0.0.1:15672/#/exchanges
   
   *Symptoms:*
   
@@ -44,19 +48,14 @@
   * [ ] Understand their code in detail (obey, cooperate, diverge)
   * [ ] Try to pass different strings using an API call into their example
   * [ ] Refactor their code to work with your botnet (generate new work list)
+  * [ ] Pound the exchange and see if it fails [it worked]
+  * [ ] Run it to failure and see what happens
   
   *Chosen Idea/Hypothesis*
-  Try to pass different strings using an API call into their example
-
-  * There is a callback method which contains the message information that is
-    registered with a pika 'add_timeout' method.  So the information is enclosed
-    within this callback.  There seems to be some sort of heart beat approach
-    followed by this example; like we have to bit bang our messages.
+  Run it to failure and see what happens
+    PUBLISH_INTERVAL = 0.00000000000000000000001
+    time to failure: after 5 minutes, I stopped the test.  It didn't fail.
     
-  * I could make this work, but I really think I should understand the code in
-    its entirety before proceeding.
-    
-
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
 
 = Act =
