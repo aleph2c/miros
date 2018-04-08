@@ -38,16 +38,24 @@
 = Decide =
   *Idea/Hypotheses for Rabbit Disconnection Exception: >=5*
   * [ ] Reproduce old issue; time it [too long]
-  * [ ] Get networking working
-  * [ ] Get user_name/password working
-  * [ ] Pass a string
-  * [ ] Understand their code in detail (cooperate, obey, diverge)
+  * [X] Get networking working
+  * [X] Get user_name/password working
+  * [X] Pass a string
+  * [ ] Understand their code in detail (obey, cooperate, diverge)
+  * [ ] Try to pass different strings using an API call into their example
   * [ ] Refactor their code to work with your botnet (generate new work list)
   
   *Chosen Idea/Hypothesis*
-  Pass a string
-  * find the code which sends a message
-  * put something that isn't Chinese into it so you can read it in the logs
+  Try to pass different strings using an API call into their example
+
+  * There is a callback method which contains the message information that is
+    registered with a pika 'add_timeout' method.  So the information is enclosed
+    within this callback.  There seems to be some sort of heart beat approach
+    followed by this example; like we have to bit bang our messages.
+    
+  * I could make this work, but I really think I should understand the code in
+    its entirety before proceeding.
+    
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
 
