@@ -3,9 +3,15 @@
 import logging
 import pika
 import json
+from queue import Queue as ThreadQueue
+from threading import Thread
+from threading import Event as ThreadEvent
+import time
+import functools
+import random
 
 LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
-        '-35s %(lineno) -5d: %(message)s')
+    '-35s %(lineno) -5d: %(message)s')
 LOGGER = logging.getLogger(__name__)
 
 class ExamplePublisher(object):
@@ -21,11 +27,12 @@ class ExamplePublisher(object):
   messages that have been sent and if they've been confirmed by RabbitMQ.
 
   """
-  EXCHANGE     = 'pika_refactoring_effort'
-  EXCHANGE_TYPE  = 'topic'
-  PUBLISH_INTERVAL = 1.0
-  QUEUE      = 'text'
-  ROUTING_KEY    = 'example.text'
+  EXCHANGE                  = 'pika_refactoring_effort'
+  EXCHANGE_TYPE             = 'topic'
+  PUBLISH_BASELINE_INTERVAL = 0.5
+  PUBLISH_FAST_INTERVAL     = 0.001
+  QUEUE                     = 'text'
+  ROUTING_KEY               = 'example.text'
 
   def __init__(self, amqp_url):
     """Setup the example publisher object, passing in the URL we will use
@@ -43,6 +50,8 @@ class ExamplePublisher(object):
     self._stopping = False
     self._url = amqp_url
     self._closing = False
+    self._queue = ThreadQueue(maxsize=500)
+    self._task_run_event = ThreadEvent()
 
   def connect(self):
     """This method connects to RabbitMQ, returning the connection handle.
@@ -227,7 +236,7 @@ class ExamplePublisher(object):
     """
     LOGGER.info('Issuing consumer related RPC commands')
     self.enable_delivery_confirmations()
-    self.schedule_next_message()
+    self.schedule_producer_heart_beat(self.PUBLISH_BASELINE_INTERVAL)
 
   def enable_delivery_confirmations(self):
     """Send the Confirm.Select RPC method to RabbitMQ to enable delivery
@@ -270,19 +279,17 @@ class ExamplePublisher(object):
           self._message_number, len(self._deliveries),
           self._acked, self._nacked)
 
-  def schedule_next_message(self):
+  def schedule_producer_heart_beat(self, timeout):
     """If we are not closing our connection to RabbitMQ, schedule another
-    message to be delivered in PUBLISH_INTERVAL seconds.
+    message to be delivered in PUBLISH_BASELINE_INTERVAL seconds.
 
     """
     if self._stopping:
       return
-    LOGGER.info('Scheduling next message for %0.1f seconds',
-          self.PUBLISH_INTERVAL)
-    self._connection.add_timeout(self.PUBLISH_INTERVAL,
-                   self.publish_message)
+    LOGGER.info('Scheduling queue check for %0.3f seconds', timeout)
+    self._connection.add_timeout(timeout, self.producer_heart_beat)
 
-  def publish_message(self):
+  def publish_message(self, message):
     """If the class is not stopping, publish a message to RabbitMQ,
     appending a list of deliveries with the message number that was sent.
     This list will be used to check for delivery confirmations in the
@@ -291,17 +298,17 @@ class ExamplePublisher(object):
     Once the message has been sent, schedule another message to be sent.
     The main reason I put scheduling in was just so you can get a good idea
     of how the process is flowing by slowing down and speeding up the
-    delivery intervals by changing the PUBLISH_INTERVAL constant in the
+    delivery intervals by changing the PUBLISH_BASELINE_INTERVAL constant in the
     class.
 
     """
     if self._stopping:
       return
 
-    message = {u'json_key': u'message'}
+    json_message = {u'json_key': message}
     properties = pika.BasicProperties(app_id='example-publisher',
                       content_type='application/json',
-                      headers=message)
+                      headers=json_message)
 
     self._channel.basic_publish(self.EXCHANGE, self.ROUTING_KEY,
                   json.dumps(message, ensure_ascii=False),
@@ -309,7 +316,6 @@ class ExamplePublisher(object):
     self._message_number += 1
     self._deliveries.append(self._message_number)
     LOGGER.info('Published message # %i', self._message_number)
-    self.schedule_next_message()
 
   def close_channel(self):
     """Invoke this command to close the channel with RabbitMQ by sending
@@ -340,6 +346,7 @@ class ExamplePublisher(object):
     self._stopping = True
     self.close_channel()
     self.close_connection()
+    self._task_run_event.clear()
     self._connection.ioloop.start()
     LOGGER.info('Stopped')
 
@@ -349,16 +356,61 @@ class ExamplePublisher(object):
     self._closing = True
     self._connection.close()
 
+  def producer_heart_beat(self):
+    if self._task_run_event.is_set():
+      if self._stopping:
+        return
+      timeout_time = self.PUBLISH_BASELINE_INTERVAL
+      # speed up how often we call the next producer_heart_beat if we have
+      # messages waiting, messages events tend to be bursty
+      queue_length = self._queue.qsize()
+      if queue_length != 0:
+        timeout_time /= queue_length * 1.0
+        # ensure we can output the messages that we are waiting for before we
+        # call this producer_heart_beat again (this is a clamp)
+        timeout_time = self.PUBLISH_FAST_INTERVAL * 2 if timeout_time < self.PUBLISH_FAST_INTERVAL else timeout_time
+      self.schedule_producer_heart_beat(timeout_time)
+
+      # empty the queue
+      if queue_length >= 1:
+        for i in range(queue_length):
+          message = self._queue.get()
+          cb = functools.partial(self.publish_message, message=message)
+          self._connection.add_timeout(self.PUBLISH_FAST_INTERVAL, cb)
+          LOGGER.info('Scheduling next message for %0.3f seconds', self.PUBLISH_FAST_INTERVAL)
+
+  def post_fifo(self, message):
+    '''use this to post messages to the network'''
+    self._queue.put(message)
+
+  def start_blocking_message_prodution(self):
+    """Add a thread so that the run method doesn't steal our program control."""
+    self._task_run_event.set()
+
+    def thread_runner(self):
+      # The run method will turn on pika's callback hell.  All
+      self.run()
+
+    thread = Thread(target=thread_runner, args=(self,), daemon=True)
+    thread.start()
+
+  def stop_blocking_message_production(self):
+    self._task_run_event.clear()
 
 def main():
-  logging.basicConfig(level=logging.DEBUG, format=LOG_FORMAT)
+  logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
   # send to the raspberry pi
   example = ExamplePublisher('amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600')
-  try:
-    example.run()
-  except KeyboardInterrupt:
-    example.stop()
+  example.start_blocking_message_prodution()
+  time.sleep(2)
+  for i in range(1000):
+    example.post_fifo("Janice Library {}".format(i))
+    time.sleep(random.random()/1000.0)
+  time.sleep(10)
+  example.post_fifo("Last Message {}".format(i))
+  time.sleep(1)
 
 if __name__ == '__main__':
   main()
+  print("hello world")
