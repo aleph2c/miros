@@ -1,40 +1,82 @@
 # -*- coding: utf-8 -*-
 # This code was copied from the pika documentation
-import logging
+import time
 import pika
 import json
-from queue import Queue as ThreadQueue
-from threading import Thread
-from threading import Event as ThreadEvent
-import time
+import logging
 import functools
-import random
+from threading import Thread
+from queue import Queue as ThreadQueue
+from threading import Event as ThreadEvent
 
 LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
     '-35s %(lineno) -5d: %(message)s')
 LOGGER = logging.getLogger(__name__)
 
-class ExamplePublisher(object):
-  """This is an example publisher that will handle unexpected interactions
-  with RabbitMQ such as channel and connection closures.
+class PikaTopicPublisher():
+  """
+  This is a pika (Python-RabbitMq) message publisher heavily based on the
+  asychronous example provided in the pika documentation.  It should handle
+  unexpected interactions with RabbitMQ such as channel and connection closures.
 
-  If RabbitMQ closes the connection, it will reopen it. You should
-  look at the output, as there are limited reasons why the connection may
-  be closed, which usually are tied to permission related issues or
-  socket timeouts.
+  If RabbitMQ closes the connection, an object of this class should reopen it.
+  (You should look at the output, as there are limited reasons why the connection
+  may be closed, which usually are tied to permission related issues or socket
+  timeouts.)
 
-  It uses delivery confirmations and illustrates one way to keep track of
-  messages that have been sent and if they've been confirmed by RabbitMQ.
+  Example:
+    # set a callback mechanism to sample the task's input queue every 1.5 seconds
+    # name the exchange in the RabbitMq server at the url to 'g_pika_producer_exchange'
+    # name the RabbitMq queue on the server at the url to 'g_queue'
+    # set the topic routing key to 'pub_thread.text'
+    publisher = \
+      PikaTopicPublisher(
+        amqp_url='amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
+        publish_tempo_sec=1.5,
+        exchange_name='g_pika_producer_exchange',
+        queue_name='g_queue',
+        routing_key='pub_thread.text',
+      )
+
+    # to start the thread so pika won't block your code:
+    publisher.start_thread()
+
+    # to actually write messages (publish) to the amqp_url:
+    publish.post_fifo("Some Message")
+
+    # to stop the thread but keep the connection
+    publisher.start_thread()
+
+    # to start the thread again
+    publisher.start_thread()
+
+    # to stop the connection and the thread
+    publisher.stop()
+
+    # to reconnect and start the thread
+    publisher.start_thread()
+
+  Notes:
+    It uses delivery confirmations and illustrates one way to keep track of
+    messages that have been sent and if they've been confirmed by RabbitMQ.
+    This confirmation mechanism will not work if message tempo exceeds the
+    publish_tempo (the messages will get through but confirmation mechanism will
+    indicate there is a problem when there isn't one.)
+
+    If the input queue has more than one item they will all be sent out to the
+    network and the queue sampler callback's frequency will temporarily
+    increase to deal with queue bursting.
 
   """
-  EXCHANGE                  = 'pika_refactoring_effort'
   EXCHANGE_TYPE             = 'topic'
-  PUBLISH_BASELINE_INTERVAL = 0.5
-  PUBLISH_FAST_INTERVAL     = 0.001
-  QUEUE                     = 'text'
-  ROUTING_KEY               = 'example.text'
+  PUBLISH_FAST_INTERVAL_SEC = 0.000001
 
-  def __init__(self, amqp_url):
+  def __init__(self,
+               amqp_url,
+               routing_key,
+               publish_tempo_sec,
+               exchange_name,
+               queue_name):
     """Setup the example publisher object, passing in the URL we will use
     to connect to RabbitMQ.
 
@@ -43,15 +85,24 @@ class ExamplePublisher(object):
     """
     self._connection = None
     self._channel = None
+
     self._deliveries = []
     self._acked = 0
     self._nacked = 0
     self._message_number = 0
     self._stopping = False
-    self._url = amqp_url
     self._closing = False
-    self._queue = ThreadQueue(maxsize=500)
+
+    self._amqp_url = amqp_url
+    self._thread_queue = ThreadQueue(maxsize=500)
     self._task_run_event = ThreadEvent()
+    self._publish_tempo_sec = publish_tempo_sec
+
+    # will set the exchange, queue and routing_keys names for the RabbitMq
+    # server running on amqp_url
+    self._rabbit_exchange_name = exchange_name
+    self._rabbit_queue_name = queue_name
+    self._rabbit_routing_key = routing_key
 
   def connect(self):
     """This method connects to RabbitMQ, returning the connection handle.
@@ -63,8 +114,8 @@ class ExamplePublisher(object):
     :rtype: pika.SelectConnection
 
     """
-    LOGGER.info('Connecting to %s', self._url)
-    return pika.SelectConnection(pika.URLParameters(self._url),
+    LOGGER.info('Connecting to %s', self._amqp_url)
+    return pika.SelectConnection(pika.URLParameters(self._amqp_url),
                    self.on_connection_open,
                    stop_ioloop_on_close=False)
 
@@ -147,7 +198,7 @@ class ExamplePublisher(object):
     LOGGER.info('Channel opened')
     self._channel = channel
     self.add_on_channel_close_callback()
-    self.setup_exchange(self.EXCHANGE)
+    self.setup_exchange(self._rabbit_exchange_name)
 
   def add_on_channel_close_callback(self):
     """This method tells pika to call the on_channel_closed method if
@@ -194,7 +245,7 @@ class ExamplePublisher(object):
 
     """
     LOGGER.info('Exchange declared')
-    self.setup_queue(self.QUEUE)
+    self.setup_queue(self._rabbit_queue_name)
 
   def setup_queue(self, queue_name):
     """Setup the queue on RabbitMQ by invoking the Queue.Declare RPC
@@ -218,9 +269,9 @@ class ExamplePublisher(object):
 
     """
     LOGGER.info('Binding %s to %s with %s',
-          self.EXCHANGE, self.QUEUE, self.ROUTING_KEY)
-    self._channel.queue_bind(self.on_bindok, self.QUEUE,
-                 self.EXCHANGE, self.ROUTING_KEY)
+          self._rabbit_exchange_name, self._rabbit_queue_name, self._rabbit_routing_key)
+    self._channel.queue_bind(self.on_bindok, self._rabbit_queue_name,
+                 self._rabbit_exchange_name, self._rabbit_routing_key)
 
   def on_bindok(self, unused_frame):
     """This method is invoked by pika when it receives the Queue.BindOk
@@ -236,7 +287,7 @@ class ExamplePublisher(object):
     """
     LOGGER.info('Issuing consumer related RPC commands')
     self.enable_delivery_confirmations()
-    self.schedule_producer_heart_beat(self.PUBLISH_BASELINE_INTERVAL)
+    self.schedule_producer_heart_beat(self._publish_tempo_sec)
 
   def enable_delivery_confirmations(self):
     """Send the Confirm.Select RPC method to RabbitMQ to enable delivery
@@ -273,20 +324,29 @@ class ExamplePublisher(object):
       self._acked += 1
     elif confirmation_type == 'nack':
       self._nacked += 1
-    self._deliveries.remove(method_frame.method.delivery_tag)
-    LOGGER.info('Published %i messages, %i have yet to be confirmed, '
-          '%i were acked and %i were nacked',
-          self._message_number, len(self._deliveries),
-          self._acked, self._nacked)
+
+    item = method_frame.method.delivery_tag
+    # only remove items that exist in our list (if a previous thread was
+    # canceled and this one was started we would receive delivery_tags which we
+    # didn't send - this could cause the remove method to crash the producer
+    if item in self._deliveries:
+      self._deliveries.remove(method_frame.method.delivery_tag)
+      LOGGER.info('Published %i messages, %i have yet to be confirmed, '
+            '%i were acked and %i were nacked',
+            self._message_number, len(self._deliveries),
+            self._acked, self._nacked)
+    else:
+      LOGGER.info('Received delivery tag for something we did not send')
 
   def schedule_producer_heart_beat(self, timeout):
     """If we are not closing our connection to RabbitMQ, schedule another
-    message to be delivered in PUBLISH_BASELINE_INTERVAL seconds.
+    message to be delivered in self._publish_tempo_sec seconds.
 
     """
     if self._stopping:
       return
-    LOGGER.info('Scheduling queue check for %0.3f seconds', timeout)
+    # Scheduling next Task queue check
+    LOGGER.info('Task queue check in %0.3f seconds', timeout)
     self._connection.add_timeout(timeout, self.producer_heart_beat)
 
   def publish_message(self, message):
@@ -298,8 +358,8 @@ class ExamplePublisher(object):
     Once the message has been sent, schedule another message to be sent.
     The main reason I put scheduling in was just so you can get a good idea
     of how the process is flowing by slowing down and speeding up the
-    delivery intervals by changing the PUBLISH_BASELINE_INTERVAL constant in the
-    class.
+    delivery intervals by changing the self._publish_tempo_sec
+    constant in the class.
 
     """
     if self._stopping:
@@ -310,7 +370,7 @@ class ExamplePublisher(object):
                       content_type='application/json',
                       headers=json_message)
 
-    self._channel.basic_publish(self.EXCHANGE, self.ROUTING_KEY,
+    self._channel.basic_publish(self._rabbit_exchange_name, self._rabbit_routing_key,
                   json.dumps(message, ensure_ascii=False),
                   properties)
     self._message_number += 1
@@ -319,28 +379,23 @@ class ExamplePublisher(object):
 
   def close_channel(self):
     """Invoke this command to close the channel with RabbitMQ by sending
-    the Channel.Close RPC command.
-
-    """
+    the Channel.Close RPC command."""
     LOGGER.info('Closing the channel')
     if self._channel:
       self._channel.close()
 
   def run(self):
-    """Run the example code by connecting and then starting the IOLoop.
-
-    """
+    """Run the example code by connecting and then starting the IOLoop. """
     self._connection = self.connect()
     self._connection.ioloop.start()
 
   def stop(self):
-    """Stop the example by closing the channel and connection. We
-    set a flag here so that we stop scheduling new messages to be
+    """Stop the example by closing the channel and connection and releasing the
+    thread. We set a flag here so that we stop scheduling new messages to be
     published. The IOLoop is started because this method is
     invoked by the Try/Catch below when KeyboardInterrupt is caught.
     Starting the IOLoop again will allow the publisher to cleanly
     disconnect from RabbitMQ.
-
     """
     LOGGER.info('Stopping')
     self._stopping = True
@@ -357,59 +412,109 @@ class ExamplePublisher(object):
     self._connection.close()
 
   def producer_heart_beat(self):
+    """This is the callback that is called ever publish_tempo_sec to check to
+    see if something is in the thread_queue.  If there are items in this queue
+    it schedules other callbacks to send out the messages, and temporarily
+    increases its frequecy to deal with queue bursting.
+    """
     if self._task_run_event.is_set():
       if self._stopping:
         return
-      timeout_time = self.PUBLISH_BASELINE_INTERVAL
+      timeout_time = self._publish_tempo_sec
       # speed up how often we call the next producer_heart_beat if we have
       # messages waiting, messages events tend to be bursty
-      queue_length = self._queue.qsize()
+      queue_length = self._thread_queue.qsize()
       if queue_length != 0:
         timeout_time /= queue_length * 1.0
         # ensure we can output the messages that we are waiting for before we
         # call this producer_heart_beat again (this is a clamp)
-        timeout_time = self.PUBLISH_FAST_INTERVAL * 2 if timeout_time < self.PUBLISH_FAST_INTERVAL else timeout_time
+        timeout_time = self.PUBLISH_FAST_INTERVAL_SEC * 2 if timeout_time < self.PUBLISH_FAST_INTERVAL_SEC else timeout_time
       self.schedule_producer_heart_beat(timeout_time)
 
       # empty the queue
       if queue_length >= 1:
         for i in range(queue_length):
-          message = self._queue.get()
+          message = self._thread_queue.get()
           cb = functools.partial(self.publish_message, message=message)
-          self._connection.add_timeout(self.PUBLISH_FAST_INTERVAL, cb)
-          LOGGER.info('Scheduling next message for %0.3f seconds', self.PUBLISH_FAST_INTERVAL)
+          self._connection.add_timeout(self.PUBLISH_FAST_INTERVAL_SEC, cb)
+          LOGGER.info('Scheduling next output message in %0.6f seconds', self.PUBLISH_FAST_INTERVAL_SEC)
 
   def post_fifo(self, message):
-    '''use this to post messages to the network'''
-    self._queue.put(message)
+    """use this to post messages to the network"""
+    self._thread_queue.put(message)
 
-  def start_blocking_message_prodution(self):
+  def start_thread(self):
     """Add a thread so that the run method doesn't steal our program control."""
     self._task_run_event.set()
+    self._stopping = False
 
     def thread_runner(self):
-      # The run method will turn on pika's callback hell.  All
+      # The run method will turn on pika's callback hell.
+      # To see how this is turned off look at the producer_heart_beat
       self.run()
+      # code here will never run
 
     thread = Thread(target=thread_runner, args=(self,), daemon=True)
     thread.start()
 
-  def stop_blocking_message_production(self):
+  def stop_thread(self):
+    """stop the thread, but keep the connection open.  To close the connection
+    and stop the thread, use the 'stop' api"""
     self._task_run_event.clear()
 
 def main():
   logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
-
   # send to the raspberry pi
-  example = ExamplePublisher('amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600')
-  example.start_blocking_message_prodution()
+  pub_thread1 = \
+    PikaTopicPublisher(
+      amqp_url='amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
+      routing_key='pub_thread.text',
+      publish_tempo_sec=1.5,
+      exchange_name='g_pika_producer_exchange',
+      queue_name='g_queue',
+    )
+  pub_thread2 = \
+    PikaTopicPublisher(
+      amqp_url='amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
+      routing_key='pub_thread.text',
+      publish_tempo_sec=0.5,
+      exchange_name='g_pika_producer_exchange',
+      queue_name='g_queue',
+    )
+  pub_thread3 = \
+    PikaTopicPublisher(
+      amqp_url='amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
+      routing_key='pub_thread.text',
+      publish_tempo_sec=1.1,
+      exchange_name='g_pika_producer_exchange',
+      queue_name='g_queue',
+    )
+  pub_thread1.start_thread()
+  pub_thread2.start_thread()
+  pub_thread3.start_thread()
+
   time.sleep(2)
-  for i in range(1000):
-    example.post_fifo("Janice Library {}".format(i))
-    time.sleep(random.random()/1000.0)
-  time.sleep(10)
-  example.post_fifo("Last Message {}".format(i))
+  for i in range(5):
+    pub_thread1.post_fifo("Janice Library {}".format(i))
+    pub_thread2.post_fifo("Mervin Burr {}".format(i))
+    pub_thread3.post_fifo("Scott {}".format(i))
+    time.sleep(0.51)
+
+  pub_thread1.stop_thread()
+  pub_thread2.stop_thread()
+  pub_thread3.stop()
+  time.sleep(3)
+
+  pub_thread1.start_thread()
+  pub_thread2.start_thread()
+  pub_thread3.start_thread()
   time.sleep(1)
+
+  pub_thread1.post_fifo("Last Message on 1")
+  pub_thread2.post_fifo("Last Message on 2")
+  print("trying to publish in the new thread runner")
+  pub_thread3.post_fifo("Last Message on 3")
+  time.sleep(0.5)
 
 if __name__ == '__main__':
   main()
