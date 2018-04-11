@@ -1,19 +1,19 @@
 *Rabbit Disconnection Exception*
 = Observe =
   *What defines Success?*
+    Get rid of the bugs that occur on the RabbitMq connection after > 15 minutes
+    of use:
+    
     Place the pika team's asynchronous code example between miros and RabbitMq.
     
-    But their code defies use with an API; for some reason they will not show a
-    reasonable example.  Bend it to your will.
  
   *Immediate Goal:*
-    Wrap their producer into its own thread.  Have it pend on a queue and
-    dispatch information out to network using techniques discovered from reading
-    the asyncio documentation.
+    [ ] Wrap their consumer into its own thread.  Have it pend on a queue and
+        dispatch information to a callback.
   
   *Global problem?*
     My botnet was working, based on an old and unreliable way of using pika
-    (RabbitMq docs).  
+    (from RabbitMq docs).  
     
     But this code would fail after running for > 15 minutes.  The time-to-test was
     too long to troubleshoot that approach, so I decided to re-write everything to
@@ -26,12 +26,15 @@
         pika.exceptions.ChannelClosed
         
     So, there needs to be a number of resets and other complications that were
-    not talked about in the RabbitMq-pika training examples.  To avoid this
-    problem I will use their complicated pika-asyncronous example as a starting
-    point, then wrap it with the functionality required for miros-rabbitmq
+    not talked about in the RabbitMq-pika training examples. (My old code is
+    broken and the testing cycle takes > 15 minutes)
+    
+    To avoid this problem again I will use the pika documentation's complicated
+    pika-asyncronous example as a starting point, then wrap it with the
+    functionality required for miros-rabbitmq
   
   *Immediate problem?*
-    The pika async code seems to be bit banger with callbacks.  You can start the
+    The pika async code seems to be a bit banger with callbacks.  You can start the
     service, but they only way you can get it to unhang is to use a timed
     callback method.  (but this is enough to work with)
 
@@ -41,68 +44,79 @@
   
 = Orient =
   *Information about the current context*
+    Go on a functool vacation.  This looks really useful, you should know more
+    about it.
+    
     The consumer will be on the pi
+    
     The producer will be on the WLS
+    
     The user/password will be the same as before
     
     The exchange is defined by the consumer, the producer's machine does not have the exchange
+    
     The pi exchange: http://192.168.1.69:15672/#/exchanges
     The WLS exchange: http://127.0.0.1:15672/#/exchanges
-    With PUBLISH_INTERVAL = 0.00000000000000000000001 it ran for 5 minutes with no issues
     
-    There is some mention about RPC calls to set exchanges in their documentation.
-    I do not understand how this works.  My previous code just build two exchanges
-    one the different machines with the same name.  I think when I'm done, I'll
-    have a complicated version of the same thing using their code.
+    With PUBLISH_INTERVAL = 0.00000000000000000000001 their example ran for 5 minutes with no issues
+    
+    There is some mention about RPC calls to set exchanges in their
+    documentation.  I do not understand how this works.  My previous code just
+    build two exchanges one on each of the different machines with the same
+    name.  I think when I'm done, I'll have a more complex version of what I had
+    before.
     
     Spit balling a strategy:
+      *Producer*:
       * [X] Put their blocking producer code into a thread
       * [X] Assign a timeout callback with this blocking producer before it
-            starts; use a technique similar to what you did with the consumer
+            starts; use a technique similar to what you did with your consumer
       * [X] Have the timeout callback wake up and look at a queue
       * [X] speed up the timeout callback mechanism if there are a lot of items
             in the queue, if there aren't then leave it at its baseline tempo
       * [X] To call the callback mechanism that sends the message using the func
             tools partial technique to force your message into that callback
             method call as an argument.
-      * [ ] Refactor the code, make sure logs make sense, update the docstrings,
-            tidy
+      * [X] Refactor the code, make sure logs make sense, update the docstrings,
+            tidy.
+      * [ ] Figure out what to do with the json serialization... try to get rid
+            of it on both the producer and the consumer
       * [ ] Wrap up their basic code example and this extension into its own
-            class
+            class.
       * [ ] Wrap this class within another class which provides the
             serialization and encryption features needed.
       * [ ] Since you have miros-rabbitmq open for surgery, change the encryption
             mechanism so that both the snoop and the mesh can set their own
             encryption key like the snoop can.
+      * [ ] Write a url maker
+      * [ ] Have a way to write a list of of url's to some producers
+      * [ ] Write it up the docs for this library?
+      
+      *Producer*:
+      * [ ] Put their blocking consumer code into a thread
+      * [ ] Assign a timeout callback with this blocking consumer before it
+            starts; use a technique similar to what you did with your consumer.
   
   *Symptoms:*
   
   *Questions for Rabbit Disconnection Exception:*
-    Can I understand their code?
-    Can I find a way to make the problem fail sooner. 
-    Can you simplify your test?
-    Do you have enough information?
+    Can I understand their code? [good enough]
+    Can I find a way to make the problem fail sooner. [moot]
+    Can you simplify your test? [moot]
     What recently changed?
 
   *Assumptions:*
 
 = Decide =
   *Idea/Hypotheses for Rabbit Disconnection Exception: >=5*
-  * [ ] Reproduce old issue; time it [too long]
+  * [ ] Reproduce old issue; time it [too long, moot]
   * [X] Get networking working
   * [X] Get user_name/password working
   * [X] Pass a string
   * [X] Understand their code in enough detail (obey, cooperate, diverge)
-  * [ ] Try to pass different strings using an API call into their example
-  * [ ] Refactor their code to work with your botnet (generate new work list)
-  * [ ] Pound the exchange and see if it fails [it worked]
-  * [ ] Run it to failure and see what happens
+  * [X] Try to pass different strings using an API call into their example
   
   *Chosen Idea/Hypothesis*
-    Try to pass different strings using an API call into their example
-    * They have an event loop with no way of passing in messages 
-    * Move their event loop into a task, and have it feed off of a queue
-    * 
     
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
 
