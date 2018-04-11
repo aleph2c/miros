@@ -56,21 +56,24 @@
     have a complicated version of the same thing using their code.
     
     Spit balling a strategy:
-      * Put their blocking producer code into a thread
-      * Assign a timeout callback with this blocking producer before it starts;
-        use a technique similar to what you did with the consumer
-      * Have the timeout callback wake up and look at a queue
-      * speed up the timeout callback mechanism if there are a lot of items in
-        the queue, if there aren't then leave it at its baseline tempo
-      * To call the callback mechanism that sends the message using the func
-        tools partial technique to force your message into that callback method
-        call as an argument.
-      * Wrap up their basic code example and this extension into its own class
-      * Wrap this class within another class which provides the serialization
-        and encryption features needed.
-      * Since you have pika open for surgery, change the encryption mechanism so
-        that both the snoop and the mesh can set their own encryption key like
-        the snoop can.
+      * [X] Put their blocking producer code into a thread
+      * [X] Assign a timeout callback with this blocking producer before it
+            starts; use a technique similar to what you did with the consumer
+      * [X] Have the timeout callback wake up and look at a queue
+      * [X] speed up the timeout callback mechanism if there are a lot of items
+            in the queue, if there aren't then leave it at its baseline tempo
+      * [X] To call the callback mechanism that sends the message using the func
+            tools partial technique to force your message into that callback
+            method call as an argument.
+      * [ ] Refactor the code, make sure logs make sense, update the docstrings,
+            tidy
+      * [ ] Wrap up their basic code example and this extension into its own
+            class
+      * [ ] Wrap this class within another class which provides the
+            serialization and encryption features needed.
+      * [ ] Since you have miros-rabbitmq open for surgery, change the encryption
+            mechanism so that both the snoop and the mesh can set their own
+            encryption key like the snoop can.
   
   *Symptoms:*
   
