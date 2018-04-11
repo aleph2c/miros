@@ -22,10 +22,10 @@ class ExampleConsumer(object):
     commands that were issued and that should surface in the output as well.
 
     """
-    EXCHANGE = 'pika_refactoring_effort'
+    EXCHANGE = 'sex_change'
     EXCHANGE_TYPE = 'topic'
     QUEUE = 'text'
-    ROUTING_KEY = 'example.text'
+    ROUTING_KEY = 'pub_thread.text'
 
     def __init__(self, amqp_url):
         """Create a new instance of the consumer class, passing in the AMQP
