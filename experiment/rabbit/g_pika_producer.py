@@ -69,7 +69,7 @@ class PikaTopicPublisher():
 
   """
   EXCHANGE_TYPE             = 'topic'
-  PUBLISH_FAST_INTERVAL_SEC = 0.000001
+  PUBLISH_FAST_INTERVAL_SEC = 0.000001  # fast
 
   def __init__(self,
                amqp_url,
@@ -287,7 +287,7 @@ class PikaTopicPublisher():
     """
     LOGGER.info('Issuing consumer related RPC commands')
     self.enable_delivery_confirmations()
-    self.schedule_producer_heart_beat(self._publish_tempo_sec)
+    self.schedule_next_producer_heart_beat(self._publish_tempo_sec)
 
   def enable_delivery_confirmations(self):
     """Send the Confirm.Select RPC method to RabbitMQ to enable delivery
@@ -338,7 +338,7 @@ class PikaTopicPublisher():
     else:
       LOGGER.info('Received delivery tag for something we did not send')
 
-  def schedule_producer_heart_beat(self, timeout):
+  def schedule_next_producer_heart_beat(self, timeout):
     """If we are not closing our connection to RabbitMQ, schedule another
     message to be delivered in self._publish_tempo_sec seconds.
 
@@ -421,17 +421,17 @@ class PikaTopicPublisher():
       if self._stopping:
         return
       timeout_time = self._publish_tempo_sec
-      # speed up how often we call the next producer_heart_beat if we have
-      # messages waiting, messages events tend to be bursty
+      # messages tend to cluster, they are bursty, so speed up our
+      # producer_heart_beat if there were messages in our queue
       queue_length = self._thread_queue.qsize()
       if queue_length != 0:
         timeout_time /= queue_length * 1.0
         # ensure we can output the messages that we are waiting for before we
-        # call this producer_heart_beat again (this is a clamp)
+        # call this producer_heart_beat again (this is just a clamp)
         timeout_time = self.PUBLISH_FAST_INTERVAL_SEC * 2 if timeout_time < self.PUBLISH_FAST_INTERVAL_SEC else timeout_time
-      self.schedule_producer_heart_beat(timeout_time)
+      self.schedule_next_producer_heart_beat(timeout_time)
 
-      # empty the queue
+      # send out all messages in the queue
       if queue_length >= 1:
         for i in range(queue_length):
           message = self._thread_queue.get()
@@ -462,7 +462,8 @@ class PikaTopicPublisher():
     and stop the thread, use the 'stop' api"""
     self._task_run_event.clear()
 
-def main():
+
+if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
   # send to the raspberry pi
   pub_thread1 = \
@@ -470,7 +471,7 @@ def main():
       amqp_url='amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
       routing_key='pub_thread.text',
       publish_tempo_sec=1.5,
-      exchange_name='g_pika_producer_exchange',
+      exchange_name='sex_change',
       queue_name='g_queue',
     )
   pub_thread2 = \
@@ -478,7 +479,7 @@ def main():
       amqp_url='amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
       routing_key='pub_thread.text',
       publish_tempo_sec=0.5,
-      exchange_name='g_pika_producer_exchange',
+      exchange_name='sex_change',
       queue_name='g_queue',
     )
   pub_thread3 = \
@@ -486,7 +487,7 @@ def main():
       amqp_url='amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
       routing_key='pub_thread.text',
       publish_tempo_sec=1.1,
-      exchange_name='g_pika_producer_exchange',
+      exchange_name='sex_change',
       queue_name='g_queue',
     )
   pub_thread1.start_thread()
@@ -515,7 +516,4 @@ def main():
   print("trying to publish in the new thread runner")
   pub_thread3.post_fifo("Last Message on 3")
   time.sleep(0.5)
-
-if __name__ == '__main__':
-  main()
   print("hello world")

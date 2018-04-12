@@ -8,7 +8,6 @@ LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
               '-35s %(lineno) -5d: %(message)s')
 LOGGER = logging.getLogger(__name__)
 
-
 class ExamplePublisher(object):
     """This is an example publisher that will handle unexpected interactions
     with RabbitMQ such as channel and connection closures.
@@ -22,11 +21,11 @@ class ExamplePublisher(object):
     messages that have been sent and if they've been confirmed by RabbitMQ.
 
     """
-    EXCHANGE = 'message'
-    EXCHANGE_TYPE = 'topic'
-    PUBLISH_INTERVAL = 1
-    QUEUE = 'text'
-    ROUTING_KEY = 'example.text'
+    EXCHANGE         = 'pika_refactoring_effort'
+    EXCHANGE_TYPE    = 'topic'
+    PUBLISH_INTERVAL = 1.0
+    QUEUE            = 'text'
+    ROUTING_KEY      = 'example.text'
 
     def __init__(self, amqp_url):
         """Setup the example publisher object, passing in the URL we will use
