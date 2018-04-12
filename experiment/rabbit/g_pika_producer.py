@@ -61,7 +61,7 @@ class PID():
 
 
 class QueueToSampleTimeControl(PID):
-  def __init__(self, ki, i_max, dt):
+  def __init__(self, i_max, dt):
     super().__init__(kp=0.07, kd=0.05, ki=0.4, i_max=i_max, i_min=-1 * i_max, dt=dt)
     if i_max != 0:
       self.min_tempo = 1 / i_max
