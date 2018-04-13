@@ -74,6 +74,7 @@ class QueueToSampleTimeControl(PID):
     output = super().next(x)
 
     # if the controller is working accelerate the wind-down of the integrator
+    # (the queue can't be negative, so help it out)
     if output <= 0:
       self.int[1] /= 1.1
       self.err[1] /= 1.1
@@ -151,6 +152,7 @@ class PikaTopicPublisher():
   """
   EXCHANGE_TYPE             = 'topic'
   PUBLISH_FAST_INTERVAL_SEC = 0.000001  # fast
+  PRODUCER_VERSION          = u'1.0'
 
   def __init__(self,
                amqp_url,
@@ -440,24 +442,26 @@ class PikaTopicPublisher():
     This list will be used to check for delivery confirmations in the
     on_delivery_confirmations method.
 
-    Once the message has been sent, schedule another message to be sent.
-    The main reason I put scheduling in was just so you can get a good idea
-    of how the process is flowing by slowing down and speeding up the
-    delivery intervals by changing the self._publish_tempo_sec
-    constant in the class.
+    Example:
+      # get the message from somewhere
+      message = self._thread_queue.get()
 
+      # user partial of this method to make a custom callback with your message as an input
+      cb = functools.partial(self.publish_message, message=message)
+
+      # then load it into a timer
+      self._connection.add_timeout(self.PUBLISH_FAST_INTERVAL_SEC, cb)
     """
     if self._stopping:
       return
-
-    json_message = {u'json_key': message}
     properties = pika.BasicProperties(app_id='miros-rabbitmq-publisher',
                       content_type='application/json',
-                      headers=json_message)
+                      headers={u'version': self.PRODUCER_VERSION})
 
     self._channel.basic_publish(self._rabbit_exchange_name, self._rabbit_routing_key,
-                  json.dumps(message, ensure_ascii=False),
+                  message,
                   properties)
+
     self._message_number += 1
     self._deliveries.append(self._message_number)
     LOGGER.info('Published message # %i', self._message_number)
@@ -577,7 +581,7 @@ if __name__ == '__main__':
   pub_thread3.start_thread()
 
   time.sleep(2)
-  for i in range(500):
+  for i in range(50):
     pub_thread1.post_fifo("Janice Library {}".format(i))
     pub_thread1.post_fifo("Janice Library {}".format(i))
     pub_thread1.post_fifo("Janice Library {}".format(i))
