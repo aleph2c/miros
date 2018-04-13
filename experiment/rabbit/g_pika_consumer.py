@@ -345,7 +345,7 @@ class SimplePikaTopicConsumer(object):
     LOGGER.info('Stopping')
     self._closing = True
     self.stop_consuming()
-    self._connection.ioloop.start()
+    self._connection.ioloop.stop()
     LOGGER.info('Stopped')
 
   def close_connection(self):
@@ -461,6 +461,5 @@ if __name__ == '__main__':
   time.sleep(1)
   example.update_encryption_key(
     b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=')
-  time.sleep(10)
-  example.stop_thread()
+  time.sleep(20)
 
