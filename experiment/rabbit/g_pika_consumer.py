@@ -2,6 +2,7 @@
 # This code was copied from the pika documentation
 
 import pika
+import time
 import pickle
 import logging
 import functools
@@ -16,7 +17,7 @@ LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
 LOGGER = logging.getLogger(__name__)
 
 
-class PikaTopicConsumer(object):
+class SimplePikaTopicConsumer(object):
   """This is an example consumer that will handle unexpected interactions
   with RabbitMQ such as channel and connection closures.
 
@@ -29,12 +30,11 @@ class PikaTopicConsumer(object):
   commands that were issued and that should surface in the output as well.
 
   """
-  EXCHANGE = 'sex_change'
   EXCHANGE_TYPE = 'topic'
   QUEUE = 'text'
-  ROUTING_KEY = 'pub_thread.text'
+  THREAD_TEMPO_SEC = 1.0  # how long it will take the thread to quit
 
-  def __init__(self, 
+  def __init__(self,
     amqp_url,
     routing_key,
     exchange_name,
@@ -50,6 +50,10 @@ class PikaTopicConsumer(object):
     self._closing = False
     self._consumer_tag = None
     self._url = amqp_url
+    self._task_run_event = ThreadEvent()
+    self._thread_tempo_sec = self.THREAD_TEMPO_SEC
+    self._exchange_name = exchange_name
+    self._routing_key = routing_key
 
   def connect(self):
     """This method connects to RabbitMQ, returning the connection handle.
@@ -139,7 +143,7 @@ class PikaTopicConsumer(object):
     LOGGER.info('Channel opened')
     self._channel = channel
     self.add_on_channel_close_callback()
-    self.setup_exchange(self.EXCHANGE)
+    self.setup_exchange(self._exchange_name)
 
   def add_on_channel_close_callback(self):
     """This method tells pika to call the on_channel_closed method if
@@ -210,9 +214,9 @@ class PikaTopicConsumer(object):
 
     """
     LOGGER.info('Binding %s to %s with %s',
-          self.EXCHANGE, self.QUEUE, self.ROUTING_KEY)
+          self._exchange_name, self.QUEUE, self._routing_key)
     self._channel.queue_bind(self.on_bindok, self.QUEUE,
-                 self.EXCHANGE, self.ROUTING_KEY)
+                 self._exchange_name, self._routing_key)
 
   def on_bindok(self, unused_frame):
     """Invoked by pika when the Queue.Bind method has completed. At this
@@ -323,7 +327,8 @@ class PikaTopicConsumer(object):
     starting the IOLoop to block and allow the SelectConnection to operate.
 
     """
-    self._connection = self.connect()
+    if self._connection is None:
+      self._connection = self.connect()
     self._connection.ioloop.start()
 
   def stop(self):
@@ -348,7 +353,30 @@ class PikaTopicConsumer(object):
     LOGGER.info('Closing connection')
     self._connection.close()
 
-class Subclassed(PikaTopicConsumer):
+  def start_thread(self):
+    self._task_run_event.set()
+    self._connection = self.connect()
+
+    def thread_runner(self):
+      def timeout_callback():
+        if not self._closing:
+          if self._task_run_event.is_set():
+            self._connection.add_timeout(deadline=self.THREAD_TEMPO_SEC, callback_method=timeout_callback)
+          else:
+            self.stop()
+      self._connection.add_timeout(
+        deadline=self.THREAD_TEMPO_SEC,
+        callback_method=timeout_callback
+      )
+      self.run()
+
+    thread = Thread(target=thread_runner, args=(self,), daemon=True)
+    thread.start()
+
+  def stop_thread(self):
+    self._task_run_event.clear()
+
+class PikaTopicConsumer(SimplePikaTopicConsumer):
 
   def __init__(self,
                amqp_url,
@@ -391,10 +419,11 @@ class Subclassed(PikaTopicConsumer):
       self._deserialization_function = deserialization_function
 
   def update_encryption_key(self, encryption_key):
-    self.stop_consuming
+    self.stop_thread()
     self._decryption_function = \
         functools.partial(self._sdf,
           encryption_key=encryption_key)
+    self.start_thread()
 
   def get_rabbit_user(self, url):
     user = url.split(':')[1][2:]
@@ -418,7 +447,7 @@ class Subclassed(PikaTopicConsumer):
 
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
-  example = Subclassed(
+  example = PikaTopicConsumer(
     amqp_url='amqp://bob:dobbs@localhost:5672/%2F',
     routing_key='pub_thread.text',
     exchange_name='sex_change',
@@ -426,7 +455,12 @@ if __name__ == '__main__':
     encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
   )
 
-  try:
-    example.run()
-  except KeyboardInterrupt:
-    example.stop()
+  example.start_thread()
+  time.sleep(1)
+  example.stop_thread()
+  time.sleep(1)
+  example.update_encryption_key(
+    b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=')
+  time.sleep(10)
+  example.stop_thread()
+

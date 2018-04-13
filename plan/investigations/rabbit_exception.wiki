@@ -1,15 +1,16 @@
 *Rabbit Disconnection Exception*
 = Observe =
   *What defines Success?*
-    Get rid of the bugs that occur on the RabbitMq connection after > 15 minutes
-    of use:
+    A working re-write of miros-rabbitmq using the the pika async example code. 
     
-    Place the pika team's asynchronous code example between miros and RabbitMq.
- 
   *Immediate Goal:*
-    [ ] Change the appilication name in the producer
-        
+    * [ ] Subclass the producer and consumer to have something to put our own
+          features in.
+    * [ ] Add encryption in subclass
+    * [ ] Add serialization in subclass
   
+  *Immediate problem?*
+    
   *Global problem?*
     My botnet was working, based on an old and unreliable way of using pika
     (from RabbitMq docs).  
@@ -31,11 +32,6 @@
     To avoid this problem again I will use the pika documentation's complicated
     pika-asyncronous example as a starting point, then wrap it with the
     functionality required for miros-rabbitmq
-  
-  *Immediate problem?*
-    The pika async code seems to be a bit banger with callbacks.  You can start the
-    service, but they only way you can get it to unhang is to use a timed
-    callback method.  (but this is enough to work with)
 
   *Evidence that informs Assumptions:*
   
@@ -114,15 +110,10 @@
   * [X] Pass a string
   * [X] Understand their code in enough detail (obey, cooperate, diverge)
   * [X] Try to pass different strings using an API call into their example
-  * [ ] Put their blocking consumer code into a thread 
+  * [X] Put their blocking consumer code into a thread 
   *Chosen Idea/Hypothesis*
-   Put their blocking consumer code into a thread 
    
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
-  * [X] Copy their code and get it into git
-  * [X] Run it on the pi and confirm things are working
-  * [ ] Understand how their code works before trying to change it
-  * [ ] 
 
 = Act =
 

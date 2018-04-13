@@ -2,11 +2,13 @@
 # This code was copied from the pika documentation
 import time
 import pika
-import json
+import pickle
 import logging
 import functools
+import cryptography
 from threading import Thread
 from queue import Queue as ThreadQueue
+from cryptography.fernet import Fernet
 from threading import Event as ThreadEvent
 
 LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
@@ -95,7 +97,7 @@ class QueueToSampleTimeControl(PID):
 
     return time_recommendation
 
-class PikaTopicPublisher():
+class SimplePikeTopicPublisher():
   """
   This is a pika (Python-RabbitMq) message publisher heavily based on the
   asychronous example provided in the pika documentation.  It should handle
@@ -112,7 +114,7 @@ class PikaTopicPublisher():
     # name the RabbitMq queue on the server at the url to 'g_queue'
     # set the topic routing key to 'pub_thread.text'
     publisher = \
-      PikaTopicPublisher(
+      SimplePikeTopicPublisher(
         amqp_url='amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
         publish_tempo_sec=1.5,
         exchange_name='g_pika_producer_exchange',
@@ -548,6 +550,76 @@ class PikaTopicPublisher():
     and stop the thread, use the 'stop' api"""
     self._task_run_event.clear()
 
+class PikaTopicPublisher(SimplePikeTopicPublisher):
+  """
+    encryption_function must have this signature: (item, encryption_key)
+    serialization_function must have this signature: (item)
+  """
+  def __init__(self,
+               amqp_url,
+               routing_key,
+               publish_tempo_sec,
+               exchange_name,
+               queue_name,
+               encryption_key,
+               encryption_function=None,
+               serialization_function=None):
+
+    super().__init__(
+               amqp_url,
+               routing_key,
+               publish_tempo_sec,
+               exchange_name,
+               queue_name)
+
+    self._encryption_key  = encryption_key
+    self._rabbit_user     = self.get_rabbit_user(amqp_url)
+    self._rabbit_password = self.get_rabbit_password(amqp_url)
+
+    # saved encryption function
+    self._sef = None
+
+    def default_encryption_function(message, encryption_key):
+      return Fernet(encryption_key).encrypt(message)
+
+    def default_serialization_function(obj):
+      return pickle.dumps(obj)
+
+    if encryption_function is None:
+      self._sef = default_encryption_function
+    else:
+      self._sef = encryption_function
+
+    self._encryption_function = functools.partial(self._sef,
+        encryption_key=encryption_key)
+
+    if serialization_function is None:
+      self._serialization_function = default_serialization_function
+    else:
+      self._serialization_function = serialization_function
+
+  def update_encryption_key(self, encryption_key):
+    self.stop_thread()
+    self._encryption_function = functools.partial(self._sef, encryption_key=encryption_key)
+    self.start_thread()
+
+  def get_rabbit_user(self, url):
+    user = url.split(':')[1][2:]
+    return user
+
+  def get_rabbit_password(self, url):
+    password = url.split(':')[2].split('@')[0]
+    return password
+
+  def encrypt(self, item):
+    return self._encryption_function(item)
+
+  def serialize(self, item):
+    return self._serialization_function(item)
+
+  def post_fifo(self, item):
+    xsitem = self.encrypt(self.serialize(item))
+    super().post_fifo(xsitem)
 
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
@@ -559,6 +631,7 @@ if __name__ == '__main__':
       publish_tempo_sec=1.5,
       exchange_name='sex_change',
       queue_name='g_queue',
+      encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
     )
   pub_thread2 = \
     PikaTopicPublisher(
@@ -567,14 +640,16 @@ if __name__ == '__main__':
       publish_tempo_sec=0.5,
       exchange_name='sex_change',
       queue_name='g_queue',
+      encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
     )
   pub_thread3 = \
     PikaTopicPublisher(
-      amqp_url='amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
+      amqp_url='amqp://bob:dobbs@127.0.0.1:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
       routing_key='pub_thread.text',
       publish_tempo_sec=1.1,
       exchange_name='sex_change',
       queue_name='g_queue',
+      encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
     )
   pub_thread1.start_thread()
   pub_thread2.start_thread()
