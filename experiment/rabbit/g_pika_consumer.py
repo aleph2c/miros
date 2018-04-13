@@ -2,6 +2,7 @@
 # This code was copied from the pika documentation
 
 import pika
+import time
 import logging
 from threading import Thread
 from queue import Queue as ThreadQueue
@@ -28,6 +29,7 @@ class PikaTopicConsumer(object):
   EXCHANGE = 'sex_change'
   EXCHANGE_TYPE = 'topic'
   QUEUE = 'text'
+  THREAD_TEMPO_SEC = 1.0  # how long it will take the thread to quit
   ROUTING_KEY = 'pub_thread.text'
 
   def __init__(self, 
@@ -45,7 +47,10 @@ class PikaTopicConsumer(object):
     self._channel = None
     self._closing = False
     self._consumer_tag = None
+
     self._url = amqp_url
+    self._task_run_event = ThreadEvent()
+    self._thread_tempo_sec = self.THREAD_TEMPO_SEC
 
   def connect(self):
     """This method connects to RabbitMQ, returning the connection handle.
@@ -319,7 +324,8 @@ class PikaTopicConsumer(object):
     starting the IOLoop to block and allow the SelectConnection to operate.
 
     """
-    self._connection = self.connect()
+    if self._connection is None:
+      self._connection = self.connect()
     self._connection.ioloop.start()
 
   def stop(self):
@@ -344,6 +350,29 @@ class PikaTopicConsumer(object):
     LOGGER.info('Closing connection')
     self._connection.close()
 
+  def start_thread(self):
+    self._task_run_event.set()
+    self._connection = self.connect()
+
+    def thread_runner(self):
+      def timeout_callback():
+        if self._task_run_event.is_set():
+          self._connection.add_timeout(deadline=self.THREAD_TEMPO_SEC, callback_method=timeout_callback)
+        else:
+          self.channel.stop()
+          return
+      self._connection.add_timeout(
+        deadline=self.THREAD_TEMPO_SEC,
+        callback_method=timeout_callback
+      )
+      self.run()
+
+    thread = Thread(target=thread_runner, args=(self,), daemon=True)
+    thread.start()
+
+  def stop_thread(self):
+    self._task_run_event.clear()
+
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
   example = PikaTopicConsumer(
@@ -353,7 +382,7 @@ if __name__ == '__main__':
     queue_name='g_queue',
   )
 
-  try:
-    example.run()
-  except KeyboardInterrupt:
-    example.stop()
+  example.start_thread()
+  time.sleep(10)
+  print("hello world")
+  example.stop_thread()
