@@ -13,6 +13,87 @@ LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
     '-35s %(lineno) -5d: %(message)s')
 LOGGER = logging.getLogger(__name__)
 
+class PID():
+  def __init__(self, kp, kd, ki, i_max, i_min, dt):
+    self.err   = [0, 0]
+    self.int   = [0, 0]
+    self.der   = 0
+    self.i_max = i_max
+    self.i_min = i_min
+    self.kp    = kp
+    self.kd    = kd
+    self.ki    = ki
+    self.dt    = dt
+
+  def next(self, x):
+    """A simple PID"""
+    # err[0] = ref - x
+    # err[1] = err[0] from the last sample
+    # int[0] = int[1] + err[0]
+    # int[1] = int[0] from the last sample
+    # der = err[1] + err[0]
+    # dt  = sample period in sec
+    # output = kp*err[0] + (ki*int[0]*dt) + (kd*der/dt)
+    output      = None
+    ref         = 0
+    self.err[0] = ref - x
+    self.int[0] = self.int[1] + self.err[0]
+    self.der    = self.err[1] + self.err[0]
+
+    self.int[0] = self.i_max if self.int[0] > self.i_max else self.int[0]
+    self.int[0] = self.i_min if self.int[0] < self.i_min else self.int[0]
+
+    output  = self.kp * self.err[0]
+    output += self.ki * self.int[0] * self.dt
+
+    if self.dt != 0:
+      output += self.kd * self.der / self.dt
+
+    self.output = output
+    self.err[1] = self.err[0]
+    self.int[1] = self.int[0]
+    return output
+
+  def reset(self):
+    self.err = [0, 0]
+    self.int = [0, 0]
+    self.der = 0
+
+
+class QueueToSampleTimeControl(PID):
+  def __init__(self, i_max, dt):
+    super().__init__(kp=0.07, kd=0.05, ki=0.4, i_max=i_max, i_min=-1 * i_max, dt=dt)
+    if i_max != 0:
+      self.min_tempo = 1 / i_max
+    else:
+      self.min_tempo = 0.000001
+
+  def next(self, x):
+    """Invert the output of our PID -> large amounts of control need to express
+       short durations in time"""
+    output = super().next(x)
+
+    # if the controller is working accelerate the wind-down of the integrator
+    if output <= 0:
+      self.int[1] /= 1.1
+      self.err[1] /= 1.1
+      output =  1 / self.dt
+
+    # start with the baseline tempo
+    time_recommendation = self.dt
+
+    if output != 0:
+      time_recommendation = 1 / output
+
+    # clamps
+    time_recommendation = \
+      self.min_tempo if time_recommendation < self.min_tempo else time_recommendation
+
+    time_recommendation = \
+      self.dt if time_recommendation > self.dt else time_recommendation
+
+    return time_recommendation
+
 class PikaTopicPublisher():
   """
   This is a pika (Python-RabbitMq) message publisher heavily based on the
@@ -60,8 +141,8 @@ class PikaTopicPublisher():
     It uses delivery confirmations and illustrates one way to keep track of
     messages that have been sent and if they've been confirmed by RabbitMQ.
     This confirmation mechanism will not work if message tempo exceeds the
-    publish_tempo (the messages will get through but confirmation mechanism will
-    indicate there is a problem when there isn't one.)
+    publish_tempo (the messages will get through but the confirmation mechanism
+    will indicate there is a problem when there isn't one.)
 
     If the input queue has more than one item they will all be sent out to the
     network and the queue sampler callback's frequency will temporarily
@@ -97,6 +178,10 @@ class PikaTopicPublisher():
     self._thread_queue = ThreadQueue(maxsize=500)
     self._task_run_event = ThreadEvent()
     self._publish_tempo_sec = publish_tempo_sec
+
+    self._tempo_controller = QueueToSampleTimeControl(
+      i_max=1 / self.PUBLISH_FAST_INTERVAL_SEC,
+      dt = publish_tempo_sec)
 
     # will set the exchange, queue and routing_keys names for the RabbitMq
     # server running on amqp_url
@@ -346,7 +431,7 @@ class PikaTopicPublisher():
     if self._stopping:
       return
     # Scheduling next Task queue check
-    LOGGER.info('Task queue check in %0.3f seconds', timeout)
+    LOGGER.info('Task queue check in %0.4f seconds', timeout)
     self._connection.add_timeout(timeout, self.producer_heart_beat)
 
   def publish_message(self, message):
@@ -366,7 +451,7 @@ class PikaTopicPublisher():
       return
 
     json_message = {u'json_key': message}
-    properties = pika.BasicProperties(app_id='example-publisher',
+    properties = pika.BasicProperties(app_id='miros-rabbitmq-publisher',
                       content_type='application/json',
                       headers=json_message)
 
@@ -420,16 +505,13 @@ class PikaTopicPublisher():
     if self._task_run_event.is_set():
       if self._stopping:
         return
-      timeout_time = self._publish_tempo_sec
       # messages tend to cluster, they are bursty, so speed up our
       # producer_heart_beat if there were messages in our queue
+
+      # new_tempo_period_sec = self._tempo_controller.next(queue_length)
       queue_length = self._thread_queue.qsize()
-      if queue_length != 0:
-        timeout_time /= queue_length * 1.0
-        # ensure we can output the messages that we are waiting for before we
-        # call this producer_heart_beat again (this is just a clamp)
-        timeout_time = self.PUBLISH_FAST_INTERVAL_SEC * 2 if timeout_time < self.PUBLISH_FAST_INTERVAL_SEC else timeout_time
-      self.schedule_next_producer_heart_beat(timeout_time)
+      new_tempo_period_sec = self._tempo_controller.next(queue_length)
+      self.schedule_next_producer_heart_beat(new_tempo_period_sec)
 
       # send out all messages in the queue
       if queue_length >= 1:
@@ -495,11 +577,18 @@ if __name__ == '__main__':
   pub_thread3.start_thread()
 
   time.sleep(2)
-  for i in range(5):
+  for i in range(500):
+    pub_thread1.post_fifo("Janice Library {}".format(i))
+    pub_thread1.post_fifo("Janice Library {}".format(i))
+    pub_thread1.post_fifo("Janice Library {}".format(i))
+    pub_thread1.post_fifo("Janice Library {}".format(i))
+    pub_thread1.post_fifo("Janice Library {}".format(i))
+    pub_thread1.post_fifo("Janice Library {}".format(i))
     pub_thread1.post_fifo("Janice Library {}".format(i))
     pub_thread2.post_fifo("Mervin Burr {}".format(i))
-    pub_thread3.post_fifo("Scott {}".format(i))
-    time.sleep(0.51)
+    pub_thread3.post_fifo("Scott Slow {}".format(i))
+    pub_thread3.post_fifo("Jessica Fast {}".format(i))
+    time.sleep(0.2)
 
   pub_thread1.stop_thread()
   pub_thread2.stop_thread()
