@@ -2,9 +2,13 @@
 # This code was copied from the pika documentation
 
 import pika
+import pickle
 import logging
+import functools
+import cryptography
 from threading import Thread
 from queue import Queue as ThreadQueue
+from cryptography.fernet import Fernet
 from threading import Event as ThreadEvent
 
 LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
@@ -344,13 +348,82 @@ class PikaTopicConsumer(object):
     LOGGER.info('Closing connection')
     self._connection.close()
 
+class Subclassed(PikaTopicConsumer):
+
+  def __init__(self,
+               amqp_url,
+               routing_key,
+               exchange_name,
+               queue_name,
+               encryption_key,
+               decryption_function=None,
+               deserialization_function=None):
+    super().__init__(
+               amqp_url,
+               routing_key,
+               exchange_name,
+               queue_name)
+
+    self._encryption_key  = encryption_key
+    self._rabbit_user     = self.get_rabbit_user(amqp_url)
+    self._rabbit_password = self.get_rabbit_password(amqp_url)
+
+    # saved decryption function
+    self._sdf = None
+
+    def default_decryption_function(message, encryption_key):
+      return Fernet(encryption_key).decrypt(message)
+
+    def default_deserialization_function(obj):
+      return pickle.loads(obj)
+
+    if decryption_function is None:
+      self._sdf = default_decryption_function
+    else:
+      self._sdf = decryption_function
+
+    self._decryption_function = \
+      functools.partial(self._sdf, encryption_key=encryption_key)
+
+    if deserialization_function is None:
+      self._deserialization_function = default_deserialization_function
+    else:
+      self._deserialization_function = deserialization_function
+
+  def update_encryption_key(self, encryption_key):
+    self.stop_consuming
+    self._decryption_function = \
+        functools.partial(self._sdf,
+          encryption_key=encryption_key)
+
+  def get_rabbit_user(self, url):
+    user = url.split(':')[1][2:]
+    return user
+
+  def get_rabbit_password(self, url):
+    password = url.split(':')[2].split('@')[0]
+    return password
+
+  def deserialize(self, item):
+    return self._deserialization_function(item)
+
+  def decrypt(self, item):
+    return self._decryption_function(item)
+
+  def on_message(self, unused_channel, basic_deliver, properties, xsbody):
+    body = self.deserialize(self.decrypt(xsbody))
+    LOGGER.info('Received message # %s from %s: %s',
+          basic_deliver.delivery_tag, properties.app_id, body)
+    self.acknowledge_message(basic_deliver.delivery_tag)
+
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
-  example = PikaTopicConsumer(
+  example = Subclassed(
     amqp_url='amqp://bob:dobbs@localhost:5672/%2F',
     routing_key='pub_thread.text',
     exchange_name='sex_change',
     queue_name='g_queue',
+    encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
   )
 
   try:
