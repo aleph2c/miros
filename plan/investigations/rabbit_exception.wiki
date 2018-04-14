@@ -63,34 +63,16 @@
     
     Spit balling a strategy:
       *Producer*:
-      * [X] Put their blocking producer code into a thread
-      * [X] Assign a timeout callback with this blocking producer before it
-            starts; use a technique similar to what you did with your consumer
-      * [X] Have the timeout callback wake up and look at a queue
-      * [X] speed up the timeout callback mechanism if there are a lot of items
-            in the queue, if there aren't then leave it at its baseline tempo
-      * [X] To call the callback mechanism that sends the message using the func
-            tools partial technique to force your message into that callback
-            method call as an argument.
-      * [X] Refactor the code, make sure logs make sense, update the docstrings,
-            tidy.
-      * [X] Figure out what to do with the json serialization... try to get rid
-            of it on both the producer and the consumer
-      * [X] Wrap up their basic code example and this extension into its own
-            class.
-      * [X] Wrap this class within another class which provides the
-            serialization and encryption features needed.
-      * [X] Since you have miros-rabbitmq open for surgery, change the encryption
-            mechanism so that both the snoop and the mesh can set their own
-            encryption key like the snoop can.
-      * [ ] Write a url maker
-      * [ ] Have a way to write a list of of url's to some producers
-      * [ ] Write it up the docs for this library?
-      
       *Consumer*:
-      * [ ] Put their blocking consumer code into a thread
-      * [ ] Assign a timeout callback with this blocking consumer before it
-            starts; use a technique similar to what you did with your consumer.
+      
+      *Mesh/Snoop*:
+        Create another file which will use the producer and the consumer
+        * [ ] Write a url maker
+        * [ ] import producer
+        * [ ] import consumer
+        * [ ] get_working_ip_address
+        * [ ] ip_addresses_on_lan
+        * [ ] ip_addresses_on_this_machine
   
   *Symptoms:*
   
@@ -104,7 +86,6 @@
 
 = Decide =
   *Idea/Hypotheses for Rabbit Disconnection Exception: >=5*
-  * [ ] Reproduce old issue; time it [too long, moot]
   * [X] Get networking working
   * [X] Get user_name/password working
   * [X] Pass a string
