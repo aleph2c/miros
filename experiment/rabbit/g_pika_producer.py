@@ -97,7 +97,7 @@ class QueueToSampleTimeControl(PID):
 
     return time_recommendation
 
-class SimplePikeTopicPublisher():
+class SimplePikaTopicPublisher():
   """
   This is a pika (Python-RabbitMq) message publisher heavily based on the
   asychronous example provided in the pika documentation.  It should handle
@@ -114,7 +114,7 @@ class SimplePikeTopicPublisher():
     # name the RabbitMq queue on the server at the url to 'g_queue'
     # set the topic routing key to 'pub_thread.text'
     publisher = \
-      SimplePikeTopicPublisher(
+      SimplePikaTopicPublisher(
         amqp_url='amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
         publish_tempo_sec=1.5,
         exchange_name='g_pika_producer_exchange',
@@ -550,7 +550,7 @@ class SimplePikeTopicPublisher():
     and stop the thread, use the 'stop' api"""
     self._task_run_event.clear()
 
-class PikaTopicPublisher(SimplePikeTopicPublisher):
+class PikaTopicPublisher(SimplePikaTopicPublisher):
   """
     encryption_function must have this signature: (item, encryption_key)
     serialization_function must have this signature: (item)
@@ -656,7 +656,7 @@ if __name__ == '__main__':
   pub_thread3.start_thread()
 
   time.sleep(2)
-  for i in range(50):
+  for i in range(500):
     pub_thread1.post_fifo("Janice Library {}".format(i))
     pub_thread1.post_fifo("Janice Library {}".format(i))
     pub_thread1.post_fifo("Janice Library {}".format(i))

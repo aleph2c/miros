@@ -18,8 +18,11 @@ LOGGER = logging.getLogger(__name__)
 
 
 class SimplePikaTopicConsumer(object):
-  """This is an example consumer that will handle unexpected interactions
-  with RabbitMQ such as channel and connection closures.
+  """
+  This is a pika (Python-RabbitMq) message consumer (topic routing), which is
+  heavily based on the asynchronous example provided in the pike documentation.
+  It should handle unexpected interactions with RabbitMQ such as channel and
+  connection closures.
 
   If RabbitMQ closes the connection, it will reopen it. You should
   look at the output, as there are limited reasons why the connection may
@@ -28,6 +31,16 @@ class SimplePikaTopicConsumer(object):
 
   If the channel is closed, it will indicate a problem with one of the
   commands that were issued and that should surface in the output as well.
+
+  Example:
+
+    example = PikaTopicConsumer(
+      amqp_url='amqp://bob:dobbs@localhost:5672/%2F',
+      routing_key='pub_thread.text',
+      exchange_name='sex_change',
+      queue_name='g_queue',
+      encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
+    )
 
   """
   EXCHANGE_TYPE = 'topic'
@@ -354,6 +367,7 @@ class SimplePikaTopicConsumer(object):
     self._connection.close()
 
   def start_thread(self):
+    """Add a thread so that the run method doesn't steal our program control."""
     self._task_run_event.set()
     self._connection = self.connect()
 
