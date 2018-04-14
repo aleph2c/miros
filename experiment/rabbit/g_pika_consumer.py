@@ -34,17 +34,15 @@ class SimplePikaTopicConsumer(object):
 
   Example:
 
-    example = PikaTopicConsumer(
+    pc = PikaTopicConsumer(
       amqp_url='amqp://bob:dobbs@localhost:5672/%2F',
       routing_key='pub_thread.text',
       exchange_name='sex_change',
       queue_name='g_queue',
-      encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
     )
-
+    pc.start_thread()
   """
   EXCHANGE_TYPE = 'topic'
-  QUEUE = 'text'
   THREAD_TEMPO_SEC = 1.0  # how long it will take the thread to quit
 
   def __init__(self,
@@ -67,6 +65,7 @@ class SimplePikaTopicConsumer(object):
     self._thread_tempo_sec = self.THREAD_TEMPO_SEC
     self._exchange_name = exchange_name
     self._routing_key = routing_key
+    self._queue_name = queue_name
 
   def connect(self):
     """This method connects to RabbitMQ, returning the connection handle.
@@ -203,7 +202,7 @@ class SimplePikaTopicConsumer(object):
 
     """
     LOGGER.info('Exchange declared')
-    self.setup_queue(self.QUEUE)
+    self.setup_queue(self._queue_name)
 
   def setup_queue(self, queue_name):
     """Setup the queue on RabbitMQ by invoking the Queue.Declare RPC
@@ -227,8 +226,8 @@ class SimplePikaTopicConsumer(object):
 
     """
     LOGGER.info('Binding %s to %s with %s',
-          self._exchange_name, self.QUEUE, self._routing_key)
-    self._channel.queue_bind(self.on_bindok, self.QUEUE,
+          self._exchange_name, self._queue_name, self._routing_key)
+    self._channel.queue_bind(self.on_bindok, self._queue_name,
                  self._exchange_name, self._routing_key)
 
   def on_bindok(self, unused_frame):
@@ -255,7 +254,7 @@ class SimplePikaTopicConsumer(object):
     LOGGER.info('Issuing consumer related RPC commands')
     self.add_on_cancel_callback()
     self._consumer_tag = self._channel.basic_consume(self.on_message,
-                             self.QUEUE)
+                             self._queue_name)
 
   def add_on_cancel_callback(self):
     """Add a callback that will be invoked if RabbitMQ cancels the consumer
@@ -391,13 +390,43 @@ class SimplePikaTopicConsumer(object):
     self._task_run_event.clear()
 
 class PikaTopicConsumer(SimplePikaTopicConsumer):
+  """This is subclass of SimplePikaTopicConsumer which extends its capabilities.
+  It can de-serialize and decrypt received messages and issues those messages to
+  client callback methods.  While constructing it, you provide it with a
+  symmetric encrytion key, and options functions for decrypting and
+  deserializing.
 
+  It has a start_thread and stop_thread method to control the thread in which
+  the rabbit consumer is running.  Without this thread, you would loss program
+  control after the 'run' call.  The encryption key can be changed while the
+  service is running.
+
+  Example:
+
+    # make a callback that will get your messages
+    def on_message_callback(unused_channel, basic_deliver, properties, body):
+      LOGGER.info('Received message # %s from %s: %s',
+            basic_deliver.delivery_tag, properties.app_id, body)
+
+    consumer = PikaTopicConsumer(
+      amqp_url='amqp://bob:dobbs@localhost:5672/%2F',
+      routing_key='pub_thread.text',
+      exchange_name='sex_change',
+      queue_name='g_queue',
+      message_callback=on_message_callback,
+      encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
+    )
+    consumer.start_thread()
+    consumer.stop_thread()
+
+  """
   def __init__(self,
                amqp_url,
                routing_key,
                exchange_name,
                queue_name,
                encryption_key,
+               message_callback,
                decryption_function=None,
                deserialization_function=None):
     super().__init__(
@@ -409,6 +438,7 @@ class PikaTopicConsumer(SimplePikaTopicConsumer):
     self._encryption_key  = encryption_key
     self._rabbit_user     = self.get_rabbit_user(amqp_url)
     self._rabbit_password = self.get_rabbit_password(amqp_url)
+    self._message_callback = message_callback
 
     # saved decryption function
     self._sdf = None
@@ -432,7 +462,17 @@ class PikaTopicConsumer(SimplePikaTopicConsumer):
     else:
       self._deserialization_function = deserialization_function
 
-  def update_encryption_key(self, encryption_key):
+  def change_encyption_key(self, encryption_key):
+    """Change the encryption_key:
+
+    Example:
+      # Fernet.generate_key() <= to make a new key
+      consumer.change_encyption_key(
+        b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
+      )
+
+    Note: the new key must match the key used by the producer
+    """
     self.stop_thread()
     self._decryption_function = \
         functools.partial(self._sdf,
@@ -455,17 +495,22 @@ class PikaTopicConsumer(SimplePikaTopicConsumer):
 
   def on_message(self, unused_channel, basic_deliver, properties, xsbody):
     body = self.deserialize(self.decrypt(xsbody))
-    LOGGER.info('Received message # %s from %s: %s',
-          basic_deliver.delivery_tag, properties.app_id, body)
+    self._message_callback(unused_channel, basic_deliver, properties, body)
     self.acknowledge_message(basic_deliver.delivery_tag)
 
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
+
+  def on_message_callback(unused_channel, basic_deliver, properties, body):
+    LOGGER.info('Received message # %s from %s: %s',
+          basic_deliver.delivery_tag, properties.app_id, body)
+
   example = PikaTopicConsumer(
     amqp_url='amqp://bob:dobbs@localhost:5672/%2F',
     routing_key='pub_thread.text',
     exchange_name='sex_change',
     queue_name='g_queue',
+    message_callback=on_message_callback,
     encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
   )
 
@@ -473,7 +518,7 @@ if __name__ == '__main__':
   time.sleep(1)
   example.stop_thread()
   time.sleep(1)
-  example.update_encryption_key(
+  example.change_encyption_key(
     b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=')
   time.sleep(20)
 
