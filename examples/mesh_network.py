@@ -126,7 +126,7 @@ import pika               # pip3 install pika --user
 import netifaces          # pip3 install netifaces --user
 from miros.hsm import pp  # pip3 install miros --user
 from miros.event import signals, Event  # "
-from miros.hsm import HsmWithQueues, spy_on
+from miros.hsm import HsmWithQueues
 
 # in the standard library
 import sys
@@ -218,7 +218,7 @@ class NetworkTool():
         'bob', 'dobbs', '192.168.1.72', 5672)
     '''
     credentials = pika.PlainCredentials(user, password)
-    #parameters = pika.ConnectionParameters(ip, port, '/', credentials,
+    # parameters = pika.ConnectionParameters(ip, port, '/', credentials,
     #    heartbeat_interval=600, blocked_connection_timeout=300)
     parameters = pika.ConnectionParameters(ip, port, '/', credentials)
     connection = pika.BlockingConnection(parameters=parameters)
@@ -586,9 +586,9 @@ class SnoopReceiver(ReceiveConnections):
     parameters = \
       pika.ConnectionParameters(
         NetworkTool.get_working_ip_address(), port, '/', credentials)
-      #pika.ConnectionParameters(
-      #  NetworkTool.get_working_ip_address(), port, '/', credentials,
-      #  heartbeat_interval=600, blocked_connection_timeout=300)
+      # pika.ConnectionParameters(
+      #   NetworkTool.get_working_ip_address(), port, '/', credentials,
+      #   heartbeat_interval=600, blocked_connection_timeout=300)
 
     self.connection = pika.BlockingConnection(parameters=parameters)
     self.channel = self.connection.channel()
@@ -803,7 +803,7 @@ class EmitConnections():
         possible_targets.remove(target)
     return possible_targets
 
-    
+
   @staticmethod
   def get_channels(targets, user, password, port=5672):
     '''
