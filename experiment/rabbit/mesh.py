@@ -5,6 +5,7 @@ import uuid
 import pickle
 import socket
 import netifaces  # pip3 install netifaces --user
+import functools
 import subprocess
 import ipaddress
 from miros.event import Event
@@ -375,6 +376,9 @@ class MirosNets:
                 rabbit_password,
                 mesh_encryption_key,
                 routing_key,
+                on_mesh_rx=None,
+                on_spy_rx=None,
+                on_trace_rx=None,
                 spy_snoop_encryption_key=None,
                 trace_snoop_encryption_key=None):
 
@@ -398,21 +402,29 @@ class MirosNets:
     else:
       self.snoop.trace.encryption = trace_snoop_encryption_key
 
-    self.mesh.routing_key  = routing_key
+    self.mesh.routing_key        = routing_key
     self.snoop.spy.routing_key   = routing_key + '.' + MirosNets.SPY_ROUTING_KEY
-    self.snoop.trace.routing_key = routing_key + '.' +  MirosNets.TRACE_ROUTING_KEY
+    self.snoop.trace.routing_key = routing_key + '.' + MirosNets.TRACE_ROUTING_KEY
 
-    self.mesh.queue_name  = MirosNets.MESH_QUEUE
+    self.mesh.queue_name        = MirosNets.MESH_QUEUE
     self.snoop.spy.queue_name   = MirosNets.SPY_QUEUE
     self.snoop.trace.queue_name = MirosNets.TRACE_QUEUE
 
-    self.mesh.exchange_name  = MirosNets.MESH_EXCHANGE
+    self.mesh.exchange_name        = MirosNets.MESH_EXCHANGE
     self.snoop.spy.exchange_name   = MirosNets.SPY_EXCHANGE
     self.snoop.trace.exchange_name = MirosNets.TRACE_EXCHANGE
 
-    self.mesh.on_message_callback = self.on_mesh_message_callback
-    self.snoop.spy.on_message_callback = self.on_snoop_spy_message_callback
-    self.snoop.trace.on_message_callback = self.on_snoop_trace_message_callback
+    self.mesh.on_message_callback = \
+      functools.partial(MirosNets.on_mesh_message_callback,
+        custom_rx_callback=on_mesh_rx)
+
+    self.snoop.spy.on_message_callback =  \
+      functools.partial(MirosNets.on_snoop_spy_message_callback,
+        custom_rx_callback=on_spy_rx)
+
+    self.snoop.trace.on_message_callback = \
+      functools.partial(MirosNets.on_snoop_trace_message_callback,
+        custom_rx_callback=on_trace_rx)
 
     def custom_serializer(obj):
       if isinstance(obj, Event):
@@ -450,15 +462,6 @@ class MirosNets:
     self.this.url = rabbit_scout.this.url
     self.build_mesh_network()
     self.build_snoop_networks()
-
-  def post_fifo(self, e):
-    pass
-
-  def broadcast_trace(self, message):
-    pass
-
-  def broadcast_spy(self, message):
-    pass
 
   def build_mesh_network(self):
     self.mesh.producers = [
@@ -525,17 +528,56 @@ class MirosNets:
         message_callback=self.snoop.trace.on_message_callback,
         encryption_key=self.snoop.trace.encryption_key)
 
-  def on_mesh_message_callback(unused_channel, basic_deliver, properties, body):
-    print('Received mesh message # %s from %s: %s',
-          basic_deliver.delivery_tag, properties.app_id, body)
+  @staticmethod
+  def on_mesh_message_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback):
+    if custom_rx_callback is None:
+      print('Received mesh message # %s from %s: %s',
+            basic_deliver.delivery_tag, properties.app_id, body)
+    else:
+      custom_rx_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback)
 
-  def on_snoop_spy_message_callback(unused_channel, basic_deliver, properties, body):
-    print('Received snoop spy message # %s from %s: %s',
-          basic_deliver.delivery_tag, properties.app_id, body)
+  @staticmethod
+  def on_snoop_spy_message_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback):
+    if custom_rx_callback is None:
+      print('Received snoop spy message # %s from %s: %s',
+            basic_deliver.delivery_tag, properties.app_id, body)
+    else:
+      custom_rx_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback)
 
-  def on_snoop_trace_message_callback(unused_channel, basic_deliver, properties, body):
-    print('Received snoop trace message # %s from %s: %s',
-          basic_deliver.delivery_tag, properties.app_id, body)
+  @staticmethod
+  def on_snoop_trace_message_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback):
+    if custom_rx_callback is None:
+      print('Received snoop trace message # %s from %s: %s',
+            basic_deliver.delivery_tag, properties.app_id, body)
+    else:
+      custom_rx_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback)
+
+  def transmit(self, event):
+    for producer in self.mesh.producers:
+      producer.post_fifo(event)
+
+  def broadcast_spy(self, message):
+    for producer in self.snoop.spy.producers:
+      producer.post_fifo(message)
+
+  def broadcast_trace(self, message):
+    for producer in self.snoop.trace.producers:
+      producer.post_fifo(message)
+
+  def change_mesh_encyption_key(self, encryption_key):
+    for producer in self.mesh.producers:
+      producer.change_encyption_key(encryption_key)
+    self.mesh.consumer.change_encyption_key(encryption_key)
+
+  def change_spy_encyption_key(self, encryption_key):
+    for producer in self.snoop.spy.producers:
+      producer.change_encyption_key(encryption_key)
+    self.snoop.spy.consumer.change_encyption_key(encryption_key)
+
+  def change_trace_encyption_key(self, encryption_key):
+    for producer in self.snoop.trace.producers:
+      producer.change_encyption_key(encryption_key)
+    self.snoop.trace.consumer.change_encyption_key(encryption_key)
 
 if __name__ == '__main__':
   from miros.activeobject import ActiveObject
