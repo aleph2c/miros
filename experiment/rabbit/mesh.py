@@ -2,12 +2,15 @@ import os
 import re
 import time
 import uuid
+import pickle
 import socket
 import netifaces  # pip3 install netifaces --user
 import subprocess
 import ipaddress
+from miros.event import Event
 from g_pika_consumer import PikaTopicConsumer
 from g_pika_producer import PikaTopicPublisher
+
 
 import pprint
 def pp(item):
@@ -134,6 +137,50 @@ class LocalAreaNetwork():
         lan_ip_addresses.append(shost)
     return lan_ip_addresses
 
+class RabbitHelper():
+  CONNECTION_ATTEMPTS    = 3
+  HEARTBEAT_INTERVAL_SEC = 3600
+  PORT                   = 5672
+
+  @staticmethod
+  def make_amqp_url(ip_address,
+               rabbit_user,
+               rabbit_password,
+               rabbit_port=None,
+               connection_attempts=None,
+               heartbeat_interval=None):
+    '''Make a RabbitMq url.
+
+      Example:
+        amqp_url = \
+          RabbitHelper.make_amqp_url(
+              ip_address=192.168.1.1,
+              rabbit_user='bob',
+              rabbit_password='dobb',
+              connection_attempts='3',
+              heartbeat_interval='3600')
+
+        print(amqp_url)  # => \
+          'amqp://bob:dobbs@192.168.1.1:5672/%2F?connection_attempts=3&heartbeat_interval=3600'
+
+    '''
+    if rabbit_port is None:
+      rabbit_port = RabbitHelper.PORT
+    if connection_attempts is None:
+      connection_attempts = RabbitHelper.CONNECTION_ATTEMPTS
+    if heartbeat_interval is None:
+      heartbeat_interval = RabbitHelper.HEARTBEAT_INTERVAL_SEC
+
+    amqp_url = \
+      "amqp://{}:{}@{}:{}/%2F?connection_attempts={}&heartbeat_interval={}".format(
+          rabbit_user,
+          rabbit_password,
+          ip_address,
+          rabbit_port,
+          connection_attempts,
+          heartbeat_interval)
+    return amqp_url
+
 class RabbitScout():
   '''Scouts a list of ip_addresses or your LAN ip_addresses for RabbitMq servers running clients
   with the correction encryption_key and routing_key.
@@ -182,8 +229,8 @@ class RabbitScout():
   HEARTBEAT_INTERVAL_SEC = 3600
   PORT                   = 5672
 
-  SCOUT_TEMPO_SEC       = 0.01
-  SCOUT_TIMEOUT_SEC      = 0.3
+  SCOUT_TEMPO_SEC        = 0.01
+  SCOUT_TIMEOUT_SEC      = 0.4
 
   def __init__(self,
                rabbit_user,
@@ -267,13 +314,12 @@ class RabbitScout():
       heartbeat_interval = self.heartbeat_interval
 
     amqp_url = \
-      "amqp://{}:{}@{}:{}/%2F?connection_attempts={}&heartbeat_interval={}".format(
-          rabbit_user,
-          rabbit_password,
-          ip_address,
-          rabbit_port,
-          connection_attempts,
-          heartbeat_interval)
+      RabbitHelper.make_amqp_url(
+          ip_address=ip_address,
+          rabbit_user=rabbit_user,
+          rabbit_password=rabbit_password,
+          connection_attempts=connection_attempts,
+          heartbeat_interval=heartbeat_interval)
     return amqp_url
 
   def scout_candidates(self):
@@ -307,7 +353,192 @@ class RabbitScout():
     ]
     return candidate_amqp_urls, candidate_ip_addresses
 
+class MirosApiException(BaseException):
+  pass
+
+class MirosNets:
+
+  TRACE_ROUTING_KEY = 'snoop.trace'
+  SPY_ROUTING_KEY   = 'snoop.spy'
+
+  MESH_EXCHANGE     = 'miros.mesh.exchange'
+  TRACE_EXCHANGE    = 'miros.snoop.trace.exchange'
+  SPY_EXCHANGE      = 'miros.snoop.spy.exchange'
+
+  MESH_QUEUE   = 'miros.mesh.queue'
+  TRACE_QUEUE  = 'miros.snoop.trace.queue'
+  SPY_QUEUE    = 'miros.snoop.spy.queue'
+
+  def __init__(self,
+                miros_object,
+                rabbit_user,
+                rabbit_password,
+                mesh_encryption_key,
+                routing_key,
+                spy_snoop_encryption_key=None,
+                trace_snoop_encryption_key=None):
+
+    self.this = Attribute()
+    self.mesh = Attribute()
+    self.snoop = Attribute()
+    self.snoop.spy = Attribute()
+    self.snoop.trace = Attribute()
+
+    self.mesh.encryption_key = mesh_encryption_key
+    self._rabbit_user = rabbit_user
+    self._rabbit_password = rabbit_password
+
+    if spy_snoop_encryption_key is None:
+      self.snoop.spy.encryption_key = mesh_encryption_key
+    else:
+      self.snoop.spy.encryption = spy_snoop_encryption_key
+
+    if trace_snoop_encryption_key is None:
+      self.snoop.trace.encryption_key = mesh_encryption_key
+    else:
+      self.snoop.trace.encryption = trace_snoop_encryption_key
+
+    self.mesh.routing_key  = routing_key
+    self.snoop.spy.routing_key   = routing_key + '.' + MirosNets.SPY_ROUTING_KEY
+    self.snoop.trace.routing_key = routing_key + '.' +  MirosNets.TRACE_ROUTING_KEY
+
+    self.mesh.queue_name  = MirosNets.MESH_QUEUE
+    self.snoop.spy.queue_name   = MirosNets.SPY_QUEUE
+    self.snoop.trace.queue_name = MirosNets.TRACE_QUEUE
+
+    self.mesh.exchange_name  = MirosNets.MESH_EXCHANGE
+    self.snoop.spy.exchange_name   = MirosNets.SPY_EXCHANGE
+    self.snoop.trace.exchange_name = MirosNets.TRACE_EXCHANGE
+
+    self.mesh.on_message_callback = self.on_mesh_message_callback
+    self.snoop.spy.on_message_callback = self.on_snoop_spy_message_callback
+    self.snoop.trace.on_message_callback = self.on_snoop_trace_message_callback
+
+    def custom_serializer(obj):
+      if isinstance(obj, Event):
+        pobj = Event.dumps(obj)
+      ppobj = pickle.dumps(pobj)
+      return ppobj
+
+    def custom_deserializer(ppobj):
+      pobj = pickle.loads(ppobj)
+      obj  = Event.load(pobj)
+      return obj
+
+    self.mesh.serializer = custom_serializer
+    self.mesh.deserializer = custom_deserializer
+
+    api_ok = True
+    api_ok &= hasattr(miros_object.__class__, 'post_fifo')
+    api_ok &= hasattr(miros_object.__class__, 'post_lifo')
+    api_ok &= hasattr(miros_object.__class__, 'start_at')
+    api_ok &= hasattr(miros_object.__class__, 'register_live_spy_callback')
+    api_ok &= hasattr(miros_object.__class__, 'register_live_trace_callback')
+
+    if api_ok is False:
+      raise MirosApiException("miros_object {} doesn't have the required attributes".format(miros_object))
+
+    rabbit_scout = RabbitScout(
+                    rabbit_user = self._rabbit_user,
+                    rabbit_password=self._rabbit_password,
+                    routing_key=self.mesh.routing_key,
+                    exchange_name=self.mesh.exchange_name,
+                    queue_name=self.mesh.queue_name,
+                    encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=')
+
+    self._urls = rabbit_scout.urls
+    self.this.url = rabbit_scout.this.url
+    self.build_mesh_network()
+    self.build_snoop_networks()
+
+  def post_fifo(self, e):
+    pass
+
+  def broadcast_trace(self, message):
+    pass
+
+  def broadcast_spy(self, message):
+    pass
+
+  def build_mesh_network(self):
+    self.mesh.producers = [
+      PikaTopicPublisher(
+        amqp_url=amqp_url,
+        routing_key=self.mesh.routing_key,
+        publish_tempo_sec=1.0,
+        exchange_name=self.mesh.exchange_name,
+        queue_name=self.mesh.queue_name,
+        serialization_function=self.mesh.serializer,
+        encryption_key=self.mesh.encryption_key)
+      for amqp_url in self._urls
+    ]
+
+    self.mesh.consumer = \
+      PikaTopicConsumer(
+        amqp_url=self.this.url,
+        routing_key=self.mesh.routing_key,
+        exchange_name=self.mesh.exchange_name,
+        queue_name=self.mesh.queue_name,
+        message_callback=self.mesh.on_message_callback,
+        deserialization_function=self.mesh.deserializer,
+        encryption_key=self.mesh.encryption_key)
+
+  def build_snoop_networks(self):
+
+    self.snoop.spy.producers = [
+      PikaTopicPublisher(
+        amqp_url=amqp_url,
+        routing_key=self.snoop.spy.routing_key,
+        publish_tempo_sec=1.0,
+        exchange_name=self.snoop.spy.exchange_name,
+        queue_name=self.snoop.spy.queue_name,
+        encryption_key=self.snoop.spy.encryption_key)
+      for amqp_url in self._urls
+    ]
+
+    self.snoop.spy.consumer = \
+      PikaTopicConsumer(
+        amqp_url=self.this.url,
+        routing_key=self.snoop.spy.routing_key,
+        exchange_name=self.snoop.spy.exchange_name,
+        queue_name=self.snoop.spy.queue_name,
+        message_callback=self.snoop.spy.on_message_callback,
+        encryption_key=self.snoop.spy.encryption_key)
+
+    self.snoop.trace.producers = [
+      PikaTopicPublisher(
+        amqp_url=amqp_url,
+        routing_key=self.snoop.trace.routing_key,
+        publish_tempo_sec=1.0,
+        exchange_name=self.snoop.trace.exchange_name,
+        queue_name=self.snoop.trace.queue_name,
+        encryption_key=self.snoop.trace.encryption_key)
+      for amqp_url in self._urls
+    ]
+
+    self.snoop.trace.consumer = \
+      PikaTopicConsumer(
+        amqp_url=self.this.url,
+        routing_key=self.snoop.trace.routing_key,
+        exchange_name=self.snoop.trace.exchange_name,
+        queue_name=self.snoop.trace.queue_name,
+        message_callback=self.snoop.trace.on_message_callback,
+        encryption_key=self.snoop.trace.encryption_key)
+
+  def on_mesh_message_callback(unused_channel, basic_deliver, properties, body):
+    print('Received mesh message # %s from %s: %s',
+          basic_deliver.delivery_tag, properties.app_id, body)
+
+  def on_snoop_spy_message_callback(unused_channel, basic_deliver, properties, body):
+    print('Received snoop spy message # %s from %s: %s',
+          basic_deliver.delivery_tag, properties.app_id, body)
+
+  def on_snoop_trace_message_callback(unused_channel, basic_deliver, properties, body):
+    print('Received snoop trace message # %s from %s: %s',
+          basic_deliver.delivery_tag, properties.app_id, body)
+
 if __name__ == '__main__':
+  from miros.activeobject import ActiveObject
   lan = LocalAreaNetwork()
   print(lan.this.address)
   print(lan.addresses)
@@ -326,3 +557,11 @@ if __name__ == '__main__':
   pp(rn.addresses)
   pp(rn.this.url)
   pp(rn.other.urls)
+
+  ao = ActiveObject(name='testing')
+  mn = MirosNets(miros_object = ao,
+                  rabbit_user='bob',
+                  rabbit_password='dobbs',
+                  mesh_encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=',
+                  routing_key="testing")
+  pp(mn._urls)
