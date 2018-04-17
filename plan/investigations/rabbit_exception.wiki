@@ -4,12 +4,26 @@
     A working re-write of miros-rabbitmq using the the pika async example code. 
     
   *Immediate Goal:*
-    * [X] Adjust the RabbitNetwork Api to make it really easy to use.
-      * [X] rn.urls
-      * [X] rn.other.urls
-      * [X] rn.this.url
-    * [X] Adjust the timeout in the RabbitNetwork to be a class const
-  
+    * [ ] look at the old mesh_network code to get the next list of specification.
+    * [ ] create an intermediate class so a non-factory can use it
+    * [X] MirosNets - it will need:
+      * [X] the post_fifo method
+      * [X] register_live_spy_callback (what class does this first occur in?  HsmWithQueues)
+      * [X] register_live_trace_callback
+      * [X] start_at
+      * [X] live_trace attribute (to turn on the trace_snoop)
+      * [X] live_spy attribute (to turn on the spy_snoop)
+      * [X] mesh_encryption_key (as an argument)
+      * [X] spy_snoop_encryption_key (as an argument)
+      * [X] trace_snoop_encryption_key (as an argument)
+    * [ ] MirosNets - will provide:
+      * [ ] custom serialization to the producers on the mesh
+      * [ ] custom deserialization to the consumer on the mesh
+      * [ ] mesh (post_fifo)
+      * [ ] spy_snoop
+      * [ ] trace_snoop
+      * [ ] start_at - managed by outside object
+
   *Immediate problem?*
     
   *Global problem?*
@@ -49,12 +63,17 @@
     Spit balling a strategy:
       *Producer*:
       *Consumer*:
-      *Mesh/Snoop*:
+      *Scout*
+      *Mesh*
+      *Snoop*:
+      * how do we make a fanout exchange?
   
   *Symptoms:*
   
   *Questions for Rabbit Disconnection Exception:*
     What don't I know that I need to know?
+    Am I going to review this process when you have finished? Improve it?
+    Can I make better decisions this time?
 
   *Assumptions:*
 

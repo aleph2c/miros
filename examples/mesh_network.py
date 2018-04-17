@@ -1,5 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# NOT in the standard library
+import pika               # pip3 install pika --user
+import netifaces          # pip3 install netifaces --user
+from miros.hsm import pp  # pip3 install miros --user
+from miros.event import signals, Event  # "
+from miros.hsm import HsmWithQueues
+
+# in the standard library
+import sys
+import time
+import uuid
+import socket
+import pickle
+import subprocess
+import cryptography
+from functools import wraps
+from threading import Thread
+from types import SimpleNamespace
+from miros.foreign import ForeignHsm
+from miros.activeobject import Factory
+from cryptography.fernet import Fernet
+from threading import Event as ThreadingEvent
 '''
 This package is used to link a miros statechart into an encrypted mesh network
 on a LAN.
@@ -121,28 +143,6 @@ to be common across all of its nodes.
 
 '''
 
-# NOT in the standard library
-import pika               # pip3 install pika --user
-import netifaces          # pip3 install netifaces --user
-from miros.hsm import pp  # pip3 install miros --user
-from miros.event import signals, Event  # "
-from miros.hsm import HsmWithQueues
-
-# in the standard library
-import sys
-import time
-import uuid
-import socket
-import pickle
-import subprocess
-import cryptography
-from functools import wraps
-from threading import Thread
-from types import SimpleNamespace
-from miros.foreign import ForeignHsm
-from miros.activeobject import Factory
-from cryptography.fernet import Fernet
-from threading import Event as ThreadingEvent
 
 class NetworkTool():
   '''

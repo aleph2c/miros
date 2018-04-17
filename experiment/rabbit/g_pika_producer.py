@@ -113,6 +113,7 @@ class SimplePikaTopicPublisher():
     # name the exchange in the RabbitMq server at the url to 'g_pika_producer_exchange'
     # name the RabbitMq queue on the server at the url to 'g_queue'
     # set the topic routing key to 'pub_thread.text'
+
     publisher = \
       SimplePikaTopicPublisher(
         amqp_url='amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
