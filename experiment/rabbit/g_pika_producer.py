@@ -177,6 +177,7 @@ class SimplePikaTopicPublisher():
     self._message_number = 0
     self._stopping = False
     self._closing = False
+    self.connect_error = False
 
     self._amqp_url = amqp_url
     self._thread_queue = ThreadQueue(maxsize=500)
@@ -255,7 +256,6 @@ class SimplePikaTopicPublisher():
     self._acked = 0
     self._nacked = 0
     self._message_number = 0
-
     # This is the old connection IOLoop instance, stop its ioloop
     self._connection.ioloop.stop()
 
@@ -539,8 +539,11 @@ class SimplePikaTopicPublisher():
     def thread_runner(self):
       # The run method will turn on pika's callback hell.
       # To see how this is turned off look at the producer_heart_beat
-      self.run()
-      # code here will never run
+      try:
+        self.run()
+      except:
+        self.stop_thread()
+        self.connect_error = True
 
     thread = Thread(target=thread_runner, args=(self,), daemon=True)
     thread.start()
