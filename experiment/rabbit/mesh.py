@@ -13,20 +13,36 @@ import pprint
 def pp(item):
   pprint.pprint(item)
 
+class Attribute():
+  def __init__(self):
+    pass
+
 class LocalAreaNetwork():
-  '''Provides the addresses of the local area network (LAN)
+  '''Provides the ip_addresses of the local area network (LAN)
 
   Example:
     lan = LocalAreaNetwork()
-    lan.addresses  # => contains all the addresses that answered to ping on this LAN
-    lan.this       # => this computer's primary IP address
+
+    print(lan.addresses)  # => \
+      ['192.168.1.66', '192.168.1.69', '192.168.1.70', '192.168.1.71', '192.168.1.75', '192.168.1.254']
+
+    print(lan.this.address)  # => '192.168.1.75'
+
+    print(lan.other.addresses)  # => \
+      ['192.168.1.66', '192.168.1.69', '192.168.1.70', '192.168.1.71', '192.168.1.254']
+
+    print(LocalAreaNetwork.get_working_ip_address())  # => '192.168.1.75'
 
   '''
   def __init__(self):
-    self.this = self.get_working_ip_address()
+    self.this  = Attribute()
+    self.other = Attribute()
+    self.this.address = LocalAreaNetwork.get_working_ip_address()
     self.addresses = self.candidate_ip_addresses()
+    self.other.addresses = list(set(self.addresses) - set([self.this.address]))
 
-  def get_working_ip_address(self):
+  @staticmethod
+  def get_working_ip_address():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
       s.connect(('10.255.255.255', 1))
@@ -38,7 +54,7 @@ class LocalAreaNetwork():
     return ip
 
   def get_ipv4_network(self):
-    ip_address = self.get_working_ip_address()
+    ip_address = LocalAreaNetwork.get_working_ip_address()
     netmask    = self.get_netmask_on_this_machine()
     inet4 = ipaddress.ip_network(ip_address + '/' + netmask, strict=False)
     return inet4
@@ -85,7 +101,7 @@ class LocalAreaNetwork():
   def get_netmask_on_this_machine(self):
     interfaces = [interface for interface in netifaces.interfaces()]
     local_netmask = None
-    working_address = self.get_working_ip_address()
+    working_address = LocalAreaNetwork.get_working_ip_address()
     for interface in interfaces:
       interface_network_types = netifaces.ifaddresses(interface)
       if netifaces.AF_INET in interface_network_types:
@@ -109,7 +125,7 @@ class LocalAreaNetwork():
     lan_ip_addresses = []
     a = set(self.ip_addresses_on_lan())
     b = set(self.ip_addresses_on_this_machine())
-    c = set([self.get_working_ip_address()])
+    c = set([LocalAreaNetwork.get_working_ip_address()])
     candidates = list(a - b ^ c)
     inet4 = self.get_ipv4_network()
     for host in inet4.hosts():
@@ -118,7 +134,57 @@ class LocalAreaNetwork():
         lan_ip_addresses.append(shost)
     return lan_ip_addresses
 
-class RabbitNetwork():
+class RabbitScout():
+  '''Scouts a list of ip_addresses or your LAN ip_addresses for RabbitMq servers running clients
+  with the correction encryption_key and routing_key.
+
+  Example:
+    rs = RabbitScout(
+          rabbit_user='bob',
+          rabbit_password='dobbs',
+          routing_key='pub_thread.text',
+          exchange_name='sex_change',
+          queue_name='g_queue',
+          encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=')
+
+    print(rs.addresses)      # => ['192.168.1.69', '192.168.1.75']
+    print(rs.this.address)   # => '192.168.1.75'
+    print(rs.other.addresss) # => ['192.168.1.69']
+
+    print(rs.urls) # => \
+      [amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
+      'amqp://bob:dobbs@192.168.1.75:5672/%2F?connection_attempts=3&heartbeat_interval=3600']
+
+    print(rs.this.url) # => \
+      'amqp://bob:dobbs@192.168.1.75:5672/%2F?connection_attempts=3&heartbeat_interval=3600'
+
+    print(rs.other.urls) # => \
+      [amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600']
+
+
+  Notes:
+    The RabbitScout determines is an address has a rabbitmq server with a client
+    using the correct encryption_key and routing_key by starting a
+    PikaTopicPublisher thread using URL which will will not try to reconnect if
+    an error is detected.  It tries to establish a connection, but only waits
+    the scout_timeout_sec (default of 0.3 second/address).  If the connection is
+    not made the PikaTopicPublisher indicates this with a 'connect_error' flag.
+    If this flag is detected the address is disqualified.
+
+    If you notice that some of your addresses are not being picked up by the
+    RabbRabbitScout increase the scout_timeout_sec parameter.  The downside of
+    doing this is it will take more time to get through your list of searched
+    IP addresses to find the other RabbitMq clients in the address list or on
+    the LAN.
+
+  '''
+
+  CONNECTION_ATTEMPTS    = 3
+  HEARTBEAT_INTERVAL_SEC = 3600
+  PORT                   = 5672
+
+  SCOUT_TEMPO_SEC       = 0.01
+  SCOUT_TIMEOUT_SEC      = 0.3
 
   def __init__(self,
                rabbit_user,
@@ -127,7 +193,14 @@ class RabbitNetwork():
                exchange_name,
                queue_name,
                encryption_key,
-               addresses=None):
+               addresses=None,
+               rabbit_port=None,
+               connection_attempts=None,
+               heartbeat_interval=None,
+               scout_timeout_sec=None):
+
+    self.this  = Attribute()
+    self.other = Attribute()
 
     self.queue_name = queue_name
     self.routing_key = routing_key
@@ -140,9 +213,24 @@ class RabbitNetwork():
     else:
       self.candidates = addresses
 
+    if rabbit_port is None:
+      self.rabbit_port = self.PORT
+
+    if connection_attempts is None:
+      self.connection_attempts = self.CONNECTION_ATTEMPTS
+
+    if heartbeat_interval is None:
+      self.heartbeat_interval = self.HEARTBEAT_INTERVAL_SEC
+
+    if scout_timeout_sec is None:
+      self._scout_timeout_sec = self.SCOUT_TIMEOUT_SEC
+
     self.rabbit_user = rabbit_user
     self.rabbit_password = rabbit_password
+    self.this.address = LocalAreaNetwork.get_working_ip_address()
     self.urls, self.addresses = self.scout_candidates()
+    self.this.url = self.make_amqp_url(ip_address=self.this.address)
+    self.other.urls = list(set(self.urls) - set([self.this.url]))
 
   def possible_amqp_urls(self, connection_attempts=None, addresses=None):
     if connection_attempts is None:
@@ -161,27 +249,30 @@ class RabbitNetwork():
     return amqp_urls
 
   def make_amqp_url(self,
-                    rabbit_user,
-                    rabbit_password,
                     ip_address,
+                    rabbit_user=None,
+                    rabbit_password=None,
                     rabbit_port=None,
-                    port=None,
                     connection_attempts=None,
                     heartbeat_interval=None):
 
-    if port is None:
-      port = 5672
+    if rabbit_user is None:
+      rabbit_user = self.rabbit_user
+    if rabbit_password is None:
+      rabbit_password = self.rabbit_password
+    if rabbit_port is None:
+      rabbit_port = self.rabbit_port
     if connection_attempts is None:
-      connection_attempts = 3
+      connection_attempts = self.connection_attempts
     if heartbeat_interval is None:
-      heartbeat_interval = 3600
+      heartbeat_interval = self.heartbeat_interval
 
     amqp_url = \
       "amqp://{}:{}@{}:{}/%2F?connection_attempts={}&heartbeat_interval={}".format(
           rabbit_user,
           rabbit_password,
           ip_address,
-          port,
+          rabbit_port,
           connection_attempts,
           heartbeat_interval)
     return amqp_url
@@ -194,14 +285,15 @@ class RabbitNetwork():
       thread = PikaTopicPublisher(
         amqp_url=amqp_url,
         routing_key=self.routing_key,
-        publish_tempo_sec=0.01,
+        publish_tempo_sec=self.SCOUT_TEMPO_SEC,
         exchange_name=self.exchange_name,
         queue_name=self.queue_name,
         encryption_key=self.encryption_key)
 
       thread.start_thread()
+      # send a unexpected message to make it harder to decrypt
       thread.post_fifo(uuid.uuid4().hex.upper()[0:12])
-      time.sleep(0.3)
+      time.sleep(self._scout_timeout_sec)
       thread.stop_thread()
       if thread.connect_error:
         scouting_amqp_urls.remove(amqp_url)
@@ -218,10 +310,11 @@ class RabbitNetwork():
 
 if __name__ == '__main__':
   lan = LocalAreaNetwork()
-  print(lan.this)
+  print(lan.this.address)
   print(lan.addresses)
+  print(lan.other.addresses)
 
-  rn = RabbitNetwork(
+  rn = RabbitScout(
       'bob',
       'dobbs',
       routing_key='pub_thread.text',
@@ -232,3 +325,5 @@ if __name__ == '__main__':
   )
   pp(rn.urls)
   pp(rn.addresses)
+  pp(rn.this.url)
+  pp(rn.other.urls)
