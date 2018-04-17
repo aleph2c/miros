@@ -4,12 +4,13 @@
     A working re-write of miros-rabbitmq using the the pika async example code. 
     
   *Immediate Goal:*
-    * [X] Callback mechanism to be issued when a message is received
+    * [X] Adjust the RabbitNetwork Api to make it really easy to use.
+      * [X] rn.urls
+      * [X] rn.other.urls
+      * [X] rn.this.url
+    * [X] Adjust the timeout in the RabbitNetwork to be a class const
   
   *Immediate problem?*
-    Added the ability to change the encryption key, encryption/decryption
-    function and serialization/deserialization function (needed for miros).  This
-    code needs to be documented (tedious work)
     
   *Global problem?*
     My botnet was working, based on an old and unreliable way of using pika
@@ -39,59 +40,27 @@
   
 = Orient =
   *Information about the current context*
-    Go on a functool vacation.  This looks really useful, you should know more
-    about it.
-    
-    The consumer will be on the pi
-    
-    The producer will be on the WLS
-    
-    The user/password will be the same as before
-    
-    The exchange is defined by the consumer, the producer's machine does not have the exchange
-    
     The pi exchange: http://192.168.1.69:15672/#/exchanges
     The WLS exchange: http://127.0.0.1:15672/#/exchanges
     
-    With PUBLISH_INTERVAL = 0.00000000000000000000001 their example ran for 5 minutes with no issues
-    
-    There is some mention about RPC calls to set exchanges in their
-    documentation.  I do not understand how this works.  My previous code just
-    build two exchanges one on each of the different machines with the same
-    name.  I think when I'm done, I'll just have a more complex version of what
-    I had before.
+    Go on a functool vacation.  This looks really useful, you should know more
+    about it.
     
     Spit balling a strategy:
       *Producer*:
       *Consumer*:
-      
       *Mesh/Snoop*:
-        Create another file which will use the producer and the consumer
-        * [ ] Write a url maker
-        * [ ] import producer
-        * [ ] import consumer
-        * [ ] get_working_ip_address
-        * [ ] ip_addresses_on_lan
-        * [ ] ip_addresses_on_this_machine
   
   *Symptoms:*
   
   *Questions for Rabbit Disconnection Exception:*
-    Can I understand their code? [good enough]
-    Can I find a way to make the problem fail sooner. [moot]
-    Can you simplify your test? [moot]
-    What recently changed?
+    What don't I know that I need to know?
 
   *Assumptions:*
 
 = Decide =
   *Idea/Hypotheses for Rabbit Disconnection Exception: >=5*
-  * [X] Get networking working
-  * [X] Get user_name/password working
-  * [X] Pass a string
-  * [X] Understand their code in enough detail (obey, cooperate, diverge)
-  * [X] Try to pass different strings using an API call into their example
-  * [X] Put their blocking consumer code into a thread 
+  
   *Chosen Idea/Hypothesis*
    
   *Plan to Expand-on-Idea/Disprove-Hypothesis*

@@ -161,7 +161,6 @@ class RabbitScout():
     print(rs.other.urls) # => \
       [amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600']
 
-
   Notes:
     The RabbitScout determines is an address has a rabbitmq server with a client
     using the correct encryption_key and routing_key by starting a
