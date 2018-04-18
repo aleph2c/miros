@@ -428,13 +428,17 @@ class MirosNets:
 
     def custom_serializer(obj):
       if isinstance(obj, Event):
-        pobj = Event.dumps(obj)
-      ppobj = pickle.dumps(pobj)
-      return ppobj
+        obj = Event.dumps(obj)
+      pobj = pickle.dumps(obj)
+      return pobj
 
     def custom_deserializer(ppobj):
       pobj = pickle.loads(ppobj)
-      obj  = Event.load(pobj)
+      try:
+        obj = Event.loads(pobj)
+      except:
+        obj = pobj
+
       return obj
 
     self.mesh.serializer = custom_serializer
@@ -462,6 +466,58 @@ class MirosNets:
     self.this.url = rabbit_scout.this.url
     self.build_mesh_network()
     self.build_snoop_networks()
+
+    self.snoop.spy.enabled = False
+    self.snoop.trace.enabled = False
+    
+    self.mesh.started = False
+    self.snoop.spy.started = False
+    self.snoop.trace.started = False
+
+  def enable_snoop_spy(self):
+    self.snoop.spy.enabled = True
+
+  def enable_snoop_trace(self):
+    self.snoop.trace.enabled = True
+
+  def start_threads(self):
+
+    if self.mesh.started is False:
+      for producer in self.mesh.producers:
+        producer.start_thread()
+      self.mesh.consumer.start_thread()
+      self.mesh.started = True
+
+    if self.snoop.spy.started is False and self.snoop.spy.enabled:
+      for spy_producer in self.snoop.spy.producers:
+        spy_producer.start_thread()
+      self.snoop.spy.consumer.start_thread()
+      self.snoop.spy.enabled = True
+
+    if self.snoop.trace.started is False and self.snoop.trace.enabled:
+      for trace_producer in self.snoop.trace.producers:
+        trace_producer.start_thread()
+      self.snoop.trace.consumer.start_thread()
+      self.snoop.trace.enabled = True
+
+  def stop_threads(self):
+    if self.mesh.started is True:
+      for producer in self.mesh.producers:
+        producer.stop_thread()
+      self.mesh.consumer.stop_thread()
+      self.mesh.started = False
+
+    if self.snoop.spy.started is True:
+      for spy_producer in self.snoop.spy.producers:
+        spy_producer.stop_thread()
+      self.snoop.spy.consumer.stop_thread()
+      self.snoop.spy.enabled = False
+
+    if self.snoop.trace.started is True:
+      for trace_producer in self.snoop.trace.producers:
+        trace_producer.stop_thread()
+      self.snoop.trace.consumer.stop_thread()
+      self.snoop.trace.enabled = False
 
   def build_mesh_network(self):
     self.mesh.producers = [
@@ -581,24 +637,24 @@ class MirosNets:
 
 if __name__ == '__main__':
   from miros.activeobject import ActiveObject
-  lan = LocalAreaNetwork()
-  print(lan.this.address)
-  print(lan.addresses)
-  print(lan.other.addresses)
+  #lan = LocalAreaNetwork()
+  #print(lan.this.address)
+  #print(lan.addresses)
+  #print(lan.other.addresses)
 
-  rn = RabbitScout(
-      'bob',
-      'dobbs',
-      routing_key='pub_thread.text',
-      exchange_name='sex_change',
-      queue_name='g_queue',
-      encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=',
-      addresses=lan.addresses,
-  )
-  pp(rn.urls)
-  pp(rn.addresses)
-  pp(rn.this.url)
-  pp(rn.other.urls)
+  #rn = RabbitScout(
+  #    'bob',
+  #    'dobbs',
+  #    routing_key='pub_thread.text',
+  #    exchange_name='sex_change',
+  #    queue_name='g_queue',
+  #    encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=',
+  #    addresses=lan.addresses,
+  #)
+  #pp(rn.urls)
+  #pp(rn.addresses)
+  #pp(rn.this.url)
+  #pp(rn.other.urls)
 
   ao = ActiveObject(name='testing')
   mn = MirosNets(miros_object = ao,
@@ -607,3 +663,8 @@ if __name__ == '__main__':
                   mesh_encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=',
                   routing_key="testing")
   pp(mn._urls)
+
+  print("transmitting something")
+  mn.start_threads()
+  mn.transmit("bob")
+  time.sleep(4)
