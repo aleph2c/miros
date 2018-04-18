@@ -1,30 +1,67 @@
 *Rabbit Disconnection Exception*
 = Observe =
   *What defines Success?*
-    A working re-write of miros-rabbitmq using the the pika async example code. 
+  A working re-write of miros-rabbitmq using the the pika async example code. 
     
-  *Immediate Goal:*
-    * [ ] MirosNets (change this name to something better)
-      * [ ] add empty encryption/decryption
-      * [ ] add empty serialization/deserialization
-      * [ ] document the docstring of MirosNets
-      * [ ] create an example:
-        * [ ] HsmWithQueues which uses it
-        * [ ] ActiveObject which uses it
-        * [ ] Factory which uses it
-      * [ ] change the networked_horse_archer.py to use new design
-      * [ ] re-write all docs
-      * [ ] create new miros-rabbitmq package
-
-  *Immediate problem?*
+  *Immediate Goal*
+    Demonstrate (three different versions using different HSM classes of)
+    two small ergotic HSMs that can communicate between each other from
+    different processes on the same machine (use WLS).  From within this
+    example, demonstrate that the mesh is working, that the spy snoop is working
+    and the trace snoop is working.
+ 
+  *Problem*
+    We are using a completely new code base; The snoop network has been broken
+    into two parts, the topic subscription scheme is different from the previous
+    version of the software.
     
-  *Global problem?*
+    The new framework should work for multiple classes in the miros stack (Factory,
+    Active Object, Hsm with Queues).  To know if it actually works we need to
+    try these.
+    
+    The snoop spy results will be extremely noisy.
+    
+    The small ergotic HSM needs to be designed.
+  
+  *Evidence that informs Assumptions:*
+  
+= Orient/Homework/Empathy =
+  *Information about the current context*
+    The pi exchange: http://192.168.1.69:15672/#/exchanges
+    The WLS exchange: http://127.0.0.1:15672/#/exchanges
+    
+    Go on a functool vacation.  This looks really useful, you should know more
+    about it.
+    
+   *Feature Visions*: 
+      *Producer*:
+      *Consumer*:
+      *Scout*
+      *Mesh*
+      *Snoop*:
+      * [ ] Add coloring from different machines
+      * [ ] Add spy filtering
+      *Integration*
+      * [ ] MirosNets (change this name to something better)
+        * [ ] add empty encryption/decryption
+        * [ ] add empty serialization/deserialization
+        * [ ] document the docstring of MirosNets
+        * [ ] create an example:
+          * [ ] HsmWithQueues which uses it
+          * [ ] ActiveObject which uses it
+          * [ ] Factory which uses it
+        * [ ] change the networked_horse_archer.py to use new design
+        * [ ] re-write all docs :(
+        * [ ] create new miros-rabbitmq package
+  
+  *History*
     My botnet was working, based on an old and unreliable way of using pika
     (from RabbitMq docs).  
     
-    But this code would fail after running for > 15 minutes.  The time-to-test was
-    too long to troubleshoot that approach, so I decided to re-write everything to
-    work from the pika project's stable example.  Errors seen in my previous version:
+    But this code would fail after running for > 15 minutes.  The time-to-test
+    was too long to troubleshoot comfortably, so I decided to re-write
+    everything based on the pika project's stable example.  Errors seen in my
+    previous version:
     
       One two bots (WSL):
         pika.exceptions.ConnectionClosed: (-1, "ConnectionResetError(104, 'Connection reset by peer')")
@@ -38,39 +75,36 @@
     
     To avoid this problem again I will use the pika documentation's complicated
     pika-asyncronous example as a starting point, then wrap it with the
-    functionality required for miros-rabbitmq
-
-  *Evidence that informs Assumptions:*
-  
-  Previous issues:
-  
-= Orient =
-  *Information about the current context*
-    The pi exchange: http://192.168.1.69:15672/#/exchanges
-    The WLS exchange: http://127.0.0.1:15672/#/exchanges
-    
-    Go on a functool vacation.  This looks really useful, you should know more
-    about it.
-    
-    Spit balling a strategy:
-      *Producer*:
-      *Consumer*:
-      *Scout*
-      *Mesh*
-      *Snoop*:
-      * how do we make a fanout exchange?
+    functionality required for miros-rabbitmq.  Once again, you can't trust the
+    dom.
   
   *Symptoms:*
   
   *Questions for Rabbit Disconnection Exception:*
     What don't I know that I need to know?
-    Am I going to review this process when you have finished? Improve it?
+    Am I going to review this process when I have finished it?
+    Can I Improve this process?
     Can I make better decisions this time?
 
   *Assumptions:*
 
 = Decide =
   *Idea/Hypotheses for Rabbit Disconnection Exception: >=5*
+  * [ ] Build something with a randomizing one shot (1-3 seconds)
+  * [ ] Have it switch states so we can see if it works
+  * [ ] Create three versions of this statechart using the three available
+        classes.
+  * [ ] Link the charts together with the race pattern
+  * [ ] Use local trace to see if the mesh is working [debug]
+  * [ ] Turn on the snoop trace [debug]
+  * [ ] Turn on the snoop spy [debug]
+  * [ ] Add colors for snoop traces from other machines [debug]
+  * [ ] Add spy filters [debug]
+  * [ ] Create new immediate goal for this plan
+  * [ ] Add code to miros-rabbitmq and release package
+  * [ ] Use this pack in the horse archer example [debug]
+  * [ ] Re-write documentation
+  * [ ] Write up miros-rabbitmq documentation
   
   *Chosen Idea/Hypothesis*
    
