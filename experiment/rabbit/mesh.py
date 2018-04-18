@@ -587,24 +587,24 @@ class MirosNets:
   @staticmethod
   def on_mesh_message_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback):
     if custom_rx_callback is None:
-      print('Received mesh message # %s from %s: %s',
-            basic_deliver.delivery_tag, properties.app_id, body)
+      print("Received mesh message # {} from {}: {}".format(
+            basic_deliver.delivery_tag, properties.app_id, body))
     else:
       custom_rx_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback)
 
   @staticmethod
   def on_snoop_spy_message_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback):
     if custom_rx_callback is None:
-      print('Received snoop spy message # %s from %s: %s',
-            basic_deliver.delivery_tag, properties.app_id, body)
+      print("Received snoop-spy message # {} from {}: {}".format(
+            basic_deliver.delivery_tag, properties.app_id, body))
     else:
       custom_rx_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback)
 
   @staticmethod
   def on_snoop_trace_message_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback):
     if custom_rx_callback is None:
-      print('Received snoop trace message # %s from %s: %s',
-            basic_deliver.delivery_tag, properties.app_id, body)
+      print("Received snoop-spy message # {} from {}: {}".format(
+            basic_deliver.delivery_tag, properties.app_id, body))
     else:
       custom_rx_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback)
 
@@ -666,5 +666,7 @@ if __name__ == '__main__':
 
   print("transmitting something")
   mn.start_threads()
-  mn.transmit("bob")
-  time.sleep(4)
+  for i in range(100):
+    mn.transmit("bob {}".format(i))
+    time.sleep(0.1)
+  time.sleep(1)
