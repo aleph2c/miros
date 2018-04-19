@@ -590,7 +590,7 @@ class MirosNets:
       print("Received mesh message # {} from {}: {}".format(
             basic_deliver.delivery_tag, properties.app_id, body))
     else:
-      custom_rx_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback)
+      custom_rx_callback(unused_channel, basic_deliver, properties, body)
 
   @staticmethod
   def on_snoop_spy_message_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback):
@@ -657,11 +657,17 @@ if __name__ == '__main__':
   pp(rn.other.urls)
 
   ao = ActiveObject(name='testing')
+
+  def custom_on_message_callback(unused_channel, basic_deliver, properties, body):
+      print("Custom rx, Received mesh message # {} from {}: {}".format(basic_deliver.delivery_tag, properties.app_id, body))
+
   mn = MirosNets(miros_object = ao,
                   rabbit_user='bob',
                   rabbit_password='dobbs',
                   mesh_encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=',
-                  routing_key="testing")
+                  routing_key="testing",
+                  on_mesh_rx=custom_on_message_callback,
+                  )
   pp(mn._urls)
 
   print("transmitting something")
