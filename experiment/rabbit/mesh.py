@@ -637,24 +637,24 @@ class MirosNets:
 
 if __name__ == '__main__':
   from miros.activeobject import ActiveObject
-  #lan = LocalAreaNetwork()
-  #print(lan.this.address)
-  #print(lan.addresses)
-  #print(lan.other.addresses)
+  lan = LocalAreaNetwork()
+  print(lan.this.address)
+  print(lan.addresses)
+  print(lan.other.addresses)
 
-  #rn = RabbitScout(
-  #    'bob',
-  #    'dobbs',
-  #    routing_key='pub_thread.text',
-  #    exchange_name='sex_change',
-  #    queue_name='g_queue',
-  #    encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=',
-  #    addresses=lan.addresses,
-  #)
-  #pp(rn.urls)
-  #pp(rn.addresses)
-  #pp(rn.this.url)
-  #pp(rn.other.urls)
+  rn = RabbitScout(
+      'bob',
+      'dobbs',
+      routing_key='pub_thread.text',
+      exchange_name='sex_change',
+      queue_name='g_queue',
+      encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=',
+      addresses=lan.addresses,
+  )
+  pp(rn.urls)
+  pp(rn.addresses)
+  pp(rn.this.url)
+  pp(rn.other.urls)
 
   ao = ActiveObject(name='testing')
   mn = MirosNets(miros_object = ao,
@@ -668,5 +668,9 @@ if __name__ == '__main__':
   mn.start_threads()
   for i in range(100):
     mn.transmit("bob {}".format(i))
+    if i % 53 is 0:
+      mn.stop_threads()
+    if i % 54 is 0:
+      mn.start_threads()
     time.sleep(0.1)
   time.sleep(1)

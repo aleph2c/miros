@@ -303,7 +303,11 @@ class SimplePikaTopicConsumer(object):
 
     """
     LOGGER.info('Acknowledging message %s', delivery_tag)
-    self._channel.basic_ack(delivery_tag)
+    try:
+      self._channel.basic_ack(delivery_tag)
+    except:
+      LOGGER.info('Acknowledgment requires an open channel')
+
 
   def stop_consuming(self):
     """Tell RabbitMQ that you would like to stop consuming by sending the
