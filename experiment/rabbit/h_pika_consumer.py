@@ -49,8 +49,7 @@ class SimplePikaTopicConsumer(object):
   def __init__(self,
     amqp_url,
     routing_key,
-    exchange_name,
-    queue_name):
+    exchange_name):
     """Create a new instance of the consumer class, passing in the AMQP
     URL used to connect to RabbitMQ.
 
@@ -66,7 +65,7 @@ class SimplePikaTopicConsumer(object):
     self._thread_tempo_sec = self.THREAD_TEMPO_SEC
     self._exchange_name = exchange_name
     self._routing_key = routing_key
-    self._queue_name = queue_name
+    self._queue_name = None
 
   def connect(self):
     """This method connects to RabbitMQ, returning the connection handle.
@@ -205,9 +204,9 @@ class SimplePikaTopicConsumer(object):
 
     """
     LOGGER.info('Exchange declared')
-    self.setup_queue(self.RPC_QUEUE_NAME)
+    self.setup_queue()
 
-  def setup_queue(self, queue_name):
+  def setup_queue(self):
     """Setup the queue on RabbitMQ by invoking the Queue.Declare RPC
     command. When it is complete, the on_queue_declareok method will
     be invoked by pika.
@@ -215,11 +214,11 @@ class SimplePikaTopicConsumer(object):
     :param str|unicode queue_name: The name of the queue to declare.
 
     """
-    LOGGER.info('Declaring queue %s', queue_name)
+    LOGGER.info('Declaring queue')
     self._channel.queue_declare(
         callback=self.on_queue_declareok,
-        queue=self._queue_name,
-        arguments={'x-message-ttl' : 1000})
+        arguments={'x-message-ttl': 50000},
+        exclusive=True)
 
   def on_queue_declareok(self, method_frame):
     """Method invoked by pika when the Queue.Declare RPC call made in
@@ -231,10 +230,11 @@ class SimplePikaTopicConsumer(object):
     :param pika.frame.Method method_frame: The Queue.DeclareOk frame
 
     """
-    LOGGER.info('Binding %s to %s with %s',
-          self._exchange_name, self._queue_name, self._routing_key)
+    self._queue_name = method_frame.method.queue
     self._channel.queue_bind(self.on_bindok, self._queue_name,
                  self._exchange_name, self._routing_key)
+    LOGGER.info('Binding %s to %s with %s',
+          self._exchange_name, self._queue_name, self._routing_key)
 
   def on_bindok(self, unused_frame):
     """Invoked by pika when the Queue.Bind method has completed. At this
@@ -440,7 +440,6 @@ class PikaTopicConsumer(SimplePikaTopicConsumer):
                amqp_url,
                routing_key,
                exchange_name,
-               queue_name,
                encryption_key,
                message_callback,
                decryption_function=None,
@@ -448,8 +447,7 @@ class PikaTopicConsumer(SimplePikaTopicConsumer):
     super().__init__(
                amqp_url,
                routing_key,
-               exchange_name,
-               queue_name)
+               exchange_name)
 
     self._encryption_key  = encryption_key
     self._rabbit_user     = self.get_rabbit_user(amqp_url)
@@ -540,7 +538,6 @@ if __name__ == '__main__':
     amqp_url='amqp://bob:dobbs@localhost:5672/%2F',
     routing_key='pub_thread.text',
     exchange_name='sex_change',
-    queue_name='g_queue',
     message_callback=on_message_callback,
     encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
   )

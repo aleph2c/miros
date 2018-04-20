@@ -119,7 +119,6 @@ class SimplePikaTopicPublisher():
         amqp_url='amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
         publish_tempo_sec=1.5,
         exchange_name='g_pika_producer_exchange',
-        queue_name='g_queue',
         routing_key='pub_thread.text',
       )
 
@@ -538,7 +537,6 @@ class PikaTopicPublisher(SimplePikaTopicPublisher):
         routing_key='pub_thread.text',
         publish_tempo_sec=1.5,
         exchange_name='sex_change',
-        queue_name='g_queue',
         encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
       )
 
