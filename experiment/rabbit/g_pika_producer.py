@@ -348,7 +348,10 @@ class SimplePikaTopicPublisher():
 
     '''
     LOGGER.info('Declaring queue %s', queue_name)
-    self._channel.queue_declare(self.on_queue_declareok, queue_name)
+    self._channel.queue_declare(
+        callback=self.on_queue_declareok, 
+        queue=queue_name,
+        arguments={'x-message-ttl' : 1000})
 
   def on_queue_declareok(self, method_frame):
     '''Method invoked by pika when the Queue.Declare RPC call made in

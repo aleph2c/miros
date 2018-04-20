@@ -44,6 +44,7 @@ class SimplePikaTopicConsumer(object):
   """
   EXCHANGE_TYPE = 'topic'
   THREAD_TEMPO_SEC = 1.0  # how long it will take the thread to quit
+  RPC_QUEUE_NAME = 'RPC_QUEUE'
 
   def __init__(self,
     amqp_url,
@@ -204,7 +205,7 @@ class SimplePikaTopicConsumer(object):
 
     """
     LOGGER.info('Exchange declared')
-    self.setup_queue(self._queue_name)
+    self.setup_queue(self.RPC_QUEUE_NAME)
 
   def setup_queue(self, queue_name):
     """Setup the queue on RabbitMQ by invoking the Queue.Declare RPC
@@ -217,8 +218,8 @@ class SimplePikaTopicConsumer(object):
     LOGGER.info('Declaring queue %s', queue_name)
     self._channel.queue_declare(
         callback=self.on_queue_declareok,
-        queue=queue_name,
-        auto_delete=True)
+        queue=self._queue_name,
+        arguments={'x-message-ttl' : 1000})
 
   def on_queue_declareok(self, method_frame):
     """Method invoked by pika when the Queue.Declare RPC call made in
