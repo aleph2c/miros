@@ -500,7 +500,16 @@ class PikaTopicConsumer(SimplePikaTopicConsumer):
     return self._decryption_function(item)
 
   def on_message(self, unused_channel, basic_deliver, properties, xsbody):
-    body = self.deserialize(self.decrypt(xsbody))
+    try:
+      sbody = self.decrypt(xsbody)
+    except:
+      sbody = xsbody
+
+    try: 
+      body  = self.deserialize(sbody)
+    except:
+      body = sbody
+    #body = self.deserialize(self.decrypt(xsbody))
     self._message_callback(unused_channel, basic_deliver, properties, body)
     self.acknowledge_message(basic_deliver.delivery_tag)
 
