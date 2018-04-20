@@ -323,9 +323,11 @@ class SimplePikaTopicPublisher():
 
     '''
     LOGGER.info('Declaring exchange %s', exchange_name)
-    self._channel.exchange_declare(self.on_exchange_declareok,
-                     exchange_name,
-                     self.EXCHANGE_TYPE)
+    self._channel.exchange_declare(
+                     callback=self.on_exchange_declareok,
+                     exchange=exchange_name,
+                     exchange_type=self.EXCHANGE_TYPE,
+                     durable=False)
 
   def on_exchange_declareok(self, unused_frame):
     '''Invoked by pika when RabbitMQ has finished the Exchange.Declare RPC
