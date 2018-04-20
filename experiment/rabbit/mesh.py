@@ -641,6 +641,7 @@ if __name__ == '__main__':
   print(lan.this.address)
   print(lan.addresses)
   print(lan.other.addresses)
+  name = uuid.uuid4().hex[0:2]
 
   rn = RabbitScout(
       'bob',
@@ -673,7 +674,7 @@ if __name__ == '__main__':
   print("transmitting something")
   mn.start_threads()
   for i in range(100):
-    mn.transmit("bob {}".format(i))
+    mn.transmit("{} bob {}".format(name, i))
     if i % 53 is 0:
       mn.stop_threads()
     if i % 54 is 0:
