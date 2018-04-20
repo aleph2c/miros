@@ -679,5 +679,5 @@ if __name__ == '__main__':
       mn.stop_threads()
     if i % 54 is 0:
       mn.start_threads()
-    time.sleep(0.1)
-  time.sleep(1)
+    time.sleep(0.5)
+  time.sleep(0.5)

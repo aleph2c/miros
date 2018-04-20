@@ -680,7 +680,7 @@ if __name__ == '__main__':
   pub_thread3.start_thread()
 
   time.sleep(2)
-  for i in range(500):
+  for i in range(50):
     pub_thread1.post_fifo("Janice Library {}".format(i))
     pub_thread1.post_fifo("Janice Library {}".format(i))
     pub_thread1.post_fifo("Janice Library {}".format(i))

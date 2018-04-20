@@ -310,6 +310,12 @@ class SimplePikaTopicConsumer(object):
     except:
       LOGGER.info('Acknowledgment requires an open channel')
 
+  def nak_message(self, delivery_tag):
+    LOGGER.info('Not acknowledging message %s', delivery_tag)
+    try:
+      self._channel.basic_nack(delivery_tag)
+    except:
+      LOGGER.info('Acknowledgment requires an open channel')
 
   def stop_consuming(self):
     """Tell RabbitMQ that you would like to stop consuming by sending the
@@ -500,18 +506,24 @@ class PikaTopicConsumer(SimplePikaTopicConsumer):
     return self._decryption_function(item)
 
   def on_message(self, unused_channel, basic_deliver, properties, xsbody):
+    ignore = False
     try:
       sbody = self.decrypt(xsbody)
     except:
       sbody = xsbody
+      ignore = True
 
     try: 
       body  = self.deserialize(sbody)
     except:
       body = sbody
+      ignore = True
     #body = self.deserialize(self.decrypt(xsbody))
-    self._message_callback(unused_channel, basic_deliver, properties, body)
-    self.acknowledge_message(basic_deliver.delivery_tag)
+    if not ignore:
+      self._message_callback(unused_channel, basic_deliver, properties, body)
+      self.acknowledge_message(basic_deliver.delivery_tag)
+    else:
+      self.nak_message(basic_deliver.delivery_tag)
 
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
