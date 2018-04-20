@@ -642,7 +642,7 @@ if __name__ == '__main__':
   print(lan.addresses)
   print(lan.other.addresses)
   name = uuid.uuid4().hex[0:2]
-
+  print("I am {}".format(name))
   rn = RabbitScout(
       'bob',
       'dobbs',
