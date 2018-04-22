@@ -9,8 +9,8 @@ import functools
 import subprocess
 import ipaddress
 from miros.event import Event
-from g_pika_consumer import PikaTopicConsumer
-from g_pika_producer import PikaTopicPublisher
+from h_pika_consumer import PikaTopicConsumer
+from h_pika_producer import PikaTopicPublisher
 
 
 import pprint
@@ -192,7 +192,6 @@ class RabbitScout():
           rabbit_password='dobbs',
           routing_key='pub_thread.text',
           exchange_name='sex_change',
-          queue_name='g_queue',
           encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=')
 
     print(rs.addresses)      # => ['192.168.1.69', '192.168.1.75']
@@ -238,7 +237,6 @@ class RabbitScout():
                rabbit_password,
                routing_key,
                exchange_name,
-               queue_name,
                encryption_key,
                addresses=None,
                rabbit_port=None,
@@ -249,7 +247,6 @@ class RabbitScout():
     self.this  = Attribute()
     self.other = Attribute()
 
-    self.queue_name = queue_name
     self.routing_key = routing_key
     self.exchange_name = exchange_name
     self.encryption_key = encryption_key
@@ -333,7 +330,6 @@ class RabbitScout():
         routing_key=self.routing_key,
         publish_tempo_sec=self.SCOUT_TEMPO_SEC,
         exchange_name=self.exchange_name,
-        queue_name=self.queue_name,
         encryption_key=self.encryption_key)
 
       thread.start_thread()
@@ -365,10 +361,6 @@ class MirosNets:
   MESH_EXCHANGE     = 'miros.mesh.exchange'
   TRACE_EXCHANGE    = 'miros.snoop.trace.exchange'
   SPY_EXCHANGE      = 'miros.snoop.spy.exchange'
-
-  MESH_QUEUE   = 'miros.mesh.queue'
-  TRACE_QUEUE  = 'miros.snoop.trace.queue'
-  SPY_QUEUE    = 'miros.snoop.spy.queue'
 
   def __init__(self,
                 miros_object,
@@ -405,10 +397,6 @@ class MirosNets:
     self.mesh.routing_key        = routing_key
     self.snoop.spy.routing_key   = routing_key + '.' + MirosNets.SPY_ROUTING_KEY
     self.snoop.trace.routing_key = routing_key + '.' + MirosNets.TRACE_ROUTING_KEY
-
-    self.mesh.queue_name        = MirosNets.MESH_QUEUE
-    self.snoop.spy.queue_name   = MirosNets.SPY_QUEUE
-    self.snoop.trace.queue_name = MirosNets.TRACE_QUEUE
 
     self.mesh.exchange_name        = MirosNets.MESH_EXCHANGE
     self.snoop.spy.exchange_name   = MirosNets.SPY_EXCHANGE
@@ -459,7 +447,6 @@ class MirosNets:
                     rabbit_password=self._rabbit_password,
                     routing_key=self.mesh.routing_key,
                     exchange_name=self.mesh.exchange_name,
-                    queue_name=self.mesh.queue_name,
                     encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=')
 
     self._urls = rabbit_scout.urls
@@ -469,7 +456,6 @@ class MirosNets:
 
     self.snoop.spy.enabled = False
     self.snoop.trace.enabled = False
-    
     self.mesh.started = False
     self.snoop.spy.started = False
     self.snoop.trace.started = False
@@ -487,6 +473,7 @@ class MirosNets:
         producer.start_thread()
       self.mesh.consumer.start_thread()
       self.mesh.started = True
+    time.sleep(2.0)
 
     if self.snoop.spy.started is False and self.snoop.spy.enabled:
       for spy_producer in self.snoop.spy.producers:
@@ -526,7 +513,6 @@ class MirosNets:
         routing_key=self.mesh.routing_key,
         publish_tempo_sec=1.0,
         exchange_name=self.mesh.exchange_name,
-        queue_name=self.mesh.queue_name,
         serialization_function=self.mesh.serializer,
         encryption_key=self.mesh.encryption_key)
       for amqp_url in self._urls
@@ -537,7 +523,6 @@ class MirosNets:
         amqp_url=self.this.url,
         routing_key=self.mesh.routing_key,
         exchange_name=self.mesh.exchange_name,
-        queue_name=self.mesh.queue_name,
         message_callback=self.mesh.on_message_callback,
         deserialization_function=self.mesh.deserializer,
         encryption_key=self.mesh.encryption_key)
@@ -550,7 +535,6 @@ class MirosNets:
         routing_key=self.snoop.spy.routing_key,
         publish_tempo_sec=1.0,
         exchange_name=self.snoop.spy.exchange_name,
-        queue_name=self.snoop.spy.queue_name,
         encryption_key=self.snoop.spy.encryption_key)
       for amqp_url in self._urls
     ]
@@ -560,7 +544,6 @@ class MirosNets:
         amqp_url=self.this.url,
         routing_key=self.snoop.spy.routing_key,
         exchange_name=self.snoop.spy.exchange_name,
-        queue_name=self.snoop.spy.queue_name,
         message_callback=self.snoop.spy.on_message_callback,
         encryption_key=self.snoop.spy.encryption_key)
 
@@ -570,7 +553,6 @@ class MirosNets:
         routing_key=self.snoop.trace.routing_key,
         publish_tempo_sec=1.0,
         exchange_name=self.snoop.trace.exchange_name,
-        queue_name=self.snoop.trace.queue_name,
         encryption_key=self.snoop.trace.encryption_key)
       for amqp_url in self._urls
     ]
@@ -580,7 +562,6 @@ class MirosNets:
         amqp_url=self.this.url,
         routing_key=self.snoop.trace.routing_key,
         exchange_name=self.snoop.trace.exchange_name,
-        queue_name=self.snoop.trace.queue_name,
         message_callback=self.snoop.trace.on_message_callback,
         encryption_key=self.snoop.trace.encryption_key)
 
@@ -648,7 +629,6 @@ if __name__ == '__main__':
       'dobbs',
       routing_key='pub_thread.text',
       exchange_name='sex_change',
-      queue_name='g_queue',
       encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=',
       addresses=lan.addresses,
   )
@@ -667,17 +647,18 @@ if __name__ == '__main__':
                   rabbit_password='dobbs',
                   mesh_encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=',
                   routing_key="testing",
-                  on_mesh_rx=custom_on_message_callback,
-                  )
+                  on_mesh_rx=custom_on_message_callback)
   pp(mn._urls)
 
   print("transmitting something")
   mn.start_threads()
+  crash_sample_number = 100
   for i in range(100):
     mn.transmit("{} bob {}".format(name, i))
-    if i % 53 is 0:
+    if i != 0 and i % crash_sample_number is 0:
       mn.stop_threads()
-    if i % 54 is 0:
+      time.sleep(2)
+    if i != 0 and i % (crash_sample_number + 1) is 0:
       mn.start_threads()
+      time.sleep(2)
     time.sleep(0.5)
-  time.sleep(0.5)
