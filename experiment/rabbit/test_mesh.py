@@ -108,7 +108,7 @@ class NetworkedActiveObject(ActiveObject):
 
   def on_network_message(self, event):
     if isinstance(event, Event):
-      print("heard {} from {}".format(event.signal_name, event.payload))
+      # print("heard {} from {}".format(event.signal_name, event.payload))
       if event.payload != self.name:
         self.post_fifo(event)
     else:
