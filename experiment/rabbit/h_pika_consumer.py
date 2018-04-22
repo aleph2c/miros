@@ -43,7 +43,7 @@ class SimplePikaTopicConsumer(object):
     pc.start_thread()
   """
   EXCHANGE_TYPE = 'topic'
-  THREAD_TEMPO_SEC = 1.0  # how long it will take the thread to quit
+  KILL_THREAD_CALLBACK_TEMPO = 1.0  # how long it will take the thread to quit
   RPC_QUEUE_NAME = 'RPC_QUEUE'
 
   def __init__(self,
@@ -62,7 +62,6 @@ class SimplePikaTopicConsumer(object):
     self._consumer_tag = None
     self._url = amqp_url
     self._task_run_event = ThreadEvent()
-    self._thread_tempo_sec = self.THREAD_TEMPO_SEC
     self._exchange_name = exchange_name
     self._routing_key = routing_key
     self._queue_name = None
@@ -381,29 +380,49 @@ class SimplePikaTopicConsumer(object):
     LOGGER.info('Closing connection')
     self._connection.close()
 
+  def timeout_callback_method(self, provide_callback=False):
+    # This syntax is a bit strange, so I'll explain what is going on.
+    #
+    # I am trying to build a partial function from a method, providing a default
+    # value for 'self'.  I previously wrote this code as:
+    #   timeout_callback = functools.partial(self.timeout_callback_method, self=self)
+    # Which was wrong.
+    #
+    # The correct way to turn a method into a callback
+    # function, with a frozen value of 'self', is like this:
+    #   timeout_callback = functools.partial(self.timeout_callback_method)
+    timeout_callback = functools.partial(self.timeout_callback_method, provide_callback)
+    LOGGER.info('Timout callback being registered')
+
+    if self._task_run_event.is_set():
+      self._connection.add_timeout(deadline=self.KILL_THREAD_CALLBACK_TEMPO, callback_method=timeout_callback)
+    else:
+      if not self._closing:
+        LOGGER.info('Consuming thread is being shutdown')
+        self.stop()
+
+    if provide_callback:
+      return timeout_callback
+
   def start_thread(self):
     """Add a thread so that the run method doesn't steal our program control."""
     self._task_run_event.set()
     self._connection = self.connect()
 
     def thread_runner(self):
-      def timeout_callback():
-        if not self._closing:
-          if self._task_run_event.is_set():
-            self._connection.add_timeout(deadline=self.THREAD_TEMPO_SEC, callback_method=timeout_callback)
-          else:
-            self.stop()
-      self._connection.add_timeout(
-        deadline=self.THREAD_TEMPO_SEC,
-        callback_method=timeout_callback
-      )
-      self.run()
+      LOGGER.info('The Thread is Running')
+      if self._task_run_event.is_set():
+        self._closing = False
+        self.run()
+      LOGGER.info('The Thread is Dead')
 
     thread = Thread(target=thread_runner, args=(self,), daemon=True)
     thread.start()
 
   def stop_thread(self):
     self._task_run_event.clear()
+    timeout_callback = functools.partial(self.timeout_callback_method, provide_callback=True)
+    self._connection.add_timeout(deadline=0.01, callback_method=timeout_callback)
 
 class PikaTopicConsumer(SimplePikaTopicConsumer):
   """This is subclass of SimplePikaTopicConsumer which extends its capabilities.
@@ -488,6 +507,7 @@ class PikaTopicConsumer(SimplePikaTopicConsumer):
     Note: the new key must match the key used by the producer
     """
     self.stop_thread()
+    time.sleep(0.2)
     self._decryption_function = \
         functools.partial(self._sdf,
           encryption_key=encryption_key)
@@ -515,12 +535,12 @@ class PikaTopicConsumer(SimplePikaTopicConsumer):
       sbody = xsbody
       ignore = True
 
-    try: 
+    try:
       body  = self.deserialize(sbody)
     except:
       body = sbody
       ignore = True
-    #body = self.deserialize(self.decrypt(xsbody))
+    #  body = self.deserialize(self.decrypt(xsbody))
     if not ignore:
       self._message_callback(unused_channel, basic_deliver, properties, body)
       self.acknowledge_message(basic_deliver.delivery_tag)
@@ -543,9 +563,11 @@ if __name__ == '__main__':
   )
 
   example.start_thread()
-  time.sleep(1)
   example.stop_thread()
-  time.sleep(1)
+  example.start_thread()
+  example.stop_thread()
+  example.start_thread()
+  example.stop_thread()
   example.change_encyption_key(
     b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=')
   time.sleep(20)
