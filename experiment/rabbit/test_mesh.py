@@ -43,6 +43,9 @@ def inner_exit(chart, e):
 def inner_other_to_inner(chart, e):
   return return_status.HANDLED
 
+def inner_to_inner(chart, e):
+  return return_status.HANDLED
+
 def inner_to_outer(chart, e):
   return chart.trans(outer)
 
@@ -60,8 +63,10 @@ def inner(chart, e):
     status = inner_to_outer(chart, e)
   elif(e.signal == signals.other_to_outer):
     status = inner_other_to_outer(chart, e)
-  elif(e.signal == signals.inner_other_to_inner):
+  elif(e.signal == signals.other_to_inner):
     status = inner_other_to_inner(chart, e)
+  elif(e.signal == signals.to_inner):
+    status = inner_to_inner(chart, e)
   elif(e.signal == signals.other_to_inner):
     status = return_status.HANDLED
   elif(e.signal == signals.EXIT_SIGNAL):
