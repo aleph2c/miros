@@ -6,9 +6,7 @@ import time
 import pickle
 import logging
 import functools
-import cryptography
 from threading import Thread
-from queue import Queue as ThreadQueue
 from cryptography.fernet import Fernet
 from threading import Event as ThreadEvent
 
@@ -45,11 +43,13 @@ class SimplePikaTopicConsumer(object):
   EXCHANGE_TYPE = 'topic'
   KILL_THREAD_CALLBACK_TEMPO = 1.0  # how long it will take the thread to quit
   RPC_QUEUE_NAME = 'RPC_QUEUE'
+  QUEUE_TTL_IN_MS = 500
 
   def __init__(self,
     amqp_url,
     routing_key,
-    exchange_name):
+    exchange_name,
+    message_ttl_in_ms=None):
     """Create a new instance of the consumer class, passing in the AMQP
     URL used to connect to RabbitMQ.
 
@@ -65,6 +65,11 @@ class SimplePikaTopicConsumer(object):
     self._exchange_name = exchange_name
     self._routing_key = routing_key
     self._queue_name = None
+
+    if not message_ttl_in_ms:
+      self._message_ttl_in_ms = self.QUEUE_TTL_IN_MS
+    else:
+      self._message_ttl_in_ms = message_ttl_in_ms
 
   def connect(self):
     """This method connects to RabbitMQ, returning the connection handle.
@@ -354,9 +359,15 @@ class SimplePikaTopicConsumer(object):
     starting the IOLoop to block and allow the SelectConnection to operate.
 
     """
-    if self._connection is None:
-      self._connection = self.connect()
-    self._connection.ioloop.start()
+    self._connection = self.connect()
+    try:
+      self._connection.ioloop.start()
+    except Exception as e:
+      # if we are turning off the task, ignore exceptions from callbacks
+      if not self._task_run_event.is_set():
+        pass
+      else:
+        print('{}:{}'.format(e.__class__, self._task_run_event.is_set()))
 
   def stop(self):
     """Cleanly shutdown the connection to RabbitMQ by stopping the consumer
@@ -507,7 +518,6 @@ class PikaTopicConsumer(SimplePikaTopicConsumer):
     Note: the new key must match the key used by the producer
     """
     self.stop_thread()
-    time.sleep(0.2)
     self._decryption_function = \
         functools.partial(self._sdf,
           encryption_key=encryption_key)
@@ -562,13 +572,17 @@ if __name__ == '__main__':
     encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
   )
 
-  example.start_thread()
-  example.stop_thread()
-  example.start_thread()
-  example.stop_thread()
-  example.start_thread()
-  example.stop_thread()
-  example.change_encyption_key(
-    b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=')
+  for i in range(1):
+    example.start_thread()
+    example.stop_thread()
+    #time.sleep(1)
+    example.start_thread()
+    time.sleep(10)
+    #example.stop_thread()
+    #time.sleep(1)
+    #example.start_thread()
+    #example.stop_thread()
+    #example.change_encyption_key(
+    #  b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=')
   time.sleep(20)
 
