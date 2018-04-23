@@ -511,7 +511,7 @@ class MirosNets:
       PikaTopicPublisher(
         amqp_url=amqp_url,
         routing_key=self.mesh.routing_key,
-        publish_tempo_sec=1.0,
+        publish_tempo_sec=0.1,
         exchange_name=self.mesh.exchange_name,
         serialization_function=self.mesh.serializer,
         encryption_key=self.mesh.encryption_key)

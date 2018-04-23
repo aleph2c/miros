@@ -15,7 +15,7 @@ def outer_init(chart, e):
   chart.post_fifo(
     Event(signal=signals.to_inner),
     times=1,
-    period=random.randint(2, 5),
+    period=random.randint(2, 7),
     deferred=True)
   chart.transmit(Event(signal=signals.other_to_outer, payload=chart.name))
   return return_status.HANDLED
@@ -31,7 +31,7 @@ def inner_entry(chart, e):
   chart.post_fifo(
     Event(signal=signals.to_outer),
     times=1,
-    period=random.randint(2, 5),
+    period=random.randint(2, 7),
     deferred=True)
   chart.transmit(Event(signal=signals.other_to_inner, payload=chart.name))
   return return_status.HANDLED
@@ -109,8 +109,6 @@ class NetworkedActiveObject(ActiveObject):
                  routing_key="testing",
                  on_mesh_rx=on_message_callback)
 
-    self.nets.start_threads()
-
   def on_network_message(self, event):
     if isinstance(event, Event):
       # print("heard {} from {}".format(event.signal_name, event.payload))
@@ -122,9 +120,16 @@ class NetworkedActiveObject(ActiveObject):
   def transmit(self, event):
     self.nets.transmit(event)
 
+  def start_at(self, initial_state):
+    super().start_at(initial_state)
+    time.sleep(0.1)
+    self.nets.start_threads()
+
+
 if __name__ == '__main__':
   ao = NetworkedActiveObject(make_name('active_object'))
   ao.live_trace = True
+  random.seed()
 
   def custom_on_message_callback(unused_channel,
                                  basic_deliver,
@@ -136,6 +141,6 @@ if __name__ == '__main__':
 
   ao.start_at(outer)
 
-  time.sleep(30)
+  time.sleep(60)
 
 
