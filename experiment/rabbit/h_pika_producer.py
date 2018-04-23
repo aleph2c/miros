@@ -5,7 +5,6 @@ import pika
 import pickle
 import logging
 import functools
-import cryptography
 from threading import Thread
 from queue import Queue as ThreadQueue
 from cryptography.fernet import Fernet
@@ -153,7 +152,7 @@ class SimplePikaTopicPublisher():
 
   '''
   EXCHANGE_TYPE             = 'topic'
-  PUBLISH_FAST_INTERVAL_SEC = 0.000001  # fast
+  PUBLISH_FAST_INTERVAL_SEC = 0.000001  # right now
   PRODUCER_VERSION          = u'1.0'
 
   def __init__(self,
@@ -167,21 +166,22 @@ class SimplePikaTopicPublisher():
     :param str amqp_url: The URL for connecting to RabbitMQ
 
     '''
-    self._connection = None
     self._channel = None
+    self._connection = None
 
-    self._deliveries = []
     self._acked = 0
     self._nacked = 0
+    self._deliveries = []
     self._message_number = 0
-    self._stopping = False
+
     self._closing = False
+    self._stopping = False
     self.connect_error = False
 
     self._amqp_url = amqp_url
-    self._thread_queue = ThreadQueue(maxsize=500)
     self._task_run_event = ThreadEvent()
     self._publish_tempo_sec = publish_tempo_sec
+    self._thread_queue = ThreadQueue(maxsize=500)
 
     self._tempo_controller = QueueToSampleTimeControl(
       i_max=1 / self.PUBLISH_FAST_INTERVAL_SEC,
@@ -254,6 +254,7 @@ class SimplePikaTopicPublisher():
     self._acked = 0
     self._nacked = 0
     self._message_number = 0
+
     # This is the old connection IOLoop instance, stop its ioloop
     self._connection.ioloop.stop()
 
@@ -403,6 +404,7 @@ class SimplePikaTopicPublisher():
     '''
     if self._stopping:
       return
+
     # Scheduling next Task queue check
     LOGGER.info('Task queue check in %0.4f seconds', timeout)
     self._connection.add_timeout(timeout, self.producer_heart_beat)
@@ -480,10 +482,8 @@ class SimplePikaTopicPublisher():
     if self._task_run_event.is_set():
       if self._stopping:
         return
-      # messages tend to cluster, they are bursty, so speed up our
+      # messages tend to bunch up, they are bursty, so speed up our
       # producer_heart_beat if there were messages in our queue
-
-      # new_tempo_period_sec = self._tempo_controller.next(queue_length)
       queue_length = self._thread_queue.qsize()
       new_tempo_period_sec = self._tempo_controller.next(queue_length)
       self.schedule_next_producer_heart_beat(new_tempo_period_sec)
@@ -615,7 +615,7 @@ if __name__ == '__main__':
     PikaTopicPublisher(
       amqp_url='amqp://bob:dobbs@192.168.1.69:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
       routing_key='pub_thread.text',
-      publish_tempo_sec=1.5,
+      publish_tempo_sec=0.5,
       exchange_name='sex_change',
       encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
     )
@@ -631,7 +631,7 @@ if __name__ == '__main__':
     PikaTopicPublisher(
       amqp_url='amqp://bob:dobbs@127.0.0.1:5672/%2F?connection_attempts=3&heartbeat_interval=3600',
       routing_key='pub_thread.text',
-      publish_tempo_sec=1.1,
+      publish_tempo_sec=0.5,
       exchange_name='sex_change',
       encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
     )
@@ -640,12 +640,14 @@ if __name__ == '__main__':
   pub_thread3.start_thread()
 
   time.sleep(2)
-  for i in range(50):
+  for i in range(100):
     pub_thread1.post_fifo("Janice Library {}".format(i))
     pub_thread1.post_fifo("Janice Library {}".format(i))
     pub_thread1.post_fifo("Janice Library {}".format(i))
     pub_thread1.post_fifo("Janice Library {}".format(i))
     pub_thread1.post_fifo("Janice Library {}".format(i))
+    if i != 0 and i % 40 is 0:
+      time.sleep(10)
     pub_thread1.post_fifo("Janice Library {}".format(i))
     pub_thread1.post_fifo("Janice Library {}".format(i))
     pub_thread2.post_fifo("Mervin Burr {}".format(i))
