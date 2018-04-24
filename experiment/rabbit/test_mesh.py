@@ -100,6 +100,8 @@ class NetworkedActiveObject(ActiveObject):
                 rabbit_user,
                 rabbit_password,
                 mesh_encryption_key,
+                tx_routing_key=None,
+                rx_routing_key=None,
                 spy_snoop_encryption_key=None,
                 trace_snoop_encryption_key=None):
     super().__init__(name)
@@ -107,6 +109,12 @@ class NetworkedActiveObject(ActiveObject):
     on_message_callback = functools.partial(self.on_network_message)
     on_trace_message_callback = functools.partial(self.on_network_trace_message)
     on_spy_message_callback = functools.partial(self.on_network_spy_message)
+
+    if tx_routing_key is None:
+      tx_routing_key = "empty"
+
+    if rx_routing_key is None:
+      rx_routing_key = tx_routing_key
 
     if trace_snoop_encryption_key is None:
       trace_snoop_encryption_key = mesh_encryption_key
@@ -120,7 +128,8 @@ class NetworkedActiveObject(ActiveObject):
                  mesh_encryption_key=mesh_encryption_key,
                  trace_snoop_encryption_key=trace_snoop_encryption_key,
                  spy_snoop_encryption_key=spy_snoop_encryption_key,
-                 routing_key="testing",
+                 tx_routing_key=tx_routing_key,
+                 rx_routing_key=rx_routing_key,
                  on_mesh_rx=on_message_callback,
                  on_trace_rx=on_trace_message_callback,
                  on_spy_rx=on_spy_message_callback)
@@ -165,6 +174,8 @@ if __name__ == '__main__':
   ao = NetworkedActiveObject(make_name('ao'),
                               rabbit_user='bob',
                               rabbit_password='dobbs',
+                              tx_routing_key='bob.dobbs',
+                              rx_routing_key='#',
                               mesh_encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=')
   ao.enable_snoop_trace()
   random.seed()

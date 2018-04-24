@@ -15,7 +15,7 @@ LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
 LOGGER = logging.getLogger(__name__)
 
 
-class SimplePikaTopicConsumer(object):
+class SimplePikaTopicConsumer():
   """
   This is a pika (Python-RabbitMq) message consumer (topic routing), which is
   heavily based on the asynchronous example provided in the pike documentation.
