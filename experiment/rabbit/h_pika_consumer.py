@@ -367,7 +367,7 @@ class SimplePikaTopicConsumer(object):
       if not self._task_run_event.is_set():
         pass
       else:
-        print('{}:{}'.format(e.__class__, self._task_run_event.is_set()))
+        raise(e)
 
   def stop(self):
     """Cleanly shutdown the connection to RabbitMQ by stopping the consumer

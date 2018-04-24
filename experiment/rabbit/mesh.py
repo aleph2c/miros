@@ -355,12 +355,12 @@ class MirosApiException(BaseException):
 
 class MirosNets:
 
-  TRACE_ROUTING_KEY = 'snoop.trace'
   SPY_ROUTING_KEY   = 'snoop.spy'
+  TRACE_ROUTING_KEY = 'snoop.trace'
 
   MESH_EXCHANGE     = 'miros.mesh.exchange'
-  TRACE_EXCHANGE    = 'miros.snoop.trace.exchange'
   SPY_EXCHANGE      = 'miros.snoop.spy.exchange'
+  TRACE_EXCHANGE    = 'miros.snoop.trace.exchange'
 
   def __init__(self,
                 miros_object,
@@ -374,8 +374,11 @@ class MirosNets:
                 spy_snoop_encryption_key=None,
                 trace_snoop_encryption_key=None):
 
+    self.name = miros_object.name
+
     self.this = Attribute()
     self.mesh = Attribute()
+
     self.snoop = Attribute()
     self.snoop.spy = Attribute()
     self.snoop.trace = Attribute()
@@ -387,12 +390,12 @@ class MirosNets:
     if spy_snoop_encryption_key is None:
       self.snoop.spy.encryption_key = mesh_encryption_key
     else:
-      self.snoop.spy.encryption = spy_snoop_encryption_key
+      self.snoop.spy.encryption_key = spy_snoop_encryption_key
 
     if trace_snoop_encryption_key is None:
       self.snoop.trace.encryption_key = mesh_encryption_key
     else:
-      self.snoop.trace.encryption = trace_snoop_encryption_key
+      self.snoop.trace.encryption_key = trace_snoop_encryption_key
 
     self.mesh.routing_key        = routing_key
     self.snoop.spy.routing_key   = routing_key + '.' + MirosNets.SPY_ROUTING_KEY
@@ -533,7 +536,7 @@ class MirosNets:
       PikaTopicPublisher(
         amqp_url=amqp_url,
         routing_key=self.snoop.spy.routing_key,
-        publish_tempo_sec=1.0,
+        publish_tempo_sec=0.1,
         exchange_name=self.snoop.spy.exchange_name,
         encryption_key=self.snoop.spy.encryption_key)
       for amqp_url in self._urls
@@ -551,7 +554,7 @@ class MirosNets:
       PikaTopicPublisher(
         amqp_url=amqp_url,
         routing_key=self.snoop.trace.routing_key,
-        publish_tempo_sec=1.0,
+        publish_tempo_sec=0.1,
         exchange_name=self.snoop.trace.exchange_name,
         encryption_key=self.snoop.trace.encryption_key)
       for amqp_url in self._urls
@@ -566,7 +569,7 @@ class MirosNets:
         encryption_key=self.snoop.trace.encryption_key)
 
   @staticmethod
-  def on_mesh_message_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback):
+  def on_mesh_message_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback=None):
     if custom_rx_callback is None:
       print("Received mesh message # {} from {}: {}".format(
             basic_deliver.delivery_tag, properties.app_id, body))
@@ -574,20 +577,20 @@ class MirosNets:
       custom_rx_callback(unused_channel, basic_deliver, properties, body)
 
   @staticmethod
-  def on_snoop_spy_message_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback):
+  def on_snoop_spy_message_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback=None):
     if custom_rx_callback is None:
       print("Received snoop-spy message # {} from {}: {}".format(
             basic_deliver.delivery_tag, properties.app_id, body))
     else:
-      custom_rx_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback)
+      custom_rx_callback(unused_channel, basic_deliver, properties, body)
 
   @staticmethod
-  def on_snoop_trace_message_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback):
+  def on_snoop_trace_message_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback=None):
     if custom_rx_callback is None:
       print("Received snoop-spy message # {} from {}: {}".format(
             basic_deliver.delivery_tag, properties.app_id, body))
     else:
-      custom_rx_callback(unused_channel, basic_deliver, properties, body, custom_rx_callback)
+      custom_rx_callback(unused_channel, basic_deliver, properties, body)
 
   def transmit(self, event):
     for producer in self.mesh.producers:
@@ -595,7 +598,7 @@ class MirosNets:
 
   def broadcast_spy(self, message):
     for producer in self.snoop.spy.producers:
-      producer.post_fifo(message)
+      producer.post_fifo(self.name + " " + message)
 
   def broadcast_trace(self, message):
     for producer in self.snoop.trace.producers:

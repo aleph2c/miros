@@ -1,15 +1,17 @@
 import time
 import uuid
 import random
+import functools
 from miros.hsm import pp
-from miros.activeobject import Factory
-from miros.hsm import HsmWithQueues, spy_on
-from miros.activeobject import ActiveObject
-from miros.event import signals, Event, return_status
 from mesh import MirosNets
+from miros.foreign import ForeignHsm
+from miros.activeobject import Factory
+from miros.activeobject import ActiveObject
+from miros.hsm import HsmWithQueues, spy_on
+from miros.event import signals, Event, return_status
 
-def make_name(pre):
-  return pre + str(uuid.uuid4())[0:5]
+def make_name(post):
+  return str(uuid.uuid4())[0:5] + '_' + post
 
 def outer_init(chart, e):
   chart.post_fifo(
@@ -93,29 +95,52 @@ def outer(chart, e):
   return status
 
 class NetworkedActiveObject(ActiveObject):
-  def __init__(self, name):
+  def __init__(self,
+                name,
+                rabbit_user,
+                rabbit_password,
+                mesh_encryption_key,
+                spy_snoop_encryption_key=None,
+                trace_snoop_encryption_key=None):
     super().__init__(name)
 
-    def on_message_callback(unused_channel,
-                             basic_deliver,
-                             properties,
-                             body):
-      self.on_network_message(body)
+    on_message_callback = functools.partial(self.on_network_message)
+    on_trace_message_callback = functools.partial(self.on_network_trace_message)
+    on_spy_message_callback = functools.partial(self.on_network_spy_message)
+
+    if trace_snoop_encryption_key is None:
+      trace_snoop_encryption_key = mesh_encryption_key
+
+    if spy_snoop_encryption_key is None:
+      spy_snoop_encryption_key = mesh_encryption_key
 
     self.nets = MirosNets(miros_object = self,
-                 rabbit_user='bob',
-                 rabbit_password='dobbs',
-                 mesh_encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=',
+                 rabbit_user=rabbit_user,
+                 rabbit_password=rabbit_password,
+                 mesh_encryption_key=mesh_encryption_key,
+                 trace_snoop_encryption_key=trace_snoop_encryption_key,
+                 spy_snoop_encryption_key=spy_snoop_encryption_key,
                  routing_key="testing",
-                 on_mesh_rx=on_message_callback)
+                 on_mesh_rx=on_message_callback,
+                 on_trace_rx=on_trace_message_callback,
+                 on_spy_rx=on_spy_message_callback)
 
-  def on_network_message(self, event):
+
+  def on_network_message(self, unused_channel, basic_deliver, properties, event):
     if isinstance(event, Event):
       # print("heard {} from {}".format(event.signal_name, event.payload))
       if event.payload != self.name:
         self.post_fifo(event)
     else:
       print("rx non-event {}".format(event))
+
+  def on_network_trace_message(self, ch, method, properties, body):
+    '''create a on_network_trace_message function received messages in the queue'''
+    print(" [+t] {}".format(body.replace('\n', '')))
+
+  def on_network_spy_message(self, ch, method, properties, body):
+    '''create a on_network_spy_message function received messages in the queue'''
+    print(" [+s] {}".format(body))
 
   def transmit(self, event):
     self.nets.transmit(event)
@@ -125,10 +150,23 @@ class NetworkedActiveObject(ActiveObject):
     time.sleep(0.1)
     self.nets.start_threads()
 
+  def enable_snoop_trace(self):
+    self.live_trace = True
+    self.register_live_trace_callback(self.nets.broadcast_trace)
+    self.nets.enable_snoop_trace()
+
+  def enable_snoop_spy(self):
+    self.live_spy = True
+    self.register_live_spy_callback(self.nets.broadcast_spy)
+    self.nets.enable_snoop_spy()
 
 if __name__ == '__main__':
-  ao = NetworkedActiveObject(make_name('active_object'))
-  ao.live_trace = True
+
+  ao = NetworkedActiveObject(make_name('ao'),
+                              rabbit_user='bob',
+                              rabbit_password='dobbs',
+                              mesh_encryption_key=b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=')
+  ao.enable_snoop_trace()
   random.seed()
 
   def custom_on_message_callback(unused_channel,
@@ -137,10 +175,7 @@ if __name__ == '__main__':
                                  body):
     print("chart rx, Received mesh message # {} from {}: {}".
       format(basic_deliver.delivery_tag, properties.app_id, body))
-
-
   ao.start_at(outer)
-
   time.sleep(60)
 
 
