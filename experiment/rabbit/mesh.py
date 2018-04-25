@@ -1847,6 +1847,11 @@ class NetworkedActiveObject(ActiveObject, MirosNetworkMixin):
                  on_trace_rx=on_trace_message_callback,
                  on_spy_rx=on_spy_message_callback)
 
+  def start_at(self, initial_state):
+    super().start_at(initial_state)
+    time.sleep(0.1)
+    self.nets.start_threads()
+
 class NetworkedFactory(Factory, MirosNetworkMixin):
   def __init__(self,
                 name,
@@ -1893,6 +1898,7 @@ class NetworkedFactory(Factory, MirosNetworkMixin):
     self.nets.start_threads()
 
 if __name__ == '__main__':
+
   from miros.activeobject import ActiveObject
   lan = LocalAreaNetwork()
   print(lan.this.address)
