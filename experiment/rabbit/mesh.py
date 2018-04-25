@@ -1771,7 +1771,7 @@ class MirosNets:
       producer.change_encyption_key(encryption_key)
     self.snoop.trace.consumer.change_encyption_key(encryption_key)
 
-class MirosNetworkMixin():
+class MirosNetsInterface():
 
   def on_network_message(self, unused_channel, basic_deliver, properties, event):
     if isinstance(event, Event):
@@ -1792,11 +1792,6 @@ class MirosNetworkMixin():
   def transmit(self, event):
     self.nets.transmit(event)
 
-  def start_at(self, initial_state):
-    super().start_at(initial_state)
-    time.sleep(0.1)
-    self.nets.start_threads()
-
   def enable_snoop_trace(self):
     self.live_trace = True
     self.register_live_trace_callback(self.nets.broadcast_trace)
@@ -1807,7 +1802,7 @@ class MirosNetworkMixin():
     self.register_live_spy_callback(self.nets.broadcast_spy)
     self.nets.enable_snoop_spy()
 
-class NetworkedActiveObject(ActiveObject, MirosNetworkMixin):
+class NetworkedActiveObject(ActiveObject, MirosNetsInterface):
   def __init__(self,
                 name,
                 rabbit_user,
@@ -1852,7 +1847,7 @@ class NetworkedActiveObject(ActiveObject, MirosNetworkMixin):
     time.sleep(0.1)
     self.nets.start_threads()
 
-class NetworkedFactory(Factory, MirosNetworkMixin):
+class NetworkedFactory(Factory, MirosNetsInterface):
   def __init__(self,
                 name,
                 rabbit_user,
