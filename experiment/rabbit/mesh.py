@@ -17,6 +17,7 @@ from queue import Queue as ThreadQueue
 from cryptography.fernet import Fernet
 from threading import Event as ThreadEvent
 from miros.activeobject import ActiveObject
+from miros.activeobject import Factory
 
 LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
         '-35s %(lineno) -5d: %(message)s')
@@ -1770,7 +1771,43 @@ class MirosNets:
       producer.change_encyption_key(encryption_key)
     self.snoop.trace.consumer.change_encyption_key(encryption_key)
 
-class NetworkedActiveObject(ActiveObject):
+class MirosNetworkMixin():
+
+  def on_network_message(self, unused_channel, basic_deliver, properties, event):
+    if isinstance(event, Event):
+      # print("heard {} from {}".format(event.signal_name, event.payload))
+      if event.payload != self.name:
+        self.post_fifo(event)
+    else:
+      print("rx non-event {}".format(event))
+
+  def on_network_trace_message(self, ch, method, properties, body):
+    '''create a on_network_trace_message function received messages in the queue'''
+    print(" [+t] {}".format(body.replace('\n', '')))
+
+  def on_network_spy_message(self, ch, method, properties, body):
+    '''create a on_network_spy_message function received messages in the queue'''
+    print(" [+s] {}".format(body))
+
+  def transmit(self, event):
+    self.nets.transmit(event)
+
+  def start_at(self, initial_state):
+    super().start_at(initial_state)
+    time.sleep(0.1)
+    self.nets.start_threads()
+
+  def enable_snoop_trace(self):
+    self.live_trace = True
+    self.register_live_trace_callback(self.nets.broadcast_trace)
+    self.nets.enable_snoop_trace()
+
+  def enable_snoop_spy(self):
+    self.live_spy = True
+    self.register_live_spy_callback(self.nets.broadcast_spy)
+    self.nets.enable_snoop_spy()
+
+class NetworkedActiveObject(ActiveObject, MirosNetworkMixin):
   def __init__(self,
                 name,
                 rabbit_user,
@@ -1810,40 +1847,50 @@ class NetworkedActiveObject(ActiveObject):
                  on_trace_rx=on_trace_message_callback,
                  on_spy_rx=on_spy_message_callback)
 
+class NetworkedFactory(Factory, MirosNetworkMixin):
+  def __init__(self,
+                name,
+                rabbit_user,
+                rabbit_password,
+                mesh_encryption_key,
+                tx_routing_key=None,
+                rx_routing_key=None,
+                spy_snoop_encryption_key=None,
+                trace_snoop_encryption_key=None):
+    super().__init__(name)
 
-  def on_network_message(self, unused_channel, basic_deliver, properties, event):
-    if isinstance(event, Event):
-      # print("heard {} from {}".format(event.signal_name, event.payload))
-      if event.payload != self.name:
-        self.post_fifo(event)
-    else:
-      print("rx non-event {}".format(event))
+    on_message_callback = functools.partial(self.on_network_message)
+    on_trace_message_callback = functools.partial(self.on_network_trace_message)
+    on_spy_message_callback = functools.partial(self.on_network_spy_message)
 
-  def on_network_trace_message(self, ch, method, properties, body):
-    '''create a on_network_trace_message function received messages in the queue'''
-    print(" [+t] {}".format(body.replace('\n', '')))
+    if tx_routing_key is None:
+      tx_routing_key = "empty"
 
-  def on_network_spy_message(self, ch, method, properties, body):
-    '''create a on_network_spy_message function received messages in the queue'''
-    print(" [+s] {}".format(body))
+    if rx_routing_key is None:
+      rx_routing_key = tx_routing_key
 
-  def transmit(self, event):
-    self.nets.transmit(event)
+    if trace_snoop_encryption_key is None:
+      trace_snoop_encryption_key = mesh_encryption_key
+
+    if spy_snoop_encryption_key is None:
+      spy_snoop_encryption_key = mesh_encryption_key
+
+    self.nets = MirosNets(miros_object = self,
+                 rabbit_user=rabbit_user,
+                 rabbit_password=rabbit_password,
+                 mesh_encryption_key=mesh_encryption_key,
+                 trace_snoop_encryption_key=trace_snoop_encryption_key,
+                 spy_snoop_encryption_key=spy_snoop_encryption_key,
+                 tx_routing_key=tx_routing_key,
+                 rx_routing_key=rx_routing_key,
+                 on_mesh_rx=on_message_callback,
+                 on_trace_rx=on_trace_message_callback,
+                 on_spy_rx=on_spy_message_callback)
 
   def start_at(self, initial_state):
     super().start_at(initial_state)
     time.sleep(0.1)
     self.nets.start_threads()
-
-  def enable_snoop_trace(self):
-    self.live_trace = True
-    self.register_live_trace_callback(self.nets.broadcast_trace)
-    self.nets.enable_snoop_trace()
-
-  def enable_snoop_spy(self):
-    self.live_spy = True
-    self.register_live_spy_callback(self.nets.broadcast_spy)
-    self.nets.enable_snoop_spy()
 
 if __name__ == '__main__':
   from miros.activeobject import ActiveObject
