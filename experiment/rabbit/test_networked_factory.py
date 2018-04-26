@@ -34,14 +34,17 @@ def on_inner_entry(chart, e):
   return return_status.HANDLED
 
 def on_inner_exit(chart, e):
+  chart.snoop_scribble("cancelling {}".format('to_outer'))
   chart.cancel_events(
     Event(signal=signals.to_outer))
   return return_status.HANDLED
 
 def on_inner_other_to_inner(chart, e):
+  chart.snoop_scribble("ignoring {}".format(e.signal_name))
   return return_status.HANDLED
 
 def on_inner_to_inner(chart, e):
+  chart.snoop_scribble("ignoring {}".format(e.signal_name))
   return return_status.HANDLED
 
 def on_inner_to_outer(chart, e):
@@ -77,7 +80,7 @@ chart.nest(outer, parent=None). \
 
 if __name__ == '__main__':
   random.seed()
-  chart.enable_snoop_trace()
+  #chart.enable_snoop_spy()
   chart.start_at(outer)
   time.sleep(60)
 

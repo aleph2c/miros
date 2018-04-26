@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+import re
+import pprint
+import traceback  # try not use this if you can avoid it (it's fragile)
+from copy         import copy
+from functools    import wraps
+from datetime     import datetime as stdlib_datetime
+from contextlib   import contextmanager
+from collections  import namedtuple, deque
+from miros.event  import signals, return_status, Event
 """
 This module provides a hierarchical state machine event class (HsmEventProcessor), and an
 instrumented hierarchical state machine class (InstrumentedHsmEventProcessor).  The
@@ -106,15 +115,6 @@ Example::
                                          # features
 
 """
-import re
-import pprint
-import traceback  # try not use this if you can avoid it (it's fragile)
-from copy         import copy
-from functools    import wraps
-from datetime     import datetime as stdlib_datetime
-from contextlib   import contextmanager
-from collections  import namedtuple, deque
-from miros.event  import signals, return_status, Event
 
 
 def pp(item):
