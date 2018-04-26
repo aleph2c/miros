@@ -39,6 +39,7 @@ def on_inner_exit(chart, e):
   return return_status.HANDLED
 
 def on_inner_other_to_inner(chart, e):
+  chart.snoop_scribble("ignoring {}".format(e.signal_name))
   return return_status.HANDLED
 
 def on_inner_to_inner(chart, e):

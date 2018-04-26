@@ -6,6 +6,7 @@ from miros.hsm import pp
 from miros.hsm import HsmWithQueues, spy_on
 from miros.event import signals, Event, return_status
 from mesh_network import RabbitFactory
+from miros_rabbitmq.network import NetworkedFactory
 
 '''
   +------------empathy----------------+  Legend:
@@ -131,7 +132,7 @@ class OtherHorseArcher(HsmWithQueues):
     result = self.state_name == 'not_waiting'
     return result
 
-class HorseArcher(RabbitFactory):
+class HorseArcher(NetworkedFactory):
 
   MAXIMUM_ARROW_CAPACITY = 60
 
@@ -141,12 +142,10 @@ class HorseArcher(RabbitFactory):
     super().__init__(name=name,
           rabbit_user=rabbit_user,
           rabbit_password=rabbit_password,
-          tx_routing_key='archer.{}'.format(name),
-          rx_routing_key='archer.#',
-          snoop_key=
+          mesh_encryption_key=
             b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=',
-          rabbit_port=rabbit_port)
-
+          tx_routing_key='archer.{}'.format(name),
+          rx_routing_key='archer.#')
     self.arrows = 0
     self.ticks  = 0
     self.time_compression = time_compression
@@ -719,19 +718,19 @@ archer.nest(battle, parent=None). \
   nest(waiting_to_advance, parent=marshal)
 
 if __name__ == '__main__':
+  random.seed()
   print("I am {}".format(archer.name))
-  archer.time_compression = 1
-  archer.start_at(battle)
-  archer.live_trace = True
-  #archer.live_spy = True
+  archer.time_compression = 10
+  # archer.live_spy = True
   snoop_type = sys.argv[1:]
   if len(snoop_type) >= 1:
     if snoop_type[0] == 'trace':
-      archer.enable_snoop(live_trace=True)
+      archer.enable_snoop_trace()
     elif snoop_type[0] == 'spy':
-      archer.enable_snoop(live_spy=True)
+      archer.enable_snoop_trace()
   else:
     archer.live_trace = True
+  archer.start_at(battle)
 
   # build a horse archer and rev his time by 100
   archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
