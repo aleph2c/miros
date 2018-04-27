@@ -4,24 +4,15 @@
   A working re-write of miros-rabbitmq using the the pika async example code. 
     
   *Immediate Goal*
-    Demonstrate (two different versions using different HSM classes of)
-    two small ergotic HSMs that can communicate between each other from
-    different processes on the same machine (use WLS).  From within this
-    example, demonstrate that the mesh is working, that the spy snoop is working
-    and the trace snoop is working.
- 
+    Identify why the trace snoop doesn't work in the horse archers example.
+    
   *Problem*
     We are using a completely new code base; The snoop network has been broken
     into two parts, the topic subscription scheme is different from the previous
     version of the software.
     
     The new framework should work for multiple classes in the miros stack (Factory,
-    Active Object, Hsm with Queues).  To know if it actually works we need to
-    try these.
-    
-    The snoop spy results will be extremely noisy.
-    
-    The small ergotic HSM needs to be designed.
+    Active Object).  To know if it actually works we need to try these classes.
   
   *Evidence that informs Assumptions:*
   
@@ -40,7 +31,7 @@
       *Mesh*
       *Snoop*:
       * [ ] Add coloring from different machines
-      * [ ] Add spy filtering
+      * [ ] Add spy filtering [doesn't make sense]
       *Integration*
       * [O] MirosNets (change this name to something better)
         * [X] get minimal active object example working
@@ -52,7 +43,7 @@
         * [X] create new miros-rabbitmq package
         * [X] confirm that the package is working
         * [X] test across network
-        * [ ] change the networked_horse_archer.py to use new design
+        * [X] change the networked_horse_archer.py to use new design
         * [ ] document the docstring of MirosNets
         * [ ] create an example:
           * [ ] ActiveObject which uses it

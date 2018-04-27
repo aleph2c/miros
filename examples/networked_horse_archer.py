@@ -308,7 +308,7 @@ def advance_entry(archer, e):
     first_name_of_others = next(iter(archer.others))
     print(archer.others[first_name_of_others].trace())
     archer.others[first_name_of_others].clear_trace()
-  archer.snoop_scribble("{} advancing with {} arrows".format(archer.name, archer.arrows))
+  archer.snoop_scribble("advancing with {} arrows".format(archer.arrows))
 
   archer.post_fifo(
     Event(signal=signals.Close_Enough_For_Circle),
@@ -424,10 +424,10 @@ def skirmish_retreat_ready_war_cry(archer, e):
 # Waiting-to-Lure callbacks
 def wtl_entry(archer, e):
   archer.yell(Event(signal=signals.Other_Retreat_Ready_War_Cry, payload=archer.name))
-  archer.snoop_scribble("{} has {} arrows".format(archer.name, archer.arrows))
+  archer.snoop_scribble("{} arrows".format(archer.arrows))
   archer.scribble('put away bow')
   archer.scribble('pull scimitar')
-  archer.snoop_scribble("{} acts scared".format(archer.name))
+  archer.snoop_scribble("acts scared")
   return return_status.HANDLED
 
 def wtl_second(archer, e):
@@ -462,7 +462,7 @@ def fr_second(archer, e):
   if archer.ticks % 3 == 0:
     if random.randint(1, 10) <= 8:
       archer.arrows = archer.arrows - 1 if archer.arrows >= 1  else 0
-      archer.scribble('arrows left {}'.format(archer.arrows))
+      archer.scribble('arrows left {}')
     if archer.arrows == 0:
       archer.post_fifo(
         Event(signal=signals.Out_Of_Arrows))
@@ -721,18 +721,16 @@ if __name__ == '__main__':
   random.seed()
   print("I am {}".format(archer.name))
   archer.time_compression = 10
-  # archer.live_spy = True
   snoop_type = sys.argv[1:]
   if len(snoop_type) >= 1:
     if snoop_type[0] == 'trace':
       archer.enable_snoop_trace()
     elif snoop_type[0] == 'spy':
-      archer.enable_snoop_trace()
+      archer.enable_snoop_spy()
   else:
     archer.live_trace = True
   archer.start_at(battle)
 
-  # build a horse archer and rev his time by 100
   archer.post_fifo(Event(signal=signals.Senior_Advance_War_Cry))
   time.sleep(1800)
 

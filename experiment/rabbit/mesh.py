@@ -1618,9 +1618,11 @@ class MirosNets:
 
   def enable_snoop_spy(self):
     self.snoop.spy.enabled = True
+    self.start_threads()
 
   def enable_snoop_trace(self):
     self.snoop.trace.enabled = True
+    self.start_threads()
 
   def start_threads(self):
 
