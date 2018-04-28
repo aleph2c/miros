@@ -1,53 +1,176 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Setting Up RabbitMQ &#8212; miros 2.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '2.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Spy and Trace Across a Network" href="networked_instrumentation.html" />
     <link rel="prev" title="Interacting Statecharts (Same Machine)" href="interactingcharts.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body>
-  
+  </head><body>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          miros</a>
+        <span class="navbar-text navbar-version pull-left"><b>2.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
             
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reflection.html">Reflection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="patterns.html">Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Setting Up RabbitMQ</a><ul>
+<li><a class="reference internal" href="#installing-on-linux-with-ansible">Installing On Linux with Ansible</a></li>
+<li><a class="reference internal" href="#installing-on-windows">Installing On Windows</a></li>
+<li><a class="reference internal" href="#learning-to-basic-messaging-patterns-and-networking-rabbitmq">Learning to Basic Messaging Patterns and Networking RabbitMQ</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="interactingcharts.html" title="Previous Chapter: Interacting Statecharts (Same Machine)"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Interacting S...</span>
+    </a>
+  </li>
+  <li>
+    <a href="networked_instrumentation.html" title="Next Chapter: Spy and Trace Across a Network"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Spy and Trace... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/setting_up_rabbit_mq.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><p class="logo"><a href="index.html">
+  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
+</a></p><ul>
+<li><a class="reference internal" href="#">Setting Up RabbitMQ</a><ul>
+<li><a class="reference internal" href="#installing-on-linux-with-ansible">Installing On Linux with Ansible</a></li>
+<li><a class="reference internal" href="#installing-on-windows">Installing On Windows</a></li>
+<li><a class="reference internal" href="#learning-to-basic-messaging-patterns-and-networking-rabbitmq">Learning to Basic Messaging Patterns and Networking RabbitMQ</a></li>
+</ul>
+</li>
+</ul>
+
+  <li>
+    <a href="interactingcharts.html" title="Previous Chapter: Interacting Statecharts (Same Machine)"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Interacting S...</span>
+    </a>
+  </li>
+  <li>
+    <a href="networked_instrumentation.html" title="Next Chapter: Spy and Trace Across a Network"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Spy and Trace... &raquo;</span>
+    </a>
+  </li>
+<div id="sourcelink">
+  <a href="_sources/setting_up_rabbit_mq.rst.txt"
+     rel="nofollow">Source</a>
+</div>
+<form action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
   <div class="section" id="setting-up-rabbitmq">
 <span id="setting-up-rabbit-mq-setting-up-rabbit-mq"></span><h1>Setting Up RabbitMQ<a class="headerlink" href="#setting-up-rabbitmq" title="Permalink to this headline">¶</a></h1>
 <p>Before we setup RabbitMQ, I should tell you what it is.  It’s a library written
 on top of the Erlang programming language which allows you to send messages
 across the Internet, or just to different processes running on your machine.</p>
 <p>Even though it is written in Erlang, RabbitMQ supports many different
-programming languages, including Python.  It does this with the <code class="docutils literal"><span class="pre">pika</span></code>
+programming languages, including Python.  It does this with the <code class="docutils literal notranslate"><span class="pre">pika</span></code>
 library.</p>
 <p>Bernhard Wenzel provides an excellent introduction to RabbitMQ here:</p>
 <center>
@@ -56,7 +179,7 @@ library.</p>
 illegible to me as a new user, so I wrote this guide to save you the pain which
 I went through.</p>
 <p>: note:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Most</span> <span class="n">of</span> <span class="n">the</span> <span class="n">documentation</span> <span class="n">on</span> <span class="n">the</span> <span class="n">RabbitMq</span> <span class="n">website</span> <span class="ow">is</span> <span class="n">illegible</span> <span class="p">(</span><span class="k">except</span> <span class="n">their</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Most</span> <span class="n">of</span> <span class="n">the</span> <span class="n">documentation</span> <span class="n">on</span> <span class="n">the</span> <span class="n">RabbitMq</span> <span class="n">website</span> <span class="ow">is</span> <span class="n">illegible</span> <span class="p">(</span><span class="k">except</span> <span class="n">their</span>
 <span class="n">tutorials</span> <span class="n">section</span><span class="p">)</span><span class="o">.</span>  <span class="n">There</span> <span class="n">are</span> <span class="n">a</span> <span class="n">lot</span> <span class="n">of</span> <span class="n">words</span> <span class="n">written</span> <span class="n">but</span> <span class="n">think</span> <span class="n">of</span> <span class="n">their</span>
 <span class="n">documents</span> <span class="k">as</span> <span class="n">a</span> <span class="n">collection</span> <span class="n">of</span> <span class="nb">open</span> <span class="n">secrets</span><span class="p">;</span> <span class="n">they</span> <span class="n">are</span> <span class="n">a</span> <span class="n">consulting</span> <span class="n">company</span> <span class="n">after</span>
 <span class="nb">all</span><span class="o">.</span> <span class="p">(</span><span class="n">their</span> <span class="n">docs</span> <span class="n">remind</span> <span class="n">me</span> <span class="n">of</span> <span class="n">the</span> <span class="n">Noam</span> <span class="n">Chomsky</span> <span class="n">bot</span> <span class="n">that</span> <span class="n">can</span> <span class="n">write</span> <span class="n">you</span> <span class="n">pages</span>
@@ -73,69 +196,69 @@ reasons; it turns your program installation into source code that you can keep
 under revision control, and it is scalable; with minimal effort, you can deploy
 things onto multiple machines.</p>
 <p>To install Ansible:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">ansible</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">ansible</span>
 </pre></div>
 </div>
 <p>Now if you don’t know already, figure out what your hostname is, by typing:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">hostname</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">hostname</span>
 </pre></div>
 </div>
 <p>When I type this on the raspberry pi that I tested this procedure with, I see it’s
-hostname is <code class="docutils literal"><span class="pre">scotty</span></code>.  In the following examples replace <code class="docutils literal"><span class="pre">scotty</span></code> with your
+hostname is <code class="docutils literal notranslate"><span class="pre">scotty</span></code>.  In the following examples replace <code class="docutils literal notranslate"><span class="pre">scotty</span></code> with your
 hostname.</p>
 <p>Now you will need to change the host files for Ansible.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">pico</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ansible</span><span class="o">/</span><span class="n">hosts</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">pico</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ansible</span><span class="o">/</span><span class="n">hosts</span>
 </pre></div>
 </div>
 <p>Now add the following:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">scotty</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">scotty</span><span class="p">]</span>
 <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span>
 </pre></div>
 </div>
 <p>Save (write-out) and exit the file.  What I have done is to link my hostname,
-<code class="docutils literal"><span class="pre">scotty</span></code> to my IP address.  127.0.0.1 is always the IP of your local machine.
-By writing this into the <code class="docutils literal"><span class="pre">/etc/ansible/hosts</span></code> file I am telling Ansible that I
-want to do a deployment to <em>this</em> machine when I reference <code class="docutils literal"><span class="pre">scotty</span></code> in the
+<code class="docutils literal notranslate"><span class="pre">scotty</span></code> to my IP address.  127.0.0.1 is always the IP of your local machine.
+By writing this into the <code class="docutils literal notranslate"><span class="pre">/etc/ansible/hosts</span></code> file I am telling Ansible that I
+want to do a deployment to <em>this</em> machine when I reference <code class="docutils literal notranslate"><span class="pre">scotty</span></code> in the
 Ansible file (which we will talk about shortly).</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">If you want to have Ansible deploy RabbitMQ to other IP addresses, you can add
-them below the 127.0.0.1 address in the <code class="docutils literal"><span class="pre">/etc/ansible/hosts</span></code> file.  In this
+them below the 127.0.0.1 address in the <code class="docutils literal notranslate"><span class="pre">/etc/ansible/hosts</span></code> file.  In this
 way you can have rabbitMq install everywhere you need it, all at once.</p>
 </div>
 <p>Ansible does its deployments using ssh.  So to use Ansible we have to setup ssh
 for our computer.</p>
 <p>To do this, we generate a public and private key, then concatenate our public
-key into our <code class="docutils literal"><span class="pre">authorized_keys</span></code>.  If you don’t have a <code class="docutils literal"><span class="pre">id_rsa</span></code> or a
-<code class="docutils literal"><span class="pre">id_rsa.pub</span></code> in your <code class="docutils literal"><span class="pre">~/.ssh/</span></code> directory, then you need to make them.  To do
+key into our <code class="docutils literal notranslate"><span class="pre">authorized_keys</span></code>.  If you don’t have a <code class="docutils literal notranslate"><span class="pre">id_rsa</span></code> or a
+<code class="docutils literal notranslate"><span class="pre">id_rsa.pub</span></code> in your <code class="docutils literal notranslate"><span class="pre">~/.ssh/</span></code> directory, then you need to make them.  To do
 this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">mkdir</span> <span class="o">~/.</span><span class="n">ssh</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">mkdir</span> <span class="o">~/.</span><span class="n">ssh</span>
 <span class="o">&gt;</span> <span class="n">cd</span> <span class="o">~/.</span><span class="n">ssh</span>
 <span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">ssh</span><span class="o">-</span><span class="n">keygen</span>
 </pre></div>
 </div>
 <p>When you see an option to enter a passphrase, just hit enter.</p>
 <p>Now that you have a public and private key, you want to concatenate your
-<code class="docutils literal"><span class="pre">authorized_keys</span></code> file with your public key:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">cat</span> <span class="s1">&#39;~/.ssh/id_rsa.pub&#39;</span> <span class="o">&gt;&gt;</span> <span class="s1">&#39;~/.ssh/authorized_keys&#39;</span>
+<code class="docutils literal notranslate"><span class="pre">authorized_keys</span></code> file with your public key:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">cat</span> <span class="s1">&#39;~/.ssh/id_rsa.pub&#39;</span> <span class="o">&gt;&gt;</span> <span class="s1">&#39;~/.ssh/authorized_keys&#39;</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>If you have included other IP addresses in your ansible host file, you will
 need to place your public key onto these servers as well, to do this:</p>
-<div class="last highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">cat</span> <span class="o">~/.</span><span class="n">ssh</span><span class="o">/</span><span class="n">id_rsa</span><span class="o">.</span><span class="n">pub</span> <span class="o">|</span> \
+<div class="last highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">cat</span> <span class="o">~/.</span><span class="n">ssh</span><span class="o">/</span><span class="n">id_rsa</span><span class="o">.</span><span class="n">pub</span> <span class="o">|</span> \
   <span class="n">ssh</span> <span class="n">user</span><span class="nd">@hostname</span> <span class="s1">&#39;cat &gt;&gt; .ssh/authorized_keys&#39;</span>
 </pre></div>
 </div>
 </div>
 <p>To test that this works, I type the following and confirm that I can login
 using ssh:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>&gt; ssh $USER@scotty
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>&gt; ssh $USER@scotty
 </pre></div>
 </div>
 <p>If this command succeeds, you will log into another version of your shell.</p>
-<p>To exit this connection, just type <code class="docutils literal"><span class="pre">exit</span></code>.</p>
+<p>To exit this connection, just type <code class="docutils literal notranslate"><span class="pre">exit</span></code>.</p>
 <p>Now that I can login to this computer using ssh, Ansible can perform automatic
 deployments for me.</p>
 <p>Ansible uses a set of <a class="reference internal" href="glossary.html#term-yaml"><span class="xref std std-term">yml</span></a> files to hold instructions on how to deploy
@@ -178,21 +301,21 @@ be used by Ansible:</p>
 </tbody>
 </table>
 <p>Copy the above files into a directory on your Linux machine.</p>
-<p>The only thing you should change is the <code class="docutils literal"><span class="pre">hosts</span></code> (which is set to scotty), the
-<code class="docutils literal"><span class="pre">rabbit_name</span></code> (bob), <code class="docutils literal"><span class="pre">rabbit_password</span></code> (dobbs) and the <code class="docutils literal"><span class="pre">guest_password</span></code>
+<p>The only thing you should change is the <code class="docutils literal notranslate"><span class="pre">hosts</span></code> (which is set to scotty), the
+<code class="docutils literal notranslate"><span class="pre">rabbit_name</span></code> (bob), <code class="docutils literal notranslate"><span class="pre">rabbit_password</span></code> (dobbs) and the <code class="docutils literal notranslate"><span class="pre">guest_password</span></code>
 (rabbit123) to whatever you want.  These variables are found in the
 <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbit_install.yml">rabbit_install.yml</a> file.</p>
 <p>Now to setup your RabbitMQ server, type:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">K</span> <span class="n">rabbit_install</span><span class="o">.</span><span class="n">yml</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">K</span> <span class="n">rabbit_install</span><span class="o">.</span><span class="n">yml</span>
 </pre></div>
 </div>
-<p>This command will prompt you for your <code class="docutils literal"><span class="pre">sudo</span></code> password, enter it and the
+<p>This command will prompt you for your <code class="docutils literal notranslate"><span class="pre">sudo</span></code> password, enter it and the
 rabbitmq server should be setup.</p>
 <p>To see if your server is running, you can open the management software that
-comes with it via their web app, by typing <code class="docutils literal"><span class="pre">localhost:15672</span></code> and log in with your
+comes with it via their web app, by typing <code class="docutils literal notranslate"><span class="pre">localhost:15672</span></code> and log in with your
 user name and password, if you didn’t change this in the
-<a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbit_install.yml">rabbit_install.yml</a> file, your user name will be <code class="docutils literal"><span class="pre">bob</span></code> and the password will
-be <code class="docutils literal"><span class="pre">dobbs</span></code>:</p>
+<a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbit_install.yml">rabbit_install.yml</a> file, your user name will be <code class="docutils literal notranslate"><span class="pre">bob</span></code> and the password will
+be <code class="docutils literal notranslate"><span class="pre">dobbs</span></code>:</p>
 <img alt="_images/RabbitMQ.PNG" class="align-center" src="_images/RabbitMQ.PNG" />
 <p>If you have come this far you have a working RabbitMQ message broker running on
 your Linux system.</p>
@@ -287,68 +410,21 @@ messages are not encrypted.</p>
 </div>
 
 
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
-  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
-</a></p>
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Setting Up RabbitMQ</a><ul>
-<li><a class="reference internal" href="#installing-on-linux-with-ansible">Installing On Linux with Ansible</a></li>
-<li><a class="reference internal" href="#installing-on-windows">Installing On Windows</a></li>
-<li><a class="reference internal" href="#learning-to-basic-messaging-patterns-and-networking-rabbitmq">Learning to Basic Messaging Patterns and Networking RabbitMQ</a></li>
-</ul>
-</li>
-</ul>
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="examples.html">Examples</a><ul>
-      <li>Previous: <a href="interactingcharts.html" title="previous chapter">Interacting Statecharts (Same Machine)</a></li>
-      <li>Next: <a href="networked_instrumentation.html" title="next chapter">Spy and Trace Across a Network</a></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/setting_up_rabbit_mq.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2018, Scott Volk.
       
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.6</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
       
-      |
-      <a href="_sources/setting_up_rabbit_mq.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-
-    
+    </p>
+    <p>
+        &copy; Copyright 2018, Scott Volk.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.<br/>
+    </p>
+  </div>
+</footer>
   </body>
 </html>

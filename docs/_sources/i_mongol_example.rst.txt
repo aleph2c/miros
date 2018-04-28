@@ -2265,7 +2265,7 @@ a network?
 .. _i_mongol_example-building-a-mesh-network:
 
 Building a Mesh Network
-=======================
+-----------------------
 We need to imagine the terrain on which the warbot will roam.  I vote that we
 keep them in the lab; Mongol horse archers are far too dangerous to let loose on
 an unsuspecting Internet.
@@ -2703,12 +2703,10 @@ descendant of the RabbitFactory class.
 In the next section, we will connect Gandbold to his brethren using these
 networks and the RabbitFactory API.
 
-.. _i_mongol_example-instrumenting-to-debug-the-botnet:
-
 .. _i_mongol_example-attaching-the-mongol-to-the-mesh:
 
 Attaching the Mongol to the Mesh
-================================
+--------------------------------
 The Mongols in our warbot will run on different processes on many different
 computers, or, within many processes on one machine.  It doesn't matter, if they
 are running somewhere on a LAN they should find one another and start to work
@@ -2818,7 +2816,7 @@ watch the collective instrumentation on the snoop network.
 .. _i_mongol_example-building-a-mongol-unit:
 
 Building a Mongol Unit
-======================
+----------------------
 Off camera, I re-wrote the horse archer to use the RabbitFactory and it's
 network.  In this section I will describe the new parts of the design and then
 present the code.

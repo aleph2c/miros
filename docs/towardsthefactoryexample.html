@@ -1,46 +1,177 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Using and Unwinding a Factory &#8212; miros 2.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '2.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Interacting Statecharts (Same Machine)" href="interactingcharts.html" />
     <link rel="prev" title="Hacking to Learn" href="scribbleexample.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body>
-  
+  </head><body>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          miros</a>
+        <span class="navbar-text navbar-version pull-left"><b>2.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
             
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reflection.html">Reflection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="patterns.html">Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Using and Unwinding a Factory</a><ul>
+<li><a class="reference internal" href="#example-summary">Example Summary</a></li>
+<li><a class="reference internal" href="#why-a-factory">Why a Factory?</a></li>
+<li><a class="reference internal" href="#standard-approach-to-writing-state-methods">Standard Approach to Writing State Methods</a></li>
+<li><a class="reference internal" href="#registering-callbacks-to-specific-events">Registering Callbacks to Specific Events</a></li>
+<li><a class="reference internal" href="#creating-a-statechart-using-templates">Creating a Statechart Using Templates</a></li>
+<li><a class="reference internal" href="#using-the-factory-class">Using the Factory Class</a></li>
+<li><a class="reference internal" href="#unwinding-a-factory-state-method">Unwinding a Factory State Method</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="scribbleexample.html" title="Previous Chapter: Hacking to Learn"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Hacking to Learn</span>
+    </a>
+  </li>
+  <li>
+    <a href="interactingcharts.html" title="Next Chapter: Interacting Statecharts (Same Machine)"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Interacting S... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/towardsthefactoryexample.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><p class="logo"><a href="index.html">
+  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
+</a></p><ul>
+<li><a class="reference internal" href="#">Using and Unwinding a Factory</a><ul>
+<li><a class="reference internal" href="#example-summary">Example Summary</a></li>
+<li><a class="reference internal" href="#why-a-factory">Why a Factory?</a></li>
+<li><a class="reference internal" href="#standard-approach-to-writing-state-methods">Standard Approach to Writing State Methods</a></li>
+<li><a class="reference internal" href="#registering-callbacks-to-specific-events">Registering Callbacks to Specific Events</a></li>
+<li><a class="reference internal" href="#creating-a-statechart-using-templates">Creating a Statechart Using Templates</a></li>
+<li><a class="reference internal" href="#using-the-factory-class">Using the Factory Class</a></li>
+<li><a class="reference internal" href="#unwinding-a-factory-state-method">Unwinding a Factory State Method</a></li>
+</ul>
+</li>
+</ul>
+
+  <li>
+    <a href="scribbleexample.html" title="Previous Chapter: Hacking to Learn"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Hacking to Learn</span>
+    </a>
+  </li>
+  <li>
+    <a href="interactingcharts.html" title="Next Chapter: Interacting Statecharts (Same Machine)"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Interacting S... &raquo;</span>
+    </a>
+  </li>
+<div id="sourcelink">
+  <a href="_sources/towardsthefactoryexample.rst.txt"
+     rel="nofollow">Source</a>
+</div>
+<form action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
   <blockquote>
 <div><p><em>You know you are working with clean code when each routine you read turns out to
 be pretty much what you expected. You can call it beautiful code when the code
@@ -111,9 +242,9 @@ than it would be for something that is auto-generated.</p>
 <span id="towardsthefactoryexample-standard-approach"></span><h2>Standard Approach to Writing State Methods<a class="headerlink" href="#standard-approach-to-writing-state-methods" title="Permalink to this headline">¶</a></h2>
 <a class="reference external image-reference" href="_static/factory1.pdf"><div align="center" class="align-center"><img alt="_images/factory1.svg" src="_images/factory1.svg" /></div>
 </a>
-<p>To create the above diagram we would define three state methods, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">c1</span></code>
-and <code class="docutils literal"><span class="pre">c2</span></code> and an active object.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<p>To create the above diagram we would define three state methods, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">c1</span></code>
+and <code class="docutils literal notranslate"><span class="pre">c2</span></code> and an active object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
 <span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
 <span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
@@ -163,7 +294,7 @@ posting an event, you have to give it the briefest opportunity to react.
 This delay is highlighted in the above code.</p>
 <p>When the above code is run, it would output this to your terminal:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
  <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:c2&#39;</span><span class="p">,</span>
  <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:c&#39;</span><span class="p">,</span>
  <span class="s1">&#39;ENTRY_SIGNAL:c&#39;</span><span class="p">,</span>
@@ -182,11 +313,11 @@ This delay is highlighted in the above code.</p>
 </div></blockquote>
 <p>We see from the spy log that we had two run to completion events with no
 surprises.  Notice that the event processor tried to call the state functions
-with the <code class="docutils literal"><span class="pre">ENTRY_SIGNAL</span></code>, <code class="docutils literal"><span class="pre">INIT_SIGNAL</span></code> and <code class="docutils literal"><span class="pre">EXIT_SIGNAL</span></code> as it should
+with the <code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code>, <code class="docutils literal notranslate"><span class="pre">INIT_SIGNAL</span></code> and <code class="docutils literal notranslate"><span class="pre">EXIT_SIGNAL</span></code> as it should
 have, even though our state methods did not handle these events.  The handlers
 for these events were left out of the state method examples to keep the code
 compact.  This demonstrates that the event processor assumes that a missing
-handler for <code class="docutils literal"><span class="pre">entry</span></code>, <code class="docutils literal"><span class="pre">init</span></code> and <code class="docutils literal"><span class="pre">exit</span></code> signals are handled by a state
+handler for <code class="docutils literal notranslate"><span class="pre">entry</span></code>, <code class="docutils literal notranslate"><span class="pre">init</span></code> and <code class="docutils literal notranslate"><span class="pre">exit</span></code> signals are handled by a state
 method.</p>
 </div>
 <div class="section" id="registering-callbacks-to-specific-events">
@@ -202,7 +333,7 @@ To make something common across all state methods we can ask the questions but
 we can’t answer them.  The answers will have to be injected into the state
 methods after they have been created.</p>
 <p>To be more specific a general state method could look something like this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">general_state_method</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 
 <span class="hll">  <span class="c1"># How should I respond to the events that I care about?</span>
@@ -218,15 +349,15 @@ methods after they have been created.</p>
 </pre></div>
 </div>
 <p>We see that the chart argument provides different context managers,
-<code class="docutils literal"><span class="pre">signal_callback</span></code> and <code class="docutils literal"><span class="pre">parent_callback</span></code>.  It is within these context
+<code class="docutils literal notranslate"><span class="pre">signal_callback</span></code> and <code class="docutils literal notranslate"><span class="pre">parent_callback</span></code>.  It is within these context
 managers that the answers are made.</p>
 <p>To inject the information into the chart
 object so that these context managers have something to answer with we can use the
-<code class="docutils literal"><span class="pre">register_signal_callback</span></code> and the <code class="docutils literal"><span class="pre">register_parent</span></code> of the active object.</p>
+<code class="docutils literal notranslate"><span class="pre">register_signal_callback</span></code> and the <code class="docutils literal notranslate"><span class="pre">register_parent</span></code> of the active object.</p>
 <p>Things should become a bit clearer with an example, reconsider our previous design:</p>
 <a class="reference external image-reference" href="_static/factory3.pdf"><div align="center" class="align-center"><img alt="_images/factory3.svg" src="_images/factory3.svg" /></div>
 </a>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">tc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 
 <span class="hll">  <span class="k">with</span> <span class="n">chart</span><span class="o">.</span><span class="n">signal_callback</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">tc</span><span class="p">)</span> <span class="k">as</span> <span class="n">fn</span><span class="p">:</span>
@@ -266,13 +397,13 @@ object so that these context managers have something to answer with we can use t
 <p>To distinguish these state methods from the previous ones we pre-pend their names
 with <cite>t</cite> which stands for template.</p>
 <p>These state methods almost look identical, the highlighted lines spell out how
-they are different;  the <code class="docutils literal"><span class="pre">signal_callback</span></code> context manager is using the state
+they are different;  the <code class="docutils literal notranslate"><span class="pre">signal_callback</span></code> context manager is using the state
 method’s name to get its information.  Other than that it hardly seems worth
 writing out the code three times.</p>
 <p>Now we have to give it the information required to perform the actions we want,
 first we define some callback methods, then we describe how we want our state
 methods to call them.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="hll"><span class="k">def</span> <span class="nf">trans_to_tc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="k">def</span> <span class="nf">trans_to_tc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 </span><span class="hll">  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">tc</span><span class="p">)</span>
 </span><span class="hll">
 </span><span class="hll"><span class="k">def</span> <span class="nf">trans_to_tc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -312,10 +443,10 @@ would if they were defined within a state method.</p>
 processor and it also provides a means to register callback methods for events
 and to register a parent state.</p>
 <p>The next block shows how are three state methods are given their information.
-For instance, the event <code class="docutils literal"><span class="pre">BB</span></code> will cause state <code class="docutils literal"><span class="pre">tc</span></code> to transition to itself.</p>
+For instance, the event <code class="docutils literal notranslate"><span class="pre">BB</span></code> will cause state <code class="docutils literal notranslate"><span class="pre">tc</span></code> to transition to itself.</p>
 <p>If we run this code like we did in our previous example we would expect to it
 behave the same:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">tc2</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">tc2</span><span class="p">)</span>
 <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>  <span class="c1"># give your active object a moment to respond</span>
 <span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
@@ -323,7 +454,7 @@ behave the same:</p>
 </div>
 <p>If we ran this code, we would see:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
  <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:tc2&#39;</span><span class="p">,</span>
  <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:tc&#39;</span><span class="p">,</span>
  <span class="s1">&#39;ENTRY_SIGNAL:tc&#39;</span><span class="p">,</span>
@@ -346,11 +477,11 @@ behave the same:</p>
 <p>We pretty much wrote the same method three times in a row in our <a class="reference internal" href="#towardsthefactoryexample-registering-callbacks-to-specific-events"><span class="std std-ref">last
 example</span></a>.
 Wouldn’t it be nice if something could write the thing for us?</p>
-<p>This is exactly what the <code class="docutils literal"><span class="pre">miros.hsm.state_method_template</span></code> does.</p>
+<p>This is exactly what the <code class="docutils literal notranslate"><span class="pre">miros.hsm.state_method_template</span></code> does.</p>
 <p>It writes the template code within another function, then copies it so that
 this function result is unique in memory, then it renames it and then decorates
 it with some instrumentation.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span>
 
 <span class="k">def</span> <span class="nf">state_method_template</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
 
@@ -373,11 +504,11 @@ it with some instrumentation.</p>
 </div>
 <p>With this method we can automatically write our state methods then register
 event callbacks and parent states.</p>
-<p>Let’s re-create our example, this time using this <code class="docutils literal"><span class="pre">state_method_template</span></code>
+<p>Let’s re-create our example, this time using this <code class="docutils literal notranslate"><span class="pre">state_method_template</span></code>
 method:</p>
 <a class="reference external image-reference" href="_static/factory4.pdf"><div align="center" class="align-center"><img alt="_images/factory4.svg" src="_images/factory4.svg" /></div>
 </a>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># create the specific behavior we want in our state chart</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># create the specific behavior we want in our state chart</span>
 <span class="k">def</span> <span class="nf">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
 
@@ -418,10 +549,10 @@ method:</p>
 </div>
 <p>This is a much more compact version of our map.  I removed the registration of
 signals that weren’t being used by the design, but more importantly I used the
-<code class="docutils literal"><span class="pre">state_method_template</span></code> to create the state methods that could have
+<code class="docutils literal notranslate"><span class="pre">state_method_template</span></code> to create the state methods that could have
 information added to them with the active object registration methods.</p>
 <p>The output from this program is:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
  <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc2&#39;</span><span class="p">,</span>
  <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc&#39;</span><span class="p">,</span>
  <span class="s1">&#39;ENTRY_SIGNAL:fc&#39;</span><span class="p">,</span>
@@ -441,17 +572,17 @@ information added to them with the active object registration methods.</p>
 </div>
 <div class="section" id="using-the-factory-class">
 <span id="towardsthefactoryexample-using-the-factory-class"></span><h2>Using the Factory Class<a class="headerlink" href="#using-the-factory-class" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal"><span class="pre">active_object</span></code> module’s Factory class provides a syntax which is similar to
-the previous miros version.  It has the <code class="docutils literal"><span class="pre">create</span></code>, <code class="docutils literal"><span class="pre">catch</span></code> and <code class="docutils literal"><span class="pre">nest</span></code>
-methods, but it also extends the other API with <code class="docutils literal"><span class="pre">to_method</span></code> and <code class="docutils literal"><span class="pre">to_code</span></code>.</p>
-<p>The Factory class wraps the <code class="docutils literal"><span class="pre">register_signal_callback</span></code> and
-<code class="docutils literal"><span class="pre">register_parent</span></code> described in the <a class="reference internal" href="#towardsthefactoryexample-registering-a-parent-to-a-state-method"><span class="std std-ref">previous
+<p>The <code class="docutils literal notranslate"><span class="pre">active_object</span></code> module’s Factory class provides a syntax which is similar to
+the previous miros version.  It has the <code class="docutils literal notranslate"><span class="pre">create</span></code>, <code class="docutils literal notranslate"><span class="pre">catch</span></code> and <code class="docutils literal notranslate"><span class="pre">nest</span></code>
+methods, but it also extends the other API with <code class="docutils literal notranslate"><span class="pre">to_method</span></code> and <code class="docutils literal notranslate"><span class="pre">to_code</span></code>.</p>
+<p>The Factory class wraps the <code class="docutils literal notranslate"><span class="pre">register_signal_callback</span></code> and
+<code class="docutils literal notranslate"><span class="pre">register_parent</span></code> described in the <a class="reference internal" href="#towardsthefactoryexample-registering-a-parent-to-a-state-method"><span class="std std-ref">previous
 section</span></a>
 making syntax that is a bit more concise.</p>
 <a class="reference external image-reference" href="_static/factory5.pdf"><div align="center" class="align-center"><img alt="_images/factory5.svg" src="_images/factory5.svg" /></div>
 </a>
-<p>Here is how you could implement this statechart with the <code class="docutils literal"><span class="pre">Factory</span></code> class:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<p>Here is how you could implement this statechart with the <code class="docutils literal notranslate"><span class="pre">Factory</span></code> class:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -527,7 +658,7 @@ making syntax that is a bit more concise.</p>
 </pre></div>
 </td></tr></table></div>
 <p>If we ran the above code we would see the expected behavior:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
  <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc&#39;</span><span class="p">,</span>
  <span class="s1">&#39;ENTRY_SIGNAL:fc&#39;</span><span class="p">,</span>
  <span class="s1">&#39;INIT_SIGNAL:fc&#39;</span><span class="p">,</span>
@@ -549,13 +680,13 @@ making syntax that is a bit more concise.</p>
 <span id="towardsthefactoryexample-unwinding-a-factory-state-method"></span><h2>Unwinding a Factory State Method<a class="headerlink" href="#unwinding-a-factory-state-method" title="Permalink to this headline">¶</a></h2>
 <p>State methods made from factories are hard to debug because you can’t actually
 see their code.  If you find that you have an issue with such a state method, you
-can unwind it into flat code using the <code class="docutils literal"><span class="pre">to_code</span></code> method.  This method outputs a
+can unwind it into flat code using the <code class="docutils literal notranslate"><span class="pre">to_code</span></code> method.  This method outputs a
 string that you can use as a hand written state method.</p>
 <p>In the following example, I’ll show how we can ‘unwind’ a design.</p>
 <a class="reference external image-reference" href="_static/factory4.pdf"><div align="center" class="align-center"><img alt="_images/factory4.svg" src="_images/factory4.svg" /></div>
 </a>
 <p>First we repeat the work of the last section:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># create the specific behavior we want in our state chart</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># create the specific behavior we want in our state chart</span>
 <span class="k">def</span> <span class="nf">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
 
@@ -588,24 +719,24 @@ string that you can use as a hand written state method.</p>
 <span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">fc2</span><span class="p">,</span> <span class="n">fc</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal"><span class="pre">fc</span></code>, <code class="docutils literal"><span class="pre">fc1</span></code> and <code class="docutils literal"><span class="pre">fc2</span></code> objects contain state methods that were
-generated by the framework and their code is hidden within the <code class="docutils literal"><span class="pre">ao</span></code> object.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">fc</span></code>, <code class="docutils literal notranslate"><span class="pre">fc1</span></code> and <code class="docutils literal notranslate"><span class="pre">fc2</span></code> objects contain state methods that were
+generated by the framework and their code is hidden within the <code class="docutils literal notranslate"><span class="pre">ao</span></code> object.</p>
 <p>Now suppose something were to go wrong with this design?  An application
 developer would have to know that there are at least four different places to
 look within the miros framework to understand their state method: the
 registration functions, the context managers and in the actual template
 generation function.  That would be a lot to keep in their head while they were
 also trying to wrestle with their own design problem.</p>
-<p>Instead, they could use the <code class="docutils literal"><span class="pre">to_code</span></code> method, copy the result and write it
+<p>Instead, they could use the <code class="docutils literal notranslate"><span class="pre">to_code</span></code> method, copy the result and write it
 back into the design as flat state methods.  In this way they could focus their
 entire attention on their own issue.  Here is how they could do it:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">to_code</span><span class="p">(</span><span class="n">fc</span><span class="p">))</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">to_code</span><span class="p">(</span><span class="n">fc</span><span class="p">))</span>
 <span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">to_code</span><span class="p">(</span><span class="n">fc1</span><span class="p">))</span>
 <span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">to_code</span><span class="p">(</span><span class="n">fc2</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>This would output the following:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
@@ -655,7 +786,7 @@ entire attention on their own issue.  Here is how they could do it:</p>
 </div>
 <p>They could copy these methods and re-write their original code as this, making
 sure that the comment out all of the factory code:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># create the specific behavior we want in our state chart</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># create the specific behavior we want in our state chart</span>
 <span class="k">def</span> <span class="nf">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
 
@@ -744,7 +875,7 @@ sure that the comment out all of the factory code:</p>
 <p>The highlighted sections identify all of the changes to the design.  New
 flattened state methods were added and the old factory code was commented out.
 If we run this code, we see that it behaves properly:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
  <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc2&#39;</span><span class="p">,</span>
  <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc&#39;</span><span class="p">,</span>
  <span class="s1">&#39;ENTRY_SIGNAL:fc&#39;</span><span class="p">,</span>
@@ -768,72 +899,21 @@ whether it should be done or not is dependent upon the engineering trade offs.</
 </div>
 
 
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
-  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
-</a></p>
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Using and Unwinding a Factory</a><ul>
-<li><a class="reference internal" href="#example-summary">Example Summary</a></li>
-<li><a class="reference internal" href="#why-a-factory">Why a Factory?</a></li>
-<li><a class="reference internal" href="#standard-approach-to-writing-state-methods">Standard Approach to Writing State Methods</a></li>
-<li><a class="reference internal" href="#registering-callbacks-to-specific-events">Registering Callbacks to Specific Events</a></li>
-<li><a class="reference internal" href="#creating-a-statechart-using-templates">Creating a Statechart Using Templates</a></li>
-<li><a class="reference internal" href="#using-the-factory-class">Using the Factory Class</a></li>
-<li><a class="reference internal" href="#unwinding-a-factory-state-method">Unwinding a Factory State Method</a></li>
-</ul>
-</li>
-</ul>
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="examples.html">Examples</a><ul>
-      <li>Previous: <a href="scribbleexample.html" title="previous chapter">Hacking to Learn</a></li>
-      <li>Next: <a href="interactingcharts.html" title="next chapter">Interacting Statecharts (Same Machine)</a></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/towardsthefactoryexample.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2018, Scott Volk.
       
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.6</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
       
-      |
-      <a href="_sources/towardsthefactoryexample.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-
-    
+    </p>
+    <p>
+        &copy; Copyright 2018, Scott Volk.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.<br/>
+    </p>
+  </div>
+</footer>
   </body>
 </html>

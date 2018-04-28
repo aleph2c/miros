@@ -4,8 +4,8 @@
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>610</x>
-      <y>600</y>
+      <x>550</x>
+      <y>840</y>
       <w>400</w>
       <h>290</h>
     </coordinates>
@@ -14,7 +14,7 @@
 entry / chart.post_fifo(
   Event(signal=signals.to_outer),
   times=1,
-  period=random.randint(2,5),
+  period=random.randint(2,7),
   deferred=True
   )
   chart.transmit(Event(signal=signals.other_to_outer))
@@ -23,6 +23,7 @@ exit / chart.cancel_events(
   Event(signal=signals.to_outer))
 
 other_to_inner / {}
+to_inner / {}
 valign=top
 </panel_attributes>
     <additional_attributes/>
@@ -30,10 +31,10 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>470</x>
-      <y>380</y>
+      <x>410</x>
+      <y>640</y>
       <w>590</w>
-      <h>550</h>
+      <h>530</h>
     </coordinates>
     <panel_attributes>*outer*
 --
@@ -46,8 +47,8 @@ valign=top
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>390</x>
-      <y>740</y>
+      <x>330</x>
+      <y>980</y>
       <w>20</w>
       <h>20</h>
     </coordinates>
@@ -57,8 +58,8 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>390</x>
-      <y>740</y>
+      <x>330</x>
+      <y>980</y>
       <w>100</w>
       <h>30</h>
     </coordinates>
@@ -68,8 +69,8 @@ valign=top
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>660</x>
-      <y>570</y>
+      <x>600</x>
+      <y>810</y>
       <w>20</w>
       <h>20</h>
     </coordinates>
@@ -79,8 +80,8 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>660</x>
-      <y>560</y>
+      <x>600</x>
+      <y>800</y>
       <w>310</w>
       <h>40</h>
     </coordinates>
@@ -91,8 +92,8 @@ valign=top
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>950</x>
-      <y>570</y>
+      <x>890</x>
+      <y>810</y>
       <w>20</w>
       <h>20</h>
     </coordinates>
@@ -102,8 +103,8 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>460</x>
-      <y>650</y>
+      <x>400</x>
+      <y>890</y>
       <w>170</w>
       <h>40</h>
     </coordinates>
@@ -114,8 +115,8 @@ to_inner</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>460</x>
-      <y>780</y>
+      <x>400</x>
+      <y>1020</y>
       <w>170</w>
       <h>40</h>
     </coordinates>
@@ -126,15 +127,15 @@ to_outer</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>680</x>
-      <y>430</y>
+      <x>620</x>
+      <y>670</y>
       <w>270</w>
       <h>160</h>
     </coordinates>
     <panel_attributes>chart.post_fifo(
   Event(signal=signals.to_inner),
   times=1,
-  period=random.randint(2,5),
+  period=random.randint(2,7),
   deferred=True
 )
 chart.transmit(
@@ -145,20 +146,20 @@ style=wordwrap</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>880</x>
-      <y>330</y>
+      <x>820</x>
+      <y>600</y>
       <w>30</w>
-      <h>80</h>
+      <h>70</h>
     </coordinates>
     <panel_attributes>lt=()-[v]</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
   </element>
   <element>
     <id>UMLSyncBarHorizontal</id>
     <coordinates>
-      <x>350</x>
-      <y>280</y>
-      <w>720</w>
+      <x>410</x>
+      <y>560</y>
+      <w>600</w>
       <h>20</h>
     </coordinates>
     <panel_attributes>lw=5
@@ -168,119 +169,42 @@ style=wordwrap</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>870</x>
-      <y>280</y>
-      <w>50</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>lt=[^]-(</panel_attributes>
-    <additional_attributes>20.0;10.0;20.0;40.0</additional_attributes>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>350</x>
-      <y>100</y>
-      <w>220</w>
-      <h>130</h>
-    </coordinates>
-    <panel_attributes>*Factory*
---
-
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLGeneric</id>
-    <coordinates>
-      <x>360</x>
-      <y>150</y>
-      <w>200</w>
-      <h>60</h>
-    </coordinates>
-    <panel_attributes>symbol=component
-Event Processor</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>600</x>
-      <y>100</y>
-      <w>220</w>
-      <h>130</h>
-    </coordinates>
-    <panel_attributes>*ActiveObject*
---
-
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLGeneric</id>
-    <coordinates>
-      <x>610</x>
-      <y>150</y>
-      <w>200</w>
-      <h>60</h>
-    </coordinates>
-    <panel_attributes>symbol=component
-Event Processor</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>850</x>
-      <y>100</y>
-      <w>220</w>
-      <h>130</h>
-    </coordinates>
-    <panel_attributes>*HsmWithQueues*
---
-
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLGeneric</id>
-    <coordinates>
-      <x>860</x>
-      <y>150</y>
-      <w>200</w>
-      <h>60</h>
-    </coordinates>
-    <panel_attributes>symbol=component
-Event Processor</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>560</x>
-      <y>170</y>
-      <w>60</w>
-      <h>30</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>40.0;10.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
       <x>810</x>
-      <y>170</y>
-      <w>60</w>
-      <h>30</h>
+      <y>560</y>
+      <w>50</w>
+      <h>60</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>40.0;10.0;10.0;10.0</additional_attributes>
+    <panel_attributes>lt=[^]-(</panel_attributes>
+    <additional_attributes>20.0;10.0;20.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>660</x>
+      <y>410</y>
+      <w>200</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+Event Processor</panel_attributes>
+    <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>950</x>
-      <y>250</y>
+      <x>760</x>
+      <y>510</y>
+      <w>30</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>500</x>
+      <y>530</y>
       <w>30</w>
       <h>60</h>
     </coordinates>
@@ -290,85 +214,30 @@ Event Processor</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>700</x>
-      <y>250</y>
-      <w>30</w>
-      <h>60</h>
-    </coordinates>
-    <panel_attributes>lt=()-[v]</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>440</x>
-      <y>250</y>
-      <w>30</w>
-      <h>60</h>
-    </coordinates>
-    <panel_attributes>lt=()-[v]</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>430</x>
-      <y>190</y>
+      <x>490</x>
+      <y>450</y>
       <w>50</w>
-      <h>80</h>
-    </coordinates>
-    <panel_attributes>lt=[^]-(</panel_attributes>
-    <additional_attributes>20.0;10.0;20.0;50.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>690</x>
-      <y>190</y>
-      <w>50</w>
-      <h>80</h>
-    </coordinates>
-    <panel_attributes>lt=[^]-(</panel_attributes>
-    <additional_attributes>20.0;10.0;20.0;50.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>940</x>
-      <y>190</y>
-      <w>50</w>
-      <h>80</h>
-    </coordinates>
-    <panel_attributes>lt=[^]-(</panel_attributes>
-    <additional_attributes>20.0;10.0;20.0;50.0</additional_attributes>
-  </element>
-  <element>
-    <id>UMLSpecialState</id>
-    <coordinates>
-      <x>910</x>
-      <y>120</y>
-      <w>100</w>
       <h>100</h>
     </coordinates>
-    <panel_attributes>type=termination</panel_attributes>
-    <additional_attributes/>
+    <panel_attributes>lt=[^]-(</panel_attributes>
+    <additional_attributes>20.0;10.0;20.0;70.0</additional_attributes>
   </element>
   <element>
-    <id>UMLSpecialState</id>
+    <id>Relation</id>
+    <coordinates>
+      <x>750</x>
+      <y>450</y>
+      <w>50</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=[^]-(</panel_attributes>
+    <additional_attributes>20.0;10.0;20.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
     <coordinates>
       <x>400</x>
-      <y>120</y>
-      <w>100</w>
-      <h>100</h>
-    </coordinates>
-    <panel_attributes>type=termination</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>460</x>
-      <y>690</y>
+      <y>930</y>
       <w>170</w>
       <h>40</h>
     </coordinates>
@@ -379,13 +248,260 @@ other_to_inner</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>460</x>
-      <y>820</y>
+      <x>400</x>
+      <y>1060</y>
       <w>170</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 other_to_outer</panel_attributes>
     <additional_attributes>150.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>660</x>
+      <y>290</y>
+      <w>120</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>/Factory/
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>660</x>
+      <y>230</y>
+      <w>120</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>/ActiveObject/
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>710</x>
+      <y>260</y>
+      <w>30</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>790</x>
+      <y>150</y>
+      <w>220</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>*MirosNetsInterface*
+--
+on_network_message(...)
+--
+on_network_trace_message(...)
+--
+on_network_spy_message(...)
+-
+transmit(self, event)
+-
+enable_snoop_trace()
+-
+enable_snoop_spy()
+--
+snoop_scribble(...)
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>650</x>
+      <y>360</y>
+      <w>220</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>*NetworkedFactory*
+--
+start_at(self, initial_state)
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>710</x>
+      <y>320</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>820</x>
+      <y>320</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>410</x>
+      <y>360</y>
+      <w>220</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>*NetworkedActiveObject*
+--
+start_at(self, initial_state)
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>420</x>
+      <y>410</y>
+      <w>200</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+Event Processor</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>580</x>
+      <y>240</y>
+      <w>100</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>80.0;10.0;10.0;10.0;10.0;120.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>190</y>
+      <w>270</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>250.0;10.0;10.0;10.0;10.0;170.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>890</x>
+      <y>340</y>
+      <w>330</w>
+      <h>210</h>
+    </coordinates>
+    <panel_attributes>fo = NetworkedActiveObject(make_name('ao'),
+                            rabbit_user='bob',
+                            rabbit_password='dobbs',
+                            tx_routing_key='heya.man',
+                            rx_routing_key='#.man',
+                            mesh_encryption_key=b'u3U...')
+                            
+# use fo to build your chart
+
+fo.enable_snoop_trace()
+# ao.enable_snoop_spy()
+fo.start_at(outer)
+
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>860</x>
+      <y>370</y>
+      <w>70</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;20.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>380</x>
+      <y>300</y>
+      <w>50</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;30.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>230</x>
+      <y>170</y>
+      <w>380</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>ao = NetworkedActiveObject(make_name('ao'),
+                            rabbit_user='bob',
+                            rabbit_password='dobbs',
+                            tx_routing_key='heya.man',
+                            rx_routing_key='#.man',
+                            mesh_encryption_key=b'u3U...')
+ao.enable_snoop_trace()
+# ao.enable_snoop_spy()
+ao.start_at(outer)
+
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>230</x>
+      <y>450</y>
+      <w>120</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>/MirosNets/
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>460</y>
+      <w>90</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>70.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>270</x>
+      <y>480</y>
+      <w>430</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>410.0;10.0;410.0;50.0;300.0;50.0;300.0;30.0;10.0;30.0;10.0;10.0</additional_attributes>
   </element>
 </diagram>
