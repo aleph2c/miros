@@ -20,7 +20,7 @@
 import os
 import sys
 import datetime
-import sphinx_bootstrap_theme
+#import sphinx_bootstrap_theme
 #sys.path.insert(0, os.path.abspath('C:\\github\\hsm\\miros'))
 sys.path.insert(0, os.path.abspath('C:\\github\\hsm\\miros'))
 
@@ -90,8 +90,8 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'bootstrap'
-html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+html_theme = 'alabaster'
+#html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 html_favicon = 'favicon.ico'
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -100,7 +100,8 @@ html_favicon = 'favicon.ico'
 #
 html_theme_options = {
   'github_user': 'aleph2c',
-  'github_repo': 'py-activeobject',
+  'github_repo': 'miros',
+  'show_powered_by' : False,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
