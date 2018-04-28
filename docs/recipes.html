@@ -25,111 +25,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head><body>
-  <div class="document">
-    
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
-  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
-</a></p>
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Recipes</a><ul>
-<li><a class="reference internal" href="#states">States</a><ul>
-<li><a class="reference internal" href="#what-a-state-does-and-how-to-structure-it">What a State Does and How to Structure it</a></li>
-<li><a class="reference internal" href="#boiler-plate-state-method-code">Boiler Plate State Method Code</a></li>
-<li><a class="reference internal" href="#describe-a-parent-state">Describe a Parent State</a></li>
-<li><a class="reference internal" href="#pass-an-event-through-to-a-parent-state">Pass an event through to a Parent State</a></li>
-<li><a class="reference internal" href="#transition-to-another-state">Transition to another state</a></li>
-<li><a class="reference internal" href="#do-something-when-the-state-is-entered">Do Something when the State is Entered</a></li>
-<li><a class="reference internal" href="#do-something-when-the-state-is-initialized">Do Something when the State is Initialized</a></li>
-<li><a class="reference internal" href="#do-something-when-the-state-is-exited">Do Something when the State is Exited</a></li>
-<li><a class="reference internal" href="#augment-your-active-object">Augment Your Active Object</a></li>
-<li><a class="reference internal" href="#create-a-hook">Create a Hook</a></li>
-<li><a class="reference internal" href="#catch-and-release">Catch and Release</a></li>
-<li><a class="reference internal" href="#create-a-one-shot">Create a One-Shot</a></li>
-<li><a class="reference internal" href="#create-a-multi-shot">Create a Multi-Shot</a></li>
-<li><a class="reference internal" href="#cancelling-events">Cancelling Events</a></li>
-<li><a class="reference internal" href="#deferring-and-recalling-an-event">Deferring and Recalling an Event</a></li>
-<li><a class="reference internal" href="#create-a-guard">Create a Guard</a></li>
-<li><a class="reference internal" href="#creating-a-statechart-from-a-template">Creating a Statechart From a Template</a></li>
-<li><a class="reference internal" href="#creating-a-statechart-from-a-factory">Creating a Statechart From a Factory</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#events-and-signals">Events And Signals</a><ul>
-<li><a class="reference internal" href="#creating-an-event">Creating an Event</a></li>
-<li><a class="reference internal" href="#creating-a-signal">Creating a Signal</a></li>
-<li><a class="reference internal" href="#posting-events">Posting Events</a></li>
-<li><a class="reference internal" href="#posting-an-event-to-the-fifo">Posting an Event to the Fifo</a></li>
-<li><a class="reference internal" href="#posting-an-event-to-the-lifo">Posting an Event to the LIFO</a></li>
-<li><a class="reference internal" href="#creating-a-one-shot-event">Creating a One-Shot Event</a></li>
-<li><a class="reference internal" href="#creating-a-multishot-event">Creating a Multishot Event</a></li>
-<li><a class="reference internal" href="#cancelling-a-specific-event-source">Cancelling a Specific Event Source</a></li>
-<li><a class="reference internal" href="#cancelling-event-source-by-signal-name">Cancelling Event Source By Signal Name</a></li>
-<li><a class="reference internal" href="#recipes-deferring-an-event">Deferring and Recalling an Event</a></li>
-<li><a class="reference internal" href="#adding-a-payload-to-an-event">Adding a Payload to an Event</a></li>
-<li><a class="reference internal" href="#determining-if-an-event-has-a-payload">Determining if an Event Has a Payload</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#multiple-statecharts">Multiple Statecharts</a><ul>
-<li><a class="reference internal" href="#subscribing-to-an-event-posted-by-another-active-object">Subscribing to an Event Posted by Another Active Object</a></li>
-<li><a class="reference internal" href="#publishing-events-to-other-active-objects">Publishing events to other Active Objects</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#recipes-seeing-what-is">Seeing What is Going On</a><ul>
-<li><a class="reference internal" href="#determining-the-current-state">Determining the Current State</a></li>
-<li><a class="reference internal" href="#seeing-what-signals-you-have-in-your-system">Seeing what Signals You Have In Your System</a></li>
-<li><a class="reference internal" href="#using-the-trace">Using the Trace</a></li>
-<li><a class="reference internal" href="#using-the-spy">Using the Spy</a></li>
-<li><a class="reference internal" href="#add-timing-information-to-the-spy">Add Timing Information to the Spy</a></li>
-<li><a class="reference internal" href="#tracing-live">Tracing Live</a></li>
-<li><a class="reference internal" href="#spying-live">Spying Live</a></li>
-<li><a class="reference internal" href="#scribble-on-the-spy">Scribble On the Spy</a></li>
-<li><a class="reference internal" href="#flatting-a-state-method">Flatting a State Method</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#describing-your-work">Describing your Work</a><ul>
-<li><a class="reference internal" href="#drawing-a-statechart">Drawing a StateChart</a></li>
-<li><a class="reference internal" href="#drawing-a-sequence-diagram">Drawing a Sequence Diagram</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#testing">Testing</a><ul>
-<li><a class="reference internal" href="#using-a-trace-as-a-test-target">Using a Trace As a Test Target</a></li>
-<li><a class="reference internal" href="#using-a-spy-as-a-test-target">Using a Spy as a Test Target</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="i_mongol_example.html" title="previous chapter">Mongol Horse Archer</a></li>
-      <li>Next: <a href="reflection.html" title="next chapter">Reflection</a></li>
-  </ul></li>
-</ul>
-</div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/recipes.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+  
+
+    <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
@@ -2164,8 +2062,111 @@ specification.</p>
           </div>
         </div>
       </div>
-    <div class="clearer"></div>
-  </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
+  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
+</a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Recipes</a><ul>
+<li><a class="reference internal" href="#states">States</a><ul>
+<li><a class="reference internal" href="#what-a-state-does-and-how-to-structure-it">What a State Does and How to Structure it</a></li>
+<li><a class="reference internal" href="#boiler-plate-state-method-code">Boiler Plate State Method Code</a></li>
+<li><a class="reference internal" href="#describe-a-parent-state">Describe a Parent State</a></li>
+<li><a class="reference internal" href="#pass-an-event-through-to-a-parent-state">Pass an event through to a Parent State</a></li>
+<li><a class="reference internal" href="#transition-to-another-state">Transition to another state</a></li>
+<li><a class="reference internal" href="#do-something-when-the-state-is-entered">Do Something when the State is Entered</a></li>
+<li><a class="reference internal" href="#do-something-when-the-state-is-initialized">Do Something when the State is Initialized</a></li>
+<li><a class="reference internal" href="#do-something-when-the-state-is-exited">Do Something when the State is Exited</a></li>
+<li><a class="reference internal" href="#augment-your-active-object">Augment Your Active Object</a></li>
+<li><a class="reference internal" href="#create-a-hook">Create a Hook</a></li>
+<li><a class="reference internal" href="#catch-and-release">Catch and Release</a></li>
+<li><a class="reference internal" href="#create-a-one-shot">Create a One-Shot</a></li>
+<li><a class="reference internal" href="#create-a-multi-shot">Create a Multi-Shot</a></li>
+<li><a class="reference internal" href="#cancelling-events">Cancelling Events</a></li>
+<li><a class="reference internal" href="#deferring-and-recalling-an-event">Deferring and Recalling an Event</a></li>
+<li><a class="reference internal" href="#create-a-guard">Create a Guard</a></li>
+<li><a class="reference internal" href="#creating-a-statechart-from-a-template">Creating a Statechart From a Template</a></li>
+<li><a class="reference internal" href="#creating-a-statechart-from-a-factory">Creating a Statechart From a Factory</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#events-and-signals">Events And Signals</a><ul>
+<li><a class="reference internal" href="#creating-an-event">Creating an Event</a></li>
+<li><a class="reference internal" href="#creating-a-signal">Creating a Signal</a></li>
+<li><a class="reference internal" href="#posting-events">Posting Events</a></li>
+<li><a class="reference internal" href="#posting-an-event-to-the-fifo">Posting an Event to the Fifo</a></li>
+<li><a class="reference internal" href="#posting-an-event-to-the-lifo">Posting an Event to the LIFO</a></li>
+<li><a class="reference internal" href="#creating-a-one-shot-event">Creating a One-Shot Event</a></li>
+<li><a class="reference internal" href="#creating-a-multishot-event">Creating a Multishot Event</a></li>
+<li><a class="reference internal" href="#cancelling-a-specific-event-source">Cancelling a Specific Event Source</a></li>
+<li><a class="reference internal" href="#cancelling-event-source-by-signal-name">Cancelling Event Source By Signal Name</a></li>
+<li><a class="reference internal" href="#recipes-deferring-an-event">Deferring and Recalling an Event</a></li>
+<li><a class="reference internal" href="#adding-a-payload-to-an-event">Adding a Payload to an Event</a></li>
+<li><a class="reference internal" href="#determining-if-an-event-has-a-payload">Determining if an Event Has a Payload</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#multiple-statecharts">Multiple Statecharts</a><ul>
+<li><a class="reference internal" href="#subscribing-to-an-event-posted-by-another-active-object">Subscribing to an Event Posted by Another Active Object</a></li>
+<li><a class="reference internal" href="#publishing-events-to-other-active-objects">Publishing events to other Active Objects</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#recipes-seeing-what-is">Seeing What is Going On</a><ul>
+<li><a class="reference internal" href="#determining-the-current-state">Determining the Current State</a></li>
+<li><a class="reference internal" href="#seeing-what-signals-you-have-in-your-system">Seeing what Signals You Have In Your System</a></li>
+<li><a class="reference internal" href="#using-the-trace">Using the Trace</a></li>
+<li><a class="reference internal" href="#using-the-spy">Using the Spy</a></li>
+<li><a class="reference internal" href="#add-timing-information-to-the-spy">Add Timing Information to the Spy</a></li>
+<li><a class="reference internal" href="#tracing-live">Tracing Live</a></li>
+<li><a class="reference internal" href="#spying-live">Spying Live</a></li>
+<li><a class="reference internal" href="#scribble-on-the-spy">Scribble On the Spy</a></li>
+<li><a class="reference internal" href="#flatting-a-state-method">Flatting a State Method</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#describing-your-work">Describing your Work</a><ul>
+<li><a class="reference internal" href="#drawing-a-statechart">Drawing a StateChart</a></li>
+<li><a class="reference internal" href="#drawing-a-sequence-diagram">Drawing a Sequence Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#testing">Testing</a><ul>
+<li><a class="reference internal" href="#using-a-trace-as-a-test-target">Using a Trace As a Test Target</a></li>
+<li><a class="reference internal" href="#using-a-spy-as-a-test-target">Using a Spy as a Test Target</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="i_mongol_example.html" title="previous chapter">Mongol Horse Archer</a></li>
+      <li>Next: <a href="reflection.html" title="next chapter">Reflection</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/recipes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
     <div class="footer">
       &copy;2018, Scott Volk.
       

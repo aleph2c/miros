@@ -102,7 +102,6 @@ html_theme_options = {
   'github_user': 'aleph2c',
   'github_repo': 'miros',
   'show_powered_by' : False,
-  'fixed_sidebar' : True,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
