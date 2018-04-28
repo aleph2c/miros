@@ -23,35 +23,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <p>There will be situations where you want to post a kind of artificial event into
-a queue which won’t immediately be acted upon by your startchart.  It is an
-<cite>artificial</cite> event, because your chart is making it up, it isn’t being given to
-it by the outside world.  It is a way for your chart to build up a kind of
-processing pressure that can be relieved when you have the cycles to work on
-things.</p>
-<p>This is a two stage process, one, deferring the event, and two, recalling the
-event.  It is called a deferment of an event because we are holding off our
-reaction to it.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># code to place in the state that is deferring the event:</span>
-<span class="n">chart</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">signal_that_is_deferred</span><span class="p">)</span>
-
-<span class="c1"># code to place in the state where you would like the event reposted into</span>
-<span class="c1"># the chart&#39;s first in first out queue</span>
-<span class="n">chart</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span> <span class="c1"># posts our deferred event to the chart.</span>
-</pre></div>
-</div>
-
-
-          </div>
-        </div>
-      </div>
+  <div class="document">
+    
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
   <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
@@ -83,8 +56,34 @@ reaction to it.</p>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>There will be situations where you want to post a kind of artificial event into
+a queue which won’t immediately be acted upon by your startchart.  It is an
+<cite>artificial</cite> event, because your chart is making it up, it isn’t being given to
+it by the outside world.  It is a way for your chart to build up a kind of
+processing pressure that can be relieved when you have the cycles to work on
+things.</p>
+<p>This is a two stage process, one, deferring the event, and two, recalling the
+event.  It is called a deferment of an event because we are holding off our
+reaction to it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># code to place in the state that is deferring the event:</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">signal_that_is_deferred</span><span class="p">)</span>
+
+<span class="c1"># code to place in the state where you would like the event reposted into</span>
+<span class="c1"># the chart&#39;s first in first out queue</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span> <span class="c1"># posts our deferred event to the chart.</span>
+</pre></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
     <div class="footer">
       &copy;2018, Scott Volk.
       

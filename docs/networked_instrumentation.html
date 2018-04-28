@@ -25,9 +25,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head><body>
-  
-
-    <div class="document">
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
+  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
+</a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Spy and Trace Across a Network</a><ul>
+<li><a class="reference internal" href="#context">Context</a></li>
+<li><a class="reference internal" href="#getting-the-required-libraries">Getting the Required Libraries</a></li>
+<li><a class="reference internal" href="#setting-up-and-network-and-messaging">Setting Up and Network and Messaging</a></li>
+<li><a class="reference internal" href="#example-design-specification">Example Design Specification</a></li>
+<li><a class="reference internal" href="#the-producer-design">The Producer Design</a><ul>
+<li><a class="reference internal" href="#making-a-class-that-can-send-information-on-the-network">Making a Class that can Send Information on the Network</a></li>
+<li><a class="reference internal" href="#connect-the-output-of-our-spy-and-trace-logs-to-the-network">Connect the output of our Spy and Trace Logs to the Network</a></li>
+<li><a class="reference internal" href="#create-the-statechart-s-hsm">Create the Statechart’s HSM</a></li>
+<li><a class="reference internal" href="#have-our-statechart-react-to-some-events">Have our statechart React to some Events</a></li>
+<li><a class="reference internal" href="#close-the-connection">Close the Connection</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-consumer-design">The Consumer Design</a><ul>
+<li><a class="reference internal" href="#import-the-required-libraries">Import the Required Libraries</a></li>
+<li><a class="reference internal" href="#create-a-class-and-a-drawing-in-its-docstring">Create a Class and a Drawing in its Docstring</a></li>
+<li><a class="reference internal" href="#add-the-rabbitmq-boiler-plate-code-and-ability-to-get-ip">Add the RabbitMq Boiler Plate Code and Ability to get IP</a></li>
+<li><a class="reference internal" href="#add-a-shutdown-count-and-a-foreignhsm-object">Add a Shutdown Count and a ForeignHsm Object</a></li>
+<li><a class="reference internal" href="#link-our-messages-to-callback-functions">Link our Messages to Callback Functions</a></li>
+<li><a class="reference internal" href="#decrypt-our-messages">Decrypt our Messages</a></li>
+<li><a class="reference internal" href="#turn-off-the-network-and-shutdown-the-program">Turn off the Network and Shutdown the Program</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="examples.html">Examples</a><ul>
+      <li>Previous: <a href="setting_up_rabbit_mq.html" title="previous chapter">Setting Up RabbitMQ</a></li>
+      <li>Next: <a href="i_mongol_example.html" title="next chapter">Mongol Horse Archer</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/networked_instrumentation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
@@ -2030,72 +2093,8 @@ within another.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
-  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
-</a></p>
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Spy and Trace Across a Network</a><ul>
-<li><a class="reference internal" href="#context">Context</a></li>
-<li><a class="reference internal" href="#getting-the-required-libraries">Getting the Required Libraries</a></li>
-<li><a class="reference internal" href="#setting-up-and-network-and-messaging">Setting Up and Network and Messaging</a></li>
-<li><a class="reference internal" href="#example-design-specification">Example Design Specification</a></li>
-<li><a class="reference internal" href="#the-producer-design">The Producer Design</a><ul>
-<li><a class="reference internal" href="#making-a-class-that-can-send-information-on-the-network">Making a Class that can Send Information on the Network</a></li>
-<li><a class="reference internal" href="#connect-the-output-of-our-spy-and-trace-logs-to-the-network">Connect the output of our Spy and Trace Logs to the Network</a></li>
-<li><a class="reference internal" href="#create-the-statechart-s-hsm">Create the Statechart’s HSM</a></li>
-<li><a class="reference internal" href="#have-our-statechart-react-to-some-events">Have our statechart React to some Events</a></li>
-<li><a class="reference internal" href="#close-the-connection">Close the Connection</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#the-consumer-design">The Consumer Design</a><ul>
-<li><a class="reference internal" href="#import-the-required-libraries">Import the Required Libraries</a></li>
-<li><a class="reference internal" href="#create-a-class-and-a-drawing-in-its-docstring">Create a Class and a Drawing in its Docstring</a></li>
-<li><a class="reference internal" href="#add-the-rabbitmq-boiler-plate-code-and-ability-to-get-ip">Add the RabbitMq Boiler Plate Code and Ability to get IP</a></li>
-<li><a class="reference internal" href="#add-a-shutdown-count-and-a-foreignhsm-object">Add a Shutdown Count and a ForeignHsm Object</a></li>
-<li><a class="reference internal" href="#link-our-messages-to-callback-functions">Link our Messages to Callback Functions</a></li>
-<li><a class="reference internal" href="#decrypt-our-messages">Decrypt our Messages</a></li>
-<li><a class="reference internal" href="#turn-off-the-network-and-shutdown-the-program">Turn off the Network and Shutdown the Program</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="examples.html">Examples</a><ul>
-      <li>Previous: <a href="setting_up_rabbit_mq.html" title="previous chapter">Setting Up RabbitMQ</a></li>
-      <li>Next: <a href="i_mongol_example.html" title="next chapter">Mongol Horse Archer</a></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/networked_instrumentation.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
+    <div class="clearer"></div>
+  </div>
     <div class="footer">
       &copy;2018, Scott Volk.
       
