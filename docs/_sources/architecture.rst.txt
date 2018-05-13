@@ -3,7 +3,7 @@
 Architecture
 ============
 
-How the miros library is structured.
+How the miros library is structured:
 
 .. toctree::
    :maxdepth: 2
