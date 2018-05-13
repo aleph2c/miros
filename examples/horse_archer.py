@@ -1,8 +1,8 @@
 import time
 import random
-from miros.hsm import pp
-from miros.activeobject import Factory
-from miros.event import signals, Event, return_status
+from miros import pp
+from miros import Factory
+from miros import signals, Event, return_status
 
 class HorseArcher(Factory):
 
