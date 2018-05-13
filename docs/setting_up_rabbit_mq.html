@@ -4,12 +4,20 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Setting Up RabbitMQ &#8212; miros 2.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -24,7 +32,8 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head><body>
+  </head>
+  <body>
   
 
     <div class="document">
@@ -38,7 +47,7 @@
 on top of the Erlang programming language which allows you to send messages
 across the Internet, or just to different processes running on your machine.</p>
 <p>Even though it is written in Erlang, RabbitMQ supports many different
-programming languages, including Python.  It does this with the <code class="docutils literal notranslate"><span class="pre">pika</span></code>
+programming languages, including Python.  It does this with the <code class="docutils literal"><span class="pre">pika</span></code>
 library.</p>
 <p>Bernhard Wenzel provides an excellent introduction to RabbitMQ here:</p>
 <center>
@@ -46,13 +55,13 @@ library.</p>
 </center><p>I found the installation documentation on the RabbitMQ website to be mostly
 illegible to me as a new user, so I wrote this guide to save you the pain which
 I went through.</p>
-<p>: note:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Most</span> <span class="n">of</span> <span class="n">the</span> <span class="n">documentation</span> <span class="n">on</span> <span class="n">the</span> <span class="n">RabbitMq</span> <span class="n">website</span> <span class="ow">is</span> <span class="n">illegible</span> <span class="p">(</span><span class="k">except</span> <span class="n">their</span>
-<span class="n">tutorials</span> <span class="n">section</span><span class="p">)</span><span class="o">.</span>  <span class="n">There</span> <span class="n">are</span> <span class="n">a</span> <span class="n">lot</span> <span class="n">of</span> <span class="n">words</span> <span class="n">written</span> <span class="n">but</span> <span class="n">think</span> <span class="n">of</span> <span class="n">their</span>
-<span class="n">documents</span> <span class="k">as</span> <span class="n">a</span> <span class="n">collection</span> <span class="n">of</span> <span class="nb">open</span> <span class="n">secrets</span><span class="p">;</span> <span class="n">they</span> <span class="n">are</span> <span class="n">a</span> <span class="n">consulting</span> <span class="n">company</span> <span class="n">after</span>
-<span class="nb">all</span><span class="o">.</span> <span class="p">(</span><span class="n">their</span> <span class="n">docs</span> <span class="n">remind</span> <span class="n">me</span> <span class="n">of</span> <span class="n">the</span> <span class="n">Noam</span> <span class="n">Chomsky</span> <span class="n">bot</span> <span class="n">that</span> <span class="n">can</span> <span class="n">write</span> <span class="n">you</span> <span class="n">pages</span>
-<span class="ow">and</span> <span class="n">pages</span> <span class="n">of</span> <span class="n">gibberish</span><span class="p">)</span><span class="o">.</span>
-</pre></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Most of the documentation on the RabbitMq website is illegible (except their
+tutorials section).  There are a lot of words written but think of their
+documents as a collection of open secrets; they are a consulting company after
+all. (their docs remind me of the Noam Chomsky bot that can write you pages
+and pages of gibberish).</p>
 </div>
 <div class="section" id="installing-on-linux-with-ansible">
 <span id="setting-up-rabbit-mq-installing-on-linux-with-ansible"></span><h2>Installing On Linux with Ansible<a class="headerlink" href="#installing-on-linux-with-ansible" title="Permalink to this headline">¶</a></h2>
@@ -64,69 +73,69 @@ reasons; it turns your program installation into source code that you can keep
 under revision control, and it is scalable; with minimal effort, you can deploy
 things onto multiple machines.</p>
 <p>To install Ansible:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">ansible</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">ansible</span>
 </pre></div>
 </div>
 <p>Now if you don’t know already, figure out what your hostname is, by typing:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">hostname</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">hostname</span>
 </pre></div>
 </div>
 <p>When I type this on the raspberry pi that I tested this procedure with, I see it’s
-hostname is <code class="docutils literal notranslate"><span class="pre">scotty</span></code>.  In the following examples replace <code class="docutils literal notranslate"><span class="pre">scotty</span></code> with your
+hostname is <code class="docutils literal"><span class="pre">scotty</span></code>.  In the following examples replace <code class="docutils literal"><span class="pre">scotty</span></code> with your
 hostname.</p>
 <p>Now you will need to change the host files for Ansible.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">pico</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ansible</span><span class="o">/</span><span class="n">hosts</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">pico</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ansible</span><span class="o">/</span><span class="n">hosts</span>
 </pre></div>
 </div>
 <p>Now add the following:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">scotty</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">scotty</span><span class="p">]</span>
 <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span>
 </pre></div>
 </div>
 <p>Save (write-out) and exit the file.  What I have done is to link my hostname,
-<code class="docutils literal notranslate"><span class="pre">scotty</span></code> to my IP address.  127.0.0.1 is always the IP of your local machine.
-By writing this into the <code class="docutils literal notranslate"><span class="pre">/etc/ansible/hosts</span></code> file I am telling Ansible that I
-want to do a deployment to <em>this</em> machine when I reference <code class="docutils literal notranslate"><span class="pre">scotty</span></code> in the
+<code class="docutils literal"><span class="pre">scotty</span></code> to my IP address.  127.0.0.1 is always the IP of your local machine.
+By writing this into the <code class="docutils literal"><span class="pre">/etc/ansible/hosts</span></code> file I am telling Ansible that I
+want to do a deployment to <em>this</em> machine when I reference <code class="docutils literal"><span class="pre">scotty</span></code> in the
 Ansible file (which we will talk about shortly).</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">If you want to have Ansible deploy RabbitMQ to other IP addresses, you can add
-them below the 127.0.0.1 address in the <code class="docutils literal notranslate"><span class="pre">/etc/ansible/hosts</span></code> file.  In this
+them below the 127.0.0.1 address in the <code class="docutils literal"><span class="pre">/etc/ansible/hosts</span></code> file.  In this
 way you can have rabbitMq install everywhere you need it, all at once.</p>
 </div>
 <p>Ansible does its deployments using ssh.  So to use Ansible we have to setup ssh
 for our computer.</p>
 <p>To do this, we generate a public and private key, then concatenate our public
-key into our <code class="docutils literal notranslate"><span class="pre">authorized_keys</span></code>.  If you don’t have a <code class="docutils literal notranslate"><span class="pre">id_rsa</span></code> or a
-<code class="docutils literal notranslate"><span class="pre">id_rsa.pub</span></code> in your <code class="docutils literal notranslate"><span class="pre">~/.ssh/</span></code> directory, then you need to make them.  To do
+key into our <code class="docutils literal"><span class="pre">authorized_keys</span></code>.  If you don’t have a <code class="docutils literal"><span class="pre">id_rsa</span></code> or a
+<code class="docutils literal"><span class="pre">id_rsa.pub</span></code> in your <code class="docutils literal"><span class="pre">~/.ssh/</span></code> directory, then you need to make them.  To do
 this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">mkdir</span> <span class="o">~/.</span><span class="n">ssh</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">mkdir</span> <span class="o">~/.</span><span class="n">ssh</span>
 <span class="o">&gt;</span> <span class="n">cd</span> <span class="o">~/.</span><span class="n">ssh</span>
 <span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">ssh</span><span class="o">-</span><span class="n">keygen</span>
 </pre></div>
 </div>
 <p>When you see an option to enter a passphrase, just hit enter.</p>
 <p>Now that you have a public and private key, you want to concatenate your
-<code class="docutils literal notranslate"><span class="pre">authorized_keys</span></code> file with your public key:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">cat</span> <span class="s1">&#39;~/.ssh/id_rsa.pub&#39;</span> <span class="o">&gt;&gt;</span> <span class="s1">&#39;~/.ssh/authorized_keys&#39;</span>
+<code class="docutils literal"><span class="pre">authorized_keys</span></code> file with your public key:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">cat</span> <span class="s1">&#39;~/.ssh/id_rsa.pub&#39;</span> <span class="o">&gt;&gt;</span> <span class="s1">&#39;~/.ssh/authorized_keys&#39;</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>If you have included other IP addresses in your ansible host file, you will
 need to place your public key onto these servers as well, to do this:</p>
-<div class="last highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">cat</span> <span class="o">~/.</span><span class="n">ssh</span><span class="o">/</span><span class="n">id_rsa</span><span class="o">.</span><span class="n">pub</span> <span class="o">|</span> \
+<div class="last highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">cat</span> <span class="o">~/.</span><span class="n">ssh</span><span class="o">/</span><span class="n">id_rsa</span><span class="o">.</span><span class="n">pub</span> <span class="o">|</span> \
   <span class="n">ssh</span> <span class="n">user</span><span class="nd">@hostname</span> <span class="s1">&#39;cat &gt;&gt; .ssh/authorized_keys&#39;</span>
 </pre></div>
 </div>
 </div>
 <p>To test that this works, I type the following and confirm that I can login
 using ssh:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>&gt; ssh $USER@scotty
+<div class="highlight-python"><div class="highlight"><pre><span></span>&gt; ssh $USER@scotty
 </pre></div>
 </div>
 <p>If this command succeeds, you will log into another version of your shell.</p>
-<p>To exit this connection, just type <code class="docutils literal notranslate"><span class="pre">exit</span></code>.</p>
+<p>To exit this connection, just type <code class="docutils literal"><span class="pre">exit</span></code>.</p>
 <p>Now that I can login to this computer using ssh, Ansible can perform automatic
 deployments for me.</p>
 <p>Ansible uses a set of <a class="reference internal" href="glossary.html#term-yaml"><span class="xref std std-term">yml</span></a> files to hold instructions on how to deploy
@@ -169,21 +178,21 @@ be used by Ansible:</p>
 </tbody>
 </table>
 <p>Copy the above files into a directory on your Linux machine.</p>
-<p>The only thing you should change is the <code class="docutils literal notranslate"><span class="pre">hosts</span></code> (which is set to scotty), the
-<code class="docutils literal notranslate"><span class="pre">rabbit_name</span></code> (bob), <code class="docutils literal notranslate"><span class="pre">rabbit_password</span></code> (dobbs) and the <code class="docutils literal notranslate"><span class="pre">guest_password</span></code>
+<p>The only thing you should change is the <code class="docutils literal"><span class="pre">hosts</span></code> (which is set to scotty), the
+<code class="docutils literal"><span class="pre">rabbit_name</span></code> (bob), <code class="docutils literal"><span class="pre">rabbit_password</span></code> (dobbs) and the <code class="docutils literal"><span class="pre">guest_password</span></code>
 (rabbit123) to whatever you want.  These variables are found in the
 <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbit_install.yml">rabbit_install.yml</a> file.</p>
 <p>Now to setup your RabbitMQ server, type:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">K</span> <span class="n">rabbit_install</span><span class="o">.</span><span class="n">yml</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">K</span> <span class="n">rabbit_install</span><span class="o">.</span><span class="n">yml</span>
 </pre></div>
 </div>
-<p>This command will prompt you for your <code class="docutils literal notranslate"><span class="pre">sudo</span></code> password, enter it and the
+<p>This command will prompt you for your <code class="docutils literal"><span class="pre">sudo</span></code> password, enter it and the
 rabbitmq server should be setup.</p>
 <p>To see if your server is running, you can open the management software that
-comes with it via their web app, by typing <code class="docutils literal notranslate"><span class="pre">localhost:15672</span></code> and log in with your
+comes with it via their web app, by typing <code class="docutils literal"><span class="pre">localhost:15672</span></code> and log in with your
 user name and password, if you didn’t change this in the
-<a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbit_install.yml">rabbit_install.yml</a> file, your user name will be <code class="docutils literal notranslate"><span class="pre">bob</span></code> and the password will
-be <code class="docutils literal notranslate"><span class="pre">dobbs</span></code>:</p>
+<a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbit_install.yml">rabbit_install.yml</a> file, your user name will be <code class="docutils literal"><span class="pre">bob</span></code> and the password will
+be <code class="docutils literal"><span class="pre">dobbs</span></code>:</p>
 <img alt="_images/RabbitMQ.PNG" class="align-center" src="_images/RabbitMQ.PNG" />
 <p>If you have come this far you have a working RabbitMQ message broker running on
 your Linux system.</p>
@@ -314,14 +323,12 @@ messages are not encrypted.</p>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

@@ -1,32 +1,29 @@
-[ Chart: Hulagu.73f74 ] (?)
-             top                        advance                  circle_and_fire                 skirmish                  feigned_retreat                  marshal           
-              +--------start_at()--------->|                            |                            |                            |                            |
-              |            (?)             |                            |                            |                            |                            |
-              |                            +-Close_Enough_For_Circle()->|                            |                            |                            |
-              |                            |            (?)             |                            |                            |                            |
-              |                            |                            +----Skirmish_War_Cry()----->|                            |                            |
-              |                            |                            |            (?)             |                            |                            |
-              |                            |                            |                            +--Other_Retreat_War_Cry()-->|                            |
-              |                            |                            |                            |            (?)             |                            |
-              |                            |                            |                            |                            +------Out_Of_Arrows()------>|
-              |                            |                            |                            |                            |            (?)             |
+  [Statechart: 04ccc_ao] (?)
+        top           outer          inner
+         +--start_at()->|              |
+         |     (?)      |              |
+         |              +--to_inner()->|
+         |              |     (?)      |
+         |              +<-to_outer()--|
+         |              |     (?)      |
+         |              +--to_inner()->|
+         |              |     (?)      |
+         |              +<-to_outer()--|
+         |              |     (?)      |
+         |              +--to_inner()->|
+         |              |     (?)      |
 
-[ Chart: Ihbarhasvad.22197 ] (?)
-             top                        advance                  circle_and_fire                 skirmish                  feigned_retreat       
-              +--------start_at()--------->|                            |                            |                            |
-              |            (?)             |                            |                            |                            |
-              |                            +-Close_Enough_For_Circle()->|                            |                            |
-              |                            |            (?)             |                            |                            |
-              |                            |                            +-Other_Skirmish_War_Cry()-->|                            |
-              |                            |                            |            (?)             |                            |
-              |                            |                            |                            +-----Retreat_War_Cry()----->|
-              |                            |                            |                            |            (?)             |
-
-[ Chart: Gandbold.43065 ] (?)
-           advance                  circle_and_fire                 skirmish                  feigned_retreat       
-              +-Close_Enough_For_Circle()->|                            |                            |
-              |            (?)             |                            |                            |
-              |                            +-Other_Skirmish_War_Cry()-->|                            |
-              |                            |            (?)             |                            |
-              |                            |                            +--Other_Retreat_War_Cry()-->|
-              |                            |                            |            (?)             |
+  [Statechart: 2771f_ao] (?)
+           top                 outer                inner
+            +-----start_at()---->|                    |
+            |        (?)         |                    |
+            |                    +--other_to_inner()->|
+            |                    |        (?)         |
+            |                    +<-other_to_outer()--|
+            |                    |        (?)         |
+            |                    +-----to_inner()---->|
+            |                    |        (?)         |
+            |                    +<-other_to_outer()--|
+            |                    |        (?)         |
+            |                    +--other_to_inner()->|
+            |                    |        (?)         |

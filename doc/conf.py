@@ -20,9 +20,7 @@
 import os
 import sys
 import datetime
-#import sphinx_bootstrap_theme
-#sys.path.insert(0, os.path.abspath('C:\\github\\hsm\\miros'))
-sys.path.insert(0, os.path.abspath('C:\\github\\hsm\\miros'))
+sys.path.insert(0, os.path.abspath('./../miros'))
 
 sys.path.append(os.path.abspath('..\..'))
 sys.path.append(os.path.abspath('..\.'))
@@ -37,8 +35,7 @@ sys.path.append(os.path.abspath('.'))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc',
-    'sphinx.ext.doctest']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -101,7 +98,7 @@ html_favicon = 'favicon.ico'
 html_theme_options = {
   'github_user': 'aleph2c',
   'github_repo': 'miros',
-  'show_powered_by' : False,
+  'show_powered_by': False,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

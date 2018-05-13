@@ -22,7 +22,7 @@ I found the installation documentation on the RabbitMQ website to be mostly
 illegible to me as a new user, so I wrote this guide to save you the pain which
 I went through.
 
-: note::
+.. note::
 
   Most of the documentation on the RabbitMq website is illegible (except their
   tutorials section).  There are a lot of words written but think of their

@@ -20,9 +20,19 @@ class Handler(watchdog.events.PatternMatchingEventHandler):
 
   def on_modified(self, event):
     if event.src_path.lower().endswith('.rst'):
-      #try:
       # remove the old artifacts from this directory
       cmd = 'make clean'
+      p = subprocess.Popen(cmd,
+                      stdout=subprocess.PIPE,
+                      stdin=subprocess.PIPE,
+                      shell=True)
+      output = p.communicate()
+      p.wait()
+      print("{}".format(cmd))
+      print(output)
+
+      # generate the api docs
+      cmd = 'sphinx-apidoc -f -o ./../miros .'
       p = subprocess.Popen(cmd,
                       stdout=subprocess.PIPE,
                       stdin=subprocess.PIPE,
@@ -42,19 +52,10 @@ class Handler(watchdog.events.PatternMatchingEventHandler):
       p.wait()
       print("{}".format(cmd))
       print(output)
-      #try:
       shutil.rmtree('./../docs')
-      #except:
-      #  print("could not remove old docs directory")
 
-      #try:
       shutil.copytree('./_build/html/', './../docs')
       open('./../docs/.nojekyll', 'a').close()
-      #except:
-      #  print("could not copy build results into the docs directory")
-
-      #except:
-      #  print("Screw you human! I'm not going to change anything")
 
   on_created = on_modified
 
