@@ -200,9 +200,9 @@ First you would describe state's ``c``, ``c1`` and ``c2``:
 
 .. code-block:: python
 
-  from miros.hsm import spy_on
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, return_status, Event
+  from miros import spy_on
+  from miros import ActiveObject
+  from miros import signals, return_status, Event
 
   def c(self, e):
     status = return_status.UNHANDLED
@@ -272,8 +272,8 @@ For a flat state:
 
 .. code-block:: python
 
-  from miros.hsm import spy_on
-  from miros.event import signals, return_status, Event
+  from miros import spy_on
+  from miros import signals, return_status, Event
 
   @spy_on
   def <your_state_method_name>(self, e):
@@ -819,9 +819,9 @@ Import the correct items from the miros library:
 
 .. code-block:: python
 
-  from miros.hsm import state_method_template
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
+  from miros import state_method_template
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
 
 .. _recipes-template-2:
 
@@ -928,8 +928,8 @@ Import the correct items from the miros library:
 
 .. code-block:: python
 
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import Factory
+  from miros import signals, Event, return_status
 
 .. _recipes-factory-2:
 
@@ -1017,8 +1017,8 @@ reacted to, then removed from memory.
 
 .. code-block:: python
 
-  from miros.event import Event
-  from miros.event import signals
+  from miros import Event
+  from miros import signals
 
   event_1 = Event(signal="name_of_signal")
   # or 
@@ -1041,8 +1041,8 @@ have to explicitly define them.
 .. code-block:: python
   :emphasize-lines: 6
 
-  from miros.event import Event
-  from miros.event import signals
+  from miros import Event
+  from miros import signals
   
   # signal named "name_of_signaL" invented
   # here and given a unique number
@@ -1519,9 +1519,9 @@ Let's first look how to flatten a template state method:
 .. code-block:: python
   :emphasize-lines: 20
 
-  from miros.hsm import state_method_template
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
+  from miros import state_method_template
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
 
   def trans_to_fc1(chart, e):
     return chart.trans(fc1)
@@ -1563,9 +1563,9 @@ The same process applies for a state method built using the ``Factory``:
 .. code-block:: python
   :emphasize-lines: 16
   
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
-  from miros.activeobject import Factory
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
+  from miros import Factory
 
   # create the specific behavior we want in our state chart
   def trans_to_fc1(chart, e):

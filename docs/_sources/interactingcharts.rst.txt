@@ -200,8 +200,8 @@ Let's begin by importing the required libraries:
 .. code-block:: python
   :emphasize-lines: 1
 
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import Factory
+  from miros import signals, Event, return_status
   import time
 
 We will build up these charts using a
@@ -212,8 +212,8 @@ picture:
 .. code-block:: python
   :emphasize-lines: 5-17
 
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import Factory
+  from miros import signals, Event, return_status
   import time
 
   # 
@@ -237,8 +237,8 @@ placed on the diagram as we build it out:
   :emphasize-lines: 19-20, 22-23, 25-26, 28-31
   :linenos:
 
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import Factory
+  from miros import signals, Event, return_status
   import time
 
   #
@@ -281,8 +281,8 @@ Now let's use the factory and build the ``b_chart``.
 .. code-block:: python
   :emphasize-lines: 33-36, 38-41, 43-44, 46-48
 
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import Factory
+  from miros import signals, Event, return_status
   import time
 
   # 
@@ -336,8 +336,8 @@ Now that we have built the ``b_chart`` let's build out the ``c_chart``:
   :emphasize-lines: 51-101
   :linenos:
 
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import Factory
+  from miros import signals, Event, return_status
   import time
 
   #
@@ -464,8 +464,8 @@ Now that the charts are written, let's turn them on and see what happens:
 .. code-block:: python
   :emphasize-lines: 101-104, 106-110
 
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import Factory
+  from miros import signals, Event, return_status
   import time
 
   #

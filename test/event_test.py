@@ -3,8 +3,8 @@ from miros.event import OrderedDictWithParams
 from miros.event import ReturnStatus
 from miros.event import SignalSource
 from miros.event import Signal
-from miros.event import signals
-from miros.event import Event
+from miros import signals
+from miros import Event
 
 
 @pytest.mark.event

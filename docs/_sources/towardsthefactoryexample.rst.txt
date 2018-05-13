@@ -95,9 +95,9 @@ and ``c2`` and an active object.
   :emphasize-lines: 42
   
   import time
-  from miros.hsm import spy_on, pp
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
+  from miros import spy_on, pp
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
 
 
   @spy_on
@@ -365,7 +365,7 @@ it with some instrumentation.
 
 .. code-block:: python
 
-  from miros.hsm import spy_on
+  from miros import spy_on
 
   def state_method_template(name):
 
@@ -485,9 +485,9 @@ Here is how you could implement this statechart with the ``Factory`` class:
   :emphasize-lines: 15
   :linenos:
 
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
-  from miros.activeobject import Factory
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
+  from miros import Factory
 
   # create the specific behavior we want in our state chart
   def trans_to_fc(chart, e):

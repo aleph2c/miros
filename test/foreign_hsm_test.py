@@ -1,9 +1,9 @@
 import time
 import pytest
-from miros.hsm import spy_on, pp
-from miros.hsm import stripped
-from miros.activeobject import ActiveObject
-from miros.event import signals, Event, return_status
+from miros import spy_on, pp
+from miros import stripped
+from miros import ActiveObject
+from miros import signals, Event, return_status
 from miros.foreign import ForeignHsm
 
 @pytest.mark.fhsm

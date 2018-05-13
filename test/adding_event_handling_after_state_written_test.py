@@ -2,9 +2,9 @@ import time
 import pytest
 
 from miros.hsm import spy_on, pp, state_method_template
-from miros.activeobject import ActiveObject
-from miros.event import signals, Event, return_status
-from miros.activeobject import Factory as ActiveObjectFactory
+from miros import ActiveObject
+from miros import signals, Event, return_status
+from miros import Factory as ActiveObjectFactory
 from copy import copy
 
 

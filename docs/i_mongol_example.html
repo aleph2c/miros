@@ -699,9 +699,9 @@ So I will add the ability to compress time in Gandbold’s universe, this way we
 can speed him up.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">pp</span>
-<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">Factory</span>
-<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">pp</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
 
 <span class="k">class</span> <span class="nc">HorseArcher</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
 
@@ -1290,7 +1290,7 @@ state machine using the orthogonal component pattern.</p>
 <p>I’ll write the empathy state machine using a flat method technique then have ten
 different empathy-objects, derived from the OtherHorseArcher class, link to it
 and use it as a behavioral map.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">HsmWithQueues</span><span class="p">,</span> <span class="n">spy_on</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">HsmWithQueues</span><span class="p">,</span> <span class="n">spy_on</span>
 
 <span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">empathy</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -1396,10 +1396,10 @@ being called within the code that we wrote before.</p>
 <p>To skip to the other side of this code listing, click <a class="reference internal" href="#other-size-of-empathy-listing"><span class="std std-ref">here</span></a>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">pp</span>
-<span class="hll"><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">HsmWithQueues</span><span class="p">,</span> <span class="n">spy_on</span>
-</span><span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">Factory</span>
-<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">pp</span>
+<span class="hll"><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">HsmWithQueues</span><span class="p">,</span> <span class="n">spy_on</span>
+</span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
 
 
 <span class="hll"><span class="sd">&#39;&#39;&#39;</span>
@@ -2436,7 +2436,7 @@ encrypted channel</em>.</p>
 <p>Now let’s show the serialization technique, it is also implemented using a
 decorator:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">miros.event</span> <span class="nn">import</span> <span class="nn">Event</span>
+<span class="kn">import</span> <span class="nn">miros</span> <span class="nn">import</span> <span class="nn">Event</span>
 
 <span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
   <span class="c1"># ..</span>
@@ -2491,7 +2491,7 @@ problem, we just call the Event <code class="docutils literal"><span class="pre"
 <p>How do we turn it back to an object after it has been decrypted?  Well, we call
 the <code class="docutils literal"><span class="pre">deserialize</span></code> decorator.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">miros.event</span> <span class="nn">import</span> <span class="nn">Event</span>
+<span class="kn">import</span> <span class="nn">miros</span> <span class="nn">import</span> <span class="nn">Event</span>
 
 <span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
   <span class="c1"># ..</span>
@@ -2650,7 +2650,7 @@ communicate with each other, not the debugging network.</p>
  9
 10
 11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mesh_network</span> <span class="kn">import</span> <span class="n">MeshTransmitter</span>
-<span class="kn">from</span> <span class="nn">miros.events</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">signals</span>
 
 <span class="c1"># Assume confirmed connected IPs are: [192.168.0.102, 192.168.0.103]</span>
 <span class="c1"># The actual routing keys for this transmission are:</span>
@@ -2705,7 +2705,7 @@ network.</p>
 17
 18</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">mesh_network</span> <span class="kn">import</span> <span class="n">MeshReceiver</span>
-<span class="kn">from</span> <span class="nn">miros.events</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">signals</span>
 
 <span class="k">def</span> <span class="nf">custom_rx_callback</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
   <span class="k">print</span><span class="p">(</span><span class="s2">&quot; [+] {}:{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">routing_key</span><span class="p">,</span> <span class="n">body</span><span class="p">))</span>
@@ -2826,7 +2826,7 @@ using our party line.</p>
 18
 19
 20</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mesh_network</span> <span class="kn">import</span> <span class="n">SnoopTransmitter</span>
-<span class="kn">from</span> <span class="nn">miros.events</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">signals</span>
 
 <span class="n">tx_instrument</span> <span class="o">=</span> <span class="n">SnoopTransmitter</span><span class="p">(</span>
  <span class="n">user</span><span class="o">=</span><span class="s1">&#39;bob&#39;</span><span class="p">,</span>

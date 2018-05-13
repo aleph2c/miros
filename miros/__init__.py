@@ -8,3 +8,5 @@ from miros.hsm import HsmWithQueues
 
 from miros.activeobject import ActiveObject
 from miros.activeobject import Factory
+from miros.hsm import stripped
+from miros.hsm import InstrumentedHsmEventProcessor

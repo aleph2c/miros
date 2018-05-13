@@ -107,9 +107,9 @@ signal name of BEHAVIOR_NAME to your statechart:
   :emphasize-lines: 10-13
 
   import time
-  from miros.hsm import spy_on, pp
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
+  from miros import spy_on, pp
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
 
   @spy_on
   def outer_state(chart, e):
@@ -172,9 +172,9 @@ object there.
   :linenos:
 
   import time
-  from miros.hsm import spy_on, pp
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
+  from miros import spy_on, pp
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
 
 
   @spy_on
@@ -241,9 +241,9 @@ inner_state then send it an event with the BEHAVIOR_NAME.
   :linenos:
 
   import time
-  from miros.hsm import spy_on, pp
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
+  from miros import spy_on, pp
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
 
   @spy_on
   def outer_state(chart, e):
@@ -350,9 +350,9 @@ specific responses in your inner states. Let's build out the above diagram:
   :emphasize-lines: 6-8, 10-12, 14-17
 
   import time
-  from miros.hsm import pp
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import pp
+  from miros import Factory
+  from miros import signals, Event, return_status
 
   def process_a_generic(chart, e):
     chart.scribble('processing a generic')
@@ -514,9 +514,9 @@ Let's see what happens when we try to make this broken statechart
   :emphasize-lines: 14,15,27,28
 
   import time
-  from miros.hsm import pp
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import pp
+  from miros import Factory
+  from miros import signals, Event, return_status
 
   def polling_time_out(chart, e):
     return chart.trans(polling)
@@ -679,9 +679,9 @@ events<Artificial Event>`:
   :emphasize-lines: 8,9,26,27,53,60
 
   import time
-  from miros.hsm import pp
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import pp
+  from miros import Factory
+  from miros import signals, Event, return_status
 
   def polling_time_out(chart, e):
     chart.scribble("polling")
@@ -875,9 +875,9 @@ Now, let's write the code:
 .. code-block:: python
 
   import time
-  from miros.hsm import pp
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import pp
+  from miros import Factory
+  from miros import signals, Event, return_status
 
   def polling_time_out_hook(chart, e):
     '''generic TIME_OUT ultimate hook for all states,
@@ -1102,9 +1102,9 @@ Now let's redraw the diagram and then write it's code:
   import random
   import time
   from datetime import datetime
-  from miros.hsm import pp
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import pp
+  from miros import Factory
+  from miros import signals, Event, return_status
 
   def processing_entry(chart, e):
     chart.defer(e)
@@ -2556,9 +2556,9 @@ So let's build up this design and test it.
 .. code-block:: python
   
   import time
-  from miros.hsm import pp
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import pp
+  from miros import Factory
+  from miros import signals, Event, return_status
 
   # Create a ToasterOven class from Factory
   class ToasterOven(Factory):

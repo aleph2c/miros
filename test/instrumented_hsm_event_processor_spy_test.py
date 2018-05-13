@@ -1,6 +1,6 @@
 import pytest
-from miros.event import signals, Event, return_status
-from miros.hsm   import InstrumentedHsmEventProcessor, spy_on
+from miros import signals, Event, return_status
+from miros import InstrumentedHsmEventProcessor, spy_on
 import pprint
 
 

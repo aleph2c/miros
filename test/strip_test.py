@@ -1,5 +1,5 @@
 import pytest
-from miros.hsm import stripped
+from miros import stripped
 
 
 @pytest.mark.strip

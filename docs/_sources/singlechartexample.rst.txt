@@ -46,12 +46,12 @@ First we import some items from the miros library:
 
 .. code-block:: python
 
-  from miros.event import Event
-  from miros.event import signals
-  from miros.event import return_status
+  from miros import Event
+  from miros import signals
+  from miros import return_status
 
-  from miros.hsm import spy_on
-  from miros.activeobject import ActiveObject
+  from miros import spy_on
+  from miros import ActiveObject
 
 Now we write our state methods.  Each of these methods will represent a specific
 state in our diagram.

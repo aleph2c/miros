@@ -1,6 +1,6 @@
 import pytest
 from miros.activeobject import LockingDeque
-from miros.hsm import HsmWithQueues
+from miros import HsmWithQueues
 from threading import Thread, Event
 import time
 

@@ -3,10 +3,10 @@
 
   import time
   import random
-  from miros.hsm import pp
-  from miros.hsm import HsmWithQueues, spy_on
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import pp
+  from miros import HsmWithQueues, spy_on
+  from miros import Factory
+  from miros import signals, Event, return_status
 
 
   '''

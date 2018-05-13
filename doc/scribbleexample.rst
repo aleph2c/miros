@@ -194,9 +194,9 @@ Now I'll import the items I'll need to run my experiment:
   '''
 
   import time
-  from miros.hsm import spy_on, pp
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
+  from miros import spy_on, pp
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
 
 .. _scribbleexample-from-diagram-to-code,-third-pass:
 
@@ -223,9 +223,9 @@ Now I will frame in the state methods:
 
   '''
   import time
-  from miros.hsm import spy_on, pp
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
+  from miros import spy_on, pp
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
 
   @spy_on
   def s_state(chart, e)
@@ -273,9 +273,9 @@ methods:
 
   '''
   import time
-  from miros.hsm import spy_on, pp
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
+  from miros import spy_on, pp
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
 
   @spy_on
   def s_state(chart, e)
@@ -363,9 +363,9 @@ Then I add the hierarchy:
   '''
 
   import time
-  from miros.hsm import spy_on, pp
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
+  from miros import spy_on, pp
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
 
   @spy_on
   def s_state(chart, e):
@@ -459,9 +459,9 @@ Now I'll add management for the ``T`` event in state ``s1`` event and the
   '''
 
   import time
-  from miros.hsm import spy_on, pp
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
+  from miros import spy_on, pp
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
 
   @spy_on
   def s_state(chart, e):
@@ -560,9 +560,9 @@ seeing what happens:
   '''
 
   import time
-  from miros.hsm import spy_on, pp
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
+  from miros import spy_on, pp
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
 
   @spy_on
   def s_state(chart, e):
@@ -693,9 +693,9 @@ this will build this part of the picture:
   '''
 
   import time
-  from miros.hsm import spy_on, pp
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
+  from miros import spy_on, pp
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
 
 
   @spy_on
@@ -816,9 +816,9 @@ function to ``e_function`` to avoid a name collision:
   '''
 
   import time
-  from miros.hsm import spy_on, pp
-  from miros.activeobject import ActiveObject
-  from miros.event import signals, Event, return_status
+  from miros import spy_on, pp
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
 
 
   @spy_on

@@ -5,7 +5,7 @@ signals:
 
 .. code-block:: python
 
-  from miros.event import signals
+  from miros import signals
 
 The signals object is provided by a singleton of the SignalSource class, which
 is just an OrderedDictionary with a ``__getattr__`` method to make the syntax

@@ -855,9 +855,9 @@ can speed him up.
 
   import time
   import random
-  from miros.hsm import pp
-  from miros.activeobject import Factory
-  from miros.event import signals, Event, return_status
+  from miros import pp
+  from miros import Factory
+  from miros import signals, Event, return_status
 
   class HorseArcher(Factory):
 
@@ -1528,7 +1528,7 @@ and use it as a behavioral map.
 
 .. code-block:: python
 
-  from miros.hsm import HsmWithQueues, spy_on
+  from miros import HsmWithQueues, spy_on
   
   @spy_on
   def empathy(other, e):
@@ -2128,7 +2128,7 @@ decorator:
   :emphasize-lines: 35, 36, 38
 
   import pickle
-  import miros.event import Event
+  import miros import Event
 
   class Connection():
     # ..
@@ -2188,7 +2188,7 @@ the ``deserialize`` decorator.
   :emphasize-lines: 21,22,23
 
   import pickle
-  import miros.event import Event
+  import miros import Event
 
   class Connection():
     # ..
@@ -2372,7 +2372,7 @@ To build a standard mesh transmitter:
   :linenos:
 
   from mesh_network import MeshTransmitter
-  from miros.events import Event, signals
+  from miros import Event, signals
 
   # Assume confirmed connected IPs are: [192.168.0.102, 192.168.0.103]
   # The actual routing keys for this transmission are:
@@ -2418,7 +2418,7 @@ To build a standard mesh receiver:
 
   import time
   from mesh_network import MeshReceiver
-  from miros.events import Event, signals
+  from miros import Event, signals
 
   def custom_rx_callback(ch, method, properties, body):
     print(" [+] {}:{}".format(method.routing_key, body))
@@ -2542,7 +2542,7 @@ Let's build the instrumentation transmitter:
   :linenos:
 
   from mesh_network import SnoopTransmitter
-  from miros.events import Event, signals
+  from miros import Event, signals
 
   tx_instrument = SnoopTransmitter(
    user='bob',

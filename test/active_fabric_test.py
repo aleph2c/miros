@@ -1,5 +1,5 @@
 import pytest
-from miros.event import signals, Event
+from miros import signals, Event
 from miros.activeobject import ActiveFabric
 from collections import deque
 import time

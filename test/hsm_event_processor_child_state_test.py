@@ -2,8 +2,8 @@
 import pprint
 import pytest
 import traceback
-from miros.event import signals, Event, return_status
-from miros.hsm   import HsmEventProcessor
+from miros import signals, Event, return_status
+from miros.hsm import HsmEventProcessor
 
 
 def pp(item):

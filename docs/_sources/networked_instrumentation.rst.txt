@@ -536,7 +536,7 @@ To begin with we will import the required libraries:
   import pika
   import socket
   from miros.foreign import ForeignHsm
-  from miros.hsm import pp
+  from miros import pp
   from cryptography.fernet import Fernet
   from functools import wraps
 
@@ -562,7 +562,7 @@ string.
   import pika
   import socket
   from miros.foreign import ForeignHsm
-  from miros.hsm import pp
+  from miros import pp
   from cryptography.fernet import Fernet
   from functools import wraps
 
@@ -621,7 +621,7 @@ obtained from the get_ip static method of the LocalConsumer class.
   import pika
   import socket
   from miros.foreign import ForeignHsm
-  from miros.hsm import pp
+  from miros import pp
   from cryptography.fernet import Fernet
   from functools import wraps
 
@@ -721,7 +721,7 @@ statechart object.
   import pika
   import socket
   from miros.foreign import ForeignHsm
-  from miros.hsm import pp
+  from miros import pp
   from cryptography.fernet import Fernet
   from functools import wraps
 
@@ -821,7 +821,7 @@ information, like print it to the terminal of my windows box.
   import pika
   import socket
   from miros.foreign import ForeignHsm
-  from miros.hsm import pp
+  from miros import pp
   from cryptography.fernet import Fernet
   from functools import wraps
 
@@ -945,7 +945,7 @@ Finally, we will need to build an object of the class and run the code:
   import pika
   import socket
   from miros.foreign import ForeignHsm
-  from miros.hsm import pp
+  from miros import pp
   from cryptography.fernet import Fernet
   from functools import wraps
 
@@ -1084,7 +1084,7 @@ soon to quit.
   import pika
   import socket
   from miros.foreign import ForeignHsm
-  from miros.hsm import pp
+  from miros import pp
   from cryptography.fernet import Fernet
   from functools import wraps
 

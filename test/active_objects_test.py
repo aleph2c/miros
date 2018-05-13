@@ -2,9 +2,9 @@ import time
 import pytest
 import pprint
 
-from miros.hsm import spy_on
+from miros import spy_on
 from miros.activeobject import ActiveObject, ActiveFabric
-from miros.event import signals, Event, return_status
+from miros import signals, Event, return_status
 
 
 def pp(item):

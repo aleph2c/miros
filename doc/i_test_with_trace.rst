@@ -49,7 +49,7 @@ date timestamp.  We can get around this issue like this:
 .. code-block:: python
   :linenos:
 
-  from miros.hsm import stripped
+  from miros import stripped
 
   target = \
   '''[2017-11-05 21:31:56.098526] [tazor] e->start_at() top->arming

@@ -1,7 +1,7 @@
 import pytest
-from miros.hsm import spy_on
-from miros.event import signals, Event, return_status
-from miros.activeobject import ActiveObject
+from miros import spy_on
+from miros import signals, Event, return_status
+from miros import ActiveObject
 import pprint
 
 

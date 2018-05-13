@@ -1,7 +1,7 @@
 import pytest
 import traceback
-from miros.event import signals, return_status
-from miros.hsm   import HsmEventProcessor, HsmTopologyException
+from miros import signals, return_status
+from miros.hsm import HsmEventProcessor, HsmTopologyException
 import pprint
 
 

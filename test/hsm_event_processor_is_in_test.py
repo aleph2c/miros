@@ -1,7 +1,7 @@
 import pytest
 import traceback
-from miros.event import signals, return_status
-from miros.hsm   import HsmEventProcessor
+from miros import signals, return_status
+from miros.hsm import HsmEventProcessor
 import pprint
 
 

@@ -194,9 +194,9 @@ working code.</p>
 <a class="reference external image-reference" href="_static/eventprocessors.pdf"><div align="center" class="align-center"><img alt="_images/eventprocessors.svg" src="_images/eventprocessors.svg" /></div>
 </a>
 <p>First you would describe state’s <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">c1</span></code> and <code class="docutils literal"><span class="pre">c2</span></code>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span>
-<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
-<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">return_status</span><span class="p">,</span> <span class="n">Event</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">return_status</span><span class="p">,</span> <span class="n">Event</span>
 
 <span class="k">def</span> <span class="nf">c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
@@ -260,8 +260,8 @@ than one active object.</p>
 <div class="section" id="boiler-plate-state-method-code">
 <span id="recipes-boiler-plate-state-method-code"></span><h3>Boiler Plate State Method Code<a class="headerlink" href="#boiler-plate-state-method-code" title="Permalink to this headline">¶</a></h3>
 <p>For a flat state:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">spy_on</span>
-<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">return_status</span><span class="p">,</span> <span class="n">Event</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">return_status</span><span class="p">,</span> <span class="n">Event</span>
 
 <span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="o">&lt;</span><span class="n">your_state_method_name</span><span class="o">&gt;</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -830,9 +830,9 @@ if statement:</p>
 <a class="reference external image-reference" href="_static/factory2.pdf"><div align="center" class="align-center"><img alt="_images/factory2.svg" src="_images/factory2.svg" /></div>
 </a>
 <p id="recipes-template-1">Import the correct items from the miros library:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">state_method_template</span>
-<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
-<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">state_method_template</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
 </pre></div>
 </div>
 <p id="recipes-template-2">Create a set of states from the miros template:</p>
@@ -902,8 +902,8 @@ if statement:</p>
 <a class="reference external image-reference" href="_static/factory5.pdf"><div align="center" class="align-center"><img alt="_images/factory5.svg" src="_images/factory5.svg" /></div>
 </a>
 <p id="recipes-factory-1">Import the correct items from the miros library:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">Factory</span>
-<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
 </pre></div>
 </div>
 <p id="recipes-factory-2">Create the statechart’s event callback methods:</p>
@@ -960,8 +960,8 @@ signals.  Then turn it it into a method.</p>
 <span id="recipes-creating-an-event"></span><h3>Creating an Event<a class="headerlink" href="#creating-an-event" title="Permalink to this headline">¶</a></h3>
 <p>An event is something that will be passed into your statechart, it will be
 reacted to, then removed from memory.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">Event</span>
-<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
 
 <span class="n">event_1</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="s2">&quot;name_of_signal&quot;</span><span class="p">)</span>
 <span class="c1"># or</span>
@@ -979,8 +979,8 @@ event processor. (it is faster to compare two numbers than two strings)</p>
 <p>When you create a signal it will not be removed from memory until your program
 finishes.  They are created at the moment they are referenced, so you don’t
 have to explicitly define them.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">Event</span>
-<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
 
 <span class="c1"># signal named &quot;name_of_signaL&quot; invented</span>
 <span class="c1"># here and given a unique number</span>
@@ -1414,7 +1414,7 @@ decorator or if you have constructed your statechart with the Factory class.</p>
 <span id="recipes-seeing-what-signals-you-have-in-your-system"></span><h3>Seeing what Signals You Have In Your System<a class="headerlink" href="#seeing-what-signals-you-have-in-your-system" title="Permalink to this headline">¶</a></h3>
 <span class="target" id="recipes-seeing-your-signals"></span><p>A signal is the name that can be given to an event.  To get access to your
 signals:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
 </pre></div>
 </div>
 <p>The signals object is provided by a singleton of the SignalSource class, which
@@ -1687,9 +1687,9 @@ state method:</p>
 and you would like to see it’s code as if it where written by hand, use the
 <code class="docutils literal"><span class="pre">to_code</span></code> call.</p>
 <p>Let’s first look how to flatten a template state method:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">state_method_template</span>
-<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
-<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">state_method_template</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
 
 <span class="k">def</span> <span class="nf">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc1</span><span class="p">)</span>
@@ -1727,9 +1727,9 @@ and you would like to see it’s code as if it where written by hand, use the
 the active object.  You could copy this and drop it into your design for
 debugging purposes.</p>
 <p>The same process applies for a state method built using the <code class="docutils literal"><span class="pre">Factory</span></code>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
-<span class="kn">from</span> <span class="nn">miros.event</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
-<span class="kn">from</span> <span class="nn">miros.activeobject</span> <span class="kn">import</span> <span class="n">Factory</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
 
 <span class="c1"># create the specific behavior we want in our state chart</span>
 <span class="k">def</span> <span class="nf">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -1980,7 +1980,7 @@ date timestamp.  We can get around this issue like this:</p>
 10
 11
 12
-13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros.hsm</span> <span class="kn">import</span> <span class="n">stripped</span>
+13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">stripped</span>
 
 <span class="n">target</span> <span class="o">=</span> \
 <span class="sd">&#39;&#39;&#39;[2017-11-05 21:31:56.098526] [tazor] e-&gt;start_at() top-&gt;arming</span>

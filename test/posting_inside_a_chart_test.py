@@ -1,9 +1,9 @@
 import time
 import pytest
-from miros.hsm import spy_on, stripped, pp
-from miros.event import signals, Event
-from miros.event import return_status as state
-from miros.activeobject import ActiveObject
+from miros import spy_on, stripped, pp
+from miros import signals, Event
+from miros import return_status as state
+from miros import ActiveObject
 
 
 assert(pp)  # to make an irritating pep8 error go away
