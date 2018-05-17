@@ -14,8 +14,6 @@ Examples
    scribbleexample
    towardsthefactoryexample
    interactingcharts
-   setting_up_rabbit_mq
-   networked_instrumentation
    i_mongol_example
 
 More examples can be found in the :ref:`patterns section<patterns>`.
