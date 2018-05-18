@@ -54,6 +54,12 @@
     
   *Problem*
     The requirements are not understood yet.
+    
+  *Code Cache*
+  To extract an IP from a URL using the host file:
+  import socket
+  socket.gethostbyname('google.com')    #=> 216.58.193.78
+  socket.gethostbyname('216.58.193.78') #=> 216.58.193.78
   
   *Evidence that informs Assumptions:*
   
@@ -61,9 +67,6 @@
   *Information about the current context*
     The pi exchange: http://192.168.1.69:15672/#/exchanges
     The WLS exchange: http://127.0.0.1:15672/#/exchanges
-    
-    Go on a functool vacation.  This looks really useful, you should know more
-    about it.
     
    *Feature Visions*: 
       *Producer*:
@@ -120,13 +123,14 @@
 
 = Decide =
   *Idea/Hypotheses for Rabbit Disconnection Exception: >=5*
-  * [ ] Add caching and cache time out for scout process
-  * [ ] Select cache file format
-  * [ ] Select cache file structure (simple please)
-  * [ ] Have ability to destroy cache
-  * [ ] Have ability to expire cache
-  * [ ] Move the cache code into a sensible location of the network.py file
+  * [X] Add caching and cache time out for scout process
+  * [X] Select cache file format
+  * [X] Select cache file structure (simple please)
+  * [X] Have ability to destroy cache
+  * [X] Have ability to expire cache
+  * [X] Move the cache code into a sensible location of the network.py file
   * [ ] Ensure you have the ability to get the IP address out of an AMQP URL
+  * [ ] 
   
   *Chosen Idea/Hypothesis*
    
