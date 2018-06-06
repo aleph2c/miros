@@ -747,7 +747,7 @@ Create a Multi-Shot
 
 Cancelling Events
 ^^^^^^^^^^^^^^^^^
-To kill a cancel a spefic event, see :ref:`this.<recipes-cancelling-a-specific-event-source>`
+To kill a cancel a specific event, see :ref:`this.<recipes-cancelling-a-specific-event-source>`
 
 To kill all events sharing a signal name, see :ref:`this.<recipes-cancelling-event-source-by-signal-name>`
 
@@ -1270,7 +1270,7 @@ To add a payload to your event:
 
 .. code-block:: python
 
-  e = Event(signal=signals.YOUR_SIGNAL_NAME, event="My Payload")
+  e = Event(signal=signals.YOUR_SIGNAL_NAME, payload="My Payload")
 
 .. _recipes-determining-if-an-event-has-a-payload:
 
