@@ -2,95 +2,12 @@
 
 = Observe =
   *What defines Success?*
+    Write up the latest miros-rabbitmq design, deploy the new library, ensure
+    encryption and credentials handle properly, link into ansible script (write
+    the .env file)  Add aliens.
  
-  Clear up your thinking regarding the different caching mechanisms:
-    * cache, expiry and discovery for LAN (come from the LAN)
-    * cache, expiry for Manual (come from the user)
-    * cache, expiry and discovery for Aliens (come from outer space)
-  
-  The design has become complex enough that I should follow some rules.  A
-  payload should always been a named tuple, and it's structure should be shared.
-
-  The named tuple should be described on the arrow leaving the statechart and
-  beside the code which is subscribing to it
-  
-  Rules:
-    Public events are Capitalized: '_'
-    Private events are low_case: '_'
-    The publish should have a red dot (they are stopped)
-    The subscribe instance should have a green dot (they are going)
-    All payloads should be in the form of a named tuple 
-      The named tuple should be described on the arrow leaving the statechart
-      The named tuple should be described at the subscription
-    All multi-unit signals should have OTHER pre-pended to them, any multi-unit
-    signal is a kind of super public signal.
-    
-  There needs to be a network cache that can be used in three different ways:
-    * automatic: Discovers other nodes in your LAN
-    * manual: Can connect to nodes outside of your LAN 
-    * alien: A node that does not exist in the cache, but will be added upon
-      discovery from an unsolicited message to the process.
-  
-  The automatic address discovery technique examines the network information for
-  the computer, finds the broadcast address and pings this address to fill the
-  arp table (Linux/Windows).  It then accesses this ARP table to build amqp urls
-  with a single timeout it tries to hit all of the addresses in the local network.
-  This could be a bad idea for a large network.  It disqualifies any address
-  that times out; but this time out process is very fragile and slow.  (perform
-  this in parallel).
-  
-  The manual addresses are fixed by the user; they will need to be tested.  If
-  they work they will be placed in the 'live' catagory of the manual cache;
-  otherwise they will be placed in the 'dead' catagory.
-  
-  Five randomly selected dead addresses will be tested upon startup.  If they
-  are alive, they will be place in the live catagory and removed from the dead
-  catagory.
-  
-  To make the network discovery process faster, we will provide some additional
-  discovery techniques:
-    * a node will dispatch it's live cache to other nodes; it will use this
-      information to update their 'dead' cache
-    * a node will add a new node to its cache if it receives messages from it
-      and it didn't previously know about it's existence in the network. (alien)
-  
-  This Design should:
-    * Time-out the automatic cache if too old
-    * Skip the discovery process if cache relevant 
-    * If cache too old, discover the LAN, and test dead addresses
-    * Write working addresses in LAN to automatic address
-    * Write any working dead address to the live addreses in the manual nodes
-    * Begin
-  
-  After delay:
-    * Update automatic cache with ip/amqp_url from dark nodes
-    * Turn messages from alien nodes into new producers
-    * Transmit manual cache to other nodes in network
-  
-  Upon receiving alien cache:
-    * Test IP addresses with longer time out
-    * If IP does respond update the manual cache with new addresses/amqp_urls
-  
-  Constraints:
-    * Cache file access should be locked so multiple threads can try and access
-      it
-      
-  To turn off readability:
-    chmod 
-    
-  *Immediate Goal*
-    Wrap your head around the requirements; write your ideas down.
-    
   *Problem*
-    The requirements are not understood yet.
-    
-  *Code Cache*
-  
-  To extract an IP from a URL using the host file:
-  import socket
-  socket.gethostbyname('google.com')    #=> 216.58.193.78
-  socket.gethostbyname('216.58.193.78') #=> 216.58.193.78
-  
+      
   *Evidence that informs Assumptions:*
   
 = Orient/Homework/Empathy =
@@ -98,69 +15,19 @@
     The pi exchange: http://192.168.1.69:15672/#/exchanges
     The WLS exchange: http://127.0.0.1:15672/#/exchanges
     
-   *Feature Visions*: 
-      *Producer*:
-      *Consumer*:
-      *Scout*
-      *Mesh*
-      *Snoop*:
-      * [ ] Add coloring from different machines
-      * [ ] Add spy filtering [doesn't make sense]
-      *Integration*
-  
-  *History*
-    I built a botnet to describe multiunit statechart patterns.
-    
-    My botnet was working, based on an old and unreliable way of using pika
-    (from RabbitMq docs).  
-    
-    But this code would fail after running for > 15 minutes.  The time-to-test
-    was too long to troubleshoot comfortably (this is volunteer work), so I
-    decided to re-write everything based on the pika project's stable example.
-    Errors seen in my previous version:
-    
-      One two bots (WSL):
-        pika.exceptions.ConnectionClosed: (-1, "ConnectionResetError(104, 'Connection reset by peer')")
-      
-      The other two bots:
-        pika.exceptions.ChannelClosed
-        
-    So, there needs to be a number of resets and other complications that were
-    not talked about in the RabbitMq-pika training examples. (My old code is
-    broken and the testing cycle takes > 15 minutes)
-    
-    To avoid this problem again I will use the pika documentation's complicated
-    pika-asyncronous example as a starting point, then wrap it with the
-    functionality required for miros-rabbitmq.  (Once again, you can't trust the
-    DOM.)
-    
-    The miros-rabbitmq package was built and tested and documented.  The
-    encryption scheme was updated using modern techniques; but the network
-    discovery process and network definition design is still redimentary.
-  
   *Symptoms:*
   
   *Questions for Rabbit Disconnection Exception:*
+    
     Have you written code like this is a previous design.
     What don't I know that I need to know?
-    Can you break the problem down into logical parts.
-    
-    Am I going to review this process when I have finished it?
-    Can I Improve this process?
-    Can I make better decisions this time?
+    Can you break the problem down into smaller parts.
 
   *Assumptions:*
 
 = Decide =
   *Idea/Hypotheses for Rabbit Disconnection Exception: >=5*
-  * [X] Add caching and cache time out for scout process
-  * [X] Select cache file format
-  * [X] Select cache file structure (simple please)
-  * [X] Have ability to destroy cache
-  * [X] Have ability to expire cache
-  * [X] Move the cache code into a sensible location of the network.py file
-  * [ ] Ensure you have the ability to get the IP address out of an AMQP URL
-  * [ ] 
+  * [ ]
   
   *Chosen Idea/Hypothesis*
    
