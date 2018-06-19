@@ -111,6 +111,6 @@ if __name__ == '__main__':
   ao.enable_snoop_trace()
   # ao.enable_snoop_spy()
   ao.start_at(outer)
-  time.sleep(60)
+  time.sleep(20)
 
 
