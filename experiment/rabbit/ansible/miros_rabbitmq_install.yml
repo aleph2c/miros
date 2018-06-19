@@ -1,15 +1,7 @@
 ---
 - hosts: scotty
   vars:
-    python_packages_to_install:
-      - pika
-
-    rabbit_name: bob
-    rabbit_password: dobbs
-    rabbit_tags:
-      - administrator
-    guest_password: rabbit123
-
+    miros_rabbitmq_project_directory: '~/miros-rabbitmq'
   tasks:
    - name: Install rabbitmq-server
      become: true
@@ -20,22 +12,22 @@
 
    - name: Remove user
      become: true 
-     shell: rabbitmqctl delete_user {{rabbit_name}}
+     shell: rabbitmqctl delete_user {{rabbit_user}}
      ignore_errors: True
 
    - name: Create a user with password
      become: true 
-     shell: rabbitmqctl add_user {{rabbit_name}} {{rabbit_password}}
+     shell: rabbitmqctl add_user {{rabbit_user}} {{rabbit_password}}
      ignore_errors: True
 
    - name: Assign a tag to the user
      become: true 
-     shell: "rabbitmqctl set_user_tags {{rabbit_name}} {{rabbit_tags | join(' ')}}"
+     shell: "rabbitmqctl set_user_tags {{rabbit_user}} {{rabbit_tags | join(' ')}}"
      ignore_errors: True
 
    - name: Set permissions
      become: true
-     shell: rabbitmqctl set_permissions -p / {{rabbit_name}} ".*" ".*" ".*"
+     shell: rabbitmqctl set_permissions -p / {{rabbit_user}} ".*" ".*" ".*"
      ignore_errors: True
   
    - name: Change default admin password
@@ -64,5 +56,12 @@
 
    - name: Restart the rabbitmq-server service
      become: true
-     shell: sudo service rabbitmq-server restart
+     shell: service rabbitmq-server restart
      ignore_errors: True
+
+   - name: Write the .env file
+     template:
+       src: ./.env.j2
+       dest: "{{ miros_rabbitmq_project_directory }}/.env"
+       mode: "u=rw,g=r,o=r"
+

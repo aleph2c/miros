@@ -1,0 +1,16 @@
+---
+python_packages_to_install:
+  - miros-rabbitmq
+
+rabbit_user: "{{ vault_RABBIT_USER }}"
+rabbit_password: "{{ vault_RABBIT_PASSWORD }}"
+rabbit_port: "{{ vault_RABBIT_PORT }}"
+rabbit_heartbeat_interval: "{{ vault_RABBIT_HEARTBEAT_INTERVAL }}"
+connection_attempts: "{{ vault_CONNECTION_ATTEMPTS }}"
+rabbit_tags:
+  - administrator
+guest_password: rabbit123
+mesh_encryption_key: "{{ vault_MESH_ENCRYPTION_KEY }}"
+snoop_trace_encryption_key: "{{ vault_SNOOP_TRACE_ENCRYPTION_KEY }}"
+snoop_spy_encryption_key: "{{ vault_SNOOP_SPY_ENCRYPTION_KEY }}"
+rabbit_heart_beat_interval: 3600
