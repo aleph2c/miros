@@ -146,6 +146,7 @@ class HorseArcher(NetworkedFactory):
             b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=',
           tx_routing_key='archer.{}'.format(name),
           rx_routing_key='archer.#')
+    import pdb; pdb.set_trace()
     self.arrows = 0
     self.ticks  = 0
     self.time_compression = time_compression

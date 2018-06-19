@@ -38,7 +38,7 @@ the ``fifo`` or ``lifo`` api behaves like this.
       elif(e.signal == signals.EXIT_SIGNAL):
         # we are leaving this state for an outer state
         # so we cancel our one-shot in case it hasn't gone off yet
-        ao.cancel_events(ao.delay_one_second)
+        ao.cancel_events(signals.delay_one_second)
         status = state.HANDLED
 
       # ignore our init
