@@ -1,0 +1,8 @@
+{
+  "hosts": [
+  {% for host in ansible_play_batch %}
+  "{{ host }}"{% if not loop.last %},{% endif %}
+  {% endfor %}
+
+  ]
+}

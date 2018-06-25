@@ -1,7 +1,7 @@
 ---
 - hosts: scotty
   vars:
-    miros_rabbitmq_project_directory: '~/miros-rabbitmq'
+    miros_rabbitmq_project_directory: '~/miros-rabbitmq-deployment'
   tasks:
    - name: Install rabbitmq-server
      become: true
@@ -61,7 +61,26 @@
 
    - name: Write the .env file
      template:
-       src: ./.env.j2
+       src: .env.j2
        dest: "{{ miros_rabbitmq_project_directory }}/.env"
        mode: "u=rw,g=r,o=r"
+     tags:
+       - '.env'
+
+   - name: Write the .miros_rabbitlan_cache.json file
+     template:
+       src: .miros_rabbitlan_cache.json.j2
+       dest: "{{ miros_rabbitmq_project_directory }}/.miros_rabbitlan_cache.json"
+       mode: "u=rw,g=r,o=r"
+     tags:
+       - 'cache'
+
+   - name: Write the .miros_rabbit_hosts.json file
+     template:
+       src: .miros_rabbit_hosts.json.j2
+       dest: "{{ miros_rabbitmq_project_directory }}/.miros_rabbit_hosts.json"
+       mode: "u=rw,g=rw,o=r"
+     tags:
+       - 'hosts'
+
 
