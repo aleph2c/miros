@@ -4,20 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>&lt;no title&gt; &#8212; miros 2.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '2.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -30,8 +22,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -49,7 +40,7 @@ This will also be useful while debugging your chart, your logs won’t be filled
 with unnecessary events.</p>
 <p>You should cancel your multi-shot events in the exit handler of the state that
 created them.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Here define a middle state the creates a multi-shot event called</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here define a middle state the creates a multi-shot event called</span>
 <span class="c1"># three_pulse.  The same three_pulse signal is captured</span>
 <span class="c1"># by the middle state and used to transition into the inner state</span>
 <span class="nd">@spy_on</span>
@@ -80,10 +71,10 @@ created them.</p>
   <span class="k">return</span> <span class="n">status</span>
 </pre></div>
 </div>
-<p>By setting the <code class="docutils literal"><span class="pre">times</span></code> argument of the <code class="docutils literal"><span class="pre">post_fifo</span></code> to 0, you can create an
+<p>By setting the <code class="docutils literal notranslate"><span class="pre">times</span></code> argument of the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> to 0, you can create an
 infinite multi-shot event.  This is how you could make an inner heart beat.</p>
-<p>The <code class="docutils literal"><span class="pre">post_lifo</span></code> api can be used the same as the <code class="docutils literal"><span class="pre">post_fifo</span></code> api for
-creating these types of repeating events.  You would use the <code class="docutils literal"><span class="pre">post_lifo</span></code> api
+<p>The <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> api can be used the same as the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> api for
+creating these types of repeating events.  You would use the <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> api
 when you would need your heart beat event signal to barge ahead of all other
 events waiting to be processed by the active object.</p>
 <span class="target" id="recipes-cancelling-a-specific-event-source"></span>
@@ -110,12 +101,14 @@ events waiting to be processed by the active object.</p>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

@@ -1973,735 +1973,137 @@ To skip to the other side of this code listing, click :ref:`here<other_size_of_r
 
 .. _other_size_of_regression_test:
 
-.. _i_mongol_example-encrypted-communications:
+.. _i_mongol_example-networking-our-horse-archer:
 
-Encrypted Communications
-------------------------
-The ergodic nature of our warbot has a downside. Once you know how to defeat
-one node, you know how to beat all of them. Furthermore, the communications
-between the bots are fundamental to its system design; if you can inject your
-own messaging between them, you will *PWN* this botnet.
+Networking our Horse Archers
+----------------------------
+When I first wrote this documentation I described the steps needed to integrate
+Gandbold with the RabbitMQ networking library.  This turned out to be both
+complicated and distracting, since I was spending a lot of time writing about
+networks and security and not writing about horse archers or statecharts.  So, I
+left this project for a while and wrote the `miros-rabbitmq plugin
+<https://aleph2c.github.io/miros-rabbitmq/index.html>`_.
 
-A 13th century European would not have spoken Mongolian so an invading horde
-would have no problem with intercepted communications. But, what would have
-happened if they had to fight another unit of horse archers? Each group would
-know what the other side was up to; they could yell distracting calls into the
-other side's string of commands to jam up the other team's manoeuvre.
+You can now use the `miros-rabbitmq plugin
+<https://aleph2c.github.io/miros-rabbitmq/index.html>`_ to make networkable
+statecharts.  So let's network our mongols by following these steps:
 
-So it would make sense if each Mongol unit had their own set of war cries. This
-way they could act on instruction without doubt or hesitation.
+* `install RabbitMQ <file:///C:/github/miros-rabbitmq/docs/installing_infrastructure.html>`_ and `miros-rabbitmq <https://aleph2c.github.io/miros-rabbitmq/installation.html>`_ on all of the computers you want to network.
+* `make a .env file in the same directory as your code <file:///C:/github/miros-rabbitmq/docs/recipes.html#managing-your-encryption-keys-and-rabbitmq-credentials-short-version>`_ 
+* replace any Factory class with a NetworkedFactory class
 
-The horse archer communications need to be encrypted. There are many different
-ways to do this; it can happen at the communications layer using SSL, or it can
-be handled by our warbot directly.
-
-I have opted to use a symmetric encryption scheme with the Fernet library within
-our warbot. I did this after investigating pycrypto; which does not have windows
-support and has mainly been abandon by its maintainer. Don’t use pycrypto.
-
-Let’s just use Fernet.
-
-Fernet takes a lot of pain out of encryption, but you still need a key.
-Encryption is really about key management; how do you keep your key hidden from
-your opponent? Well, for now, we will hide our key as highlighted plain text on
-this website so that everyone on the Internet can see it:
+Let's talk about the directory structure that you will need for this to work:
 
 .. code-block:: python
-  :emphasize-lines: 17
-  
-  from cryptography.fernet import Fernet 
 
-  class Connection():
-    @staticmethod
-    def key():
-      '''
-      Get the encryption key for this connection.  This key is used for encryption
-      and decryption.
-    
-      Example:
-        key = Connection.key()
-    
-      Note:
-      To generate a new key: Fernet.generate_key()
-      A better way to do this is to get the key from your connected flash-drive.
-      '''
-      return b'u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg='
+  .
+  ├── .env
+  └── networked_horse_archer.py
 
-Feeling better already.
+The hidden, ``.env`` file holds your RabbitMQ credentials and your
+miros-rabbitmq encryption keys.
 
-To encrypt our data we will use a Python decorator:
+.. note:: 
+
+  You can actually place your ``.env`` file in an outer directory too.  Typically
+  they are placed in the same directory as your ``.git`` folder.
+
+Your ``.env`` file contains your secrets.  It will look something like this:
 
 .. code-block:: python
-  :emphasize-lines: 35,36, 40, 42
 
-  from cryptography.fernet import Fernet 
+  MESH_ENCRYPTION_KEY=u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=
+  SNOOP_TRACE_ENCRYPTION_KEY=u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=
+  SNOOP_SPY_ENCRYPTION_KEY=u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=
+  RABBIT_USER=peter
+  RABBIT_PASSWORD=rabbit
+  RABBIT_PORT=5672
+  RABBIT_HEARTBEAT_INTERVAL=3600
+  CONNECTION_ATTEMPTS=3
+  RABBIT_GUEST_USER=rabbit567
 
-  class Connection():
-    # ..
-    # ..
-    @staticmethod
-    def encrypt(fn):
-      '''
-      A decorator which will encrypt a byte stream prior to transmission:
-    
-      Example:
-        @Connection.serialize
-        @Connection.encrypt   # <- HERE: 'message' (encrypted bytestream)
-        def message_to_other_channels(self, message):
-          for channel in self.channels:
-            ip = channel.extension.ip_address
-            channel.basic_publish(exchange='mirror',
-                routing_key=ip, body=message)
-            print(" [x] Sent \"{}\" to {}".format(message, ip))
-    
-      '''
-      @wraps(fn)
-      def _encrypt(*args):
-        '''
-        encrypt a byte stream
-        '''
+.. note:: 
 
-        # To get around the 'self-as-the-first-argument' issue
-        if len(args) == 1:
-          plain_text = args[0]
-        elif len(args) == 2:
-          plain_text = args[1]
-        else:
-          assert(False)
-        f = Fernet(Connection.key())
-        cyphertext = f.encrypt(plain_text)
+  Make sure you use the same credentials in your .env file that you used while
+  installing RabbitMQ on your system.  Take special note that the
+  ``RABBIT_USER`` and the ``RABBIT_PASSWORD`` match how you set your RabbitMQ
+  installation up.
 
-        # To get around the 'self-as-the-first-argument' issue
-        if len(args) == 1:
-          fn(cyphertext)
-        else:
-          fn(args[0], cyphertext)
-      return _encrypt
+The miros-rabbitmq library uses ``pydotenv`` as a dependency.  It is this
+``pydotenv`` which will turn the items of your ``.env`` file into environment
+variables that your program can use.
 
-To decrypt we make another decorator:
+To access these secrets and use the new networkable statechart classes you will need to add some code to your
+``networked_horse_archer.py`` file:
 
 .. code-block:: python
-  :emphasize-lines: 21-23
 
-  from cryptography.fernet import Fernet 
+  # drop in replacements of the ActiveObject and Factory
+  from miros_rabbitmq import NetworkedActiveObject
+  from miros_rabbitmq import NetworkedFactory
 
-  class Connection():
-    # ..
-    # ..
-    @staticmethod
-    def decrypt(fn):
-      '''
-      A decorator which will decrypt a received message into a byte stream.
-    
-      Example:
-        @Connection.decrypt  # <- HERE: 'body' decrypted into a byte stream
-        @Connection.deserialize
-        def custom_rx_callback(ch, method, properties, body):
-          print(" [+] {}:{}".format(method.routing_key, body))
-    
-      '''
-      @wraps(fn)
-      def _decrypt(ch, method, properties, cyphertext):
-        '''LocalConsumer.decrypt()'''
-        f = Fernet(Connection.key())
-        plain_text = f.decrypt(cyphertext)
-        fn(ch, method, properties, plain_text)
-      return _decrypt
+  # imports needed to get your secrets from the .env file
+  import os
+  from dotenv import load_dotenv
+  from pathlib import Path
 
-So, we can get a key; we can encrypt and decrypt.  Now, what can we send?  There
-is a process in python called pickling which serializes an object into a
-collection of bytes.  This collection of bytes can be transmitted across a
-network.
+  # put the secrets in the .env file into separate environment variables
+  env_path = Path('.') / '.env'
+  if env_path.is_file():
+    load_dotenv(env_path)  # variables now set in the shell's environment
+  else:
+    # recurse outward to find .env file if no .env file found
+    load_dotenv()
 
-Serialization will allow our horse archers to transmit anything within their war
-cries.  "Hey Ганболд (Gandbold), do you want one of my extra horses?", "yes",
-"OK here you go, `lala-bee-boop <https://www.youtube.com/watch?v=gsNaR6FRuO0>`_".  This concept expands on the notion of a war
-cry; but it is cool that we can transmit the objects of working programs,
-between the nodes of our botnet.  Of course, this is a security nightmare, so if
-we are going to serialize and deserialize messages *we will have to use an
-encrypted channel*.
+  # get the contents of our shell's environment
+  RABBIT_USER = os.getenv('RABBIT_USER')
+  RABBIT_PASSWORD = os.getenv('RABBIT_PASSWORD')
+  RABBIT_HEARTBEAT_INTERVAL = os.getenv('RABBIT_HEARTBEAT_INTERVAL')
+  CONNECTION_ATTEMPTS = os.getenv('CONNECTION_ATTEMPTS')
+  MESH_ENCRYPTION_KEY = os.getenv("MESH_ENCRYPTION_KEY")
+  SNOOP_TRACE_ENCRYPTION_KEY = os.getenv("SNOOP_TRACE_ENCRYPTION_KEY")
+  SNOOP_SPY_ENCRYPTION_KEY = os.getenv("SNOOP_SPY_ENCRYPTION_KEY")
 
-Now let's show the serialization technique, it is also implemented using a
-decorator:
+.. note:: 
 
-.. code-block:: python
-  :emphasize-lines: 35, 36, 38
+  Often the code to access your .env file is put within the setup.py file for
+  your package or application.  If you set things up this way, you can just
+  import your variables from the setup.
 
-  import pickle
-  import miros import Event
+We previously derived our HorserArcher from the Factory class.  To get the networking features, I'll derive the HorseArcher with the new
+NetworkedFactory instead:
 
-  class Connection():
-    # ..
-    # ..
-
-    @staticmethod
-    def serialize(fn):
-      '''
-      A decorator which will turn arguments into a byte stream prior to encryption:
-    
-      Example:
-        @Connection.serialize  # <- HERE: 'message' turned into byte stream
-        @Connection.encrypt
-        def message_to_other_channels(self, message):
-          for channel in self.channels:
-            ip = channel.extension.ip_address
-            channel.basic_publish(exchange='mirror',
-                routing_key=ip, body=message)
-            print(" [x] Sent \"{}\" to {}".format(message, ip))
-    
-      '''
-      @wraps(fn)
-      def _pickle_dumps(*args):
-        if len(args) == 1:
-          message = args[0]
-        elif len(args) == 2:
-          message = args[1]
-        else:
-          assert(False)
-    
-        # The event object is dynamically constructed and can't be serialized by
-        # pickle, so we call it's custom serializer prior to pickling it
-        if isinstance(message, Event):
-          message = Event.dumps(message)
-    
-        pmessage = pickle.dumps(message)
-    
-        if len(args) == 1:
-          fn(pmessage)
-        else:
-          fn(args[0], pmessage)
-      return _pickle_dumps
-
-The highlighted text in our serialization code demonstrates where the actual
-pickling happens.  We see that there is a custom ``dumps`` method written for a
-miros Event.  The miros Event object can't be serialized with pickle because it
-uses a simple metaprogramming technique for making new signal names.  No
-problem, we just call the Event ``dumps`` method first, then call the pickle
-``dumps`` method on its result.
-
-Now we have a byte stream we can feed our encryption decorator.  
-
-How do we turn it back to an object after it has been decrypted?  Well, we call
-the ``deserialize`` decorator.
-
-.. code-block:: python
-  :emphasize-lines: 21,22,23
-
-  import pickle
-  import miros import Event
-
-  class Connection():
-    # ..
-    # ..
-    @staticmethod
-    def deserialize(fn):
-      '''
-      A decorator used to turn a serialized byte stream into a python object
-    
-      Example:
-        @Connection.decrypt
-        @Connection.deserialize  # <- HERE: 'body' bytestream turn into object
-        def custom_rx_callback(ch, method, properties, body):
-          print(" [+] {}:{}".format(method.routing_key, body))
-    
-      '''
-      @wraps(fn)
-      def _pickle_loads(ch, method, properties, p_plain_text):
-        plain_text = pickle.loads(p_plain_text)
-        if isinstance(plain_text, Event):
-          plain_text = Event.loads(plain_text)
-        fn(ch, method, properties, plain_text)
-      return _pickle_loads
-
-The deserialization is just the reverse of the serialization.  We call the
-pickle ``loads`` method on the pickled object, then if it is a serialized Event,
-we call the custom ``loads`` method of the Event object to get a version of the
-event made by the bot that sent it to us in the first place.
-
-Let's go over everything again from a high level.  If a node in our warbot wants
-to share one of its objects with another node, it turns that object into a
-byte-stream using the ``serialize`` decorator, encrypts the byte stream with the
-``encrypt`` decorator and spits some garbled data onto the network layer.  The
-node receiving the data decrypts the stream using the ``decrypt`` decorator,
-then turns the byte stream back into the intended Python object using the
-``deserialize`` decorator.  
-
-Ok, now what do we do about our secret key?
-
-Our Mongol unit will have a lot of shared experience.  If they don't follow each
-other in their advances and their retreats; their senior officers will kill
-them.  Maybe we could use this path of actions and the common time experienced
-while advancing and retreating to modulate their original secret key.  In this
-way, we could obnoxiously post the key (see above) on the Internet for everyone
-to look at and it wouldn't matter.  If you wanted to *PWN* the bot you would
-have to know every action they had taken, when they made it and their modulation
-algorithm.
-
-This would be like the Mongol unit making up a new war language every time they
-finished a loop.  They would know that if one of their members became
-de-synchronized, they would never find one another again.
-
-I'm not going to write this into the example, but it is how I would start-up my
-thinking about this annoying key issue.  I would do the work well after I was
-sure the original code was running well.  Then we would have to provide some way
-for the botnet to get orders from its commanding officer; we have yet another
-key issue.  Maybe the botnet could look out at thousands upon thousands of
-websites, knowing that only one has a message from the commanding officer (on
-craigslist?).  Then inject a random delay before acting on the news.
-
-In this example I demonstrated how to encrypt the data but I exposed the key.
-So, what we have here is security theater, I'm pretending that the system is
-secure.  It is not; I haven't solved the key issue.
-
-Security is hard; the attacker has the advantage; you can't know when you have
-been compromised and you can't trust anything, from your GPU to the encryption
-standard, to your CPU, it's all exposed and compromised.
-
-The attacker has the advantage, so when in doubt, attack!
-
-Well that was dramatic.  But where do we attack and whom?  What good is a botnet without
-a network?
-
-.. _i_mongol_example-building-a-mesh-network:
-
-Building a Mesh Network
------------------------
-We need to imagine the terrain on which the warbot will roam.  I vote that we
-keep them in the lab; Mongol horse archers are far too dangerous to let loose on
-an unsuspecting Internet.
-
-.. image:: _static/InLab.jpg
+.. image:: _static/networked_ergotic_mongol.svg
+    :target: _static/networked_ergotic_mongol.pdf
     :align: center
 
-Our network should consist of one-or-more programs running on one computer and
-one-or-more programs running on one-or-more *other* computers.  Statecharts
-should be able to work together even if they are deployed across the entire
-world; networking is a solved problem.
+The miros-rabbitmq plugin's NetworkedFactory classes extend the interface of the Factory class with
+the `transmit
+<https://aleph2c.github.io/miros-rabbitmq/recipes.html#transmitting-an-event>`_, `enable_snoop_trace
+<https://aleph2c.github.io/miros-rabbitmq/recipes.html#snoop-trace>`_ and
+`enable_snoop_spy
+<https://aleph2c.github.io/miros-rabbitmq/recipes.html#snoop-spy>`_ methods.
+This means that any object derived from our HorseArcher will have these methods
+too.
 
-So we just have to pick a technology that can send messages between computers.
+The miros-rabbitmq library actually constructs three different RabbitMQ
+networks:
 
-But, which technology to pick?  I wanted simple things to be simple and hard
-things to be possible.
-
-Right or wrong I picked RabbitMq.  RabbitMq is free, it is written in Erlang
-which was designed by Ericsson to solve *the hard concurrency problems in*
-embedded systems.  It is old; it first appeared in 1986, one year before David
-Harel's paper on statecharts and five years before Python was invented.  So I
-trust that Erlang has a well thought out and proven architecture.
-
-RabbitMq stays true to the underlying Erlang structures and moreover, it
-provides a polyglot platform: they have written many different libraries for
-other programming languages to control RabbitMq.  In Python, RabbitMq is
-accessed using the ``pika`` library.
-
-RabbitMq is heavy duty.  You can scale it up to handle a lot of messaging.
-Our horse archers aren't going to yell that much, but it's nice to know we could
-support their entire horde.
-
-What kind of network should we build?  How about this, everything that *can*
-connect is connected.  Let's create a mesh network.
-
-.. image:: _static/Partial_Mesh_Diagram.svg
-    :target: _static/Partial_Mesh_Diagram.pdf
+.. image:: _static/networked_ergotic_mongol_2.svg
+    :target: _static/networked_ergotic_mongol_2.pdf
     :align: center
 
-Our lab will exist behind a router; so all of the bots will live on the same
-Ethernet bus.  This means that the ARP table on
-each of the computers on the LAN will have all of the LAN's IP addresses.
-
-.. note::
-
-  ARP stands for Address Resolution Protocol.
-
-  An ARP table contains information about how each machine on your LAN maps it's
-  IP address to its physical machine address (MAC address). This table is
-  needed for Ethernet to work.  We aren't interested how this works, we only use
-  it to get a list of the IP addresses on our LAN.
-
-We can use these IP addresses to send out encrypted messages to a RabbitMq port,
-with a username and a password and see if there is a sensible response.  If
-there is, we add this IP to our mesh network.  This means that our horse archers
-won't yell at our router or our printer or our phone.  Oora!
-
-Things get a little tricky when a computer has more than one working IP address
-connected to a RabbitMq server.  Any transmitted message would be received two
-or more times by all of the RabbitMq connected Python programs running on that
-computer.  To address this, I adjusted the code to only connect to one working
-IP address on each machine.
-
-Two different kinds of networking will affect our Mongols.  One that they need
-and one that *we need* to understand and debug their programs.  The first kind
-of networking will let them yell to one another, and it will use the RabbitMq
-*topic* routing strategy.  The second, instrumentation kind of networking will
-use the RabbitMq *fanout* strategy.  Each layer will have a different encryption
-key.  Debugging an encrypted blob can be frustrating; so we want to make sure we
-can *see* our design while we play with the encryption key for the first type of
-mesh networking.  To distinguish between the two different types of networking,
-I will call one the mesh and the other the snoop network.  When we are happy
-with the design; we will turn off the instrumentation, remove our ability to
-snoop and release the horde.
-
-By using RabbitMq, every running Horse Archer program on any connected computer
-in our LAN will look like a node in our mesh network.  This is great; it means
-we can significantly simplify our code.
-
-But what are the specifics?  How is a horse archer explicitly connected to the
-network?  Well, he has two transmitters one for his yells and one to send out
-his instrumentation, and he has two receivers, one to hear cries and one to
-receive all of the instrumentation sent out by every other horse archer.  This
-means that as a developer, you can hook into any individual horse archer and
-start debugging all other connected horse archers.
-
-Writing networked code that runs in Python while on Windows and Linux is kind of
-tricky.  To simplify things I ran my Windows code from the Window's Linux
-Subsystem (WLS).  Unfortunately the WLS isn't done yet, so it's missing a lot of
-standard Linux networking commands, like arp.  However, windows has it's own
-``arp.exe`` command and the WLS can call out to DOS.  So the code I wrote is
-filled with weird little corner cases to deal with the current short comings of
-the WLS.  I'll be changing it a lot, so there is no point in writing it out and
-explaining it in this example; you can find the code in its entirety here:
-`mesh_network`_
-
-Instead, I will talk about its network API.  To begin with I'll talk about the horse
-archer's topic network.  This is the network that will be used for them to
-communicate with each other, not the debugging network.
-
-To build a standard mesh transmitter:
-
-.. code-block:: python
-  :linenos:
-
-  from mesh_network import MeshTransmitter
-  from miros import Event, signals
-
-  # Assume confirmed connected IPs are: [192.168.0.102, 192.168.0.103]
-  # The actual routing keys for this transmission are:
-  #   '192.168.0.102.archer.mary'
-  #   '192.168.0.103.archer.mary'
-  tx = MeshTransmitter(user="bob", password="dobbs")
-  tx.message_to_other_channels(
-    Event(signal=signals.Mirror, payload=[1, 2, 3]),
-      routing_key = 'archer.mary')
-
-Let's consider the above code listing.
-
-After importing the mesh_network package that contains all of the RabbitMq
-networking code we see something about 'confirmed' connected IP addresses (line
-4).  A confirmed IP address belongs to a computer that successfully received and
-decrypted an automatic scouting message sent out by our program.  This comment
-is suggesting that 192.168.0.102 and 192.168.0.103 both are connected.  Say this
-was true, that means that the computer on which this code is written has one of
-these IP addresses.
-
-The same comment informs us about the routing keys.  If we let our eyes jump to
-line 11 we see that we are setting a routing key to ``archer.mary``.  So, the
-comment is trying to tell us that the IP address of the computer is
-automatically pre-pended to the routing key we set in the call to
-``message_to_other_channels``.  We will learn more about topic routing keys when
-we look at the receiver.
-
-On line 8 we see how to construct a mesh transmitter; we have to pass in a user
-and password.  These are the credentials for your RabbitMq server.  If these
-aren't right the code will not run.
-
-Finally, on lines 9 to 11 we see how to send a statechart event to all other
-programs in our mesh, programmed to receive the routing keys:
-``192.168.0.102.archer.mary`` and ``192.168.0.103.archer.mary``.  This
-``message_to_other_channels`` call will serialize the Event object with it's
-payload into a bytestream then encrypt it prior to dispatching it out across the
-network.
-
-To build a standard mesh receiver:
-
-.. code-block:: python
-  :linenos:
-
-  import time
-  from mesh_network import MeshReceiver
-  from miros import Event, signals
-
-  def custom_rx_callback(ch, method, properties, body):
-    print(" [+] {}:{}".format(method.routing_key, body))
-
-  # Assuming IP: 192.168.0.103
-  # The routing key will be '192.168.0.103.archer.mary'
-  rx = MeshReceiver(user='bob',
-         password='dobbs',
-         routing_key='archer.mary')
-
-  rx.register_live_callback(custom_rx_callback)
-  rx.start_consuming() # launches a consuming task
-  time.sleep(10)
-  rx.stop_consuming()  # kills consuming task
-  rx.start_consuming() # launches a consuming task with same custom_rx_callback
-
-Let's consider the above code listing.
-
-First we import our required packages (lines 1-3).  Then on lines 5-6 we create
-a callback function.  We will want to register this callback function with the
-underlying framework, see line 14. This callback function will be called if, and
-only if, a message is received by RabbitMq that has the correct topic routing
-key.  This routing key is specified on line 12, where we construct the mesh
-receiver object, rx.  
-
-The comments on lines 8 and 9 describe some routing key specifics.  We see that
-for the code on lines 10-12, the routing key will be
-``192.168.0.103.archer.mary``.  So like the transmitter API, the receiver API
-pre-pends an IP address to its routing key.
-
-Before we talk more about the routing key,  let's fire up and run our receiver.
-On lines 10 through 12 we see how to build a rx object.  We need to know the
-RabbitMq username and password and we specify the routing_key.
-
-On line 14 we register our ``custom_rx_callback`` with the receiver.  The ``rx``
-object will take care of the decryption and deserialization, much like we
-described in the encryption section.
-
-The ``pika`` Python library that reaches into the RabbitMq server will be doing
-the real work to receive messages.  For it to run, we have to call it's
-``start_consuming`` method, which will hang the program forever; it is a
-blocking call.  We want ``pika`` to dispatch received messages but would also
-like to be able to do other things with our program too.  For this reason, the
-MeshReceiver class will spin up a separate task for the ``pika`` receiver code
-to run and block.  We see the API for this on line 15: the MeshReceiver also has
-a ``start_consuming.`` method, which calls the ``pika`` ``start_consuming``
-method within it's own separate thread.  In this way, it can greedily block on
-messages without harming the rest of the Python program.  To stop this thread,
-and to stop it from dispatching any received messages we would call the
-``stop_consuming`` method, as seen on line 17.  If we wanted to restart the
-thread, we would call ``start_consuming`` as seen on line 18.
-
-In our transmitter example, we sent a message with a routing key of
-``192.168.0.103.archer.mary``.  If this code was run on this, or the other
-computer the callback function on line 5-6 would run, and we would print the
-contents of the event.
-
-Now let's talk about routing keys.  Just because every node is connected to
-every node in our mesh network doesn't mean that we would want to 'hear' all of
-the transmitted messages.  The routing key is the way in which we can match
-transmitted messages to specific receiving callback functions through the use of
-patterns.  RabbitMq supports a very lightweight glob pattern matching language.
-``*`` means to substitute exactly one word and ``#`` means to substitute zero or
-more words.  That's it. 
-
-So if we wanted our receiver to match all messages to its IP address, we would
-have set it's routing key to ``#`` (this is the default value).  If we wanted
-the receiver to match all archers addressed to it's IP address we the routing
-key would be ``archer.*`` or ``archer#``.  In RabbitMq the routing key can be no
-more than 255 characters.
-
-We probably aren't going to need this for our example, but it is a simple and
-powerful bonus feature.
-
-Now let's try to draw the RabbitMq style producer and consumer diagram for our
-mesh network so that we can understand how things are connected:
-
-.. image:: _static/mesh_network_1.svg
-    :target: _static/mesh_network_1.pdf
-    :align: center
-
-In the above diagram we see the two classes MeshTransmitter and the MeshReceiver
-and below them the RabbitMq-style description of their network collaboration.
-It is important to understand that only one of these structures exists on each
-machine in our mesh network.
-
-If you place your eyes on the "statechart producer" you can see how a statechart
-starts the information flow by producing messages in the form of Event objects.
-These messages will be sent to the "mirror exchange" which is accessed by both
-the MeshTransmitter and MeshReceiver.  This message is branded with the routing
-key provided by the user and pushed into a RabbitMq queue (the red box).  It is
-serialized and encrypted and then pushed out onto the network.
-
-To see how a statechart can consume events from the network, look at the
-"Network" arrow to the left of the "Deserialized/Decrypted" bubble.  Any message
-coming from the network is decrypted then deserialized and passed into the
-mirror exchange.  If the decryption process worked, the exchange will compare
-the <IP>.<rx_routing_key> against the message's, <IP>.<tx_routing_key>.  If
-these match it will pass the message into a RabbitMq queue.  Eventually, the
-RabbitMq server will post this information into a statechart linked to the
-MeshReceiver.
-
-The snoop network is very similar to the mesh network we
-have written about already.  There will be an instrumentation receiver and an
-instrumentation transmitter.  It too is a mesh network; in fact, it is even more
-*meshy* about it, there is no routing key, every node is connected to every
-other node; you get everyone's messages whether you want them or not.  It's like
-the old `telephone party line
-<https://en.wikipedia.org/wiki/Party_line_(telephony)>`_ in the country, where
-everyone's phone would ring for any call on the network.  The old ladies in the
-community would quietly snoop on all calls and pretend that they weren't there;
-you could hear their breathing on the line while you talked to your friends
-about the upcoming orgy.
-
-If you think that is juicy, listen to this, you can hear the entire Mongol horde
-using our party line.
-
-Let's build the instrumentation transmitter:
-
-.. code-block:: python
-  :linenos:
-
-  from mesh_network import SnoopTransmitter
-  from miros import Event, signals
-
-  tx_instrument = SnoopTransmitter(
-   user='bob',
-   password='dobbs',
-   port=5672,
-   encryption_key=
-    b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0='
-  )
-
-  # Given that ao is a statechart object you would register it's live
-  # spy/trace output with the tx_instrument broadcast_spy and broadcast_trace
-  # methods respectively:
-  ao.register_live_spy_callback(tx_instrument.broadcast_spy)
-  ao.register_live_trace_callback(tx_instrument.broadcast_trace)
-
-  # Or you can broadcast messages directly to the connected spy and trace exchanges
-  tx_instrument.broadcast_spy("Spy information")
-  tx_instrument.broadcast_trace("Trace information")
-
-On lines 1-2 we import the required packages.
-
-On lines 4-10 we build the instrumentation transmission object.  The class
-which it is derived from is called SnoopTransmitter, in honour of the old
-lady on our imagined party line.  It needs the RabbitMq username and password,
-an optional port number and an encryption key.  This key can be different from
-the key used by our other mesh network.
-
-Line 15-16 might cause some confusion until you realize that the ``ao`` object
-is just an imagined statechart.  If we were going to debug this statechart on
-this machine, we could turn on it's live_spy and the live_trace.  This would
-spit out debugging information to our screen as the statechart reacted to
-different events.  The code on line 15-16 is just telling the statechart to spit
-out its live information into the snoop transmitter instead.  By doing this, the
-imagined ``ao`` object will transmit out all of its live spy and trace
-information to every other connected statechart across the mesh, to every Snoop
-receiver.
-
-Line 19 and 20 is showing us how to send out information directly to all other
-connected nodes on the Snoop network.  
-
-To build an instrumentation, Snoop receiver:
-
-.. code-block:: python
-  :linenos:
-
-  from mesh_network import SnoopReceiver
-
-  rx_instrumentation = SnoopReceiver(
-    user='bob',
-    password='dobbs',
-    port=5672,
-    encryption_key=
-      b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=')
-
-  rx_instrumentation.start_consuming()
-
-  # You can also tie a live_spy and live_trace callback method:
-  def custom_spy_callback(ch, method, properties, body):
-    print(" [+s] {}:{}".format(method.routing_key, body))
-
-  def custom_trace_callback(ch, method, properties, body):
-    print(" [+t] {}:{}".format(method.routing_key, body))
-
-  # register spy instrumentation callback with your rx_instrumentation
-  rx_instrumentation.register_live_spy_callback(custom_spy_callback)
-
-  # register trace instrumentation callback with your rx_instrumentation
-  rx_instrumentation.register_live_trace_callback(custom_trace_callback)
-
-  # The rx_instrumentationt will have a ForeignHsm object from which you can
-  # view all spy and trace information
-  pp(rx_instrumentation.spy())
-  print(rx_instrumentation.trace())
-
-The Snoop receiver can tie two callbacks, a spy and trace callback, to *all of
-the* spy and trace information coming back from your botnet.
-
-On line 1 we import the SnoopReceiver class.  On lines 3 through 4 we construct
-an object of the SnoopReceiver class, providing the RabbitMq server's username
-and password, the port connecting the server to the network and its encryption
-key.  This encryption key must match the encryption keys used by all of the
-linked SnoopTransmitters, or we will just receive a stream of useless encrypted
-data.  The Snoop receiver is connected to a RabbitMq 'fanout' exchange, so every
-message sent into this exchange will be received by every other receiver
-connected across the whole network.
-
-On line 10, we start a thread within the SnoopReceiver to listen for received
-messages.
-
-On lines 19 through 23 we see how to connect the callbacks defined on lines
-12-17 to the snoop receiver.  In this example, we will just print out the spy
-and trace information coming from this and all other connected snoop
-transmitters in our network.
-
-Lines 25 through 28 demonstrate that if we wanted to access the spy or trace
-logs in their entirety, we could by calling the ``spy`` and ``trace`` methods on
-the Snoop receiver.  These methods link to a ForeignHsm object embedded in the
-Snoop Receiver object.  The ForeignHsm doesn't have an Hsm, nor can it access
-one, it just provides the same ``spy`` and ``trace`` debugging interfaces that
-you would use if you were dealing with an actual HSM; within a Factory, Active
-Object or an HsmWithQueues derived object.
-
-Now let's try to draw the RabbitMq style producer and consumer diagram for our
-snoop network:
-
-.. image:: _static/snoop_network_1.svg
-    :target: _static/snoop_network_1.pdf
-    :align: center
-
-The SnoopTransmitter and SnoopReciever collaborate to build the RabbitMq snoop
-architecture in the bottom part of the picture.
-
-The diagram looks more cluttered than that for the mesh network, despite this,
-it is a more straightforward structure: The snoop network doesn’t serialize or
-deserialize. Instead of using a topic network with routing keys, it uses two
-fanout exchanges.  So, any message sent to the spy or trace exchanges will be
-dispatched to every other spy or trace exchange on the network.
-
-It will be up to the consumer of this spy and trace information to decide how
-much instrumentation they want to look at.
-
-Our example has become a lot more complicated because of the network.  To manage
-this complexity, I have created a class called RabbitFactory.  The miros package
-has no dependencies outside of the standard python library.  However, if we
-would like to get the RabbitFactory to work we will need to include at the very
-least *pika* and have RabbitMq installed on the system.  Not every user of
-*miros* will want to use RabbitMq.  For this reason I have separated all of the
-RabbitMq code into it's own miros plugin package: miros-rabbitmq.  If you would
-like to learn more about it, look here.
-
-For now, let's just consider what the RabbitFactory looks like and what it will
-do for us:
-
-.. image:: _static/rabbit_factory_1.svg
-    :target: _static/rabbit_factory_1.pdf
-    :align: center
-
-The RabbitFactory gives us all of the networking features that we have described
-so far with a simple interface.  In fact, it is intended to be an interface
-class or a class from which another class inherits.  This way the inheriting
-class just gets all of the features and the API of the RabbitFactory without
-having to concern themselves with the details of how the networks are set up.
-
-From the diagram, we see that the RabbitFactory will need the RabbitMq
-credentials, a tx and an rx routing key for the mesh network and a snoop_key
-(encryption key) for the snoop network.  It will provide the ``start_at``,
-``enable_snoop``, ``disable_snoop``, ``transit`` and ``snoop_scribble`` methods
-for access to the mesh and the snoop networks.  The user doesn't have to worry
-about the networking details.  If they build a statechart from a class which
-inherits from the RabbitFactory most of the networking complexity will disappear
-from view.
-
-To summarize, we can build two different mesh networks. One with routing keys
-and one for debugging all of the relevant state charts spy and trace streams. To
-connect, transmit and receive with these networks a statechart just has to be a
-descendant of the RabbitFactory class.
-
-In the next section, we will connect Gandbold to his brethren using these
-networks and the RabbitFactory API.
+The most important of these networks, is the mesh network, which is used by the
+statecharts to send events to one another.  To send an event, a statechart would
+use its ``transmit`` method.
+
+RabbitMQ permits the use of a `topic routing feature
+<https://www.rabbitmq.com/tutorials/tutorial-five-python.html>`_, which
+miros-rabbitmq provides access to on the mesh network only.
+
+The two snoop networks are set up for debugging the distributed system from one
+computer.  For a node to participate in one of the snoop networks, you need to enable it
+with a call to either ``enable_snoop_trace`` or ``enable_snoop_spy`` methods.
 
 .. _i_mongol_example-attaching-the-mongol-to-the-mesh:
 
@@ -3191,11 +2593,10 @@ discover new voodoo tricks.
 
   The interactions between the simple rules of your agents create the global
   emergent patterns, so make it easy to change them while you are testing your
-  system.  In this example the impatience of one horse archer starts a emergent
+  system.  In this example the impatience of one horse archer starts an emergent
   oscillation.  The amount of this impatience could be turned into an attribute
   of the Horse Archer class so that you can parametrize it, and tune it while
   testing the team of horse archers.
-
 
 
 .. _mesh_network: https://github.com/aleph2c/miros/blob/master/examples/mesh_network.py

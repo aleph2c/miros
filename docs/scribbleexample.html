@@ -4,20 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Hacking to Learn &#8212; miros 2.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '2.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -32,8 +24,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -56,19 +47,19 @@
 </ol>
 <div class="section" id="a-picture-and-a-question">
 <h2>A Picture and a Question<a class="headerlink" href="#a-picture-and-a-question" title="Permalink to this headline">¶</a></h2>
-<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
-when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?</p>
+<img alt="_images/scribble.svg" src="_images/scribble.svg" /><p>Suppose we started the above chart in <code class="docutils literal notranslate"><span class="pre">s11</span></code>, then we send a <code class="docutils literal notranslate"><span class="pre">T</span></code> event to it,
+when would each of the functions, <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>, <code class="docutils literal notranslate"><span class="pre">g</span></code>, and <code class="docutils literal notranslate"><span class="pre">t</span></code> happen?</p>
 <p>If you are unfamiliar with UML, this part of the diagram:</p>
 <a class="reference external image-reference" href="_static/guard.pdf"><div align="center" class="align-center"><img alt="_images/guard.svg" src="_images/guard.svg" /></div>
 </a>
 <p>contains a <strong>guard</strong>.  Specifically, the code:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">g</span><span class="p">()]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">g</span><span class="p">()]</span>
 </pre></div>
 </div>
 <p>on the arrow is the <strong>guard</strong>.</p>
 <p>It is shorthand for: <cite>if the logic between the square brackets is True then let
 the event on the arrow pass through</cite>.  The code that is after the guard on the
-diagram, <code class="docutils literal"><span class="pre">t()</span></code>, runs if the guard doesn’t block it.  Now that we know how a
+diagram, <code class="docutils literal notranslate"><span class="pre">t()</span></code>, runs if the guard doesn’t block it.  Now that we know how a
 guard works, we can infer that:</p>
 <a class="reference external image-reference" href="_static/guard2.pdf"><div align="center" class="align-center"><img alt="_images/guard2.svg" src="_images/guard2.svg" /></div>
 </a>
@@ -83,51 +74,51 @@ guard works, we can infer that:</p>
 <div class="section" id="a-partial-answer">
 <h2>A Partial Answer<a class="headerlink" href="#a-partial-answer" title="Permalink to this headline">¶</a></h2>
 <p>Now that we understand that, let’s re-ask the question:</p>
-<p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
-when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
+<p>“Suppose we started the above chart in <code class="docutils literal notranslate"><span class="pre">s11</span></code>, then we send a <code class="docutils literal notranslate"><span class="pre">T</span></code> event to it,
+when would each of the functions, <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>, <code class="docutils literal notranslate"><span class="pre">g</span></code>, and <code class="docutils literal notranslate"><span class="pre">t</span></code> happen?”</p>
 <a class="reference external image-reference" href="_static/scribble.pdf"><div align="center" class="align-center"><img alt="_images/scribble.svg" src="_images/scribble.svg" /></div>
 </a>
-<p>Well, if we start in <code class="docutils literal"><span class="pre">s11</span></code>, then we receive a <code class="docutils literal"><span class="pre">T</span></code>, <code class="docutils literal"><span class="pre">s11</span></code> wouldn’t know
-what to do with <code class="docutils literal"><span class="pre">T</span></code>, so it would pass it out to <code class="docutils literal"><span class="pre">s1</span></code>.  <code class="docutils literal"><span class="pre">s1</span></code> <em>does know</em>
-what to do with <code class="docutils literal"><span class="pre">T</span></code>, it would try to pass it to <code class="docutils literal"><span class="pre">s2</span></code>.</p>
-<p>Ok, now how do we get from <code class="docutils literal"><span class="pre">s11</span></code> to <code class="docutils literal"><span class="pre">s2</span></code>?  We need to exit, <code class="docutils literal"><span class="pre">s11</span></code>,
-then we need to exit <code class="docutils literal"><span class="pre">s1</span></code> then we need to enter <code class="docutils literal"><span class="pre">s2</span></code>.  Oh, and don’t forget
-to run <code class="docutils literal"><span class="pre">g</span></code> and <code class="docutils literal"><span class="pre">t</span></code> on the <code class="docutils literal"><span class="pre">T</span></code> event.  Here is a working theory:</p>
+<p>Well, if we start in <code class="docutils literal notranslate"><span class="pre">s11</span></code>, then we receive a <code class="docutils literal notranslate"><span class="pre">T</span></code>, <code class="docutils literal notranslate"><span class="pre">s11</span></code> wouldn’t know
+what to do with <code class="docutils literal notranslate"><span class="pre">T</span></code>, so it would pass it out to <code class="docutils literal notranslate"><span class="pre">s1</span></code>.  <code class="docutils literal notranslate"><span class="pre">s1</span></code> <em>does know</em>
+what to do with <code class="docutils literal notranslate"><span class="pre">T</span></code>, it would try to pass it to <code class="docutils literal notranslate"><span class="pre">s2</span></code>.</p>
+<p>Ok, now how do we get from <code class="docutils literal notranslate"><span class="pre">s11</span></code> to <code class="docutils literal notranslate"><span class="pre">s2</span></code>?  We need to exit, <code class="docutils literal notranslate"><span class="pre">s11</span></code>,
+then we need to exit <code class="docutils literal notranslate"><span class="pre">s1</span></code> then we need to enter <code class="docutils literal notranslate"><span class="pre">s2</span></code>.  Oh, and don’t forget
+to run <code class="docutils literal notranslate"><span class="pre">g</span></code> and <code class="docutils literal notranslate"><span class="pre">t</span></code> on the <code class="docutils literal notranslate"><span class="pre">T</span></code> event.  Here is a working theory:</p>
 <ol class="arabic simple">
-<li><code class="docutils literal"><span class="pre">a</span></code> will run because <code class="docutils literal"><span class="pre">s11</span></code> needs to be exited.</li>
-<li><code class="docutils literal"><span class="pre">b</span></code> will run because <code class="docutils literal"><span class="pre">s1</span></code> needs to be exited.</li>
-<li><code class="docutils literal"><span class="pre">g</span></code> will run because it is the guard for the <cite>T</cite> event between the <code class="docutils literal"><span class="pre">s1</span></code> and <code class="docutils literal"><span class="pre">s2</span></code> states.</li>
-<li><code class="docutils literal"><span class="pre">t</span></code> will run (assuming that <code class="docutils literal"><span class="pre">g</span></code> returned true)</li>
-<li><code class="docutils literal"><span class="pre">c</span></code> will run because <code class="docutils literal"><span class="pre">s2</span></code> needs to be entered.</li>
+<li><code class="docutils literal notranslate"><span class="pre">a</span></code> will run because <code class="docutils literal notranslate"><span class="pre">s11</span></code> needs to be exited.</li>
+<li><code class="docutils literal notranslate"><span class="pre">b</span></code> will run because <code class="docutils literal notranslate"><span class="pre">s1</span></code> needs to be exited.</li>
+<li><code class="docutils literal notranslate"><span class="pre">g</span></code> will run because it is the guard for the <cite>T</cite> event between the <code class="docutils literal notranslate"><span class="pre">s1</span></code> and <code class="docutils literal notranslate"><span class="pre">s2</span></code> states.</li>
+<li><code class="docutils literal notranslate"><span class="pre">t</span></code> will run (assuming that <code class="docutils literal notranslate"><span class="pre">g</span></code> returned true)</li>
+<li><code class="docutils literal notranslate"><span class="pre">c</span></code> will run because <code class="docutils literal notranslate"><span class="pre">s2</span></code> needs to be entered.</li>
 </ol>
 </div>
 <div class="section" id="a-better-answer">
 <h2>A Better Answer<a class="headerlink" href="#a-better-answer" title="Permalink to this headline">¶</a></h2>
 <p>Now that we have a partial answer, let’s re-ask the question:</p>
-<p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
-when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
+<p>“Suppose we started the above chart in <code class="docutils literal notranslate"><span class="pre">s11</span></code>, then we send a <code class="docutils literal notranslate"><span class="pre">T</span></code> event to it,
+when would each of the functions, <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>, <code class="docutils literal notranslate"><span class="pre">g</span></code>, and <code class="docutils literal notranslate"><span class="pre">t</span></code> happen?”</p>
 <a class="reference external image-reference" href="_static/scribble.pdf"><div align="center" class="align-center"><img alt="_images/scribble.svg" src="_images/scribble.svg" /></div>
 </a>
-<p>If we look at the <code class="docutils literal"><span class="pre">s2</span></code> state, we see that it has an initialization event
-(black dot) with another function <code class="docutils literal"><span class="pre">d</span></code> hanging on it .  After <code class="docutils literal"><span class="pre">s2</span></code> is
-entered, we would expect the next thing to be a transition into the <code class="docutils literal"><span class="pre">s21</span></code>
-state, but first we would run the <code class="docutils literal"><span class="pre">d</span></code> function on the arrow tied to the black
-dot, since it is outside of the <code class="docutils literal"><span class="pre">s21</span></code> state and we haven’t entered it yet.
+<p>If we look at the <code class="docutils literal notranslate"><span class="pre">s2</span></code> state, we see that it has an initialization event
+(black dot) with another function <code class="docutils literal notranslate"><span class="pre">d</span></code> hanging on it .  After <code class="docutils literal notranslate"><span class="pre">s2</span></code> is
+entered, we would expect the next thing to be a transition into the <code class="docutils literal notranslate"><span class="pre">s21</span></code>
+state, but first we would run the <code class="docutils literal notranslate"><span class="pre">d</span></code> function on the arrow tied to the black
+dot, since it is outside of the <code class="docutils literal notranslate"><span class="pre">s21</span></code> state and we haven’t entered it yet.
 Let’s add this to our working theory:</p>
 <ol class="arabic simple">
-<li><code class="docutils literal"><span class="pre">a</span></code> will run because <code class="docutils literal"><span class="pre">s11</span></code> needs to be exited.</li>
-<li><code class="docutils literal"><span class="pre">b</span></code> will run because <code class="docutils literal"><span class="pre">s1</span></code> needs to be exited.</li>
-<li><code class="docutils literal"><span class="pre">g</span></code> will run because it is the guard for the <cite>T</cite> event between the <code class="docutils literal"><span class="pre">s1</span></code> and <code class="docutils literal"><span class="pre">s2</span></code> states.</li>
-<li><code class="docutils literal"><span class="pre">t</span></code> will run (assuming that <code class="docutils literal"><span class="pre">g</span></code> returned true)</li>
-<li><code class="docutils literal"><span class="pre">c</span></code> will run because <code class="docutils literal"><span class="pre">s2</span></code> needs to be entered.</li>
-<li><code class="docutils literal"><span class="pre">d</span></code> will run on the init transition event from <code class="docutils literal"><span class="pre">s2</span></code> to <code class="docutils literal"><span class="pre">s21</span></code></li>
-<li><code class="docutils literal"><span class="pre">e</span></code> will run because the <code class="docutils literal"><span class="pre">s21</span></code> needs to be entered.</li>
+<li><code class="docutils literal notranslate"><span class="pre">a</span></code> will run because <code class="docutils literal notranslate"><span class="pre">s11</span></code> needs to be exited.</li>
+<li><code class="docutils literal notranslate"><span class="pre">b</span></code> will run because <code class="docutils literal notranslate"><span class="pre">s1</span></code> needs to be exited.</li>
+<li><code class="docutils literal notranslate"><span class="pre">g</span></code> will run because it is the guard for the <cite>T</cite> event between the <code class="docutils literal notranslate"><span class="pre">s1</span></code> and <code class="docutils literal notranslate"><span class="pre">s2</span></code> states.</li>
+<li><code class="docutils literal notranslate"><span class="pre">t</span></code> will run (assuming that <code class="docutils literal notranslate"><span class="pre">g</span></code> returned true)</li>
+<li><code class="docutils literal notranslate"><span class="pre">c</span></code> will run because <code class="docutils literal notranslate"><span class="pre">s2</span></code> needs to be entered.</li>
+<li><code class="docutils literal notranslate"><span class="pre">d</span></code> will run on the init transition event from <code class="docutils literal notranslate"><span class="pre">s2</span></code> to <code class="docutils literal notranslate"><span class="pre">s21</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">e</span></code> will run because the <code class="docutils literal notranslate"><span class="pre">s21</span></code> needs to be entered.</li>
 </ol>
 </div>
 <div class="section" id="our-first-working-hypothesis">
 <h2>Our First Working Hypothesis<a class="headerlink" href="#our-first-working-hypothesis" title="Permalink to this headline">¶</a></h2>
-<p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
-when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
+<p>“Suppose we started the above chart in <code class="docutils literal notranslate"><span class="pre">s11</span></code>, then we send a <code class="docutils literal notranslate"><span class="pre">T</span></code> event to it,
+when would each of the functions, <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>, <code class="docutils literal notranslate"><span class="pre">g</span></code>, and <code class="docutils literal notranslate"><span class="pre">t</span></code> happen?”</p>
 <a class="reference external image-reference" href="_static/scribble.pdf"><div align="center" class="align-center"><img alt="_images/scribble.svg" src="_images/scribble.svg" /></div>
 </a>
 <p>Ok, our thinking is a bit clearer now but let’s tighten up our answer.  There are
@@ -135,16 +126,16 @@ actually two parts, because the guard can return True or False.  We will start w
 easy part of the answer, then explain the longer part of the answer:</p>
 <ol class="arabic simple">
 <li>If g() returns False, none of the functions are called.</li>
-<li>If g() returns True, then…  wait <code class="docutils literal"><span class="pre">g</span></code> had to be called first? Hmm.. whatever, here is
-my theory so far:  <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>.  It is
+<li>If g() returns True, then…  wait <code class="docutils literal notranslate"><span class="pre">g</span></code> had to be called first? Hmm.. whatever, here is
+my theory so far:  <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">g</span></code>, <code class="docutils literal notranslate"><span class="pre">t</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>.  It is
 easy to answer this way because my eyes work that way when I’m looking at
 the picture.</li>
 </ol>
-<p>But, there is something nagging at me now: <code class="docutils literal"><span class="pre">g</span></code> had to be called first, otherwise
+<p>But, there is something nagging at me now: <code class="docutils literal notranslate"><span class="pre">g</span></code> had to be called first, otherwise
 my answer doesn’t really make any sense.  So, here is my answer:</p>
 <ol class="arabic simple">
-<li>If g() returns False, only <code class="docutils literal"><span class="pre">g</span></code> is called</li>
-<li>If g() returns True, then <code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>.</li>
+<li>If g() returns False, only <code class="docutils literal notranslate"><span class="pre">g</span></code> is called</li>
+<li>If g() returns True, then <code class="docutils literal notranslate"><span class="pre">g</span></code>, <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">t</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>.</li>
 </ol>
 <p>We have our theory, but we are hackers not philosophers.  We have more work to
 do.  Hackers ruthlessly deploy the scientific method to seek understanding
@@ -163,7 +154,7 @@ up the statechart in the diagram and actually see what happens.</p>
 <span id="scribbleexample-from-diagram-to-code-first-pass"></span><h2>Code, Make a Picture<a class="headerlink" href="#code-make-a-picture" title="Permalink to this headline">¶</a></h2>
 <p>To begin with I will draw the picture in the code, so that as I work I can see
 what I’m trying to build:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">+----------------------------- s -------------------------------+</span>
 <span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
 <span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
@@ -183,7 +174,7 @@ what I’m trying to build:</p>
 <div class="section" id="code-required-imports">
 <span id="scribbleexample-from-diagram-to-code-second-pass"></span><h2>Code, Required Imports<a class="headerlink" href="#code-required-imports" title="Permalink to this headline">¶</a></h2>
 <p>Now I’ll import the items I’ll need to run my experiment:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">+----------------------------- s -------------------------------+</span>
 <span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
 <span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
@@ -208,7 +199,7 @@ what I’m trying to build:</p>
 <div class="section" id="code-frame-in-the-states">
 <span id="scribbleexample-from-diagram-to-code-third-pass"></span><h2>Code, Frame in the States<a class="headerlink" href="#code-frame-in-the-states" title="Permalink to this headline">¶</a></h2>
 <p>Now I will frame in the state methods:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">+----------------------------- s -------------------------------+</span>
 <span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
 <span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
@@ -253,7 +244,7 @@ what I’m trying to build:</p>
 <span id="scribbleexample-from-diagram-to-code-fourth-pass"></span><h2>Code, Add Common Internal State Code<a class="headerlink" href="#code-add-common-internal-state-code" title="Permalink to this headline">¶</a></h2>
 <p>Now I add the internal-event-handling code into each of the state
 methods:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">+----------------------------- s -------------------------------+</span>
 <span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
 <span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
@@ -337,7 +328,7 @@ methods:</p>
 <div class="section" id="code-add-hiearchy">
 <span id="scribbleexample-from-diagram-to-code-fifth-pass"></span><h2>Code, Add Hiearchy<a class="headerlink" href="#code-add-hiearchy" title="Permalink to this headline">¶</a></h2>
 <p>Then I add the hierarchy:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">+----------------------------- s -------------------------------+</span>
 <span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
 <span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
@@ -426,9 +417,9 @@ methods:</p>
 </div>
 <div class="section" id="code-add-the-t-and-init-events">
 <span id="scribbleexample-from-diagram-to-code-sixth-pass"></span><h2>Code, Add the T and Init events<a class="headerlink" href="#code-add-the-t-and-init-events" title="Permalink to this headline">¶</a></h2>
-<p>Now I’ll add management for the <code class="docutils literal"><span class="pre">T</span></code> event in state <code class="docutils literal"><span class="pre">s1</span></code> event and the
-<code class="docutils literal"><span class="pre">init</span></code> event needed in <code class="docutils literal"><span class="pre">s2</span></code>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<p>Now I’ll add management for the <code class="docutils literal notranslate"><span class="pre">T</span></code> event in state <code class="docutils literal notranslate"><span class="pre">s1</span></code> event and the
+<code class="docutils literal notranslate"><span class="pre">init</span></code> event needed in <code class="docutils literal notranslate"><span class="pre">s2</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">+----------------------------- s -------------------------------+</span>
 <span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
 <span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
@@ -527,7 +518,7 @@ seeing what happens:</p>
 it has received an instruction.</p>
 <p id="scribbleexample">When we run this code it outputs:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
  <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:s11_state&#39;</span><span class="p">,</span>
  <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:s1_state&#39;</span><span class="p">,</span>
  <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:s_state&#39;</span><span class="p">,</span>
@@ -543,11 +534,11 @@ it has received an instruction.</p>
 </div>
 <div class="section" id="code-add-the-guard-and-t-function">
 <span id="scribbleexample-from-diagram-to-code-ninth-pass"></span><h2>Code, Add the guard and t function<a class="headerlink" href="#code-add-the-guard-and-t-function" title="Permalink to this headline">¶</a></h2>
-<p>Now lets add the guard function <code class="docutils literal"><span class="pre">g</span></code> and the <code class="docutils literal"><span class="pre">t</span></code> function into s1_state,
+<p>Now lets add the guard function <code class="docutils literal notranslate"><span class="pre">g</span></code> and the <code class="docutils literal notranslate"><span class="pre">t</span></code> function into s1_state,
 this will build this part of the picture:</p>
 <a class="reference external image-reference" href="_static/guard.pdf"><div align="center" class="align-center"><img alt="_images/guard.svg" src="_images/guard.svg" /></div>
 </a>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">+----------------------------- s -------------------------------+</span>
 <span class="sd">| +-------- s1 ---------+                 +-------- s2 -------+ |</span>
 <span class="sd">| | exit / b()          |                 | entry / c()       | |</span>
@@ -654,15 +645,15 @@ this will build this part of the picture:</p>
 </pre></div>
 </div>
 <p>The guard condition totally makes sense when you look it it in Python.</p>
-<p>Functions <code class="docutils literal"><span class="pre">g</span></code> and <code class="docutils literal"><span class="pre">t</span></code> use the chart’s <code class="docutils literal"><span class="pre">scribble</span></code> method which puts little
+<p>Functions <code class="docutils literal notranslate"><span class="pre">g</span></code> and <code class="docutils literal notranslate"><span class="pre">t</span></code> use the chart’s <code class="docutils literal notranslate"><span class="pre">scribble</span></code> method which puts little
 notes directly into the spy output log.  We do this so that our tests will
-reveal exactly when <code class="docutils literal"><span class="pre">g</span></code> and <code class="docutils literal"><span class="pre">t</span></code> are called by the event processor.</p>
+reveal exactly when <code class="docutils literal notranslate"><span class="pre">g</span></code> and <code class="docutils literal notranslate"><span class="pre">t</span></code> are called by the event processor.</p>
 </div>
 <div class="section" id="code-add-the-other-functions">
 <span id="scribbleexample-from-diagram-to-code-tenth-pass"></span><h2>Code, Add the other functions<a class="headerlink" href="#code-add-the-other-functions" title="Permalink to this headline">¶</a></h2>
-<p>Now let’s frame <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>. Notice we re-name the <code class="docutils literal"><span class="pre">e</span></code>
-function to <code class="docutils literal"><span class="pre">e_function</span></code> to avoid a name collision:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+<p>Now let’s frame <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>. Notice we re-name the <code class="docutils literal notranslate"><span class="pre">e</span></code>
+function to <code class="docutils literal notranslate"><span class="pre">e_function</span></code> to avoid a name collision:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
   2
   3
   4
@@ -922,12 +913,12 @@ function to <code class="docutils literal"><span class="pre">e_function</span></
 <h2>Challenging Our Hypothesis<a class="headerlink" href="#challenging-our-hypothesis" title="Permalink to this headline">¶</a></h2>
 <p>Let’s bring our question and our hypothesis back into view so we can think
 about it again:</p>
-<p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
-when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
+<p>“Suppose we started the above chart in <code class="docutils literal notranslate"><span class="pre">s11</span></code>, then we send a <code class="docutils literal notranslate"><span class="pre">T</span></code> event to it,
+when would each of the functions, <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>, <code class="docutils literal notranslate"><span class="pre">g</span></code>, and <code class="docutils literal notranslate"><span class="pre">t</span></code> happen?”</p>
 <a class="reference external image-reference" href="_static/scribble.pdf"><div align="center" class="align-center"><img alt="_images/scribble.svg" src="_images/scribble.svg" /></div>
 </a>
 <p>Our answer:
-<code class="docutils literal"><span class="pre">if</span> <span class="pre">g()</span> <span class="pre">returns</span> <span class="pre">True,</span> <span class="pre">then</span> <span class="pre">the</span> <span class="pre">function</span> <span class="pre">order</span> <span class="pre">will</span> <span class="pre">be:</span></code> <code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code></p>
+<code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">g()</span> <span class="pre">returns</span> <span class="pre">True,</span> <span class="pre">then</span> <span class="pre">the</span> <span class="pre">function</span> <span class="pre">order</span> <span class="pre">will</span> <span class="pre">be:</span></code> <code class="docutils literal notranslate"><span class="pre">g</span></code>, <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">t</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code></p>
 <p>Let’s examine my own personal psychological state.  I have been taking tiny
 steps to keep my cognitive load light, and right now I’m feeling pretty good.
 I have a theory, but more importantly I have built up some firm reality outside
@@ -939,7 +930,7 @@ activated and I’m feeling ready to grok something about these statecharts.</p>
 <p>If you have actually been doing the work and debugging your own code, well,
 maybe you feel this too.</p>
 <p>Now, let’s pull the trigger and see what happens.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;T:s11_state&#39;</span><span class="p">,</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;T:s11_state&#39;</span><span class="p">,</span>
  <span class="s1">&#39;T:s1_state&#39;</span><span class="p">,</span>
 <span class="hll"> <span class="s1">&#39;Running g() -- the guard, which return True&#39;</span><span class="p">,</span>
 </span><span class="hll"> <span class="s1">&#39;Running t() -- function run on event T&#39;</span><span class="p">,</span>
@@ -961,25 +952,25 @@ maybe you feel this too.</p>
  <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>Look, it’s different.  We got an order of: <code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>,
-<code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>.</p>
+<p>Look, it’s different.  We got an order of: <code class="docutils literal notranslate"><span class="pre">g</span></code>, <code class="docutils literal notranslate"><span class="pre">t</span></code>, <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>,
+<code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>.</p>
 <p>The answer:
-<code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>.</p>
-<p>Now let’s see what happens when we adjust the <code class="docutils literal"><span class="pre">g</span></code> function to return a False:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;T:s11_state&#39;</span><span class="p">,</span>
+<code class="docutils literal notranslate"><span class="pre">g</span></code>, <code class="docutils literal notranslate"><span class="pre">t</span></code>, <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>.</p>
+<p>Now let’s see what happens when we adjust the <code class="docutils literal notranslate"><span class="pre">g</span></code> function to return a False:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;T:s11_state&#39;</span><span class="p">,</span>
  <span class="s1">&#39;T:s1_state&#39;</span><span class="p">,</span>
  <span class="s1">&#39;Running g() -- the guard, which return False&#39;</span><span class="p">,</span>
  <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Now that we understand that, let’s re-ask the question:</p>
-<p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
-when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
+<p>“Suppose we started the above chart in <code class="docutils literal notranslate"><span class="pre">s11</span></code>, then we send a <code class="docutils literal notranslate"><span class="pre">T</span></code> event to it,
+when would each of the functions, <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>, <code class="docutils literal notranslate"><span class="pre">g</span></code>, and <code class="docutils literal notranslate"><span class="pre">t</span></code> happen?”</p>
 <a class="reference external image-reference" href="_static/scribble.pdf"><div align="center" class="align-center"><img alt="_images/scribble.svg" src="_images/scribble.svg" /></div>
 </a>
 <ol class="arabic simple">
-<li>If g() returns False, only <code class="docutils literal"><span class="pre">g</span></code> is called</li>
-<li>If g() returns True, then <code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>.</li>
+<li>If g() returns False, only <code class="docutils literal notranslate"><span class="pre">g</span></code> is called</li>
+<li>If g() returns True, then <code class="docutils literal notranslate"><span class="pre">g</span></code>, <code class="docutils literal notranslate"><span class="pre">t</span></code>, <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>.</li>
 </ol>
 <p>We know this, because we just confirmed the behavior.</p>
 </div>
@@ -1008,23 +999,23 @@ state configuration is exited and the target state configuration is entered
 <cite>atomically</cite>.  That way the state machine is observable only in a safe state
 configuration, either before or after the transition, but not in the middle.</p>
 </div></blockquote>
-<p>So, our <code class="docutils literal"><span class="pre">t</span></code> function runs within the context of the thing that asked for the
+<p>So, our <code class="docutils literal notranslate"><span class="pre">t</span></code> function runs within the context of the thing that asked for the
 transition.  This keeps it out of the strange limbo state described above.</p>
 <p>Let’s think about how we could re-adjust our thinking, by re-asking the
 question and considering how we could approach it the next time we see
 something like it.</p>
-<p>“Suppose we started the above chart in <code class="docutils literal"><span class="pre">s11</span></code>, then we send a <code class="docutils literal"><span class="pre">T</span></code> event to it,
-when would each of the functions, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code>, <code class="docutils literal"><span class="pre">g</span></code>, and <code class="docutils literal"><span class="pre">t</span></code> happen?”</p>
+<p>“Suppose we started the above chart in <code class="docutils literal notranslate"><span class="pre">s11</span></code>, then we send a <code class="docutils literal notranslate"><span class="pre">T</span></code> event to it,
+when would each of the functions, <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>, <code class="docutils literal notranslate"><span class="pre">g</span></code>, and <code class="docutils literal notranslate"><span class="pre">t</span></code> happen?”</p>
 <a class="reference external image-reference" href="_static/scribble.pdf"><div align="center" class="align-center"><img alt="_images/scribble.svg" src="_images/scribble.svg" /></div>
 </a>
-<p>Knowing that the source state of our <code class="docutils literal"><span class="pre">T</span></code> event was <strong>s11</strong> you would first
+<p>Knowing that the source state of our <code class="docutils literal notranslate"><span class="pre">T</span></code> event was <strong>s11</strong> you would first
 re-imagine the diagram as:</p>
 <a class="reference external image-reference" href="_static/scribble2.pdf"><div align="center" class="align-center"><img alt="_images/scribble2.svg" src="_images/scribble2.svg" /></div>
 </a>
 <p>Then the answer to the question would just reveal itself from your imagined diagram:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">g</span></code>, <code class="docutils literal"><span class="pre">t</span></code>, <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code>, <code class="docutils literal"><span class="pre">d</span></code>, <code class="docutils literal"><span class="pre">e</span></code> if <code class="docutils literal"><span class="pre">g</span></code> returns True</li>
-<li><code class="docutils literal"><span class="pre">g</span></code> if <code class="docutils literal"><span class="pre">g</span></code> returns False</li>
+<li><code class="docutils literal notranslate"><span class="pre">g</span></code>, <code class="docutils literal notranslate"><span class="pre">t</span></code>, <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code> if <code class="docutils literal notranslate"><span class="pre">g</span></code> returns True</li>
+<li><code class="docutils literal notranslate"><span class="pre">g</span></code> if <code class="docutils literal notranslate"><span class="pre">g</span></code> returns False</li>
 </ul>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 <table class="docutils footnote" frame="void" id="f1" rules="none">
@@ -1085,12 +1076,14 @@ re-imagine the diagram as:</p>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

@@ -4,20 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Simple Posting Example &#8212; miros 2.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '2.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -32,8 +24,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -61,7 +52,7 @@ inner state.</p>
 <p>The event with signal name <strong>A</strong> will cause a transition from the middle state to
 the inner state.  The event with signal name <strong>B</strong> will cause the outer event to
 exit, print “flash b!” then enter back into the outer state.  Finally, the
-event with the signal name <strong>D</strong> will cause the <code class="docutils literal"><span class="pre">recall</span></code> method to be triggered
+event with the signal name <strong>D</strong> will cause the <code class="docutils literal notranslate"><span class="pre">recall</span></code> method to be triggered
 in the outer state.</p>
 <p>Now that we have a feeling for how the states relate and how they react to
 events, lets look at the custom code that has been placed within the
@@ -78,17 +69,17 @@ When the innner state is initialized, it prints “”flash B!” to the termina
 then stops processing.</p>
 <p>Generally speaking we have an idea about what is going on with the chart, now
 let’s look how to implement this design using the <em>miros</em> library, then start it
-up in the <code class="docutils literal"><span class="pre">outer</span></code> state.  We will do this in three steps:</p>
+up in the <code class="docutils literal notranslate"><span class="pre">outer</span></code> state.  We will do this in three steps:</p>
 <ol class="arabic simple">
 <li>We will define the state methods and fill them with the custom code in the
 diagram.</li>
 <li>We will create an active object</li>
 <li>We will tie our active object to the state methods, by starting it within
-the <code class="docutils literal"><span class="pre">outer</span></code> state.</li>
+the <code class="docutils literal notranslate"><span class="pre">outer</span></code> state.</li>
 <li>We will trigger an event and watch the chart react.</li>
 </ol>
 <p>The <strong>outer</strong> state method would look like this:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -127,33 +118,33 @@ the <code class="docutils literal"><span class="pre">outer</span></code> state.<
   <span class="k">return</span> <span class="n">status</span>
 </pre></div>
 </td></tr></table></div>
-<p>On line <strong>1</strong> we see we are using the <code class="docutils literal"><span class="pre">&#64;spy_on</span></code> decorator.  This will allow us to
+<p>On line <strong>1</strong> we see we are using the <code class="docutils literal notranslate"><span class="pre">&#64;spy_on</span></code> decorator.  This will allow us to
 look at how the chart behaves in a log once we start sending events to
 it.</p>
-<p>Line <strong>2</strong> has the state name, and the method signature.  The <code class="docutils literal"><span class="pre">ao</span></code> object will be
-overwritten with <code class="docutils literal"><span class="pre">self</span></code> when this method is used by an active object.
+<p>Line <strong>2</strong> has the state name, and the method signature.  The <code class="docutils literal notranslate"><span class="pre">ao</span></code> object will be
+overwritten with <code class="docutils literal notranslate"><span class="pre">self</span></code> when this method is used by an active object.
 However, it can be used by other active objects as well, in that it is a kind
 of slide-method that can be shared between objects.  So long as we don’t mark the
 function’s name space directly we could share this method between as many
 active objects as we construct in our system.  In this example we only use this
 method within one active object.  The second argument in the method signature
 contains the event that is being sent to this state method.</p>
-<p>On line <strong>3</strong> we see the <code class="docutils literal"><span class="pre">status</span></code> variable defined.  Pay special attention to
+<p>On line <strong>3</strong> we see the <code class="docutils literal notranslate"><span class="pre">status</span></code> variable defined.  Pay special attention to
 this status variable, because it is used by the event processor to determine
 what to do as it searches the chart hierarchy while responding to various
 events.  We will talk about this in greater detail as we move through the
 example.</p>
 <p>On lines <strong>4-6</strong>, we see the entry handling for this state.  If we are entering the
-state (line <strong>4</strong>), then call the <code class="docutils literal"><span class="pre">recall</span></code> method of the active object (line <strong>5</strong>)
-and finally set the <code class="docutils literal"><span class="pre">status</span></code> to <code class="docutils literal"><span class="pre">HANDLED</span></code>, or tell the event processor that
+state (line <strong>4</strong>), then call the <code class="docutils literal notranslate"><span class="pre">recall</span></code> method of the active object (line <strong>5</strong>)
+and finally set the <code class="docutils literal notranslate"><span class="pre">status</span></code> to <code class="docutils literal notranslate"><span class="pre">HANDLED</span></code>, or tell the event processor that
 we know what to do with this event and it does not have to recurse the chart
 to respond to the event anymore (line <strong>6</strong>).</p>
 <p>On line <em>7-8</em> we are saying, run no custom code upon exiting the state.  On
 line <em>9-10</em> we are saying, no custom code needs to be run to initialize this
 state.</p>
 <p>Lines <strong>11-13</strong> describe this state’s reaction to an event with the <strong>D</strong>
-signal.  It runs the <code class="docutils literal"><span class="pre">recall</span></code> method of the active object (line <strong>12</strong>) then
-sets the status variable to <code class="docutils literal"><span class="pre">HANDLED</span></code>.  If there is an event in the deferred
+signal.  It runs the <code class="docutils literal notranslate"><span class="pre">recall</span></code> method of the active object (line <strong>12</strong>) then
+sets the status variable to <code class="docutils literal notranslate"><span class="pre">HANDLED</span></code>.  If there is an event in the deferred
 queue of the active object it will be placed into the fifo for the next run to
 completion event.  This probably won’t make sense to you yet, don’t worry when
 we move through the dynamics of the chart, we will see what this means.  Line
@@ -165,9 +156,9 @@ hook pattern which you can read about in the section titled
 <a class="reference internal" href="patterns.html#patterns-ultimate-hook"><span class="std std-ref">Ultimate Hook</span></a>.</p>
 <p>Lines <strong>14-16</strong> describe the <strong>B</strong> arrow on the diagram.  If any state within
 our state chart receives an event called <strong>B</strong> we would like it to pass control
-to the outer state (line 14,16), then exit the outer state, run <code class="docutils literal"><span class="pre">print(flash</span>
+to the outer state (line 14,16), then exit the outer state, run <code class="docutils literal notranslate"><span class="pre">print(flash</span>
 <span class="pre">B)</span></code> (line 15) then re-enter the outer state (line 16).  Pay special attention
-to line 16.  Here we are using the <code class="docutils literal"><span class="pre">trans</span></code> method, which will return the
+to line 16.  Here we are using the <code class="docutils literal notranslate"><span class="pre">trans</span></code> method, which will return the
 status.  Unlike the other parts of this method, we are not saying that the
 status is HANDLED, here we let the trans method decide how to set this
 variable.  This is important since it allows the event processor to perform the
@@ -185,7 +176,7 @@ structure and semantics since many in our industry have become familiar with
 them.  It will also ensure that if you port your work into the quantum
 framework, the code will look about the same there as it does here.</p>
 <p>Now let’s move on to the construction of the <em>middle</em> state:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -242,17 +233,17 @@ framework, the code will look about the same there as it does here.</p>
 <em>1</em> instruments the method.  Line <em>2</em> has the same method signature.  Line <em>3</em>
 uses the same way to set up are return variable.</p>
 <p>On lines <strong>4-14</strong> we see the code which will be run  when this state is
-entered.  Line <strong>5</strong> stores the <code class="docutils literal"><span class="pre">multi_shot_thread</span></code> id which is produced in
-the call to <code class="docutils literal"><span class="pre">post_fifo</span></code> on line <strong>6</strong>.  The <code class="docutils literal"><span class="pre">post_fifo</span></code> call creates a
+entered.  Line <strong>5</strong> stores the <code class="docutils literal notranslate"><span class="pre">multi_shot_thread</span></code> id which is produced in
+the call to <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> on line <strong>6</strong>.  The <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> call creates a
 little parallel thread which will make events then send them back at our
 statechart with no regard to what state our active object is in, it will just
 place the event into the active object’s first in first out buffer.</p>
-<p>We see on lines <strong>12-13</strong> that we <code class="docutils literal"><span class="pre">augment</span></code> our <code class="docutils literal"><span class="pre">ao</span></code> with the attribute
-called <code class="docutils literal"><span class="pre">multi_shot_thread</span></code> and give it the contents that was returned on line
+<p>We see on lines <strong>12-13</strong> that we <code class="docutils literal notranslate"><span class="pre">augment</span></code> our <code class="docutils literal notranslate"><span class="pre">ao</span></code> with the attribute
+called <code class="docutils literal notranslate"><span class="pre">multi_shot_thread</span></code> and give it the contents that was returned on line
 <strong>6</strong>.  This was done to salt away this information so that it can be used in
 the exit condition of this state method.  Now lets jump back to how the
-<code class="docutils literal"><span class="pre">post_fifo</span></code> event was called:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">),</span>
+<code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> event was called:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">),</span>
                 <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
                 <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
                 <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -274,11 +265,11 @@ processor search the chart’s hierarchy with no hope of finding any useful work
 <p>Let’s talk about how this little thread can be canceled upon exiting our state.</p>
 <p>On lines <strong>10-11</strong> we see this comment: “We mark up the ao with this id, so
 that this state function can be used by many different aos.”  Then we see some
-code where the <code class="docutils literal"><span class="pre">multi_shot_thread</span></code> attribute is created an given the id of
-the thread used to post the <em>A</em> events.  Remember, the <code class="docutils literal"><span class="pre">ao</span></code> variable
-represents the <code class="docutils literal"><span class="pre">self</span></code> of your active object.  Here we are creating code that
+code where the <code class="docutils literal notranslate"><span class="pre">multi_shot_thread</span></code> attribute is created an given the id of
+the thread used to post the <em>A</em> events.  Remember, the <code class="docutils literal notranslate"><span class="pre">ao</span></code> variable
+represents the <code class="docutils literal notranslate"><span class="pre">self</span></code> of your active object.  Here we are creating code that
 could be written as this instead:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Re-writing lines 12-13 as if they were in the active object class</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Re-writing lines 12-13 as if they were in the active object class</span>
 <span class="n">this</span><span class="o">.</span><span class="n">multi_shot_thread</span> <span class="o">=</span> <span class="n">multi_shot_thread</span>
 </pre></div>
 </div>
@@ -298,9 +289,9 @@ method, so we can cancel it if we want to.  Now let’s move on.</p>
 does not have to recurse the outer states of the chart.</p>
 <p>Lines <strong>16-18</strong> describes what we want to do when this state is being exited.
 On line <strong>17</strong> we see that we are using the thread id of our little event
-posting thread to cancel that thread.  The <code class="docutils literal"><span class="pre">cancel_event</span></code> method needs a
+posting thread to cancel that thread.  The <code class="docutils literal notranslate"><span class="pre">cancel_event</span></code> method needs a
 specific thread id.  If you wanted to avoid all of this trouble of storing
-event source ids into your active object, you could use the <code class="docutils literal"><span class="pre">cancel_events</span></code>
+event source ids into your active object, you could use the <code class="docutils literal notranslate"><span class="pre">cancel_events</span></code>
 method instead.  See the <a class="reference internal" href="recipes.html#recipes-cancelling-event-source-by-signal-name"><span class="std std-ref">Cancelling Event Source By Signal Name</span></a> recipe.</p>
 <p>From line <strong>20-21</strong> we see that we don’t have any special handling for the
 initialization event for this state.</p>
@@ -308,7 +299,7 @@ initialization event for this state.</p>
 transition into the <strong>inner</strong> state.</p>
 <p>On lines <strong>24-25</strong> we see how this state method handle’s signals it does not
 know what to do with, it sets the status to <strong>SUPER</strong> and sets the
-<code class="docutils literal"><span class="pre">ao.temp.fun</span></code> to the outer function.</p>
+<code class="docutils literal notranslate"><span class="pre">ao.temp.fun</span></code> to the outer function.</p>
 <p>With these bread crumbs the event processor will know what to do so that our
 architecture can give us the dynamics of the Harel statechart formalism.</p>
 <p>It is easy to forget that our statecharts are just programs that repeatedly
@@ -327,7 +318,7 @@ things are called, will behave as they would expect them to.  By placing the
 their cognition, focusing on the design itself rather than how they are going
 to implement it.</p>
 <p>Let’s describe the <strong>inner</strong> state as a state method:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -360,14 +351,14 @@ event with the signal name <strong>B</strong>, but what does this mean?</p>
 <p>To understand this, we have to know that an active object has a kind of
 savings-account queue.  You can put things into it and nothing will happen.  The
 active object won’t react to them until you ask it to react to them with a call
-to the <code class="docutils literal"><span class="pre">recall</span></code> method.  The recall method moves an item out of the
+to the <code class="docutils literal notranslate"><span class="pre">recall</span></code> method.  The recall method moves an item out of the
 <cite>deferred</cite> queue and places it into the <cite>fifo</cite> queue.  The active object reacts
-to elements in the <cite>fifo</cite> so when you call the <code class="docutils literal"><span class="pre">recall</span></code> method you are asking
+to elements in the <cite>fifo</cite> so when you call the <code class="docutils literal notranslate"><span class="pre">recall</span></code> method you are asking
 the chart to react to the oldest thing that was placed into the deferred queue.</p>
-<p>Ok, so <code class="docutils literal"><span class="pre">defer</span></code> stores an Event, so who recalls the event?  By examining our
-state diagram, we see that the <strong>outer</strong> state has a <code class="docutils literal"><span class="pre">recall</span></code> method that it
-calls upon receiving the event named <strong>D</strong>.  The entry of the <code class="docutils literal"><span class="pre">inner</span></code>
-entry handler also has the <code class="docutils literal"><span class="pre">recall</span></code> method.  That’s kind of strange, but this
+<p>Ok, so <code class="docutils literal notranslate"><span class="pre">defer</span></code> stores an Event, so who recalls the event?  By examining our
+state diagram, we see that the <strong>outer</strong> state has a <code class="docutils literal notranslate"><span class="pre">recall</span></code> method that it
+calls upon receiving the event named <strong>D</strong>.  The entry of the <code class="docutils literal notranslate"><span class="pre">inner</span></code>
+entry handler also has the <code class="docutils literal notranslate"><span class="pre">recall</span></code> method.  That’s kind of strange, but this
 will make more sense once we reflect upon the dynamics of the active object.</p>
 <p>Before we do that, let’s look at lines <strong>8-9</strong>.  Here we see that once the state
 is initialized we print, “charging with B” to the terminal.  Once again, this
@@ -383,7 +374,7 @@ wait about 4 seconds and then send an event named <strong>D</strong>?</p>
 <p><em>Hint: I modeled the diagram on a tazor.</em></p>
 <p>Let’s see what happens using our state methods within an active object, then
 reflecting upon it’s behavior.</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
 4
@@ -425,7 +416,7 @@ amplifier which separates the charge at a high voltage across the capacitor.
 After this capacitor is charged up, you can zap somebody; the charge is coming
 out of the capacitor in a hurry.</p>
 <p>Line <strong>9</strong> shows us the action:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -548,7 +539,7 @@ sent a single event to it, and we got all of this action.</p>
 <p>Lines <strong>1-7</strong> occurred as a result of us starting up the active object in the
 <strong>middle</strong> state.  We entered the <strong>outer</strong> state, ran it’s entry code, then
 entered the <strong>middle</strong> state and ran it’s entry code, then it’s <strong>init</strong> code.</p>
-<p>The <strong>entry</strong> code for the <strong>middle</strong> state started up or <code class="docutils literal"><span class="pre">post_fifo</span></code> thread,
+<p>The <strong>entry</strong> code for the <strong>middle</strong> state started up or <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> thread,
 which would post an <strong>A</strong> signal to the chart once a second for 3 seconds.  We
 are charging the capacitor.  To see how, look at lines <strong>7-13</strong>, we see that an
 <strong>A</strong> event was fired, the chart transitioned into the <strong>inner</strong> state, the
@@ -574,7 +565,7 @@ cascade of activity.</p>
 signal was HANDLED (see line <strong>34</strong>), the chart is still in it’s prior
 <strong>inner</strong> state.  Lines <strong>36-38</strong> show the event processor searching the chart
 to see if any of the state methods know how to handle the <strong>B</strong> signal.  It
-finds the <code class="docutils literal"><span class="pre">trans</span></code> code in the <strong>outer</strong> state, builds up a strategy, then
+finds the <code class="docutils literal notranslate"><span class="pre">trans</span></code> code in the <strong>outer</strong> state, builds up a strategy, then
 starts to act on that strategy from lines <strong>39-46</strong>.  We see that it runs the
 <strong>exit</strong> event against the <strong>inner</strong> method, then runs the <strong>exit</strong> event
 against the <strong>middle</strong> method (which cancels our post_fifo thread if it is
@@ -595,7 +586,7 @@ have look like this:</p>
 beginning of our <a class="reference internal" href="#examples-simple-posting-example"><span class="std std-ref">Simple Posting Example</span></a>.  The only adjustment
 was to add a new signal from re-arming our tazor (READY).</p>
 <p>Here are the state methods for the diagram:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">tazor_operating</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
@@ -664,21 +655,21 @@ was to add a new signal from re-arming our tazor (READY).</p>
 </div>
 <p>Now we will create an active object, link the above state methods into it by
 starting it in the arming state:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">tazor</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tazor</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
 <span class="n">tazor</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">arming</span><span class="p">)</span>
 <span class="hll"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">4.0</span><span class="p">)</span>
 </span></pre></div>
 </div>
 <p>Notice that we wait 3 seconds to let it charge up.</p>
 <p>Now let’s pull the trigger:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">tazor</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">TRIGGER_PULLED</span><span class="p">))</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tazor</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">TRIGGER_PULLED</span><span class="p">))</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># if you don&#39;t wait it won&#39;t look like it is working</span>
 <span class="hll"><span class="k">print</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
 </span></pre></div>
 </div>
 <p>The highlighted code above shows that we used the trace to output a high level
 view of what happened when we pulled the trigger:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
 4
@@ -697,14 +688,14 @@ view of what happened when we pulled the trigger:</p>
 expect it to occur between lines <em>4</em> and <em>5</em>.  This is because the trace only
 shows signals that cause state transition.  The <strong>TRIGGER_PULL</strong> signal was
 handled by a HOOK and therefore didn’t directly cause a transition.  Instead,
-it cause the <code class="docutils literal"><span class="pre">recall</span></code> method to post a <strong>CAPACITOR_CHARGE</strong> signal, which
+it cause the <code class="docutils literal notranslate"><span class="pre">recall</span></code> method to post a <strong>CAPACITOR_CHARGE</strong> signal, which
 in turn causes two more state transitions.</p>
 <p>To see our full spy log, we would use the following code:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pp</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pp</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
 </pre></div>
 </div>
 <p>Which outputs the full story:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -851,12 +842,14 @@ in turn causes two more state transitions.</p>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

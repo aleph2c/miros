@@ -4,20 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Spy and Trace Across a Network &#8212; miros 2.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '2.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -30,8 +22,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -56,11 +47,11 @@ trace log on another.</p>
 </div>
 <div class="section" id="getting-the-required-libraries">
 <span id="networked-instrumentation-getting-the-required-libraries"></span><h2>Getting the Required Libraries<a class="headerlink" href="#getting-the-required-libraries" title="Permalink to this headline">¶</a></h2>
-<p>Up until now, I have only been using <code class="docutils literal"><span class="pre">miros</span></code> and the Python standard library.
-To make this example work, you will have to install <code class="docutils literal"><span class="pre">pika</span></code> for messaging with
-<a class="reference internal" href="setting_up_rabbit_mq.html#setting-up-rabbit-mq-setting-up-rabbit-mq"><span class="std std-ref">RabbitMq</span></a> and <code class="docutils literal"><span class="pre">cryptography</span></code>
+<p>Up until now, I have only been using <code class="docutils literal notranslate"><span class="pre">miros</span></code> and the Python standard library.
+To make this example work, you will have to install <code class="docutils literal notranslate"><span class="pre">pika</span></code> for messaging with
+<a class="reference internal" href="setting_up_rabbit_mq.html#setting-up-rabbit-mq-setting-up-rabbit-mq"><span class="std std-ref">RabbitMq</span></a> and <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>
 for encrypting your messages.  So let’s do that now:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">pip3</span> <span class="n">install</span> <span class="n">pika</span> <span class="n">cryptography</span> <span class="o">--</span><span class="n">user</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">pip3</span> <span class="n">install</span> <span class="n">pika</span> <span class="n">cryptography</span> <span class="o">--</span><span class="n">user</span>
 </pre></div>
 </div>
 </div>
@@ -76,7 +67,7 @@ was a producer because it was producing information. The spy and trace
 aggregator running on Windows was the consumer since it consumed the messages
 generated elsewhere.</p>
 <p>To keep things as simple as possible, I wrote a ForeignHsm class which could
-accept spy and trace logs. To access these logs, you would use its <code class="docutils literal"><span class="pre">spy</span></code> and <code class="docutils literal"><span class="pre">trace</span></code>
+accept spy and trace logs. To access these logs, you would use its <code class="docutils literal notranslate"><span class="pre">spy</span></code> and <code class="docutils literal notranslate"><span class="pre">trace</span></code>
 methods, just like you would with any other statechart. So the ForeignHsm object
 will live on the consumer since it will consume the spy and trace logs generated
 by the statechart running on the raspberry pi.</p>
@@ -168,7 +159,7 @@ it works across a network:</p>
 </tr>
 </tbody>
 </table>
-<p>If you are feeling comfortable enough with programming RabbitMq with <code class="docutils literal"><span class="pre">pika</span></code>,
+<p>If you are feeling comfortable enough with programming RabbitMq with <code class="docutils literal notranslate"><span class="pre">pika</span></code>,
 then let us move on and design the producer:</p>
 <a class="reference external image-reference" href="_static/rabbit_chart_producer_1.pdf" id="producer-design"><div align="center" class="align-center"><img alt="_images/rabbit_chart_producer_1.svg" src="_images/rabbit_chart_producer_1.svg" /></div>
 </a>
@@ -197,7 +188,7 @@ example will also demonstrate a straightforward form of encryption.</p>
 <div class="section" id="making-a-class-that-can-send-information-on-the-network">
 <span id="networked-instrumentation-making-a-class-that-can-send-information-on-the-network"></span><h3>Making a Class that can Send Information on the Network<a class="headerlink" href="#making-a-class-that-can-send-information-on-the-network" title="Permalink to this headline">¶</a></h3>
 <p id="networked-instrumentation-subsubsection-titl">Let’s begin framing in the RabbitProducer class:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -239,7 +230,7 @@ these exchanges will get all of its messages.</p>
 <span id="networked-instrumentation-connect-the-output-of-our-spy-and-trace-logs-to-the-network"></span><h3>Connect the output of our Spy and Trace Logs to the Network<a class="headerlink" href="#connect-the-output-of-our-spy-and-trace-logs-to-the-network" title="Permalink to this headline">¶</a></h3>
 <p>Now that we have something that can send messages over a network let’s wire it
 to the logs emitted by our statechart:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -354,32 +345,32 @@ to the logs emitted by our statechart:</p>
 <p>I’m going to ask you to look at the new code out of sequence.  Let’s begin with
 lines 54 and 55.  Here we see we are turning on the live spy and trace logging
 for the statechart.</p>
-<p>On lines 52 and 53 we are calling the <code class="docutils literal"><span class="pre">register_live_spy_callback</span></code> and
-<code class="docutils literal"><span class="pre">register_live_trace_callback</span></code> to allow us to over-write the live spy and
+<p>On lines 52 and 53 we are calling the <code class="docutils literal notranslate"><span class="pre">register_live_spy_callback</span></code> and
+<code class="docutils literal notranslate"><span class="pre">register_live_trace_callback</span></code> to allow us to over-write the live spy and
 trace behavior.  Instead of just outputting information to a terminal, we send
 information into the provided functions.  So for instance, anytime our
 statechart emits an item to its spy instrumentation it will send this to the
-<code class="docutils literal"><span class="pre">broadcast_spy</span></code> function instead.</p>
-<p>The <code class="docutils literal"><span class="pre">broadcast_spy</span></code> function is defined within the <code class="docutils literal"><span class="pre">__init__</span></code> method scope
-to enclose the <code class="docutils literal"><span class="pre">self.channel</span></code> object.  I wrote it this way because the
-<code class="docutils literal"><span class="pre">pika</span></code> callback signature only has one argument, the <code class="docutils literal"><span class="pre">spy_live</span></code> argument.  It doesn’t
-accept <code class="docutils literal"><span class="pre">self</span></code>, and I need access to the <code class="docutils literal"><span class="pre">self</span></code> attribute to gain access to
+<code class="docutils literal notranslate"><span class="pre">broadcast_spy</span></code> function instead.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">broadcast_spy</span></code> function is defined within the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method scope
+to enclose the <code class="docutils literal notranslate"><span class="pre">self.channel</span></code> object.  I wrote it this way because the
+<code class="docutils literal notranslate"><span class="pre">pika</span></code> callback signature only has one argument, the <code class="docutils literal notranslate"><span class="pre">spy_live</span></code> argument.  It doesn’t
+accept <code class="docutils literal notranslate"><span class="pre">self</span></code>, and I need access to the <code class="docutils literal notranslate"><span class="pre">self</span></code> attribute to gain access to
 the network.  I’m sure there is a neat way to get around this limitation, but I
 didn’t think about it too hard since I knew I could solve the issue with a
 closure.</p>
-<p>Both the <code class="docutils literal"><span class="pre">broadcast_spy</span></code> and <code class="docutils literal"><span class="pre">broadcast_trace</span></code> callback functions can send
+<p>Both the <code class="docutils literal notranslate"><span class="pre">broadcast_spy</span></code> and <code class="docutils literal notranslate"><span class="pre">broadcast_trace</span></code> callback functions can send
 strings across the network.  We see these functions are both decorated with
-<code class="docutils literal"><span class="pre">encrypt</span></code>.  This means that before they do their business, their input is sent
-to the <code class="docutils literal"><span class="pre">encrypt</span></code> function defined on line 27.</p>
+<code class="docutils literal notranslate"><span class="pre">encrypt</span></code>.  This means that before they do their business, their input is sent
+to the <code class="docutils literal notranslate"><span class="pre">encrypt</span></code> function defined on line 27.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">There are two main encryption libraries for Python, one is <code class="docutils literal"><span class="pre">cryptography</span></code>
-and the other is <code class="docutils literal"><span class="pre">pycrypto</span></code>.  Use <code class="docutils literal"><span class="pre">cryptography</span></code> since <code class="docutils literal"><span class="pre">pycrypto</span></code> will
+<p class="last">There are two main encryption libraries for Python, one is <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>
+and the other is <code class="docutils literal notranslate"><span class="pre">pycrypto</span></code>.  Use <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> since <code class="docutils literal notranslate"><span class="pre">pycrypto</span></code> will
 crash on windows.</p>
 </div>
 <p>Take note of the key, the consumer will have to have the same key, or it will
 not be able to make sense of the messages sent to it.</p>
-<p>The code is cluttered a bit with the <code class="docutils literal"><span class="pre">strip_trace</span></code> decorator, which removes
+<p>The code is cluttered a bit with the <code class="docutils literal notranslate"><span class="pre">strip_trace</span></code> decorator, which removes
 the newline characters for the trace stream.  I left it in the example because
 you might want to follow this pattern for sprucing up your messages prior to
 sending them out over the network.</p>
@@ -388,7 +379,7 @@ sending them out over the network.</p>
 <span id="networked-instrumentation-create-the-statecharts-hsm"></span><h3>Create the Statechart’s HSM<a class="headerlink" href="#create-the-statechart-s-hsm" title="Permalink to this headline">¶</a></h3>
 <p>Now we create a RabbitProducer chart and add a hierarchical state machine to it.
 The newly added code is highlighted:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
   2
   3
   4
@@ -613,7 +604,7 @@ a foreign consumer.  While building up this object, we provide the credentials
 required to dispatch from the local RabbitMq server.</p>
 <p>On lines 93-104 we create the state methods, linking callbacks to specific
 signal names.</p>
-<p>Finally, on lines 106 to 108 we add the chart’s hierarchy, using the <code class="docutils literal"><span class="pre">nest</span></code>
+<p>Finally, on lines 106 to 108 we add the chart’s hierarchy, using the <code class="docutils literal notranslate"><span class="pre">nest</span></code>
 method.</p>
 </div>
 <div class="section" id="have-our-statechart-react-to-some-events">
@@ -621,8 +612,8 @@ method.</p>
 <p>The full RabbitMq chart has been built and linked to its thread with access to a
 rabbitMq server and thereby it has access to the whole internet.</p>
 <p>Now it is time to start our chart and watch it change its state.  We will start
-it in the producer_outer state, wait, then send a <code class="docutils literal"><span class="pre">B</span></code> signal to it.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># RabbitMq chart construction above</span>
+it in the producer_outer state, wait, then send a <code class="docutils literal notranslate"><span class="pre">B</span></code> signal to it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># RabbitMq chart construction above</span>
 <span class="hll"><span class="n">chart</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">producer_outer</span><span class="p">)</span>
 </span><span class="hll"><span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">))</span>
 </span><span class="hll"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
@@ -634,14 +625,14 @@ it in the producer_outer state, wait, then send a <code class="docutils literal"
 <div class="section" id="close-the-connection">
 <span id="networked-instrumentation-close-the-connection"></span><h3>Close the Connection<a class="headerlink" href="#close-the-connection" title="Permalink to this headline">¶</a></h3>
 <p>To close our connection:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># RabbitMq chart construction above</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># RabbitMq chart construction above</span>
 <span class="c1"># Chart start code and B signal injection above</span>
 <span class="hll"><span class="n">chart</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </span></pre></div>
 </div>
 <p>The code to build our designed producer is complete.  Now let’s see it’s
 terminal output on the raspberry pi:</p>
-<div class="highlight-guess" id="producer-output"><div class="highlight"><pre><span></span>[&#39;START&#39;,
+<div class="highlight-guess notranslate" id="producer-output"><div class="highlight"><pre><span></span>[&#39;START&#39;,
  &#39;SEARCH_FOR_SUPER_SIGNAL:producer_outer&#39;,
  &#39;ENTRY_SIGNAL:producer_outer&#39;,
  &#39;INIT_SIGNAL:producer_outer&#39;,
@@ -666,7 +657,7 @@ terminal output on the raspberry pi:</p>
 </div>
 <p>Comparing this to our <span class="xref std std-ref">producer design</span> we see that it is
 the expected spy and trace.  If we ran our trace through sequence we would see:</p>
-<div class="highlight-guess"><div class="highlight"><pre><span></span><span class="k">[ Chart: producer_192.168.1.72 ]</span>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="k">[ Chart: producer_192.168.1.72 ]</span>
      <span class="na">top          c1</span>
       <span class="na">+start_at()-&gt;|</span>
       <span class="na">|    (1)     |</span>
@@ -700,7 +691,7 @@ them onto the screen.</p>
 <div class="section" id="import-the-required-libraries">
 <span id="networked-instrumentation-report-the-required-libraries"></span><h3>Import the Required Libraries<a class="headerlink" href="#import-the-required-libraries" title="Permalink to this headline">¶</a></h3>
 <p>To begin with we will import the required libraries:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
 4
@@ -713,7 +704,7 @@ them onto the screen.</p>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 </pre></div>
 </td></tr></table></div>
-<p>On line 1 we see that we will be using the <code class="docutils literal"><span class="pre">pika</span></code> rabbitMq Python library.</p>
+<p>On line 1 we see that we will be using the <code class="docutils literal notranslate"><span class="pre">pika</span></code> rabbitMq Python library.</p>
 <p>Line 3 introduces the ForeignHsm class, which is just an interface around the
 spy and trace logs streaming in from another machine.  On line 5 we see we are
 calling the Fermet crypto library which we will use for decrypting the messages
@@ -724,7 +715,7 @@ coming from the producer.</p>
 <p>Now we will define a LocalConsumer class which acts as a container of
 functionality.  In it, we will draw a picture of our network strategy in its doc
 string.</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -818,7 +809,7 @@ that will destroy themselves one the program stops running, identify the name of
 these queues and bind the exchange to the queue name.</p>
 <p>This boilerplate code needs to know the local IP address.  This information is
 obtained from the get_ip static method of the LocalConsumer class.</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -988,11 +979,11 @@ obtained from the get_ip static method of the LocalConsumer class.</p>
 compare against.  We will use this count later.</p>
 <p>A foreign_hsm will be added, which will consume the spy and trace messages
 emitted from the producer on the raspberry pi.  This foreign_hsm object will
-have the same <code class="docutils literal"><span class="pre">spy</span></code> and <code class="docutils literal"><span class="pre">trace</span></code> methods of any other miros spy/trace
+have the same <code class="docutils literal notranslate"><span class="pre">spy</span></code> and <code class="docutils literal notranslate"><span class="pre">trace</span></code> methods of any other miros spy/trace
 supported object.  However, if you look inside of the object, there is no event
 processor it is just a store of information with an interface that looks like a
 statechart object.</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -1171,7 +1162,7 @@ statechart object.</p>
 <p>Now we need to link the messages coming from the live spy and live trace on the
 raspberry pi to a set of callbacks that do something interesting with this
 information, like print it to the terminal of my windows box.</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
   2
   3
   4
@@ -1396,7 +1387,7 @@ will just print a nonsensical set of strings coming from the raspberry pi’s
 statechart.  We need to decrypt the messages.  To do this, we will decorate the
 callback function with a static decrypt method.</p>
 <p>Finally, we will need to build an object of the class and run the code:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
   2
   3
   4
@@ -1647,11 +1638,11 @@ callback function with a static decrypt method.</p>
 <div class="section" id="turn-off-the-network-and-shutdown-the-program">
 <span id="networked-instrumentation-turn-off-the-network-and-shutdown-the-program"></span><h3>Turn off the Network and Shutdown the Program<a class="headerlink" href="#turn-off-the-network-and-shutdown-the-program" title="Permalink to this headline">¶</a></h3>
 <p>So, it’s mostly working, but how do we stop it?  When asked about this on stack
-overflow the <code class="docutils literal"><span class="pre">pika</span></code> maintainer recommended a timeout callback that can call
-the <code class="docutils literal"><span class="pre">stop_consuming</span></code> method of the channel class.  So we will add a callback
+overflow the <code class="docutils literal notranslate"><span class="pre">pika</span></code> maintainer recommended a timeout callback that can call
+the <code class="docutils literal notranslate"><span class="pre">stop_consuming</span></code> method of the channel class.  So we will add a callback
 that has a timer, references our count and can resubscribe itself if it is too
 soon to quit.</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
   2
   3
   4
@@ -1935,11 +1926,11 @@ soon to quit.</p>
 </pre></div>
 </td></tr></table></div>
 <p>Closing a program like this seems somewhat clumsy.  In the future, we will call
-the <code class="docutils literal"><span class="pre">stop_consuming</span></code> method from within a statechart based on a statechart.</p>
+the <code class="docutils literal notranslate"><span class="pre">stop_consuming</span></code> method from within a statechart based on a statechart.</p>
 <p>So there you have it, a full consumer.  Let’s run it and the producer and see
 what happens.</p>
 <p>The consumer outputs:</p>
-<div class="highlight-guess"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-guess notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -2022,7 +2013,7 @@ what happens.</p>
 </td></tr></table></div>
 <p>So we see that the decryption worked and the live spy and traced messages were
 being emitted onto the screen as they were received from the network.  We also
-see that the foreign_hsm object’s <code class="docutils literal"><span class="pre">spy</span></code> and <code class="docutils literal"><span class="pre">trace</span></code> methods output
+see that the foreign_hsm object’s <code class="docutils literal notranslate"><span class="pre">spy</span></code> and <code class="docutils literal notranslate"><span class="pre">trace</span></code> methods output
 instrumentation results as if they were coming from a real statechart running on
 this machine.</p>
 <p>To see the full consumer code, reference this <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/c_trace_consumer.py">c_trace_consumer</a>.</p>
@@ -2085,12 +2076,14 @@ within another.</p>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

@@ -4,20 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>&lt;no title&gt; &#8212; miros 2.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '2.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -30,8 +22,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -50,8 +41,8 @@ and your chart will needlessly search as it reacts to these events.</p>
 <p>It is important to know that if your chart changes state, the event posted to
 it will look like it came from outside of your statechart, even though it was
 originally generated within a given state.  The construction of any event with
-the <code class="docutils literal"><span class="pre">fifo</span></code> or <code class="docutils literal"><span class="pre">lifo</span></code> api behaves like this.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Here define a middle state the creates a one-shot event called</span>
+the <code class="docutils literal notranslate"><span class="pre">fifo</span></code> or <code class="docutils literal notranslate"><span class="pre">lifo</span></code> api behaves like this.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here define a middle state the creates a one-shot event called</span>
 <span class="c1"># delayed_one_second.  The same delayed_one_second signal is captured</span>
 <span class="c1"># by the middle state and used to transition into the inner state</span>
 <span class="nd">@spy_on</span>
@@ -72,7 +63,7 @@ the <code class="docutils literal"><span class="pre">fifo</span></code> or <code
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
     <span class="c1"># we are leaving this state for an outer state</span>
     <span class="c1"># so we cancel our one-shot in case it hasn&#39;t gone off yet</span>
-    <span class="n">ao</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">delay_one_second</span><span class="p">)</span>
+    <span class="n">ao</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">delay_one_second</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
 
   <span class="c1"># ignore our init</span>
@@ -114,12 +105,14 @@ the <code class="docutils literal"><span class="pre">fifo</span></code> or <code
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

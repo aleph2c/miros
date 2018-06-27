@@ -4,20 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Mongol Horse Archer &#8212; miros 2.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '2.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -32,8 +24,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -67,8 +58,8 @@ one node remains.</p>
 <li><a class="reference internal" href="#i-mongol-example-technical-oveview"><span class="std std-ref">Technical Overview</span></a></li>
 <li><a class="reference internal" href="#i-mongol-example-designing-the-mongol-in-its-tactic"><span class="std std-ref">Designing the Mongol in its Tactic</span></a></li>
 <li><a class="reference internal" href="#i-mongol-example-the-first-horseman"><span class="std std-ref">The First Horseman</span></a></li>
-<li><a class="reference internal" href="#i-mongol-example-encrypted-communications"><span class="std std-ref">Encrypted Communications</span></a></li>
-<li><a class="reference internal" href="#i-mongol-example-building-a-mesh-network"><span class="std std-ref">Building a Mesh Network</span></a></li>
+<li><span class="xref std std-ref">Encrypted Communications</span></li>
+<li><span class="xref std std-ref">Building a Mesh Network</span></li>
 <li><a class="reference internal" href="#i-mongol-example-attaching-the-mongol-to-the-mesh"><span class="std std-ref">Attaching the Mongol to the Mesh</span></a></li>
 <li><a class="reference internal" href="#i-mongol-example-building-a-mongol-unit"><span class="std std-ref">Building a Mongol Unit</span></a></li>
 </ul>
@@ -293,8 +284,8 @@ demonstrate that it is working.</p>
 <ul class="simple">
 <li><a class="reference internal" href="#i-mongol-example-designing-the-mongol-in-its-tactic"><span class="std std-ref">Designing the Mongol in its Tactic</span></a></li>
 <li><a class="reference internal" href="#i-mongol-example-the-first-horseman"><span class="std std-ref">The First Horseman</span></a></li>
-<li><a class="reference internal" href="#i-mongol-example-encrypted-communications"><span class="std std-ref">Encrypted Communications</span></a></li>
-<li><a class="reference internal" href="#i-mongol-example-building-a-mesh-network"><span class="std std-ref">Building a Mesh Network</span></a></li>
+<li><span class="xref std std-ref">Encrypted Communications</span></li>
+<li><span class="xref std std-ref">Building a Mesh Network</span></li>
 <li><a class="reference internal" href="#i-mongol-example-attaching-the-mongol-to-the-mesh"><span class="std std-ref">Attaching the Mongol to the Mesh</span></a></li>
 <li><a class="reference internal" href="#i-mongol-example-building-a-mongol-unit"><span class="std std-ref">Building a Mongol Unit</span></a></li>
 </ul>
@@ -642,7 +633,7 @@ his empathy statechart.  We can see this logic placed on all of the “Other” 
 cry events in the chart.</p>
 <p>We also have to feed all of our empathy charts with information anytime we issue
 the Advance_War_Cry or the Retreat_Ready_War_Cry.  This is done using an
-iterator on the <code class="docutils literal"><span class="pre">other</span></code> object.</p>
+iterator on the <code class="docutils literal notranslate"><span class="pre">other</span></code> object.</p>
 <p>Now we get to the meat of the multi-chart pending pattern.  The horse archers
 have to wait until the last of their members have entered the “waiting to lure”
 state before they can all perform the false retreat.  So in plain English, when
@@ -692,12 +683,12 @@ improve it until we get something truly remarkable.</p>
 <a class="reference external image-reference" href="_static/ergotic_mongol_51.pdf"><div align="center" class="align-center"><img alt="_images/ergotic_mongol_51.svg" src="_images/ergotic_mongol_51.svg" /></div>
 </a>
 <p>Scanning the design diagram we see he can carry sixty arrows, he should have an
-internal counter, <code class="docutils literal"><span class="pre">tick</span></code>, some <code class="docutils literal"><span class="pre">arrows</span></code> and the ability to <code class="docutils literal"><span class="pre">yell</span></code>.</p>
+internal counter, <code class="docutils literal notranslate"><span class="pre">tick</span></code>, some <code class="docutils literal notranslate"><span class="pre">arrows</span></code> and the ability to <code class="docutils literal notranslate"><span class="pre">yell</span></code>.</p>
 <p>Gandbold moves around the battlefield slowly; and as developers, we don’t want
 to wait around and see what he does while we are trying to debug his program.
 So I will add the ability to compress time in Gandbold’s universe, this way we
 can speed him up.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">pp</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
@@ -726,7 +717,7 @@ can speed him up.</p>
 </div>
 <p>Let’s implement Gandbold’s statechart using the Factory class.  We don’t <em>have
 to use this</em>; we could write the code using flat methods instead.  Or, we could
-program it with the Factory class, then run the <code class="docutils literal"><span class="pre">to_code</span></code> method to see what
+program it with the Factory class, then run the <code class="docutils literal notranslate"><span class="pre">to_code</span></code> method to see what
 our factory methods would look like if they were written using the flat method
 technique, then drop these resulting methods into our code.  We have options.</p>
 <p>When using a Factory class, we create statecharts by first writing callbacks.
@@ -747,7 +738,7 @@ by making slight design alterations.</p>
 <p>Let’s begin by writing the callbacks for the defeat_in_detail_tactic state:</p>
 <a class="reference external image-reference" href="_static/ergotic_mongol_61.pdf"><div align="center" class="align-center"><img alt="_images/ergotic_mongol_61.svg" src="_images/ergotic_mongol_61.svg" /></div>
 </a>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Deceit-In-Detail-Tactic state callbacks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Deceit-In-Detail-Tactic state callbacks</span>
 <span class="k">def</span> <span class="nf">didt_entry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39;Load up on arrows and start tracking time within this tactic&#39;&#39;&#39;</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">arrows</span> <span class="o">=</span> <span class="n">HorseArcher</span><span class="o">.</span><span class="n">MAXIMUM_ARROW_CAPACITY</span>
@@ -819,7 +810,7 @@ by making slight design alterations.</p>
 <p>Now lets write the callbacks for the “Advance” state:</p>
 <a class="reference external image-reference" href="_static/ergotic_mongol_62.pdf"><div align="center" class="align-center"><img alt="_images/ergotic_mongol_62.svg" src="_images/ergotic_mongol_62.svg" /></div>
 </a>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Advance callbacks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Advance callbacks</span>
 <span class="k">def</span> <span class="nf">advance_entry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39;Upon entering the advanced state wait 3 seconds then issue</span>
 <span class="sd">     Close_Enough_For_Circle war cry&#39;&#39;&#39;</span>
@@ -855,7 +846,7 @@ by making slight design alterations.</p>
 </div>
 <p>Now lets write the callbacks for the “Circle and Fire” state:</p>
 <div align="center" class="align-center"><img alt="_images/ergotic_mongol_63.svg" src="_images/ergotic_mongol_63.svg" /></div>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Circle-And-Fire callbacks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Circle-And-Fire callbacks</span>
 <span class="k">def</span> <span class="nf">caf_second</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39;A horse archer can fire 1 to 3 arrows at a time in this maneuver,</span>
 <span class="sd">     how they behave is up to them and how they respond</span>
@@ -873,7 +864,7 @@ by making slight design alterations.</p>
 </div>
 <p>Now lets write the callbacks for the “Skirmish” state:</p>
 <div align="center" class="align-center"><img alt="_images/ergotic_mongol_64.svg" src="_images/ergotic_mongol_64.svg" /></div>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Skirmish state callbacks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Skirmish state callbacks</span>
 <span class="k">def</span> <span class="nf">skirmish_entry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39;The Horse Archer will trigger an Ammunition_Low event if he</span>
 <span class="sd">     has less than 10 arrows when he begins skirmishing</span>
@@ -953,7 +944,7 @@ by making slight design alterations.</p>
 <p>Here are the callbacks for the “Waiting to Lure” state:</p>
 <a class="reference external image-reference" href="_static/ergotic_mongol_65.pdf"><div align="center" class="align-center"><img alt="_images/ergotic_mongol_65.svg" src="_images/ergotic_mongol_65.svg" /></div>
 </a>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Waiting-to-Lure callbacks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Waiting-to-Lure callbacks</span>
 <span class="k">def</span> <span class="nf">wtl_entry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s1">&#39;put away bow&#39;</span><span class="p">)</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s1">&#39;pull scimitar&#39;</span><span class="p">)</span>
@@ -974,7 +965,7 @@ by making slight design alterations.</p>
 <p>Lets write the callbacks for the “Feigned Retreat” state:</p>
 <a class="reference external image-reference" href="_static/ergotic_mongol_66.pdf"><div align="center" class="align-center"><img alt="_images/ergotic_mongol_66.svg" src="_images/ergotic_mongol_66.svg" /></div>
 </a>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Feigned-Retreat callbacks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Feigned-Retreat callbacks</span>
 <span class="k">def</span> <span class="nf">fr_entry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s1">&#39;fire on knights&#39;</span><span class="p">)</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s1">&#39;fire on footman&#39;</span><span class="p">)</span>
@@ -1014,7 +1005,7 @@ by making slight design alterations.</p>
 </div>
 <p>The “Marshal” state callbacks:</p>
 <div align="center" class="align-center"><img alt="_images/ergotic_mongol_67.svg" src="_images/ergotic_mongol_67.svg" /></div>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Marshal callbacks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Marshal callbacks</span>
 <span class="k">def</span> <span class="nf">marshal_entry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;halt horse&quot;</span><span class="p">)</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;identify next marshal point&quot;</span><span class="p">)</span>
@@ -1040,7 +1031,7 @@ by making slight design alterations.</p>
 </div>
 <p>Now we write the callbacks for our last state, “Waiting to Advance”:</p>
 <div align="center" class="align-center"><img alt="_images/ergotic_mongol_68.svg" src="_images/ergotic_mongol_68.svg" /></div>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Waiting-to-Advance callbacks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Waiting-to-Advance callbacks</span>
 <span class="k">def</span> <span class="nf">wta_entry</span><span class="p">(</span><span class="n">archer</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">arrows</span> <span class="o">=</span> <span class="n">HorseArcher</span><span class="o">.</span><span class="n">MAXIMUM_ARROW_CAPACITY</span>
 
@@ -1060,7 +1051,7 @@ by making slight design alterations.</p>
 </a>
 <p>Now that the callbacks are written, let’s make a statechart, and wire these
 callbacks into its states:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Create the archer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the archer</span>
 <span class="n">archer</span> <span class="o">=</span> <span class="n">HorseArcher</span><span class="p">()</span>
 
 <span class="c1"># Create the archer states</span>
@@ -1197,8 +1188,8 @@ callbacks into its states:</p>
   <span class="n">to_method</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Using the <code class="docutils literal"><span class="pre">nest</span></code> method we add the design’s hierarchy:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">archer</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="n">deceit_in_detail</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+<p>Using the <code class="docutils literal notranslate"><span class="pre">nest</span></code> method we add the design’s hierarchy:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">archer</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="n">deceit_in_detail</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
   <span class="n">nest</span><span class="p">(</span><span class="n">advance</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">deceit_in_detail</span><span class="p">)</span><span class="o">.</span> \
   <span class="n">nest</span><span class="p">(</span><span class="n">circle_and_fire</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">advance</span><span class="p">)</span><span class="o">.</span> \
   <span class="n">nest</span><span class="p">(</span><span class="n">skirmish</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">deceit_in_detail</span><span class="p">)</span><span class="o">.</span> \
@@ -1210,7 +1201,7 @@ callbacks into its states:</p>
 </div>
 <p>Now that we have programmed Gandbold, let’s have him run through his tactic and
 watch his behavior in real time:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
 <span class="hll">  <span class="k">print</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </span><span class="hll">  <span class="n">archer</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
 </span>  <span class="n">archer</span><span class="o">.</span><span class="n">time_compression</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -1238,7 +1229,7 @@ precision, we can use the spy instead.</p>
 trying to debug this; such slow feedback could harm your ability to concentrate.
 So to speed up our debugging process, and improve our ability to think about the
 problem, we compress Gandbold’s time:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
   <span class="k">print</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 <span class="hll">  <span class="n">archer</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
 </span><span class="hll">  <span class="n">archer</span><span class="o">.</span><span class="n">time_compression</span> <span class="o">=</span> <span class="mi">100</span>
@@ -1259,7 +1250,7 @@ the trace information:</p>
 instrumentation to think about and ‘see’ your design.  But, to help other people
 comprehend your efforts, you could use a sequence diagram generated from the trace
 output:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>[2018-02-24 06:53:18.711127] [Gandbold] e-&gt;start_at() top-&gt;advance
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>[2018-02-24 06:53:18.711127] [Gandbold] e-&gt;start_at() top-&gt;advance
 [2018-02-24 06:53:18.741241] [Gandbold] e-&gt;Close_Enough_For_Circle() \
   advance-&gt;circle_and_fire
 
@@ -1290,7 +1281,7 @@ state machine using the orthogonal component pattern.</p>
 <p>I’ll write the empathy state machine using a flat method technique then have ten
 different empathy-objects, derived from the OtherHorseArcher class, link to it
 and use it as a behavioral map.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">HsmWithQueues</span><span class="p">,</span> <span class="n">spy_on</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">HsmWithQueues</span><span class="p">,</span> <span class="n">spy_on</span>
 
 <span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">empathy</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -1356,8 +1347,8 @@ and use it as a behavioral map.</p>
 <p>Above is an empathy state machine and a class, whose objects would like to link
 to this state machine.  But, the actual linking doesn’t happen until you take the
 event processor within an object derived from the OtherHorseArcher class and
-tell it which HSM to use.  This is done with the <code class="docutils literal"><span class="pre">start_at</span></code> method:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">oha_1</span> <span class="o">=</span> <span class="n">OtherHorseArcher</span><span class="p">(</span><span class="s1">&#39;Hulagu&#39;</span><span class="p">)</span>
+tell it which HSM to use.  This is done with the <code class="docutils literal notranslate"><span class="pre">start_at</span></code> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oha_1</span> <span class="o">=</span> <span class="n">OtherHorseArcher</span><span class="p">(</span><span class="s1">&#39;Hulagu&#39;</span><span class="p">)</span>
 <span class="n">oha_1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">empathy</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1394,7 +1385,7 @@ HSMs for the empathy state machine.</p>
 callbacks, a battle state, adjust the nesting and how the ‘others’ items are
 being called within the code that we wrote before.</p>
 <p>To skip to the other side of this code listing, click <a class="reference internal" href="#other-size-of-empathy-listing"><span class="std std-ref">here</span></a>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">pp</span>
 <span class="hll"><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">HsmWithQueues</span><span class="p">,</span> <span class="n">spy_on</span>
@@ -2024,13 +2015,13 @@ this reaction to the HSM diagram, I confirmed that the HSM in the code was
 matching the HSM in the picture.</p>
 <a class="reference external image-reference" href="_static/empathy_1.pdf"><div align="center" class="align-center"><img alt="_images/empathy_1.svg" src="_images/empathy_1.svg" /></div>
 </a>
-<p>Notice the use of the <code class="docutils literal"><span class="pre">complete_circuit</span></code> method in the following code listing.
+<p>Notice the use of the <code class="docutils literal notranslate"><span class="pre">complete_circuit</span></code> method in the following code listing.
 The oha object doesn’t have its own thread; it’s derived from the HsmWithQueues
 class.  With no thread to drive the next run-to-completion event, the oha object
 can’t pull events from its queue and force it’s HSM to react to them.  The
-<code class="docutils literal"><span class="pre">complete_circuit</span></code> method, uses the main operating thread to drive events from
+<code class="docutils literal notranslate"><span class="pre">complete_circuit</span></code> method, uses the main operating thread to drive events from
 the empathy FIFO into its HSM.  It will run until its FIFO is empty.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">oha</span> <span class="o">=</span> <span class="n">OtherHorseArcher</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oha</span> <span class="o">=</span> <span class="n">OtherHorseArcher</span><span class="p">()</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">empathy</span><span class="p">)</span>  <span class="c1"># tie oha to outer state of empathy hsm</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">))</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">))</span>
@@ -2048,7 +2039,7 @@ the empathy FIFO into its HSM.  It will run until its FIFO is empty.</p>
 </div>
 <p>This code created the feedback I needed to fix my empathy HSM.  To begin with it
 was completely wrong, so I changed the HSM code until it matched what I was expecting:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">17.592835</span><span class="p">]</span> <span class="p">[</span><span class="n">other</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">17.592835</span><span class="p">]</span> <span class="p">[</span><span class="n">other</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
 <span class="p">[</span><span class="mf">17.593095</span><span class="p">]</span> <span class="p">[</span><span class="n">other</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">()</span> <span class="n">not_waiting</span><span class="o">-&gt;</span><span class="n">waiting</span>
 <span class="p">[</span><span class="mf">17.593384</span><span class="p">]</span> <span class="p">[</span><span class="n">other</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Retreat_War_Cry</span><span class="p">()</span> <span class="n">waiting</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
 <span class="p">[</span><span class="mf">17.593570</span><span class="p">]</span> <span class="p">[</span><span class="n">other</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Advance_War_Cry</span><span class="p">()</span> <span class="n">not_waiting</span><span class="o">-&gt;</span><span class="n">dead</span>
@@ -2062,10 +2053,10 @@ was completely wrong, so I changed the HSM code until it matched what I was expe
 a regression test could use it as a specification.  But the trace output
 contains date-time information, so if I compared it with another trace they
 would never match, because they are logging different times.</p>
-<p>The <code class="docutils literal"><span class="pre">stripped</span></code> context manager, pulls off all date-time information and allows
+<p>The <code class="docutils literal notranslate"><span class="pre">stripped</span></code> context manager, pulls off all date-time information and allows
 test code to compare old trace outputs, to new trace outputs.  So I used the
-<code class="docutils literal"><span class="pre">stripped</span></code> context manager to build up the following test code:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">oha</span> <span class="o">=</span> <span class="n">OtherHorseArcher</span><span class="p">()</span>
+<code class="docutils literal notranslate"><span class="pre">stripped</span></code> context manager to build up the following test code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oha</span> <span class="o">=</span> <span class="n">OtherHorseArcher</span><span class="p">()</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">empathy</span><span class="p">)</span>  <span class="c1"># tie oha to outer state of empathy hsm)</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Other_Retreat_Ready_War_Cry</span><span class="p">))</span>
 <span class="n">oha</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retreat_War_Cry</span><span class="p">))</span>
@@ -2101,11 +2092,11 @@ his head yet.</p>
 <p>Gandbold’s statechart has a thread which came from his ActiveObject
 ancestral-class.  This thread will continuously pluck events from his queues and
 react to these events by driving them through his battle and empathy state
-machines.  The battle state machine uses the <code class="docutils literal"><span class="pre">dispatch</span></code> method to push a
+machines.  The battle state machine uses the <code class="docutils literal notranslate"><span class="pre">dispatch</span></code> method to push a
 subset of its experiences into his empathy HSMs.  The thread does the work of
 pulling items off of his queues, so we do not need to use the
-<code class="docutils literal"><span class="pre">complete_circuit</span></code> method anymore.  You will only need to use
-<code class="docutils literal"><span class="pre">complete_circuit</span></code> when you have an event processor derived from an
+<code class="docutils literal notranslate"><span class="pre">complete_circuit</span></code> method anymore.  You will only need to use
+<code class="docutils literal notranslate"><span class="pre">complete_circuit</span></code> when you have an event processor derived from an
 HsmWithQueues class or any of its ancestors.</p>
 <p>We need to confirm that his battle HSM dispatches the events required to drive
 his empathy.</p>
@@ -2122,7 +2113,7 @@ behaving properly.</p>
 this test it was because Gandbold wasn’t dispatching to it.</p>
 <a class="reference external image-reference" href="_static/empathy_1.pdf"><div align="center" class="align-center"><img alt="_images/empathy_1.svg" src="_images/empathy_1.svg" /></div>
 </a>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># stop time for the horse archer so that we can test his empathy reactions</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># stop time for the horse archer so that we can test his empathy reactions</span>
 <span class="n">archer</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Second</span><span class="p">))</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
 <span class="n">archer</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c1">#  stop looking at his reactions</span>
@@ -2175,7 +2166,7 @@ this test it was because Gandbold wasn’t dispatching to it.</p>
 </pre></div>
 </div>
 <p>This will output the following empathy trace:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">18</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">18</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
 <span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Other_Advance_War_Cry</span><span class="p">()</span> <span class="n">not_waiting</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
 <span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Other_Skirmish_War_Cry</span><span class="p">()</span> <span class="n">not_waiting</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
 <span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">Altan_192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">10</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Other_Retreat_War_Cry</span><span class="p">()</span> <span class="n">not_waiting</span><span class="o">-&gt;</span><span class="n">not_waiting</span>
@@ -2194,7 +2185,7 @@ this test it was because Gandbold wasn’t dispatching to it.</p>
 is doing on the battlefield.  The code listing below demonstrates how to turn
 this trace and lock in Gandbold’s expected behaviour, as a regression test:</p>
 <p>To skip to the other side of this code listing, click <a class="reference internal" href="#other-size-of-regression-test"><span class="std std-ref">here</span></a>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># start time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># start time</span>
 <span class="n">archer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
   <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ResetTactic</span><span class="p">))</span>
 
@@ -2305,690 +2296,111 @@ this trace and lock in Gandbold’s expected behaviour, as a regression test:</p
 </pre></div>
 </div>
 </div>
-<div class="section" id="encrypted-communications">
-<span id="i-mongol-example-encrypted-communications"></span><span id="other-size-of-regression-test"></span><h2>Encrypted Communications<a class="headerlink" href="#encrypted-communications" title="Permalink to this headline">¶</a></h2>
-<p>The ergodic nature of our warbot has a downside. Once you know how to defeat
-one node, you know how to beat all of them. Furthermore, the communications
-between the bots are fundamental to its system design; if you can inject your
-own messaging between them, you will <em>PWN</em> this botnet.</p>
-<p>A 13th century European would not have spoken Mongolian so an invading horde
-would have no problem with intercepted communications. But, what would have
-happened if they had to fight another unit of horse archers? Each group would
-know what the other side was up to; they could yell distracting calls into the
-other side’s string of commands to jam up the other team’s manoeuvre.</p>
-<p>So it would make sense if each Mongol unit had their own set of war cries. This
-way they could act on instruction without doubt or hesitation.</p>
-<p>The horse archer communications need to be encrypted. There are many different
-ways to do this; it can happen at the communications layer using SSL, or it can
-be handled by our warbot directly.</p>
-<p>I have opted to use a symmetric encryption scheme with the Fernet library within
-our warbot. I did this after investigating pycrypto; which does not have windows
-support and has mainly been abandon by its maintainer. Don’t use pycrypto.</p>
-<p>Let’s just use Fernet.</p>
-<p>Fernet takes a lot of pain out of encryption, but you still need a key.
-Encryption is really about key management; how do you keep your key hidden from
-your opponent? Well, for now, we will hide our key as highlighted plain text on
-this website so that everyone on the Internet can see it:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cryptography.fernet</span> <span class="kn">import</span> <span class="n">Fernet</span>
-
-<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
-  <span class="nd">@staticmethod</span>
-  <span class="k">def</span> <span class="nf">key</span><span class="p">():</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Get the encryption key for this connection.  This key is used for encryption</span>
-<span class="sd">    and decryption.</span>
-
-<span class="sd">    Example:</span>
-<span class="sd">      key = Connection.key()</span>
-
-<span class="sd">    Note:</span>
-<span class="sd">    To generate a new key: Fernet.generate_key()</span>
-<span class="sd">    A better way to do this is to get the key from your connected flash-drive.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-<span class="hll">    <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;u3Uc-qAi9iiCv3fkBfRUAKrM1gH8w51-nVU8M8A73Jg=&#39;</span>
-</span></pre></div>
-</div>
-<p>Feeling better already.</p>
-<p>To encrypt our data we will use a Python decorator:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cryptography.fernet</span> <span class="kn">import</span> <span class="n">Fernet</span>
-
-<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
-  <span class="c1"># ..</span>
-  <span class="c1"># ..</span>
-  <span class="nd">@staticmethod</span>
-  <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    A decorator which will encrypt a byte stream prior to transmission:</span>
-
-<span class="sd">    Example:</span>
-<span class="sd">      @Connection.serialize</span>
-<span class="sd">      @Connection.encrypt   # &lt;- HERE: &#39;message&#39; (encrypted bytestream)</span>
-<span class="sd">      def message_to_other_channels(self, message):</span>
-<span class="sd">        for channel in self.channels:</span>
-<span class="sd">          ip = channel.extension.ip_address</span>
-<span class="sd">          channel.basic_publish(exchange=&#39;mirror&#39;,</span>
-<span class="sd">              routing_key=ip, body=message)</span>
-<span class="sd">          print(&quot; [x] Sent \&quot;{}\&quot; to {}&quot;.format(message, ip))</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_encrypt</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-      <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">      encrypt a byte stream</span>
-<span class="sd">      &#39;&#39;&#39;</span>
-
-      <span class="c1"># To get around the &#39;self-as-the-first-argument&#39; issue</span>
-      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">plain_text</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-      <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">plain_text</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-      <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-<span class="hll">      <span class="n">f</span> <span class="o">=</span> <span class="n">Fernet</span><span class="p">(</span><span class="n">Connection</span><span class="o">.</span><span class="n">key</span><span class="p">())</span>
-</span><span class="hll">      <span class="n">cyphertext</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">plain_text</span><span class="p">)</span>
-</span>
-      <span class="c1"># To get around the &#39;self-as-the-first-argument&#39; issue</span>
-      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<span class="hll">        <span class="n">fn</span><span class="p">(</span><span class="n">cyphertext</span><span class="p">)</span>
-</span>      <span class="k">else</span><span class="p">:</span>
-<span class="hll">        <span class="n">fn</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cyphertext</span><span class="p">)</span>
-</span>    <span class="k">return</span> <span class="n">_encrypt</span>
+<div class="section" id="networking-our-horse-archers">
+<span id="i-mongol-example-networking-our-horse-archer"></span><span id="other-size-of-regression-test"></span><h2>Networking our Horse Archers<a class="headerlink" href="#networking-our-horse-archers" title="Permalink to this headline">¶</a></h2>
+<p>When I first wrote this documentation I described the steps needed to integrate
+Gandbold with the RabbitMQ networking library.  This turned out to be both
+complicated and distracting, since I was spending a lot of time writing about
+networks and security and not writing about horse archers or statecharts.  So, I
+left this project for a while and wrote the <a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a>.</p>
+<p>You can now use the <a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a> to make networkable
+statecharts.  So let’s network our mongols by following these steps:</p>
+<ul class="simple">
+<li><a class="reference external" href="file:///C:/github/miros-rabbitmq/docs/installing_infrastructure.html">install RabbitMQ</a> and <a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/installation.html">miros-rabbitmq</a> on all of the computers you want to network.</li>
+<li><a class="reference external" href="file:///C:/github/miros-rabbitmq/docs/recipes.html#managing-your-encryption-keys-and-rabbitmq-credentials-short-version">make a .env file in the same directory as your code</a></li>
+<li>replace any Factory class with a NetworkedFactory class</li>
+</ul>
+<p>Let’s talk about the directory structure that you will need for this to work:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>.
+├── .env
+└── networked_horse_archer.py
 </pre></div>
 </div>
-<p>To decrypt we make another decorator:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cryptography.fernet</span> <span class="kn">import</span> <span class="n">Fernet</span>
-
-<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
-  <span class="c1"># ..</span>
-  <span class="c1"># ..</span>
-  <span class="nd">@staticmethod</span>
-  <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    A decorator which will decrypt a received message into a byte stream.</span>
-
-<span class="sd">    Example:</span>
-<span class="sd">      @Connection.decrypt  # &lt;- HERE: &#39;body&#39; decrypted into a byte stream</span>
-<span class="sd">      @Connection.deserialize</span>
-<span class="sd">      def custom_rx_callback(ch, method, properties, body):</span>
-<span class="sd">        print(&quot; [+] {}:{}&quot;.format(method.routing_key, body))</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_decrypt</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">cyphertext</span><span class="p">):</span>
-      <span class="sd">&#39;&#39;&#39;LocalConsumer.decrypt()&#39;&#39;&#39;</span>
-<span class="hll">      <span class="n">f</span> <span class="o">=</span> <span class="n">Fernet</span><span class="p">(</span><span class="n">Connection</span><span class="o">.</span><span class="n">key</span><span class="p">())</span>
-</span><span class="hll">      <span class="n">plain_text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">cyphertext</span><span class="p">)</span>
-</span><span class="hll">      <span class="n">fn</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">plain_text</span><span class="p">)</span>
-</span>    <span class="k">return</span> <span class="n">_decrypt</span>
-</pre></div>
-</div>
-<p>So, we can get a key; we can encrypt and decrypt.  Now, what can we send?  There
-is a process in python called pickling which serializes an object into a
-collection of bytes.  This collection of bytes can be transmitted across a
-network.</p>
-<p>Serialization will allow our horse archers to transmit anything within their war
-cries.  “Hey Ганболд (Gandbold), do you want one of my extra horses?”, “yes”,
-“OK here you go, <a class="reference external" href="https://www.youtube.com/watch?v=gsNaR6FRuO0">lala-bee-boop</a>”.  This concept expands on the notion of a war
-cry; but it is cool that we can transmit the objects of working programs,
-between the nodes of our botnet.  Of course, this is a security nightmare, so if
-we are going to serialize and deserialize messages <em>we will have to use an
-encrypted channel</em>.</p>
-<p>Now let’s show the serialization technique, it is also implemented using a
-decorator:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">miros</span> <span class="nn">import</span> <span class="nn">Event</span>
-
-<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
-  <span class="c1"># ..</span>
-  <span class="c1"># ..</span>
-
-  <span class="nd">@staticmethod</span>
-  <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    A decorator which will turn arguments into a byte stream prior to encryption:</span>
-
-<span class="sd">    Example:</span>
-<span class="sd">      @Connection.serialize  # &lt;- HERE: &#39;message&#39; turned into byte stream</span>
-<span class="sd">      @Connection.encrypt</span>
-<span class="sd">      def message_to_other_channels(self, message):</span>
-<span class="sd">        for channel in self.channels:</span>
-<span class="sd">          ip = channel.extension.ip_address</span>
-<span class="sd">          channel.basic_publish(exchange=&#39;mirror&#39;,</span>
-<span class="sd">              routing_key=ip, body=message)</span>
-<span class="sd">          print(&quot; [x] Sent \&quot;{}\&quot; to {}&quot;.format(message, ip))</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_pickle_dumps</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">message</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-      <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">message</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-      <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-
-      <span class="c1"># The event object is dynamically constructed and can&#39;t be serialized by</span>
-      <span class="c1"># pickle, so we call it&#39;s custom serializer prior to pickling it</span>
-<span class="hll">      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">Event</span><span class="p">):</span>
-</span><span class="hll">        <span class="n">message</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-</span>
-<span class="hll">      <span class="n">pmessage</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-</span>
-      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">fn</span><span class="p">(</span><span class="n">pmessage</span><span class="p">)</span>
-      <span class="k">else</span><span class="p">:</span>
-        <span class="n">fn</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pmessage</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_pickle_dumps</span>
-</pre></div>
-</div>
-<p>The highlighted text in our serialization code demonstrates where the actual
-pickling happens.  We see that there is a custom <code class="docutils literal"><span class="pre">dumps</span></code> method written for a
-miros Event.  The miros Event object can’t be serialized with pickle because it
-uses a simple metaprogramming technique for making new signal names.  No
-problem, we just call the Event <code class="docutils literal"><span class="pre">dumps</span></code> method first, then call the pickle
-<code class="docutils literal"><span class="pre">dumps</span></code> method on its result.</p>
-<p>Now we have a byte stream we can feed our encryption decorator.</p>
-<p>How do we turn it back to an object after it has been decrypted?  Well, we call
-the <code class="docutils literal"><span class="pre">deserialize</span></code> decorator.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">miros</span> <span class="nn">import</span> <span class="nn">Event</span>
-
-<span class="k">class</span> <span class="nc">Connection</span><span class="p">():</span>
-  <span class="c1"># ..</span>
-  <span class="c1"># ..</span>
-  <span class="nd">@staticmethod</span>
-  <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    A decorator used to turn a serialized byte stream into a python object</span>
-
-<span class="sd">    Example:</span>
-<span class="sd">      @Connection.decrypt</span>
-<span class="sd">      @Connection.deserialize  # &lt;- HERE: &#39;body&#39; bytestream turn into object</span>
-<span class="sd">      def custom_rx_callback(ch, method, properties, body):</span>
-<span class="sd">        print(&quot; [+] {}:{}&quot;.format(method.routing_key, body))</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_pickle_loads</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">p_plain_text</span><span class="p">):</span>
-<span class="hll">      <span class="n">plain_text</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">p_plain_text</span><span class="p">)</span>
-</span><span class="hll">      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plain_text</span><span class="p">,</span> <span class="n">Event</span><span class="p">):</span>
-</span><span class="hll">        <span class="n">plain_text</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">plain_text</span><span class="p">)</span>
-</span>      <span class="n">fn</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">plain_text</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_pickle_loads</span>
-</pre></div>
-</div>
-<p>The deserialization is just the reverse of the serialization.  We call the
-pickle <code class="docutils literal"><span class="pre">loads</span></code> method on the pickled object, then if it is a serialized Event,
-we call the custom <code class="docutils literal"><span class="pre">loads</span></code> method of the Event object to get a version of the
-event made by the bot that sent it to us in the first place.</p>
-<p>Let’s go over everything again from a high level.  If a node in our warbot wants
-to share one of its objects with another node, it turns that object into a
-byte-stream using the <code class="docutils literal"><span class="pre">serialize</span></code> decorator, encrypts the byte stream with the
-<code class="docutils literal"><span class="pre">encrypt</span></code> decorator and spits some garbled data onto the network layer.  The
-node receiving the data decrypts the stream using the <code class="docutils literal"><span class="pre">decrypt</span></code> decorator,
-then turns the byte stream back into the intended Python object using the
-<code class="docutils literal"><span class="pre">deserialize</span></code> decorator.</p>
-<p>Ok, now what do we do about our secret key?</p>
-<p>Our Mongol unit will have a lot of shared experience.  If they don’t follow each
-other in their advances and their retreats; their senior officers will kill
-them.  Maybe we could use this path of actions and the common time experienced
-while advancing and retreating to modulate their original secret key.  In this
-way, we could obnoxiously post the key (see above) on the Internet for everyone
-to look at and it wouldn’t matter.  If you wanted to <em>PWN</em> the bot you would
-have to know every action they had taken, when they made it and their modulation
-algorithm.</p>
-<p>This would be like the Mongol unit making up a new war language every time they
-finished a loop.  They would know that if one of their members became
-de-synchronized, they would never find one another again.</p>
-<p>I’m not going to write this into the example, but it is how I would start-up my
-thinking about this annoying key issue.  I would do the work well after I was
-sure the original code was running well.  Then we would have to provide some way
-for the botnet to get orders from its commanding officer; we have yet another
-key issue.  Maybe the botnet could look out at thousands upon thousands of
-websites, knowing that only one has a message from the commanding officer (on
-craigslist?).  Then inject a random delay before acting on the news.</p>
-<p>In this example I demonstrated how to encrypt the data but I exposed the key.
-So, what we have here is security theater, I’m pretending that the system is
-secure.  It is not; I haven’t solved the key issue.</p>
-<p>Security is hard; the attacker has the advantage; you can’t know when you have
-been compromised and you can’t trust anything, from your GPU to the encryption
-standard, to your CPU, it’s all exposed and compromised.</p>
-<p>The attacker has the advantage, so when in doubt, attack!</p>
-<p>Well that was dramatic.  But where do we attack and whom?  What good is a botnet without
-a network?</p>
-</div>
-<div class="section" id="building-a-mesh-network">
-<span id="i-mongol-example-building-a-mesh-network"></span><h2>Building a Mesh Network<a class="headerlink" href="#building-a-mesh-network" title="Permalink to this headline">¶</a></h2>
-<p>We need to imagine the terrain on which the warbot will roam.  I vote that we
-keep them in the lab; Mongol horse archers are far too dangerous to let loose on
-an unsuspecting Internet.</p>
-<img alt="_images/InLab.jpg" class="align-center" src="_images/InLab.jpg" />
-<p>Our network should consist of one-or-more programs running on one computer and
-one-or-more programs running on one-or-more <em>other</em> computers.  Statecharts
-should be able to work together even if they are deployed across the entire
-world; networking is a solved problem.</p>
-<p>So we just have to pick a technology that can send messages between computers.</p>
-<p>But, which technology to pick?  I wanted simple things to be simple and hard
-things to be possible.</p>
-<p>Right or wrong I picked RabbitMq.  RabbitMq is free, it is written in Erlang
-which was designed by Ericsson to solve <em>the hard concurrency problems in</em>
-embedded systems.  It is old; it first appeared in 1986, one year before David
-Harel’s paper on statecharts and five years before Python was invented.  So I
-trust that Erlang has a well thought out and proven architecture.</p>
-<p>RabbitMq stays true to the underlying Erlang structures and moreover, it
-provides a polyglot platform: they have written many different libraries for
-other programming languages to control RabbitMq.  In Python, RabbitMq is
-accessed using the <code class="docutils literal"><span class="pre">pika</span></code> library.</p>
-<p>RabbitMq is heavy duty.  You can scale it up to handle a lot of messaging.
-Our horse archers aren’t going to yell that much, but it’s nice to know we could
-support their entire horde.</p>
-<p>What kind of network should we build?  How about this, everything that <em>can</em>
-connect is connected.  Let’s create a mesh network.</p>
-<a class="reference external image-reference" href="_static/Partial_Mesh_Diagram.pdf"><div align="center" class="align-center"><img alt="_images/Partial_Mesh_Diagram.svg" src="_images/Partial_Mesh_Diagram.svg" /></div>
-</a>
-<p>Our lab will exist behind a router; so all of the bots will live on the same
-Ethernet bus.  This means that the ARP table on
-each of the computers on the LAN will have all of the LAN’s IP addresses.</p>
+<p>The hidden, <code class="docutils literal notranslate"><span class="pre">.env</span></code> file holds your RabbitMQ credentials and your
+miros-rabbitmq encryption keys.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p>ARP stands for Address Resolution Protocol.</p>
-<p class="last">An ARP table contains information about how each machine on your LAN maps it’s
-IP address to its physical machine address (MAC address). This table is
-needed for Ethernet to work.  We aren’t interested how this works, we only use
-it to get a list of the IP addresses on our LAN.</p>
+<p class="last">You can actually place your <code class="docutils literal notranslate"><span class="pre">.env</span></code> file in an outer directory too.  Typically
+they are placed in the same directory as your <code class="docutils literal notranslate"><span class="pre">.git</span></code> folder.</p>
 </div>
-<p>We can use these IP addresses to send out encrypted messages to a RabbitMq port,
-with a username and a password and see if there is a sensible response.  If
-there is, we add this IP to our mesh network.  This means that our horse archers
-won’t yell at our router or our printer or our phone.  Oora!</p>
-<p>Things get a little tricky when a computer has more than one working IP address
-connected to a RabbitMq server.  Any transmitted message would be received two
-or more times by all of the RabbitMq connected Python programs running on that
-computer.  To address this, I adjusted the code to only connect to one working
-IP address on each machine.</p>
-<p>Two different kinds of networking will affect our Mongols.  One that they need
-and one that <em>we need</em> to understand and debug their programs.  The first kind
-of networking will let them yell to one another, and it will use the RabbitMq
-<em>topic</em> routing strategy.  The second, instrumentation kind of networking will
-use the RabbitMq <em>fanout</em> strategy.  Each layer will have a different encryption
-key.  Debugging an encrypted blob can be frustrating; so we want to make sure we
-can <em>see</em> our design while we play with the encryption key for the first type of
-mesh networking.  To distinguish between the two different types of networking,
-I will call one the mesh and the other the snoop network.  When we are happy
-with the design; we will turn off the instrumentation, remove our ability to
-snoop and release the horde.</p>
-<p>By using RabbitMq, every running Horse Archer program on any connected computer
-in our LAN will look like a node in our mesh network.  This is great; it means
-we can significantly simplify our code.</p>
-<p>But what are the specifics?  How is a horse archer explicitly connected to the
-network?  Well, he has two transmitters one for his yells and one to send out
-his instrumentation, and he has two receivers, one to hear cries and one to
-receive all of the instrumentation sent out by every other horse archer.  This
-means that as a developer, you can hook into any individual horse archer and
-start debugging all other connected horse archers.</p>
-<p>Writing networked code that runs in Python while on Windows and Linux is kind of
-tricky.  To simplify things I ran my Windows code from the Window’s Linux
-Subsystem (WLS).  Unfortunately the WLS isn’t done yet, so it’s missing a lot of
-standard Linux networking commands, like arp.  However, windows has it’s own
-<code class="docutils literal"><span class="pre">arp.exe</span></code> command and the WLS can call out to DOS.  So the code I wrote is
-filled with weird little corner cases to deal with the current short comings of
-the WLS.  I’ll be changing it a lot, so there is no point in writing it out and
-explaining it in this example; you can find the code in its entirety here:
-<a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/mesh_network.py">mesh_network</a></p>
-<p>Instead, I will talk about its network API.  To begin with I’ll talk about the horse
-archer’s topic network.  This is the network that will be used for them to
-communicate with each other, not the debugging network.</p>
-<p>To build a standard mesh transmitter:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mesh_network</span> <span class="kn">import</span> <span class="n">MeshTransmitter</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">signals</span>
-
-<span class="c1"># Assume confirmed connected IPs are: [192.168.0.102, 192.168.0.103]</span>
-<span class="c1"># The actual routing keys for this transmission are:</span>
-<span class="c1">#   &#39;192.168.0.102.archer.mary&#39;</span>
-<span class="c1">#   &#39;192.168.0.103.archer.mary&#39;</span>
-<span class="n">tx</span> <span class="o">=</span> <span class="n">MeshTransmitter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;bob&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;dobbs&quot;</span><span class="p">)</span>
-<span class="n">tx</span><span class="o">.</span><span class="n">message_to_other_channels</span><span class="p">(</span>
-  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Mirror</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span>
-    <span class="n">routing_key</span> <span class="o">=</span> <span class="s1">&#39;archer.mary&#39;</span><span class="p">)</span>
+<p>Your <code class="docutils literal notranslate"><span class="pre">.env</span></code> file contains your secrets.  It will look something like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">MESH_ENCRYPTION_KEY</span><span class="o">=</span><span class="n">u3Uc</span><span class="o">-</span><span class="n">qAi9iiCv3fkBfRUAKrM1gH8w51</span><span class="o">-</span><span class="n">nVU8M8A73Jg</span><span class="o">=</span>
+<span class="n">SNOOP_TRACE_ENCRYPTION_KEY</span><span class="o">=</span><span class="n">u3Uc</span><span class="o">-</span><span class="n">qAi9iiCv3fkBfRUAKrM1gH8w51</span><span class="o">-</span><span class="n">nVU8M8A73Jg</span><span class="o">=</span>
+<span class="n">SNOOP_SPY_ENCRYPTION_KEY</span><span class="o">=</span><span class="n">u3Uc</span><span class="o">-</span><span class="n">qAi9iiCv3fkBfRUAKrM1gH8w51</span><span class="o">-</span><span class="n">nVU8M8A73Jg</span><span class="o">=</span>
+<span class="n">RABBIT_USER</span><span class="o">=</span><span class="n">peter</span>
+<span class="n">RABBIT_PASSWORD</span><span class="o">=</span><span class="n">rabbit</span>
+<span class="n">RABBIT_PORT</span><span class="o">=</span><span class="mi">5672</span>
+<span class="n">RABBIT_HEARTBEAT_INTERVAL</span><span class="o">=</span><span class="mi">3600</span>
+<span class="n">CONNECTION_ATTEMPTS</span><span class="o">=</span><span class="mi">3</span>
+<span class="n">RABBIT_GUEST_USER</span><span class="o">=</span><span class="n">rabbit567</span>
 </pre></div>
-</td></tr></table></div>
-<p>Let’s consider the above code listing.</p>
-<p>After importing the mesh_network package that contains all of the RabbitMq
-networking code we see something about ‘confirmed’ connected IP addresses (line
-4).  A confirmed IP address belongs to a computer that successfully received and
-decrypted an automatic scouting message sent out by our program.  This comment
-is suggesting that 192.168.0.102 and 192.168.0.103 both are connected.  Say this
-was true, that means that the computer on which this code is written has one of
-these IP addresses.</p>
-<p>The same comment informs us about the routing keys.  If we let our eyes jump to
-line 11 we see that we are setting a routing key to <code class="docutils literal"><span class="pre">archer.mary</span></code>.  So, the
-comment is trying to tell us that the IP address of the computer is
-automatically pre-pended to the routing key we set in the call to
-<code class="docutils literal"><span class="pre">message_to_other_channels</span></code>.  We will learn more about topic routing keys when
-we look at the receiver.</p>
-<p>On line 8 we see how to construct a mesh transmitter; we have to pass in a user
-and password.  These are the credentials for your RabbitMq server.  If these
-aren’t right the code will not run.</p>
-<p>Finally, on lines 9 to 11 we see how to send a statechart event to all other
-programs in our mesh, programmed to receive the routing keys:
-<code class="docutils literal"><span class="pre">192.168.0.102.archer.mary</span></code> and <code class="docutils literal"><span class="pre">192.168.0.103.archer.mary</span></code>.  This
-<code class="docutils literal"><span class="pre">message_to_other_channels</span></code> call will serialize the Event object with it’s
-payload into a bytestream then encrypt it prior to dispatching it out across the
-network.</p>
-<p>To build a standard mesh receiver:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">mesh_network</span> <span class="kn">import</span> <span class="n">MeshReceiver</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">signals</span>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Make sure you use the same credentials in your .env file that you used while
+installing RabbitMQ on your system.  Take special note that the
+<code class="docutils literal notranslate"><span class="pre">RABBIT_USER</span></code> and the <code class="docutils literal notranslate"><span class="pre">RABBIT_PASSWORD</span></code> match how you set your RabbitMQ
+installation up.</p>
+</div>
+<p>The miros-rabbitmq library uses <code class="docutils literal notranslate"><span class="pre">pydotenv</span></code> as a dependency.  It is this
+<code class="docutils literal notranslate"><span class="pre">pydotenv</span></code> which will turn the items of your <code class="docutils literal notranslate"><span class="pre">.env</span></code> file into environment
+variables that your program can use.</p>
+<p>To access these secrets and use the new networkable statechart classes you will need to add some code to your
+<code class="docutils literal notranslate"><span class="pre">networked_horse_archer.py</span></code> file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># drop in replacements of the ActiveObject and Factory</span>
+<span class="kn">from</span> <span class="nn">miros_rabbitmq</span> <span class="kn">import</span> <span class="n">NetworkedActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros_rabbitmq</span> <span class="kn">import</span> <span class="n">NetworkedFactory</span>
 
-<span class="k">def</span> <span class="nf">custom_rx_callback</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
-  <span class="k">print</span><span class="p">(</span><span class="s2">&quot; [+] {}:{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">routing_key</span><span class="p">,</span> <span class="n">body</span><span class="p">))</span>
+<span class="c1"># imports needed to get your secrets from the .env file</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="c1"># Assuming IP: 192.168.0.103</span>
-<span class="c1"># The routing key will be &#39;192.168.0.103.archer.mary&#39;</span>
-<span class="n">rx</span> <span class="o">=</span> <span class="n">MeshReceiver</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s1">&#39;bob&#39;</span><span class="p">,</span>
-       <span class="n">password</span><span class="o">=</span><span class="s1">&#39;dobbs&#39;</span><span class="p">,</span>
-       <span class="n">routing_key</span><span class="o">=</span><span class="s1">&#39;archer.mary&#39;</span><span class="p">)</span>
+<span class="c1"># put the secrets in the .env file into separate environment variables</span>
+<span class="n">env_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="s1">&#39;.env&#39;</span>
+<span class="k">if</span> <span class="n">env_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+  <span class="n">load_dotenv</span><span class="p">(</span><span class="n">env_path</span><span class="p">)</span>  <span class="c1"># variables now set in the shell&#39;s environment</span>
+<span class="k">else</span><span class="p">:</span>
+  <span class="c1"># recurse outward to find .env file if no .env file found</span>
+  <span class="n">load_dotenv</span><span class="p">()</span>
 
-<span class="n">rx</span><span class="o">.</span><span class="n">register_live_callback</span><span class="p">(</span><span class="n">custom_rx_callback</span><span class="p">)</span>
-<span class="n">rx</span><span class="o">.</span><span class="n">start_consuming</span><span class="p">()</span> <span class="c1"># launches a consuming task</span>
-<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">rx</span><span class="o">.</span><span class="n">stop_consuming</span><span class="p">()</span>  <span class="c1"># kills consuming task</span>
-<span class="n">rx</span><span class="o">.</span><span class="n">start_consuming</span><span class="p">()</span> <span class="c1"># launches a consuming task with same custom_rx_callback</span>
+<span class="c1"># get the contents of our shell&#39;s environment</span>
+<span class="n">RABBIT_USER</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;RABBIT_USER&#39;</span><span class="p">)</span>
+<span class="n">RABBIT_PASSWORD</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;RABBIT_PASSWORD&#39;</span><span class="p">)</span>
+<span class="n">RABBIT_HEARTBEAT_INTERVAL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;RABBIT_HEARTBEAT_INTERVAL&#39;</span><span class="p">)</span>
+<span class="n">CONNECTION_ATTEMPTS</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;CONNECTION_ATTEMPTS&#39;</span><span class="p">)</span>
+<span class="n">MESH_ENCRYPTION_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MESH_ENCRYPTION_KEY&quot;</span><span class="p">)</span>
+<span class="n">SNOOP_TRACE_ENCRYPTION_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;SNOOP_TRACE_ENCRYPTION_KEY&quot;</span><span class="p">)</span>
+<span class="n">SNOOP_SPY_ENCRYPTION_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;SNOOP_SPY_ENCRYPTION_KEY&quot;</span><span class="p">)</span>
 </pre></div>
-</td></tr></table></div>
-<p>Let’s consider the above code listing.</p>
-<p>First we import our required packages (lines 1-3).  Then on lines 5-6 we create
-a callback function.  We will want to register this callback function with the
-underlying framework, see line 14. This callback function will be called if, and
-only if, a message is received by RabbitMq that has the correct topic routing
-key.  This routing key is specified on line 12, where we construct the mesh
-receiver object, rx.</p>
-<p>The comments on lines 8 and 9 describe some routing key specifics.  We see that
-for the code on lines 10-12, the routing key will be
-<code class="docutils literal"><span class="pre">192.168.0.103.archer.mary</span></code>.  So like the transmitter API, the receiver API
-pre-pends an IP address to its routing key.</p>
-<p>Before we talk more about the routing key,  let’s fire up and run our receiver.
-On lines 10 through 12 we see how to build a rx object.  We need to know the
-RabbitMq username and password and we specify the routing_key.</p>
-<p>On line 14 we register our <code class="docutils literal"><span class="pre">custom_rx_callback</span></code> with the receiver.  The <code class="docutils literal"><span class="pre">rx</span></code>
-object will take care of the decryption and deserialization, much like we
-described in the encryption section.</p>
-<p>The <code class="docutils literal"><span class="pre">pika</span></code> Python library that reaches into the RabbitMq server will be doing
-the real work to receive messages.  For it to run, we have to call it’s
-<code class="docutils literal"><span class="pre">start_consuming</span></code> method, which will hang the program forever; it is a
-blocking call.  We want <code class="docutils literal"><span class="pre">pika</span></code> to dispatch received messages but would also
-like to be able to do other things with our program too.  For this reason, the
-MeshReceiver class will spin up a separate task for the <code class="docutils literal"><span class="pre">pika</span></code> receiver code
-to run and block.  We see the API for this on line 15: the MeshReceiver also has
-a <code class="docutils literal"><span class="pre">start_consuming.</span></code> method, which calls the <code class="docutils literal"><span class="pre">pika</span></code> <code class="docutils literal"><span class="pre">start_consuming</span></code>
-method within it’s own separate thread.  In this way, it can greedily block on
-messages without harming the rest of the Python program.  To stop this thread,
-and to stop it from dispatching any received messages we would call the
-<code class="docutils literal"><span class="pre">stop_consuming</span></code> method, as seen on line 17.  If we wanted to restart the
-thread, we would call <code class="docutils literal"><span class="pre">start_consuming</span></code> as seen on line 18.</p>
-<p>In our transmitter example, we sent a message with a routing key of
-<code class="docutils literal"><span class="pre">192.168.0.103.archer.mary</span></code>.  If this code was run on this, or the other
-computer the callback function on line 5-6 would run, and we would print the
-contents of the event.</p>
-<p>Now let’s talk about routing keys.  Just because every node is connected to
-every node in our mesh network doesn’t mean that we would want to ‘hear’ all of
-the transmitted messages.  The routing key is the way in which we can match
-transmitted messages to specific receiving callback functions through the use of
-patterns.  RabbitMq supports a very lightweight glob pattern matching language.
-<code class="docutils literal"><span class="pre">*</span></code> means to substitute exactly one word and <code class="docutils literal"><span class="pre">#</span></code> means to substitute zero or
-more words.  That’s it.</p>
-<p>So if we wanted our receiver to match all messages to its IP address, we would
-have set it’s routing key to <code class="docutils literal"><span class="pre">#</span></code> (this is the default value).  If we wanted
-the receiver to match all archers addressed to it’s IP address we the routing
-key would be <code class="docutils literal"><span class="pre">archer.*</span></code> or <code class="docutils literal"><span class="pre">archer#</span></code>.  In RabbitMq the routing key can be no
-more than 255 characters.</p>
-<p>We probably aren’t going to need this for our example, but it is a simple and
-powerful bonus feature.</p>
-<p>Now let’s try to draw the RabbitMq style producer and consumer diagram for our
-mesh network so that we can understand how things are connected:</p>
-<a class="reference external image-reference" href="_static/mesh_network_1.pdf"><div align="center" class="align-center"><img alt="_images/mesh_network_1.svg" src="_images/mesh_network_1.svg" /></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Often the code to access your .env file is put within the setup.py file for
+your package or application.  If you set things up this way, you can just
+import your variables from the setup.</p>
+</div>
+<p>We previously derived our HorserArcher from the Factory class.  To get the networking features, I’ll derive the HorseArcher with the new
+NetworkedFactory instead:</p>
+<a class="reference external image-reference" href="_static/networked_ergotic_mongol.pdf"><div align="center" class="align-center"><img alt="_images/networked_ergotic_mongol.svg" src="_images/networked_ergotic_mongol.svg" /></div>
 </a>
-<p>In the above diagram we see the two classes MeshTransmitter and the MeshReceiver
-and below them the RabbitMq-style description of their network collaboration.
-It is important to understand that only one of these structures exists on each
-machine in our mesh network.</p>
-<p>If you place your eyes on the “statechart producer” you can see how a statechart
-starts the information flow by producing messages in the form of Event objects.
-These messages will be sent to the “mirror exchange” which is accessed by both
-the MeshTransmitter and MeshReceiver.  This message is branded with the routing
-key provided by the user and pushed into a RabbitMq queue (the red box).  It is
-serialized and encrypted and then pushed out onto the network.</p>
-<p>To see how a statechart can consume events from the network, look at the
-“Network” arrow to the left of the “Deserialized/Decrypted” bubble.  Any message
-coming from the network is decrypted then deserialized and passed into the
-mirror exchange.  If the decryption process worked, the exchange will compare
-the &lt;IP&gt;.&lt;rx_routing_key&gt; against the message’s, &lt;IP&gt;.&lt;tx_routing_key&gt;.  If
-these match it will pass the message into a RabbitMq queue.  Eventually, the
-RabbitMq server will post this information into a statechart linked to the
-MeshReceiver.</p>
-<p>The snoop network is very similar to the mesh network we
-have written about already.  There will be an instrumentation receiver and an
-instrumentation transmitter.  It too is a mesh network; in fact, it is even more
-<em>meshy</em> about it, there is no routing key, every node is connected to every
-other node; you get everyone’s messages whether you want them or not.  It’s like
-the old <a class="reference external" href="https://en.wikipedia.org/wiki/Party_line_(telephony)">telephone party line</a> in the country, where
-everyone’s phone would ring for any call on the network.  The old ladies in the
-community would quietly snoop on all calls and pretend that they weren’t there;
-you could hear their breathing on the line while you talked to your friends
-about the upcoming orgy.</p>
-<p>If you think that is juicy, listen to this, you can hear the entire Mongol horde
-using our party line.</p>
-<p>Let’s build the instrumentation transmitter:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mesh_network</span> <span class="kn">import</span> <span class="n">SnoopTransmitter</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">signals</span>
-
-<span class="n">tx_instrument</span> <span class="o">=</span> <span class="n">SnoopTransmitter</span><span class="p">(</span>
- <span class="n">user</span><span class="o">=</span><span class="s1">&#39;bob&#39;</span><span class="p">,</span>
- <span class="n">password</span><span class="o">=</span><span class="s1">&#39;dobbs&#39;</span><span class="p">,</span>
- <span class="n">port</span><span class="o">=</span><span class="mi">5672</span><span class="p">,</span>
- <span class="n">encryption_key</span><span class="o">=</span>
-  <span class="sa">b</span><span class="s1">&#39;lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=&#39;</span>
-<span class="p">)</span>
-
-<span class="c1"># Given that ao is a statechart object you would register it&#39;s live</span>
-<span class="c1"># spy/trace output with the tx_instrument broadcast_spy and broadcast_trace</span>
-<span class="c1"># methods respectively:</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">register_live_spy_callback</span><span class="p">(</span><span class="n">tx_instrument</span><span class="o">.</span><span class="n">broadcast_spy</span><span class="p">)</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">register_live_trace_callback</span><span class="p">(</span><span class="n">tx_instrument</span><span class="o">.</span><span class="n">broadcast_trace</span><span class="p">)</span>
-
-<span class="c1"># Or you can broadcast messages directly to the connected spy and trace exchanges</span>
-<span class="n">tx_instrument</span><span class="o">.</span><span class="n">broadcast_spy</span><span class="p">(</span><span class="s2">&quot;Spy information&quot;</span><span class="p">)</span>
-<span class="n">tx_instrument</span><span class="o">.</span><span class="n">broadcast_trace</span><span class="p">(</span><span class="s2">&quot;Trace information&quot;</span><span class="p">)</span>
-</pre></div>
-</td></tr></table></div>
-<p>On lines 1-2 we import the required packages.</p>
-<p>On lines 4-10 we build the instrumentation transmission object.  The class
-which it is derived from is called SnoopTransmitter, in honour of the old
-lady on our imagined party line.  It needs the RabbitMq username and password,
-an optional port number and an encryption key.  This key can be different from
-the key used by our other mesh network.</p>
-<p>Line 15-16 might cause some confusion until you realize that the <code class="docutils literal"><span class="pre">ao</span></code> object
-is just an imagined statechart.  If we were going to debug this statechart on
-this machine, we could turn on it’s live_spy and the live_trace.  This would
-spit out debugging information to our screen as the statechart reacted to
-different events.  The code on line 15-16 is just telling the statechart to spit
-out its live information into the snoop transmitter instead.  By doing this, the
-imagined <code class="docutils literal"><span class="pre">ao</span></code> object will transmit out all of its live spy and trace
-information to every other connected statechart across the mesh, to every Snoop
-receiver.</p>
-<p>Line 19 and 20 is showing us how to send out information directly to all other
-connected nodes on the Snoop network.</p>
-<p>To build an instrumentation, Snoop receiver:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mesh_network</span> <span class="kn">import</span> <span class="n">SnoopReceiver</span>
-
-<span class="n">rx_instrumentation</span> <span class="o">=</span> <span class="n">SnoopReceiver</span><span class="p">(</span>
-  <span class="n">user</span><span class="o">=</span><span class="s1">&#39;bob&#39;</span><span class="p">,</span>
-  <span class="n">password</span><span class="o">=</span><span class="s1">&#39;dobbs&#39;</span><span class="p">,</span>
-  <span class="n">port</span><span class="o">=</span><span class="mi">5672</span><span class="p">,</span>
-  <span class="n">encryption_key</span><span class="o">=</span>
-    <span class="sa">b</span><span class="s1">&#39;lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=&#39;</span><span class="p">)</span>
-
-<span class="n">rx_instrumentation</span><span class="o">.</span><span class="n">start_consuming</span><span class="p">()</span>
-
-<span class="c1"># You can also tie a live_spy and live_trace callback method:</span>
-<span class="k">def</span> <span class="nf">custom_spy_callback</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
-  <span class="k">print</span><span class="p">(</span><span class="s2">&quot; [+s] {}:{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">routing_key</span><span class="p">,</span> <span class="n">body</span><span class="p">))</span>
-
-<span class="k">def</span> <span class="nf">custom_trace_callback</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
-  <span class="k">print</span><span class="p">(</span><span class="s2">&quot; [+t] {}:{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">routing_key</span><span class="p">,</span> <span class="n">body</span><span class="p">))</span>
-
-<span class="c1"># register spy instrumentation callback with your rx_instrumentation</span>
-<span class="n">rx_instrumentation</span><span class="o">.</span><span class="n">register_live_spy_callback</span><span class="p">(</span><span class="n">custom_spy_callback</span><span class="p">)</span>
-
-<span class="c1"># register trace instrumentation callback with your rx_instrumentation</span>
-<span class="n">rx_instrumentation</span><span class="o">.</span><span class="n">register_live_trace_callback</span><span class="p">(</span><span class="n">custom_trace_callback</span><span class="p">)</span>
-
-<span class="c1"># The rx_instrumentationt will have a ForeignHsm object from which you can</span>
-<span class="c1"># view all spy and trace information</span>
-<span class="n">pp</span><span class="p">(</span><span class="n">rx_instrumentation</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
-<span class="k">print</span><span class="p">(</span><span class="n">rx_instrumentation</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
-</pre></div>
-</td></tr></table></div>
-<p>The Snoop receiver can tie two callbacks, a spy and trace callback, to <em>all of
-the</em> spy and trace information coming back from your botnet.</p>
-<p>On line 1 we import the SnoopReceiver class.  On lines 3 through 4 we construct
-an object of the SnoopReceiver class, providing the RabbitMq server’s username
-and password, the port connecting the server to the network and its encryption
-key.  This encryption key must match the encryption keys used by all of the
-linked SnoopTransmitters, or we will just receive a stream of useless encrypted
-data.  The Snoop receiver is connected to a RabbitMq ‘fanout’ exchange, so every
-message sent into this exchange will be received by every other receiver
-connected across the whole network.</p>
-<p>On line 10, we start a thread within the SnoopReceiver to listen for received
-messages.</p>
-<p>On lines 19 through 23 we see how to connect the callbacks defined on lines
-12-17 to the snoop receiver.  In this example, we will just print out the spy
-and trace information coming from this and all other connected snoop
-transmitters in our network.</p>
-<p>Lines 25 through 28 demonstrate that if we wanted to access the spy or trace
-logs in their entirety, we could by calling the <code class="docutils literal"><span class="pre">spy</span></code> and <code class="docutils literal"><span class="pre">trace</span></code> methods on
-the Snoop receiver.  These methods link to a ForeignHsm object embedded in the
-Snoop Receiver object.  The ForeignHsm doesn’t have an Hsm, nor can it access
-one, it just provides the same <code class="docutils literal"><span class="pre">spy</span></code> and <code class="docutils literal"><span class="pre">trace</span></code> debugging interfaces that
-you would use if you were dealing with an actual HSM; within a Factory, Active
-Object or an HsmWithQueues derived object.</p>
-<p>Now let’s try to draw the RabbitMq style producer and consumer diagram for our
-snoop network:</p>
-<a class="reference external image-reference" href="_static/snoop_network_1.pdf"><div align="center" class="align-center"><img alt="_images/snoop_network_1.svg" src="_images/snoop_network_1.svg" /></div>
+<p>The miros-rabbitmq plugin’s NetworkedFactory classes extend the interface of the Factory class with
+the <a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/recipes.html#transmitting-an-event">transmit</a>, <a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/recipes.html#snoop-trace">enable_snoop_trace</a> and
+<a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/recipes.html#snoop-spy">enable_snoop_spy</a> methods.
+This means that any object derived from our HorseArcher will have these methods
+too.</p>
+<p>The miros-rabbitmq library actually constructs three different RabbitMQ
+networks:</p>
+<a class="reference external image-reference" href="_static/networked_ergotic_mongol_2.pdf"><div align="center" class="align-center"><img alt="_images/networked_ergotic_mongol_2.svg" src="_images/networked_ergotic_mongol_2.svg" /></div>
 </a>
-<p>The SnoopTransmitter and SnoopReciever collaborate to build the RabbitMq snoop
-architecture in the bottom part of the picture.</p>
-<p>The diagram looks more cluttered than that for the mesh network, despite this,
-it is a more straightforward structure: The snoop network doesn’t serialize or
-deserialize. Instead of using a topic network with routing keys, it uses two
-fanout exchanges.  So, any message sent to the spy or trace exchanges will be
-dispatched to every other spy or trace exchange on the network.</p>
-<p>It will be up to the consumer of this spy and trace information to decide how
-much instrumentation they want to look at.</p>
-<p>Our example has become a lot more complicated because of the network.  To manage
-this complexity, I have created a class called RabbitFactory.  The miros package
-has no dependencies outside of the standard python library.  However, if we
-would like to get the RabbitFactory to work we will need to include at the very
-least <em>pika</em> and have RabbitMq installed on the system.  Not every user of
-<em>miros</em> will want to use RabbitMq.  For this reason I have separated all of the
-RabbitMq code into it’s own miros plugin package: miros-rabbitmq.  If you would
-like to learn more about it, look here.</p>
-<p>For now, let’s just consider what the RabbitFactory looks like and what it will
-do for us:</p>
-<a class="reference external image-reference" href="_static/rabbit_factory_1.pdf"><div align="center" class="align-center"><img alt="_images/rabbit_factory_1.svg" src="_images/rabbit_factory_1.svg" /></div>
-</a>
-<p>The RabbitFactory gives us all of the networking features that we have described
-so far with a simple interface.  In fact, it is intended to be an interface
-class or a class from which another class inherits.  This way the inheriting
-class just gets all of the features and the API of the RabbitFactory without
-having to concern themselves with the details of how the networks are set up.</p>
-<p>From the diagram, we see that the RabbitFactory will need the RabbitMq
-credentials, a tx and an rx routing key for the mesh network and a snoop_key
-(encryption key) for the snoop network.  It will provide the <code class="docutils literal"><span class="pre">start_at</span></code>,
-<code class="docutils literal"><span class="pre">enable_snoop</span></code>, <code class="docutils literal"><span class="pre">disable_snoop</span></code>, <code class="docutils literal"><span class="pre">transit</span></code> and <code class="docutils literal"><span class="pre">snoop_scribble</span></code> methods
-for access to the mesh and the snoop networks.  The user doesn’t have to worry
-about the networking details.  If they build a statechart from a class which
-inherits from the RabbitFactory most of the networking complexity will disappear
-from view.</p>
-<p>To summarize, we can build two different mesh networks. One with routing keys
-and one for debugging all of the relevant state charts spy and trace streams. To
-connect, transmit and receive with these networks a statechart just has to be a
-descendant of the RabbitFactory class.</p>
-<p>In the next section, we will connect Gandbold to his brethren using these
-networks and the RabbitFactory API.</p>
+<p>The most important of these networks, is the mesh network, which is used by the
+statecharts to send events to one another.  To send an event, a statechart would
+use its <code class="docutils literal notranslate"><span class="pre">transmit</span></code> method.</p>
+<p>RabbitMQ permits the use of a <a class="reference external" href="https://www.rabbitmq.com/tutorials/tutorial-five-python.html">topic routing feature</a>, which
+miros-rabbitmq provides access to on the mesh network only.</p>
+<p>The two snoop networks are set up for debugging the distributed system from one
+computer.  For a node to participate in one of the snoop networks, you need to enable it
+with a call to either <code class="docutils literal notranslate"><span class="pre">enable_snoop_trace</span></code> or <code class="docutils literal notranslate"><span class="pre">enable_snoop_spy</span></code> methods.</p>
 </div>
 <div class="section" id="attaching-the-mongol-to-the-mesh">
 <span id="i-mongol-example-attaching-the-mongol-to-the-mesh"></span><h2>Attaching the Mongol to the Mesh<a class="headerlink" href="#attaching-the-mongol-to-the-mesh" title="Permalink to this headline">¶</a></h2>
@@ -3032,7 +2444,7 @@ will provide a publish/subscription routing model for event messaging with a
 mesh network.</p>
 <p>Now that we know more about the architecture, how do we syntactical construct a
 networked statechart?  Here is how we would build a networked archer object:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">archer</span> <span class="o">=</span> <span class="n">HorseArcher</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">archer</span> <span class="o">=</span> <span class="n">HorseArcher</span><span class="p">(</span>
   <span class="n">name</span> <span class="o">=</span> <span class="n">HorseArcher</span><span class="o">.</span><span class="n">get_a_name</span><span class="p">(),</span>
 <span class="hll">  <span class="n">rabbit_user</span><span class="o">=</span><span class="s1">&#39;bob&#39;</span><span class="p">,</span>
 </span><span class="hll">  <span class="n">rabbit_password</span><span class="o">=</span><span class="s1">&#39;dobbs&#39;</span><span class="p">,</span>
@@ -3045,7 +2457,7 @@ connect to the network.  We need a RabbitMq username, password and port
 information.   The rabbit_port argument is optional; it will default to 5672.</p>
 <p>Inside the HorseArcher class, it’s RabbitFactory object is constructed with a
 bit more detail:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -3075,15 +2487,15 @@ not required by the Factory class.  Lines 7 and 8 are RabbitMq topic routing
 keys for the mesh network.  Lines 9-10 describe the snoop network’s encryption
 key.  This will have to be the same for all connected bots in our botnet.</p>
 <p>Now that we can build a networked horse archer, how do we use it?</p>
-<p>Well, to start with we can <code class="docutils literal"><span class="pre">yell</span></code> events across the mesh network.  The <code class="docutils literal"><span class="pre">yell</span></code>
+<p>Well, to start with we can <code class="docutils literal notranslate"><span class="pre">yell</span></code> events across the mesh network.  The <code class="docutils literal notranslate"><span class="pre">yell</span></code>
 method takes an Event as an input and posts it into the FIFO inbox of all
-connected statecharts.  The <code class="docutils literal"><span class="pre">yell</span></code> method calls the <code class="docutils literal"><span class="pre">transmit</span></code> method of the
+connected statecharts.  The <code class="docutils literal notranslate"><span class="pre">yell</span></code> method calls the <code class="docutils literal notranslate"><span class="pre">transmit</span></code> method of the
 RabbitFactory.</p>
-<p>The <code class="docutils literal"><span class="pre">enable_snoop</span></code> method acts on the other network, the snoop network.  It
+<p>The <code class="docutils literal notranslate"><span class="pre">enable_snoop</span></code> method acts on the other network, the snoop network.  It
 turns on the ability to debug every connected statechart on one machine.  The
-only other method that we will want is <code class="docutils literal"><span class="pre">snoop_scribble</span></code>. Think of this as a
+only other method that we will want is <code class="docutils literal notranslate"><span class="pre">snoop_scribble</span></code>. Think of this as a
 networked print statement that will write your messages into the snoop network.</p>
-<p>So to use our networks: we will <code class="docutils literal"><span class="pre">yell</span></code> out events on the mesh network and
+<p>So to use our networks: we will <code class="docutils literal notranslate"><span class="pre">yell</span></code> out events on the mesh network and
 watch the collective instrumentation on the snoop network.</p>
 </div>
 <div class="section" id="building-a-mongol-unit">
@@ -3100,12 +2512,12 @@ code that used to exist in their HSMs.  Upon scanning the design, I noticed
 there was a lot of code repetition.  To DRY my Python up I sucked the repetitive
 code up out of the HSMs, into named methods in the HorseArcher and
 OtherHorseArcher classes.</p>
-<p>The HorseArcher class also has a static method: <code class="docutils literal"><span class="pre">HorseArcher.get_name</span></code>.  In
+<p>The HorseArcher class also has a static method: <code class="docutils literal notranslate"><span class="pre">HorseArcher.get_name</span></code>.  In
 our previous design, we were going to reference the other horse archer’s by
 their IP addresses.  But if we named them this way, we could not run more than
 one horse archer process per machine without breaking the software.  I don’t
 have ten computers in my LAN; so I will have to test multiple processes per
-device to confirm that the design is working.  The <code class="docutils literal"><span class="pre">HorseArcher.get_name</span></code>
+device to confirm that the design is working.  The <code class="docutils literal notranslate"><span class="pre">HorseArcher.get_name</span></code>
 static method will provide <em>unique</em> names so that we can create horse archers on
 the same machine.</p>
 <p>Now let’s talk about the battle statechart.  Things have become quite
@@ -3128,7 +2540,7 @@ debug.</p>
 also receive those same events from others in the mesh.</p>
 <p>The following method, called from the Other_Arrival_On_Field hook, is used to
 add members to a horse archer’s unit:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">add_member_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_archer_name</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">add_member_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_archer_name</span><span class="p">):</span>
   <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">other_archer_name</span> <span class="ow">and</span> <span class="n">other_archer_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">other_archer_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">:</span>
       <span class="n">oha</span> <span class="o">=</span> <span class="n">OtherHorseArcher</span><span class="p">(</span><span class="n">other_archer_name</span><span class="p">)</span>
@@ -3136,7 +2548,7 @@ add members to a horse archer’s unit:</p>
       <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">other_archer_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">oha</span>
 </pre></div>
 </div>
-<p>Consider what a horse archer does when he calls his <code class="docutils literal"><span class="pre">add_member_if_needed</span></code>
+<p>Consider what a horse archer does when he calls his <code class="docutils literal notranslate"><span class="pre">add_member_if_needed</span></code>
 method:</p>
 <p>He checks to see if he is just listening to himself and if he can identify a
 name within the shout.  Then he checks to see if he is already mentally tracking
@@ -3162,7 +2574,7 @@ hint, for helping us program this design:</p>
 <p>The horse archer must send various events into his empathy HSMs so he can track
 what his unit is doing.  This code, which used to be peppered all over our
 previous HSMs, is now wrapped up into two different HorseArcher methods,
-<code class="docutils literal"><span class="pre">dispatch_to_all_empathy</span></code> and <code class="docutils literal"><span class="pre">dispatch_to_empathy</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">dispatch_to_all_empathy</span></code> and <code class="docutils literal notranslate"><span class="pre">dispatch_to_empathy</span></code>.</p>
 <p>The pattern hints are explicitly written down to help us avoid making mistakes.
 The events that are intended for our local consumption, like the
 Advance_War_Cry, need to be sent to all empathy statecharts.  The events that
@@ -3173,11 +2585,11 @@ empathy HSM.</p>
 <a class="reference external image-reference" href="_static/empathy_1.pdf"><div align="center" class="align-center"><img alt="_images/empathy_1.svg" src="_images/empathy_1.svg" /></div>
 </a>
 <p>So these design hints, and their policies, are intended to save us from getting
-lost in details.  All <code class="docutils literal"><span class="pre">Other</span></code> pre-pended events in listed in the empathy
-diagram need to use the <code class="docutils literal"><span class="pre">dispatch_to_empathy</span></code> method when referenced anywhere
+lost in details.  All <code class="docutils literal notranslate"><span class="pre">Other</span></code> pre-pended events in listed in the empathy
+diagram need to use the <code class="docutils literal notranslate"><span class="pre">dispatch_to_empathy</span></code> method when referenced anywhere
 in the deceit_in_detail statechart.  Likewise all personal events, like the
 Advance_War_Cry and the Retreat_War_Cry need to use the
-<code class="docutils literal"><span class="pre">dispatch_to_all_empathy</span></code> methods.  By generalizing our thinking, imposing
+<code class="docutils literal notranslate"><span class="pre">dispatch_to_all_empathy</span></code> methods.  By generalizing our thinking, imposing
 simple rules and following these rules we can save ourselves from adding bugs to
 our design.</p>
 <div class="admonition note">
@@ -3187,8 +2599,8 @@ others and a war cry to themselves could be split into separate methods; then
 a policy could be set without expecting the developer to be vigilent.  This
 would be an obvious refactoring objective for the next design iteration.</p>
 </div>
-<p>Let’s look at how the <code class="docutils literal"><span class="pre">dispatch_to_empathy</span></code> method works.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">dispatch_to_empathy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">other_archer_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<p>Let’s look at how the <code class="docutils literal notranslate"><span class="pre">dispatch_to_empathy</span></code> method works.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">dispatch_to_empathy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">other_archer_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
   <span class="k">if</span> <span class="n">other_archer_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
     <span class="n">other_archer_name</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">payload</span>
   <span class="k">if</span> <span class="n">other_archer_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -3198,10 +2610,10 @@ would be an obvious refactoring objective for the next design iteration.</p>
 </div>
 <p>It seems simple enough.  The method determines what the name of the other horse
 archer is.  If it hasn’t heard from this horse archer before, it is added to the
-<code class="docutils literal"><span class="pre">others</span></code> object.  Then, because our empathy HSM doesn’t have it’s own thread,
-we call its <code class="docutils literal"><span class="pre">dispatch</span></code> method.</p>
-<p>The <code class="docutils literal"><span class="pre">dispatch_to_all_empathy</span></code> method is even simpler:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">dispatch_to_all_empathy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<code class="docutils literal notranslate"><span class="pre">others</span></code> object.  Then, because our empathy HSM doesn’t have it’s own thread,
+we call its <code class="docutils literal notranslate"><span class="pre">dispatch</span></code> method.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">dispatch_to_all_empathy</span></code> method is even simpler:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">dispatch_to_all_empathy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
   <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">other</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="n">other</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
 </pre></div>
@@ -3248,7 +2660,7 @@ take advantage of the redundant network paths to ensure messages are
 transmitted out to all units.  It’s an automatic feature.</p>
 </div>
 <p>The second new thing we see in this design is an innocuous little comment,
-<code class="docutils literal"><span class="pre">orthogonal</span> <span class="pre">component</span> <span class="pre">debug</span> <span class="pre">code</span> <span class="pre">here</span></code>.  The orthogonal component pattern was
+<code class="docutils literal notranslate"><span class="pre">orthogonal</span> <span class="pre">component</span> <span class="pre">debug</span> <span class="pre">code</span> <span class="pre">here</span></code>.  The orthogonal component pattern was
 invented by Miro Samek to be a faster, drop-in replacement of the orthogonal
 region pattern imagined by David Harel.  We are using the orthogonal component
 pattern to build unit empathy.  The only problem is that the instrumentation
@@ -3263,14 +2675,14 @@ the first one.  If it works, we can have confidence that the others will work
 too.</p>
 <p>Here is some orthogonal component debug code that could be put into the
 ‘advance’ state’s entry condition to test to see if our empathy design works:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># in the advance entry state</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># in the advance entry state</span>
 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
   <span class="n">first_name_of_others</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="p">))</span>
   <span class="k">print</span><span class="p">(</span><span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">first_name_of_others</span><span class="p">]</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
   <span class="n">archer</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">first_name_of_others</span><span class="p">]</span><span class="o">.</span><span class="n">clear_trace</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The above code would appear under the <code class="docutils literal"><span class="pre">orthogonal</span> <span class="pre">component</span> <span class="pre">debug</span> <span class="pre">code</span> <span class="pre">here</span></code>
+<p>The above code would appear under the <code class="docutils literal notranslate"><span class="pre">orthogonal</span> <span class="pre">component</span> <span class="pre">debug</span> <span class="pre">code</span> <span class="pre">here</span></code>
 comment.  It will only run if there is another horse archer in the mesh.  We
 get the first empathy orthogonal component.  We print it’s trace information to
 the screen, then we clear it’s trace log so that we will only capture the next
@@ -3307,7 +2719,7 @@ map were done to serve this “multi-chart pend” pattern.</p>
 <a class="reference external image-reference" href="_static/n_ergotic_mongol_skirmish_2.pdf"><div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_skirmish_2.svg" src="_images/n_ergotic_mongol_skirmish_2.svg" /></div>
 </a>
 <p>We see that the “multi-chart pend” pattern uses the empathy structures, that the
-<code class="docutils literal"><span class="pre">dispatch_to_empathy</span></code> and <code class="docutils literal"><span class="pre">dispatch_to_all_empathy</span></code> methods were used to
+<code class="docutils literal notranslate"><span class="pre">dispatch_to_empathy</span></code> and <code class="docutils literal notranslate"><span class="pre">dispatch_to_all_empathy</span></code> methods were used to
 feed these empathy orthogonal components with the information they need to
 settle into their correct states.  We also see that the iterator on the
 Retreat_Ready_War_Cry event was there to determine if we were the last living,
@@ -3321,16 +2733,16 @@ waiting_to_lure state.  The Other_Retreat_Ready_War_Cry is only used to feed the
 empathy charts, to update information about if another horse archer is waiting,
 not waiting or dead.  It can’t cause an oscillation.</p>
 <p>We see something else here too, when a horse archer thinks another one is dead
-he calls the <code class="docutils literal"><span class="pre">snoop_scribble</span></code> method to write about it.  This will put this
+he calls the <code class="docutils literal notranslate"><span class="pre">snoop_scribble</span></code> method to write about it.  This will put this
 information into the snoop stream.  Any snooping horse archer will see this
 information on their snoop network.  This is very useful for understanding what
 is happening across the whole of the botnet.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The <code class="docutils literal"><span class="pre">snoop_scribble</span></code> will print information out onto the snoop network.  If
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">snoop_scribble</span></code> will print information out onto the snoop network.  If
 this network has been set to track the trace instrumentation it will be
 written in to that stream, if it has been set to track the spy information, it
-will be written into that stream.  The local, <code class="docutils literal"><span class="pre">scribble</span></code> method will still work,
+will be written into that stream.  The local, <code class="docutils literal notranslate"><span class="pre">scribble</span></code> method will still work,
 but it will only write information into the local statechart’s spy stream.</p>
 </div>
 <p>Let’s see what new networking code I added to the feigned_retreat state.</p>
@@ -3382,7 +2794,7 @@ discover new voodoo tricks.</p>
 <p class="first admonition-title">Note</p>
 <p class="last">The interactions between the simple rules of your agents create the global
 emergent patterns, so make it easy to change them while you are testing your
-system.  In this example the impatience of one horse archer starts a emergent
+system.  In this example the impatience of one horse archer starts an emergent
 oscillation.  The amount of this impatience could be turned into an attribute
 of the Horse Archer class so that you can parametrize it, and tune it while
 testing the team of horse archers.</p>
@@ -3408,8 +2820,7 @@ testing the team of horse archers.</p>
 <li><a class="reference internal" href="#technical-overview">Technical Overview</a></li>
 <li><a class="reference internal" href="#designing-the-mongol-in-its-tactic">Designing the Mongol in its Tactic</a></li>
 <li><a class="reference internal" href="#the-first-horseman">The First Horseman</a></li>
-<li><a class="reference internal" href="#encrypted-communications">Encrypted Communications</a></li>
-<li><a class="reference internal" href="#building-a-mesh-network">Building a Mesh Network</a></li>
+<li><a class="reference internal" href="#networking-our-horse-archers">Networking our Horse Archers</a></li>
 <li><a class="reference internal" href="#attaching-the-mongol-to-the-mesh">Attaching the Mongol to the Mesh</a></li>
 <li><a class="reference internal" href="#building-a-mongol-unit">Building a Mongol Unit</a></li>
 </ul>
@@ -3435,12 +2846,14 @@ testing the team of horse archers.</p>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

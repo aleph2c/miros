@@ -4,20 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Glossary &#8212; miros 2.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '2.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -32,8 +24,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -90,10 +81,10 @@ actually solves your business problem.  It is different the the
 statechart code in that it does not describe the structure of the
 hierarchical state machine.</dd>
 <dt id="term-defer">Defer</dt>
-<dd><p class="first">The <code class="docutils literal"><span class="pre">defer</span></code> method is a way to place an event into a secondary queue
-that is ignored by the active object until the momenent the <code class="docutils literal"><span class="pre">recall</span></code>
+<dd><p class="first">The <code class="docutils literal notranslate"><span class="pre">defer</span></code> method is a way to place an event into a secondary queue
+that is ignored by the active object until the momenent the <code class="docutils literal notranslate"><span class="pre">recall</span></code>
 method is called.  At this point the event is placed into the active
-object’s queue as if an outside caller used it’s <code class="docutils literal"><span class="pre">post_fifo</span></code> method.</p>
+object’s queue as if an outside caller used it’s <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> method.</p>
 <p class="last">The number of elements contained with the deferred queue can be seen
 using the spy instrumentation.</p>
 </dd>
@@ -108,8 +99,8 @@ event by running a subset of your design to manifest the behavior
 described by the chart’s structure.  An event is often named something.
 This name is called a <a class="reference internal" href="#term-signal"><span class="xref std std-term">signal</span></a>.  An event can also carry a
 payload, which can be any data object describable by Python.</p>
-<p class="last">An event can be source from a <code class="docutils literal"><span class="pre">post_fifo</span></code> or <code class="docutils literal"><span class="pre">post_lifo</span></code> or
-<code class="docutils literal"><span class="pre">publish</span></code> or <code class="docutils literal"><span class="pre">dispatch</span></code> call.  An event can have an optional payload
+<p class="last">An event can be source from a <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> or <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> or
+<code class="docutils literal notranslate"><span class="pre">publish</span></code> or <code class="docutils literal notranslate"><span class="pre">dispatch</span></code> call.  An event can have an optional payload
 but it must be created with a <a class="reference internal" href="#term-signal"><span class="xref std std-term">signal</span></a>.  An event is always the second
 argument of your <a class="reference internal" href="#term-state-method"><span class="xref std std-term">state method</span></a>.</p>
 </dd>
@@ -128,7 +119,7 @@ machine without having to add explicit states</p>
 class and thereby gains all of it’s abilities and relationship with the
 Active Fabric.  In addition to this it can be used to manufacture state
 methods and nest them within one another.  It also has a reflection
-feature, <code class="docutils literal"><span class="pre">to_code</span></code> which can be used to show what it’s manufactured
+feature, <code class="docutils literal notranslate"><span class="pre">to_code</span></code> which can be used to show what it’s manufactured
 state methods would look like if they were hand crafted.</p>
 <p class="last">To learn about what a Factor is and how to use it, read the <a class="reference internal" href="towardsthefactoryexample.html#towardsthefactoryexample-towards-a-factory"><span class="std std-ref">using
 and unwinding a factory
@@ -199,7 +190,7 @@ behavior accessible to all child states.  To learn more about it read
 <dd>The initialization (init) event, is an <a class="reference internal" href="#term-internal-event"><span class="xref std std-term">internal event</span></a> with signal called INIT_SIGNAL.  It is injected into your state
 method when the event processor has settled upon this state after either
 starting within it or finishing a state transition from a called to
-<code class="docutils literal"><span class="pre">trans</span></code>.  In UML the init event looks like a big black dot and an arrow
+<code class="docutils literal notranslate"><span class="pre">trans</span></code>.  In UML the init event looks like a big black dot and an arrow
 and it can point to another state, or have some code written directly on
 it.</dd>
 <dt id="term-internal-event">Internal Event</dt>
@@ -221,17 +212,17 @@ different from the Mealy approach, in that the transitions do not output
 information from the program.  The program outputs happen within the
 states themselves.</dd>
 <dt id="term-multi-shot">Multi Shot</dt>
-<dd>A multi shot is sent from a <code class="docutils literal"><span class="pre">post_lifo</span></code> call by setting the <code class="docutils literal"><span class="pre">times</span></code>
+<dd>A multi shot is sent from a <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> call by setting the <code class="docutils literal notranslate"><span class="pre">times</span></code>
 argument to how every many events you would like to post (0 for
-infinite).  If you would like to delay the event, set the <code class="docutils literal"><span class="pre">deferred</span></code>
-argument to True.  The <code class="docutils literal"><span class="pre">period</span></code> argument is in units of seconds and
+infinite).  If you would like to delay the event, set the <code class="docutils literal notranslate"><span class="pre">deferred</span></code>
+argument to True.  The <code class="docutils literal notranslate"><span class="pre">period</span></code> argument is in units of seconds and
 it’s value will determine the time delay prior to the event being
 presented to the active object’s queue if you have deferred the event.
 It also represents the period of your multishot.</dd>
 <dt id="term-one-shot">One Shot</dt>
-<dd><p class="first">A one shot is a delay event.  It can be created using the <code class="docutils literal"><span class="pre">post_fifo</span></code>
-or <code class="docutils literal"><span class="pre">post_lifo</span></code> call by setting the <code class="docutils literal"><span class="pre">times</span></code> argument to 1 and the
-<code class="docutils literal"><span class="pre">deferred</span></code> argument to True.  The <code class="docutils literal"><span class="pre">period</span></code> argument is in units of
+<dd><p class="first">A one shot is a delay event.  It can be created using the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code>
+or <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> call by setting the <code class="docutils literal notranslate"><span class="pre">times</span></code> argument to 1 and the
+<code class="docutils literal notranslate"><span class="pre">deferred</span></code> argument to True.  The <code class="docutils literal notranslate"><span class="pre">period</span></code> argument is in units of
 seconds and it’s value will determine the time delay prior to the event
 being presented to the active object’s queue.</p>
 <p class="last">A one shot is often used as a kind of delayed <a class="reference internal" href="#term-initialization-event"><span class="xref std std-term">init</span></a>
@@ -276,7 +267,7 @@ used by the consumer of the event.</dd>
 <dd>Awkward UML language describing icons or glyphs that aren’t transitions
 or states.</dd>
 <dt id="term-publish">Publish</dt>
-<dd>An active object can publish an event anytime by using the <code class="docutils literal"><span class="pre">publish</span></code>
+<dd>An active object can publish an event anytime by using the <code class="docutils literal notranslate"><span class="pre">publish</span></code>
 method.  This will pass the event to the active fabric which will search
 and determine if any other active objects have
 <a class="reference internal" href="#term-subscribe"><span class="xref std std-term">subscribed</span></a> to the <a class="reference internal" href="#term-event"><span class="xref std std-term">event</span></a>.  If they have
@@ -284,7 +275,7 @@ it will post this event into their internal queue so that it will be
 consumed during a future <a class="reference internal" href="#term-run-to-completion"><span class="xref std std-term">run to completion</span></a>
 process.</dd>
 <dt id="term-recall">Recall</dt>
-<dd>The <code class="docutils literal"><span class="pre">recall</span></code> method is to pop the oldest item from the deferred queue
+<dd>The <code class="docutils literal notranslate"><span class="pre">recall</span></code> method is to pop the oldest item from the deferred queue
 and place those items into the working queue of the current active
 object.</dd>
 <dt id="term-reminder-pattern">Reminder Pattern</dt>
@@ -326,9 +317,9 @@ algorithm.</dd>
 <dd>The spy is one of the two instrumentation techniques used by the miros
 library.  It shows every detail that the event processor is doing while
 it is searching and running an RTC event.  You can add information into
-the spy log by using the <code class="docutils literal"><span class="pre">scribble</span></code> method.  You can view this
+the spy log by using the <code class="docutils literal notranslate"><span class="pre">scribble</span></code> method.  You can view this
 log live as it is running by using the live spy.  Or you can look to see
-what the log contains by running the <code class="docutils literal"><span class="pre">spy</span></code> method.  The spy log has a
+what the log contains by running the <code class="docutils literal notranslate"><span class="pre">spy</span></code> method.  The spy log has a
 ring buffer containing 500 spots.</dd>
 <dt id="term-state">State</dt>
 <dd>Defines the current operating condition of a program.  A program will have
@@ -355,13 +346,13 @@ will contain.</dd>
 <dd>A parent state.</dd>
 <dt id="term-template">Template</dt>
 <dd><p class="first">A template is a state method that has a structure which contains the
-<code class="docutils literal"><span class="pre">signal_callback</span></code> and <code class="docutils literal"><span class="pre">parent_callback</span></code> context managers.  You can
-use a template using the <code class="docutils literal"><span class="pre">state_method_template</span></code> and it will return a
+<code class="docutils literal notranslate"><span class="pre">signal_callback</span></code> and <code class="docutils literal notranslate"><span class="pre">parent_callback</span></code> context managers.  You can
+use a template using the <code class="docutils literal notranslate"><span class="pre">state_method_template</span></code> and it will return a
 state method who’s name is as an input.  It will be instrumented and will
 has access to the signal callbacks and parent state which you provide
 it’s active object with once it is formed.</p>
 <p class="last">A state method built up this way can be turned back into a flat method by
-using the <code class="docutils literal"><span class="pre">to_code</span></code> method.</p>
+using the <code class="docutils literal notranslate"><span class="pre">to_code</span></code> method.</p>
 </dd>
 <dt id="term-top-state">Top State</dt>
 <dd>A top state is a state that is the parent state to all states within a
@@ -376,7 +367,7 @@ transitions occured or any of the internal workings of the event processor.</p>
 <p>It can be used with the <a class="reference internal" href="#term-sequence"><span class="xref std std-term">sequence</span></a> tool to generate ASCII sequence
 diagrams.</p>
 <p class="last">You can view the live trace log by using the live trace.  Or you can look
-to what what the log contains using the <code class="docutils literal"><span class="pre">trace</span></code> method.  The trace log
+to what what the log contains using the <code class="docutils literal notranslate"><span class="pre">trace</span></code> method.  The trace log
 has a ring buffer which contains 250 spots.</p>
 </dd>
 <dt id="term-transducer">Transducer</dt>
@@ -421,12 +412,14 @@ MINECRAFT admistrators.)</dd>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

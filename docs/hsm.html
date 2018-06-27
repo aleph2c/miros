@@ -4,20 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Hsm &#8212; miros 2.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '2.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -32,8 +24,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -62,7 +53,7 @@ attribute, this argument must be a string</p>
 object as an attribute to the other class, using this object’s name.  This
 option will only work if the other object also has an augment method that
 acts exactly the same as this one.</p>
-<p><code class="docutils literal"><span class="pre">Examples</span></code>
+<p><code class="docutils literal notranslate"><span class="pre">Examples</span></code>
 alarm       = HsmEventProcessor(); alarm.name       = “alarm”
 time_keeper = HsmEventProcessor(); time_keeper.name = “time_keeper”
 alarm.augment(other=time_keeper, name=”time_keeper”)</p>
@@ -82,7 +73,7 @@ assert(networker.inverter == inverter ) # will be true</p>
 <dd><p>finds the child state of a given parent</p>
 <p>This method will only return a child state of a given handler, if the system
 is in a substate of the state being called:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+----------</span> <span class="n">graph_e1_s1</span> <span class="o">-----------+</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+----------</span> <span class="n">graph_e1_s1</span> <span class="o">-----------+</span>
 <span class="o">|</span> <span class="o">+--------</span> <span class="n">graph_e1_s2</span> <span class="o">-------+</span>   <span class="o">|</span>
 <span class="o">|</span> <span class="o">|</span> <span class="o">+------</span> <span class="n">graph_e1_s3</span> <span class="o">-----+</span> <span class="o">|</span>   <span class="o">|</span>
 <span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">+----</span> <span class="n">graph_e1_s4</span> <span class="o">---+</span> <span class="o">|</span> <span class="o">|</span>   <span class="o">|</span>
@@ -269,7 +260,7 @@ hsm.start(starting_state_function)</p>
 <dt id="hsm.HsmEventProcessor.trans_">
 <code class="descname">trans_</code><span class="sig-paren">(</span><em>tpath</em>, <em>max_index</em><span class="sig-paren">)</span><a class="headerlink" href="#hsm.HsmEventProcessor.trans_" title="Permalink to this definition">¶</a></dt>
 <dd><p>execute a transition sequence in a hsm</p>
-<p>A helper function for the <code class="docutils literal"><span class="pre">`dispatch`</span></code>.  It navigates through the possible
+<p>A helper function for the <code class="docutils literal notranslate"><span class="pre">`dispatch`</span></code>.  It navigates through the possible
 supported topologies, navigating the chart just up to the point of entering
 the target hierarchy.  The target entry path is placed into the provided
 tpath list, and the depth of the entry path is provided as an output of the
@@ -293,10 +284,10 @@ to a given index location.</dd>
 </dd>
 </dl>
 <p>If you don’t understand what S/T are, read all of the mnemonics described in
-the <code class="docutils literal"><span class="pre">`dispatch`</span></code> docstring.</p>
+the <code class="docutils literal notranslate"><span class="pre">`dispatch`</span></code> docstring.</p>
 <p>To understand beyond this point you must first know what happens with
 the tpath, ip and iq. Consider this example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+--------</span> <span class="n">s1</span><span class="o">---------+</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+--------</span> <span class="n">s1</span><span class="o">---------+</span>
 <span class="o">|</span> <span class="o">+-------</span><span class="n">s2</span><span class="o">-------+</span> <span class="o">|</span>
 <span class="o">|</span> <span class="o">|</span> <span class="o">+-----</span><span class="n">s3</span><span class="o">-----+</span> <span class="o">|</span> <span class="o">|</span>
 <span class="o">|</span> <span class="o">|</span> <span class="o">|</span> <span class="o">+---</span><span class="n">s4</span><span class="o">---+</span> <span class="o">|</span> <span class="o">|</span> <span class="o">|</span>
@@ -312,7 +303,7 @@ the tpath, ip and iq. Consider this example:</p>
 <p>As <a href="#id5"><span class="problematic" id="id6">trans_</span></a> searches, it will place state handlers into the tpath array
 These state handlers will be used to enter toward the target state once
 the lca has been found:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>            <span class="n">useful</span> <span class="n">data</span> <span class="o">&lt;-+-&gt;</span> <span class="n">garbage</span> <span class="n">data</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>            <span class="n">useful</span> <span class="n">data</span> <span class="o">&lt;-+-&gt;</span> <span class="n">garbage</span> <span class="n">data</span>
                           <span class="o">|</span>   <span class="n">collected</span> <span class="ow">in</span> <span class="n">search</span>
        <span class="o">+----+----+----+---+----+-----+-----+</span>
 <span class="n">tpath</span><span class="p">:</span> <span class="o">|</span> <span class="n">s5</span> <span class="o">|</span> <span class="n">s4</span> <span class="o">|</span> <span class="n">s3</span> <span class="o">|</span><span class="n">s2</span> <span class="o">|</span> <span class="n">s1</span> <span class="o">|</span> <span class="n">top</span> <span class="o">|</span> <span class="n">s21</span> <span class="o">|</span>
@@ -324,7 +315,7 @@ the lca has been found:</p>
 <p>The method that called <a href="#id7"><span class="problematic" id="id8">trans_</span></a> already has a reference to the tpath so it
 doesn’t need to be returned.  However, ip does need to be returned at it
 represents which state handlers will be entered.</p>
-<p>Returning the above from this method will tell <code class="docutils literal"><span class="pre">`dispatch`</span></code> to
+<p>Returning the above from this method will tell <code class="docutils literal notranslate"><span class="pre">`dispatch`</span></code> to
 enter s1, enter s2, enter s3, enter s4, enter s5.</p>
 <p>iq is a bool, it represents if we have found the lca of S and T.  It is only
 used later in the method and it is not used outside of the method, so we
@@ -367,12 +358,14 @@ attention back to S and T and how they relate to a diagram.</p>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
