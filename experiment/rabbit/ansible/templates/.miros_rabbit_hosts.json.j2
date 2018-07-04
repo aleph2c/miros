@@ -1,7 +1,8 @@
 {
   "hosts": [
-  {% for host in ansible_play_batch %}
-  "{{ host }}"{% if not loop.last %},{% endif %}
+  {% for host in groups['miros-rabbitmq'] %}
+  "{{ host }}"{% if not loop.last %},
+{% endif %}
   {% endfor %}
 
   ]

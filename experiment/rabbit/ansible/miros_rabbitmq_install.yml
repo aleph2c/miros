@@ -1,14 +1,33 @@
 ---
-- hosts: scotty
+- hosts: miros-rabbitmq
   vars:
     miros_rabbitmq_project_directory: '~/miros-rabbitmq-deployment'
+
   tasks:
+    #- name: 
+    #- debug:
+    #-  msg: "{{ansible_date_time}}"
+
    - name: Install rabbitmq-server
      become: true
      apt: name={{ item }} state=present update_cache=false
      with_items:
        - erlang
        - rabbitmq-server
+
+   - name: Setup environment variables
+     become: true
+     template:
+       src: ./rabbitmq-env.conf.j2
+       dest: /etc/rabbitmq/rabbitmq-env.conf
+       mode: 0644
+
+   - name: Setup configuration file
+     become: true
+     template:
+       src: ./rabbitmq.config.j2
+       dest: /etc/rabbitmq/rabbitmq.config
+       mode: 0644
 
    - name: Remove user
      become: true 
@@ -35,19 +54,6 @@
      shell: rabbitmqctl change_password guest {{guest_password}}
      ignore_errors: True
 
-   - name: Setup environment variables
-     become: true
-     template:
-       src: ./rabbitmq-env.conf.j2
-       dest: /etc/rabbitmq/rabbitmq-env.conf
-       mode: 644
-
-   - name: Setup configuration file
-     become: true
-     template:
-       src: ./rabbitmq.config.j2
-       dest: /etc/rabbitmq/rabbitmq.config
-       mode: 644
 
    - name: Enable the management plugin
      become: true
@@ -56,7 +62,9 @@
 
    - name: Restart the rabbitmq-server service
      become: true
-     shell: service rabbitmq-server restart
+     service:
+       name: rabbitmq-server
+       state: restarted
      ignore_errors: True
 
    - name: Write the .env file
