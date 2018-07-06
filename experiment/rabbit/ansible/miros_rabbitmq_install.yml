@@ -14,66 +14,75 @@
      with_items:
        - erlang
        - rabbitmq-server
+     tags: rabbitmq
 
-   - name: Setup environment variables
+   - name: Print Hosts
+     debug:
+       msg: "{{groups['miros-rabbitmq']}}"
+     delegate_to: localhost
+     tags: debug
+
+   - name: Setup rabbit environment variables
      become: true
      template:
        src: ./rabbitmq-env.conf.j2
        dest: /etc/rabbitmq/rabbitmq-env.conf
        mode: 0644
+     tags: rabbitmq
 
-   - name: Setup configuration file
+   - name: Setup rabbit configuration file
      become: true
      template:
        src: ./rabbitmq.config.j2
        dest: /etc/rabbitmq/rabbitmq.config
        mode: 0644
+     tags: rabbitmq
 
-   - name: Remove user
+   - name: Remove rabbit user
      become: true 
      shell: rabbitmqctl delete_user {{rabbit_user}}
      ignore_errors: True
+     tags: rabbitmq
 
-   - name: Create a user with password
+   - name: Create a rabbit user with password
      become: true 
      shell: rabbitmqctl add_user {{rabbit_user}} {{rabbit_password}}
      ignore_errors: True
+     tags: rabbitmq
 
-   - name: Assign a tag to the user
+   - name: Assign a tag to the rabbit user
      become: true 
      shell: "rabbitmqctl set_user_tags {{rabbit_user}} {{rabbit_tags | join(' ')}}"
      ignore_errors: True
+     tags: rabbitmq
 
-   - name: Set permissions
+   - name: Set permissions for the rabbit user
      become: true
      shell: rabbitmqctl set_permissions -p / {{rabbit_user}} ".*" ".*" ".*"
      ignore_errors: True
+     tags: rabbitmq
   
-   - name: Change default admin password
+   - name: Change default guest password for rabbitmq
      become: true
      shell: rabbitmqctl change_password guest {{guest_password}}
      ignore_errors: True
+     tags: rabbitmq
 
-
-   - name: Enable the management plugin
+   - name: Enable the management plugin for the RabbitMQ server
      become: true
      shell: rabbitmq-plugins enable rabbitmq_management
      ignore_errors: True
+     tags: rabbitmq
+     notify: Restart the rabbitmq-server service
 
-   - name: Restart the rabbitmq-server service
-     become: true
-     service:
-       name: rabbitmq-server
-       state: restarted
-     ignore_errors: True
-
-   - name: Write the .env file
+   - name: Write the miros-rabbitmq .env file
      template:
        src: .env.j2
        dest: "{{ miros_rabbitmq_project_directory }}/.env"
        mode: "u=rw,g=r,o=r"
      tags:
        - '.env'
+       - 'miros-rabbitmq'
 
    - name: Write the .miros_rabbitlan_cache.json file
      template:
@@ -82,6 +91,7 @@
        mode: "u=rw,g=r,o=r"
      tags:
        - 'cache'
+       - 'miros-rabbitmq'
 
    - name: Write the .miros_rabbit_hosts.json file
      template:
@@ -90,5 +100,13 @@
        mode: "u=rw,g=rw,o=r"
      tags:
        - 'hosts'
+       - 'miros-rabbitmq'
 
-
+  handlers:
+   - name: Restart the rabbitmq-server service
+     become: true
+     service:
+       name: rabbitmq-server
+       state: restarted
+     ignore_errors: True
+     tags: rabbitmq

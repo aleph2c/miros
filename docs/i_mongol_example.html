@@ -35,7 +35,7 @@
   <blockquote id="i-mongol-example-mongol-horsemen">
 <div><p><em>It ain’t what you don’t know that gets you into trouble.  It’s what you know
 for sure that just ain’t so.</em></p>
-<p class="attribution">&mdash;Mark Twain (fake quote)</p>
+<p class="attribution">&mdash;Mark Twain</p>
 </div></blockquote>
 <div class="section" id="mongol-horse-archer">
 <h1>Mongol Horse Archer<a class="headerlink" href="#mongol-horse-archer" title="Permalink to this headline">¶</a></h1>
@@ -2412,9 +2412,9 @@ together.</p>
 networked Mongol statechart structure without being bogged down by the details
 of networking.</p>
 <p>So we would like our horse archers to be able to yell commands back and forth,
-and we want to be able to monitor what their botnet is doing from one machine.  To
-do all of this we will insert the RabbitFactory class (with all of it’s
-networking features) between the HorseArcher class and it’s Factory ancestor in
+and we want to be able to monitor what their botnet is doing from one machine.
+To do all of this we will insert the NetworkedActiveObject class (with all of
+it’s networking features) between the HorseArcher and it’s Factory ancestor in
 our class inheritance hierarchy.</p>
 <p>The RabbitFactory abstracts away large parts of the network, and it provides a
 way to build up a statechart which can access the mesh and snoop networks.</p>
@@ -2435,26 +2435,29 @@ ActiveObject provides us with the ability to make statecharts.  The Factory
 class gives us the ability to build up statecharts by writing callbacks,
 constructing state objects, linking these then imposing a hierarchy on the
 states.  As of now, between the Factory class and the HorseArcher, we place the
-RabbitFactory.</p>
-<p>The RabbitFactory will include all of the required network dependencies.   It
-will link all of the statechart features to other statecharts across two
-different types of networks:  It will allow us to extend our spy and trace
-instrumentation across every connected statechart using a snoop-network, and it
-will provide a publish/subscription routing model for event messaging with a
-mesh network.</p>
-<p>Now that we know more about the architecture, how do we syntactical construct a
-networked statechart?  Here is how we would build a networked archer object:</p>
+NetworkedFactory (from the miros-rabbitmq plugin).</p>
+<p>The NetworkedFactory will include all of the required network dependencies.   It
+will link all of the statechart features to other statecharts across three
+different types of networks:  it will provide a publish/subscription routing
+model for event messaging with an encrypted mesh network and it allow us to
+extend our spy and trace instrumentation across every connected statechart using
+a two different snoop-networks.</p>
+<p>Now that we know more about the architecture, how do we syntactically construct
+a networked statechart?  Here is how we would build a networked archer object:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">archer</span> <span class="o">=</span> <span class="n">HorseArcher</span><span class="p">(</span>
   <span class="n">name</span> <span class="o">=</span> <span class="n">HorseArcher</span><span class="o">.</span><span class="n">get_a_name</span><span class="p">(),</span>
-<span class="hll">  <span class="n">rabbit_user</span><span class="o">=</span><span class="s1">&#39;bob&#39;</span><span class="p">,</span>
-</span><span class="hll">  <span class="n">rabbit_password</span><span class="o">=</span><span class="s1">&#39;dobbs&#39;</span><span class="p">,</span>
-</span><span class="hll">  <span class="n">rabbit_port</span><span class="o">=</span><span class="mi">5672</span>
+<span class="hll">  <span class="n">rabbit_user</span><span class="o">=</span><span class="n">RABBIT_USER</span><span class="p">,</span>
+</span><span class="hll">  <span class="n">rabbit_password</span><span class="o">=</span><span class="n">RABBIT_PASSWORD</span><span class="p">,</span>
+</span><span class="hll">  <span class="n">rabbit_port</span><span class="o">=</span><span class="n">RABBIT_PORT</span><span class="p">,</span>
+</span><span class="hll">  <span class="n">mesh_encryption_key</span><span class="o">=</span><span class="n">MESH_ENCRYPTION_KEY</span><span class="p">,</span>
+</span><span class="hll">  <span class="n">snoop_trace_encryption_key</span><span class="o">=</span><span class="n">SNOOP_TRACE_ENCRYPTION_KEY</span><span class="p">,</span>
+</span><span class="hll">  <span class="n">snoop_trace_encryption_key</span><span class="o">=</span><span class="n">SNOOP_SPY_ENCRYPTION_KEY</span><span class="p">,</span>
 </span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The highlighted lines in the above listing show what information is required to
-connect to the network.  We need a RabbitMq username, password and port
-information.   The rabbit_port argument is optional; it will default to 5672.</p>
+connect to the network.  We get this information from the <code class="docutils literal notranslate"><span class="pre">.env</span></code> file and the
+code that we added to access our networking secrets.</p>
 <p>Inside the HorseArcher class, it’s RabbitFactory object is constructed with a
 bit more detail:</p>
 <div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
@@ -2468,42 +2471,46 @@ bit more detail:</p>
  9
 10
 11
-12</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># . code inside the __init__ method of the HorseArcher</span>
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># . code inside the __init__ method of the HorseArcher</span>
 <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-<span class="c1"># super would be RabbitFactory</span>
+<span class="c1"># super would be NetworkedFactory</span>
 <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-<span class="hll">      <span class="n">rabbit_user</span><span class="o">=</span><span class="n">rabbit_user</span><span class="p">,</span>
-</span><span class="hll">      <span class="n">rabbit_password</span><span class="o">=</span><span class="n">rabbit_password</span><span class="p">,</span>
-</span><span class="hll">      <span class="n">tx_routing_key</span><span class="o">=</span><span class="s1">&#39;archer.{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
+<span class="hll">      <span class="n">tx_routing_key</span><span class="o">=</span><span class="s1">&#39;archer.{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
 </span><span class="hll">      <span class="n">rx_routing_key</span><span class="o">=</span><span class="s1">&#39;archer.#&#39;</span><span class="p">,</span>
-</span><span class="hll">      <span class="n">snoop_key</span><span class="o">=</span>
-</span><span class="hll">        <span class="sa">b</span><span class="s1">&#39;lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=&#39;</span><span class="p">,</span>
-</span><span class="hll">      <span class="n">rabbit_port</span><span class="o">=</span><span class="n">rabbit_port</span><span class="p">)</span>
-</span><span class="c1"># .</span>
+</span>      <span class="n">rabbit_user</span><span class="o">=</span><span class="n">rabbit_user</span><span class="p">,</span>
+      <span class="n">rabbit_password</span><span class="o">=</span><span class="n">rabbit_password</span><span class="p">,</span>
+      <span class="n">mesh_encryption_key</span><span class="o">=</span><span class="n">mesh_encryption_key</span><span class="p">,</span>
+      <span class="n">snoop_key</span><span class="o">=</span><span class="n">snoop_trace_encryption_key</span><span class="o">=</span><span class="n">snoop_trace_encryption_key</span><span class="p">,</span>
+      <span class="n">snoop_key</span><span class="o">=</span><span class="n">snoop_spy_encryption_key</span><span class="o">=</span><span class="n">snoop_spy_encryption_key</span><span class="p">,</span>
+      <span class="n">rabbit_port</span><span class="o">=</span><span class="n">rabbit_port</span><span class="p">)</span>
+<span class="c1"># .</span>
 </pre></div>
 </td></tr></table></div>
-<p>Lines 5-11 are arguments that are required by the RabbitFactory class which were
-not required by the Factory class.  Lines 7 and 8 are RabbitMq topic routing
-keys for the mesh network.  Lines 9-10 describe the snoop network’s encryption
-key.  This will have to be the same for all connected bots in our botnet.</p>
+<p>The highlighted lines describe how we will set up the <a class="reference external" href="https://www.rabbitmq.com/tutorials/tutorial-five-python.html">topic routing scheme</a> for this state
+chart.  We will transmit each event wrapped in an ‘archer.&lt;name&gt;’ topic, and we
+will receive ‘archer.#’, where the ‘#’ matches zero or more words.  We really
+aren’t using this feature in any meaningful way.  I am adding it here so that
+you are aware of it for your own designs.</p>
 <p>Now that we can build a networked horse archer, how do we use it?</p>
-<p>Well, to start with we can <code class="docutils literal notranslate"><span class="pre">yell</span></code> events across the mesh network.  The <code class="docutils literal notranslate"><span class="pre">yell</span></code>
-method takes an Event as an input and posts it into the FIFO inbox of all
-connected statecharts.  The <code class="docutils literal notranslate"><span class="pre">yell</span></code> method calls the <code class="docutils literal notranslate"><span class="pre">transmit</span></code> method of the
-RabbitFactory.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">enable_snoop</span></code> method acts on the other network, the snoop network.  It
-turns on the ability to debug every connected statechart on one machine.  The
-only other method that we will want is <code class="docutils literal notranslate"><span class="pre">snoop_scribble</span></code>. Think of this as a
-networked print statement that will write your messages into the snoop network.</p>
-<p>So to use our networks: we will <code class="docutils literal notranslate"><span class="pre">yell</span></code> out events on the mesh network and
-watch the collective instrumentation on the snoop network.</p>
+<p>Well, to start with we can <code class="docutils literal notranslate"><span class="pre">yell</span></code> events across the mesh.  The <code class="docutils literal notranslate"><span class="pre">yell</span></code> method
+takes an Event as an input and posts it into the FIFO inbox of all connected
+statecharts.  The <code class="docutils literal notranslate"><span class="pre">yell</span></code> method calls the <code class="docutils literal notranslate"><span class="pre">transmit</span></code> method of the
+NetworkedFactory.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">enable_snoop_trace</span></code> and <code class="docutils literal notranslate"><span class="pre">enable_snoop_spy</span></code> methods act on the other
+snoop networks.  It turns on the ability to debug every connected statechart on
+one machine.  The only other method that we will want is <code class="docutils literal notranslate"><span class="pre">snoop_scribble</span></code>.
+Think of this as a networked print statement that will write your messages into
+the snoop networks.</p>
+<p>So to use the new features provided by the NetworkedFactory class: we will
+<code class="docutils literal notranslate"><span class="pre">yell</span></code> out events on the mesh network and watch the collective instrumentation
+on one, or both of our snoop networks.</p>
 </div>
 <div class="section" id="building-a-mongol-unit">
 <span id="i-mongol-example-building-a-mongol-unit"></span><h2>Building a Mongol Unit<a class="headerlink" href="#building-a-mongol-unit" title="Permalink to this headline">¶</a></h2>
-<p>Off camera, I re-wrote the horse archer to use the RabbitFactory and it’s
-network.  In this section I will describe the new parts of the design and then
-present the code.</p>
-<p>To begin, let’s Reduce the resolution on the RabbitFactory part of our
+<p>Off camera, I re-wrote the horse archer to use the NetworkedFactory.  In this
+section I will describe the new parts of the design and then present the code.</p>
+<p>To begin, let’s Reduce the resolution on the NetworkedFactory part of our
 architectural diagram while increasing the detail on the battle HSM:</p>
 <a class="reference external image-reference" href="_static/n_ergotic_mongol_2.pdf"><div align="center" class="align-center"><img alt="_images/n_ergotic_mongol_2.svg" src="_images/n_ergotic_mongol_2.svg" /></div>
 </a>

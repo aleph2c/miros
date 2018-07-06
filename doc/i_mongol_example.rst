@@ -3,8 +3,7 @@
   *It ain't what you don't know that gets you into trouble.  It's what you know
   for sure that just ain't so.* 
   
-  -- Mark Twain (fake quote)
-
+  -- Mark Twain
 
 Mongol Horse Archer
 ===================
@@ -2119,9 +2118,9 @@ networked Mongol statechart structure without being bogged down by the details
 of networking.
 
 So we would like our horse archers to be able to yell commands back and forth,
-and we want to be able to monitor what their botnet is doing from one machine.  To
-do all of this we will insert the RabbitFactory class (with all of it's
-networking features) between the HorseArcher class and it's Factory ancestor in
+and we want to be able to monitor what their botnet is doing from one machine.
+To do all of this we will insert the NetworkedActiveObject class (with all of
+it's networking features) between the HorseArcher and it's Factory ancestor in
 our class inheritance hierarchy.
 
 The RabbitFactory abstracts away large parts of the network, and it provides a
@@ -2149,81 +2148,88 @@ ActiveObject provides us with the ability to make statecharts.  The Factory
 class gives us the ability to build up statecharts by writing callbacks,
 constructing state objects, linking these then imposing a hierarchy on the
 states.  As of now, between the Factory class and the HorseArcher, we place the
-RabbitFactory.
+NetworkedFactory (from the miros-rabbitmq plugin).
 
-The RabbitFactory will include all of the required network dependencies.   It
-will link all of the statechart features to other statecharts across two
-different types of networks:  It will allow us to extend our spy and trace
-instrumentation across every connected statechart using a snoop-network, and it
-will provide a publish/subscription routing model for event messaging with a
-mesh network.
+The NetworkedFactory will include all of the required network dependencies.   It
+will link all of the statechart features to other statecharts across three
+different types of networks:  it will provide a publish/subscription routing
+model for event messaging with an encrypted mesh network and it allow us to
+extend our spy and trace instrumentation across every connected statechart using
+a two different snoop-networks.
 
-Now that we know more about the architecture, how do we syntactical construct a
-networked statechart?  Here is how we would build a networked archer object:
+Now that we know more about the architecture, how do we syntactically construct
+a networked statechart?  Here is how we would build a networked archer object:
 
 .. code-block:: python
-  :emphasize-lines: 3-5
+  :emphasize-lines: 3-8
   
   archer = HorseArcher(
     name = HorseArcher.get_a_name(),
-    rabbit_user='bob',
-    rabbit_password='dobbs',
-    rabbit_port=5672
+    rabbit_user=RABBIT_USER,
+    rabbit_password=RABBIT_PASSWORD,
+    rabbit_port=RABBIT_PORT,
+    mesh_encryption_key=MESH_ENCRYPTION_KEY,
+    snoop_trace_encryption_key=SNOOP_TRACE_ENCRYPTION_KEY,
+    snoop_trace_encryption_key=SNOOP_SPY_ENCRYPTION_KEY,
   )
 
 The highlighted lines in the above listing show what information is required to
-connect to the network.  We need a RabbitMq username, password and port
-information.   The rabbit_port argument is optional; it will default to 5672.
+connect to the network.  We get this information from the ``.env`` file and the
+code that we added to access our networking secrets.
 
 Inside the HorseArcher class, it's RabbitFactory object is constructed with a
 bit more detail:
 
 .. code-block:: python
-  :emphasize-lines: 5-11
+  :emphasize-lines: 5-6
   :linenos:
 
   # . code inside the __init__ method of the HorseArcher
   self.name = name
-  # super would be RabbitFactory
+  # super would be NetworkedFactory
   super().__init__(name=name,
-        rabbit_user=rabbit_user,
-        rabbit_password=rabbit_password,
         tx_routing_key='archer.{}'.format(name),
         rx_routing_key='archer.#',
-        snoop_key=
-          b'lV5vGz-Hekb3K3396c9ZKRkc3eDIazheC4kow9DlKY0=',
+        rabbit_user=rabbit_user,
+        rabbit_password=rabbit_password,
+        mesh_encryption_key=mesh_encryption_key,
+        snoop_key=snoop_trace_encryption_key=snoop_trace_encryption_key,
+        snoop_key=snoop_spy_encryption_key=snoop_spy_encryption_key,
         rabbit_port=rabbit_port)
   # .
 
-Lines 5-11 are arguments that are required by the RabbitFactory class which were
-not required by the Factory class.  Lines 7 and 8 are RabbitMq topic routing
-keys for the mesh network.  Lines 9-10 describe the snoop network's encryption
-key.  This will have to be the same for all connected bots in our botnet.
+The highlighted lines describe how we will set up the `topic routing scheme
+<https://www.rabbitmq.com/tutorials/tutorial-five-python.html>`_ for this state
+chart.  We will transmit each event wrapped in an 'archer.<name>' topic, and we
+will receive 'archer.#', where the '#' matches zero or more words.  We really
+aren't using this feature in any meaningful way.  I am adding it here so that
+you are aware of it for your own designs.
 
 Now that we can build a networked horse archer, how do we use it?  
 
-Well, to start with we can ``yell`` events across the mesh network.  The ``yell``
-method takes an Event as an input and posts it into the FIFO inbox of all
-connected statecharts.  The ``yell`` method calls the ``transmit`` method of the
-RabbitFactory.
+Well, to start with we can ``yell`` events across the mesh.  The ``yell`` method
+takes an Event as an input and posts it into the FIFO inbox of all connected
+statecharts.  The ``yell`` method calls the ``transmit`` method of the
+NetworkedFactory.
 
-The ``enable_snoop`` method acts on the other network, the snoop network.  It
-turns on the ability to debug every connected statechart on one machine.  The
-only other method that we will want is ``snoop_scribble``. Think of this as a
-networked print statement that will write your messages into the snoop network.
+The ``enable_snoop_trace`` and ``enable_snoop_spy`` methods act on the other
+snoop networks.  It turns on the ability to debug every connected statechart on
+one machine.  The only other method that we will want is ``snoop_scribble``.
+Think of this as a networked print statement that will write your messages into
+the snoop networks.
 
-So to use our networks: we will ``yell`` out events on the mesh network and
-watch the collective instrumentation on the snoop network.
+So to use the new features provided by the NetworkedFactory class: we will
+``yell`` out events on the mesh network and watch the collective instrumentation
+on one, or both of our snoop networks.
 
 .. _i_mongol_example-building-a-mongol-unit:
 
 Building a Mongol Unit
 ----------------------
-Off camera, I re-wrote the horse archer to use the RabbitFactory and it's
-network.  In this section I will describe the new parts of the design and then
-present the code.
+Off camera, I re-wrote the horse archer to use the NetworkedFactory.  In this
+section I will describe the new parts of the design and then present the code.
 
-To begin, let's Reduce the resolution on the RabbitFactory part of our
+To begin, let's Reduce the resolution on the NetworkedFactory part of our
 architectural diagram while increasing the detail on the battle HSM:
 
 .. image:: _static/n_ergotic_mongol_2.svg
