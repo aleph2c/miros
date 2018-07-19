@@ -10,9 +10,14 @@ Installation
    :maxdepth: 2
    :caption: Contents:
 
-To install::
+To install:
 
-   > pip3 install miros --user
+.. code-block:: python
+
+  python3 -m venv
+  . ./venv/bin/activate
+  pip install miros
+
 
 Miros has been tested on Python 3.5 and is only dependent upon the Python
 standard library.
