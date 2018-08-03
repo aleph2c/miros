@@ -18,6 +18,7 @@ Python Statecharts
    introduction
    quickstart
    examples
+   reading_diagrams
    recipes
    reflection
    patterns

@@ -157,7 +157,7 @@ enemies chasing them; placing the highest priority on officers.
 It is possible that modern Western military theory has still not caught up to
 medieval Mongol thinking. The tactic name, “defeat in detail” might have been
 called “deceit in detail” had it been written down by a 13th century Mongol,
-instead of by a despotic Frenchman.
+instead of Napoleon.
 
 .. _i_mongol_example-modelling-the-mongol-mind:
 
@@ -323,18 +323,33 @@ Here are the steps:
 
 Designing the Mongol in its Tactic
 ----------------------------------
-We already understand the tactic, so I’ll draw and describe how I think it might
-work in an HSM several times over; adding complexity and technical improvements
-with each iteration. When we have a design that can sufficiently sketch out our
-botnet, I’ll move to the next step.
+One of the things that killed UML is the idea that you can completely design a
+complicated system before you build it.  `Nobody can actually do that
+<https://www.wired.com/2017/04/the-myth-of-a-superhuman-ai/>`_.  Good design
+requires a tolerance for making mistakes and experimentation.  Think play-doh,
+not sculpting granite.  The UML drawing is not a blueprint, it is a mistake in
+the right direction.  
 
-While working on the example, we will introduce different events that cause
-changes in the horse archer’s behaviour.
+To relate this design process back to the battle metaphor; what we need is our
+commander's intent, not a specific set of instructions on how to do things.  The
+commander's intent for this design is provided in the historical description of
+the mongol tactic.  It is a fairly high level specification; we know how we want
+our units to fight and we know that they need to communicate somehow.
 
-When is an event a war cry, who exactly is yelling it out? Any war cry can come
-from one of two places. It can come from the horse archer himself, or a senior
-officer. We do this so that the unit tactic can be autonomous yet flexible
-enough to receive outside direction.
+At this point in the writing, I have no idea about how to connect the nodes of
+our botnet.  I don't even know how I'm going to make their HSMs work, and that's
+OK.  We will sketch first, then draw in the details as the picture starts to
+reveal itself.  We will throw out the bad ideas and keep the right ideas.  To do
+this I'll let my mind jump around -- I'll think about the story, then I'll
+ask a lot of questions, then try to answer them.  Then I'll draw some pictures
+and try and make some software that will work well enough so that we can see
+what it does so we can make it better.  Let's begin.
+
+When is an event a war cry? Who exactly is yelling it out? 
+
+Any war cry can come from one of two places. It can come from the horse archer
+himself, or a senior officer. We do this so that the unit tactic can be
+autonomous yet flexible enough to receive outside direction.
 
 Let’s think about a single horse archer and the actions he would take. He would
 meet up with his brethren (marshal), then they would determine where they would
@@ -342,24 +357,25 @@ like to meet after their first maneuver, then they would fill their quivers with
 arrows.
 
 So, I have to first figure out what to call the outer state. For now, I’ll call
-it, Deceit_in_Detail_Tactic (marshalled), because I want to express that the
-horse archers are meeting and that this is one tactic of many.
+it, Deceit_in_Detail_Tactic (marshaled), because I want to express that the
+horse archers are meeting and that this is one tactic of many.  It's probably
+not a very good name, but I don't want to get hung up on that right now.
 
 .. image:: _static/ergotic_mongol_11.svg
     :target: _static/ergotic_mongol_11.pdf
     :align: center
 
-Immediately after filling their arrows, they attack.  This action may not be
-historically accurate, but let's have our botnet just attack right away.
+Immediately after filling their arrows, the Mongols attack.  This action may not
+be historically accurate, but let's have our botnet just attack right away.
 
 Once the horse archers advance close enough to the mass of their enemy, they
-would circle and fire.  How do we express this in software?  If we were building
-a botnet to fight the North Koreans or a malevolent AI or something, we could
-have each node in our botnet read a transducer or take a reading.  For now, we
-will fake out this information with a
-:ref:`one-shot<recipes-create-a-one-shot-state>` so that we can frame in our
-design.  Three seconds after advancing they will issue the
-Close_Enough_For_Circle event.
+create a circle and fire arrows.  How do we express this in software?  If we
+were building a botnet to fight the North Koreans or a malevolent AI or
+something, we could have each node in our botnet read a transducer or take a
+reading.  For now, we will fake out this information with a
+:ref:`one-shot<recipes-create-a-one-shot-state>` so that we can make something
+that can be tested within our design.  Three seconds after advancing they will
+issue the Close_Enough_For_Circle event.
 
 So our horse archers circle and fire; creating an intangible rain of arrows down
 upon the enemy's front line. So far so good.  To save themselves, the enemy
@@ -369,7 +385,7 @@ charge in for their next play.
 Notice that the Circle and Fire state is within the Advance state.  Why do this?
 I did this in case an individual horse archer decided that the enemies front was
 sufficiently disorganized enough not to waste arrows on an imprecise
-bombardment; To skip the circle and fire step and just advance into a skirmish.
+bombardment -- to skip the circle and fire step and just advance into a skirmish.
 To do this, they would issue a Skirmish_War_Cry and charge into the enemy's
 disorganized front to make individual attacks.
 
@@ -398,7 +414,7 @@ design more flexibility, which we will see later in this example).
 After a horse archer issues the Retreat_Ready_War_Cry they enter the "Waiting to
 Lure" state.  He would expertly attach his bow to his mount and pull his
 scimitar, then he would do something really brave.  He draws the attention of an
-enemy officer and somehow convinces him that he was scared and incompetent, that
+enemy officer and somehow convinces him that he was scared and incompetent; that
 his unit's will was broken.  While in the waiting to lure state, he would act
 like a father who is being chased by his children.  He would pretend that they
 could actually catch him if they only just tried a little bit harder.
@@ -408,12 +424,13 @@ incompetent, he would want to do something other than watch his footmen die.  He
 might look down at his massive warhorse and compare it to the strange little
 ponies these horse archers are riding.
 
+
 .. image:: _static/horsearcher.jpg
     :target: _static/horsearcher.pdf
     :align: center
 
-What he doesn't know is that he is the quarry.  They are on a hunting trip; not
-every arrow carries the same value; the whole point of their attack was to find
+What he doesn't know is that he is the quarry.  The Mongols are on a hunting trip -- not
+every arrow carries the same value; the whole point of this attack has been to find
 him.  They have something to give him.
 
 The Knight see's his chance and attacks!
@@ -449,7 +466,7 @@ the knight; taking advantage of how his helmet has cut off his peripheral
 vision.  It doesn't really matter; once the knight attacks, stupidly charging
 into a group of organized horse archers with unprotected flanks, he is doomed.
 
-What to do next?  The unit goal has been achieved, yet they still have arrows.
+What to do next?  The Mongol's unit goal has been achieved, yet they still have arrows.
 So they leave them in any other pursuing soldiers, then ride full gallop back to
 the marshal point.
 
@@ -1985,7 +2002,7 @@ left this project for a while and wrote the `miros-rabbitmq plugin
 
 You can now use the `miros-rabbitmq plugin
 <https://aleph2c.github.io/miros-rabbitmq/index.html>`_ to make networkable
-statecharts.  So let's network our mongols by following these steps:
+statecharts.  So let's network our Mongols by following these steps:
 
 * `install RabbitMQ <file:///C:/github/miros-rabbitmq/docs/installing_infrastructure.html>`_ and `miros-rabbitmq <https://aleph2c.github.io/miros-rabbitmq/installation.html>`_ on all of the computers you want to network.
 * `make a .env file in the same directory as your code <file:///C:/github/miros-rabbitmq/docs/recipes.html#managing-your-encryption-keys-and-rabbitmq-credentials-short-version>`_ 
@@ -2604,6 +2621,39 @@ discover new voodoo tricks.
   of the Horse Archer class so that you can parametrize it, and tune it while
   testing the team of horse archers.
 
+
+System Programming your Organization
+====================================
+Let's imagine two armies competing as businesses in a free market.  One army is
+organized as an engineering hierarchy and the second based on our mongol horde
+example.
+
+Our first army's basic unit: Every engineering step requires the involvement of
+three groups of people: a manager, and architect and a set of developers.  The
+manager asks the same question over and over, "When is it going to be done?" The
+architect, wrestles with the problem then draws some pictures and makes plans to
+build an entire solution.  Having high social status they do not have to lower
+themselves to actually look at the feedback from their programmed experiments.
+The developers would not bother to really think about the problem because they
+were getting their thinking from someone else.  They would instead focus on the
+specific "deliverables" given to them by their manager.  But their manager
+doesn't actually understand the problem or what they do.
+
+.. note::
+
+  This is not a straw man, since I have seen this many times in my
+  career.  Such a structure creates a deadened environment; an organization
+  absent of personal victories; slow, plodding and stupid.  I have seen it done
+  within an "Agile" development framework.  Each member is smart and capable,
+  but the structure of the organization was envisioned by someone who doesn't
+  understand how to program systems. (MBA/HR?)
+
+Now we imagine a second organization, one where the developers are the
+architects and the managers all wrapped into one person.  There are still
+ranking officers, who will kill/fire the team if there is a lack of cohesion.
+How can you fire an entire team?  Well if that team was a set of contractors,
+easy, cancel the contract.  If the team were employees, there is probably
+something else that can be done.
 
 .. _mesh_network: https://github.com/aleph2c/miros/blob/master/examples/mesh_network.py
 .. _party_line: https://en.wikipedia.org/wiki/Party_line_(telephony)

@@ -1,0 +1,644 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Diagrams &#8212; miros 2.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Recipes" href="recipes.html" />
+    <link rel="prev" title="Mongol Horse Archer" href="i_mongol_example.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <blockquote id="reading-diagrams-reading-diagrams">
+<div><p><em>If I can’t picture it, I can’t understand it</em></p>
+<p class="attribution">&mdash;Albert Einstein</p>
+</div></blockquote>
+<div class="section" id="diagrams">
+<h1>Diagrams<a class="headerlink" href="#diagrams" title="Permalink to this headline">¶</a></h1>
+<p>In the 1990s a number of people got together an collected all of the different
+popular ways of drawing pictures of software into one standard called UML
+(unified modeling language).  The Harel formalism (the way David Harel wanted us
+to draw statecharts) was included in UML.</p>
+<p>UML has fallen out of favor because the committee controlling it, became
+overly pedantic. They tried to turn UML into a programming language, rather than
+a collection of best practices about how to sketch out some pictures of software
+systems.  They flew too close to the Sun, annoyed everyone, burnt their wings
+and crashed into the ground.  Now UML has become some kind of undead, anti-brand.</p>
+<p>But they left behind some useful technology.  A number of free diagramming tools
+still exist which can be used to draw pictures really fast so that we can
+communicate to one another what we want to build.  With these same tools we can
+draw our statecharts.</p>
+<p>Martin Fowler translated the gobbledegook of the UML standard into something
+legible with his book: <a class="reference external" href="https://martinfowler.com/books/uml.html">UML distilled</a>.  If you want a very solid
+understanding about Harel formalism as it relates to UML, go to the source and
+read <a class="reference external" href="https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download">Practical UML Statechart in C/C++, 2nd
+Edition</a> by
+Miro Samek.</p>
+<p>Do you need to read these books before you use UML?  No, just start drawing
+things.  Use your search engine to answer the questions you come up with as you
+go.  Make sure the people on your team know what you mean when you draw your
+pictures.</p>
+<p>At some point another attempt will be made to standardize the current best
+practices for diagramming our software systems.  Maybe it will incorporate all
+of the new programming idioms.  Until then we can limp along with UML.</p>
+<div class="section" id="a-warning-about-diagramming">
+<span id="reading-diagrams-a-warning-about-diagramming"></span><h2>A Warning about Diagramming<a class="headerlink" href="#a-warning-about-diagramming" title="Permalink to this headline">¶</a></h2>
+<p>Be aware that as you draw your pictures, you will lock-in your thinking.</p>
+<p>You and everyone on your team will be effected by the Sunk Cost Fallacy:  “Your
+decisions are tainted by the emotional investments you accumulate, and the more
+you invest in something the harder it becomes to abandon”. <a class="footnote-reference" href="#id3" id="id1">[1]</a></p>
+<p>If you build beautiful drawings with a graphic design application; you will need
+to put time and effort into them and you will probably become emotionally
+attached to them.  Remember, your diagrams are just mistakes in the right
+direction.  You need to be able to destroy these pictures, just as casually as
+you would refactor your code.</p>
+<p>So use a simple and fast moving tool that almost draws the pictures for you; I
+use UMLet.  With UMLet you can build custom templates.  <a class="reference external" href="https://github.com/aleph2c/umlet-statechart-template">Here is the custom
+template I use</a>.  It is
+hard to fall in love with a picture made by UMLet.</p>
+<p>You don’t have to use this tool or this template, there <a class="reference external" href="https://en.wikipedia.org/wiki/List_of_Unified_Modeling_Language_tools">a lot of UML drawing
+tools available</a>.</p>
+<p>Another way to make your pictures easy to change is to limit the amount of
+detail on them.  You don’t have to draw every class and you can shrink a
+complicated statechart into a kind of short hand.</p>
+<p>Some diagrams map better to your specifications than others.  Generally
+speaking, the statechart picture is something you can trust to change less often
+than a class diagram picture.  Your sequence diagram pictures, the closest thing
+you have to a written narrative, will change all of the time.</p>
+<p>UML can’t begin to describe what you write with your Python code.  So, if you
+need to express a code’s idea on the diagram, just write the code directly onto
+the picture.</p>
+</div>
+<div class="section" id="classes">
+<span id="reading-diagrams-classes"></span><h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<p>The class is a blueprint for an object.</p>
+<p>Unfortunately UML was constructed to focus on this instead of the object itself.
+But the UML class diagram is good at providing a bit of context around your
+statechart diagram.</p>
+<p>Typically, your class diagram would have a name and it would describe the
+important variables (attributes) and functions (methods) of your class.  I tend
+to put a little line between these when I’m diagramming them.</p>
+<a class="reference external image-reference" href="_static/class_1.pdf"><div align="center" class="align-center"><img alt="_images/class_1.svg" src="_images/class_1.svg" /></div>
+</a>
+<p>If your class inherits from another class, you draw it with the inheritance
+arrow (the ToasterOven <em>is an</em> ActiveObject):</p>
+<a class="reference external image-reference" href="_static/class_2.pdf"><div align="center" class="align-center"><img alt="_images/class_2.svg" src="_images/class_2.svg" /></div>
+</a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...</span>
+<span class="k">class</span> <span class="nc">ToaterOven</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
+  <span class="c1"># ...</span>
+</pre></div>
+</div>
+<p>More about inheritance will be written about in a later section.</p>
+<p>If the object that is instantiated from your class, constructs another
+object of another class, you can draw this with the composite arrow (The toaster
+oven <em>has a</em> light):</p>
+<a class="reference external image-reference" href="_static/class_3.pdf"><div align="center" class="align-center"><img alt="_images/class_3.svg" src="_images/class_3.svg" /></div>
+</a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ToasterOven</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">light</span> <span class="o">=</span> <span class="n">Light</span><span class="p">()</span>
+    <span class="c1"># ...</span>
+</pre></div>
+</div>
+<p>If your object references another object that already exists, you can draw this
+with an aggregation arrow (The toaster oven <em>has a</em> relay).</p>
+<a class="reference external image-reference" href="_static/class_4.pdf"><div align="center" class="align-center"><img alt="_images/class_4.svg" src="_images/class_4.svg" /></div>
+</a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">relay</span> <span class="o">=</span> <span class="n">Relay</span><span class="p">()</span>
+
+<span class="c1"># ...</span>
+<span class="k">class</span> <span class="nc">ToasterOven</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relay</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">relay</span> <span class="o">=</span> <span class="n">relay</span>
+    <span class="c1"># ...</span>
+
+<span class="n">toaster_oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">relay</span><span class="p">)</span>
+</pre></div>
+</div>
+<p id="reading-diagrams-backwards-arrows">Oh, but wait, did you notice the aggregation and composition arrows are
+backwards?  This was done for a good reason, the arrow head (diamond looking
+thing) is on the side that owns the other thing.  So at a glance you can see who
+owns what.</p>
+<a class="reference external image-reference" href="_static/arrow_pear.pdf"><div align="center" class="align-center"><img alt="_images/arrow_pear.svg" src="_images/arrow_pear.svg" /></div>
+</a>
+<p>The composite pear-arrow is black because when your object is destroyed, so is
+the object that it has built within it.</p>
+<a class="reference external image-reference" href="_static/arrow_pear_2.pdf"><div align="center" class="align-center"><img alt="_images/arrow_pear_2.svg" src="_images/arrow_pear_2.svg" /></div>
+</a>
+<p>These mnemonics should help you when you are diagramming.</p>
+<p>If you get these pear-arrows confused, they don’t really matter that much, just
+use a dashed line to show there is some sort of relationship between your
+objects/classes.</p>
+<p>These class diagrams are ill conceived since you have to know about all sorts of
+activity in the background before you understand them.  You have to know that
+the relationships are between the objects that are instantiated and not the
+classes themselves.  As Dave Thomas (of Pragmatic fame) says, Python is not
+class oriented programming it’s object oriented programming, yet UML draws
+everything with classes.</p>
+<p>So treat the class diagrams as a quick reference to provide your statechart some
+context, or just a kind of throw away thing.  Use lots of class shorthand
+pictures if you are going to draw a few different classes on the same diagram.
+Your actual classes are well defined in your Python code, so you can use your
+code-tools (ctag/cscope) to see the class hierarchies and who references what
+within your editor.</p>
+<p>Martin Fowler spends over two chapters of <a class="reference external" href="https://martinfowler.com/books/uml.html">UML distilled</a> writing about class diagrams.  You
+can make them really complicated if you want.</p>
+<p>But, if you are using this miros package, you are managing your system’s
+complexity using statecharts and not with classes.  So drawing detailed pictures
+using class diagrams is not a good use of your time.</p>
+</div>
+<div class="section" id="inheritance-and-miros">
+<span id="reading-diagrams-inheritance"></span><h2>Inheritance and miros<a class="headerlink" href="#inheritance-and-miros" title="Permalink to this headline">¶</a></h2>
+<p>Imagine that you have written some code that is good at doing something, so you
+pack this code into a Python class.  Now you want to make a new object that does
+these things and a few more things.  You don’t want to copy in your old working
+code, it’s variables and functions into new class, you just want it included
+automatically, so that it’s in one spot, easy to fix and change.  You want a
+syntactical short hand for, “take this old blueprint and change it a bit”.  You
+want to program your blueprints by difference.  You want to use the idea of a
+code-patch as it applies to your classes.</p>
+<a class="reference external image-reference" href="_static/class_5.pdf"><div align="center" class="align-center"><img alt="_images/class_5.svg" src="_images/class_5.svg" /></div>
+</a>
+<p>So, you put your working code into a class, then make a new class where it
+inherits from the class with the working code.  That’s a nice feature and it’s
+called inheritance.  Any time you see an arrow with an open arrow on one side,
+think of it as short hand for: “is a”.  The above diagram would read
+BluePrintPatch “is a” ClassContainingWorkingCode.</p>
+<p>Within the context of this library, you would inherit from either the
+ActiveObject or the ActiveFactory to gain access to the event processor, and all
+of the other useful methods which would drive your statechart diagram.  Then,
+you can either attach this class directly to your statechart, or make an
+intermediate class that holds all of your worker-functions for the thing you are
+trying to build.</p>
+<a class="reference external image-reference" href="_static/class_6.pdf"><div align="center" class="align-center"><img alt="_images/class_6.svg" src="_images/class_6.svg" /></div>
+</a>
+<p>Patching is easy for a computer, but it’s a lot harder for a human mind.  In the
+1990’s when object oriented programming was <em>the</em> raging fad, the computer
+science community really over-emphasized this feature.  We have since learned
+that inheritance is like any good vitamin, if you use too much of it becomes
+hazardous to your well-being.</p>
+<p>So don’t over use inheritance or you will make your code <em>really</em> hard to debug
+and maintain:</p>
+<a class="reference external image-reference" href="_static/class_7.pdf"><div align="center" class="align-center"><img alt="_images/class_7.svg" src="_images/class_7.svg" /></div>
+</a>
+<p>It makes sense to inherit from an ActiveObject or an ActiveFactory, because you
+probably have no intention of debugging this library’s code.  If you make a
+subclass of one of these classes, you can put your specific worker functions and
+named attributes in it; but will you ever need to subclass beyond that point?
+Probably not; inheritance can get you into a lot of trouble if it’s too deep.</p>
+<p>If you are going to inherit ask yourself if the “as-a” relationship holds true
+when you use the two class names in a sentence.  “The ToasterOven class is an
+ActiveObject”; yes, that makes sense.  Ok, I’ll use inheritance.</p>
+<p>If you want all of the states of your statechart to react the same when they see
+a specific event, use the <a class="reference internal" href="patterns.html#patterns-ultimate-hook"><span class="std std-ref">ultimate hook pattern</span></a>.
+This gives you all of the benefits of inheritance while still having debuggable
+code.</p>
+</div>
+<div class="section" id="understand-what-a-statechart-is-from-a-metaphor">
+<span id="reading-diagrams-understand-what-a-statechart-is-from-a-metaphor"></span><h2>Understand what a Statechart is from a Metaphor<a class="headerlink" href="#understand-what-a-statechart-is-from-a-metaphor" title="Permalink to this headline">¶</a></h2>
+<p>If you don’t know what a statechart is, think of it as a way to make a board
+game that maps to your engineering problem.</p>
+<p>The board game has a board with a picture on it.  It has some marbles that you
+can place, or roll around the board in accordance to the game’s rulebook.  And
+the board game has some players that take turns playing.  This game is a little
+strange in that it only has one common game piece that all of the players can
+indirectly control by playing their marbles.  The common game piece is used to
+determine where a marble starts to roll from, but we will get into these details
+later.</p>
+<p>As the board game designer, you would have control over the drawing on the board
+and you would design some of the marbles that are used by the players, but you
+wouldn’t control the rulebook or the players specific behavior, what fun would
+that be?  Though you could choose who gets to play the game.</p>
+<p>The players of your game could be people, touching an external user interface.
+At the moment they press a key, an electrical signal would be sent into your
+computer and then turned into a software abstraction of the key-press event that
+could effect your board game.  But a player doesn’t actually have to be a
+person, it could be a count down timer that fires an event every 3 seconds, it
+could be the stock market, it could be the weather.  A player in this metaphor
+is just something in the outside world that can trigger the events you want your
+board game to react to.</p>
+<p>To distinguish one event from another event, we will call them by different
+names: signal names.  Sometimes an event carries additional information, let’s
+call this a payload.  Going back to our metaphor, an event is a marble.
+A player would build a marble and put it on the board when it was their turn to
+play the game.  Every marble would have a signal name painted on it, and
+sometimes, deep within the marble would be a payload.</p>
+<p>So now what?  Well, every game has a rule book.  In our case this rule book is
+called the Harel Formalism.  These rules govern how the marble can move on the
+board and what it means and how it will trigger different software, which you
+have marked onto the board to make the game fun.  The board game can produce its
+own marbles as your marble rolls on or across lines on the board.  These are
+known as internal events, they also follow the game’s rules, and they can also
+trigger your software.  The rules will determine when the common game piece can
+be moved on the board – based on interaction between the marble, the board, where the
+piece was before the play begin their move.</p>
+<p>The statechart board game also has rules about when a player gets to play.  If
+one player really needs to put a marble on the board while another is playing,
+this is OK.  She will just put it into a loading dock.  The statechart board
+game will only let one player play out there marble on the board at a time; this
+rule is called run to completion (RTC).  When a player’s marble has finished
+moving around the board, our board game will check it’s loading dock to see if
+another marble needs to be acted upon.</p>
+<p>The loading dock is a python deque.  The thing that will load the marble onto
+the board when the game has finished processing the last player’s marble is a
+python thread.</p>
+<p>So what does this board game look like?  Well, it looks kind of like a bunch of
+rounded rectangles connected with arrows.  The arrows have signal names painted
+on them to describe paths that certain marbles can follow and the rounded
+rectangles are called states.  All the states have names, and a state can be
+within another state.  As the different players play the game, the common piece
+is moved around the board, coming to rest within one of the states.  This is
+called the resting state.</p>
+<p>The rules are pretty straightforward, but who wants to read a rulebook anyway?
+The players certainly don’t.  So, you as the board game designer and the board
+game itself must know the rules.  The board game’s software that applies the
+rules to the marbles on the board is called the event processor.</p>
+<p>So how is this useful?  Well your game has software on it’s game board that can
+run when a marble roles over it.  You can connect this software to the output of
+your computer; so you can control things in the outside world.  Your board game,
+statechart, could be used to control a trading strategy, it could be used to
+control the massive doors over a stadium, automatically reacting to changes in
+weather conditions.</p>
+<p>Getting down to brass tacks, what do we do now?  Well I have to show you how to
+draw a board game; I have to show you how to draw a statechart.  We will use
+UML.  I have to show you how to connect your board game to it’s automatic rule
+book; the event processor.  I have to show you how to create your custom
+marbles, the events and their payloads and how to send these to the board game
+so that you can connect outside things into the events to which your statechart
+will react.</p>
+<p>Once you know how to draw the pictures, you will need to know how to translate
+this into code.  Then I will show you how to see if your statechart it working;
+it can give you feedback about what it is doing, and you can use this to both
+trouble shoot your design and to document how it works.</p>
+</div>
+<div class="section" id="events">
+<span id="reading-diagrams-events"></span><h2>Events<a class="headerlink" href="#events" title="Permalink to this headline">¶</a></h2>
+<p>Any code which uses the miros library is event-driven.</p>
+<p>This means that your software will be waiting for an occurrence of an event: a
+mouse click, a stock price passing a certain threshold, or the arrival of a data
+packet.  After recognizing the event your system will react to it, by
+manipulating the hardware state or sending further internal events to itself.
+After completing the processing of this event in accordance to your design, the
+system will stop processing; waiting for the next event.</p>
+<p>An event has a name and an optional payload.  The event’s name is called a
+signal name.  There are internal signal names, like entry, exit and init and
+there are external signals; which are just names that you define to track the
+real world events that your software is reacting to.</p>
+<p>The internal signal names are used by the event processor to send specific
+events to your event handler functions as the statechart tries to behave in
+accordance to the Harel formalism.  For instance if your statechart reacts to an
+event by changing to a deeper state, it will send entry events to all of the
+intermediate state handlers.  This will be explained in the up coming sections.</p>
+</div>
+<div class="section" id="event-processor-attachment-points">
+<span id="reading-diagrams-event-processor-connection"></span><h2>Event Processor Attachment Points<a class="headerlink" href="#event-processor-attachment-points" title="Permalink to this headline">¶</a></h2>
+<p>To connect the event processor of your object to a statemachine; draw an
+attachment point like this:</p>
+<p>I’m not sure if I’m using UML properly according to the standard, and I don’t
+really care.  What I care about is if you understand what I mean.</p>
+<p>In the context of this library an object instantiated with an event processor
+can attach itself to a statemachine.  Another object instantiated with an event
+processor can also attach to the same statemachine.</p>
+<p>The statemachine doesn’t keep track of variables or the current state; it simply
+acts as a behavioral specification.  The object that was instantiated from the class
+containing the event processor keeps track of it’s variable contents and state
+information.  This is why the diagram is drawn this way.</p>
+</div>
+<div class="section" id="states">
+<span id="reading-diagrams-states"></span><h2>States<a class="headerlink" href="#states" title="Permalink to this headline">¶</a></h2>
+<p>UML lets you draw lots of different states.  The Miro Samek algorithm doesn’t
+really care about this, since it supports finite state machines (simple states)
+and hierarchical state machines (composite states) exactly the same.</p>
+<p>Here is a simple state, you would use it when drawing a finite state machine:</p>
+<p>Here is an example of a finite state machine.</p>
+<p>You could have drawn the above machine like this:</p>
+<p>Here is a second way of drawing the same machine is here:</p>
+<p>Here is a simple hierarchical state machine:</p>
+<p>You could draw the above hierarchical state machine using simple states, but
+that would be harder to do than using the composite state widgets, so just use
+the composite state widgets.</p>
+<p>In code your state is represented with a state handler, which is kind of a
+callback function that is given two arguments, a reference to an object that has
+an event processor and an event.</p>
+<p>This event contains information that can be used by your handler.  The returned
+value from this state handler has to be something that makes sense to the event
+processor.</p>
+<p>So a state handler is not like a function or a method, you don’t give it
+arguments and it gives you a result.  Instead, you send it events and its
+behavior is dependent upon how you have structured it’s topology.  The results
+of the work done by your statechart are left on the object provided as the first
+argument to the state handler.</p>
+</div>
+<div class="section" id="state-shorthand">
+<span id="reading-diagrams-state-shorthand"></span><h2>State Shorthand<a class="headerlink" href="#state-shorthand" title="Permalink to this headline">¶</a></h2>
+<p>When you are wrestling with your tools to draw a picture, you will often find
+that a state has too much information in it to fit on your page.</p>
+<p>You can hide some of the inner details of your states with state shorthand, so
+that your diagram is sized to fit on the page.</p>
+<p>For some reason the OMG called this decomposition hiding.  I don’t use this
+terminology, I’m not sure how to remember it, but if you need to google it, this
+is it’s search term.</p>
+</div>
+<div class="section" id="entry-event">
+<span id="reading-diagrams-entry-signals"></span><h2>Entry Event<a class="headerlink" href="#entry-event" title="Permalink to this headline">¶</a></h2>
+<p>The entry event will be sent to your state handler anytime the lines representing
+it’s boundary are cross from the outer, into the inner.</p>
+</div>
+<div class="section" id="initialization-dot">
+<span id="reading-diagrams-initialization-signals"></span><h2>Initialization Dot<a class="headerlink" href="#initialization-dot" title="Permalink to this headline">¶</a></h2>
+<p>The init event will be sent to your state handler anytime you have settled into a
+state, this could happen after the last entry event, if the transition occurred
+from after an entry signal or after the last exit signal.</p>
+</div>
+<div class="section" id="exit-signals">
+<span id="reading-diagrams-exit-signals"></span><h2>Exit Signals<a class="headerlink" href="#exit-signals" title="Permalink to this headline">¶</a></h2>
+<p>The exit event will be sent to your state handler anytime the lines representing
+it’s boundary are cross from the inner, to the outer part of your diagram.</p>
+</div>
+<div class="section" id="event-guards-if-structures">
+<span id="reading-diagrams-event-guards"></span><h2>Event Guards (If Structures)<a class="headerlink" href="#event-guards-if-structures" title="Permalink to this headline">¶</a></h2>
+<p>You can write code that will run on an event arrow that could cause a state
+transition.  If you would like to only let this event work if a condition is
+true, you would add an event guard to it.  It looks like this:</p>
+<p>In the code this would translate to something like this:</p>
+</div>
+<div class="section" id="if-else-structures">
+<span id="reading-diagrams-if-structures"></span><h2>If-Else Structures<a class="headerlink" href="#if-else-structures" title="Permalink to this headline">¶</a></h2>
+<p>If you would like an event to be managed in different ways depending on some
+condition, you would use an if-else structure.  In UML your if structures look
+like diamonds:</p>
+<p>The above diagram would look something like this in the code:</p>
+</div>
+<div class="section" id="extending-arrows">
+<span id="reading-diagrams-extending-arrows"></span><h2>Extending Arrows<a class="headerlink" href="#extending-arrows" title="Permalink to this headline">¶</a></h2>
+<p>Often you will find it tricky to get all of your arrows packed onto your page.
+If a number of arrows share the same kind of action, you can join them using a
+bar:</p>
+<p>You can also split them using a bar too:</p>
+</div>
+<div class="section" id="explicitely-placing-the-return-codes-on-your-diagram">
+<span id="reading-diagrams-explicitely-placing-the-return-codes-on-your-diagram"></span><h2>Explicitely Placing the Return codes on your diagram<a class="headerlink" href="#explicitely-placing-the-return-codes-on-your-diagram" title="Permalink to this headline">¶</a></h2>
+<p>Your statechart’s topology is discovered by the event processor every time it
+reacts to an event.  To so this, it uses the returned values of your state
+handler method.  When I first wrote the library I hid this from the user; but it
+is necessary to have control of the return value since with it, you can define
+hooks, or let events be processed and fall out to another state.</p>
+</div>
+<div class="section" id="making-notes">
+<span id="reading-diagrams-making-notes"></span><h2>Making Notes<a class="headerlink" href="#making-notes" title="Permalink to this headline">¶</a></h2>
+<p>You can add notes to your diagram using the note box:</p>
+</div>
+<div class="section" id="terminate-dot">
+<span id="reading-diagrams-terminate-pseudostate"></span><h2>Terminate Dot<a class="headerlink" href="#terminate-dot" title="Permalink to this headline">¶</a></h2>
+<p>If you want to destroy your statechart upon reacting to an event, you can use the terminate
+icon:</p>
+</div>
+<div class="section" id="final-dot">
+<span id="reading-diagrams-final-state"></span><h2>Final Dot<a class="headerlink" href="#final-dot" title="Permalink to this headline">¶</a></h2>
+<p>If your event has completed all of the work required in the enclose region, you
+want draw this with the final state icon:</p>
+<p>This might make sense to use this if you want some code to run upon the
+initialization of the state, but you do not want to transition deeper into the
+state machine.</p>
+</div>
+<div class="section" id="fall-through">
+<h2>Fall Through<a class="headerlink" href="#fall-through" title="Permalink to this headline">¶</a></h2>
+<p>The miros event handler can do something that I haven’t seen specified anywhere,
+it can do a kind of catch and release, where an event can be processed by a
+state, then released outward into the statechart to be processed by an outer
+state.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is not in the UML standard</p>
+</div>
+</div>
+<div class="section" id="deep-history-dot">
+<span id="reading-diagrams-deep-history-dot"></span><h2>Deep History Dot<a class="headerlink" href="#deep-history-dot" title="Permalink to this headline">¶</a></h2>
+<p>If an event has caused you to leave a state deeply embedded in your statechart,
+but you would like to transition back to that state after the interruption, you
+can use the deep history dot, it’s a circle enclosing a H*:</p>
+</div>
+<div class="section" id="publishing-dot">
+<span id="reading-diagrams-publishing-to-other-charts"></span><h2>Publishing Dot<a class="headerlink" href="#publishing-dot" title="Permalink to this headline">¶</a></h2>
+<p>If you are publishing an event to another chart, if is often very useful to have
+your eyes fall on this immediately while looking at your diagram.  I use a red
+dot to signify this, red, because the event is currently stopped waiting for
+processing.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is not in the UML standard</p>
+</div>
+</div>
+<div class="section" id="subscription-dot">
+<span id="reading-diagrams-subscribing-from-other-charts"></span><h2>Subscription Dot<a class="headerlink" href="#subscription-dot" title="Permalink to this headline">¶</a></h2>
+<p>If you have subscribed to an event being posted by another chart, it’s often
+very useful to have your eyes fall on this immediately while looking at your
+diagram.  I use a green dot, to show that this signal is going, or being acted
+upon by the statechart which has subscribed to it</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is not in the UML standard</p>
+</div>
+</div>
+<div class="section" id="high-level-dependency-diagrams">
+<span id="reading-diagrams-high-level-dependency-diagrams"></span><h2>High Level Dependency Diagrams<a class="headerlink" href="#high-level-dependency-diagrams" title="Permalink to this headline">¶</a></h2>
+<p>If you have a number of statecharts that are all working together to perform
+some sort of collective action, it’s often very useful to see how they relate
+to one another from a very high point of view.  For this I draw high level
+dependency diagrams:</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is not in the UML standard</p>
+</div>
+</div>
+<div class="section" id="medium-level-construction-and-pub-sub-diagrams">
+<span id="reading-diagrams-medium-level-construction-and-pub-sub-diagrams"></span><h2>Medium Level Construction and Pub/Sub Diagrams<a class="headerlink" href="#medium-level-construction-and-pub-sub-diagrams" title="Permalink to this headline">¶</a></h2>
+<p>If you have build a federation of statecharts working together, you might want
+to look at how a specific statchart works in the context of this federation
+without looking at the details of its state machine.  This can be done with a
+medium level contextual view.  You would identify what it publishes, what it’s
+subscribed to and what it constructs to perform it’s tasks:</p>
+</div>
+<div class="section" id="detailed-statechart-diagrams">
+<span id="reading-diagrams-detailed-statechart-diagrams"></span><h2>Detailed Statechart Diagrams<a class="headerlink" href="#detailed-statechart-diagrams" title="Permalink to this headline">¶</a></h2>
+<p>The complete statechart is something that shows the topological nature of your
+design with code marked upon it so you can quickly scan it and see what it’s
+doing.  The publish and subscription dots are immediately visible and if you
+need to further augment the chart with graphs to describe timing or whatever you
+think will be useful, place those on the diagram well:</p>
+</div>
+<div class="section" id="sequence-diagrams">
+<span id="reading-diagrams-sequence-diagrams"></span><h2>Sequence Diagrams<a class="headerlink" href="#sequence-diagrams" title="Permalink to this headline">¶</a></h2>
+<p>Sequence diagrams are very useful and extremely fragile to design changes.  The
+can be generated directly from the trace instrumentation of the state machine and
+quickly written up in plain text.</p>
+<p>Avoid spending a lot of time on these diagrams, and avoid the more advanced
+diagramming features, since to put effort into hand drawing a sequence diagram
+while designing a reactive system will be a Sisyphean task</p>
+</div>
+<div class="section" id="payloads">
+<span id="reading-diagrams-payloads"></span><h2>Payloads<a class="headerlink" href="#payloads" title="Permalink to this headline">¶</a></h2>
+<p>Your statechart is running in it’s own thread.  An event can be published from
+one thread and consumed by another thread.  This means if you put mutable data
+in your event’s payload, you could be creating a shared global variable between two
+separating threads.  Shared global information should be locked and unlocked if
+it’s being used by multiple concurrent processes.</p>
+<p>Instead of coming up with complicated locking mechanisms, wrap large common data
+structures within their own statecharts and copy smaller payloads into named
+tuples.  A named tuple is immutable, so you won’t accidentally short yourself in
+the foot by accidentally creating a global variable.  You can draw your payloads
+into your statecharts like this:</p>
+</div>
+<div class="section" id="dealing-with-the-anti-brand">
+<span id="reading-diagrams-dealing-with-the-anti-brand"></span><h2>Dealing with the Anti-Brand<a class="headerlink" href="#dealing-with-the-anti-brand" title="Permalink to this headline">¶</a></h2>
+<p>People may roll their eyes when they see your pictures.</p>
+<p>A techno-anthropologist could build a career around looking at the history of
+UML.  In my own career I saw a strange kind of social stratum emerge between
+architects and practitioners, where architects had higher social status than the
+people implementing their vision.  The architects invented techno-babble to
+describe simple concepts and tried to present their work as a collection of open
+secrets and I don’t think they did this on purpose.</p>
+<p>The developers, who were ultimately responsible for the delivery of working
+software would create something independent of this vision.  It wouldn’t
+surprise me if the whole agile management movement was given birth because of
+this political tension.  It is a lot more interesting than this, but I’m not a
+historian.</p>
+<p>So, what do you do when people start rolling their eyes when you show them these
+pictures?  First of all, don’t take it personally, they might have some well
+earned cynicism.  Just quickly explain what the pictures mean and show them how
+to draw their own pictures.  Show them why they are useful.  Explain things in
+plain English, don’t use the language of professors or consultants.  You don’t
+have to signal that you are clever, we are trying to expose ideas not to hide
+behind them.</p>
+<p>The Python programming language has moved well beyond UML.  In fact, it could be
+said that we don’t really know how to program computers yet.  We might still be
+using Roman numerals; when Arabic numbers have yet to be discovered.  UML isn’t
+the answer, it’s a trajectory toward what we really want.  We want to be able
+to see our designs using the visual parts of our mind.  We want to be able to
+communicate our complex ideas to one another using a formalism that is
+expressive enough to solve our problems.</p>
+<p>If you can’t sell your ideas to everyone, don’t worry about it.  Their will
+always be people you can’t reach, focus on what you can change instead.  This is
+the power of open source, you can always fork a project and go your own way.</p>
+<p>If a developer isn’t diagramming their own software, then your organization is
+doing it wrong.</p>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="https://youarenotsosmart.com/2011/03/25/the-sunk-cost-fallacy/">The Sunk Cost Fallacy</a></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
+  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
+</a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Diagrams</a><ul>
+<li><a class="reference internal" href="#a-warning-about-diagramming">A Warning about Diagramming</a></li>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#inheritance-and-miros">Inheritance and miros</a></li>
+<li><a class="reference internal" href="#understand-what-a-statechart-is-from-a-metaphor">Understand what a Statechart is from a Metaphor</a></li>
+<li><a class="reference internal" href="#events">Events</a></li>
+<li><a class="reference internal" href="#event-processor-attachment-points">Event Processor Attachment Points</a></li>
+<li><a class="reference internal" href="#states">States</a></li>
+<li><a class="reference internal" href="#state-shorthand">State Shorthand</a></li>
+<li><a class="reference internal" href="#entry-event">Entry Event</a></li>
+<li><a class="reference internal" href="#initialization-dot">Initialization Dot</a></li>
+<li><a class="reference internal" href="#exit-signals">Exit Signals</a></li>
+<li><a class="reference internal" href="#event-guards-if-structures">Event Guards (If Structures)</a></li>
+<li><a class="reference internal" href="#if-else-structures">If-Else Structures</a></li>
+<li><a class="reference internal" href="#extending-arrows">Extending Arrows</a></li>
+<li><a class="reference internal" href="#explicitely-placing-the-return-codes-on-your-diagram">Explicitely Placing the Return codes on your diagram</a></li>
+<li><a class="reference internal" href="#making-notes">Making Notes</a></li>
+<li><a class="reference internal" href="#terminate-dot">Terminate Dot</a></li>
+<li><a class="reference internal" href="#final-dot">Final Dot</a></li>
+<li><a class="reference internal" href="#fall-through">Fall Through</a></li>
+<li><a class="reference internal" href="#deep-history-dot">Deep History Dot</a></li>
+<li><a class="reference internal" href="#publishing-dot">Publishing Dot</a></li>
+<li><a class="reference internal" href="#subscription-dot">Subscription Dot</a></li>
+<li><a class="reference internal" href="#high-level-dependency-diagrams">High Level Dependency Diagrams</a></li>
+<li><a class="reference internal" href="#medium-level-construction-and-pub-sub-diagrams">Medium Level Construction and Pub/Sub Diagrams</a></li>
+<li><a class="reference internal" href="#detailed-statechart-diagrams">Detailed Statechart Diagrams</a></li>
+<li><a class="reference internal" href="#sequence-diagrams">Sequence Diagrams</a></li>
+<li><a class="reference internal" href="#payloads">Payloads</a></li>
+<li><a class="reference internal" href="#dealing-with-the-anti-brand">Dealing with the Anti-Brand</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="i_mongol_example.html" title="previous chapter">Mongol Horse Archer</a></li>
+      <li>Next: <a href="recipes.html" title="next chapter">Recipes</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/reading_diagrams.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Scott Volk.
+      
+      |
+      <a href="_sources/reading_diagrams.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

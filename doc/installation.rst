@@ -12,7 +12,7 @@ Installation
 
 To install:
 
-.. code-block:: python
+.. code-block:: bash
 
   python3 -m venv
   . ./venv/bin/activate

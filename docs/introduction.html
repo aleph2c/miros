@@ -36,77 +36,58 @@
 <div><p><em>Decisions without actions are pointless. Actions without decisions are reckless.</em></p>
 <p class="attribution">&mdash;John Boyd</p>
 </div></blockquote>
+<blockquote>
+<div><p><em>Point of view is worth 80 IQ points</em></p>
+<p class="attribution">&mdash;Alan Kay</p>
+</div></blockquote>
 <div class="section" id="introduction">
 <span id="introduction-introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>Miros is a statechart library written in Python.  Statecharts are a type of
-behavioral drawing.</p>
-<p>These drawings use a kind of formalism that was invented by Dr. David Harel in
-the 1980s to help the Israeli air force construct better software for their jet
-fighters.</p>
+<p>Miros is a statechart library written in Python.  A statechart is a hierarchical
+state machine (HSM), running within it’s own thread.  If you program using
+statecharts, you will have the ability to quickly translate your design goals
+into working and robust code.</p>
+<p>An HSM follows an intuitive set of rules called the Harel formalism.  This
+formalism was invented by the mathematician, Dr. David Harel in the 1980s to
+help the Israeli air force construct better software for their jet fighters.</p>
 <p>His innovation was to take the sentences that you would find in a specification
-and quickly translate them into an easily understood picture.  These pictures
-were different from the other types of technical drawings that were used at the
-time.  You could pack a lot more complexity into them, all the while keeping
-them from needlessly spreading over multiple pages and becoming more
-complicated than the code that they were suppose to describe.</p>
-<p>The diagrams were easy to explain and they were easy to turn into software.</p>
-<p>For this reason statecharts have been used to:</p>
-<ol class="arabic simple">
-<li>Allow software to write itself to automatically find better software algorithms</li>
-<li>Describe the quantum interactions of atoms</li>
-<li><a class="reference internal" href="concurrency_essay.html#on-firmware"><span class="std std-ref">Create infinitely-expensive-engineering-systems (F22/F35)</span></a></li>
-<li><a class="reference internal" href="quickstart.html#quick-start"><span class="std std-ref">Design toaster ovens</span></a></li>
-<li><a class="reference internal" href="patterns.html#nuclear-fusion-example"><span class="std std-ref">Control Fusion Reactors</span></a></li>
-</ol>
-<p>These pictures will also reduce the cognitive load you experience while designing
-and building your system.  Think about how hard it would be to perform a double
+and quickly translate them into an easily understood picture.</p>
+<p>These pictures reduce the cognitive load you experience while designing and
+building your system.  Think about how hard it would be to perform a double
 digit multiplication problem using Roman numerals, whereas the same problem can
-be performed effortlessly using Arabic numbers by a child in grade 3.  A hard
-problem can be transformed into an easy problem by using a better point of
-view.</p>
-<blockquote>
-<div><strong>Point of view is worth 80 IQ points</strong>
-– <em>Alan Kay</em></div></blockquote>
-<p>As a library, Miros provides most of the features expected to express your
-Harel statechart pictures in running Python software.  The same pictorial
-formalism is used by industrial software frameworks like Matlab and Miro
-Samek’s <a class="reference external" href="http://www.state-machine.com/">QP framework</a> for embedded systems.  So, you can quickly prototype
-your ideas using this library in Python, then port your work into compiled
-production code if you need the performance such systems provide.  Or you can
-use it as the reactive portion of your Python project while still having access
-to the legion of other libraries written in Python.</p>
-<p>Miros is not a drawing tool.  It is a way to express your drawing as running
-software.  The <a class="reference internal" href="glossary.html#term-harel-formalism"><span class="xref std std-term">Harel drawing formalism</span></a> is simple
-enough to be expressed on a napkin, or a piece of paper – both of which are
-excellent technologies for expressing a Harel <a class="reference internal" href="glossary.html#term-statechart"><span class="xref std std-term">statechart</span></a>.</p>
-<p>The <a class="reference internal" href="glossary.html#term-harel-formalism"><span class="xref std std-term">Harel Formalism</span></a> for drawing
-<a class="reference internal" href="glossary.html#term-statechart"><span class="xref std std-term">statecharts</span></a> was digested by the UML standard in the 1990s.
-Though, <a class="reference internal" href="glossary.html#term-uml"><span class="xref std std-term">UML</span></a> itself has proved to be an overcomplicated failure,
-but there are parts of it that are useful.  The statechart formalism and
-resulting sequence diagrams turn out to be in the good parts of UML.  If you
-need to describe your designs in pictures, you can use a UML tool to draw your
-statecharts and import them into your documents.  I use a simple and free
-drawing tool called <a class="reference external" href="http://www.umlet.com">umlet</a>.</p>
-<p>If you are unfamiliar with how to draw Harel <span class="xref std std-term">statecharts</span>,
-I recommend that you read the <a class="reference internal" href="quickstart.html#quick-start"><span class="std std-ref">quick start</span></a> section.  There I
-will describe a system that you already understand as a
-<a class="reference internal" href="glossary.html#term-statechart"><span class="xref std std-term">statechart</span></a>, then go through how to express that thing using
-the miros library.</p>
-<p>If you already know what <a class="reference internal" href="glossary.html#term-statechart"><span class="xref std std-term">statecharts</span></a> are and you just want
-to see how to use this library, jump to the <a class="reference internal" href="examples.html#examples"><span class="std std-ref">examples</span></a> section.
-There I create a number of simple statecharts and show how to build them. Then
-I go into greater detail about how to reflect upon their behavior as you make
-it react to events.</p>
-<p>If you know how to use the library and just need to know how to implement
-something using a programming example, jump to the <a class="reference internal" href="recipes.html#recipes"><span class="std std-ref">recipes</span></a>
-section.  It contains examples of the small lego-blocks you will need to build
-up your structure.</p>
-<p>If you would like to expand your architectural abilities, read the
-<a class="reference internal" href="patterns.html#patterns"><span class="std std-ref">patterns</span></a> section.</p>
-<p>The library is called miros in honor of <a class="reference external" href="https://www.linkedin.com/in/samek">Dr. Miro Samek</a> who has written so
-much about how to implement such systems.  The event processor within this
-library is based on his publications.  This should make it easy to use the
-miros library for prototyping, or testing a <a class="reference external" href="http://www.state-machine.com/">QP framework</a>.</p>
+effortlessly be done by a child in grade 3 using Arabic numbers.  A hard
+problem can be transformed into an easy problem by using the correct type of
+abstraction.</p>
+<p>If you use this library you do not have to write your own state-machine event
+processing engine.  It is provided, batteries included.  The library is named,
+miros, in honour of the person who wrote it’s HSM event processing algorithm,
+used by the event processing engine; <a class="reference external" href="https://www.linkedin.com/in/samek">Dr. Miro Samek</a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In fact the whole miros library has been constructed to send some business his
+way.  He runs an embedded consulting company call Quantum Leaps.  If you write
+code using this library, it should be fairly straight forward to port it to
+c/C++ if you would like to transfer your design to his <a class="reference external" href="http://www.state-machine.com/">QP framework</a> (for a
+huge performance gain).</p>
+</div>
+<p>The miros package is not a drawing tool.  It is a way to express your drawings
+as running software.  There are a lot of open source drawing tools that can be
+used to draw your statecharts.  I use a tool called <a class="reference external" href="http://www.umlet.com">umlet</a>.</p>
+<p>This package is only dependent upon the Python standard library.</p>
+<dl class="docutils">
+<dt>I have tried to document this project so that you can learn how to:</dt>
+<dd><ul class="first last simple">
+<li>translate your design goals into statechart pictures</li>
+<li>program these pictures in Python so that they will use the Harel
+formalism.</li>
+<li>use the various statechart patterns, or idioms.</li>
+<li>reflect upon the behavior or your state machines</li>
+<li>create multiple statecharts that work together</li>
+<li>to test your work</li>
+</ul>
+</dd>
+</dl>
+<p>If you would like to network your statechart, you can use the miros-rabbitmq
+plugin.</p>
 <p><a class="reference internal" href="quickstart.html#quick-start"><span class="std std-ref">Next topic</span></a>.</p>
 <div class="toctree-wrapper compound">
 </div>
