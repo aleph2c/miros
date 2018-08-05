@@ -112,9 +112,8 @@ arrow (the ToasterOven <em>is an</em> ActiveObject):</p>
   <span class="c1"># ...</span>
 </pre></div>
 </div>
-<p>More about inheritance will be written about in a later section.</p>
 <p>If the object that is instantiated from your class, constructs another
-object of another class, you can draw this with the composite arrow (The toaster
+object, of another class, you can draw this with the composite arrow (The toaster
 oven <em>has a</em> light):</p>
 <a class="reference external image-reference" href="_static/class_3.pdf"><div align="center" class="align-center"><img alt="_images/class_3.svg" src="_images/class_3.svg" /></div>
 </a>
@@ -251,11 +250,11 @@ sometimes, deep within the marble would be a payload.</p>
 called the Harel Formalism.  These rules govern how the marble can move on the
 board and what it means and how it will trigger different software, which you
 have marked onto the board to make the game fun.  The board game can produce its
-own marbles as your marble rolls on or across lines on the board.  These are
-known as internal events, they also follow the game’s rules, and they can also
-trigger your software.  The rules will determine when the common game piece can
-be moved on the board – based on interaction between the marble, the board, where the
-piece was before the play begin their move.</p>
+own marbles as your marble rolls upon the lines or across the lines on the
+board.  These are known as internal events, they also follow the game’s rules,
+and they can also trigger your software.  The rules will determine when the
+common game piece can be moved on the board – based on interaction between the
+marble, the board, and where the piece was before the player began their turn.</p>
 <p>The statechart board game also has rules about when a player gets to play.  If
 one player really needs to put a marble on the board while another is playing,
 this is OK.  She will just put it into a loading dock.  The statechart board
@@ -269,14 +268,18 @@ python thread.</p>
 <p>So what does this board game look like?  Well, it looks kind of like a bunch of
 rounded rectangles connected with arrows.  The arrows have signal names painted
 on them to describe paths that certain marbles can follow and the rounded
-rectangles are called states.  All the states have names, and a state can be
-within another state.  As the different players play the game, the common piece
-is moved around the board, coming to rest within one of the states.  This is
-called the resting state.</p>
+rectangles are called states.  Think of the arrows on the board as a groove that
+a marble can roll upon.  But, only a marble with a name that matches the arrow name
+can roll upon that arrow.  You can put code on an arrow which will run when a
+marble rolls over it.</p>
+<p>All the states have names, and a state can be within another state.  As the
+different players play the game, the common piece is moved around the board,
+coming to rest within one of the states.  This is called the resting state.</p>
 <p>The rules are pretty straightforward, but who wants to read a rulebook anyway?
 The players certainly don’t.  So, you as the board game designer and the board
 game itself must know the rules.  The board game’s software that applies the
-rules to the marbles on the board is called the event processor.</p>
+rules to the marbles on the board is called the event processor.  It is based
+upon the algorithm written by Miro Samek.</p>
 <p>So how is this useful?  Well your game has software on it’s game board that can
 run when a marble roles over it.  You can connect this software to the output of
 your computer; so you can control things in the outside world.  Your board game,
@@ -291,9 +294,10 @@ marbles, the events and their payloads and how to send these to the board game
 so that you can connect outside things into the events to which your statechart
 will react.</p>
 <p>Once you know how to draw the pictures, you will need to know how to translate
-this into code.  Then I will show you how to see if your statechart it working;
-it can give you feedback about what it is doing, and you can use this to both
-trouble shoot your design and to document how it works.</p>
+this into code.  Lastely, I will show you how to see if your statechart is
+working; so that it can give you feedback about what it is doing.   You can use
+this feedback to both trouble shoot your design and to describe how it works so
+that other people can understand it.</p>
 </div>
 <div class="section" id="events">
 <span id="reading-diagrams-events"></span><h2>Events<a class="headerlink" href="#events" title="Permalink to this headline">¶</a></h2>
@@ -302,17 +306,59 @@ trouble shoot your design and to document how it works.</p>
 mouse click, a stock price passing a certain threshold, or the arrival of a data
 packet.  After recognizing the event your system will react to it, by
 manipulating the hardware state or sending further internal events to itself.
-After completing the processing of this event in accordance to your design, the
-system will stop processing; waiting for the next event.</p>
+After completing the processing of this event in accordance to your design, and
+the Harel formalism (the rule book), the system will stop processing; and wait
+for the next event.</p>
 <p>An event has a name and an optional payload.  The event’s name is called a
-signal name.  There are internal signal names, like entry, exit and init and
-there are external signals; which are just names that you define to track the
-real world events that your software is reacting to.</p>
-<p>The internal signal names are used by the event processor to send specific
-events to your event handler functions as the statechart tries to behave in
-accordance to the Harel formalism.  For instance if your statechart reacts to an
-event by changing to a deeper state, it will send entry events to all of the
-intermediate state handlers.  This will be explained in the up coming sections.</p>
+signal name.  There are internal signal names, like entry, exit and init (black
+dot) and there are external signals; which are just names that you define to
+track the real world events that your software is reacting to.</p>
+<p>Here is how to make an external event:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="n">my_event</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">MY_EVENT</span><span class="p">)</span>
+<span class="n">my_event_with_payload</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">MY_EVENT</span><span class="p">,</span>
+  <span class="n">payload</span><span class="o">=</span><span class="s2">&quot;with a payload that is just a string&quot;</span><span class="p">)</span>
+
+<span class="n">MouseCoordinate</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;MouseCoordinates&quot;</span><span class="p">,</span>
+  <span class="p">[</span><span class="s1">&#39;x_px&#39;</span><span class="p">,</span><span class="s1">&#39;y_px&#39;</span><span class="p">,</span><span class="s1">&#39;z_px&#39;</span><span class="p">]</span>
+
+<span class="n">mouse_click_evt</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">MOUSE_CLICK</span><span class="p">,</span>
+  <span class="n">payload</span><span class="o">=</span><span class="p">(</span><span class="n">MouseCoordinate</span><span class="p">(</span><span class="n">x_px</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">y_px</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">z_pz</span><span class="o">=</span><span class="mi">30</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>Typically, external events like these come from outside of your statechart, so
+you don’t have to draw them onto your statechart picture.</p>
+<p>You don’t have to create any of the statechart’s internal events, they are made
+for you automatically by the event processor.</p>
+<p>If you are using an internal event in your picture, by writing some software on
+it it’s trigger point, you will need to include it on your diagram.  If you
+don’t include it in your diagram, it will still occur when the event processor
+is running, but your code will not be activated.</p>
+<p>The event is like a named marble that can roll on a groove, described by the
+arrows of your statechart.  You can think of the groove as being pitched so that
+a marble can only roll in one direction.  A any groove can have software written
+on it, but this software will only run when a marble rolls over it.</p>
+<p>To get a marble onto the board, you need to get it into the games loading dock.
+To do this, you use one of two different API calls to this library,
+<code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> or <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code>.  If you use <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code>, which stands for post
+first-in-first out, you are playing fair.  You will post your marble at the end
+of the line of marbles waiting to be played by the board game.  If you use the
+<code class="docutils literal notranslate"><span class="pre">post_lifo</span></code>, you are budging in line, placing your marble at the front of the
+line so that it will be the next marble the game plays.</p>
+<p>Take a look at this simple statechart diagram, it can generate 13 different
+internal events, but only 5 are used by our design.  Can you see them?  There
+are also two external event paths.</p>
+<a class="reference external image-reference" href="_static/events_internal_1.pdf"><div align="center" class="align-center"><img alt="_images/events_internal_1.svg" src="_images/events_internal_1.svg" /></div>
+</a>
+<p>Here are the internal and external event paths (grooves):</p>
+<a class="reference external image-reference" href="_static/events_internal_2.pdf"><div align="center" class="align-center"><img alt="_images/events_internal_2.svg" src="_images/events_internal_2.svg" /></div>
+</a>
+<p>Internal to the game are
+two reference points used by the event processor what it should do.  They
+are called the source (S) and the target (T).  Typically, these are not drawn on your
+statechart, but we will draw them on our pictures so we can see how events work.</p>
 </div>
 <div class="section" id="event-processor-attachment-points">
 <span id="reading-diagrams-event-processor-connection"></span><h2>Event Processor Attachment Points<a class="headerlink" href="#event-processor-attachment-points" title="Permalink to this headline">¶</a></h2>
