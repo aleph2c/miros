@@ -30,10 +30,10 @@ read `Practical UML Statechart in C/C++, 2nd
 Edition <https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download>`_ by
 Miro Samek.
 
-Do you need to read these books before you use UML?  No, just start drawing
-things.  Use your search engine to answer the questions you come up with as you
-go.  Make sure the people on your team know what you mean when you draw your
-pictures.
+Do you need to read these books before you use UML?  No, not really, just start
+drawing things.  Use your search engine to answer the questions you come up with
+as you go.  Make sure the people on your team know what you mean when you draw
+your pictures.
 
 At some point another attempt will be made to standardize the current best
 practices for diagramming our software systems.  Maybe it will incorporate all
@@ -60,18 +60,13 @@ use UMLet.  With UMLet you can build custom templates.  `Here is the custom
 template I use <https://github.com/aleph2c/umlet-statechart-template>`_.  It is
 hard to fall in love with a picture made by UMLet.
 
-You don't have to use this tool or this template, there `a lot of UML drawing
+You don't have to use this tool or this template, there `a lot of other UML drawing
 tools available
 <https://en.wikipedia.org/wiki/List_of_Unified_Modeling_Language_tools>`_.
 
 Another way to make your pictures easy to change is to limit the amount of
 detail on them.  You don't have to draw every class and you can shrink a
 complicated statechart into a kind of short hand.
-
-Some diagrams map better to your specifications than others.  Generally
-speaking, the statechart picture is something you can trust to change less often
-than a class diagram picture.  Your sequence diagram pictures, the closest thing
-you have to a written narrative, will change all of the time.
 
 UML can't begin to describe what you write with your Python code.  So, if you
 need to express a code's idea on the diagram, just write the code directly onto
@@ -85,7 +80,7 @@ The class is a blueprint for an object.
 
 Unfortunately UML was constructed to focus on this instead of the object itself.
 But the UML class diagram is good at providing a bit of context around your
-statechart diagram.
+statechart diagram.  So we will talk about it.
 
 Typically, your class diagram would have a name and it would describe the
 important variables (attributes) and functions (methods) of your class.  I tend
@@ -163,29 +158,27 @@ the object that it has built within it.
 
 These mnemonics should help you when you are diagramming.
 
-If you get these pear-arrows confused, they don't really matter that much, just
-use a dashed line to show there is some sort of relationship between your
-objects/classes.
+.. note::
 
-These class diagrams are ill conceived since you have to know about all sorts of
-activity in the background before you understand them.  You have to know that
-the relationships are between the objects that are instantiated and not the
-classes themselves.  As Dave Thomas (of Pragmatic fame) says, Python is not
-class oriented programming it's object oriented programming, yet UML draws
-everything with classes.
+  These class diagrams are ill conceived since you have to know about all sorts of
+  activity in the background before you understand them.  You have to know that
+  the relationships are between the objects that are instantiated and not the
+  classes themselves.  As Dave Thomas (of Pragmatic fame) says, Python is not
+  class oriented programming it's object oriented programming, yet UML draws
+  everything with classes.
 
-So treat the class diagrams as a quick reference to provide your statechart some
-context, or just a kind of throw away thing.  Use lots of class shorthand
-pictures if you are going to draw a few different classes on the same diagram.
-Your actual classes are well defined in your Python code, so you can use your
-code-tools (ctag/cscope) to see the class hierarchies and who references what
-within your editor.
+  So treat the class diagrams as a quick reference to provide your statechart some
+  context, or just a kind of throw away thing.  Use lots of class shorthand
+  pictures if you are going to draw a few different classes on the same diagram.
+  Your actual classes are well defined in your Python code, so you can use your
+  code-tools (ctag/cscope) to see the class hierarchies and who references what
+  within your editor.
 
 Martin Fowler spends over two chapters of `UML distilled
 <https://martinfowler.com/books/uml.html>`_ writing about class diagrams.  You
 can make them really complicated if you want.
 
-But, if you are using this miros package, you are managing your system's
+If you are using the miros package, you are managing your system's
 complexity using statecharts and not with classes.  So drawing detailed pictures
 using class diagrams is not a good use of your time.
 
@@ -255,21 +248,19 @@ code.
 
 Understand what a Statechart is from a Metaphor
 -----------------------------------------------
-If you don't know what a statechart is, think of it as a way to make a board
-game that maps to your engineering problem.
+If you don't know what a statechart is, think of it as a kind of board
+game.
 
-The board game has a board with a picture on it.  It has some marbles that you
-can place, or roll around the board in accordance to the game's rulebook.  And
-the board game has some players that take turns playing.  This game is a little
-strange in that it only has one common game piece that all of the players can
-indirectly control by playing their marbles.  The common game piece is used to
-determine where a marble starts to roll from, but we will get into these details
-later.
+The board game has a board with a picture on it, some marbles that the players
+can place, and or roll around the board in accordance to the game's rulebook.
+This game has two common game pieces that are used to move around the board;
+they respond to how the marbles are played.  If one player moves the game pieces on
+their turn, the next player will start their turn at this new position.
 
 As the board game designer, you would have control over the drawing on the board
 and you would design some of the marbles that are used by the players, but you
 wouldn't control the rulebook or the players specific behavior, what fun would
-that be?  Though you could choose who gets to play the game.
+that be?  But, you could choose who gets to play the game.
 
 The players of your game could be people, touching an external user interface.
 At the moment they press a key, an electrical signal would be sent into your
@@ -282,25 +273,26 @@ board game to react to.
 
 To distinguish one event from another event, we will call them by different
 names: signal names.  Sometimes an event carries additional information, let's
-call this a payload.  Going back to our metaphor, an event is a marble.
+call this a payload.  Going back to our metaphor, think of an event is a marble.
 A player would build a marble and put it on the board when it was their turn to
 play the game.  Every marble would have a signal name painted on it, and
 sometimes, deep within the marble would be a payload.
 
-So now what?  Well, every game has a rule book.  In our case this rule book is
+The player would place their marble on the board at the current location of the
+game pieces, let go of it and watch it roll.  As it rolled on the board, it
+might trigger software that you have written into that marble's groove.  It
+might trigger additional marbles to pop out of the board and roll in turn; but
+eventually the action would stop and the common game pieces would be moved to
+position and the next player would get to play.
+
+Every game has a rule book.  In our case our case the rule book is
 called the Harel Formalism.  These rules govern how the marble can move on the
-board and what it means and how it will trigger different software, which you
-have marked onto the board to make the game fun.  The board game can produce its
-own marbles as your marble rolls upon the lines or across the lines on the
-board.  These are known as internal events, they also follow the game's rules,
-and they can also trigger your software.  The rules will determine when the
-common game piece can be moved on the board -- based on interaction between the
-marble, the board, and where the piece was before the player began their turn.
+board and how the game pieces are shifted in response.
 
 The statechart board game also has rules about when a player gets to play.  If
 one player really needs to put a marble on the board while another is playing,
 this is OK.  She will just put it into a loading dock.  The statechart board
-game will only let one player play out there marble on the board at a time; this
+game will only let one player play out their marble on the board at a time; this
 rule is called run to completion (RTC).  When a player's marble has finished
 moving around the board, our board game will check it's loading dock to see if
 another marble needs to be acted upon.
@@ -312,13 +304,10 @@ python thread.
 So what does this board game look like?  Well, it looks kind of like a bunch of
 rounded rectangles connected with arrows.  The arrows have signal names painted
 on them to describe paths that certain marbles can follow and the rounded
-rectangles are called states.  Think of the arrows on the board as a groove that
-a marble can roll upon.  But, only a marble with a name that matches the arrow name
-can roll upon that arrow.  You can put code on an arrow which will run when a
-marble rolls over it.
+rectangles are called states.
 
 All the states have names, and a state can be within another state.  As the
-different players play the game, the common piece is moved around the board,
+different players play the game, the common pieces are moved around the board,
 coming to rest within one of the states.  This is called the resting state.
 
 The rules are pretty straightforward, but who wants to read a rulebook anyway?
@@ -340,13 +329,12 @@ UML.  I have to show you how to connect your board game to it's automatic rule
 book; the event processor.  I have to show you how to create your custom
 marbles, the events and their payloads and how to send these to the board game
 so that you can connect outside things into the events to which your statechart
-will react.
+will react too.
 
 Once you know how to draw the pictures, you will need to know how to translate
 this into code.  Lastely, I will show you how to see if your statechart is
 working; so that it can give you feedback about what it is doing.   You can use
-this feedback to both trouble shoot your design and to describe how it works so
-that other people can understand it.
+this feedback to both trouble shoot your design and to describe how it works.
 
 .. _reading_diagrams-events:
 
@@ -359,15 +347,15 @@ mouse click, a stock price passing a certain threshold, or the arrival of a data
 packet.  After recognizing the event your system will react to it, by
 manipulating the hardware state or sending further internal events to itself.
 After completing the processing of this event in accordance to your design, and
-the Harel formalism (the rule book), the system will stop processing; and wait
-for the next event.
+the Harel formalism (the rule book of the board game), the system will stop
+processing; and wait for the next event.
 
 An event has a name and an optional payload.  The event's name is called a
 signal name.  There are internal signal names, like entry, exit and init (black
-dot) and there are external signals; which are just names that you define to
-track the real world events that your software is reacting to.
+dot's on the diagram) and there are external signals; which are just names that
+you define to track the real world events that your software is reacting to.
 
-Here is how to make an external event:
+Here is how to make an external event in miros:
 
 .. code-block:: python
 
@@ -385,20 +373,62 @@ Here is how to make an external event:
     payload=(MouseCoordinate(x_px=20, y_px=40, z_pz=30)))
 
 Typically, external events like these come from outside of your statechart, so
-you don't have to draw them onto your statechart picture.
-
-You don't have to create any of the statechart's internal events, they are made
-for you automatically by the event processor.
-
-If you are using an internal event in your picture, by writing some software on
-it it's trigger point, you will need to include it on your diagram.  If you
-don't include it in your diagram, it will still occur when the event processor
-is running, but your code will not be activated.
+you don't have to draw them on your diagram.
 
 The event is like a named marble that can roll on a groove, described by the
 arrows of your statechart.  You can think of the groove as being pitched so that
-a marble can only roll in one direction.  A any groove can have software written
-on it, but this software will only run when a marble rolls over it.
+a marble can only roll in one direction.  Any groove can have software written
+on it, but this software will only run when a marble rolls over it.  This is how
+these grooves can be drawn with UML:
+
+.. image:: _static/Transition_Triggers.svg
+    :target: _static/Transition_Triggers.pdf
+    :align: center
+
+In English, the above diagram would say, "If I receive an event with a signal
+name "SIGNAL_NAME" while I am in source_state, run the guard, if it returns
+True, run the action() function within the context of the source state, then add
+the EVT_A event to my fifo queue so that it can be run during my next RTC
+process, then transition to the target_state, but, if my guard code returns
+False, ignore the event and do nothing".
+
+Your event can also run some code without causing a state transition; this is
+called a hook:
+
+.. image:: _static/hook_diagram_1.svg
+    :target: _static/hook_diagram_1.pdf
+    :align: center
+
+In English, the above diagram would say, "If I receive an event with a signal
+named "SIGNAL_NAME" while I am in source_state, run the guard, if it returns
+True, run the action().  When I have finished running the action, stay in the
+source_state.  If the guard returned false, ignore the event."
+
+Now that we understand how to draw external events on our diagrams we will talk
+about internal events:
+
+  * entry
+  * exit
+  * init (the black dot)
+
+I will explain how they work when we look at the board game's rule book, for now
+I will just show you how to draw them.  The entry and exit internal events, are
+just hooks:
+
+.. image:: _static/Transition_Triggers_With_Internal_0.svg
+    :target: _static/Transition_Triggers_With_Internal_0.pdf
+    :align: center
+
+The init internal event is drawn with something that UML calls a pseudostate;
+which means a widget on your picture that is not a state.  The init signal is a
+black dot connected to an arrow.
+
+.. image:: _static/Transition_Triggers_With_Internal_1.svg
+    :target: _static/Transition_Triggers_With_Internal_1.pdf
+    :align: center
+
+The internal events are triggered in reaction to transitions made by external
+event on your diagram.
 
 To get a marble onto the board, you need to get it into the games loading dock.
 To do this, you use one of two different API calls to this library,
@@ -407,25 +437,6 @@ first-in-first out, you are playing fair.  You will post your marble at the end
 of the line of marbles waiting to be played by the board game.  If you use the
 ``post_lifo``, you are budging in line, placing your marble at the front of the
 line so that it will be the next marble the game plays.
-
-Take a look at this simple statechart diagram, it can generate 13 different
-internal events, but only 5 are used by our design.  Can you see them?  There
-are also two external event paths.
-
-.. image:: _static/events_internal_1.svg
-    :target: _static/events_internal_1.pdf
-    :align: center
-
-Here are the internal and external event paths (grooves):
-
-.. image:: _static/events_internal_2.svg
-    :target: _static/events_internal_2.pdf
-    :align: center
-
-Internal to the game are
-two reference points used by the event processor what it should do.  They
-are called the source (S) and the target (T).  Typically, these are not drawn on your
-statechart, but we will draw them on our pictures so we can see how events work.
 
 .. _reading_diagrams-event-processor-connection:
 
