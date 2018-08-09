@@ -57,10 +57,9 @@ understanding about Harel formalism as it relates to UML, go to the source and
 read <a class="reference external" href="https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download">Practical UML Statechart in C/C++, 2nd
 Edition</a> by
 Miro Samek.</p>
-<p>Do you need to read these books before you use UML?  No, not really, just start
-drawing things.  Use your search engine to answer the questions you come up with
-as you go.  Make sure the people on your team know what you mean when you draw
-your pictures.</p>
+<p>But do you need to read these books before you use UML?  No, not really, this
+section should give you enough information so that you can make your own
+pictures.</p>
 <p>At some point another attempt will be made to standardize the current best
 practices for diagramming our software systems.  Maybe it will incorporate all
 of the new programming idioms.  Until then we can limp along with UML.</p>
@@ -69,7 +68,7 @@ of the new programming idioms.  Until then we can limp along with UML.</p>
 <p>Be aware that as you draw your pictures, you will lock-in your thinking.</p>
 <p>You and everyone on your team will be effected by the Sunk Cost Fallacy:  “Your
 decisions are tainted by the emotional investments you accumulate, and the more
-you invest in something the harder it becomes to abandon”. <a class="footnote-reference" href="#id3" id="id1">[1]</a></p>
+you invest in something the harder it becomes to abandon”. <a class="footnote-reference" href="#id4" id="id1">[1]</a></p>
 <p>If you build beautiful drawings with a graphic design application; you will need
 to put time and effort into them and you will probably become emotionally
 attached to them.  Remember, your diagrams are just mistakes in the right
@@ -91,9 +90,6 @@ the picture.</p>
 <div class="section" id="classes">
 <span id="reading-diagrams-classes"></span><h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <p>The class is a blueprint for an object.</p>
-<p>Unfortunately UML was constructed to focus on this instead of the object itself.
-But the UML class diagram is good at providing a bit of context around your
-statechart diagram.  So we will talk about it.</p>
 <p>Typically, your class diagram would have a name and it would describe the
 important variables (attributes) and functions (methods) of your class.  I tend
 to put a little line between these when I’m diagramming them.</p>
@@ -168,21 +164,6 @@ using class diagrams is not a good use of your time.</p>
 </div>
 <div class="section" id="inheritance-and-miros">
 <span id="reading-diagrams-inheritance"></span><h2>Inheritance and miros<a class="headerlink" href="#inheritance-and-miros" title="Permalink to this headline">¶</a></h2>
-<p>Imagine that you have written some code that is good at doing something, so you
-pack this code into a Python class.  Now you want to make a new object that does
-these things and a few more things.  You don’t want to copy in your old working
-code, it’s variables and functions into new class, you just want it included
-automatically, so that it’s in one spot, easy to fix and change.  You want a
-syntactical short hand for, “take this old blueprint and change it a bit”.  You
-want to program your blueprints by difference.  You want to use the idea of a
-code-patch as it applies to your classes.</p>
-<a class="reference external image-reference" href="_static/class_5.pdf"><div align="center" class="align-center"><img alt="_images/class_5.svg" src="_images/class_5.svg" /></div>
-</a>
-<p>So, you put your working code into a class, then make a new class where it
-inherits from the class with the working code.  That’s a nice feature and it’s
-called inheritance.  Any time you see an arrow with an open arrow on one side,
-think of it as short hand for: “is a”.  The above diagram would read
-BluePrintPatch “is a” ClassContainingWorkingCode.</p>
 <p>Within the context of this library, you would inherit from either the
 ActiveObject or the ActiveFactory to gain access to the event processor, and all
 of the other useful methods which would drive your statechart diagram.  Then,
@@ -191,11 +172,11 @@ intermediate class that holds all of your worker-functions for the thing you are
 trying to build.</p>
 <a class="reference external image-reference" href="_static/class_6.pdf"><div align="center" class="align-center"><img alt="_images/class_6.svg" src="_images/class_6.svg" /></div>
 </a>
-<p>Patching is easy for a computer, but it’s a lot harder for a human mind.  In the
-1990’s when object oriented programming was <em>the</em> raging fad, the computer
-science community really over-emphasized this feature.  We have since learned
-that inheritance is like any good vitamin, if you use too much of it becomes
-hazardous to your well-being.</p>
+<p>Inheritance is patching.  Patching is easy for a computer to do, but it’s a lot
+harder for a human mind.  In the 1990’s when object oriented programming was
+<em>the</em> raging fad, the computer science community really over-emphasized this
+feature.  We have since learned that inheritance is like any good vitamin, if
+you use too much of it, it becomes hazardous to your well-being.</p>
 <p>So don’t over use inheritance or you will make your code <em>really</em> hard to debug
 and maintain:</p>
 <a class="reference external image-reference" href="_static/class_7.pdf"><div align="center" class="align-center"><img alt="_images/class_7.svg" src="_images/class_7.svg" /></div>
@@ -347,7 +328,7 @@ about internal events:</p>
 <div><ul class="simple">
 <li>entry</li>
 <li>exit</li>
-<li>init (the black dot)</li>
+<li>init (the black dot, which means, “Now what?”)</li>
 </ul>
 </div></blockquote>
 <p>I will explain how they work when we look at the board game’s rule book, for now
@@ -361,7 +342,7 @@ black dot connected to an arrow.</p>
 <a class="reference external image-reference" href="_static/Transition_Triggers_With_Internal_1.pdf"><div align="center" class="align-center"><img alt="_images/Transition_Triggers_With_Internal_1.svg" src="_images/Transition_Triggers_With_Internal_1.svg" /></div>
 </a>
 <p>The internal events are triggered in reaction to transitions made by external
-event on your diagram.</p>
+events on your diagram.</p>
 <p>To get a marble onto the board, you need to get it into the games loading dock.
 To do this, you use one of two different API calls to this library,
 <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> or <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code>.  If you use <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code>, which stands for post
@@ -372,114 +353,120 @@ line so that it will be the next marble the game plays.</p>
 </div>
 <div class="section" id="event-processor-attachment-points">
 <span id="reading-diagrams-event-processor-connection"></span><h2>Event Processor Attachment Points<a class="headerlink" href="#event-processor-attachment-points" title="Permalink to this headline">¶</a></h2>
-<p>To connect the event processor of your object to a statemachine; draw an
-attachment point like this:</p>
+<p>The event processor is the rule book for your statechart.  It is the thing that will
+cause you to transition from one state to another, it will trigger internal
+events and it will read and run all of your code as your code reacts to the
+outside world.</p>
+<p>To connect the event processor of your object to a statemachine; inherit it into
+the class that will solve your problem, then draw the attachment point like this:</p>
+<a class="reference external image-reference" href="_static/attachment_point_1.pdf"><div align="center" class="align-center"><img alt="_images/attachment_point_1.svg" src="_images/attachment_point_1.svg" /></div>
+</a>
 <p>I’m not sure if I’m using UML properly according to the standard, and I don’t
 really care.  What I care about is if you understand what I mean.</p>
 <p>In the context of this library an object instantiated with an event processor
 can attach itself to a statemachine.  Another object instantiated with an event
 processor can also attach to the same statemachine.</p>
+<a class="reference external image-reference" href="_static/attachment_point_2.pdf"><div align="center" class="align-center"><img alt="_images/attachment_point_2.svg" src="_images/attachment_point_2.svg" /></div>
+</a>
 <p>The statemachine doesn’t keep track of variables or the current state; it simply
 acts as a behavioral specification.  The object that was instantiated from the class
 containing the event processor keeps track of it’s variable contents and state
 information.  This is why the diagram is drawn this way.</p>
+<a class="reference external image-reference" href="_static/attachment_point_3.pdf"><div align="center" class="align-center"><img alt="_images/attachment_point_3.svg" src="_images/attachment_point_3.svg" /></div>
+</a>
+<p>If you want to embed your state machine within your class, you can, you just
+write it’s functions as staticmethods.  An embedded state chart might look like
+this:</p>
+<a class="reference external image-reference" href="_static/attachment_point_4.pdf"><div align="center" class="align-center"><img alt="_images/attachment_point_4.svg" src="_images/attachment_point_4.svg" /></div>
+</a>
+<p>As your team gets used to looking at these kinds of diagrams, you might create
+a short hand for the attachment point, or leave it off of your diagram all
+together.</p>
 </div>
 <div class="section" id="states">
 <span id="reading-diagrams-states"></span><h2>States<a class="headerlink" href="#states" title="Permalink to this headline">¶</a></h2>
-<p>UML lets you draw lots of different states.  The Miro Samek algorithm doesn’t
-really care about this, since it supports finite state machines (simple states)
-and hierarchical state machines (composite states) exactly the same.</p>
+<p>The states in miros are just functions that you write that will react to events
+send to them by the event processor.  They will have access to the attributes
+and methods of the object that is referencing them, and they will be arranged in
+a graph that is interpreted by the event processor (the rule book).</p>
+<p>As a developer, you don’t have to solve the problems that the event processor
+solves, instead you just learn some simple rules, then write your code into
+your statechart functions.  But you don’t do this directly in one step, first
+you learn how to draw simple pictures that are easy to think about.  Model these
+pictures so that they map to your problem then write your code after you have a
+decent idea about your design.  These pictures are called state machines, and
+they come in many different UML flavors.</p>
+<p>The Miro Samek algorithm doesn’t really care about the specifics of these
+drawing conventions, since it supports finite state machines (with simple
+states: Mealy or Moore) and hierarchical state machines (composite states) in
+exactly the same way.</p>
 <p>Here is a simple state, you would use it when drawing a finite state machine:</p>
-<p>Here is an example of a finite state machine.</p>
-<p>You could have drawn the above machine like this:</p>
-<p>Here is a second way of drawing the same machine is here:</p>
-<p>Here is a simple hierarchical state machine:</p>
-<p>You could draw the above hierarchical state machine using simple states, but
-that would be harder to do than using the composite state widgets, so just use
-the composite state widgets.</p>
-<p>In code your state is represented with a state handler, which is kind of a
-callback function that is given two arguments, a reference to an object that has
-an event processor and an event.</p>
-<p>This event contains information that can be used by your handler.  The returned
-value from this state handler has to be something that makes sense to the event
-processor.</p>
-<p>So a state handler is not like a function or a method, you don’t give it
-arguments and it gives you a result.  Instead, you send it events and its
-behavior is dependent upon how you have structured it’s topology.  The results
-of the work done by your statechart are left on the object provided as the first
-argument to the state handler.</p>
-</div>
-<div class="section" id="state-shorthand">
-<span id="reading-diagrams-state-shorthand"></span><h2>State Shorthand<a class="headerlink" href="#state-shorthand" title="Permalink to this headline">¶</a></h2>
-<p>When you are wrestling with your tools to draw a picture, you will often find
-that a state has too much information in it to fit on your page.</p>
-<p>You can hide some of the inner details of your states with state shorthand, so
-that your diagram is sized to fit on the page.</p>
-<p>For some reason the OMG called this decomposition hiding.  I don’t use this
-terminology, I’m not sure how to remember it, but if you need to google it, this
-is it’s search term.</p>
-</div>
-<div class="section" id="entry-event">
-<span id="reading-diagrams-entry-signals"></span><h2>Entry Event<a class="headerlink" href="#entry-event" title="Permalink to this headline">¶</a></h2>
-<p>The entry event will be sent to your state handler anytime the lines representing
-it’s boundary are cross from the outer, into the inner.</p>
-</div>
-<div class="section" id="initialization-dot">
-<span id="reading-diagrams-initialization-signals"></span><h2>Initialization Dot<a class="headerlink" href="#initialization-dot" title="Permalink to this headline">¶</a></h2>
-<p>The init event will be sent to your state handler anytime you have settled into a
-state, this could happen after the last entry event, if the transition occurred
-from after an entry signal or after the last exit signal.</p>
-</div>
-<div class="section" id="exit-signals">
-<span id="reading-diagrams-exit-signals"></span><h2>Exit Signals<a class="headerlink" href="#exit-signals" title="Permalink to this headline">¶</a></h2>
-<p>The exit event will be sent to your state handler anytime the lines representing
-it’s boundary are cross from the inner, to the outer part of your diagram.</p>
-</div>
-<div class="section" id="event-guards-if-structures">
-<span id="reading-diagrams-event-guards"></span><h2>Event Guards (If Structures)<a class="headerlink" href="#event-guards-if-structures" title="Permalink to this headline">¶</a></h2>
-<p>You can write code that will run on an event arrow that could cause a state
-transition.  If you would like to only let this event work if a condition is
-true, you would add an event guard to it.  It looks like this:</p>
-<p>In the code this would translate to something like this:</p>
+<a class="reference external image-reference" href="_static/simple_state_1.pdf"><div align="center" class="align-center"><img alt="_images/simple_state_1.svg" src="_images/simple_state_1.svg" /></div>
+</a>
+<p>Here is an example of a finite state machine (FSM) – An oven.</p>
+<a class="reference external image-reference" href="_static/simple_state_2.pdf"><div align="center" class="align-center"><img alt="_images/simple_state_2.svg" src="_images/simple_state_2.svg" /></div>
+</a>
+<p>Here is a composite state (a state that can have states within it):</p>
+<a class="reference external image-reference" href="_static/composite_state_1.pdf"><div align="center" class="align-center"><img alt="_images/composite_state_1.svg" src="_images/composite_state_1.svg" /></div>
+</a>
+<p>Here is a simple hierarchical state machine (HSM) – A slightly better oven:</p>
+<a class="reference external image-reference" href="_static/composite_state_2.pdf"><div align="center" class="align-center"><img alt="_images/composite_state_2.svg" src="_images/composite_state_2.svg" /></div>
+</a>
+<p>I think a lot of the terminology that was invented for UML came from exhausted
+committees working on Friday afternoons, minutes before the weekend:  Any
+state-looking-widget on your diagram that actually isn’t a state, is called a
+pseudostate.  For instance, on our diagram, the black initialization dot and the
+H with a star beside it (deep history) are both called pseudostates.</p>
+<p>If you had to draw your statechart into a diagram that didn’t have enough room
+for it, you might want to simplify it into a compacted representation.  This
+would let the person reading your diagram know that there is more to it, but
+that it was simplified on the picture so that everything would fit on the page.
+For some reason this is called “decomposition hiding”.  I’ll demonstrate this by
+hiding some of the details of our HSM oven:</p>
+<a class="reference external image-reference" href="_static/composite_state_3.pdf"><div align="center" class="align-center"><img alt="_images/composite_state_3.svg" src="_images/composite_state_3.svg" /></div>
+</a>
+<p>The states aren’t useful without the assortment of arrows, internal events and
+hooks that you will pepper all over your drawing.  In addition to this, there are
+UML ways to solve some of the common problems that you will have when you try to
+draw how your code works on a diagram.  Read on for the details.</p>
 </div>
 <div class="section" id="if-else-structures">
 <span id="reading-diagrams-if-structures"></span><h2>If-Else Structures<a class="headerlink" href="#if-else-structures" title="Permalink to this headline">¶</a></h2>
 <p>If you would like an event to be managed in different ways depending on some
-condition, you would use an if-else structure.  In UML your if structures look
-like diamonds:</p>
-<p>The above diagram would look something like this in the code:</p>
+condition, you would use an if-else structure.  In UML your if-else structures look
+like diamonds with an event guard written on one of the arrow:</p>
+<a class="reference external image-reference" href="_static/if_else_1.pdf"><div align="center" class="align-center"><img alt="_images/if_else_1.svg" src="_images/if_else_1.svg" /></div>
+</a>
 </div>
 <div class="section" id="extending-arrows">
 <span id="reading-diagrams-extending-arrows"></span><h2>Extending Arrows<a class="headerlink" href="#extending-arrows" title="Permalink to this headline">¶</a></h2>
 <p>Often you will find it tricky to get all of your arrows packed onto your page.
-If a number of arrows share the same kind of action, you can join them using a
+If a number of arrows share the same kind of action, you can “join” them using a
 bar:</p>
-<p>You can also split them using a bar too:</p>
+<a class="reference external image-reference" href="_static/join_1.pdf"><div align="center" class="align-center"><img alt="_images/join_1.svg" src="_images/join_1.svg" /></div>
+</a>
+<p>You can also “fork” them using a bar too:</p>
+<a class="reference external image-reference" href="_static/fork_1.pdf"><div align="center" class="align-center"><img alt="_images/fork_1.svg" src="_images/fork_1.svg" /></div>
+</a>
 </div>
-<div class="section" id="explicitely-placing-the-return-codes-on-your-diagram">
-<span id="reading-diagrams-explicitely-placing-the-return-codes-on-your-diagram"></span><h2>Explicitely Placing the Return codes on your diagram<a class="headerlink" href="#explicitely-placing-the-return-codes-on-your-diagram" title="Permalink to this headline">¶</a></h2>
-<p>Your statechart’s topology is discovered by the event processor every time it
-reacts to an event.  To so this, it uses the returned values of your state
-handler method.  When I first wrote the library I hid this from the user; but it
-is necessary to have control of the return value since with it, you can define
-hooks, or let events be processed and fall out to another state.</p>
+<div class="section" id="terminate-icon">
+<span id="reading-diagrams-terminate-pseudostate"></span><h2>Terminate Icon<a class="headerlink" href="#terminate-icon" title="Permalink to this headline">¶</a></h2>
+<p>If you want to destroy your statechart upon reacting to an event, you can use
+the terminate pseudostate (icon):</p>
+<a class="reference external image-reference" href="_static/terminate_1.pdf"><div align="center" class="align-center"><img alt="_images/terminate_1.svg" src="_images/terminate_1.svg" /></div>
+</a>
 </div>
-<div class="section" id="making-notes">
-<span id="reading-diagrams-making-notes"></span><h2>Making Notes<a class="headerlink" href="#making-notes" title="Permalink to this headline">¶</a></h2>
-<p>You can add notes to your diagram using the note box:</p>
-</div>
-<div class="section" id="terminate-dot">
-<span id="reading-diagrams-terminate-pseudostate"></span><h2>Terminate Dot<a class="headerlink" href="#terminate-dot" title="Permalink to this headline">¶</a></h2>
-<p>If you want to destroy your statechart upon reacting to an event, you can use the terminate
-icon:</p>
-</div>
-<div class="section" id="final-dot">
-<span id="reading-diagrams-final-state"></span><h2>Final Dot<a class="headerlink" href="#final-dot" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="final-icon">
+<span id="reading-diagrams-final-state"></span><h2>Final Icon<a class="headerlink" href="#final-icon" title="Permalink to this headline">¶</a></h2>
 <p>If your event has completed all of the work required in the enclose region, you
-want draw this with the final state icon:</p>
+can draw this with the final state icon:</p>
+<a class="reference external image-reference" href="_static/final_1.pdf"><div align="center" class="align-center"><img alt="_images/final_1.svg" src="_images/final_1.svg" /></div>
+</a>
 <p>This might make sense to use this if you want some code to run upon the
 initialization of the state, but you do not want to transition deeper into the
-state machine.</p>
+state machine:</p>
+<a class="reference external image-reference" href="_static/final_2.pdf"><div align="center" class="align-center"><img alt="_images/final_2.svg" src="_images/final_2.svg" /></div>
+</a>
 </div>
 <div class="section" id="fall-through">
 <h2>Fall Through<a class="headerlink" href="#fall-through" title="Permalink to this headline">¶</a></h2>
@@ -487,45 +474,56 @@ state machine.</p>
 it can do a kind of catch and release, where an event can be processed by a
 state, then released outward into the statechart to be processed by an outer
 state.</p>
+<a class="reference external image-reference" href="_static/fall_through_1.pdf"><div align="center" class="align-center"><img alt="_images/fall_through_1.svg" src="_images/fall_through_1.svg" /></div>
+</a>
+<p>I draw this with an un-attached arrow.  The arrow has code marked on it, but it
+does not connect to anything, to express that it is not locally handled, so that
+the event processor will recurse outward in it’s search to find where it is
+handled.  The action on the unhandled arrow is a kind of side effect that can
+provide some useful features.</p>
+<a class="reference external image-reference" href="_static/catchandrelease1.pdf"><div align="center" class="align-center"><img alt="_images/catchandrelease1.svg" src="_images/catchandrelease1.svg" /></div>
+</a>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This is not in the UML standard</p>
 </div>
 </div>
-<div class="section" id="deep-history-dot">
-<span id="reading-diagrams-deep-history-dot"></span><h2>Deep History Dot<a class="headerlink" href="#deep-history-dot" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="deep-history-icon">
+<span id="reading-diagrams-deep-history-dot"></span><h2>Deep History Icon<a class="headerlink" href="#deep-history-icon" title="Permalink to this headline">¶</a></h2>
 <p>If an event has caused you to leave a state deeply embedded in your statechart,
 but you would like to transition back to that state after the interruption, you
-can use the deep history dot, it’s a circle enclosing a H*:</p>
+can use the deep history pseudostate, it’s a circle enclosing a H*:</p>
+<a class="reference external image-reference" href="_static/TransitionToHistoryStatePattern.pdf"><div align="center" class="align-center"><img alt="_images/TransitionToHistoryStatePattern.svg" src="_images/TransitionToHistoryStatePattern.svg" /></div>
+</a>
 </div>
-<div class="section" id="publishing-dot">
-<span id="reading-diagrams-publishing-to-other-charts"></span><h2>Publishing Dot<a class="headerlink" href="#publishing-dot" title="Permalink to this headline">¶</a></h2>
-<p>If you are publishing an event to another chart, if is often very useful to have
-your eyes fall on this immediately while looking at your diagram.  I use a red
-dot to signify this, red, because the event is currently stopped waiting for
-processing.</p>
+<div class="section" id="subscription-and-publishing-icons">
+<span id="reading-diagrams-publishing-to-other-charts"></span><h2>Subscription and Publishing Icons<a class="headerlink" href="#subscription-and-publishing-icons" title="Permalink to this headline">¶</a></h2>
+<p>If you are publishing an event to another chart, it is often very useful to have
+your eyes fall on this immediately while looking at your diagram.  It is an
+output.  I use a red dot to signify this, red, because the event is currently
+stopped, as it is waiting for processing in a queue.</p>
+<p>Likewise, if you have subscribed to an event being posted by another chart, it’s
+often very useful to have your eyes fall immediately on where it is being acted
+upon.  It is an input.  I use a green dot, to show that this signal is going, or
+being acted upon by the statechart which has subscribed to it</p>
+<a class="reference external image-reference" href="_static/pub_sub_icons.pdf"><div align="center" class="align-center"><img alt="_images/pub_sub_icons.svg" src="_images/pub_sub_icons.svg" /></div>
+</a>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This is not in the UML standard</p>
 </div>
 </div>
-<div class="section" id="subscription-dot">
-<span id="reading-diagrams-subscribing-from-other-charts"></span><h2>Subscription Dot<a class="headerlink" href="#subscription-dot" title="Permalink to this headline">¶</a></h2>
-<p>If you have subscribed to an event being posted by another chart, it’s often
-very useful to have your eyes fall on this immediately while looking at your
-diagram.  I use a green dot, to show that this signal is going, or being acted
-upon by the statechart which has subscribed to it</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This is not in the UML standard</p>
-</div>
-</div>
-<div class="section" id="high-level-dependency-diagrams">
-<span id="reading-diagrams-high-level-dependency-diagrams"></span><h2>High Level Dependency Diagrams<a class="headerlink" href="#high-level-dependency-diagrams" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="high-level-federation-diagrams">
+<span id="reading-diagrams-high-level-dependency-diagrams"></span><h2>High Level Federation Diagrams<a class="headerlink" href="#high-level-federation-diagrams" title="Permalink to this headline">¶</a></h2>
 <p>If you have a number of statecharts that are all working together to perform
 some sort of collective action, it’s often very useful to see how they relate
 to one another from a very high point of view.  For this I draw high level
 dependency diagrams:</p>
+<a class="reference external image-reference" href="_static/context_diagram.pdf"><div align="center" class="align-center"><img alt="_images/context_diagram.svg" src="_images/context_diagram.svg" /></div>
+</a>
+<p>When I need to write about a specific part of the system, I will change it’s
+colour to draw my audience’s attention.  In this example I am trying to draw
+your attention to the CacheFileChart used by the <a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/how_it_works.html">miros-rabbitmq plugin</a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This is not in the UML standard</p>
@@ -534,10 +532,23 @@ dependency diagrams:</p>
 <div class="section" id="medium-level-construction-and-pub-sub-diagrams">
 <span id="reading-diagrams-medium-level-construction-and-pub-sub-diagrams"></span><h2>Medium Level Construction and Pub/Sub Diagrams<a class="headerlink" href="#medium-level-construction-and-pub-sub-diagrams" title="Permalink to this headline">¶</a></h2>
 <p>If you have build a federation of statecharts working together, you might want
-to look at how a specific statchart works in the context of this federation
+to look at how a specific statechart works in the context of this federation
 without looking at the details of its state machine.  This can be done with a
 medium level contextual view.  You would identify what it publishes, what it’s
-subscribed to and what it constructs to perform it’s tasks:</p>
+subscribed to and what it constructs to perform it’s roll:</p>
+<a class="reference external image-reference" href="_static/medium_context_lan_chart.pdf"><div align="center" class="align-center"><img alt="_images/medium_context_lan_chart.svg" src="_images/medium_context_lan_chart.svg" /></div>
+</a>
+<p>This is a medium context diagram of the LanChart used by the <a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/how_it_works.html">miros-rabbitmq plugin</a>.  It uses two
+“has a” composite arrows to show that it builds a CacheFileChart and a
+LanRecceChart when it is constructed.  When the LanChart is destroyed, both the
+CacheFileChart and the LanRecceChart will be destroyed as well.</p>
+<p>We use the publish and subscribe icons to show about events are inputs (green)
+and what events are outputs (red).  The payloads of the events are described as
+well.  From this diagram we can see how are LanChart chart contributes to the
+federation of our design.</p>
+<p>What is missing is that the LanChart doesn’t describe who constructs it.  I
+really shouldn’t because it doesn’t have access to this information.  To see
+this, you would reference the</p>
 </div>
 <div class="section" id="detailed-statechart-diagrams">
 <span id="reading-diagrams-detailed-statechart-diagrams"></span><h2>Detailed Statechart Diagrams<a class="headerlink" href="#detailed-statechart-diagrams" title="Permalink to this headline">¶</a></h2>
@@ -545,16 +556,44 @@ subscribed to and what it constructs to perform it’s tasks:</p>
 design with code marked upon it so you can quickly scan it and see what it’s
 doing.  The publish and subscription dots are immediately visible and if you
 need to further augment the chart with graphs to describe timing or whatever you
-think will be useful, place those on the diagram well:</p>
+think will be useful, place those on the diagram too:</p>
+<a class="reference external image-reference" href="_static/miros_rabbitmq_cache_file_chart.pdf"><div align="center" class="align-center"><img alt="_images/miros_rabbitmq_cache_file_chart.svg" src="_images/miros_rabbitmq_cache_file_chart.svg" /></div>
+</a>
 </div>
 <div class="section" id="sequence-diagrams">
 <span id="reading-diagrams-sequence-diagrams"></span><h2>Sequence Diagrams<a class="headerlink" href="#sequence-diagrams" title="Permalink to this headline">¶</a></h2>
 <p>Sequence diagrams are very useful and extremely fragile to design changes.  The
-can be generated directly from the trace instrumentation of the state machine and
-quickly written up in plain text.</p>
+<a class="reference external" href="https://github.com/aleph2c/sequence">can be generated directly from the trace instrumentation of the state machine</a> and quickly written up in plain text.
+You can drop this plain text into your code or use it directly in your docs.</p>
+<p>From this instrumentation trace log:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">2013</span><span class="o">-</span><span class="mi">3</span><span class="o">-</span><span class="mi">24</span><span class="p">]</span> <span class="p">[</span><span class="n">doc_process</span><span class="p">]</span> <span class="n">event</span><span class="o">-&gt;</span><span class="n">begin</span><span class="p">()</span> <span class="n">spec</span><span class="o">-&gt;</span><span class="n">statechart</span>
+<span class="p">[</span><span class="mi">2013</span><span class="o">-</span><span class="mi">3</span><span class="o">-</span><span class="mi">24</span><span class="p">]</span> <span class="p">[</span><span class="n">doc_process</span><span class="p">]</span> <span class="n">event</span><span class="o">-&gt;</span><span class="n">prototype</span><span class="p">()</span> <span class="n">statechart</span><span class="o">-&gt;</span><span class="n">code</span>
+<span class="p">[</span><span class="mi">2013</span><span class="o">-</span><span class="mi">3</span><span class="o">-</span><span class="mi">24</span><span class="p">]</span> <span class="p">[</span><span class="n">doc_process</span><span class="p">]</span> <span class="n">event</span><span class="o">-&gt;</span><span class="n">debug</span><span class="p">()</span> <span class="n">code</span><span class="o">-&gt;</span><span class="n">code</span>
+<span class="p">[</span><span class="mi">2013</span><span class="o">-</span><span class="mi">3</span><span class="o">-</span><span class="mi">24</span><span class="p">]</span> <span class="p">[</span><span class="n">doc_process</span><span class="p">]</span> <span class="n">event</span><span class="o">-&gt;</span><span class="n">communicate</span><span class="p">()</span> <span class="n">code</span><span class="o">-&gt;</span><span class="n">trace</span>
+<span class="p">[</span><span class="mi">2013</span><span class="o">-</span><span class="mi">3</span><span class="o">-</span><span class="mi">24</span><span class="p">]</span> <span class="p">[</span><span class="n">doc_process</span><span class="p">]</span> <span class="n">event</span><span class="o">-&gt;</span><span class="n">sequence</span><span class="o">.</span><span class="n">rb</span><span class="p">()</span> <span class="n">trace</span><span class="o">-&gt;</span><span class="n">sequence_diagram</span>
+</pre></div>
+</div>
+<p>To this sequence diagram:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>[ Chart: doc_process ] (?)
+   spec       statechart        code             trace      sequence_diagram
+     +-begin()-&gt;|                |                |                |
+     |   (?)    |                |                |                |
+     |          +--prototype()--&gt;|                |                |
+     |          |      (?)       |                |                |
+     |          |                +                |                |
+     |          |                 \ (?)           |                |
+     |          |                 debug()         |                |
+     |          |                 /               |                |
+     |          |                &lt;                |                |
+     |          |                +-communicate()-&gt;|                |
+     |          |                |      (?)       |                |
+     |          |                |                +-sequence.rb()-&gt;|
+     |          |                |                |      (?)       |
+</pre></div>
+</div>
 <p>Avoid spending a lot of time on these diagrams, and avoid the more advanced
 diagramming features, since to put effort into hand drawing a sequence diagram
-while designing a reactive system will be a Sisyphean task</p>
+while designing a reactive system will be a Sisyphean task.</p>
 </div>
 <div class="section" id="payloads">
 <span id="reading-diagrams-payloads"></span><h2>Payloads<a class="headerlink" href="#payloads" title="Permalink to this headline">¶</a></h2>
@@ -568,6 +607,11 @@ structures within their own statecharts and copy smaller payloads into named
 tuples.  A named tuple is immutable, so you won’t accidentally short yourself in
 the foot by accidentally creating a global variable.  You can draw your payloads
 into your statecharts like this:</p>
+<a class="reference external image-reference" href="_static/immutable_payload.pdf"><div align="center" class="align-center"><img alt="_images/immutable_payload.svg" src="_images/immutable_payload.svg" /></div>
+</a>
+<p>Pepper your payloads all over your drawings, you might be repeating yourself,
+but the quick understanding that you will be getting from a glance will pay for
+this trade off.  The <a class="reference external" href="https://docs.python.org/3.5/library/collections.html#collections.namedtuple">namedtuple is nice to work with</a>.</p>
 </div>
 <div class="section" id="dealing-with-the-anti-brand">
 <span id="reading-diagrams-dealing-with-the-anti-brand"></span><h2>Dealing with the Anti-Brand<a class="headerlink" href="#dealing-with-the-anti-brand" title="Permalink to this headline">¶</a></h2>
@@ -602,7 +646,7 @@ always be people you can’t reach, focus on what you can change instead.  This 
 the power of open source, you can always fork a project and go your own way.</p>
 <p>If a developer isn’t diagramming their own software, then your organization is
 doing it wrong.</p>
-<table class="docutils footnote" frame="void" id="id3" rules="none">
+<table class="docutils footnote" frame="void" id="id4" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="https://youarenotsosmart.com/2011/03/25/the-sunk-cost-fallacy/">The Sunk Cost Fallacy</a></td></tr>
@@ -629,22 +673,14 @@ doing it wrong.</p>
 <li><a class="reference internal" href="#events">Events</a></li>
 <li><a class="reference internal" href="#event-processor-attachment-points">Event Processor Attachment Points</a></li>
 <li><a class="reference internal" href="#states">States</a></li>
-<li><a class="reference internal" href="#state-shorthand">State Shorthand</a></li>
-<li><a class="reference internal" href="#entry-event">Entry Event</a></li>
-<li><a class="reference internal" href="#initialization-dot">Initialization Dot</a></li>
-<li><a class="reference internal" href="#exit-signals">Exit Signals</a></li>
-<li><a class="reference internal" href="#event-guards-if-structures">Event Guards (If Structures)</a></li>
 <li><a class="reference internal" href="#if-else-structures">If-Else Structures</a></li>
 <li><a class="reference internal" href="#extending-arrows">Extending Arrows</a></li>
-<li><a class="reference internal" href="#explicitely-placing-the-return-codes-on-your-diagram">Explicitely Placing the Return codes on your diagram</a></li>
-<li><a class="reference internal" href="#making-notes">Making Notes</a></li>
-<li><a class="reference internal" href="#terminate-dot">Terminate Dot</a></li>
-<li><a class="reference internal" href="#final-dot">Final Dot</a></li>
+<li><a class="reference internal" href="#terminate-icon">Terminate Icon</a></li>
+<li><a class="reference internal" href="#final-icon">Final Icon</a></li>
 <li><a class="reference internal" href="#fall-through">Fall Through</a></li>
-<li><a class="reference internal" href="#deep-history-dot">Deep History Dot</a></li>
-<li><a class="reference internal" href="#publishing-dot">Publishing Dot</a></li>
-<li><a class="reference internal" href="#subscription-dot">Subscription Dot</a></li>
-<li><a class="reference internal" href="#high-level-dependency-diagrams">High Level Dependency Diagrams</a></li>
+<li><a class="reference internal" href="#deep-history-icon">Deep History Icon</a></li>
+<li><a class="reference internal" href="#subscription-and-publishing-icons">Subscription and Publishing Icons</a></li>
+<li><a class="reference internal" href="#high-level-federation-diagrams">High Level Federation Diagrams</a></li>
 <li><a class="reference internal" href="#medium-level-construction-and-pub-sub-diagrams">Medium Level Construction and Pub/Sub Diagrams</a></li>
 <li><a class="reference internal" href="#detailed-statechart-diagrams">Detailed Statechart Diagrams</a></li>
 <li><a class="reference internal" href="#sequence-diagrams">Sequence Diagrams</a></li>
