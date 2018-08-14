@@ -34,12 +34,563 @@
             
   <div class="section" id="quick-start">
 <span id="id1"></span><h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
-<p>How to get working in a hurry</p>
-<p>This is the quick start page, changing it to see if my autobuild script will see
-the results.</p>
+<p>This library is intended for three different audiences, so I have constructed
+three separate quick start sections:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#quickstart-new-to-statecharts"><span class="std std-ref">quick start for people new to statecharts</span></a></li>
+<li><a class="reference internal" href="#quickstart-quick-start-for-python"><span class="std std-ref">quick start for people experienced with statecharts</span></a></li>
+<li><a class="reference internal" href="#quickstart-going-to-port-to-embedded"><span class="std std-ref">quick start for embedded developers</span></a></li>
+</ul>
+</div></blockquote>
+<div class="section" id="quick-start-for-embedded">
+<span id="quickstart-going-to-port-to-embedded"></span><h2>Quick Start for Embedded<a class="headerlink" href="#quick-start-for-embedded" title="Permalink to this headline">¶</a></h2>
+<p>As an embedded developer you will probably port your working miros Python code
+to C/C++ for a considerable performance gain.  If you are looking for an excellent,
+and affordable framework, go to the source and use the <a class="reference external" href="https://github.com/QuantumLeaps/qpc">qp codebase</a>.  It is documented here:
+<a class="reference external" href="https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download">Practical UML Statechart in C/C++, 2nd Edition</a>.</p>
+<p>There are two different ways to make statecharts with this miros Python library.
+In this example, I will show you the programming technique that is best suited
+for porting your code to the <a class="reference external" href="https://github.com/QuantumLeaps/qpc">qp framework</a>:</p>
+<p>Let’s build a toaster oven that pays for itself, here is its <strong>specification</strong>:</p>
+<ul class="simple">
+<li>It will contain a bitcoin miner that runs hot enough to toast things.</li>
+<li>It will have an oven element that can bake things.</li>
+<li>While toasting or baking, the inside of the toaster oven should glow red.</li>
+<li>When the door is closed, and the oven is not heating, no light should be on.</li>
+<li>When the door is opened, the heating should stop.</li>
+<li>When the door is opened, a white light should turn on, so the customer can see their food.</li>
+<li>When the door is closed after it has been opened, the toaster oven should behave like it did before the door
+was opened.</li>
+<li>the bitcoin miner should survive very high temperatures.</li>
+</ul>
+<p>Here is a statechart picture that meets these specifications:</p>
+<a class="reference external image-reference" href="_static/bitcoin_toaster_oven_active_object.pdf"><div align="center" class="align-center"><img alt="_images/bitcoin_toaster_oven_active_object.svg" src="_images/bitcoin_toaster_oven_active_object.svg" /></div>
+</a>
+<p>If you intend on porting this code to C/C++ for your embedded platform, it is
+best to use the miros <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code> class rather than the miros <code class="docutils literal notranslate"><span class="pre">Factory</span></code> class.</p>
+<p>Here is how you could code this using miros and the ActiveObject class.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="c1"># This part of the code maps to the top part (non-state-machine) part of the</span>
+<span class="c1"># statechart diagram</span>
+<span class="k">class</span> <span class="nc">SelfPayingToasterOven</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39;Class that holds the attributes and worker methods used by our toaster</span>
+<span class="sd">     oven statechart&#39;&#39;&#39;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bitcoin_address</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;toaster_{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bitcoin_address</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">bitcoin_address</span> <span class="o">=</span> <span class="n">bitcoin_address</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">red_light_off</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">white_light_off</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">bitcoin_miner_off</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">heating_element_off</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="nf">red_light_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;turning red light on&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">red_light_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;turning red light off&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">white_light_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;turning white light on&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">white_light_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;turning white light off&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">bitcoin_miner_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;turning bitcoin miner on&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">bitcoin_miner_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;turning bitcoin miner off&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">heating_element_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;turning heating element on&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">heating_element_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;turning heating element off&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># The state-machine part of the statechart</span>
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">door_closed</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">white_light_off</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Off</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Bake</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">baking</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Toast</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">toasting</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Open</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">door_open</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">heating</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">red_light_on</span><span class="p">()</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">bitcoin_miner_on</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">red_light_off</span><span class="p">()</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">bitcoin_miner_off</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">baking</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">heating_element_on</span><span class="p">()</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">baking</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">heating_element_off</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">toasting</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">toasting</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">off</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">door_open</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">white_light_on</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Close</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">history</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+
+  <span class="c1"># make our toaster oven with our account information</span>
+  <span class="n">toaster</span> <span class="o">=</span> <span class="n">SelfPayingToasterOven</span><span class="p">(</span><span class="s1">&#39;142x5ZhQEMk5LLjXGZeiTBWpv2oxQpfaHJ&#39;</span><span class="p">)</span>
+
+  <span class="c1"># turn on our instrumentation so that we can test if our design is working</span>
+  <span class="n">toaster</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+
+  <span class="c1"># Start our toaster oven in the off state</span>
+  <span class="n">toaster</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+
+  <span class="c1"># Let&#39;s Bake</span>
+  <span class="n">toaster</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Bake</span><span class="p">))</span>
+
+  <span class="c1"># Let&#39;s Toast</span>
+  <span class="n">toaster</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toast</span><span class="p">))</span>
+
+  <span class="c1"># Let&#39;s Open the door to our toaster oven</span>
+  <span class="n">toaster</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Open</span><span class="p">))</span>
+
+  <span class="c1"># Let&#39;s Close the door</span>
+  <span class="n">toaster</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Close</span><span class="p">))</span>
+
+  <span class="c1"># The toaster is running in a different thread than our main program</span>
+  <span class="c1"># So wait a bit so that it can catch up before we close out this program</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here is the output of this program:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>turning red light off
+turning white light off
+turning bitcoin miner off
+turning heating element off
+turning white light off
+[2018-08-10 10:45:13.610478] [toaster_142x5] e-&gt;start_at() top-&gt;off
+turning red light on
+turning bitcoin miner on
+turning heating element on
+[2018-08-10 10:45:13.611530] [toaster_142x5] e-&gt;Bake() off-&gt;baking
+turning heating element off
+turning red light off
+turning bitcoin miner off
+turning red light on
+turning bitcoin miner on
+[2018-08-10 10:45:13.612099] [toaster_142x5] e-&gt;Toast() baking-&gt;toasting
+turning red light off
+turning bitcoin miner off
+turning white light on
+[2018-08-10 10:45:13.613183] [toaster_142x5] e-&gt;Open() toasting-&gt;door_open
+turning white light off
+turning red light on
+turning bitcoin miner on
+[2018-08-10 10:45:13.613700] [toaster_142x5] e-&gt;Close() door_open-&gt;toasting
+</pre></div>
+</div>
+</div>
+<div class="section" id="quick-start-for-experienced">
+<span id="quickstart-quick-start-for-python"></span><h2>Quick Start for Experienced<a class="headerlink" href="#quick-start-for-experienced" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="quick-start-for-newbies">
+<span id="quickstart-new-to-statecharts"></span><h2>Quick Start for Newbies<a class="headerlink" href="#quick-start-for-newbies" title="Permalink to this headline">¶</a></h2>
+<p>This introduction to statecharts using miros will be done in stages:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#quickstart-an-analogy"><span class="std std-ref">analogy:</span></a> to link something you know already to something new</li>
+<li><a class="reference internal" href="#quickstart-a-self-paying-toaster-oven"><span class="std std-ref">design</span></a> and <a class="reference internal" href="reading_diagrams.html#reading-diagrams-reading-diagrams"><span class="std std-ref">diagram</span></a>: learn by building a statechart</li>
+<li><a class="reference internal" href="#quickstart-dynamics"><span class="std std-ref">mechanics:</span></a> how a statechart works.</li>
+<li><span class="xref std std-ref">code:</span> translate your design into something a computer can do.</li>
+<li><span class="xref std std-ref">instrumentation:</span> how to debug and test your code</li>
+<li><span class="xref std std-ref">documenation:</span> how to quickly describe your design and solution to others.</li>
+</ul>
+<div class="section" id="an-analogy">
+<span id="quickstart-an-analogy"></span><h3>An Analogy<a class="headerlink" href="#an-analogy" title="Permalink to this headline">¶</a></h3>
+<p>If you don’t know what a statechart is, think of it as a kind of board game that
+you can solve your problems with.</p>
+<p>The board game has a board with a picture on it, some marbles that the players
+can place and then roll around the board in accordance to the game’s rulebook.
+It has a game piece that all of the members can move once it is their turn to
+play.  The players don’t move the piece directly, but they move it by having
+their marble interact with the board.  If one player moves the game piece on
+their turn, the next player will start their turn at this new position.</p>
+<p>As the board game designer, you would have control over the drawing on the board
+and you would design some of the marbles that are used by the players, but you
+wouldn’t control the rulebook or a player’s specific behavior, what fun would
+that be?</p>
+<p>The players of your game could be people, touching an external user interface.
+At the moment they press a key, an electrical signal would be sent into your
+computer and then turned into a software abstraction of the key-press event that
+could effect your board game.  But a player doesn’t actually have to be a
+person, it could be a count down timer that fires an event every 3 seconds, it
+could be the stock market, it could be the weather.  A player in this metaphor
+is just something in the outside world that can trigger the events you want your
+board game to react to.</p>
+<p>To distinguish one event from another event, we will call them by different
+names: signal names.  Sometimes an event carries additional information, let’s
+call this a payload.  Going back to our metaphor, think of an event is a marble.
+A player would build a marble and put it on the board when it was their turn to
+play the game.  Every marble would have a signal name painted on it, and
+sometimes, deep within the marble would be a payload.</p>
+<p>The player would place their marble on the board at the current location of the
+game piece, let go of it and watch it roll.  As it rolled on the board, it
+might trigger software that you have written into that marble’s groove.  It
+might trigger additional marbles to pop out of the board and roll in turn; but
+eventually the action would stop and the common game piece would be moved to
+it’s new position and the next player would get to play.</p>
+<p>Every game has a rule book.  In our case the rule book is called the Harel
+Formalism.  These rules govern how the marble can move on the board and how the
+game piece is shifted in response.</p>
+<p>The statechart board game also has rules about when a player gets to play.  If
+one player really needs to put a marble on the board while another is playing,
+it is OK.  She will just put it into a loading dock.  The statechart board
+game will only let one player play out their marble on the board at a time; this
+rule is called run to completion (RTC).  When a player’s marble has finished
+moving around the board, our board game will check it’s loading dock to see if
+another marble needs to be acted upon.</p>
+<p>The loading dock is a python deque.  The thing that will load the marble onto
+the board when the game has finished processing the last player’s marble is a
+python thread.</p>
+<p>So what does this board game look like?  Well, it looks kind of like a bunch of
+rounded rectangles connected with arrows.  The arrows have signal names painted
+on them to describe paths that certain marbles can follow and the rounded
+rectangles are called states.</p>
+<p>All the states have names, and a state can be within another state.  As the
+different players play the game, the common piece is moved around the board,
+coming to rest within one of the states.  This is called the resting state.</p>
+<p>The rules are pretty straightforward, but who wants to read a rulebook anyway?
+The players certainly don’t.  So, you as the board game designer and the board
+game itself must know the rules.  The board game’s software that applies the
+rules to the marbles on the board is called the event processor.  It is based
+upon the algorithm invented by Dr. Miro Samek.</p>
+<p>So how is this useful?  Well your game has software on it’s game board that can
+run when a marble roles over it.  You can connect this software to the output of
+your computer; so you can control things in the outside world.  Your board game,
+statechart, could be used to control a trading strategy, it could be used to
+control the massive doors over a stadium, automatically reacting to changes in
+weather conditions.</p>
+<p>Getting down to brass tacks, what do we do now?  Well I have to show you how to
+draw a board game; I have to show you how to draw a statechart.  We will use
+UML.  I have to show you how to connect your board game to it’s automatic rule
+book; the event processor.  I have to show you how to create your custom
+marbles, the events and their payloads and how to send these to the board game
+so that you can connect outside things into the events to which your statechart
+will react too.</p>
+<p>Once you know how to draw the pictures, you will need to know how to translate
+this into code.  Lastely, I will show you how to see if your statechart is
+working; so that it can give you feedback about what it is doing.   You can use
+this feedback to both trouble shoot your design and to describe how it works to
+others.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the diagram is too small, click on it to open it’s pdf</p>
+</div>
+</div>
+<div class="section" id="a-self-paying-toaster-oven">
+<span id="quickstart-a-self-paying-toaster-oven"></span><h3>A Self Paying Toaster Oven<a class="headerlink" href="#a-self-paying-toaster-oven" title="Permalink to this headline">¶</a></h3>
+<p>So now I will design a board game that is easy to understand.
+Let’s build a toaster oven that pays for itself, here is its <strong>specification</strong>:</p>
+<ul class="simple">
+<li>It will contain a bitcoin miner that runs hot enough to toast things.</li>
+<li>It will have an oven element that can bake things.</li>
+<li>While toasting or baking, the inside of the toaster oven should glow red.</li>
+<li>When the door is closed, and the oven is not heating, no light should be on.</li>
+<li>When the door is opened, the heating should stop.</li>
+<li>When the door is opened, a white light should turn on, so the customer can see their food.</li>
+<li>When the door is closed after it has been opened, the toaster oven should behave like it did before the door
+was opened.</li>
+<li>the bitcoin miner should survive very high temperatures.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The name “Self Paying Toaster Oven” is a marketing ploy.  A better name for
+our product should be called the “Toaster Oven Lottery Ticket”, since it is
+very unlikely our little bitcoin miner will succeed at mining a bitcoin.</p>
+</div>
+<p>Here is a <a class="reference internal" href="reading_diagrams.html#reading-diagrams-reading-diagrams"><span class="std std-ref">statechart picture</span></a> (board game) that meets these specifications:</p>
+<a class="reference external image-reference" href="_static/bitcoin_toaster_oven_active_object.pdf"><div align="center" class="align-center"><img alt="_images/bitcoin_toaster_oven_active_object.svg" src="_images/bitcoin_toaster_oven_active_object.svg" /></div>
+</a>
+<p>Let’s break the board game image into it’s parts, from the top down:</p>
+<a class="reference external image-reference" href="_static/bitcoin_toaster_oven_active_object_0.pdf"><div align="center" class="align-center"><img alt="_images/bitcoin_toaster_oven_active_object_0.svg" src="_images/bitcoin_toaster_oven_active_object_0.svg" /></div>
+</a>
+<p>The top of the diagram, highlighted in blue, describes the <a class="reference internal" href="reading_diagrams.html#reading-diagrams-classes"><span class="std std-ref">class</span></a> that we want to use from the miros library.  This
+class will provide our game’s rulebook, the thread which our game will run in and
+deques needed for our players to load their marbles into.</p>
+<a class="reference external image-reference" href="_static/bitcoin_toaster_oven_active_object_1.pdf"><div align="center" class="align-center"><img alt="_images/bitcoin_toaster_oven_active_object_1.svg" src="_images/bitcoin_toaster_oven_active_object_1.svg" /></div>
+</a>
+<p>We inherit from the ActiveObject to make a new class called
+SelfPayingToasterOven.  We put all of the worker methods and the attributes,
+needed by our specific board game inside of this derived class.</p>
+<a class="reference external image-reference" href="_static/bitcoin_toaster_oven_active_object_2.pdf"><div align="center" class="align-center"><img alt="_images/bitcoin_toaster_oven_active_object_2.svg" src="_images/bitcoin_toaster_oven_active_object_2.svg" /></div>
+</a>
+<p>In the diagram above, the hierarchical state machine (HSM) is highlighted in
+blue.   This specific type of state machine is called a hierarchical
+statemachine, because it has states within states, making a hierarchical
+structure.  We will talk about the benefits of this shortly.</p>
+<p>The miros package uses the HSM as a specification for behavior.  The
+statemachine doesn’t actually keep any information about what happens when your
+program interacts with it.  All of that information is kept within the object
+that uses it.  Because of this, a statemachine can be used by many many
+different processes at the same time.</p>
+<a class="reference external image-reference" href="_static/bitcoin_toaster_oven_active_object_3.pdf"><div align="center" class="align-center"><img alt="_images/bitcoin_toaster_oven_active_object_3.svg" src="_images/bitcoin_toaster_oven_active_object_3.svg" /></div>
+</a>
+<p>The icons highlighted blue in the above diagram represent the attachment point
+between our toaster object and it’s state machine.  Using our game metaphor,
+think of this attachment point as a clear plastic sheet that our toaster puts
+over the game board.  The event processor can write information onto this sheet
+so that the game can keep track of its state without marking up the game board
+directly.</p>
+<p>The game is started where the attachment point is made, in the above example it
+is like writing:</p>
+<blockquote>
+<div><ul class="simple">
+<li>construct an object from the class containing the event processor
+(SelfPayingToasterOven)</li>
+<li>place a clear plastic sheet down over the board game (our HSM)</li>
+<li>on the sheet, use a marker to note that the beginning position is the <code class="docutils literal notranslate"><span class="pre">door_closed</span></code>
+state.</li>
+<li>begin the game</li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This attachment point is a useful fiction, but if you dig into the code, the
+statemachine is actually a set of functions that reference one another.  These
+functions have two arguments, a handle to your specific
+object and an event. These functions call your code
+and call other functions in accordance to the rulebook of the game.  A state
+machine’s function doesn’t have it’s own memory, it uses the memory of the
+object provided as it’s first argument.  We won’t get into the details of this
+yet, but know that your statemachine functions are actually the thing from
+which the picture emerges.</p>
+</div>
+<p>Before I start talking about the dynamics of our game, let’s clear up some
+terminology:</p>
+<p>A statechart, is a statemachine operating within a thread, which has access to
+information about it’s previous state.  It has queues that can be used to store
+up events (marbles played by players who don’t want to wait their turn to play).
+So the statechart in this diagram is the whole picture.</p>
+<p id="quickstart-dynamics">Let’s start the game:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">toaster</span> <span class="o">=</span> <span class="n">SelfPayingToasterOven</span><span class="p">(</span><span class="s1">&#39;142x5ZhQEMk5LLjXGZeiTBWpv2oxQpfaHJ&#39;</span><span class="p">)</span>
+<span class="n">toaster</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">door_closed</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will cause the game dynamics to turn on; the event processor starts rolling
+marbles onto the board.</p>
+<a class="reference external image-reference" href="_static/bitcoin_toaster_oven_active_object_4.pdf"><div align="center" class="align-center"><img alt="_images/bitcoin_toaster_oven_active_object_4.svg" src="_images/bitcoin_toaster_oven_active_object_4.svg" /></div>
+</a>
+<p>The <code class="docutils literal notranslate"><span class="pre">start_at</span></code> call will cause the game to enter the <code class="docutils literal notranslate"><span class="pre">door_closed</span></code>
+state.  As a result, the event processor will roll an entry marble onto the
+board.  This is caught by the entry handler of the <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> state, calling
+the <code class="docutils literal notranslate"><span class="pre">white_light_off()</span></code> method of the toaster.  Now the game is in the
+<code class="docutils literal notranslate"><span class="pre">door_closed</span></code> region of the diagram.</p>
+<p>The event processor rolls an init marble onto the board, this is caught by the
+black dot within the <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> region.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The black dots with connected arrows are called “init pseudostates” in UML.
+Think of them as, “What do I do when I land in this region?”. From now on I’ll
+call these init icons or black dots.</p>
+</div>
+<p>The marble follows the groove into the <code class="docutils literal notranslate"><span class="pre">off</span></code> state.  Since the
+<code class="docutils literal notranslate"><span class="pre">off</span></code> state was entered the event processor rolls an entry marble to it.  It’s
+entry handler runs the <code class="docutils literal notranslate"><span class="pre">oven.history=off</span></code> code in the context of the toaster
+object.</p>
+<p>At this point, the play is over, because the event processor has nothing left to
+do.  Another way of saying this is that the run to completion process (RTC) is
+finished.  The <code class="docutils literal notranslate"><span class="pre">off</span></code> state is marked onto the clear plastic sheet as the
+starting state for the next play of the game.</p>
+<p>Since there is nothing left to do, the statechart thread looks to see if there
+is a marble in it’s loading dock.  The marble might have been played during the
+last RTC process by another player.</p>
+<p>Now suppose that while the game was running its startup code, someone pressed
+the <code class="docutils literal notranslate"><span class="pre">Bake</span></code> button on the outside of our toaster, in code this would look like
+this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bakeer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Bake</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Here is what would happen:</p>
+<a class="reference external image-reference" href="_static/bitcoin_toaster_oven_active_object_5_1.pdf"><div align="center" class="align-center"><img alt="_images/bitcoin_toaster_oven_active_object_5_1.svg" src="_images/bitcoin_toaster_oven_active_object_5_1.svg" /></div>
+</a>
+<p>The event processor would begin it’s work by checking to see if the <code class="docutils literal notranslate"><span class="pre">off</span></code>
+state knew what to do with a <code class="docutils literal notranslate"><span class="pre">Bake</span></code> marble.  The <code class="docutils literal notranslate"><span class="pre">off</span></code> state doesn’t know,
+so the event processor would roll the marble outward on the board to the next most
+outer state: <code class="docutils literal notranslate"><span class="pre">door_closed</span></code>, and ask it if it knows what to do with the
+<code class="docutils literal notranslate"><span class="pre">Bake</span></code> marble.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> state has a named groove called <code class="docutils literal notranslate"><span class="pre">Bake</span></code>, so it knows what
+to do with the <code class="docutils literal notranslate"><span class="pre">Bake</span></code> marble.  The bake groove is trying to dump it’s marble
+from the <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> state into the <code class="docutils literal notranslate"><span class="pre">bakeing</span></code> state, but before the event
+processor can do this, it must exit out of the <code class="docutils literal notranslate"><span class="pre">off</span></code> state.</p>
+<p>So the event processor gives itself a sub-goal to transition from <code class="docutils literal notranslate"><span class="pre">off</span></code> to
+<code class="docutils literal notranslate"><span class="pre">baking</span></code>.  To begin this work it marks an S on the board over the <code class="docutils literal notranslate"><span class="pre">off</span></code>
+state and marks a T on the board on the <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> state. S stands for
+source and T stands for target.  Then it figures out how to transition from the
+S to the T:</p>
+<ul class="simple">
+<li>it needs to exit the <code class="docutils literal notranslate"><span class="pre">off</span></code> state.</li>
+</ul>
+<p>To exit the off state it rolls an exit marble to the <code class="docutils literal notranslate"><span class="pre">off</span></code> state handler.
+There isn’t one so nothing happens.</p>
+<p>Now the event processor is in the <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> state.  It’s new target is the
+<code class="docutils literal notranslate"><span class="pre">baking</span></code> state.  So it marks an S on <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> and a “T” on
+<code class="docutils literal notranslate"><span class="pre">baking_state</span></code>.  Then it makes a list of the work required to transition
+from “S” to “T”:</p>
+<ul class="simple">
+<li>enter the <code class="docutils literal notranslate"><span class="pre">heating</span></code> state, then</li>
+<li>enter the <code class="docutils literal notranslate"><span class="pre">baking</span></code> state.</li>
+</ul>
+<p>To do this, it rolls an entry marble to the <code class="docutils literal notranslate"><span class="pre">heating</span></code> state, which is caught
+by it’s handler and the <code class="docutils literal notranslate"><span class="pre">oven.red_light_on()</span></code> is run, then the
+<code class="docutils literal notranslate"><span class="pre">oven.bitcoin_miner_on()</span></code> is run.  Then the event processor rolls an entry
+marble to the <code class="docutils literal notranslate"><span class="pre">baking</span></code> state.  This causes our program to run
+<code class="docutils literal notranslate"><span class="pre">oven.heating_element_on()</span></code> then <code class="docutils literal notranslate"><span class="pre">oven.history</span> <span class="pre">=</span> <span class="pre">baking</span></code>.</p>
+<p>The event processor is now in a new region, the <code class="docutils literal notranslate"><span class="pre">baking</span></code> state region.  It
+looks for an init icon and it’s groove (a black dot with an arrow), but there
+isn’t any so it stops searching for work to do.</p>
+<p>It is at this point that the second RTC process is completed.  So the event
+processor marks <code class="docutils literal notranslate"><span class="pre">baking</span></code> as the next starting point for the game and passes
+control back to the statechart’s thread so it can check it’s loading dock for
+player marbles.</p>
+<p>We just learned about one of the benefits of having a HSM.  We get automatic
+grooves.  The <code class="docutils literal notranslate"><span class="pre">off</span></code> state didn’t have to be explicitly connected to the
+<code class="docutils literal notranslate"><span class="pre">baking</span></code> state.  The Bake marble rolled outward till the event processor found
+something that knew what to do with it.  This means in our game metaphor we
+should think of the inner states as being higher off the ground than the outer
+states; this way it becomes easy to imagine what the marbles do.  If they aren’t
+explicitly handled with a named arrow from the state that was rolled the marble,
+they fall outward until they are.</p>
+<p>Guess what happens when a marble isn’t handled by an outer state?  That’s right,
+it rolls off the outer edge, is ignored and no state transition happens (only
+costing us a few wasted cycles).</p>
+<p>Now let’s do something really dangerous; let’s turn off the oven.  Here is what
+would happen if you were in the <code class="docutils literal notranslate"><span class="pre">baking</span></code> state and you issued an Off event:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">toaster</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Off</span><span class="p">))</span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="_static/bitcoin_toaster_oven_active_object_6.pdf"><div align="center" class="align-center"><img alt="_images/bitcoin_toaster_oven_active_object_6.svg" src="_images/bitcoin_toaster_oven_active_object_6.svg" /></div>
+</a>
+<p>Here is what would happen:</p>
+<ul class="simple">
+<li>Any code on the “Off” arrow would be run: none</li>
+<li>The exit code of the backing state would be run: <code class="docutils literal notranslate"><span class="pre">oven.heating_element_off()</span></code></li>
+<li>The exit code of the heating state would be run: <code class="docutils literal notranslate"><span class="pre">oven.red_light_off();</span>
+<span class="pre">oven.bitcoin_miner_off()</span></code></li>
+<li>The entry code of the off state could be run:  <code class="docutils literal notranslate"><span class="pre">oven.history</span> <span class="pre">=</span> <span class="pre">off</span></code></li>
+<li>The init code of the off state would be run: none</li>
+</ul>
+<p>Let’s toast something:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">toaster</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toast</span><span class="p">))</span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="_static/bitcoin_toaster_oven_active_object_7.pdf"><div align="center" class="align-center"><img alt="_images/bitcoin_toaster_oven_active_object_7.svg" src="_images/bitcoin_toaster_oven_active_object_7.svg" /></div>
+</a>
+<ul class="simple">
+<li>Any code on the “Toast” arrow would be run: none</li>
+<li>The exit code of the off state would be run: none</li>
+<li>The entry code of the heating state would be run: <code class="docutils literal notranslate"><span class="pre">oven.red_light_on();</span>
+<span class="pre">oven.bitcoin_miner_on()</span></code></li>
+<li>The entry code to the toasting state would be run: <code class="docutils literal notranslate"><span class="pre">oven.history</span> <span class="pre">=</span> <span class="pre">toasting</span></code></li>
+</ul>
+<p>Now let’s open then close the door to the toaster over:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">toaster</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Open</span><span class="p">))</span>
+<span class="n">toaster</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Close</span><span class="p">))</span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="_static/bitcoin_toaster_oven_active_object_8.pdf"><div align="center" class="align-center"><img alt="_images/bitcoin_toaster_oven_active_object_8.svg" src="_images/bitcoin_toaster_oven_active_object_8.svg" /></div>
+</a>
+<ul class="simple">
+<li>Any code in the “Open” arrow would be run: none</li>
+<li>The exit code of the toasting state: none</li>
+<li>The exit code of the heating state: <code class="docutils literal notranslate"><span class="pre">oven.red_light_off();</span> <span class="pre">oven.bitcoin_miner_off</span></code></li>
+<li>The exit state of the door_closed state: none</li>
+<li>The entry state of the door_open: <code class="docutils literal notranslate"><span class="pre">oven.white_light_on()</span></code></li>
+<li>The Close event is sent to the event processor</li>
+<li>The code on the “Close” arrow would be run: none</li>
+<li>The deep history the last state of the door_closed region to be the target</li>
+<li>The entry code for the heating state: <code class="docutils literal notranslate"><span class="pre">oven.red_light_on();</span> <span class="pre">oven.bitcoin_miner_on()</span></code></li>
+<li>The entry code of the toasting state: <code class="docutils literal notranslate"><span class="pre">oven.history</span> <span class="pre">=</span> <span class="pre">toasting</span></code></li>
+<li>The init code for the toasting state: none</li>
+</ul>
+<p>If you understand this, you understand the basic dynamics of statecharts.</p>
 <div class="toctree-wrapper compound">
 </div>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">Next topic</span></a>.</p>
+</div>
+</div>
 </div>
 
 
@@ -49,7 +600,21 @@ the results.</p>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
   <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
-</a></p><div class="relations">
+</a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Quick Start</a><ul>
+<li><a class="reference internal" href="#quick-start-for-embedded">Quick Start for Embedded</a></li>
+<li><a class="reference internal" href="#quick-start-for-experienced">Quick Start for Experienced</a></li>
+<li><a class="reference internal" href="#quick-start-for-newbies">Quick Start for Newbies</a><ul>
+<li><a class="reference internal" href="#an-analogy">An Analogy</a></li>
+<li><a class="reference internal" href="#a-self-paying-toaster-oven">A Self Paying Toaster Oven</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
