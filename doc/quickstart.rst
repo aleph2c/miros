@@ -331,7 +331,7 @@ the black dot within the ``door_closed`` region (3).
 .. note::
   The black dots with connected arrows are called “init pseudostates” in UML.
   Think of them as, “What do I do when I land in this region?”. From now on I’ll
-  call these init icons or black dots.
+  call these block dots, init icons.
 
 The marble follows the groove into the ``off`` state.  Since the
 ``off`` state was entered the event processor rolls an entry marble to it.  Its
@@ -468,7 +468,7 @@ Now let's open then close the door to the toaster oven.:
     :target: _static/bitcoin_toaster_oven_active_object_8.pdf
     :align: center
 
-Here is what would happen:
+Here is what would happen in detail:
 
 * The ``Open`` event is sent to the event processor
 * Any code in the Open-arrow would run: none
@@ -489,9 +489,6 @@ If you understand this, you understand the basic dynamics of statecharts.
 
 Code
 ----
-I am going to talk about how the event processor works with your code.  If you
-would just like to skip to the state function, construction-checklist, go here.
-
 The thing to understand about the miros library is that it works with a special
 type of callback function.  If you haven't seen a callback function before, it
 is just a function that is given to another function, so that it can be called

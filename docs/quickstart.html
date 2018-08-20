@@ -470,7 +470,7 @@ the black dot within the <code class="docutils literal notranslate"><span class=
 <p class="first admonition-title">Note</p>
 <p class="last">The black dots with connected arrows are called “init pseudostates” in UML.
 Think of them as, “What do I do when I land in this region?”. From now on I’ll
-call these init icons or black dots.</p>
+call these block dots, init icons.</p>
 </div>
 <p>The marble follows the groove into the <code class="docutils literal notranslate"><span class="pre">off</span></code> state.  Since the
 <code class="docutils literal notranslate"><span class="pre">off</span></code> state was entered the event processor rolls an entry marble to it.  Its
@@ -580,7 +580,7 @@ would happen if you were <code class="docutils literal notranslate"><span class=
 </div>
 <a class="reference external image-reference" href="_static/bitcoin_toaster_oven_active_object_8.pdf"><div align="center" class="align-center"><img alt="_images/bitcoin_toaster_oven_active_object_8.svg" src="_images/bitcoin_toaster_oven_active_object_8.svg" /></div>
 </a>
-<p>Here is what would happen:</p>
+<p>Here is what would happen in detail:</p>
 <ul class="simple">
 <li>The <code class="docutils literal notranslate"><span class="pre">Open</span></code> event is sent to the event processor</li>
 <li>Any code in the Open-arrow would run: none</li>
@@ -600,8 +600,6 @@ would happen if you were <code class="docutils literal notranslate"><span class=
 </div>
 <div class="section" id="code">
 <span id="quickstart-code"></span><h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
-<p>I am going to talk about how the event processor works with your code.  If you
-would just like to skip to the state function, construction-checklist, go here.</p>
 <p>The thing to understand about the miros library is that it works with a special
 type of callback function.  If you haven’t seen a callback function before, it
 is just a function that is given to another function, so that it can be called
