@@ -145,19 +145,19 @@ if __name__ == "__main__":
   toaster.live_trace = True
 
   # Start our toaster oven in the off state
-  toaster.start_at(off)
+  toaster.start_at(door_closed)
 
   # Let's Bake
   toaster.post_fifo(Event(signal=signals.Bake))
 
-  # Let's Toast
-  toaster.post_fifo(Event(signal=signals.Toast))
+  ## Let's Toast
+  #toaster.post_fifo(Event(signal=signals.Toast))
 
-  # Let's Open the door to our toaster oven
-  toaster.post_fifo(Event(signal=signals.Open))
+  ## Let's Open the door to our toaster oven
+  #toaster.post_fifo(Event(signal=signals.Open))
 
-  # Let's Close the door
-  toaster.post_fifo(Event(signal=signals.Close))
+  ## Let's Close the door
+  #toaster.post_fifo(Event(signal=signals.Close))
 
   # The toaster is running in a different thread than our main program
   # So wait a bit so that it can catch up before we close out this program

@@ -1041,22 +1041,111 @@ events you have sent to it.</p>
 </div>
 <div class="section" id="instrumentation">
 <span id="quickstart-instrumentation"></span><h3>Instrumentation<a class="headerlink" href="#instrumentation" title="Permalink to this headline">¶</a></h3>
-<p>The miros library provides two different logging techniques so you can see how
-your statecharts have reacted to events.  One provides great detail, the
-<code class="docutils literal notranslate"><span class="pre">spy</span></code>, and the other, the <code class="docutils literal notranslate"><span class="pre">trace</span></code>, provides a high level view.</p>
-<p>But for these logging techniques to work you need to wrap your state callback
-functions, within other functions that can instrument them.  Python’s decorator
-language feature, makes it easy to wrap a function inside of a function, and the
-miros package uses this to make a <code class="docutils literal notranslate"><span class="pre">&#64;spy_on</span></code> decorator.  If you place this
-decorator on your state callback functions you will have the capability to use
-either, or both, the <code class="docutils literal notranslate"><span class="pre">spy</span></code> or the  <code class="docutils literal notranslate"><span class="pre">trace</span></code> logging systems.</p>
+<p>We now understand how to make a statechart diagram and how to program it using
+<code class="docutils literal notranslate"><span class="pre">miros</span></code>.  But, there is a big step between writing code and writing <em>working
+code</em> – we need someway to debug applications written with this library.</p>
+<p>The debugging of our design will be tricky, since the event processor is calling
+our functions to build up a graph and make an event follow the rules of the
+game.  If we put a breakpoint in one of our state callback functions, then step
+past it’s return point, well, “<a class="reference external" href="https://en.wikipedia.org/wiki/Here_be_dragons">here be dragons</a>”.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Once you are convinced your code is working as intended, you can remove the
-decorators from your state callbacks to improve the performance of your
-application.  (I never do this)</p>
+<p class="last">Microsoft has recently released a version of Visual Studio, who’s debugger
+will only step into code that you have changed.  This feature would be
+extremely valuable for debugging statecharts with miros.</p>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">trace</span></code> log can be used to</p>
+<p>Instead of trying to debug our state functions by stepping into the event
+processor, we could litter our state functions with print statements. Or, we
+could do a lot better than this: we could turn on the <code class="docutils literal notranslate"><span class="pre">miros</span></code> instrumentation.</p>
+<p>The instrumentation can be thought of as another transparent piece of plastic you
+put over any state you want to monitor on your game board.  This plastic
+sheet has a bunch of sensors and wires embedded within it.  As your game is being
+played, the sensors detect and record, any action on their part of the game
+board.  To access this information, you can either use the <code class="docutils literal notranslate"><span class="pre">spy</span></code> or the
+<code class="docutils literal notranslate"><span class="pre">trace</span></code> interface provided by the ActiveObject class.</p>
+<p>To turn on the instrumentation, you place the <code class="docutils literal notranslate"><span class="pre">&#64;spy_on</span></code> decorator above your
+state callback functions.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">door_open</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="c1"># state function code</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There obviously isn’t really any clear plastic film with
+wires and sensors in it, but there is a function that is wrapping your state
+function so that it can report everything it has seen back to the <code class="docutils literal notranslate"><span class="pre">miros</span></code>
+debugging deque.</p>
+</div>
+<p>As previously stated, the miros library provides two different logging
+techniques so you can see how your statecharts have reacted to events.  One
+provides great detail, the <code class="docutils literal notranslate"><span class="pre">spy</span></code>, and the other, the <code class="docutils literal notranslate"><span class="pre">trace</span></code>, provides a
+high level view.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">spy</span></code> outputs every step made by your event processor.  It can be
+referenced after your program has finished running, or you can set it output
+information as it sees it:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># turn on the &#39;live&#39; spy feature before we start our statechart</span>
+<span class="n">toaster</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">toaster</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">door_closed</span><span class="p">)</span>
+<span class="n">toaster</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Bake</span><span class="p">))</span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="_static/bitcoin_toaster_oven_active_object_spy.pdf"><div align="center" class="align-center"><img alt="_images/bitcoin_toaster_oven_active_object_spy.svg" src="_images/bitcoin_toaster_oven_active_object_spy.svg" /></div>
+</a>
+<p>The above code listing will output a mixture of our oven’s print statements and
+<code class="docutils literal notranslate"><span class="pre">spy</span></code> information (highlighted):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">turning</span> <span class="n">red</span> <span class="n">light</span> <span class="n">off</span>
+<span class="n">turning</span> <span class="n">white</span> <span class="n">light</span> <span class="n">off</span>
+<span class="n">turning</span> <span class="n">bitcoin</span> <span class="n">miner</span> <span class="n">off</span>
+<span class="n">turning</span> <span class="n">heating</span> <span class="n">element</span> <span class="n">off</span>
+<span class="n">turning</span> <span class="n">white</span> <span class="n">light</span> <span class="n">off</span>
+<span class="hll"><span class="n">START</span>
+</span><span class="hll"><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">door_closed</span>
+</span><span class="hll"><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">door_closed</span>
+</span><span class="hll"><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">door_closed</span>
+</span><span class="hll"><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">off</span>
+</span><span class="hll"><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">off</span>
+</span><span class="hll"><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">off</span>
+</span><span class="hll"><span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+</span><span class="n">turning</span> <span class="n">red</span> <span class="n">light</span> <span class="n">on</span>
+<span class="n">turning</span> <span class="n">bitcoin</span> <span class="n">miner</span> <span class="n">on</span>
+<span class="n">turning</span> <span class="n">heating</span> <span class="n">element</span> <span class="n">on</span>
+<span class="hll"><span class="n">Bake</span><span class="p">:</span><span class="n">off</span>
+</span><span class="hll"><span class="n">Bake</span><span class="p">:</span><span class="n">door_closed</span>
+</span><span class="hll"><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">off</span>
+</span><span class="hll"><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">baking</span>
+</span><span class="hll"><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">door_closed</span>
+</span><span class="hll"><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">heating</span>
+</span><span class="hll"><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">heating</span>
+</span><span class="hll"><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">baking</span>
+</span><span class="hll"><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">baking</span>
+</span><span class="hll"><span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>If you aren’t interested in every step made by your event processor, you can use
+the <code class="docutils literal notranslate"><span class="pre">trace</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># turn on the &#39;live&#39; spy feature before we start our statechart</span>
+<span class="n">toaster</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">toaster</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">door_closed</span><span class="p">)</span>
+<span class="n">toaster</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Bake</span><span class="p">))</span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="_static/bitcoin_toaster_oven_active_object_trace.pdf"><div align="center" class="align-center"><img alt="_images/bitcoin_toaster_oven_active_object_trace.svg" src="_images/bitcoin_toaster_oven_active_object_trace.svg" /></div>
+</a>
+<p>The above code listing will output our oven’s print statements and it’s <code class="docutils literal notranslate"><span class="pre">trace</span></code>
+information (highlighted):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">turning</span> <span class="n">red</span> <span class="n">light</span> <span class="n">off</span>
+<span class="n">turning</span> <span class="n">white</span> <span class="n">light</span> <span class="n">off</span>
+<span class="n">turning</span> <span class="n">bitcoin</span> <span class="n">miner</span> <span class="n">off</span>
+<span class="n">turning</span> <span class="n">heating</span> <span class="n">element</span> <span class="n">off</span>
+<span class="n">turning</span> <span class="n">white</span> <span class="n">light</span> <span class="n">off</span>
+<span class="hll"><span class="p">[</span><span class="mi">2018</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">22</span> <span class="mi">08</span><span class="p">:</span><span class="mi">58</span><span class="p">:</span><span class="mf">45.866501</span><span class="p">]</span> <span class="p">[</span><span class="n">toaster_142x5</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">off</span>
+</span><span class="n">turning</span> <span class="n">red</span> <span class="n">light</span> <span class="n">on</span>
+<span class="n">turning</span> <span class="n">bitcoin</span> <span class="n">miner</span> <span class="n">on</span>
+<span class="n">turning</span> <span class="n">heating</span> <span class="n">element</span> <span class="n">on</span>
+<span class="hll"><span class="p">[</span><span class="mi">2018</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">22</span> <span class="mi">08</span><span class="p">:</span><span class="mi">58</span><span class="p">:</span><span class="mf">45.867832</span><span class="p">]</span> <span class="p">[</span><span class="n">toaster_142x5</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Bake</span><span class="p">()</span> <span class="n">off</span><span class="o">-&gt;</span><span class="n">baking</span>
+</span></pre></div>
+</div>
 <div class="toctree-wrapper compound">
 </div>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">Next topic</span></a>.</p>

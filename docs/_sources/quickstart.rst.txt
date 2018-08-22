@@ -821,29 +821,133 @@ section I will show you how to see what it is doing.
 
 .. _quickstart-instrumentation:
 
-
 Instrumentation
 ^^^^^^^^^^^^^^^
-The miros library provides two different logging techniques so you can see how
-your statecharts have reacted to events.  One provides great detail, the
-``spy``, and the other, the ``trace``, provides a high level view.
+We now understand how to make a statechart diagram and how to program it using
+``miros``.  But, there is a big step between writing code and writing *working
+code* -- we need someway to debug applications written with this library.
 
-But for these logging techniques to work you need to wrap your state callback
-functions, within other functions that can instrument them.  Python's decorator
-language feature, makes it easy to wrap a function inside of a function, and the
-miros package uses this to make a ``@spy_on`` decorator.  If you place this
-decorator on your state callback functions you will have the capability to use
-either, or both, the ``spy`` or the  ``trace`` logging systems.
+The debugging of our design will be tricky, since the event processor is calling
+our functions to build up a graph and make an event follow the rules of the
+game.  If we put a breakpoint in one of our state callback functions, then step
+past it's return point, well, "`here be dragons <https://en.wikipedia.org/wiki/Here_be_dragons>`_".
+
+.. note:: 
+  
+  Microsoft has recently released a version of Visual Studio, who's debugger
+  will only step into code that you have changed.  This feature would be
+  extremely valuable for debugging statecharts with miros.
+
+Instead of trying to debug our state functions by stepping into the event
+processor, we could litter our state functions with print statements. Or, we
+could do a lot better than this: we could turn on the ``miros`` instrumentation.
+
+The instrumentation can be thought of as another transparent piece of plastic you
+put over any state you want to monitor on your game board.  This plastic
+sheet has a bunch of sensors and wires embedded within it.  As your game is being
+played, the sensors detect and record, any action on their part of the game
+board.  To access this information, you can either use the ``spy`` or the
+``trace`` interface provided by the ActiveObject class.
+
+To turn on the instrumentation, you place the ``@spy_on`` decorator above your
+state callback functions.
+
+.. code-block:: python
+
+  @spy_on
+  def door_open(chart, e):
+    # state function code
 
 .. note::
 
-  Once you are convinced your code is working as intended, you can remove the
-  decorators from your state callbacks to improve the performance of your
-  application.  (I never do this)
+  There obviously isn't really any clear plastic film with
+  wires and sensors in it, but there is a function that is wrapping your state
+  function so that it can report everything it has seen back to the ``miros``
+  debugging deque.
 
-The ``trace`` log can be used to 
+As previously stated, the miros library provides two different logging
+techniques so you can see how your statecharts have reacted to events.  One
+provides great detail, the ``spy``, and the other, the ``trace``, provides a
+high level view.
 
+The ``spy`` outputs every step made by your event processor.  It can be
+referenced after your program has finished running, or you can set it output
+information as it sees it:
 
+.. code-block:: python
+
+  # turn on the 'live' spy feature before we start our statechart
+  toaster.live_spy = True
+  toaster.start_at(door_closed)
+  toaster.post_fifo(Event(signal=signals.Bake))
+
+.. image:: _static/bitcoin_toaster_oven_active_object_spy.svg
+    :target: _static/bitcoin_toaster_oven_active_object_spy.pdf
+    :align: center
+
+The above code listing will output a mixture of our oven's print statements and
+``spy`` information (highlighted):
+
+.. code-block:: python
+  :emphasize-lines: 6-13, 17-26
+
+  turning red light off
+  turning white light off
+  turning bitcoin miner off
+  turning heating element off
+  turning white light off
+  START
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  ENTRY_SIGNAL:door_closed
+  INIT_SIGNAL:door_closed
+  SEARCH_FOR_SUPER_SIGNAL:off
+  ENTRY_SIGNAL:off
+  INIT_SIGNAL:off
+  <- Queued:(0) Deferred:(0)
+  turning red light on
+  turning bitcoin miner on
+  turning heating element on
+  Bake:off
+  Bake:door_closed
+  EXIT_SIGNAL:off
+  SEARCH_FOR_SUPER_SIGNAL:baking
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  SEARCH_FOR_SUPER_SIGNAL:heating
+  ENTRY_SIGNAL:heating
+  ENTRY_SIGNAL:baking
+  INIT_SIGNAL:baking
+  <- Queued:(0) Deferred:(0)
+
+If you aren't interested in every step made by your event processor, you can use
+the ``trace``:
+
+.. code-block:: python
+
+  # turn on the 'live' spy feature before we start our statechart
+  toaster.live_trace = True
+  toaster.start_at(door_closed)
+  toaster.post_fifo(Event(signal=signals.Bake))
+
+.. image:: _static/bitcoin_toaster_oven_active_object_trace.svg
+    :target: _static/bitcoin_toaster_oven_active_object_trace.pdf
+    :align: center
+
+The above code listing will output our oven's print statements and it's ``trace``
+information (highlighted):
+
+.. code-block:: python
+  :emphasize-lines: 6,10
+
+  turning red light off
+  turning white light off
+  turning bitcoin miner off
+  turning heating element off
+  turning white light off
+  [2018-08-22 08:58:45.866501] [toaster_142x5] e->start_at() top->off
+  turning red light on
+  turning bitcoin miner on
+  turning heating element on
+  [2018-08-22 08:58:45.867832] [toaster_142x5] e->Bake() off->baking
 
 .. toctree::
    :maxdepth: 2
