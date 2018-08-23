@@ -275,8 +275,8 @@ turning bitcoin miner on
 <li><a class="reference internal" href="#quickstart-a-self-paying-toaster-oven"><span class="std std-ref">design</span></a> and <a class="reference internal" href="reading_diagrams.html#reading-diagrams-reading-diagrams"><span class="std std-ref">diagram</span></a>: learn by drawing a statechart</li>
 <li><a class="reference internal" href="#quickstart-dynamics"><span class="std std-ref">mechanics:</span></a> to understand the dynamics of a reactive program.</li>
 <li><a class="reference internal" href="#quickstart-code"><span class="std std-ref">code:</span></a> translate your design into something a computer can run.</li>
-<li><a class="reference internal" href="#quickstart-instrumentation"><span class="std std-ref">instrumentation:</span></a> how to debug and test your code</li>
-<li><span class="xref std std-ref">documenation:</span> how to quickly describe your design and solution to others.</li>
+<li><a class="reference internal" href="#quickstart-instrumentation"><span class="std std-ref">instrumentation:</span></a> how to debug your code</li>
+<li><a class="reference internal" href="#quickstart-testing"><span class="std std-ref">testing:</span></a> how to write tests</li>
 </ul>
 <div class="section" id="an-analogy">
 <span id="quickstart-an-analogy"></span><h3>An Analogy<a class="headerlink" href="#an-analogy" title="Permalink to this headline">¶</a></h3>
@@ -597,9 +597,8 @@ would happen if you were <code class="docutils literal notranslate"><span class=
 </ul>
 <p>If you understand this, you understand the basic dynamics of statecharts.</p>
 </div>
-</div>
 <div class="section" id="code">
-<span id="quickstart-code"></span><h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<span id="quickstart-code"></span><h3>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h3>
 <p>The thing to understand about the miros library is that it works with a special
 type of callback function.  If you haven’t seen a callback function before, it
 is just a function that is given to another function, so that it can be called
@@ -1039,6 +1038,7 @@ section I will show you how to see what it is doing.</p>
 the main thread wait long enough for your toaster’s thread to react to all of the
 events you have sent to it.</p>
 </div>
+</div>
 <div class="section" id="instrumentation">
 <span id="quickstart-instrumentation"></span><h3>Instrumentation<a class="headerlink" href="#instrumentation" title="Permalink to this headline">¶</a></h3>
 <p>We now understand how to make a statechart diagram and how to program it using
@@ -1146,6 +1146,44 @@ information (highlighted):</p>
 <span class="hll"><span class="p">[</span><span class="mi">2018</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">22</span> <span class="mi">08</span><span class="p">:</span><span class="mi">58</span><span class="p">:</span><span class="mf">45.867832</span><span class="p">]</span> <span class="p">[</span><span class="n">toaster_142x5</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Bake</span><span class="p">()</span> <span class="n">off</span><span class="o">-&gt;</span><span class="n">baking</span>
 </span></pre></div>
 </div>
+</div>
+<div class="section" id="testing">
+<span id="quickstart-testing"></span><h3>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
+<p>You can use the <code class="docutils literal notranslate"><span class="pre">trace</span></code> information of your statechart as a descriptive test.
+You would copy the output from the terminal into your code, then use the miros
+<code class="docutils literal notranslate"><span class="pre">stripped</span></code> context manager to remove it’s date and time information so that your
+test code could just compare some strings:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Start our toaster oven in the off state</span>
+<span class="n">toaster</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">door_closed</span><span class="p">)</span>
+<span class="n">toaster</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Bake</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">stripped</span>
+<span class="c1"># starting state door_closed, sent a Bake event:</span>
+<span class="n">toaster_off_to_baking_trace_spec</span> <span class="o">=</span> \
+<span class="sd">&#39;&#39;&#39;[2018-08-22 08:58:45.866501] [toaster_142x5] e-&gt;start_at() top-&gt;off</span>
+<span class="sd">   [2018-08-22 08:58:45.867832] [toaster_142x5] e-&gt;Bake() off-&gt;baking</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="k">with</span> <span class="n">stripped</span><span class="p">(</span><span class="n">toaster_off_to_baking_trace_spec</span><span class="p">)</span> <span class="k">as</span> <span class="n">stripped_spec</span><span class="p">,</span> \
+     <span class="n">stripped</span><span class="p">(</span><span class="n">toaster</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="k">as</span> <span class="n">stripped_trace_result</span><span class="p">:</span>
+  <span class="k">for</span> <span class="n">spec</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">stripped_spec</span><span class="p">,</span> <span class="n">stripped_trace_result</span><span class="p">):</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">result</span><span class="o">==</span><span class="n">spec</span><span class="p">)</span>
+
+<span class="c1"># starting state baking, send a Toast event</span>
+<span class="n">toaster</span><span class="o">.</span><span class="n">clear_trace</span><span class="p">()</span>
+<span class="n">toaster</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toast</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="n">toaster_baking_to_toast_spec</span> <span class="o">=</span> \
+<span class="sd">&#39;&#39;&#39;[2018-08-23 06:31:54.430984] [toaster_142x5] e-&gt;Toast() baking-&gt;toasting</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="k">with</span> <span class="n">stripped</span><span class="p">(</span><span class="n">toaster_baking_to_toast_spec</span><span class="p">)</span> <span class="k">as</span> <span class="n">stripped_spec</span><span class="p">,</span> \
+     <span class="n">stripped</span><span class="p">(</span><span class="n">toaster</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="k">as</span> <span class="n">stripped_trace_result</span><span class="p">:</span>
+  <span class="k">for</span> <span class="n">spec</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">stripped_spec</span><span class="p">,</span> <span class="n">stripped_trace_result</span><span class="p">):</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">spec</span> <span class="o">==</span> <span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">time.sleep(0.001)</span></code> code is included to provide your toaster statechart
+thread enough time to respond before it is tested (from the main thread).</p>
 <div class="toctree-wrapper compound">
 </div>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">Next topic</span></a>.</p>
@@ -1170,10 +1208,9 @@ information (highlighted):</p>
 <li><a class="reference internal" href="#an-analogy">An Analogy</a></li>
 <li><a class="reference internal" href="#design-a-self-paying-toaster-oven">Design: A Self Paying Toaster Oven</a></li>
 <li><a class="reference internal" href="#mechanics-the-game-s-dynamics">Mechanics: The Game’s Dynamics</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#code">Code</a><ul>
+<li><a class="reference internal" href="#code">Code</a></li>
 <li><a class="reference internal" href="#instrumentation">Instrumentation</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
 </ul>
 </li>
 </ul>

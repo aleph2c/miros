@@ -151,13 +151,13 @@ if __name__ == "__main__":
   toaster.post_fifo(Event(signal=signals.Bake))
 
   ## Let's Toast
-  #toaster.post_fifo(Event(signal=signals.Toast))
+  toaster.post_fifo(Event(signal=signals.Toast))
 
   ## Let's Open the door to our toaster oven
-  #toaster.post_fifo(Event(signal=signals.Open))
+  toaster.post_fifo(Event(signal=signals.Open))
 
   ## Let's Close the door
-  #toaster.post_fifo(Event(signal=signals.Close))
+  toaster.post_fifo(Event(signal=signals.Close))
 
   # The toaster is running in a different thread than our main program
   # So wait a bit so that it can catch up before we close out this program

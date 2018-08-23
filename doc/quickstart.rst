@@ -93,8 +93,8 @@ This introduction to statecharts using miros will be done in stages:
 * :ref:`design<quickstart-a-self-paying-toaster-oven>` and :ref:`diagram <reading_diagrams-reading-diagrams>`: learn by drawing a statechart
 * :ref:`mechanics: <quickstart-dynamics>` to understand the dynamics of a reactive program.
 * :ref:`code:<quickstart-code>` translate your design into something a computer can run.
-* :ref:`instrumentation: <quickstart-instrumentation>` how to debug and test your code
-* :ref:`documenation:` how to quickly describe your design and solution to others.
+* :ref:`instrumentation: <quickstart-instrumentation>` how to debug your code
+* :ref:`testing: <quickstart-testing>` how to write tests
 
 .. _quickstart-an-analogy:
 
@@ -488,7 +488,7 @@ If you understand this, you understand the basic dynamics of statecharts.
 .. _quickstart-code:
 
 Code
-----
+^^^^
 The thing to understand about the miros library is that it works with a special
 type of callback function.  If you haven't seen a callback function before, it
 is just a function that is given to another function, so that it can be called
@@ -948,6 +948,48 @@ information (highlighted):
   turning bitcoin miner on
   turning heating element on
   [2018-08-22 08:58:45.867832] [toaster_142x5] e->Bake() off->baking
+
+.. _quickstart-testing:
+
+Testing
+^^^^^^^
+You can use the ``trace`` information of your statechart as a descriptive test.
+You would copy the output from the terminal into your code, then use the miros
+``stripped`` context manager to remove it's date and time information so that your
+test code could just compare some strings:
+
+.. code-block:: python
+
+  # Start our toaster oven in the off state
+  toaster.start_at(door_closed)
+  toaster.post_fifo(Event(signal=signals.Bake))
+  time.sleep(0.001)
+
+  from miros import stripped
+  # starting state door_closed, sent a Bake event:
+  toaster_off_to_baking_trace_spec = \
+  '''[2018-08-22 08:58:45.866501] [toaster_142x5] e->start_at() top->off
+     [2018-08-22 08:58:45.867832] [toaster_142x5] e->Bake() off->baking
+  '''
+  with stripped(toaster_off_to_baking_trace_spec) as stripped_spec, \
+       stripped(toaster.trace()) as stripped_trace_result:
+    for spec, result in zip(stripped_spec, stripped_trace_result):
+      assert(result==spec)
+
+  # starting state baking, send a Toast event
+  toaster.clear_trace()
+  toaster.post_fifo(Event(signal=signals.Toast))
+  time.sleep(0.001)
+  toaster_baking_to_toast_spec = \
+  '''[2018-08-23 06:31:54.430984] [toaster_142x5] e->Toast() baking->toasting
+  '''
+  with stripped(toaster_baking_to_toast_spec) as stripped_spec, \
+       stripped(toaster.trace()) as stripped_trace_result:
+    for spec, result in zip(stripped_spec, stripped_trace_result):
+      assert(spec == result)
+
+The ``time.sleep(0.001)`` code is included to provide your toaster statechart
+thread enough time to respond before it is tested (from the main thread).
 
 .. toctree::
    :maxdepth: 2
