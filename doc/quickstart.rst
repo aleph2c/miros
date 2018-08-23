@@ -960,7 +960,6 @@ test code could just compare some strings:
 
 .. code-block:: python
 
-  # Start our toaster oven in the off state
   toaster.start_at(door_closed)
   toaster.post_fifo(Event(signal=signals.Bake))
   time.sleep(0.001)
