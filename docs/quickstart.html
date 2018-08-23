@@ -1153,8 +1153,7 @@ information (highlighted):</p>
 You would copy the output from the terminal into your code, then use the miros
 <code class="docutils literal notranslate"><span class="pre">stripped</span></code> context manager to remove it’s date and time information so that your
 test code could just compare some strings:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Start our toaster oven in the off state</span>
-<span class="n">toaster</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">door_closed</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">toaster</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">door_closed</span><span class="p">)</span>
 <span class="n">toaster</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Bake</span><span class="p">))</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
 
