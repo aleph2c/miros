@@ -994,21 +994,29 @@ Story
 ^^^^^
 Let's build a little universe.
 
-Our universe will consist of a heaven, an underworld and an earth.  The earth
-will be made up of a set of terraced pubs, it will look like a topographical
-map.  On every terrace there will be two bouncers a greeter and zero or more
-bartenders.  The bouncer on the outside of the terrace will be called, "enter",
-the bouncer on the inside of the terrace will be called "exit" and the terrace
-greeter will be called "init".
+Our universe will consist of a heaven, an earth and an underworld.   The earth
+will be made up of a set of pubs, arranged on different terraces.  To get to a
+higher pub, you would first have to walk through a lower pub.  The lower pubs
+are for a more general audience, while the higher pubs, though having less space
+have a more specialized aesthetic and a more exclusive guest list.
+
+On every terrace, there will be two bouncers a greeter and zero or more
+bartenders.   There will only be one set of stairs that can be used to enter a
+higher pub, and this is where the bouncers will be.
+
+One bouncer will be facing in the direction of people entering the terrace and
+the other will be facing in the direction of people wanting to leave it.  The
+greeter will talk to anyone who has decided to stay on her terrace.
 
 .. image:: _static/md_terraced_pubs.svg
     :target: _static/md_terraced_pubs.pdf
     :align: center
 
-The heaven will have one goddess Eve, "the goddess of physics" and the
-underworld will be ruled by Theo, "the joiner".  The earth will have a lazy god
-named Spike, "the source" who is the only guy who drinks in the whole universe.
-Spike will have a companion, who is a spirit, Tara "the explorer".
+The heaven will have one goddess Eve, "the goddess of law and order" and the
+underworld will be ruled by Theo, "the solipsist."  The earth will have a lazy god
+named Spike, "the source" who happens to be the only guy who can drink in the
+whole universe.  Spike will have a companion, who is a spirit, Tara "the
+explorer."
 
 .. image:: _static/md_terraced_gods.svg
     :target: _static/md_terraced_gods.pdf
@@ -1016,145 +1024,220 @@ Spike will have a companion, who is a spirit, Tara "the explorer".
 
 Let's put our little universe into a small multiverse. Each universe will have
 it's own heaven and underworld, gods, people and explorer spirit, but its
-terraced architecture can be shared across all universes.
+terraced architecture of pubs, can be shared across all connected worlds.
 
 .. image:: _static/md_multiverse.svg
     :target: _static/md_multiverse.pdf
     :align: center
 
-Eve, the goddess of heaven has a birds eye view of our little universe.  She
-ensures its physical laws are followed.  She is extremely nervous, but is also
-very conscientious.  She rules over the people: the bouncers, greeters and
-bartenders and Tara, "the explorer" spirit.
+Eve, the goddess of heaven has a birds-eye view of our little world.  She rules
+over the people: the bouncers, greeters and bartenders and, Tara, "the explorer"
+spirit.  She took on her duty as "the goddess of law and order" with such gusto,
+that sometime in the world's history, she banned alcohol consumption for
+everyone on earth, except Spike, who she can't control.
 
 .. image:: _static/md_eve.svg
     :target: _static/md_eve.pdf
     :align: center
 
-Theo, "the joiner" is the god of the underworld.  He is called "the joiner",
-because he joins the little universe with other universes.  He watches a portal,
-which is connected to a loading dock which can receive messages from other
-worlds, including ours.  He is extremely vigilant and enthusiastic.  He can
-motivate anyone he talks to, or looks upon.
+Theo, "the solipsist" is the god of the underworld.  He is only called the
+"solipsist" by people outside of his universe, like us, because his universe
+only works and exists if he is thinking about it.  Nobody in his world is aware
+that he has this power.
+
+One of Theo's duties is to join the little universe with other universes.  Theo
+watches a portal, which is connected to a loading dock which receives
+messages from different worlds, including ours.  He is extraordinarily attentive
+and enthusiastic.  He can motivate anyone he talks to or even looks upon, in
+fact, this is his supernatural ability.
 
 .. image:: _static/md_theo.svg
     :target: _static/md_theo.pdf
     :align: center
 
-When a message is received from another universe, it appears as a round hollow
-orb which sometimes contains a scroll with a message on it.  He will pick it up,
-marvel at it then in a reverent gesture pass it to Eve.  He will encourage her
-to fly back up into the sky and to "follow her physical laws".  Then he will
-watch as she gives her minions their marching orders.  Only after all of the
-activity is stopped will he put his attention back on the portal.
+When Theo receives a message from another universe, it appears as a round hollow
+orb which sometimes contains a scroll.  He calls these orbs "events", and if they
+have a scroll within them, he calls that scroll a "payload".
 
-Feeling freshly encouraged by Theo, Eve looks around the map until she see's
-Spike from her high vantage point.  Spike being a god, is easy to see and Eve
-knows that her underling Tara is always near him.
+.. image:: _static/md_events.svg
+    :target: _static/md_events.pdf
+    :align: center
 
-Eve flies done to Tara and gives her the orb.  She says, I want you to go to the
-terrace where the bartender knows where to take this orb, then I want you to go
-to that terrace, "Good luck Tara, I believe in you".
+When an "event" comes through the portal, Theo will pick it up, marvel at it
+then in a reverent gesture, pass it to Eve.  They both become excited, maybe
+even a little nervous, because they know there universe is going to change, it
+will react to the event.
+
+Theo encourages Eve to fly back up into the sky and to "follow the laws." Then
+he will watch as she gives her minions their marching orders.  Only after all of
+the activity stops, will he focus his attention back on the portal.
+
+Feeling oddly refreshed and encouraged by Theo, Eve looks around the map until
+she see's Spike from her high vantage point.  Spike being the god of the earth,
+is easy to see and Eve knows that her underling-spirit Tara, "the explorer",  is
+always near him.
+
+Eve flies done to Tara and gives her the event.  She says, "I want you to go to
+the terrace where there is a bartender who knows what to do with this event.
+Then I want you to go to wherever he tells you to take it.  Good luck Tara, I
+believe in you".
+
+.. image:: _static/md_bartenders_on_the_hsm.svg
+    :target: _static/md_bartenders_on_the_hsm.pdf
+    :align: center
 
 Tara enjoys Spike's company, but she also loves adventure.
 
-She looks down at the orb to study it and notices that it has something written
+She looks down at the event to study it and notices that it has something written
 on it, a word, a phrase, it could be different every time, but it's a clue and
 Tara loves a puzzle.  She looks around the pub on her terrace and studies each
 of the bartender's name tags.  If she sees that a name tag matches the name on
 the orb, she will approach that bartender and talk to him.
 
+.. image:: _static/md_events_bartenders.svg
+    :target: _static/md_events_bartenders.pdf
+    :align: center
+
 If there is no bartender to talk to on her terrace, she will go to it's exit
-point and climb down to the terrace below.  Being a spirit, she is hard to see
+staircase and descend to the next terrace.  Being a spirit, she is hard to see
 and the bouncers and greeters leave her alone when she is by herself.
 
 She will continue to climb down the terraces until she comes to the edge of the
 universe.  If she can't find a bartender who can answer her question, she will
-take the orb and throw it off the edge into oblivion, then climb back up to
-rejoin Spike.
+take the event and throw it off the edge of the earth, into oblivion, then climb
+back up to rejoin Spike.  In such rare cases the universe doesn't react to the
+event.
 
-But if Tara does find a bartender who's name tag matches the name on the orb,
+.. image:: _static/md_bartenders_on_the_hsm_oblivion.svg
+    :target: _static/md_bartenders_on_the_hsm_oblivion.pdf
+    :align: center
+
+But if Tara does find a bartender who's name tag matches the name on the event,
 she will show it to him.  He will take it and study it, sometimes he might even
 take out it's scroll.  Then he will lean across the bar and whisper the answer
 into Tara's ear.
 
-Sometimes the bartender says, "give me the orb I'll deal with it, don't worry
-about it."  When this happens, Tara passes over the orb, then rejoins Spike, who
-rejoices because he doesn't have to do anything.  For some reason Spike calls
-this a hook.
+Sometimes the bartender says, "give me the event I'll handle it, don't worry
+about it anymore."  When this happens, Tara passes over the event, then rejoins
+Spike, who rejoices because he doesn't have to do anything.  For some reason
+Spike calls this a "hook".
+
+.. image:: _static/md_bartenders_on_the_hsm_hook.svg
+    :target: _static/md_bartenders_on_the_hsm_hook.pdf
+    :align: center
 
 Most of the time, however, the bartender will tell Tara where she has to take
-the orb.  If she has to continue her journey, she will wait for Spike so she can
+the event.  If she has to continue her journey, she will wait for Spike so she can
 tell him about it.
 
-Spike knows when Tara is waiting for him.  Though he is lazy, and drunk most of
-the time, he is also curious and smart.  Having nothing else to do, he makes his
-way to the terrace where Tara has gotten her next clue.  He knows that she will
-want to talk to him about it.  As he approaches the exit, the exit bouncer puts
-up a hand, then looks at a clip board to see if Spike is on the guest list,
-which he always is, and then let's Spike pass to the next lower terrace.  You
-really can't stop the god of the earth.  For every terrace that Spike needs to
-leave so that he can rejoin with Tara, this futile ritual is repeated.
+.. image:: _static/md_bartenders_on_the_hsm_reaction_1.svg
+    :target: _static/md_bartenders_on_the_hsm_reaction_1.pdf
+    :align: center
 
-When Spike finally finds Tara he asks her what she learned.  She tells him about
-where the bartender said to take the orb, to which he always says, "great I'll
-meet you there, but first I want to have a drink."  Tara takes the orb and makes
-her way to the location that the bartender told her about.  Upon arriving on the
-terrace where she was instructed to go, she looks down at the orb and watches it
-with satisfaction as it throbs with light, then slowly fades from existence.
-When this happens she knows that she found the right location.
+Spike knows when Tara is waiting for him.  Though he is lazy, and drunk most of
+the time, he always has something interesting to say, and this is what Tara
+loves about him.  Having nothing else to do, he makes his way to the terrace
+where Tara has gotten her next clue.  He knows that she will want to talk to him
+about it.  As he approaches the exit, the exit bouncer puts up a hand, then
+looks at a clip board to see if Spike is on the guest list, which he always is,
+and then let's Spike pass to the next lower terrace.  You really can't stop the
+god of the earth.  For every terrace that Spike needs to leave so that he can
+rejoin with Tara, this futile ritual is repeated.
+
+.. image:: _static/md_bartenders_on_the_hsm_reaction_2.svg
+    :target: _static/md_bartenders_on_the_hsm_reaction_2.pdf
+    :align: center
+
+When Spike finally finds Tara he asks her what she learned.  Bubbling with
+excitement, she tells him about where the bartender said to take the orb, to
+which he always says, "great I'll meet you there, but first I want to have a
+drink."  Tara takes the orb and makes her way to the location that the bartender
+told her about.
 
 Spike finishes his drink, then again starts to make his way toward Tara.  Before
-he can climb up to a new Terrace, he is stopped by the bouncer with "enter" on
-his name tag, who looks at his clip board to see if Spike is on the guest list,
-which he always is, then let's Spike proceed.  You really can't stop the god of
-the earth anyway.
+he can climb up to a new Terrace, he is stopped by the entry bouncer, who looks
+at his clip board to see if Spike is on the guest list, which he always is, then
+let's Spike proceed.  You really can't stop the god of the earth anyway.
+
+.. image:: _static/md_bartenders_on_the_hsm_reaction_3.svg
+    :target: _static/md_bartenders_on_the_hsm_reaction_3.pdf
+    :align: center
 
 When Spike finally arrives on the Terrace where Tara is, a greeter approaches
-them.  The greeter has "init" on her name tag.  She looks at Spike and feels
-slightly uncomfortable, because sometimes she needs to tell them that they can't
-stay on this terrace.  Instead of talking to Spike directly, gods are
-intimidating, she whisper's something into Tara's ear.  Both the greeter and
-Tara work for Eve after all.  Tara is always happy to hear that there is more to
-do, because she likes to explore the pubs on the different terraces.
+them.  She looks at Spike and feels slightly uncomfortable, because sometimes
+she needs to tell them that they can't stay on this terrace.  Instead of talking
+to Spike directly, gods are intimidating, she whisper's something into Tara's
+ear.  Both the greeter and Tara work for Eve after all.  Tara is always happy to
+hear that there is more to do, because she likes to explore the pubs on the
+different terraces.
 
 If the greeter tells Tara that she needs to climb higher, Tara will relay the
 message to Spike who will answer, "great, I'll meet you there, but first I want
 to have a drink".
 
 Tara climbs to the terrace where the greeter told her to go.  Spike finishes his
-drink and makes his way through the "enter" bouncers and finally arrives at the
-same terrace where Tara is waiting.  At which point their might be another
+drink and makes his way through the entry bouncers and finally arrives at the
+same terrace where Tara is waiting.  At which point there might be another
 greeter with another uncomfortable message.
 
-If no greeter approaches them, Tara and Spike sit down and enjoy each others
-company and raise a toast to Eve.  When Eve, the goddess of heaven, see's this,
-she will let Theo, "the joiner", god of the underworld, know that she followed
-the laws and all is well in their little universe.
+.. image:: _static/md_bartenders_on_the_hsm_reaction_4.svg
+    :target: _static/md_bartenders_on_the_hsm_reaction_4.pdf
+    :align: center
 
-To this Theo smiles, then looks back at the portal with fascination, wondering
-what might be beyond it, what will happen next.  He waits patiently for an orb
+If no greeter approaches them, Tara looks down at the event and watches with
+satisfaction, as it throbs with light, then slowly fades from existence.  To
+this, Spike smiles and looks towards heaven, as he raises a toast to Eve.  
+
+When Eve, the goddess of heaven, see's this her shoulder's relax and the tension
+releases from her back: The laws were followed.
+
+Theo, "the solipsist", god of the underworld, has been watching the whole scene,
+and its "run to completion".  Knowing there is nothing left to do in the
+universe, he turns his gaze back to the portal.  He waits patiently for an event
 to pass through the little universe's loading dock.  All is well.
 
-But is it?  When not working the people become listless, the bouncers who really
-don't do anything are particularly frustrated with the meaninglessness of the
-jobs given to them by Eve.  Even if Spike wasn't always permitted to pass them,
-there is no way they could stop the god of earth.
+But is it?  Sometimes when Theo, "the solipsist", god of the underworld, closes
+his eyes and daydreams; his attention briefly drifts back to his world.  This is
+enough to wake everyone up from their non-existence.
 
-They pound sand all day, and they are starting to get sick of it. They organize
-and search for something, anything that could provide them meaning.  Then
-somehow they find out about you and me, fellow humans called programmers.
+When the people wake up, they become listless. The bouncers who have had
+nothing to do since the prohibition was announced by Eve, are particularly
+frustrated with the meaninglessness of their jobs.  Even if Spike wasn't always
+permitted to pass them, there is no way they could stop the god of earth. Why
+have a universe full of pubs if only one guy can drink?  It seems so pointless.
+
+Then somehow they find out about you and me, fellow humans called developers.
 
 They learn that we, despite being human, are all powerful.  That we can build
 the pub terrace system to which their gods are subservient; that we can send the
-orbs and give the greeters and the bouncers their secret directions.  That we
+events and give the greeters and the bouncers their secret directions.  That we
 can even built lots of different interconnected universes.
 
 They challenge us to make something useful out of their existence, even if they
 can't understand it from where they are, they need something to *mean
-something*.
+something*.  They create an organized campaign, "hack the humans":  All of the
+humans in the universe open themselves up to have code run while they are
+activated by Theo's gaze.
 
-Let's answer this challenge by using their universe to make a toaster oven.
+They create a Rosetta stone, translating the concepts of their universe into
+something legible for you and me:
+
+  * Their universe is a statechart which can be turned on with the miros
+    Python package.
+  * Theo, "the solipsist", god of the underworld is the thread which the
+    statechart runs in.
+  * Theo's portal is a deque
+  * Eve, "the goddes of law and order" is the event dispatcher, which is the god
+    that enables the Harel formalism.  It is an implementation of the HSM
+    algorithm written by Miro Samek.
+  * Spike, "the source", god of the earth is the current state of the system.
+  * Tara, "the explorer" spirit is hidden from the developer's view, unless being used to make a
+    hook.
+  * All humans: entry and exit bouncers, greeters and bartenders are things
+    which you can write code on.
+  * The terraced bar system is a collection of callbacks
+
+Let's answer this challenge by using one of their universes to make a toaster oven.
 
 .. toctree::
    :maxdepth: 2
