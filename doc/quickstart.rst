@@ -1065,7 +1065,7 @@ have a scroll within them, he calls that scroll a "payload".
 
 When an "event" comes through the portal, Theo will pick it up, marvel at it
 then in a reverent gesture, pass it to Eve.  They both become excited, maybe
-even a little nervous, because they know there universe is going to change, it
+even a little nervous, because they know there universe is going to change; it
 will react to the event.
 
 Theo encourages Eve to fly back up into the sky and to "follow the laws." Then
@@ -1105,7 +1105,7 @@ and the bouncers and greeters leave her alone when she is by herself.
 She will continue to climb down the terraces until she comes to the edge of the
 universe.  If she can't find a bartender who can answer her question, she will
 take the event and throw it off the edge of the earth, into oblivion, then climb
-back up to rejoin Spike.  In such rare cases the universe doesn't react to the
+back up to rejoin Spike.  In such rare cases their universe doesn't react to the
 event.
 
 .. image:: _static/md_bartenders_on_the_hsm_oblivion.svg
@@ -1200,44 +1200,109 @@ But is it?  Sometimes when Theo, "the solipsist", god of the underworld, closes
 his eyes and daydreams; his attention briefly drifts back to his world.  This is
 enough to wake everyone up from their non-existence.
 
-When the people wake up, they become listless. The bouncers who have had
-nothing to do since the prohibition was announced by Eve, are particularly
-frustrated with the meaninglessness of their jobs.  Even if Spike wasn't always
-permitted to pass them, there is no way they could stop the god of earth. Why
-have a universe full of pubs if only one guy can drink?  It seems so pointless.
+When the people wake up, they become listless. The bouncers who have had nothing
+to do since the prohibition was announced by Eve, are particularly frustrated
+with the meaninglessness of their jobs.  They only have one customer now.  Even
+if Spike wasn't always permitted to pass them, there is no way they could stop
+the god of earth. Why have a universe full of pubs if only one guy can drink?
+It seems so pointless.
 
 Then somehow they find out about you and me, fellow humans called developers.
 
 They learn that we, despite being human, are all powerful.  That we can build
 the pub terrace system to which their gods are subservient; that we can send the
-events and give the greeters and the bouncers their secret directions.  That we
-can even built lots of different interconnected universes.
+events and give the greeters and the bouncers their secret directions (arrows on
+the diagram).  That we can even built lots of different interconnected universes
+and have them communicate with each other.
 
 They challenge us to make something useful out of their existence, even if they
 can't understand it from where they are, they need something to *mean
-something*.  They create an organized campaign, "hack the humans":  All of the
-humans in the universe open themselves up to have code run while they are
-activated by Theo's gaze.
+something*.  So, they create an organized campaign: "hack the humans".  This is
+how it works: All of the humans in the little universe, open themselves to run
+code from our universe, while they are talking to either Tara or Spike.
 
-They create a Rosetta stone, translating the concepts of their universe into
-something legible for you and me:
+.. image:: _static/md_hack_the_humans.svg
+    :target: _static/md_hack_the_humans.pdf
+    :align: center
 
-  * Their universe is a statechart which can be turned on with the miros
-    Python package.
-  * Theo, "the solipsist", god of the underworld is the thread which the
-    statechart runs in.
-  * Theo's portal is a deque
-  * Eve, "the goddes of law and order" is the event dispatcher, which is the god
-    that enables the Harel formalism.  It is an implementation of the HSM
-    algorithm written by Miro Samek.
-  * Spike, "the source", god of the earth is the current state of the system.
-  * Tara, "the explorer" spirit is hidden from the developer's view, unless being used to make a
-    hook.
-  * All humans: entry and exit bouncers, greeters and bartenders are things
-    which you can write code on.
-  * The terraced bar system is a collection of callbacks
+To help us, they create a Rosetta stone, translating the concepts of their
+universe into something legible for you and me:
 
-Let's answer this challenge by using one of their universes to make a toaster oven.
++-------------------------------------+-----------------------------------------+
+| **Story Concept**                   | **Programming Concept**                 |
++=====================================+=========================================+
+| The universe                        | a statechart, which is an ActiveObject  |
+|                                     | derived object.                         |
++-------------------------------------+-----------------------------------------+
+| The multiverse of terraced bars     | a set of callback functions making an   |
+|                                     | HSM (accessible from multiple           |
+|                                     | statecharts, via the ``start_at``       |
+|                                     | method), each callback takes two        |
+|                                     | arguments, a reference to a statechart  |
+|                                     | and an event to send to it              |
++-------------------------------------+-----------------------------------------+
+| Eve, "the goddess of law and order",| the event processor                     |
+| goddess of heaven                   |                                         |
++-------------------------------------+-----------------------------------------+
+| Spike, "the source",                | current state, **S** of a statechart    |
+| god of the earth                    |                                         |
++-------------------------------------+-----------------------------------------+
+| Theo, "the solipsist"               | the thread that drives the              |
+| god of the underworld               | statechart                              |
++-------------------------------------+-----------------------------------------+
+| Tara, "the explorer", spirit        | a search aspect, **T**, of the          |
+|                                     | event processor                         |
++-------------------------------------+-----------------------------------------+
+| bartender                           | arrow or hook on the HSM diagram,       |
+|                                     | represented as a conditional statement  |
+|                                     | for a user defined event,               |
+|                                     | any code associated with this           |
+|                                     | conditional statement it run when       |
+|                                     | touched by **T**                        |
++-------------------------------------+-----------------------------------------+
+| greeter                             | ``INIT_SIGNAL`` event given to callback |
+|                                     | by the event processor when **S**       |
+|                                     | stabilizes in the state it represents   |
++-------------------------------------+-----------------------------------------+
+| exit bouncer                        | ``EXIT_SIGNAL`` event given to callback |
+|                                     | by the event processor when **S** exits |
+|                                     | the state it represents                 |
++-------------------------------------+-----------------------------------------+
+| exit bouncer                        | ``ENTRY_SIGNAL`` event given to callback|
+|                                     | by the event processor when **S** enters|
+|                                     | the state it represents                 |
++-------------------------------------+-----------------------------------------+
+| **run to completion, RTC**:         | The thread will only handle one event   |
+| Theo keeps his attention on the     | a time. This is called RTC.  An RTC     |
+| universe's activities until the     | process is over when the event processor|
+| action stops                        | can no longer cause state transitions   |
+|                                     | and the statechart settles on a new     |
+|                                     | state.                                  |
++-------------------------------------+-----------------------------------------+
+| Top level view of terraced bar      | Make these drawings with a 90's drawing |
+| universe                            | technology called UML                   | 
++-------------------------------------+-----------------------------------------+
+
+Here is a warning that they provide us about UML:
+
+.. image:: _static/md_translation_with_notes.svg
+    :target: _static/md_translation_with_notes.pdf
+    :align: center
+
+The above diagram shows us how a lot of information is missing from a "UML
+statechart".  The diagram describes some class information, and a behavioral
+specification for the states provided as a bird's eye view of the terraced bar
+system, but there is no information about the thread, **S**, **T**, the deques,
+the events or any of the dynamics for the statechart.
+
+So the human's provide us with the option of laying down a spy-carpet over any
+bar in their universe. If you lay this carpet down, it will record and report
+all activity that transpired between **T**, **S** and any human within that pub.
+To use this carpet you apply the **spy_on** decorator on the callback function
+representing a pub, or state in the HSM.
+
+Let's answer their challenge for meaning, by using one of their universes to make
+a toaster oven:
 
 .. toctree::
    :maxdepth: 2
