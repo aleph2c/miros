@@ -1434,7 +1434,6 @@ Using the Spy
 
 .. include:: i_spy_reactive.rst
 
-.. _recipes-tracing-live:
 
 .. _recipes-add-timing-information-to-the-spy:
 
@@ -1452,6 +1451,7 @@ with time so that you can compare it with the trace output:
   chart.scribble("{} at {}". \
       format(e.signal_name, datetime.now().strftime("%M:%S:%f")))
 
+.. _recipes-tracing-live:
 
 Tracing Live
 ^^^^^^^^^^^^
