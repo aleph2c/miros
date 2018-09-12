@@ -39,16 +39,20 @@ and thou wilt have finished.</em></p>
 </div></blockquote>
 <div class="section" id="zero-to-one">
 <h1>Zero To One<a class="headerlink" href="#zero-to-one" title="Permalink to this headline">¶</a></h1>
-<p>I’m going to try and show how a miros statecharts work, without using
+<p>This is not a 5 minute blog read.  If you want to learn how statecharts
+work, this is your one stop shop, it will take you from 0 to 1, but it will
+require you to focus and actually work through the examples.</p>
+<p>I’ll first try and show how a miros statecharts work, without using
 technical-language.  To do this, I’ll tell you a story about some characters
-interacting in a little universe.</p>
+interacting in a little universe.  Then I’ll show you how to make a reactive
+toaster oven.</p>
 <p>The story will have some pictures, which I have created using a UML drawing
 tool.  The images are intended to get someone who hasn’t seen UML before,
 comfortable looking at statecharts drawn this way.  These pictures will act as a
-bridge between the story and how to program a statechart.  If an image is too
-small in your browser, click on it to open it as a full-sized pdf.</p>
+bridge between the story and how to program a statechart.  (If an image is too
+small in your browser, click on it to open it as a full-sized pdf.)</p>
 <p>If you find the story is confusing, don’t worry, a concrete and straightforward
-statechart <a class="reference external" href="zero_to_one-a-simple-example">example</a> will follow it.  With each
+statechart <a class="reference internal" href="#zero-to-one-a-simple-example"><span class="std std-ref">example</span></a> will follow it.  With each
 reading, the statechart mechanics should become more clear for you.</p>
 <div class="admonition-scott-volk-2018-09-09 admonition">
 <p class="first admonition-title">Scott Volk: 2018-09-09</p>
@@ -57,8 +61,10 @@ about how the story relates to the technical aspects of statecharts.</p>
 <p>I challenge you <em>not to read</em> these boxes in your first look at the story,
 especially if you are new to this type of technical language.  Read the hints
 after you have programmed your first working statechart.</p>
-<p class="last">On your first pass, see if you can <em>guess</em> how the story’s features, and
-characters, relate to some of the programming concepts you know already.</p>
+<p>On your first pass just read the story and look over the pictures.</p>
+<p class="last">After you have completed the example, read the story again if your
+understanding of the dynamics aren’t clear.  At this point look at the hint
+boxes.</p>
 </div>
 <div class="section" id="story">
 <h2>Story<a class="headerlink" href="#story" title="Permalink to this headline">¶</a></h2>
@@ -122,9 +128,9 @@ terraced architecture of pubs, can be shared across all connected worlds.</p>
 internal variable state of the active object in its first argument – the
 state callback functions do not have their own memory.</p>
 <p class="last">Since the callback functions don’t keep any information, they can be called by
-many different activeobjects, in its thread, and behave as expected; there are
-no side effects.  In this way, many different active objects can use the same
-set of state callback functions.</p>
+many different activeobjects, in that activeobject’s thread, and behave as
+expected; there are no side effects.  In this way, many different active
+objects can use the same set of state callback functions.</p>
 </div>
 <p>Eve, the goddess of heaven has a birds-eye view of our little world.  She rules
 over the people: the bouncers, greeters and bartenders and, Tara, “the explorer”
@@ -450,17 +456,13 @@ to make a toaster oven:</p>
 </div>
 <div class="section" id="a-simple-example-toaster-oven">
 <span id="zero-to-one-a-simple-example"></span><h2>A Simple Example: Toaster Oven<a class="headerlink" href="#a-simple-example-toaster-oven" title="Permalink to this headline">¶</a></h2>
-<p>Software development is the process of continual improvement.  We get an idea
-about what we want to build, then we design it, then build it.  Then we get an
-idea about how to improve our previous work, then we design it, then build it.</p>
-<p>Each loop of activity can be called an iteration, or a sprint (if your team is
-following an Agile methodology).  So to make this toaster oven statechart
-example realistic, I will break it’s design process up into 6 iterations.</p>
-<p>Each iteration will have a specification, a picture and the code needed to
-manifest the design.  Examine the code and see if it makes sense, then read
-through the questions and answers about the code that will follow the example.</p>
-<p>If you have a question that I haven’t answered, just email it to me and I’ll get
-back to you.</p>
+<p>To make this toaster oven statechart example seem like a real software project,
+I will break it’s design process up into 6 steps, or iterations.</p>
+<p>Each iteration will have a specification, a design diagram and the code needed
+to match the design diagram.  Then I will prove that the code works and I’ll
+provide links to a bunch of questions and answers about the code.</p>
+<p>You can use these links to choose the questions you want to see the answers too,
+or just skip onto the next iteration.</p>
 <p>Each iteration will be heavily linked so that you can quickly bounce around in
 its documentation.</p>
 <hr class="docutils" />
@@ -515,7 +517,8 @@ pip install miros
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="iter1-code">Here is the code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># file called toaster_oven_0.py</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
@@ -762,7 +765,7 @@ Factory class.</p>
 <a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="how-am-i-going-t"><strong>How am I going to remember to structure my callback functions with all of these rules?</strong></p>
 <p>Once you do it a few times you will remember it.  To begin with just reference
-the <span class="xref std std-ref">boiler plate example</span>, and change it
+the <a class="reference internal" href="recipes.html#recipes-boiler-plate-state-method-code"><span class="std std-ref">boiler plate example</span></a>, and change it
 to match your design.</p>
 <p>Also, it is relatively easy to add this boiler plate code to whatever snippet
 technology you are using with your editor. I use Ultisnips in Vim.</p>
@@ -793,8 +796,8 @@ the active object.</p>
 <a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="can-you-explain-what-the-spy-on-decorator-is-doing"><strong>Can you explain what the spy_on decorator is doing?</strong></p>
 <p>The spy_on decorator wraps a state’s callback function with some code that lets
-you log the output of the event processor as it follows its rules, making <em>T</em>
-and <em>S</em> move around the HSM.</p>
+you log the output of the event processor as it follows its rules, making <strong>T</strong>
+and <strong>S</strong> move around the HSM.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
 </span>
 <span class="hll"><span class="nd">@spy_on</span>
@@ -852,7 +855,7 @@ the <code class="docutils literal notranslate"><span class="pre">some_state_to_p
 <p id="can-you-explain-where-the-init-and-exit-clauses-a"><strong>Can you explain where the init and exit clauses are?</strong></p>
 <p>We don’t need the init and exit clauses in the design, so we don’t include them
 in the if-elif structure of the state’s callback function.  The event processor
-will still call the function with the event named INIT_SIGNAL, after it has
+will still call the function with the event named <code class="docutils literal notranslate"><span class="pre">INIT_SIGNAL</span></code>, after it has
 entered the <code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code> state, but it will be ignored.</p>
 <p>By only including the events that we need we keep our callback function small
 and easy to read.</p>
@@ -880,20 +883,19 @@ the <code class="docutils literal notranslate"><span class="pre">temp.fun</span>
 super state, or the state that is outside their current state in the diagram.</p>
 <p>In this case, the <code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code> state doesn’t have an outer
 state, so we set the <code class="docutils literal notranslate"><span class="pre">oven.temp.fun</span></code> attribute to <code class="docutils literal notranslate"><span class="pre">oven.top</span></code>, to let the event
-processor know that there is no state outside of it.</p>
+processor know it has reached the outermost state of the HSM.</p>
 <a class="reference external image-reference" href="_static/ToastOven_0_4.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_0_4.svg" src="_images/ToasterOven_0_4.svg" /></div>
 </a>
 <p>The returned value of the state callback function is set to
-<code class="docutils literal notranslate"><span class="pre">return_status.SUPER</span></code> so that they event processor can know that this function
-didn’t handle the event it was sent.</p>
-<p>There are many different reasons the event processor might trigger the else
-clause in your callback function.  The event processor might call the state
-callback with events that it knows will not be in the if-elif structure.  It
-might do this when it is trying to discover the hierarchy of your HSM.</p>
-<p>Your event processor might also use the else clause to make <strong>T</strong> bubble out of
-the current state, when that state doesn’t know what to do with a user defined
-event.  This is the power of an HSM.</p>
-<p>This will become clearer in the next couple of iterations.</p>
+<code class="docutils literal notranslate"><span class="pre">return_status.SUPER</span></code> so that your function can notify the event processor
+that it set the <code class="docutils literal notranslate"><span class="pre">oven.temp.fun</span></code> to its superstate’s function.</p>
+<p>There are many different reasons the event processor might want to trigger the
+else clause in your callback function.  It could call the state callback with a
+reserved event, which it knows will not be in the if-elif structure – it does
+this when it is trying to discover the hierarchy of your HSM.  It could also use
+the else clause to make <strong>T</strong> bubble out of the current state, when that state
+doesn’t know what to do with a user defined event.  This is the power of an HSM.</p>
+<p>More will be said about this in the up coming iterations.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>How the else clause is called doesn’t really matter to you as an application
@@ -914,6 +916,8 @@ clause is reached.</li>
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p><strong>How does the live_trace call work?</strong></p>
+<p>The <a class="reference internal" href="recipes.html#recipes-tracing-live"><span class="std std-ref">live_trace</span></a> attribute needs to be set before the
+statechart’s thread is started:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
@@ -921,6 +925,38 @@ clause is reached.</li>
 
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 </pre></div>
+</div>
+<p>It output’s the trace log as your statechart is reacting to events.  It can only
+work if the spy_on decorator is placed above the state functions in your HSM.</p>
+<p>There are two different types of instrumentation output provided by miros.  The
+<a class="reference internal" href="recipes.html#recipes-using-the-trace"><span class="std std-ref">trace</span></a> and the <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a>.  The trace provides information only if a state
+transition has occurred.  It reports is <strong>S</strong> has moved.  For each line in a
+trace log,  describes:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The time stamp of when the event was reacted to</li>
+<li>The name of the statechart</li>
+<li>The event that caused the transition</li>
+<li>The starting state of <strong>S</strong></li>
+<li>The ending state of <strong>S</strong></li>
+</ul>
+</div></blockquote>
+<p>Our minimal example doesn’t do much, it starts from outside of the HSM and then
+transitions into the <code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">2018</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">11</span> <span class="mi">09</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span> <span class="p">[</span><span class="n">oven</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">some_state_to_prove_this_works</span>
+</pre></div>
+</div>
+<p>In this example we see: when I ran the test.  That the statechart is called oven,
+that the starting state of <strong>S</strong> in this oven instance was <code class="docutils literal notranslate"><span class="pre">top</span></code> and the
+ending state of <strong>S</strong> was <code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code>.</p>
+<p>There is no <code class="docutils literal notranslate"><span class="pre">start_at</span></code> event in miros.  But to keep the trace output useful
+for the person looking at it, I pretend that at a <code class="docutils literal notranslate"><span class="pre">start_at</span></code> event causes the
+initial transition into the HSM.  On the diagram, this will be where the event
+processor attachment point touches the HSM.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">I might remove some information from the timestamp in this documenation to make
+the text fit on the screen.</p>
 </div>
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
@@ -929,6 +965,9 @@ clause is reached.</li>
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="what-happens-when-the-start-at-method-is-call"><strong>What happens when the start_at method is called?</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">start_at</span></code> method links the oven object to the HSM, then it starts the
+statechart.  It does this by creating a new thread, then running the oven’s
+event processor in that thread.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
@@ -937,6 +976,13 @@ clause is reached.</li>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>Before a statechart is started, <strong>T</strong> and <strong>S</strong> exist outside of the outermost
+state.  The <code class="docutils literal notranslate"><span class="pre">start_at</span></code> call, places <strong>T</strong> into the
+<code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code>.  <strong>S</strong> marches towards <strong>T</strong> triggering as
+many needed entry events as required, then the init event in the state that
+<strong>T</strong> is in.</p>
+<p>In our example there isn’t much to talk about.  The entry clause of the
+<code class="docutils literal notranslate"><span class="pre">some_state_function</span></code> is called, printing “hello world”.</p>
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -944,6 +990,7 @@ clause is reached.</li>
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="why-are-you-placing-a-delay-at-the-end-of-the-code-samp"><strong>Why are you placing a delay at the end of the code sample?</strong></p>
+<p>The statechart is running in a different thread.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>

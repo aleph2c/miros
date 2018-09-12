@@ -7,18 +7,23 @@
 
 Zero To One
 ===========
-I'm going to try and show how a miros statecharts work, without using
+This is not a 5 minute blog read.  If you want to learn how statecharts
+work, this is your one stop shop, it will take you from 0 to 1, but it will
+require you to focus and actually work through the examples.
+
+I'll first try and show how a miros statecharts work, without using
 technical-language.  To do this, I'll tell you a story about some characters
-interacting in a little universe.
+interacting in a little universe.  Then I'll show you how to make a reactive
+toaster oven.
   
 The story will have some pictures, which I have created using a UML drawing
 tool.  The images are intended to get someone who hasn't seen UML before,
 comfortable looking at statecharts drawn this way.  These pictures will act as a
-bridge between the story and how to program a statechart.  If an image is too
-small in your browser, click on it to open it as a full-sized pdf.
+bridge between the story and how to program a statechart.  (If an image is too
+small in your browser, click on it to open it as a full-sized pdf.)
 
 If you find the story is confusing, don't worry, a concrete and straightforward
-statechart `example <zero_to_one-a-simple-example>`_ will follow it.  With each
+statechart :ref:`example <zero-to-one-a-simple-example>` will follow it.  With each
 reading, the statechart mechanics should become more clear for you.
 
 .. admonition:: Scott Volk: 2018-09-09
@@ -30,8 +35,11 @@ reading, the statechart mechanics should become more clear for you.
   especially if you are new to this type of technical language.  Read the hints
   after you have programmed your first working statechart.
 
-  On your first pass, see if you can *guess* how the story's features, and
-  characters, relate to some of the programming concepts you know already.
+  On your first pass just read the story and look over the pictures.
+
+  After you have completed the example, read the story again if your
+  understanding of the dynamics aren't clear.  At this point look at the hint
+  boxes.
 
 Story
 ^^^^^
@@ -116,9 +124,9 @@ terraced architecture of pubs, can be shared across all connected worlds.
   state callback functions do not have their own memory.
 
   Since the callback functions don't keep any information, they can be called by
-  many different activeobjects, in its thread, and behave as expected; there are
-  no side effects.  In this way, many different active objects can use the same
-  set of state callback functions.
+  many different activeobjects, in that activeobject's thread, and behave as
+  expected; there are no side effects.  In this way, many different active
+  objects can use the same set of state callback functions.
 
 Eve, the goddess of heaven has a birds-eye view of our little world.  She rules
 over the people: the bouncers, greeters and bartenders and, Tara, "the explorer"
@@ -483,24 +491,19 @@ instrumentation.
 Let's answer their challenge for deep meaning, by using one of their universes
 to make a toaster oven:
 
-.. _zero_to_one-a-simple-example:
+.. _zero-to-one-a-simple-example:
 
 A Simple Example: Toaster Oven
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Software development is the process of continual improvement.  We get an idea
-about what we want to build, then we design it, then build it.  Then we get an
-idea about how to improve our previous work, then we design it, then build it.
+To make this toaster oven statechart example seem like a real software project,
+I will break it's design process up into 6 steps, or iterations.
 
-Each loop of activity can be called an iteration, or a sprint (if your team is
-following an Agile methodology).  So to make this toaster oven statechart
-example realistic, I will break it's design process up into 6 iterations.
+Each iteration will have a specification, a design diagram and the code needed
+to match the design diagram.  Then I will prove that the code works and I'll
+provide links to a bunch of questions and answers about the code.
 
-Each iteration will have a specification, a picture and the code needed to
-manifest the design.  Examine the code and see if it makes sense, then read
-through the questions and answers about the code that will follow the example.
-
-If you have a question that I haven't answered, just email it to me and I'll get
-back to you.
+You can use these links to choose the questions you want to see the answers too,
+or just skip onto the next iteration.
 
 Each iteration will be heavily linked so that you can quickly bounce around in
 its documentation.
@@ -562,6 +565,7 @@ Here is the code:
 
 .. code-block:: python
 
+  # file called toaster_oven_0.py
   from miros import ActiveObject
   from miros import return_status
   from miros import Event
@@ -808,7 +812,7 @@ Factory class.
 **How am I going to remember to structure my callback functions with all of these rules?**
 
 Once you do it a few times you will remember it.  To begin with just reference
-the :ref:`boiler plate example <boiler_plate_state_method_code>`, and change it
+the :ref:`boiler plate example <recipes-boiler-plate-state-method-code>`, and change it
 to match your design.
 
 Also, it is relatively easy to add this boiler plate code to whatever snippet
@@ -849,8 +853,8 @@ The queues are missing from the UML as well:
 **Can you explain what the spy_on decorator is doing?**
 
 The spy_on decorator wraps a state's callback function with some code that lets
-you log the output of the event processor as it follows its rules, making *T*
-and *S* move around the HSM.
+you log the output of the event processor as it follows its rules, making **T**
+and **S** move around the HSM.
 
 .. code-block:: python
   :emphasize-lines: 1,3
@@ -915,7 +919,7 @@ the ``some_state_to_prove_this_works`` state.
 
 We don't need the init and exit clauses in the design, so we don't include them
 in the if-elif structure of the state's callback function.  The event processor
-will still call the function with the event named INIT_SIGNAL, after it has
+will still call the function with the event named ``INIT_SIGNAL``, after it has
 entered the ``some_state_to_prove_this_works`` state, but it will be ignored.
 
 By only including the events that we need we keep our callback function small
@@ -948,26 +952,24 @@ super state, or the state that is outside their current state in the diagram.
 
 In this case, the ``some_state_to_prove_this_works`` state doesn't have an outer
 state, so we set the ``oven.temp.fun`` attribute to ``oven.top``, to let the event
-processor know that there is no state outside of it.
+processor know it has reached the outermost state of the HSM.
 
 .. image:: _static/ToasterOven_0_4.svg
     :target: _static/ToastOven_0_4.pdf
     :align: center
 
 The returned value of the state callback function is set to
-``return_status.SUPER`` so that they event processor can know that this function
-didn't handle the event it was sent.
+``return_status.SUPER`` so that your function can notify the event processor
+that it set the ``oven.temp.fun`` to its superstate's function.
 
-There are many different reasons the event processor might trigger the else
-clause in your callback function.  The event processor might call the state
-callback with events that it knows will not be in the if-elif structure.  It
-might do this when it is trying to discover the hierarchy of your HSM.
+There are many different reasons the event processor might want to trigger the
+else clause in your callback function.  It could call the state callback with a
+reserved event, which it knows will not be in the if-elif structure -- it does
+this when it is trying to discover the hierarchy of your HSM.  It could also use
+the else clause to make **T** bubble out of the current state, when that state
+doesn't know what to do with a user defined event.  This is the power of an HSM.
 
-Your event processor might also use the else clause to make **T** bubble out of
-the current state, when that state doesn't know what to do with a user defined
-event.  This is the power of an HSM.
-
-This will become clearer in the next couple of iterations.
+More will be said about this in the up coming iterations.
 
 .. note::
 
@@ -987,6 +989,9 @@ This will become clearer in the next couple of iterations.
 
 **How does the live_trace call work?**
 
+The :ref:`live_trace <recipes-tracing-live>` attribute needs to be set before the
+statechart's thread is started:
+
 .. code-block:: python
 
   if __name__ == "__main__":
@@ -995,6 +1000,42 @@ This will become clearer in the next couple of iterations.
     oven.start_at(some_state_to_prove_this_works)
 
     time.sleep(0.1)
+
+It output's the trace log as your statechart is reacting to events.  It can only
+work if the spy_on decorator is placed above the state functions in your HSM.
+
+There are two different types of instrumentation output provided by miros.  The
+:ref:`trace <recipes-using-the-trace>` and the :ref:`spy
+<recipes-using-the-spy>`.  The trace provides information only if a state
+transition has occurred.  It reports is **S** has moved.  For each line in a
+trace log,  describes:
+
+  * The time stamp of when the event was reacted to
+  * The name of the statechart
+  * The event that caused the transition
+  * The starting state of **S**
+  * The ending state of **S**
+
+Our minimal example doesn't do much, it starts from outside of the HSM and then
+transitions into the ``some_state_to_prove_this_works``.
+
+.. code-block:: python
+
+  [2018-09-11 09:35:10] [oven] e->start_at() top->some_state_to_prove_this_works
+
+In this example we see: when I ran the test.  That the statechart is called oven,
+that the starting state of **S** in this oven instance was ``top`` and the
+ending state of **S** was ``some_state_to_prove_this_works``.
+
+There is no ``start_at`` event in miros.  But to keep the trace output useful
+for the person looking at it, I pretend that at a ``start_at`` event causes the
+initial transition into the HSM.  On the diagram, this will be where the event
+processor attachment point touches the HSM.
+
+.. note:: 
+
+  I might remove some information from the timestamp in this documenation to make
+  the text fit on the screen.
 
 .. include:: i_navigation_1.rst
 
@@ -1002,6 +1043,10 @@ This will become clearer in the next couple of iterations.
 
 **What happens when the start_at method is called?**
 
+The ``start_at`` method links the oven object to the HSM, then it starts the
+statechart.  It does this by creating a new thread, then running the oven's
+event processor in that thread.
+
 .. code-block:: python
 
   if __name__ == "__main__":
@@ -1011,11 +1056,22 @@ This will become clearer in the next couple of iterations.
 
     time.sleep(0.1)
 
+Before a statechart is started, **T** and **S** exist outside of the outermost
+state.  The ``start_at`` call, places **T** into the
+``some_state_to_prove_this_works``.  **S** marches towards **T** triggering as
+many needed entry events as required, then the init event in the state that
+**T** is in.
+
+In our example there isn't much to talk about.  The entry clause of the
+``some_state_function`` is called, printing "hello world".
+
 .. include:: i_navigation_1.rst
 
 .. _why_are_you_placing_a_delay_at_the_end_of_the_code_samp:
 
 **Why are you placing a delay at the end of the code sample?**
+
+The statechart is running in a different thread.  
 
 .. code-block:: python
 
