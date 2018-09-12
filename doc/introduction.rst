@@ -61,7 +61,10 @@ I have tried to document this project so that you can learn how to:
 If you would like to network your statechart, you can use the `miros-rabbitmq
 <https://aleph2c.github.io/miros-rabbitmq/index.html>`_ plugin.
 
-:ref:`Next topic<quick-start>`.
+.. raw:: html
+
+  <a class="reference internal" href="installation.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="quickstart.html"><span class="std std-ref">next</span></a>
+
 
 .. literalinclude:: ./../miros/hsm.py
    :pyobject: HsmEventProcssor.dispatch

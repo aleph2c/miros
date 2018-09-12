@@ -18,4 +18,6 @@ Examples
 
 More examples can be found in the :ref:`patterns section<patterns>`.
 
-:ref:`Next topic<recipes>`.
+.. raw:: html
+
+  <a class="reference internal" href="zero_to_one.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="recipes.html"><span class="std std-ref">next</span></a>

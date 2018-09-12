@@ -4,8 +4,8 @@
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>308</x>
-      <y>418</y>
+      <x>264</x>
+      <y>429</y>
       <w>341</w>
       <h>220</h>
     </coordinates>
@@ -21,15 +21,15 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>264</x>
-      <y>308</y>
+      <x>220</x>
+      <y>319</y>
       <w>605</w>
       <h>396</h>
     </coordinates>
-    <panel_attributes>Door Closed
+    <panel_attributes>*door_closed*
 --
   entry/
-  exit/
+    oven.light_off(oven)
   BUZZ/ make_buzzing_sound()
 
 valign=top
@@ -39,14 +39,15 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>330</x>
-      <y>506</y>
+      <x>286</x>
+      <y>517</y>
       <w>132</w>
       <h>88</h>
     </coordinates>
     <panel_attributes>baking
 --
-  entry/
+entry/
+  print("baking")
 
 valign=top
 </panel_attributes>
@@ -55,14 +56,15 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>495</x>
-      <y>506</y>
+      <x>451</x>
+      <y>517</y>
       <w>132</w>
       <h>88</h>
     </coordinates>
     <panel_attributes>toasting
 --
- entry/
+entry/
+  print("toasting")
 
 valign=top
 </panel_attributes>
@@ -71,8 +73,8 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>693</x>
-      <y>506</y>
+      <x>649</x>
+      <y>517</y>
       <w>132</w>
       <h>88</h>
     </coordinates>
@@ -87,8 +89,8 @@ valign=top
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>715</x>
-      <y>407</y>
+      <x>671</x>
+      <y>473</y>
       <w>22</w>
       <h>22</h>
     </coordinates>
@@ -98,19 +100,19 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>715</x>
-      <y>407</y>
+      <x>671</x>
+      <y>473</y>
       <w>33</w>
-      <h>121</h>
+      <h>66</h>
     </coordinates>
     <panel_attributes>lt=-&gt;</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>550</x>
-      <y>583</y>
+      <x>506</x>
+      <y>594</y>
       <w>77</w>
       <h>143</h>
     </coordinates>
@@ -121,8 +123,8 @@ TOAST</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>385</x>
-      <y>583</y>
+      <x>341</x>
+      <y>594</y>
       <w>66</w>
       <h>143</h>
     </coordinates>
@@ -133,8 +135,8 @@ BAKE</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>748</x>
-      <y>583</y>
+      <x>704</x>
+      <y>594</y>
       <w>66</w>
       <h>143</h>
     </coordinates>
@@ -143,25 +145,172 @@ OFF</panel_attributes>
     <additional_attributes>10.0;110.0;10.0;10.0</additional_attributes>
   </element>
   <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>550</x>
+      <y>88</y>
+      <w>275</w>
+      <h>176</h>
+    </coordinates>
+    <panel_attributes>*ToasterOven*
+--
+make_buzzing_sound()
+light_on()
+light_off()
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
     <id>Relation</id>
     <coordinates>
-      <x>792</x>
-      <y>209</y>
-      <w>33</w>
-      <h>121</h>
+      <x>682</x>
+      <y>286</y>
+      <w>88</w>
+      <h>264</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
+    <panel_attributes>lt=()-[v]</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0;60.0;100.0;60.0;220.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>671</x>
+      <y>231</y>
+      <w>55</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=[^]-(</panel_attributes>
+    <additional_attributes>20.0;10.0;20.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>583</x>
+      <y>187</y>
+      <w>220</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+Event Processor</panel_attributes>
+    <additional_attributes/>
   </element>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>792</x>
-      <y>209</y>
+      <x>781</x>
+      <y>418</y>
       <w>22</w>
       <h>22</h>
     </coordinates>
-    <panel_attributes>type=initial</panel_attributes>
+    <panel_attributes>type=history_deep</panel_attributes>
     <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>792</x>
+      <y>418</y>
+      <w>154</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>120.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>924</x>
+      <y>407</y>
+      <w>198</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>*door_open*
+--
+entry /
+  oven.light_on(oven)
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>814</x>
+      <y>484</y>
+      <w>220</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;100.0;180.0;100.0;180.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>682</x>
+      <y>55</y>
+      <w>33</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>616</x>
+      <y>33</y>
+      <w>143</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>ActiveObject</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>869</x>
+      <y>561</y>
+      <w>110</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>Door_Open
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>825</x>
+      <y>396</y>
+      <w>110</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>Door_Close
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>275</x>
+      <y>242</y>
+      <w>275</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>oven = ToasterOven(name="oven")
+oven.start_at(door_closed)
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>484</x>
+      <y>264</y>
+      <w>198</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;160.0;30.0</additional_attributes>
   </element>
 </diagram>

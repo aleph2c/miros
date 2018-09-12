@@ -23,7 +23,10 @@ Testing
 =======
 You can use the miros instrumentation to test your designs.
 
-:ref:`Next topic<glossary-glossary>`.
+.. raw:: html
+
+  <a class="reference internal" href="patterns.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="glossary.html"><span class="std std-ref">next</span></a>
+
 
 .. toctree::
    :maxdepth: 2

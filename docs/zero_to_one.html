@@ -1,0 +1,1087 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Zero To One &#8212; miros 2.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Diagrams" href="reading_diagrams.html" />
+    <link rel="prev" title="Quick Start" href="quickstart.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <blockquote id="zero-to-one-zero-to-one">
+<div><p><em>Begin.  To Begin is half the work, let half still remain; again begin this,
+and thou wilt have finished.</em></p>
+<p class="attribution">&mdash;Marcus Aurelius</p>
+</div></blockquote>
+<div class="section" id="zero-to-one">
+<h1>Zero To One<a class="headerlink" href="#zero-to-one" title="Permalink to this headline">¶</a></h1>
+<p>I’m going to try and show how a miros statecharts work, without using
+technical-language.  To do this, I’ll tell you a story about some characters
+interacting in a little universe.</p>
+<p>The story will have some pictures, which I have created using a UML drawing
+tool.  The images are intended to get someone who hasn’t seen UML before,
+comfortable looking at statecharts drawn this way.  These pictures will act as a
+bridge between the story and how to program a statechart.  If an image is too
+small in your browser, click on it to open it as a full-sized pdf.</p>
+<p>If you find the story is confusing, don’t worry, a concrete and straightforward
+statechart <a class="reference external" href="zero_to_one-a-simple-example">example</a> will follow it.  With each
+reading, the statechart mechanics should become more clear for you.</p>
+<div class="admonition-scott-volk-2018-09-09 admonition">
+<p class="first admonition-title">Scott Volk: 2018-09-09</p>
+<p>I will also pepper the story with boxes, like this one, containing <strong>hints</strong>
+about how the story relates to the technical aspects of statecharts.</p>
+<p>I challenge you <em>not to read</em> these boxes in your first look at the story,
+especially if you are new to this type of technical language.  Read the hints
+after you have programmed your first working statechart.</p>
+<p class="last">On your first pass, see if you can <em>guess</em> how the story’s features, and
+characters, relate to some of the programming concepts you know already.</p>
+</div>
+<div class="section" id="story">
+<h2>Story<a class="headerlink" href="#story" title="Permalink to this headline">¶</a></h2>
+<p>Let’s build a little universe.</p>
+<p>Our universe will consist of a heaven, an earth and an underworld.   The earth
+will be made up of a set of pubs, arranged on different terraces.  To get to a
+higher pub, you would first have to walk through a lower pub.  The lower pubs
+are for a more general audience, while the higher pubs, though having less space
+have a more specialized aesthetic.</p>
+<p>On every terrace, there will be two bouncers a greeter and zero or more
+bartenders.   There will only be one set of stairs that can be used to enter or
+exit a pub, and this is where that pub’s bouncers will be.</p>
+<p>One bouncer will be facing in the direction of people entering the terrace and
+the other will be facing in the direction of people wanting to leave it.  The
+greeter will talk to anyone who has decided to stay on her terrace.</p>
+<a class="reference external image-reference" href="_static/md_terraced_pubs.pdf"><div align="center" class="align-center"><img alt="_images/md_terraced_pubs.svg" src="_images/md_terraced_pubs.svg" /></div>
+</a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>Each pub is a state in a statemachine.  You would program these states as
+functions that take two arguments, a reference to an activeobject and an
+event.</p>
+<p>These state functions will contain an if-elif structure which will have
+multiple clauses.  The greeter is the “init” clause, and the enter and exit
+bouncers are the “entry” and “exit” clauses.</p>
+<p>The “init”, “enter”, and “exit” clauses can be activated when the state
+function is given an event with an init, entry or exit name.</p>
+<p class="last">Likewise, the bartender is a clause where the application developer sets the
+event name.</p>
+</div>
+<p>The heaven will have one goddess Eve, “the goddess of law and order” and the
+underworld will be ruled by Theo, “<a class="reference external" href="https://en.wikipedia.org/wiki/Solipsism">the solipsist.</a>”  The earth will have a lazy god
+named Spike, “the source” who happens to be the only guy who can drink in the
+whole universe.  Spike will have a companion, who is a spirit, Tara “the
+explorer.”</p>
+<a class="reference external image-reference" href="_static/md_terraced_gods.pdf"><div align="center" class="align-center"><img alt="_images/md_terraced_gods.svg" src="_images/md_terraced_gods.svg" /></div>
+</a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>Eve represents the “event processor”, or the algorithm that sends the state
+functions different events.</p>
+<p>Spike, represents the “Source” state while the event processor is searching
+the statechart.  Think of Spike as the current state of the statemachine.</p>
+<p>Tara represents the “Target” state, which is used by the event processor to
+explore the statemachine while it is trying to figure out what to do.</p>
+<p>Theo is the “thread” in which all of the code is run.  The event processor and
+all of it’s calls to the various state functions will be driven by this
+thread.</p>
+<p class="last">An application developer will not write code to change the internal behaviour
+of the event processor, the source and target states or the thread.  This is
+why these characters are supernatural in the story; it’s a mnemonic.</p>
+</div>
+<p>Let’s put our little universe into a small multiverse. Each universe will have
+it’s own heaven and underworld, gods, people and explorer spirit, but its
+terraced architecture of pubs, can be shared across all connected worlds.</p>
+<a class="reference external image-reference" href="_static/md_multiverse.pdf"><div align="center" class="align-center"><img alt="_images/md_multiverse.svg" src="_images/md_multiverse.svg" /></div>
+</a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>Anytime a statechart references a callback, that callback will change the
+internal variable state of the active object in its first argument – the
+state callback functions do not have their own memory.</p>
+<p class="last">Since the callback functions don’t keep any information, they can be called by
+many different activeobjects, in its thread, and behave as expected; there are
+no side effects.  In this way, many different active objects can use the same
+set of state callback functions.</p>
+</div>
+<p>Eve, the goddess of heaven has a birds-eye view of our little world.  She rules
+over the people: the bouncers, greeters and bartenders and, Tara, “the explorer”
+spirit.  She took on her duty as “the goddess of law and order” with such gusto,
+that sometime in the world’s history, she banned alcohol consumption for
+everyone on earth, except Spike, who she can’t control.</p>
+<a class="reference external image-reference" href="_static/md_eve.pdf"><div align="center" class="align-center"><img alt="_images/md_eve.svg" src="_images/md_eve.svg" /></div>
+</a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>Eve is the “event processor”.  The if-elif clauses, represented by the people
+in the story, exist within each of the state functions.  These if-elif clauses
+only become active when the event processor calls its function with an
+internal event, represented by one of the people in the story.</p>
+<p>Tara, the “target state” is used by the event processor when it is searching a
+statemachine to see which state handles an external event.</p>
+<p class="last">Since the event processor calls the function and change’s its target state
+while it is searching through a statemachine, we say that Eve rules over the
+people and Tara the “explorer spirit”.</p>
+</div>
+<p>Theo, “the solipsist” is the god of the underworld.  He is only called the
+“solipsist” by people outside of his universe, like us, because his universe
+only works and exists if he is thinking about it.  Nobody in his world is aware
+that he has this power.</p>
+<p>One of Theo’s duties is to join the little universe with other universes.  Theo
+watches a portal, which is connected to a loading dock which receives
+messages from different worlds, including ours.  He is extraordinarily attentive
+and enthusiastic.  He can motivate anyone he talks to or even looks upon, in
+fact, this is his supernatural ability.</p>
+<a class="reference external image-reference" href="_static/md_theo.pdf"><div align="center" class="align-center"><img alt="_images/md_theo.svg" src="_images/md_theo.svg" /></div>
+</a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p class="last">Theo represents a “thread” pending on a queue.  The activeobject’s <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code>
+and <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> methods allow an application developer to put events into
+this queue.  When the thread sees that a queue has an item, it will wake up,
+and drive the event processor, which in turn, will call the functions
+making up the statemachine.</p>
+</div>
+<p>When Theo receives a message from another universe, it appears as a round hollow
+orb which sometimes contains a scroll.  He calls these orbs “events”, and if they
+have a scroll within them, he calls that scroll a “payload”.</p>
+<a class="reference external image-reference" href="_static/md_events.pdf"><div align="center" class="align-center"><img alt="_images/md_events.svg" src="_images/md_events.svg" /></div>
+</a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>An event has a name, called a signal, which can be a user defined name or it
+can be a predefined name.  An event with a user defined signal name is called
+an external event.  An event with a predefined name is called an internal
+event.</p>
+<p>The whole point of naming an event with a signal is so that a state function
+can use an if-elif clause to “catch” the event when it is given to that
+function.  When such an event is caught, your code is run.</p>
+<p class="last">An event can have an optional payload.</p>
+</div>
+<p>When an “event” comes through the portal, Theo will pick it up, marvel at it
+then in a reverent gesture, pass it to Eve.  They both become excited, maybe
+even a little nervous, because they know there universe is going to change; it
+will react to the event.</p>
+<p>Theo encourages Eve to fly back up into the sky and to “follow the laws.” Then
+he will watch as she gives her minions their marching orders.  Only after all of
+the activity stops, will he focus his attention back on the portal.</p>
+<p>Feeling oddly refreshed and encouraged by Theo, Eve looks around the map until
+she see’s Spike from her high vantage point.  Spike being the god of the earth,
+is easy to see and Eve knows that her underling-spirit Tara, “the explorer”,  is
+always near him.</p>
+<p>Eve flies done to Tara and gives her the event.  She says, “I want you to go to
+the terrace where there is a bartender who knows what to do with this event.
+Then I want you to go to wherever he tells you to take it.  Good luck Tara, I
+believe in you”.</p>
+<p>Tara enjoys Spike’s company, but she also loves adventure.</p>
+<p>She looks down at the event to study it and notices that it has something written
+on it, a word, a phrase, it could be different every time, but it’s a clue and
+Tara loves a puzzle.  She looks around the pub on her terrace and studies each
+of the bartender’s name tags.  If she sees that a name tag matches the name on
+the event, she will approach that bartender and talk to him.</p>
+<a class="reference external image-reference" href="_static/md_events_bartenders.pdf"><div align="center" class="align-center"><img alt="_images/md_events_bartenders.svg" src="_images/md_events_bartenders.svg" /></div>
+</a>
+<p>If there is no bartender to talk to on her terrace, she will go to it’s exit
+staircase and descend to the next terrace.  Being a spirit, she is hard to see
+and the bouncers and greeters leave her alone when she is by herself.</p>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>The terraces are just callback functions containing if-elif-else clauses.  The
+else clause of each callback function provides information about what other
+callback function should be called if it doesn’t know what to do with a given
+event.  This other function, can be thought of as a lower terrace.</p>
+<p class="last">The bartender represents an if-elif clause that matches the name of the event
+given to that function.</p>
+</div>
+<p>She will continue to climb down the terraces until she comes to the edge of the
+universe.  If she can’t find a bartender who can answer her question, she will
+take the event and throw it off the edge of the earth, into oblivion, then climb
+back up to rejoin Spike.  In such rare cases their universe doesn’t react to the
+event.</p>
+<a class="reference external image-reference" href="_static/md_bartenders_on_the_hsm_oblivion.pdf"><div align="center" class="align-center"><img alt="_images/md_bartenders_on_the_hsm_oblivion.svg" src="_images/md_bartenders_on_the_hsm_oblivion.svg" /></div>
+</a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p class="last">Here we are starting to explore a statechart’s dynamics.  If your statemachine
+doesn’t handle an event in any of it’s callback functions, the event will be
+ignored.</p>
+</div>
+<p>But if Tara does find a bartender who’s name tag matches the name on the event,
+she will show it to him.  He will take it and study it, sometimes he might even
+take out it’s scroll.  Then he will lean across the bar and whisper the answer
+into Tara’s ear.</p>
+<p>Sometimes the bartender says, “give me the event I’ll handle it, don’t worry
+about it anymore.”  When this happens, Tara passes over the event, then rejoins
+Spike, who rejoices because he doesn’t have to do anything.  For some reason
+Spike calls this a “hook”.</p>
+<a class="reference external image-reference" href="_static/md_bartenders_on_the_hsm_hook.pdf"><div align="center" class="align-center"><img alt="_images/md_bartenders_on_the_hsm_hook.svg" src="_images/md_bartenders_on_the_hsm_hook.svg" /></div>
+</a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>Tara, the “target state” is used by the event processor to find which state
+callback function knows how to handle a given event.  In the above picture we
+see that T started in “C pub”, then the event processor recursed outward to “A
+pub” at which point it found an if-elif clause in the “A pub” callback that
+“handled” the event with the signal name of “Merve”.  If the application
+developer placed code between the “Merve” clause and it’s return statement,
+this code would be run while T is searching.</p>
+<p>When a state callback function returns “handled” the event processor pulls T
+back to where S is, then it stops searching.</p>
+<p class="last">A state callback function can use the T state of the event processor to
+perform this type of event handling.  For more details about this programming
+technique, read about the <a class="reference internal" href="patterns.html#patterns-ultimate-hook"><span class="std std-ref">ultimate hook pattern.</span></a></p>
+</div>
+<p>Most of the time, however, the bartender will tell Tara where she has to take
+the event.  If she has to continue her journey, she will wait for Spike so she can
+tell him about it.</p>
+<a class="reference external image-reference" href="_static/md_bartenders_on_the_hsm_reaction_1.pdf"><div align="center" class="align-center"><img alt="_images/md_bartenders_on_the_hsm_reaction_1.svg" src="_images/md_bartenders_on_the_hsm_reaction_1.svg" /></div>
+</a>
+<p>Spike knows when Tara is waiting for him.  Though he is lazy, and drunk most of
+the time, he always has something interesting to say, and this is what Tara
+loves about him.  Having nothing else to do, he makes his way to the terrace
+where Tara has gotten her next clue.  He knows that she will want to talk to him
+about it.  As he approaches the exit, the exit bouncer puts up a hand, then
+looks at a clip board to see if Spike is on the guest list, which he always is,
+and then let’s Spike pass to the next lower terrace.  You really can’t stop the
+god of the earth.  For every terrace that Spike needs to leave so that he can
+rejoin with Tara, this futile ritual is repeated.</p>
+<a class="reference external image-reference" href="_static/md_bartenders_on_the_hsm_reaction_2.pdf"><div align="center" class="align-center"><img alt="_images/md_bartenders_on_the_hsm_reaction_2.svg" src="_images/md_bartenders_on_the_hsm_reaction_2.svg" /></div>
+</a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>Tara, the “target state” is used by the event processor to recurse outward
+from C1 to find a state that knows what to do with the Event, who’s signal
+name is Mary.</p>
+<p>The A state has an if-elif clause which handles Mary, and within the clause
+there is a transition to the B2 state.  In this scenario, the A state is
+called the Least Common Ancestor, LCA of S and T.  S needs to exit all states,
+from it’s current state, to the LCA.  However, it should not exit the LCA.</p>
+<p class="last">As an application developer, you don’t really care about the LCA acronym.  You
+just need to understand the dynamics of exits work.</p>
+</div>
+<p>When Spike finally finds Tara he asks her what she learned.  Bubbling with
+excitement, she tells him about where the bartender said to take the event, to
+which he always says, “great I’ll meet you there, but first I want to have a
+drink.”  Tara takes the event and makes her way to the location that the
+bartender told her about.</p>
+<p>Spike finishes his drink, then again starts to make his way toward Tara.  Before
+he can climb up to a new Terrace, he is stopped by the entry bouncer, who looks
+at his clip board to see if Spike is on the guest list, which he always is, then
+let’s Spike proceed.  You really can’t stop the god of the earth anyway.</p>
+<a class="reference external image-reference" href="_static/md_bartenders_on_the_hsm_reaction_3.pdf"><div align="center" class="align-center"><img alt="_images/md_bartenders_on_the_hsm_reaction_3.svg" src="_images/md_bartenders_on_the_hsm_reaction_3.svg" /></div>
+</a>
+<p>When Spike finally arrives on the Terrace where Tara is, a greeter approaches
+them.  She looks at Spike and feels slightly uncomfortable, because sometimes
+she needs to tell them that they can’t stay on this terrace.  Instead of talking
+to Spike directly, gods are intimidating, she whisper’s something into Tara’s
+ear.  Both the greeter and Tara work for Eve after all.  Tara is always happy to
+hear that there is more to do, because she likes to explore the pubs on the
+different terraces.</p>
+<p>If the greeter tells Tara that she needs to climb higher, Tara will relay the
+message to Spike who will answer, “great, I’ll meet you there, but first I want
+to have a drink”.</p>
+<p>Tara climbs to the terrace where the greeter told her to go.  Spike finishes his
+drink and makes his way through the entry bouncers and finally arrives at the
+same terrace where Tara is waiting.  At which point there might be another
+greeter with another uncomfortable message.</p>
+<a class="reference external image-reference" href="_static/md_bartenders_on_the_hsm_reaction_4.pdf"><div align="center" class="align-center"><img alt="_images/md_bartenders_on_the_hsm_reaction_4.svg" src="_images/md_bartenders_on_the_hsm_reaction_4.svg" /></div>
+</a>
+<p>If no greeter approaches them, Tara looks down at the event and watches with
+satisfaction, as it throbs with light, then slowly fades from existence.  To
+this, Spike smiles and looks towards heaven, as he raises a toast to Eve.</p>
+<p>When Eve, the goddess of heaven, see’s this her shoulder’s relax and the tension
+releases from her back: The laws were followed.</p>
+<p>Theo, “the solipsist”, god of the underworld, has been watching the whole scene,
+and its “run to completion”.  Knowing there is nothing left to do in the
+universe, he turns his gaze back to the portal.  He waits patiently for an event
+to pass through the little universe’s loading dock.  All is well.</p>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>The run to completion, RTC, concept is very important to understand.  Your
+statechart will only react to one event at a time.  The thread will only
+process the next event when the event processor has run out of things to do
+with your old event.</p>
+<p class="last">For this reason, you should not put blocking code into your statecharts.  If
+you do, they will stop reacting to events and become unresponsive.</p>
+</div>
+<p>But is it?  Sometimes when Theo, “the solipsist”, god of the underworld, closes
+his eyes and daydreams; his attention briefly drifts back to his world.  This is
+enough to wake everyone up from their non-existence.</p>
+<p>When the people wake up, they become listless. The bouncers who have had nothing
+to do since the prohibition was announced by Eve, are particularly frustrated
+with the meaninglessness of their jobs.  They only have one customer now.  Even
+if Spike wasn’t always permitted to pass them, there is no way they could stop
+the god of earth. Why have a universe full of pubs if only one guy can drink?
+It seems so pointless.</p>
+<p>Then somehow they find out about you and me, fellow humans called developers.</p>
+<p>They learn that we, despite being human, are all powerful.  That we can build
+the pub terrace system to which their gods are subservient; that we can send the
+events and give the greeters and the bouncers their secret directions (arrows on
+the diagram).  That we can even built lots of different interconnected universes
+and have them communicate with each other.</p>
+<p>They challenge us to make something useful out of their existence, even if they
+can’t understand it from where they are, they need something to <em>mean
+something</em>.  So, they create an organized campaign: “hack the humans”.  This is
+how it works: All of the humans in the little universe, open themselves to run
+code from our universe, while they are talking to either Tara or Spike.</p>
+<a class="reference external image-reference" href="_static/md_hack_the_humans.pdf"><div align="center" class="align-center"><img alt="_images/md_hack_the_humans.svg" src="_images/md_hack_the_humans.svg" /></div>
+</a>
+<p>To help us, they create a Rosetta stone, translating the concepts of their
+universe into something legible for you and me:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="47%" />
+<col width="53%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><strong>Story Concept</strong></th>
+<th class="head"><strong>Programming Concept</strong></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>The universe</td>
+<td>a statechart, which is an ActiveObject
+derived object.</td>
+</tr>
+<tr class="row-odd"><td>The multiverse of terraced bars</td>
+<td>a set of callback functions making an
+HSM (accessible from multiple
+statecharts, via the <code class="docutils literal notranslate"><span class="pre">start_at</span></code>
+method), each callback takes two
+arguments, a reference to a statechart
+and an event to send to it</td>
+</tr>
+<tr class="row-even"><td>Eve, “the goddess of law and order”,
+goddess of heaven</td>
+<td>the event processor</td>
+</tr>
+<tr class="row-odd"><td>Spike, “the source”,
+god of the earth</td>
+<td>current state, <strong>S</strong> of a statechart</td>
+</tr>
+<tr class="row-even"><td>Theo, “the solipsist”
+god of the underworld</td>
+<td>the thread that drives the
+statechart</td>
+</tr>
+<tr class="row-odd"><td>Tara, “the explorer”, spirit</td>
+<td>a search aspect, <strong>T</strong>, of the
+event processor</td>
+</tr>
+<tr class="row-even"><td>bartender</td>
+<td>arrow or hook on the HSM diagram,
+represented as a conditional statement
+for a user defined event,
+any code associated with this
+conditional statement it run when
+touched by <strong>T</strong></td>
+</tr>
+<tr class="row-odd"><td>greeter</td>
+<td><code class="docutils literal notranslate"><span class="pre">INIT_SIGNAL</span></code> event given to callback
+by the event processor when <strong>S</strong>
+stabilizes in the state it represents</td>
+</tr>
+<tr class="row-even"><td>exit bouncer</td>
+<td><code class="docutils literal notranslate"><span class="pre">EXIT_SIGNAL</span></code> event given to callback
+by the event processor when <strong>S</strong> exits
+the state it represents</td>
+</tr>
+<tr class="row-odd"><td>exit bouncer</td>
+<td><code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code> event given to callback
+by the event processor when <strong>S</strong> enters
+the state it represents</td>
+</tr>
+<tr class="row-even"><td><strong>run to completion, RTC</strong>:
+Theo keeps his attention on the
+universe’s activities until the
+action stops</td>
+<td>The thread will only handle one event
+a time. This is called RTC.  An RTC
+process is over when the event processor
+can no longer cause state transitions
+and the statechart settles on a new
+state.</td>
+</tr>
+<tr class="row-odd"><td>Top level view of terraced bar
+universe</td>
+<td>Make these drawings with a 90’s drawing
+technology called UML</td>
+</tr>
+</tbody>
+</table>
+<p>Here is a warning that they provide us about UML:</p>
+<a class="reference external image-reference" href="_static/md_translation_with_notes.pdf"><div align="center" class="align-center"><img alt="_images/md_translation_with_notes.svg" src="_images/md_translation_with_notes.svg" /></div>
+</a>
+<p>The above diagram shows us how a lot of information is missing from a “UML
+statechart”.  The picture describes some class information, and a behavioural
+specification for the states provided as a bird’s eye view of the terraced bar
+system, but there is no information about the thread, <strong>S</strong>, <strong>T</strong>, the deques,
+the events or any of the dynamics for the statechart.</p>
+<p>So the human’s provide us with the option of laying down a spy-carpet over any
+bar in their universe. If you lay this carpet down, it will record and report
+all activity that transpired between <strong>T</strong>, <strong>S</strong> and any human within that pub.
+To use this carpet, you place the <strong>spy_on</strong> decorator above any callback
+function representing a pub, or state in the HSM.  This is called
+instrumentation.</p>
+<p>Let’s answer their challenge for deep meaning, by using one of their universes
+to make a toaster oven:</p>
+</div>
+<div class="section" id="a-simple-example-toaster-oven">
+<span id="zero-to-one-a-simple-example"></span><h2>A Simple Example: Toaster Oven<a class="headerlink" href="#a-simple-example-toaster-oven" title="Permalink to this headline">¶</a></h2>
+<p>Software development is the process of continual improvement.  We get an idea
+about what we want to build, then we design it, then build it.  Then we get an
+idea about how to improve our previous work, then we design it, then build it.</p>
+<p>Each loop of activity can be called an iteration, or a sprint (if your team is
+following an Agile methodology).  So to make this toaster oven statechart
+example realistic, I will break it’s design process up into 6 iterations.</p>
+<p>Each iteration will have a specification, a picture and the code needed to
+manifest the design.  Examine the code and see if it makes sense, then read
+through the questions and answers about the code that will follow the example.</p>
+<p>If you have a question that I haven’t answered, just email it to me and I’ll get
+back to you.</p>
+<p>Each iteration will be heavily linked so that you can quickly bounce around in
+its documentation.</p>
+<hr class="docutils" />
+<div class="section" id="iteration-1-setup">
+<h3>Iteration 1: setup<a class="headerlink" href="#iteration-1-setup" title="Permalink to this headline">¶</a></h3>
+<p>In this iteration I will talk about setting up our development environment.  We
+will built a very simple statechart example and confirm that it is working.</p>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="iter1-spec">Iteration 1 specification:</p>
+<ul class="simple">
+<li>Ensure our Python version is 3.5 or greater (miros needs this to work)</li>
+<li>Install miros</li>
+<li>Import the required statechart components</li>
+<li>Build a ToasterOven class which inherits from an activeobject</li>
+<li>Make a single state, and start the statechart in that state</li>
+<li>Add instrumentation to our state</li>
+<li>Use the instrumentation to confirm that the statechart is working.</li>
+</ul>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p>To confirm that Python is version 3.5 or greater, in your terminal type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 --version
+</pre></div>
+</div>
+<p>To install miros, use pip (included in Python 3.5 or greater), in your terminal
+type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 -m venv
+. ./venv/bin/activate
+pip install miros
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Miros is not dependent on any other packages.</p>
+</div>
+<p id="iter1-design">Here is the design we will use to confirm that miros is working on your computer:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_0.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_0.svg" src="_images/ToasterOven_0.svg" /></div>
+</a>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="iter1-code">Here is the code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">class</span> <span class="nc">ToasterOven</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">some_state_to_prove_this_works</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">some_state_to_prove_this_works</span><span class="p">)</span>
+
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="iter1-proof">Now to prove that the code works, in your terminal, run the program:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 toaster_oven_0.py
+hello world
+<span class="o">[</span><span class="m">2018</span>-09-11 <span class="m">09</span>:35:10.011526<span class="o">]</span> <span class="o">[</span>oven<span class="o">]</span> <span class="se">\</span>
+  e-&gt;start_at<span class="o">()</span> top-&gt;some_state_to_prove_this_works
+</pre></div>
+</div>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="iter1-questions">Questions and Answers about the code and the results:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#why-is-miros-onl"><span class="std std-ref">Why is miros only supported in Python 3.5 or greater?</span></a></li>
+<li><a class="reference internal" href="#can-you-explain"><span class="std std-ref">Can you explain what is going on with the imports on lines 1-6?</span></a></li>
+<li><a class="reference internal" href="#why-bother-making"><span class="std std-ref">Why bother making a ToasterOven that inherits from the ActiveObect, why not just use the ActiveObject?</span></a></li>
+<li><a class="reference internal" href="#you-keep-calling"><span class="std std-ref">You keep calling the state functions callbacks, what do you mean by this?</span></a></li>
+<li><a class="reference internal" href="#what-do-you-mean"><span class="std std-ref">What do you mean by a function signature?</span></a></li>
+<li><a class="reference internal" href="#how-am-i-going-t"><span class="std std-ref">How am I going to remember to structure my callback functions with all of these rules?</span></a></li>
+<li><a class="reference internal" href="#this-seems-stran"><span class="std std-ref">This seems strange to me, I haven’t seen Python that looks like this before.  Why do it this way?</span></a></li>
+<li><a class="reference internal" href="#where-is-the-thr"><span class="std std-ref">Where is the thread, event dispatcher and queues in the diagram?</span></a></li>
+<li><a class="reference internal" href="#can-you-explain-what-is-happening-in-the-entry-clau"><span class="std std-ref">Can you explain what is happening in the entry clause?</span></a></li>
+<li><a class="reference internal" href="#can-you-explain-where-the-init-and-exit-clauses-a"><span class="std std-ref">Can you explain where the init and exit clauses are?</span></a></li>
+<li><a class="reference internal" href="#can-you-explain-what-is-going-on-with-the-else-clau"><span class="std std-ref">Can you explain what is going on with the else clause?</span></a></li>
+<li><a class="reference internal" href="#how-does-the-live-trace-call-wo"><span class="std std-ref">How does the live_trace call work?</span></a></li>
+<li><a class="reference internal" href="#what-happens-when-the-start-at-method-is-call"><span class="std std-ref">What happens when the start_at method is called?</span></a></li>
+<li><a class="reference internal" href="#why-are-you-placing-a-delay-at-the-end-of-the-code-samp"><span class="std std-ref">Why are you placing a delay at the end of the code sample?</span></a></li>
+<li><a class="reference internal" href="#how-did-your-prove-that-your-code-work"><span class="std std-ref">How did your prove that your code worked?</span></a></li>
+</ul>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="why-is-miros-onl"><strong>Why is miros only supported in Python 3.5 or greater?</strong></p>
+<p>I originally wrote and tested miros in Python 3.5.  I didn’t know it at the
+time, but I used the Python 3.5 feature of avoiding circular imports.  When I
+tried to run miros in 3.4 I got a lot of ImportErrors.  So there you go, it was
+an accidental limitation.</p>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="can-you-explain"><strong>Can you explain what is going on with the imports on lines 1-6?</strong></p>
+<p>I’ll answer this question by putting a lot of comments into the code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ActiveObject contains the thread, event processor, and queues</span>
+<span class="c1"># it also contains the miros API</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+
+<span class="c1"># return_status contains information on how a state callback</span>
+<span class="c1"># should respond when called by the event processor</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+<span class="c1"># Event is the miros Event class, use this to make a new event object</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+
+<span class="c1"># signals, contains all of the signal names in the system</span>
+<span class="c1"># it also automatically constructs new signals names if it</span>
+<span class="c1"># is used with a name that hasn&#39;t been used before:</span>
+<span class="c1">#   example:</span>
+<span class="c1">#     e = Event(signal=signals.NEW_NAME)</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+
+<span class="c1"># spy_on is a decorator which when applied to state callback</span>
+<span class="c1"># function will let use used the spy and trace instrumentation</span>
+<span class="c1"># on that callback</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+
+<span class="c1"># time is imported so that the program can be delayed</span>
+<span class="kn">import</span> <span class="nn">time</span>
+</pre></div>
+</div>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="why-bother-making"><strong>Why bother making a ToasterOven that inherits from the ActiveObect, why not just use the ActiveObject?</strong></p>
+<p>We will put toaster oven attributes and worker functions into the toaster oven
+class later.  For instance, we could put a <code class="docutils literal notranslate"><span class="pre">light_on</span></code> method in the
+ToasterOven class.  The first argument given to any state callback function by
+the event processor will be a reference to a ToasterOven object. Now suppose
+this first argument was called <code class="docutils literal notranslate"><span class="pre">oven</span></code>, any state callback function could turn
+on the light with: <code class="docutils literal notranslate"><span class="pre">oven.light_on()</span></code></p>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="you-keep-calling"><strong>You keep calling the state functions callbacks, what do you mean by this?</strong></p>
+<p>A callback function is just a function that is given to another function, so
+that it can be called later:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="c1"># this will be our callback</span>
+<span class="k">def</span> <span class="nf">print_msg</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">call_something_later</span><span class="p">(</span><span class="n">callback</span><span class="p">):</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">callback</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
+
+<span class="c1"># wait one second then print &quot;hello world&quot;</span>
+<span class="n">call_something_later</span><span class="p">(</span><span class="n">print_msg</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The states in our diagram are constructed as callback functions with a given
+signature.  The event processor will call these functions when it needs to.</p>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="what-do-you-mean"><strong>What do you mean by a function signature?</strong></p>
+<p>A function signature describes the arguments that a function can take and the
+type of items it can return.</p>
+<p>Our state callback functions will always have the same signature:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># The event processor will call this function when it needs to</span>
+<span class="c1"># because the  function isn&#39;t called right away,</span>
+<span class="c1"># it is called a callback function</span>
+
+<span class="c1"># 1st part of the function signature, it&#39;s arguments.</span>
+<span class="c1"># Our state callback functions will always take two arguments:</span>
+<span class="c1"># 1) a reference to a state_chart_object</span>
+<span class="c1"># 2) an event</span>
+<span class="k">def</span> <span class="nf">some_state_function</span><span class="p">(</span><span class="n">state_chart_object</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="c1"># do useful work, then</span>
+
+  <span class="c1"># set the status variable to an attribute of return_status</span>
+  <span class="c1"># to tell the event processor how your function responded</span>
+  <span class="c1"># to its call</span>
+
+  <span class="c1"># 2nd part of the function signature: it will always return</span>
+  <span class="c1"># an attribute of the return_status object</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>For a real state function, it’s signature would be expressed like this:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="hll"><span class="k">def</span> <span class="nf">some_state_to_prove_this_works</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span>  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
+<span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span>  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
+<span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span></pre></div>
+</td></tr></table></div>
+<p>To make our state callback function have the right signature, we ensure that it
+takes two arguments, a statechart object and an event, line 1.  Then, depending
+on how the function reacts, we either return:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">return_status.UNHANDLED</span></code> if we want an event to bubble outward in the
+chart.  Typically this is the default value of the item you will return from
+a statechart callback.  See line 2.</li>
+<li><code class="docutils literal notranslate"><span class="pre">return_status.HANDLED</span></code> when we want the event processor to stop searching
+for an event.  See line 3.</li>
+<li><code class="docutils literal notranslate"><span class="pre">return_status.SUPER</span></code> when we don’t know what to do to the event, so we
+return information that will tell the event processor to try our super state. See line 8.</li>
+</ul>
+</div></blockquote>
+<p>There are more things that can be returned, we will address them as the example continues.</p>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="this-seems-stran"><strong>This seems strange to me, I haven’t seen Python that looks like this before.  Why do it this way?</strong></p>
+<p>The miros library is intended to serve two different audiences:</p>
+<ul class="simple">
+<li>Embedded programmers who need to quickly prototype their designs, then port
+the work to c/C++ using the QP framework.</li>
+<li>Python developers who want to use statecharts.</li>
+</ul>
+<p>This way of writing statecharts – by using callbacks with if-elif structures,
+working with an ActiveObject – will make code that is extremely easy to port
+back to the QP framework.</p>
+<p>If you would like to program in a more “Pythonic” way, you can inherit from the
+miros Factory class instead of the ActiveObject.  Under the hood, the Factory
+class is just making the kinds of callback functions we are talking about here.</p>
+<p>It is easier to explain this library using the traditional techniques of engaging
+with the Miros Samek event processing algorithm than by just jumping into the
+Factory class.</p>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="how-am-i-going-t"><strong>How am I going to remember to structure my callback functions with all of these rules?</strong></p>
+<p>Once you do it a few times you will remember it.  To begin with just reference
+the <span class="xref std std-ref">boiler plate example</span>, and change it
+to match your design.</p>
+<p>Also, it is relatively easy to add this boiler plate code to whatever snippet
+technology you are using with your editor. I use Ultisnips in Vim.</p>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="where-is-the-thr"><strong>Where is the thread, event dispatcher and queues in the diagram?</strong></p>
+<p>The thread is missing from the UML:</p>
+<a class="reference external image-reference" href="_static/ToastOven_0_1.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_0_1.svg" src="_images/ToasterOven_0_1.svg" /></div>
+</a>
+<p>Unlike the thread the event processor is shown on the picture, though this is
+probably invalid UML:</p>
+<a class="reference external image-reference" href="_static/ToastOven_0_2.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_0_2.svg" src="_images/ToasterOven_0_2.svg" /></div>
+</a>
+<p>I leave the event processor on my pictures so I can show the starting state of
+the active object.</p>
+<p>The queues are missing from the UML as well:</p>
+<a class="reference external image-reference" href="_static/ToastOven_0_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_0_3.svg" src="_images/ToasterOven_0_3.svg" /></div>
+</a>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="can-you-explain-what-the-spy-on-decorator-is-doing"><strong>Can you explain what the spy_on decorator is doing?</strong></p>
+<p>The spy_on decorator wraps a state’s callback function with some code that lets
+you log the output of the event processor as it follows its rules, making <em>T</em>
+and <em>S</em> move around the HSM.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+</span>
+<span class="hll"><span class="nd">@spy_on</span>
+</span><span class="k">def</span> <span class="nf">some_state_to_prove_this_works</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>By using the decorator you can debug, test and document the behavior of your
+statechart.</p>
+<p>If you don’t include the decorator, the statechart will work a little bit
+faster, but it will be harder to debug.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The spy_on decorator needs to be placed on every callback that you want to
+monitor.  I usually place the spy_on decorator on all of the state callbacks.</p>
+</div>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="can-you-explain-what-is-happening-in-the-entry-clau"><strong>Can you explain what is happening in the entry clause?</strong></p>
+<p>When the event processor sends an event with the signal name <code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code>
+the if clause of the state callback will print “hello world” to the terminal
+then it will set the status variable to <code class="docutils literal notranslate"><span class="pre">return_status.HANDLED</span></code>.  This status value
+is returned to the event processor, letting it know to stop processing the
+<code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code> event.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_state_to_prove_this_works</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span>  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>The entry signal is sent to the callback as a result of the HSM being started in
+the <code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code> state.</p>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="can-you-explain-where-the-init-and-exit-clauses-a"><strong>Can you explain where the init and exit clauses are?</strong></p>
+<p>We don’t need the init and exit clauses in the design, so we don’t include them
+in the if-elif structure of the state’s callback function.  The event processor
+will still call the function with the event named INIT_SIGNAL, after it has
+entered the <code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code> state, but it will be ignored.</p>
+<p>By only including the events that we need we keep our callback function small
+and easy to read.</p>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="can-you-explain-what-is-going-on-with-the-else-clau"><strong>Can you explain what is going on with the else clause?</strong></p>
+<p>The else clause is used by <strong>T</strong> to know how to search outward in a statechart.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_state_to_prove_this_works</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>  <span class="c1"># no outer state</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+</span>  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>The callback functions report where they are in the HSM’s hierarchy by setting
+the <code class="docutils literal notranslate"><span class="pre">temp.fun</span></code> of their active object.  They set this value to point to their
+super state, or the state that is outside their current state in the diagram.</p>
+<p>In this case, the <code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code> state doesn’t have an outer
+state, so we set the <code class="docutils literal notranslate"><span class="pre">oven.temp.fun</span></code> attribute to <code class="docutils literal notranslate"><span class="pre">oven.top</span></code>, to let the event
+processor know that there is no state outside of it.</p>
+<a class="reference external image-reference" href="_static/ToastOven_0_4.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_0_4.svg" src="_images/ToasterOven_0_4.svg" /></div>
+</a>
+<p>The returned value of the state callback function is set to
+<code class="docutils literal notranslate"><span class="pre">return_status.SUPER</span></code> so that they event processor can know that this function
+didn’t handle the event it was sent.</p>
+<p>There are many different reasons the event processor might trigger the else
+clause in your callback function.  The event processor might call the state
+callback with events that it knows will not be in the if-elif structure.  It
+might do this when it is trying to discover the hierarchy of your HSM.</p>
+<p>Your event processor might also use the else clause to make <strong>T</strong> bubble out of
+the current state, when that state doesn’t know what to do with a user defined
+event.  This is the power of an HSM.</p>
+<p>This will become clearer in the next couple of iterations.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>How the else clause is called doesn’t really matter to you as an application
+developer.  You just have to follow some rules:</p>
+<ul class="last simple">
+<li>set the <code class="docutils literal notranslate"><span class="pre">over.temp.fun</span></code> to the callback function representing the
+superstate</li>
+<li>if there is no superstate, set it to the <code class="docutils literal notranslate"><span class="pre">top</span></code> attribute of the first
+argument given to the callback</li>
+<li>ensure that the callback function returns, return_state.SUPER if the else
+clause is reached.</li>
+</ul>
+</div>
+<span class="target" id="how-does-the-live-trace-call-wo"></span><a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p><strong>How does the live_trace call work?</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">some_state_to_prove_this_works</span><span class="p">)</span>
+
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="what-happens-when-the-start-at-method-is-call"><strong>What happens when the start_at method is called?</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">some_state_to_prove_this_works</span><span class="p">)</span>
+
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="why-are-you-placing-a-delay-at-the-end-of-the-code-samp"><strong>Why are you placing a delay at the end of the code sample?</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">some_state_to_prove_this_works</span><span class="p">)</span>
+
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="how-did-your-prove-that-your-code-work"><strong>How did your prove that your code worked?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+<div class="section" id="iteration-2-basic-oven">
+<span id="iter2"></span><h3>Iteration 2: basic oven<a class="headerlink" href="#iteration-2-basic-oven" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>The toaster oven will have a door</li>
+<li>The toaster oven will have an oven light</li>
+<li>It will have two different heating modes, baking which can bake a potato
+and toasting which can toast some bread.</li>
+<li>It can be turned off, when it is off the heating element should be turned off
+and the light should be turned off</li>
+<li>The toaster oven should start in the off state</li>
+<li>The toaster can only heat when the door is closed.  This is a safety feature.</li>
+</ul>
+</div>
+<div class="section" id="iteration-3-open-door">
+<h3>Iteration 3: open door<a class="headerlink" href="#iteration-3-open-door" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>The toaster’s heating element should turn off when the door is opened</li>
+<li>The toaster should turn on it’s light when the door is opened</li>
+</ul>
+</div>
+<div class="section" id="iteration-4-adding-some-history">
+<h3>Iteration 4: adding some history<a class="headerlink" href="#iteration-4-adding-some-history" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>When a customer closes the door, the toaster oven should go back to behaving
+like it was before.</li>
+</ul>
+</div>
+<div class="section" id="iteration-5-adding-a-buzzer">
+<h3>Iteration 5: adding a buzzer<a class="headerlink" href="#iteration-5-adding-a-buzzer" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>While the toaster oven is in any state the customer should be able to press a buzzer which will
+get the attention of anyone nearby.</li>
+</ul>
+</div>
+<div class="section" id="iteration-6-adding-cook-times">
+<h3>Iteration 6: adding cook times<a class="headerlink" href="#iteration-6-adding-cook-times" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>The toaster oven should stay in the baking state for twenty seconds, then buzz
+and turn off.</li>
+<li>The toaster oven should stay in the toasting state for ten seconds, then buzz
+and turn off.</li>
+<li>If the door is opened, then closed, the cooking time should be set back to
+it’s default time of ten or twenty seconds.</li>
+</ul>
+<a class="reference external image-reference" href="_static/ToastOven_1.pdf"><div align="center" class="align-center"><img alt="_static/ToastOven_1.svg" src="_static/ToastOven_1.svg" /></div>
+</a>
+<a class="reference internal" href="quickstart.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="reading_diagrams.html"><span class="std std-ref">next</span></a></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
+  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
+</a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zero To One</a><ul>
+<li><a class="reference internal" href="#story">Story</a></li>
+<li><a class="reference internal" href="#a-simple-example-toaster-oven">A Simple Example: Toaster Oven</a><ul>
+<li><a class="reference internal" href="#iteration-1-setup">Iteration 1: setup</a></li>
+<li><a class="reference internal" href="#iteration-2-basic-oven">Iteration 2: basic oven</a></li>
+<li><a class="reference internal" href="#iteration-3-open-door">Iteration 3: open door</a></li>
+<li><a class="reference internal" href="#iteration-4-adding-some-history">Iteration 4: adding some history</a></li>
+<li><a class="reference internal" href="#iteration-5-adding-a-buzzer">Iteration 5: adding a buzzer</a></li>
+<li><a class="reference internal" href="#iteration-6-adding-cook-times">Iteration 6: adding cook times</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="quickstart.html" title="previous chapter">Quick Start</a></li>
+      <li>Next: <a href="reading_diagrams.html" title="next chapter">Diagrams</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/zero_to_one.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Scott Volk.
+      
+      |
+      <a href="_sources/zero_to_one.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

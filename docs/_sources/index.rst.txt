@@ -17,8 +17,9 @@ Python Statecharts
    installation
    introduction
    quickstart
-   examples
+   zero_to_one
    reading_diagrams
+   examples
    recipes
    reflection
    patterns

@@ -69,8 +69,6 @@ Formal description:
     superstate handle it (the [child state] inherits behavior from the
     superstate) [#1]_
 
-Makes sense to me.  Keep up! ;)
-
 To understand the ultimate hook :term:`pattern<Pattern>`, you first have to
 understand what a hook is.  It is just some code in an ``if-elif`` clause.   A
 hook is just some code that catches an event, runs your :term:`client
@@ -2796,7 +2794,10 @@ Multichart Pend
 ^^^^^^^^^^^^^^^
 :ref:`setting up rabbit mq<setting_up_rabbit_mq-setting-up-rabbit-mq>`
 
-:ref:`Next topic<testing-testing>`.
+.. raw:: html
+
+  <a class="reference internal" href="reflection.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="testing.html"><span class="std std-ref">next</span></a>
+
 
 .. [#1] p.206 Practical UML STATECHARTS in C/C++, Second Edition
 .. [#2] p.211 Practical UML STATECHARTS in C/C++, Second Edition

@@ -22,4 +22,7 @@ To install:
 Miros has been tested on Python 3.5 and is only dependent upon the Python
 standard library.
 
-:ref:`Next topic<introduction-introduction>`.
+.. raw:: html
+
+  <span class="inactive-link">prev</span>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="introduction.html"><span class="std std-ref">next</span></a>
+

@@ -16,7 +16,7 @@
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="next" title="Zero To One" href="zero_to_one.html" />
     <link rel="prev" title="Introduction" href="introduction.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -1183,6 +1183,28 @@ test code could just compare some strings:</p>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">time.sleep(0.001)</span></code> code is included to provide your toaster statechart
 thread enough time to respond before it is tested (from the main thread).</p>
+<blockquote>
+<div><p>I’m going to try and show how a miros statechart works, without using
+technical-language.  To do this, I’ll tell you a story about some characters
+interacting in a little universe.</p>
+<p>The story will have some pictures, which I have created using a UML drawing
+tool.  The images are intended to get someone who hasn’t seen UML before,
+comfortable looking at statecharts drawn this way.  These pictures will act as
+a bridge between the story and how to program a statechart.  If an image is
+too small in your browser, click on it to open it as a full-sized pdf.</p>
+<p>If you find the story is confusing, don’t worry, a concrete and
+straightforward statechart example will follow it.  With each reading, the
+statechart mechanics should become more and more evident.</p>
+</div></blockquote>
+<div class="admonition-scott-volk-2018-09-09 admonition">
+<p class="first admonition-title">Scott Volk: 2018-09-09</p>
+<p class="last">I will also pepper the story with boxes, like this one, containing hints about
+what is going on.   I challenge you <em>not</em> to read these boxes in your first
+reading of the story, especially if you are new to this type of technical
+language, read them after you have programmed your first statechart.  See if
+you can <em>guess</em> how the story’s features, and characters, relate to some of
+the programming concepts you know already.</p>
+</div>
 </div>
 <div class="section" id="story">
 <h3>Story<a class="headerlink" href="#story" title="Permalink to this headline">¶</a></h3>
@@ -1191,27 +1213,65 @@ thread enough time to respond before it is tested (from the main thread).</p>
 will be made up of a set of pubs, arranged on different terraces.  To get to a
 higher pub, you would first have to walk through a lower pub.  The lower pubs
 are for a more general audience, while the higher pubs, though having less space
-have a more specialized aesthetic and a more exclusive guest list.</p>
+have a more specialized aesthetic.</p>
 <p>On every terrace, there will be two bouncers a greeter and zero or more
-bartenders.   There will only be one set of stairs that can be used to enter a
-higher pub, and this is where the bouncers will be.</p>
+bartenders.   There will only be one set of stairs that can be used to enter or
+exit a pub, and this is where that pub’s bouncers will be.</p>
 <p>One bouncer will be facing in the direction of people entering the terrace and
 the other will be facing in the direction of people wanting to leave it.  The
 greeter will talk to anyone who has decided to stay on her terrace.</p>
 <a class="reference external image-reference" href="_static/md_terraced_pubs.pdf"><div align="center" class="align-center"><img alt="_images/md_terraced_pubs.svg" src="_images/md_terraced_pubs.svg" /></div>
 </a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>Each pub is a state in a statemachine.  You would program these states as
+functions that take two arguments, a reference to an activeobject and an
+event.</p>
+<p>These state functions will contain an if-elif structure which will have
+multiple clauses.  The greeter is the “init” clause, and the enter and exit
+bouncers are the “entry” and “exit” clauses.</p>
+<p>The “init”, “enter”, and “exit” clauses can be activated when the state
+function is given an event with an init, entry or exit name.</p>
+<p class="last">Likewise, the bartender is a clause where the application developer sets the
+event name.</p>
+</div>
 <p>The heaven will have one goddess Eve, “the goddess of law and order” and the
-underworld will be ruled by Theo, “the solipsist.”  The earth will have a lazy god
+underworld will be ruled by Theo, “<a class="reference external" href="https://en.wikipedia.org/wiki/Solipsism">the solipsist.</a>”  The earth will have a lazy god
 named Spike, “the source” who happens to be the only guy who can drink in the
 whole universe.  Spike will have a companion, who is a spirit, Tara “the
 explorer.”</p>
 <a class="reference external image-reference" href="_static/md_terraced_gods.pdf"><div align="center" class="align-center"><img alt="_images/md_terraced_gods.svg" src="_images/md_terraced_gods.svg" /></div>
 </a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>Eve represents the “event processor”, or the algorithm that sends the state
+functions different events.</p>
+<p>Spike, represents the “Source” state while the event processor is searching
+the statechart.  Think of Spike as the current state of the statemachine.</p>
+<p>Tara represents the “Target” state, which is used by the event processor to
+explore the statemachine while it is trying to figure out what to do.</p>
+<p>Theo is the “thread” in which all of the code is run.  The event processor and
+all of it’s calls to the various state functions will be driven by this
+thread.</p>
+<p class="last">An application developer will not write code to change the internal behaviour
+of the event processor, the source and target states or the thread.  This is
+why these characters are supernatural in the story; it’s a mnemonic.</p>
+</div>
 <p>Let’s put our little universe into a small multiverse. Each universe will have
 it’s own heaven and underworld, gods, people and explorer spirit, but its
 terraced architecture of pubs, can be shared across all connected worlds.</p>
 <a class="reference external image-reference" href="_static/md_multiverse.pdf"><div align="center" class="align-center"><img alt="_images/md_multiverse.svg" src="_images/md_multiverse.svg" /></div>
 </a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>Anytime a statechart references a callback, that callback will change the
+internal variable state of the active object in its first argument – the
+state callback functions do not have their own memory.</p>
+<p class="last">Since the callback functions don’t keep any information, they can be called by
+many different activeobjects, in its thread, and behave as expected; there are
+no side effects.  In this way, many different active objects can use the same
+set of state callback functions.</p>
+</div>
 <p>Eve, the goddess of heaven has a birds-eye view of our little world.  She rules
 over the people: the bouncers, greeters and bartenders and, Tara, “the explorer”
 spirit.  She took on her duty as “the goddess of law and order” with such gusto,
@@ -1219,6 +1279,18 @@ that sometime in the world’s history, she banned alcohol consumption for
 everyone on earth, except Spike, who she can’t control.</p>
 <a class="reference external image-reference" href="_static/md_eve.pdf"><div align="center" class="align-center"><img alt="_images/md_eve.svg" src="_images/md_eve.svg" /></div>
 </a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>Eve is the “event processor”.  The if-elif clauses, represented by the people
+in the story, exist within each of the state functions.  These if-elif clauses
+only become active when the event processor calls its function with an
+internal event, represented by one of the people in the story.</p>
+<p>Tara, the “target state” is used by the event processor when it is searching a
+statemachine to see which state handles an external event.</p>
+<p class="last">Since the event processor calls the function and change’s its target state
+while it is searching through a statemachine, we say that Eve rules over the
+people and Tara the “explorer spirit”.</p>
+</div>
 <p>Theo, “the solipsist” is the god of the underworld.  He is only called the
 “solipsist” by people outside of his universe, like us, because his universe
 only works and exists if he is thinking about it.  Nobody in his world is aware
@@ -1230,11 +1302,30 @@ and enthusiastic.  He can motivate anyone he talks to or even looks upon, in
 fact, this is his supernatural ability.</p>
 <a class="reference external image-reference" href="_static/md_theo.pdf"><div align="center" class="align-center"><img alt="_images/md_theo.svg" src="_images/md_theo.svg" /></div>
 </a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p class="last">Theo represents a “thread” pending on a queue.  The activeobject’s <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code>
+and <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> methods allow an application developer to put events into
+this queue.  When the thread sees that a queue has an item, it will wake up,
+and drive the event processor, which in turn, will call the functions
+making up the statemachine.</p>
+</div>
 <p>When Theo receives a message from another universe, it appears as a round hollow
 orb which sometimes contains a scroll.  He calls these orbs “events”, and if they
 have a scroll within them, he calls that scroll a “payload”.</p>
 <a class="reference external image-reference" href="_static/md_events.pdf"><div align="center" class="align-center"><img alt="_images/md_events.svg" src="_images/md_events.svg" /></div>
 </a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>An event has a name, called a signal, which can be a user defined name or it
+can be a predefined name.  An event with a user defined signal name is called
+an external event.  An event with a predefined name is called an internal
+event.</p>
+<p>The whole point of naming an event with a signal is so that a state function
+can use an if-elif clause to “catch” the event when it is given to that
+function.  When such an event is caught, your code is run.</p>
+<p class="last">An event can have an optional payload.</p>
+</div>
 <p>When an “event” comes through the portal, Theo will pick it up, marvel at it
 then in a reverent gesture, pass it to Eve.  They both become excited, maybe
 even a little nervous, because they know there universe is going to change; it
@@ -1250,19 +1341,26 @@ always near him.</p>
 the terrace where there is a bartender who knows what to do with this event.
 Then I want you to go to wherever he tells you to take it.  Good luck Tara, I
 believe in you”.</p>
-<a class="reference external image-reference" href="_static/md_bartenders_on_the_hsm.pdf"><div align="center" class="align-center"><img alt="_images/md_bartenders_on_the_hsm.svg" src="_images/md_bartenders_on_the_hsm.svg" /></div>
-</a>
 <p>Tara enjoys Spike’s company, but she also loves adventure.</p>
 <p>She looks down at the event to study it and notices that it has something written
 on it, a word, a phrase, it could be different every time, but it’s a clue and
 Tara loves a puzzle.  She looks around the pub on her terrace and studies each
 of the bartender’s name tags.  If she sees that a name tag matches the name on
-the orb, she will approach that bartender and talk to him.</p>
+the event, she will approach that bartender and talk to him.</p>
 <a class="reference external image-reference" href="_static/md_events_bartenders.pdf"><div align="center" class="align-center"><img alt="_images/md_events_bartenders.svg" src="_images/md_events_bartenders.svg" /></div>
 </a>
 <p>If there is no bartender to talk to on her terrace, she will go to it’s exit
 staircase and descend to the next terrace.  Being a spirit, she is hard to see
 and the bouncers and greeters leave her alone when she is by herself.</p>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>The terraces are just callback functions containing if-elif-else clauses.  The
+else clause of each callback function provides information about what other
+callback function should be called if it doesn’t know what to do with a given
+event.  This other function, can be thought of as a lower terrace.</p>
+<p class="last">The bartender represents an if-elif clause that matches the name of the event
+given to that function.</p>
+</div>
 <p>She will continue to climb down the terraces until she comes to the edge of the
 universe.  If she can’t find a bartender who can answer her question, she will
 take the event and throw it off the edge of the earth, into oblivion, then climb
@@ -1270,6 +1368,12 @@ back up to rejoin Spike.  In such rare cases their universe doesn’t react to t
 event.</p>
 <a class="reference external image-reference" href="_static/md_bartenders_on_the_hsm_oblivion.pdf"><div align="center" class="align-center"><img alt="_images/md_bartenders_on_the_hsm_oblivion.svg" src="_images/md_bartenders_on_the_hsm_oblivion.svg" /></div>
 </a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p class="last">Here we are starting to explore a statechart’s dynamics.  If your statemachine
+doesn’t handle an event in any of it’s callback functions, the event will be
+ignored.</p>
+</div>
 <p>But if Tara does find a bartender who’s name tag matches the name on the event,
 she will show it to him.  He will take it and study it, sometimes he might even
 take out it’s scroll.  Then he will lean across the bar and whisper the answer
@@ -1280,6 +1384,22 @@ Spike, who rejoices because he doesn’t have to do anything.  For some reason
 Spike calls this a “hook”.</p>
 <a class="reference external image-reference" href="_static/md_bartenders_on_the_hsm_hook.pdf"><div align="center" class="align-center"><img alt="_images/md_bartenders_on_the_hsm_hook.svg" src="_images/md_bartenders_on_the_hsm_hook.svg" /></div>
 </a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>Tara, the “target state” is used by the event processor to find which state
+callback function knows how to handle a given event.  In the above picture we
+see that T started in “C pub”, then the event processor recursed outward to “A
+pub” at which point it found an if-elif clause in the “A pub” callback that
+“handled” the event with the signal name of “Merve”.  If the application
+developer placed code between the “Merve” clause and it’s return statement,
+this code would be run while T is searching.</p>
+<p>When a state callback function returns “handled” the event processor pulls T
+back to where S is, then it stops searching.</p>
+<p class="last">A state callback function can use the T state of the event processor to
+perform this type of event handling.  For more details about this programming
+technique, read about the <a class="reference internal" href="patterns.html#patterns-ultimate-hook"><span class="std std-ref">ultimate hook
+pattern.</span></a></p>
+</div>
 <p>Most of the time, however, the bartender will tell Tara where she has to take
 the event.  If she has to continue her journey, she will wait for Spike so she can
 tell him about it.</p>
@@ -1296,11 +1416,23 @@ god of the earth.  For every terrace that Spike needs to leave so that he can
 rejoin with Tara, this futile ritual is repeated.</p>
 <a class="reference external image-reference" href="_static/md_bartenders_on_the_hsm_reaction_2.pdf"><div align="center" class="align-center"><img alt="_images/md_bartenders_on_the_hsm_reaction_2.svg" src="_images/md_bartenders_on_the_hsm_reaction_2.svg" /></div>
 </a>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>Tara, the “target state” is used by the event processor to recurse outward
+from C1 to find a state that knows what to do with the Event, who’s signal
+name is Mary.</p>
+<p>The A state has an if-elif clause which handles Mary, and within the clause
+there is a transition to the B2 state.  In this scenario, the A state is
+called the Least Common Ancestor, LCA of S and T.  S needs to exit all states,
+from it’s current state, to the LCA.  However, it should not exit the LCA.</p>
+<p class="last">As an application developer, you don’t really care about the LCA acronym.  You
+just need to understand the dynamics of exits work.</p>
+</div>
 <p>When Spike finally finds Tara he asks her what she learned.  Bubbling with
-excitement, she tells him about where the bartender said to take the orb, to
+excitement, she tells him about where the bartender said to take the event, to
 which he always says, “great I’ll meet you there, but first I want to have a
-drink.”  Tara takes the orb and makes her way to the location that the bartender
-told her about.</p>
+drink.”  Tara takes the event and makes her way to the location that the
+bartender told her about.</p>
 <p>Spike finishes his drink, then again starts to make his way toward Tara.  Before
 he can climb up to a new Terrace, he is stopped by the entry bouncer, who looks
 at his clip board to see if Spike is on the guest list, which he always is, then
@@ -1332,6 +1464,15 @@ releases from her back: The laws were followed.</p>
 and its “run to completion”.  Knowing there is nothing left to do in the
 universe, he turns his gaze back to the portal.  He waits patiently for an event
 to pass through the little universe’s loading dock.  All is well.</p>
+<div class="admonition-hint admonition">
+<p class="first admonition-title">hint</p>
+<p>The run to completion, RTC, concept is very important to understand.  Your
+statechart will only react to one event at a time.  The thread will only
+process the next event when the event processor has run out of things to do
+with your old event.</p>
+<p class="last">For this reason, you should not put blocking code into your statecharts.  If
+you do, they will stop reacting to events and become unresponsive.</p>
+</div>
 <p>But is it?  Sometimes when Theo, “the solipsist”, god of the underworld, closes
 his eyes and daydreams; his attention briefly drifts back to his world.  This is
 enough to wake everyone up from their non-existence.</p>
@@ -1452,9 +1593,8 @@ To use this carpet you apply the <strong>spy_on</strong> decorator on the callba
 representing a pub, or state in the HSM.</p>
 <p>Let’s answer their challenge for meaning, by using one of their universes to make
 a toaster oven:</p>
-<div class="toctree-wrapper compound">
+<a class="reference internal" href="introduction.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="zero_to_one.html"><span class="std std-ref">next</span></a><div class="toctree-wrapper compound">
 </div>
-<p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">Next topic</span></a>.</p>
 </div>
 </div>
 </div>
@@ -1490,7 +1630,7 @@ a toaster oven:</p>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="introduction.html" title="previous chapter">Introduction</a></li>
-      <li>Next: <a href="examples.html" title="next chapter">Examples</a></li>
+      <li>Next: <a href="zero_to_one.html" title="next chapter">Zero To One</a></li>
   </ul></li>
 </ul>
 </div>

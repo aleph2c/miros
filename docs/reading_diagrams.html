@@ -16,8 +16,8 @@
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Recipes" href="recipes.html" />
-    <link rel="prev" title="Mongol Horse Archer" href="i_mongol_example.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Zero To One" href="zero_to_one.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -42,21 +42,17 @@
 popular ways of drawing pictures of software into one standard called UML
 (unified modeling language).  The Harel formalism (the way David Harel wanted us
 to draw statecharts) was included in UML.</p>
-<p>UML has fallen out of favor because the committee controlling it, became
-overly pedantic. They tried to turn UML into a programming language, rather than
-a collection of best practices about how to sketch out some pictures of software
-systems.  They flew too close to the Sun, annoyed everyone, burnt their wings
-and crashed into the ground.  Now UML has become some kind of undead, anti-brand.</p>
-<p>But they left behind some useful technology.  A number of free diagramming tools
-still exist which can be used to draw pictures really fast so that we can
-communicate to one another what we want to build.  With these same tools we can
-draw our statecharts.</p>
-<p>Martin Fowler translated the gobbledegook of the UML standard into something
-legible with his book: <a class="reference external" href="https://martinfowler.com/books/uml.html">UML distilled</a>.  If you want a very solid
+<p>Unfortunately, UML has fallen out of favor because the committee controlling it
+produced something that the software community didn’t want.  There are many
+different reasons for this, but it is safe to say that it is no longer popular.
+In fact, UML, in some ways, has become a kind of anti-brand.</p>
+<p>But they left behind some useful technology.  A number of open source
+diagramming tools still exist with which we can quickly draw our statecharts.</p>
+<p>Martin Fowler rendered down the complexity of the UML standard into : <a class="reference external" href="https://martinfowler.com/books/uml.html">UML
+distilled</a>.  If you want a very solid
 understanding about Harel formalism as it relates to UML, go to the source and
-read <a class="reference external" href="https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download">Practical UML Statechart in C/C++, 2nd
-Edition</a> by
-Miro Samek.</p>
+read <a class="reference external" href="https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download">Practical UML Statechart in C/C++, 2nd Edition</a> by Miro
+Samek.</p>
 <p>But do you need to read these books before you use UML?  No, not really, this
 section should give you enough information so that you can make your own
 pictures.</p>
@@ -136,21 +132,21 @@ thing) is on the side that owns the other thing.  So at a glance you can see who
 owns what.</p>
 <a class="reference external image-reference" href="_static/arrow_pear.pdf"><div align="center" class="align-center"><img alt="_images/arrow_pear.svg" src="_images/arrow_pear.svg" /></div>
 </a>
-<p>The composite pear-arrow is black because when your object is destroyed, so is
-the object that it has built within it.</p>
+<p>The composite arrow is black because when your object is destroyed, so is the
+object that it has built within it.</p>
 <a class="reference external image-reference" href="_static/arrow_pear_2.pdf"><div align="center" class="align-center"><img alt="_images/arrow_pear_2.svg" src="_images/arrow_pear_2.svg" /></div>
 </a>
 <p>These mnemonics should help you when you are diagramming.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p>These class diagrams are ill conceived since you have to know about all sorts of
-activity in the background before you understand them.  You have to know that
-the relationships are between the objects that are instantiated and not the
-classes themselves.  As Dave Thomas (of Pragmatic fame) says, Python is not
-class oriented programming it’s object oriented programming, yet UML draws
-everything with classes.</p>
-<p class="last">So treat the class diagrams as a quick reference to provide your statechart some
-context, or just a kind of throw away thing.  Use lots of class shorthand
+<p>These class diagrams are ill conceived since you have to know about all sorts
+of activity in the background before you understand them.  You have to know
+that the relationships are between the objects that are instantiated and not
+the classes themselves.  As Dave Thomas (of Pragmatic fame) says, “[Python] is
+not about class oriented programming, it’s an object oriented programming
+language, yet UML draws everything with classes.”</p>
+<p class="last">So treat the class diagrams as a quick reference to provide your statechart
+some context, or just a kind of throw away thing.  Use lots of class shorthand
 pictures if you are going to draw a few different classes on the same diagram.
 Your actual classes are well defined in your Python code, so you can use your
 code-tools (ctag/cscope) to see the class hierarchies and who references what
@@ -158,7 +154,7 @@ within your editor.</p>
 </div>
 <p>Martin Fowler spends over two chapters of <a class="reference external" href="https://martinfowler.com/books/uml.html">UML distilled</a> writing about class diagrams.  You
 can make them really complicated if you want.</p>
-<p>If you are using the miros package, you are managing your system’s
+<p>If you are using the miros package, you are rightfully managing your system’s
 complexity using statecharts and not with classes.  So drawing detailed pictures
 using class diagrams is not a good use of your time.</p>
 </div>
@@ -166,10 +162,10 @@ using class diagrams is not a good use of your time.</p>
 <span id="reading-diagrams-inheritance"></span><h2>Inheritance and miros<a class="headerlink" href="#inheritance-and-miros" title="Permalink to this headline">¶</a></h2>
 <p>Within the context of this library, you would inherit from either the
 ActiveObject or the ActiveFactory to gain access to the event processor, and all
-of the other useful methods which would drive your statechart diagram.  Then,
-you can either attach this class directly to your statechart, or make an
-intermediate class that holds all of your worker-functions for the thing you are
-trying to build.</p>
+of the other useful methods which would drive your statechart.  Then, you can
+either attach this class directly to your statechart, or make an intermediate
+class that holds all of your worker-functions for the thing you are trying to
+build.</p>
 <a class="reference external image-reference" href="_static/class_6.pdf"><div align="center" class="align-center"><img alt="_images/class_6.svg" src="_images/class_6.svg" /></div>
 </a>
 <p>Inheritance is patching.  Patching is easy for a computer to do, but it’s a lot
@@ -193,82 +189,6 @@ ActiveObject”; yes, that makes sense.  Ok, I’ll use inheritance.</p>
 a specific event, use the <a class="reference internal" href="patterns.html#patterns-ultimate-hook"><span class="std std-ref">ultimate hook pattern</span></a>.
 This gives you all of the benefits of inheritance while still having debuggable
 code.</p>
-</div>
-<div class="section" id="understand-what-a-statechart-is-from-a-metaphor">
-<span id="reading-diagrams-understand-what-a-statechart-is-from-a-metaphor"></span><h2>Understand what a Statechart is from a Metaphor<a class="headerlink" href="#understand-what-a-statechart-is-from-a-metaphor" title="Permalink to this headline">¶</a></h2>
-<p>If you don’t know what a statechart is, think of it as a kind of board
-game.</p>
-<p>The board game has a board with a picture on it, some marbles that the players
-can place, and or roll around the board in accordance to the game’s rulebook.
-This game has two common game pieces that are used to move around the board;
-they respond to how the marbles are played.  If one player moves the game pieces on
-their turn, the next player will start their turn at this new position.</p>
-<p>As the board game designer, you would have control over the drawing on the board
-and you would design some of the marbles that are used by the players, but you
-wouldn’t control the rulebook or the players specific behavior, what fun would
-that be?  But, you could choose who gets to play the game.</p>
-<p>The players of your game could be people, touching an external user interface.
-At the moment they press a key, an electrical signal would be sent into your
-computer and then turned into a software abstraction of the key-press event that
-could effect your board game.  But a player doesn’t actually have to be a
-person, it could be a count down timer that fires an event every 3 seconds, it
-could be the stock market, it could be the weather.  A player in this metaphor
-is just something in the outside world that can trigger the events you want your
-board game to react to.</p>
-<p>To distinguish one event from another event, we will call them by different
-names: signal names.  Sometimes an event carries additional information, let’s
-call this a payload.  Going back to our metaphor, think of an event is a marble.
-A player would build a marble and put it on the board when it was their turn to
-play the game.  Every marble would have a signal name painted on it, and
-sometimes, deep within the marble would be a payload.</p>
-<p>The player would place their marble on the board at the current location of the
-game pieces, let go of it and watch it roll.  As it rolled on the board, it
-might trigger software that you have written into that marble’s groove.  It
-might trigger additional marbles to pop out of the board and roll in turn; but
-eventually the action would stop and the common game pieces would be moved to
-position and the next player would get to play.</p>
-<p>Every game has a rule book.  In our case our case the rule book is
-called the Harel Formalism.  These rules govern how the marble can move on the
-board and how the game pieces are shifted in response.</p>
-<p>The statechart board game also has rules about when a player gets to play.  If
-one player really needs to put a marble on the board while another is playing,
-this is OK.  She will just put it into a loading dock.  The statechart board
-game will only let one player play out their marble on the board at a time; this
-rule is called run to completion (RTC).  When a player’s marble has finished
-moving around the board, our board game will check it’s loading dock to see if
-another marble needs to be acted upon.</p>
-<p>The loading dock is a python deque.  The thing that will load the marble onto
-the board when the game has finished processing the last player’s marble is a
-python thread.</p>
-<p>So what does this board game look like?  Well, it looks kind of like a bunch of
-rounded rectangles connected with arrows.  The arrows have signal names painted
-on them to describe paths that certain marbles can follow and the rounded
-rectangles are called states.</p>
-<p>All the states have names, and a state can be within another state.  As the
-different players play the game, the common pieces are moved around the board,
-coming to rest within one of the states.  This is called the resting state.</p>
-<p>The rules are pretty straightforward, but who wants to read a rulebook anyway?
-The players certainly don’t.  So, you as the board game designer and the board
-game itself must know the rules.  The board game’s software that applies the
-rules to the marbles on the board is called the event processor.  It is based
-upon the algorithm written by Miro Samek.</p>
-<p>So how is this useful?  Well your game has software on it’s game board that can
-run when a marble roles over it.  You can connect this software to the output of
-your computer; so you can control things in the outside world.  Your board game,
-statechart, could be used to control a trading strategy, it could be used to
-control the massive doors over a stadium, automatically reacting to changes in
-weather conditions.</p>
-<p>Getting down to brass tacks, what do we do now?  Well I have to show you how to
-draw a board game; I have to show you how to draw a statechart.  We will use
-UML.  I have to show you how to connect your board game to it’s automatic rule
-book; the event processor.  I have to show you how to create your custom
-marbles, the events and their payloads and how to send these to the board game
-so that you can connect outside things into the events to which your statechart
-will react too.</p>
-<p>Once you know how to draw the pictures, you will need to know how to translate
-this into code.  Lastely, I will show you how to see if your statechart is
-working; so that it can give you feedback about what it is doing.   You can use
-this feedback to both trouble shoot your design and to describe how it works.</p>
 </div>
 <div class="section" id="events">
 <span id="reading-diagrams-events"></span><h2>Events<a class="headerlink" href="#events" title="Permalink to this headline">¶</a></h2>
@@ -331,9 +251,7 @@ about internal events:</p>
 <li>init (the black dot, which means, “Now what?”)</li>
 </ul>
 </div></blockquote>
-<p>I will explain how they work when we look at the board game’s rule book, for now
-I will just show you how to draw them.  The entry and exit internal events, are
-just hooks:</p>
+<p>The entry and exit internal events, are just hooks:</p>
 <a class="reference external image-reference" href="_static/Transition_Triggers_With_Internal_0.pdf"><div align="center" class="align-center"><img alt="_images/Transition_Triggers_With_Internal_0.svg" src="_images/Transition_Triggers_With_Internal_0.svg" /></div>
 </a>
 <p>The init internal event is drawn with something that UML calls a pseudostate;
@@ -343,13 +261,6 @@ black dot connected to an arrow.</p>
 </a>
 <p>The internal events are triggered in reaction to transitions made by external
 events on your diagram.</p>
-<p>To get a marble onto the board, you need to get it into the games loading dock.
-To do this, you use one of two different API calls to this library,
-<code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> or <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code>.  If you use <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code>, which stands for post
-first-in-first out, you are playing fair.  You will post your marble at the end
-of the line of marbles waiting to be played by the board game.  If you use the
-<code class="docutils literal notranslate"><span class="pre">post_lifo</span></code>, you are budging in line, placing your marble at the front of the
-line so that it will be the next marble the game plays.</p>
 </div>
 <div class="section" id="event-processor-attachment-points">
 <span id="reading-diagrams-event-processor-connection"></span><h2>Event Processor Attachment Points<a class="headerlink" href="#event-processor-attachment-points" title="Permalink to this headline">¶</a></h2>
@@ -434,7 +345,7 @@ draw how your code works on a diagram.  Read on for the details.</p>
 <span id="reading-diagrams-if-structures"></span><h2>If-Else Structures<a class="headerlink" href="#if-else-structures" title="Permalink to this headline">¶</a></h2>
 <p>If you would like an event to be managed in different ways depending on some
 condition, you would use an if-else structure.  In UML your if-else structures look
-like diamonds with an event guard written on one of the arrow:</p>
+like diamonds with an event guard written on one of the arrows:</p>
 <a class="reference external image-reference" href="_static/if_else_1.pdf"><div align="center" class="align-center"><img alt="_images/if_else_1.svg" src="_images/if_else_1.svg" /></div>
 </a>
 </div>
@@ -462,7 +373,7 @@ the terminate pseudostate (icon):</p>
 can draw this with the final state icon:</p>
 <a class="reference external image-reference" href="_static/final_1.pdf"><div align="center" class="align-center"><img alt="_images/final_1.svg" src="_images/final_1.svg" /></div>
 </a>
-<p>This might make sense to use this if you want some code to run upon the
+<p>It might make sense to use this if you want some code to run upon the
 initialization of the state, but you do not want to transition deeper into the
 state machine:</p>
 <a class="reference external image-reference" href="_static/final_2.pdf"><div align="center" class="align-center"><img alt="_images/final_2.svg" src="_images/final_2.svg" /></div>
@@ -548,7 +459,7 @@ well.  From this diagram we can see how are LanChart chart contributes to the
 federation of our design.</p>
 <p>What is missing is that the LanChart doesn’t describe who constructs it.  I
 really shouldn’t because it doesn’t have access to this information.  To see
-this, you would reference the</p>
+this, you would reference the detailed statechart diagram.</p>
 </div>
 <div class="section" id="detailed-statechart-diagrams">
 <span id="reading-diagrams-detailed-statechart-diagrams"></span><h2>Detailed Statechart Diagrams<a class="headerlink" href="#detailed-statechart-diagrams" title="Permalink to this headline">¶</a></h2>
@@ -593,7 +504,7 @@ You can drop this plain text into your code or use it directly in your docs.</p>
 </div>
 <p>Avoid spending a lot of time on these diagrams, and avoid the more advanced
 diagramming features, since to put effort into hand drawing a sequence diagram
-while designing a reactive system will be a Sisyphean task.</p>
+while designing a reactive system will be a Sisyphean effort.</p>
 </div>
 <div class="section" id="payloads">
 <span id="reading-diagrams-payloads"></span><h2>Payloads<a class="headerlink" href="#payloads" title="Permalink to this headline">¶</a></h2>
@@ -604,7 +515,7 @@ separating threads.  Shared global information should be locked and unlocked if
 it’s being used by multiple concurrent processes.</p>
 <p>Instead of coming up with complicated locking mechanisms, wrap large common data
 structures within their own statecharts and copy smaller payloads into named
-tuples.  A named tuple is immutable, so you won’t accidentally short yourself in
+tuples.  A named tuple is immutable, so you won’t accidentally shoot yourself in
 the foot by accidentally creating a global variable.  You can draw your payloads
 into your statecharts like this:</p>
 <a class="reference external image-reference" href="_static/immutable_payload.pdf"><div align="center" class="align-center"><img alt="_images/immutable_payload.svg" src="_images/immutable_payload.svg" /></div>
@@ -646,7 +557,7 @@ always be people you can’t reach, focus on what you can change instead.  This 
 the power of open source, you can always fork a project and go your own way.</p>
 <p>If a developer isn’t diagramming their own software, then your organization is
 doing it wrong.</p>
-<table class="docutils footnote" frame="void" id="id4" rules="none">
+<a class="reference internal" href="zero_to_one.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="examples.html"><span class="std std-ref">next</span></a><table class="docutils footnote" frame="void" id="id4" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="https://youarenotsosmart.com/2011/03/25/the-sunk-cost-fallacy/">The Sunk Cost Fallacy</a></td></tr>
@@ -669,7 +580,6 @@ doing it wrong.</p>
 <li><a class="reference internal" href="#a-warning-about-diagramming">A Warning about Diagramming</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#inheritance-and-miros">Inheritance and miros</a></li>
-<li><a class="reference internal" href="#understand-what-a-statechart-is-from-a-metaphor">Understand what a Statechart is from a Metaphor</a></li>
 <li><a class="reference internal" href="#events">Events</a></li>
 <li><a class="reference internal" href="#event-processor-attachment-points">Event Processor Attachment Points</a></li>
 <li><a class="reference internal" href="#states">States</a></li>
@@ -693,8 +603,8 @@ doing it wrong.</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="i_mongol_example.html" title="previous chapter">Mongol Horse Archer</a></li>
-      <li>Next: <a href="recipes.html" title="next chapter">Recipes</a></li>
+      <li>Previous: <a href="zero_to_one.html" title="previous chapter">Zero To One</a></li>
+      <li>Next: <a href="examples.html" title="next chapter">Examples</a></li>
   </ul></li>
 </ul>
 </div>

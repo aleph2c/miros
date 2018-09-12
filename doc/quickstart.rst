@@ -990,6 +990,29 @@ test code could just compare some strings:
 The ``time.sleep(0.001)`` code is included to provide your toaster statechart
 thread enough time to respond before it is tested (from the main thread).
 
+  I'm going to try and show how a miros statechart works, without using
+  technical-language.  To do this, I'll tell you a story about some characters
+  interacting in a little universe.
+    
+  The story will have some pictures, which I have created using a UML drawing
+  tool.  The images are intended to get someone who hasn't seen UML before,
+  comfortable looking at statecharts drawn this way.  These pictures will act as
+  a bridge between the story and how to program a statechart.  If an image is
+  too small in your browser, click on it to open it as a full-sized pdf.
+
+  If you find the story is confusing, don't worry, a concrete and
+  straightforward statechart example will follow it.  With each reading, the
+  statechart mechanics should become more and more evident.
+
+.. admonition:: Scott Volk: 2018-09-09
+
+  I will also pepper the story with boxes, like this one, containing hints about
+  what is going on.   I challenge you *not* to read these boxes in your first
+  reading of the story, especially if you are new to this type of technical
+  language, read them after you have programmed your first statechart.  See if
+  you can *guess* how the story's features, and characters, relate to some of
+  the programming concepts you know already.
+
 Story
 ^^^^^
 Let's build a little universe.
@@ -998,11 +1021,11 @@ Our universe will consist of a heaven, an earth and an underworld.   The earth
 will be made up of a set of pubs, arranged on different terraces.  To get to a
 higher pub, you would first have to walk through a lower pub.  The lower pubs
 are for a more general audience, while the higher pubs, though having less space
-have a more specialized aesthetic and a more exclusive guest list.
+have a more specialized aesthetic.
 
 On every terrace, there will be two bouncers a greeter and zero or more
-bartenders.   There will only be one set of stairs that can be used to enter a
-higher pub, and this is where the bouncers will be.
+bartenders.   There will only be one set of stairs that can be used to enter or
+exit a pub, and this is where that pub's bouncers will be.
 
 One bouncer will be facing in the direction of people entering the terrace and
 the other will be facing in the direction of people wanting to leave it.  The
@@ -1012,8 +1035,25 @@ greeter will talk to anyone who has decided to stay on her terrace.
     :target: _static/md_terraced_pubs.pdf
     :align: center
 
+.. admonition:: hint
+
+  Each pub is a state in a statemachine.  You would program these states as
+  functions that take two arguments, a reference to an activeobject and an
+  event.
+
+  These state functions will contain an if-elif structure which will have
+  multiple clauses.  The greeter is the "init" clause, and the enter and exit
+  bouncers are the "entry" and "exit" clauses.
+
+  The "init", "enter", and "exit" clauses can be activated when the state
+  function is given an event with an init, entry or exit name.
+
+  Likewise, the bartender is a clause where the application developer sets the
+  event name.
+
 The heaven will have one goddess Eve, "the goddess of law and order" and the
-underworld will be ruled by Theo, "the solipsist."  The earth will have a lazy god
+underworld will be ruled by Theo, "`the solipsist.
+<https://en.wikipedia.org/wiki/Solipsism>`_"  The earth will have a lazy god
 named Spike, "the source" who happens to be the only guy who can drink in the
 whole universe.  Spike will have a companion, who is a spirit, Tara "the
 explorer."
@@ -1022,6 +1062,25 @@ explorer."
     :target: _static/md_terraced_gods.pdf
     :align: center
 
+.. admonition:: hint
+
+  Eve represents the "event processor", or the algorithm that sends the state
+  functions different events.
+
+  Spike, represents the "Source" state while the event processor is searching
+  the statechart.  Think of Spike as the current state of the statemachine.
+  
+  Tara represents the "Target" state, which is used by the event processor to
+  explore the statemachine while it is trying to figure out what to do.
+
+  Theo is the "thread" in which all of the code is run.  The event processor and
+  all of it's calls to the various state functions will be driven by this
+  thread.  
+
+  An application developer will not write code to change the internal behaviour
+  of the event processor, the source and target states or the thread.  This is
+  why these characters are supernatural in the story; it's a mnemonic.
+
 Let's put our little universe into a small multiverse. Each universe will have
 it's own heaven and underworld, gods, people and explorer spirit, but its
 terraced architecture of pubs, can be shared across all connected worlds.
@@ -1029,6 +1088,17 @@ terraced architecture of pubs, can be shared across all connected worlds.
 .. image:: _static/md_multiverse.svg
     :target: _static/md_multiverse.pdf
     :align: center
+
+.. admonition:: hint
+
+  Anytime a statechart references a callback, that callback will change the
+  internal variable state of the active object in its first argument -- the
+  state callback functions do not have their own memory.
+
+  Since the callback functions don't keep any information, they can be called by
+  many different activeobjects, in its thread, and behave as expected; there are
+  no side effects.  In this way, many different active objects can use the same
+  set of state callback functions.
 
 Eve, the goddess of heaven has a birds-eye view of our little world.  She rules
 over the people: the bouncers, greeters and bartenders and, Tara, "the explorer"
@@ -1039,6 +1109,20 @@ everyone on earth, except Spike, who she can't control.
 .. image:: _static/md_eve.svg
     :target: _static/md_eve.pdf
     :align: center
+
+.. admonition:: hint
+
+  Eve is the "event processor".  The if-elif clauses, represented by the people
+  in the story, exist within each of the state functions.  These if-elif clauses
+  only become active when the event processor calls its function with an
+  internal event, represented by one of the people in the story.
+
+  Tara, the "target state" is used by the event processor when it is searching a
+  statemachine to see which state handles an external event.
+
+  Since the event processor calls the function and change's its target state
+  while it is searching through a statemachine, we say that Eve rules over the
+  people and Tara the "explorer spirit".
 
 Theo, "the solipsist" is the god of the underworld.  He is only called the
 "solipsist" by people outside of his universe, like us, because his universe
@@ -1055,6 +1139,14 @@ fact, this is his supernatural ability.
     :target: _static/md_theo.pdf
     :align: center
 
+.. admonition:: hint
+
+  Theo represents a "thread" pending on a queue.  The activeobject's ``post_fifo``
+  and ``post_lifo`` methods allow an application developer to put events into
+  this queue.  When the thread sees that a queue has an item, it will wake up,
+  and drive the event processor, which in turn, will call the functions
+  making up the statemachine.
+
 When Theo receives a message from another universe, it appears as a round hollow
 orb which sometimes contains a scroll.  He calls these orbs "events", and if they
 have a scroll within them, he calls that scroll a "payload".
@@ -1062,6 +1154,19 @@ have a scroll within them, he calls that scroll a "payload".
 .. image:: _static/md_events.svg
     :target: _static/md_events.pdf
     :align: center
+
+.. admonition:: hint
+  
+  An event has a name, called a signal, which can be a user defined name or it
+  can be a predefined name.  An event with a user defined signal name is called
+  an external event.  An event with a predefined name is called an internal
+  event.
+
+  The whole point of naming an event with a signal is so that a state function
+  can use an if-elif clause to "catch" the event when it is given to that
+  function.  When such an event is caught, your code is run.
+
+  An event can have an optional payload.
 
 When an "event" comes through the portal, Theo will pick it up, marvel at it
 then in a reverent gesture, pass it to Eve.  They both become excited, maybe
@@ -1082,17 +1187,13 @@ the terrace where there is a bartender who knows what to do with this event.
 Then I want you to go to wherever he tells you to take it.  Good luck Tara, I
 believe in you".
 
-.. image:: _static/md_bartenders_on_the_hsm.svg
-    :target: _static/md_bartenders_on_the_hsm.pdf
-    :align: center
-
 Tara enjoys Spike's company, but she also loves adventure.
 
 She looks down at the event to study it and notices that it has something written
 on it, a word, a phrase, it could be different every time, but it's a clue and
 Tara loves a puzzle.  She looks around the pub on her terrace and studies each
 of the bartender's name tags.  If she sees that a name tag matches the name on
-the orb, she will approach that bartender and talk to him.
+the event, she will approach that bartender and talk to him.
 
 .. image:: _static/md_events_bartenders.svg
     :target: _static/md_events_bartenders.pdf
@@ -1101,6 +1202,16 @@ the orb, she will approach that bartender and talk to him.
 If there is no bartender to talk to on her terrace, she will go to it's exit
 staircase and descend to the next terrace.  Being a spirit, she is hard to see
 and the bouncers and greeters leave her alone when she is by herself.
+
+.. admonition:: hint
+
+  The terraces are just callback functions containing if-elif-else clauses.  The
+  else clause of each callback function provides information about what other
+  callback function should be called if it doesn't know what to do with a given
+  event.  This other function, can be thought of as a lower terrace.
+
+  The bartender represents an if-elif clause that matches the name of the event
+  given to that function.  
 
 She will continue to climb down the terraces until she comes to the edge of the
 universe.  If she can't find a bartender who can answer her question, she will
@@ -1111,6 +1222,12 @@ event.
 .. image:: _static/md_bartenders_on_the_hsm_oblivion.svg
     :target: _static/md_bartenders_on_the_hsm_oblivion.pdf
     :align: center
+
+.. admonition:: hint
+
+  Here we are starting to explore a statechart's dynamics.  If your statemachine
+  doesn't handle an event in any of it's callback functions, the event will be
+  ignored.
 
 But if Tara does find a bartender who's name tag matches the name on the event,
 she will show it to him.  He will take it and study it, sometimes he might even
@@ -1125,6 +1242,24 @@ Spike calls this a "hook".
 .. image:: _static/md_bartenders_on_the_hsm_hook.svg
     :target: _static/md_bartenders_on_the_hsm_hook.pdf
     :align: center
+
+.. admonition:: hint
+
+  Tara, the "target state" is used by the event processor to find which state
+  callback function knows how to handle a given event.  In the above picture we
+  see that T started in "C pub", then the event processor recursed outward to "A
+  pub" at which point it found an if-elif clause in the "A pub" callback that
+  "handled" the event with the signal name of "Merve".  If the application
+  developer placed code between the "Merve" clause and it's return statement,
+  this code would be run while T is searching.
+
+  When a state callback function returns "handled" the event processor pulls T
+  back to where S is, then it stops searching.
+
+  A state callback function can use the T state of the event processor to
+  perform this type of event handling.  For more details about this programming
+  technique, read about the :ref:`ultimate hook
+  pattern.<patterns-ultimate-hook>`
 
 Most of the time, however, the bartender will tell Tara where she has to take
 the event.  If she has to continue her journey, she will wait for Spike so she can
@@ -1148,11 +1283,25 @@ rejoin with Tara, this futile ritual is repeated.
     :target: _static/md_bartenders_on_the_hsm_reaction_2.pdf
     :align: center
 
+.. admonition:: hint
+
+  Tara, the "target state" is used by the event processor to recurse outward
+  from C1 to find a state that knows what to do with the Event, who's signal
+  name is Mary.  
+
+  The A state has an if-elif clause which handles Mary, and within the clause
+  there is a transition to the B2 state.  In this scenario, the A state is
+  called the Least Common Ancestor, LCA of S and T.  S needs to exit all states,
+  from it's current state, to the LCA.  However, it should not exit the LCA.
+
+  As an application developer, you don't really care about the LCA acronym.  You
+  just need to understand the dynamics of exits work.
+
 When Spike finally finds Tara he asks her what she learned.  Bubbling with
-excitement, she tells him about where the bartender said to take the orb, to
+excitement, she tells him about where the bartender said to take the event, to
 which he always says, "great I'll meet you there, but first I want to have a
-drink."  Tara takes the orb and makes her way to the location that the bartender
-told her about.
+drink."  Tara takes the event and makes her way to the location that the
+bartender told her about.
 
 Spike finishes his drink, then again starts to make his way toward Tara.  Before
 he can climb up to a new Terrace, he is stopped by the entry bouncer, who looks
@@ -1195,6 +1344,16 @@ Theo, "the solipsist", god of the underworld, has been watching the whole scene,
 and its "run to completion".  Knowing there is nothing left to do in the
 universe, he turns his gaze back to the portal.  He waits patiently for an event
 to pass through the little universe's loading dock.  All is well.
+
+.. admonition:: hint
+
+  The run to completion, RTC, concept is very important to understand.  Your
+  statechart will only react to one event at a time.  The thread will only
+  process the next event when the event processor has run out of things to do
+  with your old event.
+
+  For this reason, you should not put blocking code into your statecharts.  If
+  you do, they will stop reacting to events and become unresponsive.
 
 But is it?  Sometimes when Theo, "the solipsist", god of the underworld, closes
 his eyes and daydreams; his attention briefly drifts back to his world.  This is
@@ -1304,9 +1463,12 @@ representing a pub, or state in the HSM.
 Let's answer their challenge for meaning, by using one of their universes to make
 a toaster oven:
 
+.. raw:: html
+
+  <a class="reference internal" href="introduction.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="zero_to_one.html"><span class="std std-ref">next</span></a>
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-:ref:`Next topic<examples>`.
 

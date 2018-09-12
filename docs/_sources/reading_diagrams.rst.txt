@@ -6,29 +6,26 @@
 
 Diagrams
 ========
+
 In the 1990s a number of people got together an collected all of the different
 popular ways of drawing pictures of software into one standard called UML
 (unified modeling language).  The Harel formalism (the way David Harel wanted us
 to draw statecharts) was included in UML.
 
-UML has fallen out of favor because the committee controlling it, became
-overly pedantic. They tried to turn UML into a programming language, rather than
-a collection of best practices about how to sketch out some pictures of software
-systems.  They flew too close to the Sun, annoyed everyone, burnt their wings
-and crashed into the ground.  Now UML has become some kind of undead, anti-brand.
+Unfortunately, UML has fallen out of favor because the committee controlling it
+produced something that the software community didn't want.  There are many
+different reasons for this, but it is safe to say that it is no longer popular.
+In fact, UML, in some ways, has become a kind of anti-brand.
 
-But they left behind some useful technology.  A number of free diagramming tools
-still exist which can be used to draw pictures really fast so that we can
-communicate to one another what we want to build.  With these same tools we can
-draw our statecharts.
+But they left behind some useful technology.  A number of open source
+diagramming tools still exist with which we can quickly draw our statecharts.
 
-Martin Fowler translated the gobbledegook of the UML standard into something
-legible with his book: `UML distilled
-<https://martinfowler.com/books/uml.html>`_.  If you want a very solid
+Martin Fowler rendered down the complexity of the UML standard into : `UML
+distilled <https://martinfowler.com/books/uml.html>`_.  If you want a very solid
 understanding about Harel formalism as it relates to UML, go to the source and
-read `Practical UML Statechart in C/C++, 2nd
-Edition <https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download>`_ by
-Miro Samek.
+read `Practical UML Statechart in C/C++, 2nd Edition
+<https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download>`_ by Miro
+Samek.
 
 But do you need to read these books before you use UML?  No, not really, this
 section should give you enough information so that you can make your own
@@ -144,8 +141,8 @@ owns what.
     :align: center
 
 
-The composite pear-arrow is black because when your object is destroyed, so is
-the object that it has built within it.
+The composite arrow is black because when your object is destroyed, so is the
+object that it has built within it.
 
 .. image:: _static/arrow_pear_2.svg
     :target: _static/arrow_pear_2.pdf
@@ -155,15 +152,15 @@ These mnemonics should help you when you are diagramming.
 
 .. note::
 
-  These class diagrams are ill conceived since you have to know about all sorts of
-  activity in the background before you understand them.  You have to know that
-  the relationships are between the objects that are instantiated and not the
-  classes themselves.  As Dave Thomas (of Pragmatic fame) says, Python is not
-  class oriented programming it's object oriented programming, yet UML draws
-  everything with classes.
+  These class diagrams are ill conceived since you have to know about all sorts
+  of activity in the background before you understand them.  You have to know
+  that the relationships are between the objects that are instantiated and not
+  the classes themselves.  As Dave Thomas (of Pragmatic fame) says, "[Python] is
+  not about class oriented programming, it's an object oriented programming
+  language, yet UML draws everything with classes."
 
-  So treat the class diagrams as a quick reference to provide your statechart some
-  context, or just a kind of throw away thing.  Use lots of class shorthand
+  So treat the class diagrams as a quick reference to provide your statechart
+  some context, or just a kind of throw away thing.  Use lots of class shorthand
   pictures if you are going to draw a few different classes on the same diagram.
   Your actual classes are well defined in your Python code, so you can use your
   code-tools (ctag/cscope) to see the class hierarchies and who references what
@@ -173,7 +170,7 @@ Martin Fowler spends over two chapters of `UML distilled
 <https://martinfowler.com/books/uml.html>`_ writing about class diagrams.  You
 can make them really complicated if you want.
 
-If you are using the miros package, you are managing your system's
+If you are using the miros package, you are rightfully managing your system's
 complexity using statecharts and not with classes.  So drawing detailed pictures
 using class diagrams is not a good use of your time.
 
@@ -183,10 +180,10 @@ Inheritance and miros
 ----------------------
 Within the context of this library, you would inherit from either the
 ActiveObject or the ActiveFactory to gain access to the event processor, and all
-of the other useful methods which would drive your statechart diagram.  Then,
-you can either attach this class directly to your statechart, or make an
-intermediate class that holds all of your worker-functions for the thing you are
-trying to build.
+of the other useful methods which would drive your statechart.  Then, you can
+either attach this class directly to your statechart, or make an intermediate
+class that holds all of your worker-functions for the thing you are trying to
+build.
 
 .. image:: _static/class_6.svg
     :target: _static/class_6.pdf
@@ -219,98 +216,6 @@ If you want all of the states of your statechart to react the same when they see
 a specific event, use the :ref:`ultimate hook pattern <patterns-ultimate-hook>`.
 This gives you all of the benefits of inheritance while still having debuggable
 code.
-
-.. _reading_diagrams-understand-what-a-statechart-is-from-a-metaphor:
-
-Understand what a Statechart is from a Metaphor
------------------------------------------------
-If you don't know what a statechart is, think of it as a kind of board
-game.
-
-The board game has a board with a picture on it, some marbles that the players
-can place, and or roll around the board in accordance to the game's rulebook.
-This game has two common game pieces that are used to move around the board;
-they respond to how the marbles are played.  If one player moves the game pieces on
-their turn, the next player will start their turn at this new position.
-
-As the board game designer, you would have control over the drawing on the board
-and you would design some of the marbles that are used by the players, but you
-wouldn't control the rulebook or the players specific behavior, what fun would
-that be?  But, you could choose who gets to play the game.
-
-The players of your game could be people, touching an external user interface.
-At the moment they press a key, an electrical signal would be sent into your
-computer and then turned into a software abstraction of the key-press event that
-could effect your board game.  But a player doesn't actually have to be a
-person, it could be a count down timer that fires an event every 3 seconds, it
-could be the stock market, it could be the weather.  A player in this metaphor
-is just something in the outside world that can trigger the events you want your
-board game to react to.
-
-To distinguish one event from another event, we will call them by different
-names: signal names.  Sometimes an event carries additional information, let's
-call this a payload.  Going back to our metaphor, think of an event is a marble.
-A player would build a marble and put it on the board when it was their turn to
-play the game.  Every marble would have a signal name painted on it, and
-sometimes, deep within the marble would be a payload.
-
-The player would place their marble on the board at the current location of the
-game pieces, let go of it and watch it roll.  As it rolled on the board, it
-might trigger software that you have written into that marble's groove.  It
-might trigger additional marbles to pop out of the board and roll in turn; but
-eventually the action would stop and the common game pieces would be moved to
-position and the next player would get to play.
-
-Every game has a rule book.  In our case our case the rule book is
-called the Harel Formalism.  These rules govern how the marble can move on the
-board and how the game pieces are shifted in response.
-
-The statechart board game also has rules about when a player gets to play.  If
-one player really needs to put a marble on the board while another is playing,
-this is OK.  She will just put it into a loading dock.  The statechart board
-game will only let one player play out their marble on the board at a time; this
-rule is called run to completion (RTC).  When a player's marble has finished
-moving around the board, our board game will check it's loading dock to see if
-another marble needs to be acted upon.
-
-The loading dock is a python deque.  The thing that will load the marble onto
-the board when the game has finished processing the last player's marble is a
-python thread.
-
-So what does this board game look like?  Well, it looks kind of like a bunch of
-rounded rectangles connected with arrows.  The arrows have signal names painted
-on them to describe paths that certain marbles can follow and the rounded
-rectangles are called states.
-
-All the states have names, and a state can be within another state.  As the
-different players play the game, the common pieces are moved around the board,
-coming to rest within one of the states.  This is called the resting state.
-
-The rules are pretty straightforward, but who wants to read a rulebook anyway?
-The players certainly don't.  So, you as the board game designer and the board
-game itself must know the rules.  The board game's software that applies the
-rules to the marbles on the board is called the event processor.  It is based
-upon the algorithm written by Miro Samek.
-
-So how is this useful?  Well your game has software on it's game board that can
-run when a marble roles over it.  You can connect this software to the output of
-your computer; so you can control things in the outside world.  Your board game,
-statechart, could be used to control a trading strategy, it could be used to
-control the massive doors over a stadium, automatically reacting to changes in
-weather conditions.
-
-Getting down to brass tacks, what do we do now?  Well I have to show you how to
-draw a board game; I have to show you how to draw a statechart.  We will use
-UML.  I have to show you how to connect your board game to it's automatic rule
-book; the event processor.  I have to show you how to create your custom
-marbles, the events and their payloads and how to send these to the board game
-so that you can connect outside things into the events to which your statechart
-will react too.
-
-Once you know how to draw the pictures, you will need to know how to translate
-this into code.  Lastely, I will show you how to see if your statechart is
-working; so that it can give you feedback about what it is doing.   You can use
-this feedback to both trouble shoot your design and to describe how it works.
 
 .. _reading_diagrams-events:
 
@@ -387,9 +292,7 @@ about internal events:
   * exit
   * init (the black dot, which means, "Now what?")
 
-I will explain how they work when we look at the board game's rule book, for now
-I will just show you how to draw them.  The entry and exit internal events, are
-just hooks:
+The entry and exit internal events, are just hooks:
 
 .. image:: _static/Transition_Triggers_With_Internal_0.svg
     :target: _static/Transition_Triggers_With_Internal_0.pdf
@@ -405,14 +308,6 @@ black dot connected to an arrow.
 
 The internal events are triggered in reaction to transitions made by external
 events on your diagram.
-
-To get a marble onto the board, you need to get it into the games loading dock.
-To do this, you use one of two different API calls to this library,
-``post_fifo`` or ``post_lifo``.  If you use ``post_fifo``, which stands for post
-first-in-first out, you are playing fair.  You will post your marble at the end
-of the line of marbles waiting to be played by the board game.  If you use the
-``post_lifo``, you are budging in line, placing your marble at the front of the
-line so that it will be the next marble the game plays.
 
 .. _reading_diagrams-event-processor-connection:
 
@@ -536,7 +431,7 @@ If-Else Structures
 ------------------
 If you would like an event to be managed in different ways depending on some
 condition, you would use an if-else structure.  In UML your if-else structures look
-like diamonds with an event guard written on one of the arrow:
+like diamonds with an event guard written on one of the arrows:
 
 .. image:: _static/if_else_1.svg
     :target: _static/if_else_1.pdf
@@ -582,7 +477,7 @@ can draw this with the final state icon:
     :target: _static/final_1.pdf
     :align: center
 
-This might make sense to use this if you want some code to run upon the
+It might make sense to use this if you want some code to run upon the
 initialization of the state, but you do not want to transition deeper into the
 state machine:
 
@@ -699,7 +594,7 @@ federation of our design.
 
 What is missing is that the LanChart doesn't describe who constructs it.  I
 really shouldn't because it doesn't have access to this information.  To see
-this, you would reference the 
+this, you would reference the detailed statechart diagram.
 
 .. _reading_diagrams-detailed-statechart-diagrams:
 
@@ -756,7 +651,7 @@ To this sequence diagram:
 
 Avoid spending a lot of time on these diagrams, and avoid the more advanced
 diagramming features, since to put effort into hand drawing a sequence diagram
-while designing a reactive system will be a Sisyphean task.
+while designing a reactive system will be a Sisyphean effort.
 
 .. _reading_diagrams-payloads:
 
@@ -770,7 +665,7 @@ it's being used by multiple concurrent processes.
 
 Instead of coming up with complicated locking mechanisms, wrap large common data
 structures within their own statecharts and copy smaller payloads into named
-tuples.  A named tuple is immutable, so you won't accidentally short yourself in
+tuples.  A named tuple is immutable, so you won't accidentally shoot yourself in
 the foot by accidentally creating a global variable.  You can draw your payloads
 into your statecharts like this:
 
@@ -824,5 +719,9 @@ the power of open source, you can always fork a project and go your own way.
 
 If a developer isn't diagramming their own software, then your organization is
 doing it wrong.
+
+.. raw:: html
+
+  <a class="reference internal" href="zero_to_one.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="examples.html"><span class="std std-ref">next</span></a>
 
 .. [#]  `The Sunk Cost Fallacy <https://youarenotsosmart.com/2011/03/25/the-sunk-cost-fallacy/>`_

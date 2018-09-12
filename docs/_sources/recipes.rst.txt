@@ -1674,7 +1674,9 @@ Using a Spy as a Test Target
 
 .. include:: i_test_with_spy.rst
 
-:ref:`Next topic<reflection>`.
+.. raw:: html
+
+  <a class="reference internal" href="examples.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="patterns.html"><span class="std std-ref">next</span></a>
 
 .. _umlet: http://www.umlet.com/
 .. _umletino: http://www.umlet.com/umletino/umletino.html

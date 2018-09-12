@@ -156,6 +156,8 @@ How to Explain your Design to Others
 
 .. include:: i_making_sequence_diagrams_from_trace.rst
 
-:ref:`Next topic<patterns>`.
+.. raw:: html
+
+  <a class="reference internal" href="recipes.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="patterns.html"><span class="std std-ref">next</span></a>
 
 .. _umlet: http://www.umlet.com
