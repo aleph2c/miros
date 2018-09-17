@@ -41,7 +41,7 @@ and thou wilt have finished.</em></p>
 <h1>Zero To One<a class="headerlink" href="#zero-to-one" title="Permalink to this headline">¶</a></h1>
 <p>This is not a 5 minute blog read.  If you want to learn how statecharts
 work, this is your one stop shop, it will take you from 0 to 1, but it will
-require you to focus and actually work through the examples.</p>
+require you to focus and actually work through the example.</p>
 <p>I’ll first try and show how a miros statecharts work, without using
 technical-language.  To do this, I’ll tell you a story about some characters
 interacting in a little universe.  Then I’ll show you how to make a reactive
@@ -85,8 +85,7 @@ greeter will talk to anyone who has decided to stay on her terrace.</p>
 <div class="admonition-hint admonition">
 <p class="first admonition-title">hint</p>
 <p>Each pub is a state in a statemachine.  You would program these states as
-functions that take two arguments, a reference to an activeobject and an
-event.</p>
+functions that take two arguments, a reference to an active object and an event.</p>
 <p>These state functions will contain an if-elif structure which will have
 multiple clauses.  The greeter is the “init” clause, and the enter and exit
 bouncers are the “entry” and “exit” clauses.</p>
@@ -128,7 +127,7 @@ terraced architecture of pubs, can be shared across all connected worlds.</p>
 internal variable state of the active object in its first argument – the
 state callback functions do not have their own memory.</p>
 <p class="last">Since the callback functions don’t keep any information, they can be called by
-many different activeobjects, in that activeobject’s thread, and behave as
+many different active objects, in that active object’s thread, and behave as
 expected; there are no side effects.  In this way, many different active
 objects can use the same set of state callback functions.</p>
 </div>
@@ -200,7 +199,7 @@ always near him.</p>
 <p>Eve flies done to Tara and gives her the event.  She says, “I want you to go to
 the terrace where there is a bartender who knows what to do with this event.
 Then I want you to go to wherever he tells you to take it.  Good luck Tara, I
-believe in you”.</p>
+believe in you.”</p>
 <p>Tara enjoys Spike’s company, but she also loves adventure.</p>
 <p>She looks down at the event to study it and notices that it has something written
 on it, a word, a phrase, it could be different every time, but it’s a clue and
@@ -218,8 +217,9 @@ and the bouncers and greeters leave her alone when she is by herself.</p>
 else clause of each callback function provides information about what other
 callback function should be called if it doesn’t know what to do with a given
 event.  This other function, can be thought of as a lower terrace.</p>
-<p class="last">The bartender represents an if-elif clause that matches the name of the event
-given to that function.</p>
+<p>The bartenders are named arrows on the HSM diagram.</p>
+<p class="last">The bartender also represents an if-elif clause that matches the name of the
+event given to that function.</p>
 </div>
 <p>She will continue to climb down the terraces until she comes to the edge of the
 universe.  If she can’t find a bartender who can answer her question, she will
@@ -285,7 +285,7 @@ there is a transition to the B2 state.  In this scenario, the A state is
 called the Least Common Ancestor, LCA of S and T.  S needs to exit all states,
 from it’s current state, to the LCA.  However, it should not exit the LCA.</p>
 <p class="last">As an application developer, you don’t really care about the LCA acronym.  You
-just need to understand the dynamics of exits work.</p>
+just need to understand the dynamics of how exits work.</p>
 </div>
 <p>When Spike finally finds Tara he asks her what she learned.  Bubbling with
 excitement, she tells him about where the bartender said to take the event, to
@@ -461,7 +461,7 @@ I will break it’s design process up into 6 steps, or iterations.</p>
 <p>Each iteration will have a specification, a design diagram and the code needed
 to match the design diagram.  Then I will prove that the code works and I’ll
 provide links to a bunch of questions and answers about the code.</p>
-<p>You can use these links to choose the questions you want to see the answers too,
+<p>You can use these links to choose the questions you want to see the answers to,
 or just skip onto the next iteration.</p>
 <p>Each iteration will be heavily linked so that you can quickly bounce around in
 its documentation.</p>
@@ -475,13 +475,13 @@ will built a very simple statechart example and confirm that it is working.</p>
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="iter1-spec">Iteration 1 specification:</p>
 <ul class="simple">
 <li>Ensure our Python version is 3.5 or greater (miros needs this to work)</li>
 <li>Install miros</li>
 <li>Import the required statechart components</li>
-<li>Build a ToasterOven class which inherits from an activeobject</li>
+<li>Build a ToasterOven class which inherits from an ActiveObject</li>
 <li>Make a single state, and start the statechart in that state</li>
 <li>Add instrumentation to our state</li>
 <li>Use the instrumentation to confirm that the statechart is working.</li>
@@ -491,7 +491,7 @@ will built a very simple statechart example and confirm that it is working.</p>
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p>To confirm that Python is version 3.5 or greater, in your terminal type:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 --version
 </pre></div>
@@ -515,9 +515,9 @@ pip install miros
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="iter1-code">Here is the code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># file called toaster_oven_0.py</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># file named toaster_oven_1.py</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
@@ -553,9 +553,9 @@ pip install miros
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="iter1-proof">Now to prove that the code works, in your terminal, run the program:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 toaster_oven_0.py
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 toaster_oven_1.py
 hello world
 <span class="o">[</span><span class="m">2018</span>-09-11 <span class="m">09</span>:35:10.011526<span class="o">]</span> <span class="o">[</span>oven<span class="o">]</span> <span class="se">\</span>
   e-&gt;start_at<span class="o">()</span> top-&gt;some_state_to_prove_this_works
@@ -566,7 +566,7 @@ hello world
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="iter1-questions">Questions and Answers about the code and the results:</p>
 <ul class="simple">
 <li><a class="reference internal" href="#why-is-miros-onl"><span class="std std-ref">Why is miros only supported in Python 3.5 or greater?</span></a></li>
@@ -576,7 +576,7 @@ hello world
 <li><a class="reference internal" href="#what-do-you-mean"><span class="std std-ref">What do you mean by a function signature?</span></a></li>
 <li><a class="reference internal" href="#how-am-i-going-t"><span class="std std-ref">How am I going to remember to structure my callback functions with all of these rules?</span></a></li>
 <li><a class="reference internal" href="#this-seems-stran"><span class="std std-ref">This seems strange to me, I haven’t seen Python that looks like this before.  Why do it this way?</span></a></li>
-<li><a class="reference internal" href="#where-is-the-thr"><span class="std std-ref">Where is the thread, event dispatcher and queues in the diagram?</span></a></li>
+<li><a class="reference internal" href="#where-is-the-thr"><span class="std std-ref">Where is the thread, event processor and queues in the diagram?</span></a></li>
 <li><a class="reference internal" href="#can-you-explain-what-is-happening-in-the-entry-clau"><span class="std std-ref">Can you explain what is happening in the entry clause?</span></a></li>
 <li><a class="reference internal" href="#can-you-explain-where-the-init-and-exit-clauses-a"><span class="std std-ref">Can you explain where the init and exit clauses are?</span></a></li>
 <li><a class="reference internal" href="#can-you-explain-what-is-going-on-with-the-else-clau"><span class="std std-ref">Can you explain what is going on with the else clause?</span></a></li>
@@ -584,13 +584,15 @@ hello world
 <li><a class="reference internal" href="#what-happens-when-the-start-at-method-is-call"><span class="std std-ref">What happens when the start_at method is called?</span></a></li>
 <li><a class="reference internal" href="#why-are-you-placing-a-delay-at-the-end-of-the-code-samp"><span class="std std-ref">Why are you placing a delay at the end of the code sample?</span></a></li>
 <li><a class="reference internal" href="#how-did-your-prove-that-your-code-work"><span class="std std-ref">How did your prove that your code worked?</span></a></li>
+<li><a class="reference internal" href="#why-are-you-using-threads"><span class="std std-ref">Why are you using threads and not asyncio?</span></a></li>
+<li><a class="reference internal" href="#when-is-it-going-to-be-do"><span class="std std-ref">When is it going to be done?</span></a></li>
 </ul>
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="why-is-miros-onl"><strong>Why is miros only supported in Python 3.5 or greater?</strong></p>
 <p>I originally wrote and tested miros in Python 3.5.  I didn’t know it at the
 time, but I used the Python 3.5 feature of avoiding circular imports.  When I
@@ -601,7 +603,7 @@ an accidental limitation.</p>
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="can-you-explain"><strong>Can you explain what is going on with the imports on lines 1-6?</strong></p>
 <p>I’ll answer this question by putting a lot of comments into the code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ActiveObject contains the thread, event processor, and queues</span>
@@ -636,7 +638,7 @@ an accidental limitation.</p>
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="why-bother-making"><strong>Why bother making a ToasterOven that inherits from the ActiveObect, why not just use the ActiveObject?</strong></p>
 <p>We will put toaster oven attributes and worker functions into the toaster oven
 class later.  For instance, we could put a <code class="docutils literal notranslate"><span class="pre">light_on</span></code> method in the
@@ -649,7 +651,7 @@ on the light with: <code class="docutils literal notranslate"><span class="pre">
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="you-keep-calling"><strong>You keep calling the state functions callbacks, what do you mean by this?</strong></p>
 <p>A callback function is just a function that is given to another function, so
 that it can be called later:</p>
@@ -674,7 +676,7 @@ signature.  The event processor will call these functions when it needs to.</p>
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="what-do-you-mean"><strong>What do you mean by a function signature?</strong></p>
 <p>A function signature describes the arguments that a function can take and the
 type of items it can return.</p>
@@ -740,7 +742,7 @@ return information that will tell the event processor to try our super state. Se
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="this-seems-stran"><strong>This seems strange to me, I haven’t seen Python that looks like this before.  Why do it this way?</strong></p>
 <p>The miros library is intended to serve two different audiences:</p>
 <ul class="simple">
@@ -762,7 +764,7 @@ Factory class.</p>
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="how-am-i-going-t"><strong>How am I going to remember to structure my callback functions with all of these rules?</strong></p>
 <p>Once you do it a few times you will remember it.  To begin with just reference
 the <a class="reference internal" href="recipes.html#recipes-boiler-plate-state-method-code"><span class="std std-ref">boiler plate example</span></a>, and change it
@@ -774,8 +776,8 @@ technology you are using with your editor. I use Ultisnips in Vim.</p>
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="where-is-the-thr"><strong>Where is the thread, event dispatcher and queues in the diagram?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="where-is-the-thr"><strong>Where is the thread, event processor and queues in the diagram?</strong></p>
 <p>The thread is missing from the UML:</p>
 <a class="reference external image-reference" href="_static/ToastOven_0_1.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_0_1.svg" src="_images/ToasterOven_0_1.svg" /></div>
 </a>
@@ -793,7 +795,7 @@ the active object.</p>
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="can-you-explain-what-the-spy-on-decorator-is-doing"><strong>Can you explain what the spy_on decorator is doing?</strong></p>
 <p>The spy_on decorator wraps a state’s callback function with some code that lets
 you log the output of the event processor as it follows its rules, making <strong>T</strong>
@@ -826,7 +828,7 @@ monitor.  I usually place the spy_on decorator on all of the state callbacks.</p
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="can-you-explain-what-is-happening-in-the-entry-clau"><strong>Can you explain what is happening in the entry clause?</strong></p>
 <p>When the event processor sends an event with the signal name <code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code>
 the if clause of the state callback will print “hello world” to the terminal
@@ -851,7 +853,7 @@ the <code class="docutils literal notranslate"><span class="pre">some_state_to_p
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="can-you-explain-where-the-init-and-exit-clauses-a"><strong>Can you explain where the init and exit clauses are?</strong></p>
 <p>We don’t need the init and exit clauses in the design, so we don’t include them
 in the if-elif structure of the state’s callback function.  The event processor
@@ -864,7 +866,7 @@ and easy to read.</p>
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="can-you-explain-what-is-going-on-with-the-else-clau"><strong>Can you explain what is going on with the else clause?</strong></p>
 <p>The else clause is used by <strong>T</strong> to know how to search outward in a statechart.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_state_to_prove_this_works</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -901,7 +903,7 @@ doesn’t know what to do with a user defined event.  This is the power of an HS
 <p>How the else clause is called doesn’t really matter to you as an application
 developer.  You just have to follow some rules:</p>
 <ul class="last simple">
-<li>set the <code class="docutils literal notranslate"><span class="pre">over.temp.fun</span></code> to the callback function representing the
+<li>set the <code class="docutils literal notranslate"><span class="pre">oven.temp.fun</span></code> to the callback function representing the
 superstate</li>
 <li>if there is no superstate, set it to the <code class="docutils literal notranslate"><span class="pre">top</span></code> attribute of the first
 argument given to the callback</li>
@@ -914,7 +916,7 @@ clause is reached.</li>
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p><strong>How does the live_trace call work?</strong></p>
 <p>The <a class="reference internal" href="recipes.html#recipes-tracing-live"><span class="std std-ref">live_trace</span></a> attribute needs to be set before the
 statechart’s thread is started:</p>
@@ -963,7 +965,7 @@ the text fit on the screen.</p>
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="what-happens-when-the-start-at-method-is-call"><strong>What happens when the start_at method is called?</strong></p>
 <p>The <code class="docutils literal notranslate"><span class="pre">start_at</span></code> method links the oven object to the HSM, then it starts the
 statechart.  It does this by creating a new thread, then running the oven’s
@@ -988,9 +990,11 @@ many needed entry events as required, then the init event in the state that
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="why-are-you-placing-a-delay-at-the-end-of-the-code-samp"><strong>Why are you placing a delay at the end of the code sample?</strong></p>
-<p>The statechart is running in a different thread.</p>
+<p>When you call the start_at method of the oven statechart, it starts a new
+thread. Then it runs the oven’s event processor in that thread.  The main
+program runs in the main thread.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
@@ -999,56 +1003,864 @@ many needed entry events as required, then the init event in the state that
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>The delay is placed at the bottom of the file to ensure that the statechart’s
+thread can react, and produce some live trace feedback, before the main thread
+exits the program.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The miros package uses daemonic threads, which means that they will be shut
+down with the main thread stops running.</p>
+</div>
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="how-did-your-prove-that-your-code-work"><strong>How did your prove that your code worked?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="how-did-your-prove-that-your-code-work"><strong>How did your prove that your code worked?</strong>
+Looking at the design, we see that the starting state should be
+<code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code> and that when it enters this state it should
+print “hello world” to the terminal.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_0.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_0.svg" src="_images/ToasterOven_0.svg" /></div>
+</a>
+<p>The output is:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hello world
+<span class="o">[</span><span class="m">2018</span>-09-11 <span class="m">09</span>:35:10.011526<span class="o">]</span> <span class="o">[</span>oven<span class="o">]</span> <span class="se">\</span>
+  e-&gt;start_at<span class="o">()</span> top-&gt;some_state_to_prove_this_works
+</pre></div>
+</div>
+<p>Which is exactly what were were expecting.</p>
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="reading_diagrams.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="why-are-you-using-threads"><strong>Why are you using threads and not asyncio?</strong></p>
+<p>Asyncio is cool, but it doesn’t work with everything yet.  It may be the future
+of Python, but to use it all of your libraries will have to be asyncio
+compliant.  I wrote miros so that it can use as much existing Python as possible.</p>
+<p>If you want to check out another implementation of the Miro Samek event
+processing algorithm in Python, written with asyncio, check out <a class="reference external" href="https://github.com/dwhall/pq">Dean Hall’s pq.</a></p>
+<p id="when-is-it-going-to-be-do"><strong>When is it going to be done?</strong></p>
+<p>I’m not answering this question</p>
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 </div>
 <div class="section" id="iteration-2-basic-oven">
 <span id="iter2"></span><h3>Iteration 2: basic oven<a class="headerlink" href="#iteration-2-basic-oven" title="Permalink to this headline">¶</a></h3>
+<p>Now that we know miros will run on our system, lets use it to build a very basic
+toaster oven.</p>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="iter2-spec">Iteration 2 specification:</p>
 <ul class="simple">
-<li>The toaster oven will have a door</li>
-<li>The toaster oven will have an oven light</li>
+<li>The toaster oven will have a door, it will always be closed</li>
+<li>The toaster oven will have an oven light, which can be turned off and on</li>
+<li>The toaster oven will have a heater, which can be turned off and on</li>
 <li>It will have two different heating modes, baking which can bake a potato
 and toasting which can toast some bread.</li>
-<li>It can be turned off, when it is off the heating element should be turned off
-and the light should be turned off</li>
 <li>The toaster oven should start in the off state</li>
-<li>The toaster can only heat when the door is closed.  This is a safety feature.</li>
+<li>The toaster can only heat when the door is closed.</li>
+<li>The toaster’s light should be off when the door is closed.</li>
 </ul>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<a class="reference external image-reference" href="_static/ToasterOven_2.pdf" id="iter2-design"><div align="center" class="align-center"><img alt="_images/ToasterOven_2.svg" src="_images/ToasterOven_2.svg" /></div>
+</a>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<div class="highlight-python notranslate" id="iter2-code"><div class="highlight"><pre><span></span><span class="c1"># file named toaster_oven_2.py</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">class</span> <span class="nc">ToasterOven</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">light_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;light_on&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">light_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;light_on&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">heater_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;heater_on&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">heater_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;heater_off&quot;</span><span class="p">)</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">door_closed</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">light_off</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Baking</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">baking</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">toasting</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Off</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">heating</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">heater_on</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">heater_off</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">baking</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;baking&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">toasting</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;toasting&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="c1"># toast something</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
+  <span class="c1"># bake something</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Baking</span><span class="p">))</span>
+  <span class="c1"># turn the oven off</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Off</span><span class="p">))</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<div class="highlight-bash notranslate" id="iter2-proof"><div class="highlight"><pre><span></span>python3 toaster_oven_2.py
+off
+<span class="o">[</span><span class="m">2018</span>-09-12 <span class="m">13</span>:54:51.890583<span class="o">]</span> <span class="o">[</span>oven<span class="o">]</span> e-&gt;start_at<span class="o">()</span> top-&gt;off
+heater_on
+toasting
+<span class="o">[</span><span class="m">2018</span>-09-12 <span class="m">13</span>:54:51.891473<span class="o">]</span> <span class="o">[</span>oven<span class="o">]</span> e-&gt;Toasting<span class="o">()</span> off-&gt;toasting
+heater_off
+heater_on
+baking
+<span class="o">[</span><span class="m">2018</span>-09-12 <span class="m">13</span>:54:51.891989<span class="o">]</span> <span class="o">[</span>oven<span class="o">]</span> e-&gt;Baking<span class="o">()</span> toasting-&gt;baking
+heater_off
+off
+<span class="o">[</span><span class="m">2018</span>-09-12 <span class="m">13</span>:54:51.892568<span class="o">]</span> <span class="o">[</span>oven<span class="o">]</span> e-&gt;Off<span class="o">()</span> baking-&gt;off
+</pre></div>
+</div>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="iter2-questions">Questions and Answers about code and results (iteration 2):</p>
+<ul class="simple">
+<li><a class="reference internal" href="#can-you-explain-how-the-picture-meets-the-design-specification"><span class="std std-ref">Can you explain how the picture meets the design specification?</span></a></li>
+<li><a class="reference internal" href="#can-you-explain-how-the-callbacks-are-arranged-relative-to-each-other"><span class="std std-ref">How do I write my state callback functions based on the HSM diagram?</span></a></li>
+<li><a class="reference internal" href="#how-do-i-use-the-return-status-with-the-callbacks"><span class="std std-ref">How do I use the return_status with these callbacks?</span></a></li>
+<li><a class="reference internal" href="#how-does-this-toaster-oven-example-relate-to-humans-in-the-story"><span class="std std-ref">How does this toaster oven example relate to humans in the story?</span></a></li>
+<li><a class="reference internal" href="#what-does-posting-the-events-do"><span class="std std-ref">What does posting the events do exactly?</span></a></li>
+<li><a class="reference internal" href="#where-are-the-signal-names-defined"><span class="std std-ref">Where are the event names defined?</span></a></li>
+<li><a class="reference internal" href="#can-you-explain-how-this-statechart-starts"><span class="std std-ref">Can you explain how this statechart starts?</span></a></li>
+<li><a class="reference internal" href="#can-you-explain-how-this-statechart-toasts"><span class="std std-ref">Can you explain how this statechart can transition from off to toasting?</span></a></li>
+<li><a class="reference internal" href="#can-you-explain-how-this-statechart-bakes"><span class="std std-ref">Can you explain how this statechart bakes?</span></a></li>
+<li><a class="reference internal" href="#can-you-explain-how-this-statechart-turns-off"><span class="std std-ref">Can you explain how this statechart turns off?</span></a></li>
+<li><a class="reference internal" href="#why-are-you-putting-state-into-the-toasteroven-and-not-its-hsm"><span class="std std-ref">Why are you putting state information into the ToasterOven and not its HSM?</span></a></li>
+</ul>
+<p id="can-you-explain-how-the-picture-meets-the-design-specification"><strong>Can you explain how the picture meets the design specification?</strong></p>
+<p>Let’s break it down:</p>
+<p><strong>The toaster oven will have a door, it will always be closed</strong></p>
+<p>The door_closed state will contain all of the behavior that the system will have
+while the door is closed in the toaster oven.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_spec_1.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_spec_1.svg" src="_images/ToasterOven_2_spec_1.svg" /></div>
+</a>
+<p>All of the statemachine’s states exist within this door_closed state, and the
+machine is started in the off state.  So the door will always be closed.</p>
+<p><strong>The toaster oven will have an oven light, which can be turned off and on</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">light_on</span></code> and <code class="docutils literal notranslate"><span class="pre">light_off</span></code> methods are within the ToasterOven class which is
+inherited from the ActiveObject class.  The statemachine can access these
+methods at anytime.  We see that when the door_closed state is entered, it uses
+one of them to shut off the oven light.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_spec_2.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_spec_2.svg" src="_images/ToasterOven_2_spec_2.svg" /></div>
+</a>
+<p><strong>The toaster oven will have a heater, which can be turned off and on</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">heater_on</span></code> and <code class="docutils literal notranslate"><span class="pre">heater_off</span></code> methods are within the ToasterOven class
+which is inherited from the ActiveObject class.  The statemachine can access
+these methods at anytime.  We see that when the heating state is entered, it
+uses one of them to turn on the heater, and when it is exited, it uses the other
+one to turn off the heater.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_spec_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_spec_3.svg" src="_images/ToasterOven_2_spec_3.svg" /></div>
+</a>
+<p><strong>It will have two different heating modes, baking which can bake a potato and toasting which can toast some bread</strong></p>
+<p>The toasting and baking states exist within the heating state.  To get to the
+states we need to invent two different events, named, “Baking” and “Toasting”.
+To allow our statechart to respond to these events, two different arrows are
+drawn from the door_closed state into the baking and toasting states.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_spec_4_1.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_spec_4_1.svg" src="_images/ToasterOven_2_spec_4_1.svg" /></div>
+</a>
+<p>What these arrows mean in English is, “while I’m in any state within the
+door_closed state, a “Baking” event will cause me to enter the baking state, and a
+“Toasting” event will cause me to enter the toasting state.</p>
+<p>If you haven’t seen an HSM before, placing the arrows from the outer state
+pointing to an inner state, is the equivalent of drawing these arrows from all
+of the states within the outer state to the target inner state.  That last
+sentence is hard to parse; its idea is best explained with a picture:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_spec_4_2.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_spec_4_2.svg" src="_images/ToasterOven_2_spec_4_2.svg" /></div>
+</a>
+<p>So now we have two different heating modes, but do they behave differently?  No,
+they pretty much do the same thing, they are just called different names.</p>
+<p>We will add different behaviors to these states in one of the next iterations of
+the design.</p>
+<p><strong>The toaster oven should start in the off state</strong></p>
+<p>Before the HSM can start reacting to events, a starting state needs to be
+selected.  Here we see we start in the off state, and this meets the
+specification.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_spec_5.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_spec_5.svg" src="_images/ToasterOven_2_spec_5.svg" /></div>
+</a>
+<p>You can see while the unit is off, it is not heating.</p>
+<p><strong>The toaster can only heat when the door is closed</strong></p>
+<p>You can see how we meet this specification item in the picture:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_spec_6.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_spec_6.svg" src="_images/ToasterOven_2_spec_6.svg" /></div>
+</a>
+<p><strong>The toaster’s light should be off when the door is closed</strong></p>
+<p>We can see that we have met this specification because the oven light is turned
+off as the HSM transitions into the off state:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_spec_7.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_spec_7.svg" src="_images/ToasterOven_2_spec_7.svg" /></div>
+</a>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="can-you-explain-how-the-callbacks-are-arranged-relative-to-each-other"><strong>How do I write my state callback functions based on the HSM diagram?</strong></p>
+<p>Consider the HSM part of the statechart:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_0.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_0.svg" src="_images/ToasterOven_2_0.svg" /></div>
+</a>
+<p>Now lets make a side projection of the HSM (the side projection is not UML):</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_1.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_1.svg" src="_images/ToasterOven_2_1.svg" /></div>
+</a>
+<p>Here is how you would construct the <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> state callback:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_2_door_closed.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_2_door_closed.svg" src="_images/ToasterOven_2_2_door_closed.svg" /></div>
+</a>
+<p>The callback’s if-elif clauses handle the events that interact with the state.
+You can see what these events are, by doing the following:</p>
+<ul class="simple">
+<li>Trace your eyes around the state boundary, and identify all the arrows that
+start from this boundary.</li>
+<li>Identify all, hooks, entry, exit and init event handlers drawn within the
+state’s region.</li>
+</ul>
+<p>To build your else clause:</p>
+<ul class="simple">
+<li>set the oven.temp.fun to the callback function representing the superstate</li>
+<li>if there is no superstate, set it to the <code class="docutils literal notranslate"><span class="pre">top</span></code> attribute of the first argument given to the callback</li>
+<li>ensure that the callback function returns, return_state.SUPER if the else clause is reached.</li>
+</ul>
+<p>Now let’s see how we would construct the off state callback:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_2_off.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_2_off.svg" src="_images/ToasterOven_2_2_off.svg" /></div>
+</a>
+<p>The same rules apply to the other states in the HSM.</p>
+<p>So, you can think of the callback functions as actually existing in two
+dimensions as a type of DAG:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_3.svg" src="_images/ToasterOven_2_3.svg" /></div>
+</a>
+<p>The event processor will use this structure to determine how to behave.</p>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="how-do-i-use-the-return-status-with-the-callbacks"><strong>How do I use the return_status with these callbacks?</strong></p>
+<p>The event processor will send events to your state callback function.  Your
+state callback function will return information to the event processor telling
+it how it responded to that event.  There are only certain types of responses
+that are permitted with the Miros Samek event processor, and this information is
+enumerated in the <code class="docutils literal notranslate"><span class="pre">return_status</span></code> object.</p>
+<p>The event processor flips back and forth between searching the graph and
+sending events to your callbacks to provide the expected behavior of your HSM.</p>
+<p>As an application developer you shouldn’t care about the inner workings of the
+event processing algorithm.  So just follow some simple conventions:</p>
+<ul class="simple">
+<li>set status to <code class="docutils literal notranslate"><span class="pre">UNHANDLED</span></code> at the top of your callback:
+<code class="docutils literal notranslate"><span class="pre">status</span> <span class="pre">=</span> <span class="pre">return_status.UNHANDLED</span></code></li>
+<li>if your callback handles an internal event, <code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code>, <code class="docutils literal notranslate"><span class="pre">EXIT_SIGNAL</span></code>
+or <code class="docutils literal notranslate"><span class="pre">INIT_SIGNAL</span></code> set status to <code class="docutils literal notranslate"><span class="pre">HANDLED</span></code>:
+<code class="docutils literal notranslate"><span class="pre">status</span> <span class="pre">=</span> <span class="pre">return_status.HANDLED</span></code></li>
+<li>if your callback uses a hook, set the status to <code class="docutils literal notranslate"><span class="pre">HANDLED</span></code>:
+<code class="docutils literal notranslate"><span class="pre">status</span> <span class="pre">=</span> <span class="pre">return_status.HANDLED</span></code></li>
+<li>if your callback needs to transition to another state, let the <code class="docutils literal notranslate"><span class="pre">trans</span></code> set
+the status variable:
+<code class="docutils literal notranslate"><span class="pre">status</span> <span class="pre">=</span> <span class="pre">oven.trans(&lt;some_state&gt;)</span></code></li>
+<li>in the else clause also set the status to <code class="docutils literal notranslate"><span class="pre">SUPER</span></code>:
+<code class="docutils literal notranslate"><span class="pre">status</span> <span class="pre">=</span> <span class="pre">return_status.SUPER</span></code></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">door_closed</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="hll">  <span class="c1"># set the status variable to the default</span>
+</span><span class="hll">  <span class="c1"># UNHANDLED attribute</span>
+</span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span>  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+<span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">light_off</span><span class="p">()</span>
+</span><span class="hll">    <span class="c1"># this is an internal event so we set</span>
+</span><span class="hll">    <span class="c1"># the status to the HANDLED attribute</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Baking</span><span class="p">):</span>
+</span><span class="hll">    <span class="c1"># this is an external event causing a transition</span>
+</span><span class="hll">    <span class="c1"># so we let the trans method set the status</span>
+</span><span class="hll">    <span class="c1"># attribute</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">baking</span><span class="p">)</span>
+<span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">):</span>
+</span><span class="hll">    <span class="c1"># this is an external event causing a transition</span>
+</span><span class="hll">    <span class="c1"># so we let the trans method set the status</span>
+</span><span class="hll">    <span class="c1"># attribute</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">toasting</span><span class="p">)</span>
+<span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="c1"># this is an internal event so we set</span>
+</span><span class="hll">    <span class="c1"># the status to the HANDLED attribute</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+<span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Off</span><span class="p">):</span>
+</span><span class="hll">    <span class="c1"># this is an external event causing a transition</span>
+</span><span class="hll">    <span class="c1"># so we let the trans method set the status</span>
+</span><span class="hll">    <span class="c1"># attribute</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+<span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="c1"># this is the else clause, set your status</span>
+</span><span class="hll">    <span class="c1"># to SUPER</span>
+</span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">I haven’t talked about how to implement a hook yet, you will see this in a
+future design iteration.</p>
+</div>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="how-does-this-toaster-oven-example-relate-to-humans-in-the-story"><strong>How does this toaster oven example relate to humans in the story?</strong></p>
+<p>Let’s consider the HSM:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_3_0.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_3_0.svg" src="_images/ToasterOven_3_0.svg" /></div>
+</a>
+<p>The humans in the story are the bouncers, the greeters and the bartenders, they
+all exist on the earth, which is just the HSM in the metaphor.</p>
+<p>The entry and exit bouncers and the greeters are internal events:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_3_1.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_3_1.svg" src="_images/ToasterOven_3_1.svg" /></div>
+</a>
+<p>The bartenders, are the user defined arrows and hooks, they are the external
+events:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_3_2.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_3_2.svg" src="_images/ToasterOven_3_2.svg" /></div>
+</a>
+<p>Each of these humans exist as a cause in your callback’s if-elif clause
+structure.  To participate in their “hack the human” campaign, to give their life
+some meaning, you place your code between their clause and how you set the return
+status for that clause.  To give the bartenders their secrets, you use the
+<code class="docutils literal notranslate"><span class="pre">trans</span></code> method, to transition to a different state.  To have a greeter move
+Spike and Tara along, again, you use the <code class="docutils literal notranslate"><span class="pre">trans</span></code> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">door_closed</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="c1"># entry bouncer clause</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># hacking this human</span>
+    <span class="c1"># Every time he talks to Spike he</span>
+    <span class="c1"># will turn our oven light&#39;s off!</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">light_off</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="c1"># a bartender named &#39;Baking&#39;</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Baking</span><span class="p">):</span>
+    <span class="c1"># his secret to Tara is to go to the baking terrace</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">baking</span><span class="p">)</span>
+
+  <span class="c1"># a bartender named &#39;Toasting&#39;</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">):</span>
+    <span class="c1"># his secret to Tara is to go to the toasting terrace</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">toasting</span><span class="p">)</span>
+
+  <span class="c1"># This is the terrace&#39;s greeter</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># if Spike and Tara arrive and settle on the terrace</span>
+    <span class="c1"># will will tell Tara they need to proceed to the</span>
+    <span class="c1"># off terrace</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+
+  <span class="c1"># A bartender named &#39;Off&#39;</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Off</span><span class="p">):</span>
+    <span class="c1"># his secret to Tara is to go to the off terrace</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+
+  <span class="k">else</span><span class="p">:</span>
+    <span class="c1"># Tara can&#39;t find her answer, so she throw&#39;s her</span>
+    <span class="c1"># event into oblivion</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">I haven’t talked about how to implement a hook yet, you will see this in a
+future design iteration.</p>
+</div>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="what-does-posting-the-events-do"><strong>What does posting the events do exactly?</strong></p>
+<p>We post the events at the bottom part of our file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="hll">  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+</span>  <span class="c1"># toast something</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
+  <span class="c1"># bake something</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Baking</span><span class="p">))</span>
+  <span class="c1"># turn the oven off</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Off</span><span class="p">))</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The above code is running in the main thread.  The statechart’s thread is
+started with the <code class="docutils literal notranslate"><span class="pre">start_at</span></code> call.  After this call, your program is running
+two threads.</p>
+<p>Your oven thread starts up it’s event processor, attaches to your callback
+graph, searches it and determines how to get <code class="docutils literal notranslate"><span class="pre">off</span></code>. ;)</p>
+<p>While this is happening your main thread is posting events into the oven
+thread’s first in first out queue.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="c1"># toast something</span>
+<span class="hll">  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
+</span>  <span class="c1"># bake something</span>
+<span class="hll">  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Baking</span><span class="p">))</span>
+</span>  <span class="c1"># turn the oven off</span>
+<span class="hll">  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Off</span><span class="p">))</span>
+</span>  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This queue is “thread safe”, which means that it can be shared across two
+threads.</p>
+<p>When the oven’s thread finally finishes processing your <code class="docutils literal notranslate"><span class="pre">start_at</span></code> call, and it has
+situated, <strong>S</strong> and <strong>T</strong> in the off state, it checks it’s queue to see if
+anything is there.</p>
+<p>Remember this picture from the story?</p>
+<a class="reference external image-reference" href="_static/md_theo.pdf"><div align="center" class="align-center"><img alt="_images/md_theo.svg" src="_images/md_theo.svg" /></div>
+</a>
+<p>The Theo in our toaster oven example is the oven thread, and after finishing its
+<code class="docutils literal notranslate"><span class="pre">start_at</span></code> call, it’s queue will look like this:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_4.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_4.svg" src="_images/ToasterOven_2_4.svg" /></div>
+</a>
+<p>It sees the first posted event,
+<code class="docutils literal notranslate"><span class="pre">Event(signal=signals.Toasting))</span></code> and it passes this information to the event
+processor which eventually causes a transition into the <code class="docutils literal notranslate"><span class="pre">baking</span></code> state.</p>
+<p>Meanwhile your main thread has probably finished processing, and it would like
+to exit.  If it were to exit, the oven thread wouldn’t get a chance to do all of
+it’s work.  It still needs to process the “Baking” and “Off” events.</p>
+<p>So, we place a <code class="docutils literal notranslate"><span class="pre">time.sleep(0.01)</span></code> at the end of our file, to let the oven
+thread finish its work before the main thread exits and kills the oven thread.</p>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="where-are-the-signal-names-defined"><strong>Where are the event names defined?</strong></p>
+<p>The event names are called signals.  A signal has a name and a number.  The
+number needs to be unique for each signal.</p>
+<p>If you were making your statecharts in c/C++ your signal numbers would be
+defined as an enumeration.  But miros is written in Python, so the signals are
+objects just like everything else.</p>
+<p>The internal signal names, <code class="docutils literal notranslate"><span class="pre">EXIT_SIGNAL</span></code>, <code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code>, <code class="docutils literal notranslate"><span class="pre">INIT_SIGNAL</span></code>
+are defined within the miros.event package, but you can access them by importing
+<code class="docutils literal notranslate"><span class="pre">signals</span></code> into your program:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+</pre></div>
+</div>
+<p>To get access to the internal signal objects:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span>
+<span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span>
+<span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span>
+</pre></div>
+</div>
+<p>The external signals, or the events that you define in your program, are created
+at the moment they are used.   Specifically when you reference an attribute of
+the <code class="docutils literal notranslate"><span class="pre">signals</span></code> object that doesn’t exist within it.  This creation only happens
+once, so the signal’s name and number remain unique across the life of the
+program.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># signals object does not have a New signal</span>
+<span class="n">some_event_the_system_has_never_seen</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">New</span><span class="p">)</span>
+<span class="c1"># signals object now has a New signal, it has been assigned a unique number</span>
+<span class="c1"># and the name &quot;New&quot;</span>
+</pre></div>
+</div>
+<p>So do you need to care about this?  No, you just need to remember to type,
+<code class="docutils literal notranslate"><span class="pre">Event(signal=signals.&lt;whatever_name_you_want&gt;)</span></code> and not worry about defining
+things before you use them.</p>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="can-you-explain-how-this-statechart-starts"><strong>Can you explain how this statechart starts?</strong></p>
+<p>The event processor identifies two different types of state’s in it’s dynamics,
+they are <strong>T</strong>, the target state, and <strong>S</strong> the source state.  The target state
+<strong>T</strong> is used to search the HSM, and <strong>S</strong> can be thought of as the current
+state of the HSM.</p>
+<p>The event processor uses <strong>T</strong> to find the target, or where it wants to go, then
+it marches <strong>S</strong> toward that target until the space between <strong>S</strong> and <strong>T</strong> is
+completely contracted.</p>
+<p>Before the oven is started, both <strong>S</strong> and <strong>T</strong>, start outside of the HSM:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_5_1.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_5_1.svg" src="_images/ToasterOven_2_5_1.svg" /></div>
+</a>
+<p>The <code class="docutils literal notranslate"><span class="pre">start_at</span></code> call places <strong>T</strong> in the off state, starts the thread and begins
+the event processor:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_5_2.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_5_2.svg" src="_images/ToasterOven_2_5_2.svg" /></div>
+</a>
+<p>Next, the <strong>S</strong> source will start walking through the entry conditions to re-join
+<strong>T</strong>; it’s first step will trigger the entry condition of the door_closed state:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_5_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_5_3.svg" src="_images/ToasterOven_2_5_3.svg" /></div>
+</a>
+<p>This means that the event processor will call the door_closed state with an
+ENTRY_SIGNAL event:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">door_closed</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">light_off</span><span class="p">()</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Baking</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">baking</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">toasting</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Off</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>Your <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> callback will catch this event with its if clause, use the
+active object’s <code class="docutils literal notranslate"><span class="pre">light_off</span></code> method to turn off the light, then return
+<code class="docutils literal notranslate"><span class="pre">return_status.HANDLED</span></code>, to let the event processor know it handled the
+ENTRY_SIGNAL event.</p>
+<p>Next, <strong>S</strong> rejoins <strong>T</strong> in the off state, this will trigger the off state’s
+entry condition:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_5_4.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_5_4.svg" src="_images/ToasterOven_2_5_4.svg" /></div>
+</a>
+<p>To trigger the off state’s entry condition the event processor will send the
+<code class="docutils literal notranslate"><span class="pre">off</span></code> state callback an ENTRY_SIGNAL event.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span>  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">off</span></code> callback catches the ENTRY_SIGNAL event in its if clause, prints
+“off” to the terminal and let’s the event processor know it handled the event.</p>
+<p>Next, the event processor calls the <code class="docutils literal notranslate"><span class="pre">off</span></code> state with an INIT_SIGNAL event.
+There is no if-elif clause for this event in the <code class="docutils literal notranslate"><span class="pre">off</span></code> function, because we
+don’t need to initialize the off state in this design.  So the callback notifies
+the event processor that it doesn’t handle this condition by returning
+<code class="docutils literal notranslate"><span class="pre">return_status.SUPER</span></code>; in effect the event is ignored:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
+<span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+</span>  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>Now the event processor has finished its <code class="docutils literal notranslate"><span class="pre">start_at</span></code> work.  The first run RTC
+process is completed and the oven’s thread pends on its queue.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_5_5.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_5_5.svg" src="_images/ToasterOven_2_5_5.svg" /></div>
+</a>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="can-you-explain-how-this-statechart-toasts"><strong>Can you explain how this statechart can transition from off to toasting?</strong></p>
+<p>The starting state is <code class="docutils literal notranslate"><span class="pre">off</span></code>, meaning that both <strong>S</strong> and <strong>T</strong> are in the off
+state.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_6_1.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_6_1.svg" src="_images/ToasterOven_2_6_1.svg" /></div>
+</a>
+<p>To toast, we need to send the oven a Toasting event.  This is how we do it with
+the miros package:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The above code places the “Toasting” event into the oven’s FIFO:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_6_2.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_6_2.svg" src="_images/ToasterOven_2_6_2.svg" /></div>
+</a>
+<p>The oven’s thread takes the Toasting event off the queue and passes it to the
+event processor.  <strong>T</strong> begins its search; the event processor calls the
+<code class="docutils literal notranslate"><span class="pre">off</span></code> state with a Baking event.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_6_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_6_3.svg" src="_images/ToasterOven_2_6_3.svg" /></div>
+</a>
+<p>There is no if-elif clause in the <code class="docutils literal notranslate"><span class="pre">off</span></code> state callback, so it’s else clause is
+triggered:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span></pre></div>
+</div>
+<p>This notifies the event processor that the <code class="docutils literal notranslate"><span class="pre">off</span></code> state can’t handle the Baking
+event, and it sets the next place to look to <code class="docutils literal notranslate"><span class="pre">door_closed</span></code>.  Here we see the
+power of the HSM.</p>
+<p>Next, <strong>T</strong> checks the <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> state to see if it can handle <code class="docutils literal notranslate"><span class="pre">Event(signal=signals.Baking)</span></code>:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_6_4.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_6_4.svg" src="_images/ToasterOven_2_6_4.svg" /></div>
+</a>
+<p>To do this, the event processor calls the <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> callback with a Baking event,
+which is caught by an elif clause:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">door_closed</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">light_off</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Baking</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">baking</span><span class="p">)</span>
+</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">toasting</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Off</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> function reacts to the Baking event by uses the oven’s
+<code class="docutils literal notranslate"><span class="pre">trans</span></code> method to request a transition to the <code class="docutils literal notranslate"><span class="pre">baking</span></code> state.  It places the
+value of the <code class="docutils literal notranslate"><span class="pre">trans</span></code> method into it’s status variable and returns whatever
+this information is to the event processor.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This means that <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> is the least common ancestor, LCA, of <code class="docutils literal notranslate"><span class="pre">off</span></code>
+and <code class="docutils literal notranslate"><span class="pre">baking</span></code>.</p>
+</div>
+<p>Next, <strong>S</strong> begins moving to rejoin <strong>T</strong>.  It’s first step is to call the exit
+condition of the off state:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_6_5.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_6_5.svg" src="_images/ToasterOven_2_6_5.svg" /></div>
+</a>
+<p>There is no exit condition in the <code class="docutils literal notranslate"><span class="pre">off</span></code> state code so it’s else clause is
+triggered:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span></pre></div>
+</div>
+<p>Next, <strong>S</strong> then rejoins <strong>T</strong>, and they are now both in the <code class="docutils literal notranslate"><span class="pre">door_closed</span></code>
+state.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_6_6.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_6_6.svg" src="_images/ToasterOven_2_6_6.svg" /></div>
+</a>
+<p>Next, the event processor places <strong>T</strong> into baking:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_6_7.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_6_7.svg" src="_images/ToasterOven_2_6_7.svg" /></div>
+</a>
+<p>Next, <strong>S</strong> begins to climb into the chart so that it can rejoin <strong>T</strong>. It
+start’s this journey by triggering the entry event of the heating state.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_6_8.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_6_8.svg" src="_images/ToasterOven_2_6_8.svg" /></div>
+</a>
+<p>To do this, the event processor sends an ENTRY_SIGNAL event to the <code class="docutils literal notranslate"><span class="pre">heating</span></code> state callback:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">heating</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">heater_on</span><span class="p">()</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">heater_off</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>The ENTRY_SIGNAL is caught by an elif clause, which will turn the heater on and
+tell the event processor it handled the event.</p>
+<p>Next, <strong>S</strong> enters the heating state to rejoin <strong>T</strong></p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_6_9.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_6_9.svg" src="_images/ToasterOven_2_6_9.svg" /></div>
+</a>
+<p>To do this the event processor calls the <code class="docutils literal notranslate"><span class="pre">baking</span></code> callback with an ENTRY_SIGNAL event:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">baking</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;baking&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span>  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p><strong>S</strong> and <strong>T</strong> are now settled in the baking state, so the event processor
+sends an INIT_SIGNAL to the <code class="docutils literal notranslate"><span class="pre">baking</span></code> callback to see if it needs to transition
+deeper into the statechart.  There is no init handle for this state, so this
+event is ignored.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There is only one handled init signal in the whole design and it’s in the
+door_closed state.  It will never be called because we start the statechart in
+the off state.  If were where to start the statechart in the door_closed
+state, this init event would be triggered, causing the statemachine to
+ultimately settle into the off state.</p>
+</div>
+<p>Another run to completion process has been finished, so the oven thread, looks
+back to it’s queue to see if any other thread posted event’s to it while it was
+trying to toast something:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2_5_5.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_5_5.svg" src="_images/ToasterOven_2_5_5.svg" /></div>
+</a>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="can-you-explain-how-this-statechart-bakes"><strong>Can you explain how this statechart bakes?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="can-you-explain-how-this-statechart-turns-off"><strong>Can you explain how this statechart turns off?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="why-are-you-putting-state-into-the-toasteroven-and-not-its-hsm"><strong>Why are you putting state information into the ToasterOven and not its HSM?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
 </div>
 <div class="section" id="iteration-3-open-door">
-<h3>Iteration 3: open door<a class="headerlink" href="#iteration-3-open-door" title="Permalink to this headline">¶</a></h3>
+<span id="iter3"></span><h3>Iteration 3: open door<a class="headerlink" href="#iteration-3-open-door" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>The toaster’s heating element should turn off when the door is opened</li>
 <li>The toaster should turn on it’s light when the door is opened</li>
 </ul>
 </div>
 <div class="section" id="iteration-4-adding-some-history">
-<h3>Iteration 4: adding some history<a class="headerlink" href="#iteration-4-adding-some-history" title="Permalink to this headline">¶</a></h3>
+<span id="iter4"></span><h3>Iteration 4: adding some history<a class="headerlink" href="#iteration-4-adding-some-history" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>When a customer closes the door, the toaster oven should go back to behaving
 like it was before.</li>
 </ul>
 </div>
 <div class="section" id="iteration-5-adding-a-buzzer">
-<h3>Iteration 5: adding a buzzer<a class="headerlink" href="#iteration-5-adding-a-buzzer" title="Permalink to this headline">¶</a></h3>
+<span id="iter5"></span><h3>Iteration 5: adding a buzzer<a class="headerlink" href="#iteration-5-adding-a-buzzer" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>While the toaster oven is in any state the customer should be able to press a buzzer which will
 get the attention of anyone nearby.</li>
 </ul>
 </div>
 <div class="section" id="iteration-6-adding-cook-times">
-<h3>Iteration 6: adding cook times<a class="headerlink" href="#iteration-6-adding-cook-times" title="Permalink to this headline">¶</a></h3>
+<span id="iter6"></span><h3>Iteration 6: adding cook times<a class="headerlink" href="#iteration-6-adding-cook-times" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>The toaster oven should stay in the baking state for twenty seconds, then buzz
 and turn off.</li>

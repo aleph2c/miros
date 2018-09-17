@@ -9,7 +9,7 @@ Zero To One
 ===========
 This is not a 5 minute blog read.  If you want to learn how statecharts
 work, this is your one stop shop, it will take you from 0 to 1, but it will
-require you to focus and actually work through the examples.
+require you to focus and actually work through the example.
 
 I'll first try and show how a miros statecharts work, without using
 technical-language.  To do this, I'll tell you a story about some characters
@@ -66,8 +66,7 @@ greeter will talk to anyone who has decided to stay on her terrace.
 .. admonition:: hint
 
   Each pub is a state in a statemachine.  You would program these states as
-  functions that take two arguments, a reference to an activeobject and an
-  event.
+  functions that take two arguments, a reference to an active object and an event.
 
   These state functions will contain an if-elif structure which will have
   multiple clauses.  The greeter is the "init" clause, and the enter and exit
@@ -124,7 +123,7 @@ terraced architecture of pubs, can be shared across all connected worlds.
   state callback functions do not have their own memory.
 
   Since the callback functions don't keep any information, they can be called by
-  many different activeobjects, in that activeobject's thread, and behave as
+  many different active objects, in that active object's thread, and behave as
   expected; there are no side effects.  In this way, many different active
   objects can use the same set of state callback functions.
 
@@ -213,7 +212,7 @@ always near him.
 Eve flies done to Tara and gives her the event.  She says, "I want you to go to
 the terrace where there is a bartender who knows what to do with this event.
 Then I want you to go to wherever he tells you to take it.  Good luck Tara, I
-believe in you".
+believe in you."
 
 Tara enjoys Spike's company, but she also loves adventure.
 
@@ -238,8 +237,10 @@ and the bouncers and greeters leave her alone when she is by herself.
   callback function should be called if it doesn't know what to do with a given
   event.  This other function, can be thought of as a lower terrace.
 
-  The bartender represents an if-elif clause that matches the name of the event
-  given to that function.  
+  The bartenders are named arrows on the HSM diagram.
+
+  The bartender also represents an if-elif clause that matches the name of the
+  event given to that function.  
 
 She will continue to climb down the terraces until she comes to the edge of the
 universe.  If she can't find a bartender who can answer her question, she will
@@ -322,7 +323,7 @@ rejoin with Tara, this futile ritual is repeated.
   from it's current state, to the LCA.  However, it should not exit the LCA.
 
   As an application developer, you don't really care about the LCA acronym.  You
-  just need to understand the dynamics of exits work.
+  just need to understand the dynamics of how exits work.
 
 When Spike finally finds Tara he asks her what she learned.  Bubbling with
 excitement, she tells him about where the bartender said to take the event, to
@@ -502,7 +503,7 @@ Each iteration will have a specification, a design diagram and the code needed
 to match the design diagram.  Then I will prove that the code works and I'll
 provide links to a bunch of questions and answers about the code.
 
-You can use these links to choose the questions you want to see the answers too,
+You can use these links to choose the questions you want to see the answers to,
 or just skip onto the next iteration.
 
 Each iteration will be heavily linked so that you can quickly bounce around in
@@ -524,7 +525,7 @@ Iteration 1 specification:
 * Ensure our Python version is 3.5 or greater (miros needs this to work)
 * Install miros
 * Import the required statechart components
-* Build a ToasterOven class which inherits from an activeobject
+* Build a ToasterOven class which inherits from an ActiveObject
 * Make a single state, and start the statechart in that state
 * Add instrumentation to our state
 * Use the instrumentation to confirm that the statechart is working.
@@ -565,7 +566,7 @@ Here is the code:
 
 .. code-block:: python
 
-  # file called toaster_oven_0.py
+  # file named toaster_oven_1.py
   from miros import ActiveObject
   from miros import return_status
   from miros import Event
@@ -603,7 +604,7 @@ Now to prove that the code works, in your terminal, run the program:
 
 .. code-block:: bash
 
-  python3 toaster_oven_0.py
+  python3 toaster_oven_1.py
   hello world
   [2018-09-11 09:35:10.011526] [oven] \
     e->start_at() top->some_state_to_prove_this_works
@@ -621,7 +622,7 @@ Questions and Answers about the code and the results:
 * :ref:`What do you mean by a function signature?<what_do_you_mean>`
 * :ref:`How am I going to remember to structure my callback functions with all of these rules?<how_am_i_going_t>`
 * :ref:`This seems strange to me, I haven't seen Python that looks like this before.  Why do it this way?<this_seems_stran>`
-* :ref:`Where is the thread, event dispatcher and queues in the diagram?<where_is_the_thr>`
+* :ref:`Where is the thread, event processor and queues in the diagram?<where_is_the_thr>`
 * :ref:`Can you explain what is happening in the entry clause?<can_you_explain_what_is_happening_in_the_entry_clau>`
 * :ref:`Can you explain where the init and exit clauses are?<can_you_explain_where_the_init_and_exit_clauses_a>`
 * :ref:`Can you explain what is going on with the else clause?<can_you_explain_what_is_going_on_with_the_else_clau>`
@@ -629,7 +630,8 @@ Questions and Answers about the code and the results:
 * :ref:`What happens when the start_at method is called?<what_happens_when_the_start_at_method_is_call>`
 * :ref:`Why are you placing a delay at the end of the code sample?<why_are_you_placing_a_delay_at_the_end_of_the_code_samp>`
 * :ref:`How did your prove that your code worked?<how_did_your_prove_that_your_code_work>`
-
+* :ref:`Why are you using threads and not asyncio?<why_are_you_using_threads>`
+* :ref:`When is it going to be done?<when_is_it_going_to_be_do>`
 
 .. include:: i_navigation_1.rst
 
@@ -822,7 +824,7 @@ technology you are using with your editor. I use Ultisnips in Vim.
 
 .. _where_is_the_thr:
 
-**Where is the thread, event dispatcher and queues in the diagram?**
+**Where is the thread, event processor and queues in the diagram?**
 
 The thread is missing from the UML:
 
@@ -976,7 +978,7 @@ More will be said about this in the up coming iterations.
   How the else clause is called doesn't really matter to you as an application
   developer.  You just have to follow some rules:
 
-  * set the ``over.temp.fun`` to the callback function representing the
+  * set the ``oven.temp.fun`` to the callback function representing the
     superstate
   * if there is no superstate, set it to the ``top`` attribute of the first
     argument given to the callback
@@ -1071,7 +1073,9 @@ In our example there isn't much to talk about.  The entry clause of the
 
 **Why are you placing a delay at the end of the code sample?**
 
-The statechart is running in a different thread.  
+When you call the start_at method of the oven statechart, it starts a new
+thread. Then it runs the oven's event processor in that thread.  The main
+program runs in the main thread.
 
 .. code-block:: python
 
@@ -1082,41 +1086,1039 @@ The statechart is running in a different thread.
 
     time.sleep(0.1)
 
+The delay is placed at the bottom of the file to ensure that the statechart's
+thread can react, and produce some live trace feedback, before the main thread
+exits the program.
+
+.. note::
+
+  The miros package uses daemonic threads, which means that they will be shut
+  down with the main thread stops running.  
+
 .. include:: i_navigation_1.rst
 
 .. _how_did_your_prove_that_your_code_work:
 
 **How did your prove that your code worked?**
+Looking at the design, we see that the starting state should be
+``some_state_to_prove_this_works`` and that when it enters this state it should
+print "hello world" to the terminal.
+
+.. image:: _static/ToasterOven_0.svg
+    :target: _static/ToasterOven_0.pdf
+    :align: center
+
+The output is:
+
+.. code-block:: bash
+
+  hello world
+  [2018-09-11 09:35:10.011526] [oven] \
+    e->start_at() top->some_state_to_prove_this_works
+
+Which is exactly what were were expecting.
 
 .. include:: i_navigation_1.rst
+
+.. _why_are_you_using_threads:
+
+**Why are you using threads and not asyncio?**
+
+Asyncio is cool, but it doesn't work with everything yet.  It may be the future
+of Python, but to use it all of your libraries will have to be asyncio
+compliant.  I wrote miros so that it can use as much existing Python as possible.
+
+If you want to check out another implementation of the Miro Samek event
+processing algorithm in Python, written with asyncio, check out `Dean Hall's pq.
+<https://github.com/dwhall/pq>`_
+
+.. _when_is_it_going_to_be_do:
+
+**When is it going to be done?**
+
+I'm not answering this question
+
+.. include:: i_navigation_1.rst
+
 
 .. _iter2:
 
 Iteration 2: basic oven
 -----------------------
-* The toaster oven will have a door
-* The toaster oven will have an oven light
+Now that we know miros will run on our system, lets use it to build a very basic
+toaster oven.
+
+.. include:: i_navigation_2.rst
+
+.. _iter2_spec:
+
+Iteration 2 specification:
+
+* The toaster oven will have a door, it will always be closed
+* The toaster oven will have an oven light, which can be turned off and on
+* The toaster oven will have a heater, which can be turned off and on
 * It will have two different heating modes, baking which can bake a potato
   and toasting which can toast some bread.
-* It can be turned off, when it is off the heating element should be turned off
-  and the light should be turned off
 * The toaster oven should start in the off state
-* The toaster can only heat when the door is closed.  This is a safety feature.
+* The toaster can only heat when the door is closed.
+* The toaster's light should be off when the door is closed.
+
+.. include:: i_navigation_2.rst
+
+.. _iter2_design:
+
+.. image:: _static/ToasterOven_2.svg
+    :target: _static/ToasterOven_2.pdf
+    :align: center
+
+.. include:: i_navigation_2.rst
+
+.. _iter2_code:
+
+.. code-block:: python
+
+  # file named toaster_oven_2.py
+  from miros import ActiveObject
+  from miros import return_status
+  from miros import Event
+  from miros import signals
+  from miros import spy_on
+  import time
+
+  class ToasterOven(ActiveObject):
+    def __init__(self, name):
+      super().__init__(name)
+
+    def light_on(self):
+      print("light_on")
+
+    def light_off(self):
+      print("light_on")
+
+    def heater_on(self):
+      print("heater_on")
+
+    def heater_off(self):
+      print("heater_off")
+
+  @spy_on
+  def door_closed(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.light_off()
+      status = return_status.HANDLED
+    elif(e.signal == signals.Baking):
+      status = oven.trans(baking)
+    elif(e.signal == signals.Toasting):
+      status = oven.trans(toasting)
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = oven.trans(off)
+    elif(e.signal == signals.Off):
+      status = oven.trans(off)
+    else:
+      oven.temp.fun = oven.top
+      status = return_status.SUPER
+    return status
+
+  @spy_on
+  def heating(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.heater_on()
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      oven.heater_off()
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = door_closed
+      status = return_status.SUPER
+    return status
+
+  @spy_on
+  def baking(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      print("baking")
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = heating
+      status = return_status.SUPER
+    return status
+
+  @spy_on
+  def toasting(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      print("toasting")
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = heating
+      status = return_status.SUPER
+    return status
+
+  @spy_on
+  def off(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      print("off")
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = door_closed
+      status = return_status.SUPER
+    return status
+
+  if __name__ == "__main__":
+    oven = ToasterOven(name="oven")
+    oven.live_trace = True
+    oven.start_at(off)
+    # toast something
+    oven.post_fifo(Event(signal=signals.Toasting))
+    # bake something
+    oven.post_fifo(Event(signal=signals.Baking))
+    # turn the oven off
+    oven.post_fifo(Event(signal=signals.Off))
+    time.sleep(0.01)
+
+
+.. include:: i_navigation_2.rst
+
+.. _iter2_proof:
+
+.. code-block:: bash
+
+	python3 toaster_oven_2.py
+	off
+	[2018-09-12 13:54:51.890583] [oven] e->start_at() top->off
+	heater_on
+	toasting
+	[2018-09-12 13:54:51.891473] [oven] e->Toasting() off->toasting
+	heater_off
+	heater_on
+	baking
+	[2018-09-12 13:54:51.891989] [oven] e->Baking() toasting->baking
+	heater_off
+	off
+	[2018-09-12 13:54:51.892568] [oven] e->Off() baking->off
+
+.. include:: i_navigation_2.rst
+
+.. _iter2_questions:
+
+Questions and Answers about code and results (iteration 2):
+
+* :ref:`Can you explain how the picture meets the design specification?<can_you_explain_how_the_picture_meets_the_design_specification>`
+* :ref:`How do I write my state callback functions based on the HSM diagram?<can_you_explain_how_the_callbacks_are_arranged_relative_to_each_other>`
+* :ref:`How do I use the return_status with these callbacks?<how_do_i_use_the_return_status_with_the_callbacks>`
+* :ref:`How does this toaster oven example relate to humans in the story?<how_does_this_toaster_oven_example_relate_to_humans_in_the_story>`
+* :ref:`What does posting the events do exactly?<what_does_posting_the_events_do>`
+* :ref:`Where are the event names defined?<where_are_the_signal_names_defined>`
+* :ref:`Can you explain how this statechart starts?<can_you_explain_how_this_statechart_starts>`
+* :ref:`Can you explain how this statechart can transition from off to toasting?<can_you_explain_how_this_statechart_toasts>`
+* :ref:`Can you explain how this statechart bakes?<can_you_explain_how_this_statechart_bakes>`
+* :ref:`Can you explain how this statechart turns off?<can_you_explain_how_this_statechart_turns_off>`
+* :ref:`Why are you putting state information into the ToasterOven and not its HSM?<why_are_you_putting_state_into_the_toasteroven_and_not_its_hsm>`
+
+
+.. _can_you_explain_how_the_picture_meets_the_design_specification:
+
+**Can you explain how the picture meets the design specification?**
+
+Let's break it down:
+
+**The toaster oven will have a door, it will always be closed**
+
+The door_closed state will contain all of the behavior that the system will have
+while the door is closed in the toaster oven.
+
+.. image:: _static/ToasterOven_2_spec_1.svg
+    :target: _static/ToasterOven_2_spec_1.pdf
+    :align: center
+
+All of the statemachine's states exist within this door_closed state, and the
+machine is started in the off state.  So the door will always be closed.
+
+**The toaster oven will have an oven light, which can be turned off and on**
+
+The ``light_on`` and ``light_off`` methods are within the ToasterOven class which is
+inherited from the ActiveObject class.  The statemachine can access these
+methods at anytime.  We see that when the door_closed state is entered, it uses
+one of them to shut off the oven light.
+
+.. image:: _static/ToasterOven_2_spec_2.svg
+    :target: _static/ToasterOven_2_spec_2.pdf
+    :align: center
+
+**The toaster oven will have a heater, which can be turned off and on**
+
+The ``heater_on`` and ``heater_off`` methods are within the ToasterOven class
+which is inherited from the ActiveObject class.  The statemachine can access
+these methods at anytime.  We see that when the heating state is entered, it
+uses one of them to turn on the heater, and when it is exited, it uses the other
+one to turn off the heater.
+
+.. image:: _static/ToasterOven_2_spec_3.svg
+    :target: _static/ToasterOven_2_spec_3.pdf
+    :align: center
+
+**It will have two different heating modes, baking which can bake a potato and toasting which can toast some bread**
+
+The toasting and baking states exist within the heating state.  To get to the
+states we need to invent two different events, named, "Baking" and "Toasting".
+To allow our statechart to respond to these events, two different arrows are
+drawn from the door_closed state into the baking and toasting states.
+
+.. image:: _static/ToasterOven_2_spec_4_1.svg
+    :target: _static/ToasterOven_2_spec_4_1.pdf
+    :align: center
+
+What these arrows mean in English is, "while I'm in any state within the
+door_closed state, a "Baking" event will cause me to enter the baking state, and a
+"Toasting" event will cause me to enter the toasting state.
+
+If you haven't seen an HSM before, placing the arrows from the outer state
+pointing to an inner state, is the equivalent of drawing these arrows from all
+of the states within the outer state to the target inner state.  That last
+sentence is hard to parse; its idea is best explained with a picture:
+
+.. image:: _static/ToasterOven_2_spec_4_2.svg
+    :target: _static/ToasterOven_2_spec_4_2.pdf
+    :align: center
+
+So now we have two different heating modes, but do they behave differently?  No,
+they pretty much do the same thing, they are just called different names.
+
+We will add different behaviors to these states in one of the next iterations of
+the design.
+
+**The toaster oven should start in the off state**
+
+Before the HSM can start reacting to events, a starting state needs to be
+selected.  Here we see we start in the off state, and this meets the
+specification.
+
+.. image:: _static/ToasterOven_2_spec_5.svg
+    :target: _static/ToasterOven_2_spec_5.pdf
+    :align: center
+
+You can see while the unit is off, it is not heating.
+
+**The toaster can only heat when the door is closed**
+
+You can see how we meet this specification item in the picture:
+
+.. image:: _static/ToasterOven_2_spec_6.svg
+    :target: _static/ToasterOven_2_spec_6.pdf
+    :align: center
+
+**The toaster's light should be off when the door is closed**
+
+We can see that we have met this specification because the oven light is turned
+off as the HSM transitions into the off state:
+
+.. image:: _static/ToasterOven_2_spec_7.svg
+    :target: _static/ToasterOven_2_spec_7.pdf
+    :align: center
+
+.. include:: i_navigation_2.rst
+
+.. _can_you_explain_how_the_callbacks_are_arranged_relative_to_each_other:
+
+**How do I write my state callback functions based on the HSM diagram?**
+
+Consider the HSM part of the statechart:
+
+.. image:: _static/ToasterOven_2_0.svg
+    :target: _static/ToasterOven_2_0.pdf
+    :align: center
+
+Now lets make a side projection of the HSM (the side projection is not UML):
+
+.. image:: _static/ToasterOven_2_1.svg
+    :target: _static/ToasterOven_2_1.pdf
+    :align: center
+
+Here is how you would construct the ``door_closed`` state callback:
+
+.. image:: _static/ToasterOven_2_2_door_closed.svg
+    :target: _static/ToasterOven_2_2_door_closed.pdf
+    :align: center
+
+The callback's if-elif clauses handle the events that interact with the state.
+You can see what these events are, by doing the following:
+
+* Trace your eyes around the state boundary, and identify all the arrows that
+  start from this boundary.
+* Identify all, hooks, entry, exit and init event handlers drawn within the
+  state's region.
+
+To build your else clause:
+
+* set the oven.temp.fun to the callback function representing the superstate
+* if there is no superstate, set it to the ``top`` attribute of the first argument given to the callback
+* ensure that the callback function returns, return_state.SUPER if the else clause is reached.
+
+Now let's see how we would construct the off state callback:
+
+.. image:: _static/ToasterOven_2_2_off.svg
+    :target: _static/ToasterOven_2_2_off.pdf
+    :align: center
+
+The same rules apply to the other states in the HSM.
+
+So, you can think of the callback functions as actually existing in two
+dimensions as a type of DAG:
+
+.. image:: _static/ToasterOven_2_3.svg
+    :target: _static/ToasterOven_2_3.pdf
+    :align: center
+
+The event processor will use this structure to determine how to behave.
+
+.. include:: i_navigation_2.rst
+
+.. _how_do_i_use_the_return_status_with_the_callbacks:
+
+**How do I use the return_status with these callbacks?**
+
+The event processor will send events to your state callback function.  Your
+state callback function will return information to the event processor telling
+it how it responded to that event.  There are only certain types of responses
+that are permitted with the Miros Samek event processor, and this information is
+enumerated in the ``return_status`` object.
+
+The event processor flips back and forth between searching the graph and
+sending events to your callbacks to provide the expected behavior of your HSM.
+
+As an application developer you shouldn't care about the inner workings of the
+event processing algorithm.  So just follow some simple conventions:
+
+* set status to ``UNHANDLED`` at the top of your callback: 
+  ``status = return_status.UNHANDLED``
+* if your callback handles an internal event, ``ENTRY_SIGNAL``, ``EXIT_SIGNAL``
+  or ``INIT_SIGNAL`` set status to ``HANDLED``:
+  ``status = return_status.HANDLED``
+* if your callback uses a hook, set the status to ``HANDLED``:
+  ``status = return_status.HANDLED``
+* if your callback needs to transition to another state, let the ``trans`` set
+  the status variable:
+  ``status = oven.trans(<some_state>)``
+* in the else clause also set the status to ``SUPER``:
+  ``status = return_status.SUPER``
+
+.. code-block:: python
+  :emphasize-lines: 2-4, 6-8, 10-13, 15-18, 20-22, 24-27, 29-32
+
+  def door_closed(oven, e):
+    # set the status variable to the default
+    # UNHANDLED attribute
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.light_off()
+      # this is an internal event so we set
+      # the status to the HANDLED attribute
+      status = return_status.HANDLED
+    elif(e.signal == signals.Baking):
+      # this is an external event causing a transition
+      # so we let the trans method set the status
+      # attribute
+      status = oven.trans(baking)
+    elif(e.signal == signals.Toasting):
+      # this is an external event causing a transition
+      # so we let the trans method set the status
+      # attribute
+      status = oven.trans(toasting)
+    elif(e.signal == signals.INIT_SIGNAL):
+      # this is an internal event so we set
+      # the status to the HANDLED attribute
+      status = oven.trans(off)
+    elif(e.signal == signals.Off):
+      # this is an external event causing a transition
+      # so we let the trans method set the status
+      # attribute
+      status = oven.trans(off)
+    else:
+      # this is the else clause, set your status
+      # to SUPER
+      oven.temp.fun = oven.top
+      status = return_status.SUPER
+    return status
+
+
+.. note::
+
+  I haven't talked about how to implement a hook yet, you will see this in a
+  future design iteration.
+
+.. include:: i_navigation_2.rst
+
+.. _how_does_this_toaster_oven_example_relate_to_humans_in_the_story:
+
+**How does this toaster oven example relate to humans in the story?**
+
+Let's consider the HSM:
+
+.. image:: _static/ToasterOven_3_0.svg
+    :target: _static/ToasterOven_3_0.pdf
+    :align: center
+
+The humans in the story are the bouncers, the greeters and the bartenders, they
+all exist on the earth, which is just the HSM in the metaphor.
+
+The entry and exit bouncers and the greeters are internal events:
+
+.. image:: _static/ToasterOven_3_1.svg
+    :target: _static/ToasterOven_3_1.pdf
+    :align: center
+
+The bartenders, are the user defined arrows and hooks, they are the external
+events:
+
+.. image:: _static/ToasterOven_3_2.svg
+    :target: _static/ToasterOven_3_2.pdf
+    :align: center
+
+Each of these humans exist as a cause in your callback's if-elif clause
+structure.  To participate in their "hack the human" campaign, to give their life
+some meaning, you place your code between their clause and how you set the return
+status for that clause.  To give the bartenders their secrets, you use the
+``trans`` method, to transition to a different state.  To have a greeter move
+Spike and Tara along, again, you use the ``trans`` method.
+
+.. code-block:: python
+
+  def door_closed(oven, e):
+    status = return_status.UNHANDLED
+
+    # entry bouncer clause
+    if(e.signal == signals.ENTRY_SIGNAL):
+      # hacking this human
+      # Every time he talks to Spike he
+      # will turn our oven light's off!
+      oven.light_off()
+      status = return_status.HANDLED
+
+    # a bartender named 'Baking'
+    elif(e.signal == signals.Baking):
+      # his secret to Tara is to go to the baking terrace
+      status = oven.trans(baking)
+
+    # a bartender named 'Toasting'
+    elif(e.signal == signals.Toasting):
+      # his secret to Tara is to go to the toasting terrace
+      status = oven.trans(toasting)
+
+    # This is the terrace's greeter
+    elif(e.signal == signals.INIT_SIGNAL):
+      # if Spike and Tara arrive and settle on the terrace
+      # will will tell Tara they need to proceed to the
+      # off terrace
+      status = oven.trans(off)
+
+    # A bartender named 'Off'
+    elif(e.signal == signals.Off):
+      # his secret to Tara is to go to the off terrace
+      status = oven.trans(off)
+
+    else:
+      # Tara can't find her answer, so she throw's her
+      # event into oblivion
+      oven.temp.fun = oven.top
+      status = return_status.SUPER
+
+    return status
+
+.. note::
+
+  I haven't talked about how to implement a hook yet, you will see this in a
+  future design iteration.
+
+.. include:: i_navigation_2.rst
+
+.. _what_does_posting_the_events_do:
+
+**What does posting the events do exactly?**
+
+We post the events at the bottom part of our file:
+
+.. code-block:: python
+  :emphasize-lines: 4
+
+  if __name__ == "__main__":
+    oven = ToasterOven(name="oven")
+    oven.live_trace = True
+    oven.start_at(off)
+    # toast something
+    oven.post_fifo(Event(signal=signals.Toasting))
+    # bake something
+    oven.post_fifo(Event(signal=signals.Baking))
+    # turn the oven off
+    oven.post_fifo(Event(signal=signals.Off))
+    time.sleep(0.01)
+
+The above code is running in the main thread.  The statechart's thread is
+started with the ``start_at`` call.  After this call, your program is running
+two threads.
+
+Your oven thread starts up it's event processor, attaches to your callback
+graph, searches it and determines how to get ``off``. ;)
+
+While this is happening your main thread is posting events into the oven
+thread's first in first out queue. 
+
+.. code-block:: python
+  :emphasize-lines: 6, 8, 10
+
+  if __name__ == "__main__":
+    oven = ToasterOven(name="oven")
+    oven.live_trace = True
+    oven.start_at(off)
+    # toast something
+    oven.post_fifo(Event(signal=signals.Toasting))
+    # bake something
+    oven.post_fifo(Event(signal=signals.Baking))
+    # turn the oven off
+    oven.post_fifo(Event(signal=signals.Off))
+    time.sleep(0.01)
+
+This queue is "thread safe", which means that it can be shared across two
+threads.
+
+When the oven's thread finally finishes processing your ``start_at`` call, and it has
+situated, **S** and **T** in the off state, it checks it's queue to see if
+anything is there.
+
+Remember this picture from the story?
+
+.. image:: _static/md_theo.svg
+    :target: _static/md_theo.pdf
+    :align: center
+
+The Theo in our toaster oven example is the oven thread, and after finishing its
+``start_at`` call, it's queue will look like this:
+
+.. image:: _static/ToasterOven_2_4.svg
+    :target: _static/ToasterOven_2_4.pdf
+    :align: center
+
+
+It sees the first posted event,
+``Event(signal=signals.Toasting))`` and it passes this information to the event
+processor which eventually causes a transition into the ``baking`` state.
+
+Meanwhile your main thread has probably finished processing, and it would like
+to exit.  If it were to exit, the oven thread wouldn't get a chance to do all of
+it's work.  It still needs to process the "Baking" and "Off" events.
+
+So, we place a ``time.sleep(0.01)`` at the end of our file, to let the oven
+thread finish its work before the main thread exits and kills the oven thread.
+
+.. include:: i_navigation_2.rst
+
+.. _where_are_the_signal_names_defined:
+
+**Where are the event names defined?**
+
+The event names are called signals.  A signal has a name and a number.  The
+number needs to be unique for each signal.
+
+If you were making your statecharts in c/C++ your signal numbers would be
+defined as an enumeration.  But miros is written in Python, so the signals are
+objects just like everything else.
+
+The internal signal names, ``EXIT_SIGNAL``, ``ENTRY_SIGNAL``, ``INIT_SIGNAL``
+are defined within the miros.event package, but you can access them by importing
+``signals`` into your program:
+
+.. code-block:: python
+
+  from miros import signals
+
+To get access to the internal signal objects:
+
+.. code-block:: python
+
+  signals.EXIT_SIGNAL
+  signals.ENTRY_SIGNAL
+  signals.INIT_SIGNAL
+
+The external signals, or the events that you define in your program, are created
+at the moment they are used.   Specifically when you reference an attribute of
+the ``signals`` object that doesn't exist within it.  This creation only happens
+once, so the signal's name and number remain unique across the life of the
+program.
+
+.. code-block:: python
+
+  # signals object does not have a New signal
+  some_event_the_system_has_never_seen = Event(signal=signals.New)
+  # signals object now has a New signal, it has been assigned a unique number
+  # and the name "New"
+
+So do you need to care about this?  No, you just need to remember to type,
+``Event(signal=signals.<whatever_name_you_want>)`` and not worry about defining
+things before you use them.
+
+.. include:: i_navigation_2.rst
+
+.. _can_you_explain_how_this_statechart_starts:
+
+**Can you explain how this statechart starts?**
+
+The event processor identifies two different types of state's in it's dynamics,
+they are **T**, the target state, and **S** the source state.  The target state
+**T** is used to search the HSM, and **S** can be thought of as the current
+state of the HSM.
+
+The event processor uses **T** to find the target, or where it wants to go, then
+it marches **S** toward that target until the space between **S** and **T** is
+completely contracted.
+
+Before the oven is started, both **S** and **T**, start outside of the HSM:
+
+.. image:: _static/ToasterOven_2_5_1.svg
+    :target: _static/ToasterOven_2_5_1.pdf
+    :align: center
+
+The ``start_at`` call places **T** in the off state, starts the thread and begins
+the event processor:
+
+.. image:: _static/ToasterOven_2_5_2.svg
+    :target: _static/ToasterOven_2_5_2.pdf
+    :align: center
+
+Next, the **S** source will start walking through the entry conditions to re-join
+**T**; it's first step will trigger the entry condition of the door_closed state:
+
+.. image:: _static/ToasterOven_2_5_3.svg
+    :target: _static/ToasterOven_2_5_3.pdf
+    :align: center
+
+This means that the event processor will call the door_closed state with an
+ENTRY_SIGNAL event:
+
+.. code-block:: python
+  :emphasize-lines: 3,4,5
+
+  def door_closed(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.light_off()
+      status = return_status.HANDLED
+    elif(e.signal == signals.Baking):
+      status = oven.trans(baking)
+    elif(e.signal == signals.Toasting):
+      status = oven.trans(toasting)
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = oven.trans(off)
+    elif(e.signal == signals.Off):
+      status = oven.trans(off)
+    else:
+      oven.temp.fun = oven.top
+      status = return_status.SUPER
+    return status
+
+Your ``door_closed`` callback will catch this event with its if clause, use the
+active object's ``light_off`` method to turn off the light, then return
+``return_status.HANDLED``, to let the event processor know it handled the
+ENTRY_SIGNAL event.
+
+Next, **S** rejoins **T** in the off state, this will trigger the off state's
+entry condition:
+
+.. image:: _static/ToasterOven_2_5_4.svg
+    :target: _static/ToasterOven_2_5_4.pdf
+    :align: center
+
+To trigger the off state's entry condition the event processor will send the
+``off`` state callback an ENTRY_SIGNAL event.
+
+.. code-block:: python
+  :emphasize-lines: 3-5
+
+  def off(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      print("off")
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = door_closed
+      status = return_status.SUPER
+    return status
+
+The ``off`` callback catches the ENTRY_SIGNAL event in its if clause, prints
+"off" to the terminal and let's the event processor know it handled the event.
+
+Next, the event processor calls the ``off`` state with an INIT_SIGNAL event.
+There is no if-elif clause for this event in the ``off`` function, because we
+don't need to initialize the off state in this design.  So the callback notifies
+the event processor that it doesn't handle this condition by returning
+``return_status.SUPER``; in effect the event is ignored:
+
+.. code-block:: python
+  :emphasize-lines: 8
+
+  def off(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      print("off")
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = door_closed
+      status = return_status.SUPER
+    return status
+
+Now the event processor has finished its ``start_at`` work.  The first run RTC
+process is completed and the oven's thread pends on its queue.
+
+.. image:: _static/ToasterOven_2_5_5.svg
+    :target: _static/ToasterOven_2_5_5.pdf
+    :align: center
+
+.. include:: i_navigation_2.rst
+
+.. _can_you_explain_how_this_statechart_toasts:
+
+**Can you explain how this statechart can transition from off to toasting?**
+
+The starting state is ``off``, meaning that both **S** and **T** are in the off
+state.
+
+.. image:: _static/ToasterOven_2_6_1.svg
+    :target: _static/ToasterOven_2_6_1.pdf
+    :align: center
+
+To toast, we need to send the oven a Toasting event.  This is how we do it with
+the miros package:
+
+.. code-block:: python
+
+  oven.post_fifo(Event(signal=signals.Toasting))
+
+The above code places the "Toasting" event into the oven's FIFO:
+
+.. image:: _static/ToasterOven_2_6_2.svg
+    :target: _static/ToasterOven_2_6_2.pdf
+    :align: center
+
+The oven's thread takes the Toasting event off the queue and passes it to the
+event processor.  **T** begins its search; the event processor calls the
+``off`` state with a Baking event.
+
+.. image:: _static/ToasterOven_2_6_3.svg
+    :target: _static/ToasterOven_2_6_3.pdf
+    :align: center
+
+There is no if-elif clause in the ``off`` state callback, so it's else clause is
+triggered:
+
+.. code-block:: python
+  :emphasize-lines: 6-9
+
+  def off(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      print("off")
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = door_closed
+      status = return_status.SUPER
+    return status
+
+This notifies the event processor that the ``off`` state can't handle the Baking
+event, and it sets the next place to look to ``door_closed``.  Here we see the
+power of the HSM.
+
+Next, **T** checks the ``door_closed`` state to see if it can handle ``Event(signal=signals.Baking)``:
+
+.. image:: _static/ToasterOven_2_6_4.svg
+    :target: _static/ToasterOven_2_6_4.pdf
+    :align: center
+
+To do this, the event processor calls the ``door_closed`` callback with a Baking event,
+which is caught by an elif clause:
+
+.. code-block:: python
+  :emphasize-lines: 6,7
+
+  def door_closed(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.light_off()
+      status = return_status.HANDLED
+    elif(e.signal == signals.Baking):
+      status = oven.trans(baking)
+    elif(e.signal == signals.Toasting):
+      status = oven.trans(toasting)
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = oven.trans(off)
+    elif(e.signal == signals.Off):
+      status = oven.trans(off)
+    else:
+      oven.temp.fun = oven.top
+      status = return_status.SUPER
+    return status
+
+The ``door_closed`` function reacts to the Baking event by uses the oven's
+``trans`` method to request a transition to the ``baking`` state.  It places the
+value of the ``trans`` method into it's status variable and returns whatever
+this information is to the event processor.
+
+.. note::
+  
+  This means that ``door_closed`` is the least common ancestor, LCA, of ``off``
+  and ``baking``.
+
+Next, **S** begins moving to rejoin **T**.  It's first step is to call the exit
+condition of the off state:
+
+.. image:: _static/ToasterOven_2_6_5.svg
+    :target: _static/ToasterOven_2_6_5.pdf
+    :align: center
+
+There is no exit condition in the ``off`` state code so it's else clause is
+triggered:
+
+.. code-block:: python
+  :emphasize-lines: 6-9
+
+  def off(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      print("off")
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = door_closed
+      status = return_status.SUPER
+    return status
+
+Next, **S** then rejoins **T**, and they are now both in the ``door_closed``
+state.
+
+.. image:: _static/ToasterOven_2_6_6.svg
+    :target: _static/ToasterOven_2_6_6.pdf
+    :align: center
+
+Next, the event processor places **T** into baking:
+
+.. image:: _static/ToasterOven_2_6_7.svg
+    :target: _static/ToasterOven_2_6_7.pdf
+    :align: center
+
+Next, **S** begins to climb into the chart so that it can rejoin **T**. It
+start's this journey by triggering the entry event of the heating state.  
+
+.. image:: _static/ToasterOven_2_6_8.svg
+    :target: _static/ToasterOven_2_6_8.pdf
+    :align: center
+
+To do this, the event processor sends an ENTRY_SIGNAL event to the ``heating`` state callback:
+
+.. code-block:: python
+  :emphasize-lines: 3-5
+
+  def heating(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.heater_on()
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      oven.heater_off()
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = door_closed
+      status = return_status.SUPER
+    return status
+
+The ENTRY_SIGNAL is caught by an elif clause, which will turn the heater on and
+tell the event processor it handled the event.
+
+Next, **S** enters the heating state to rejoin **T**
+
+.. image:: _static/ToasterOven_2_6_9.svg
+    :target: _static/ToasterOven_2_6_9.pdf
+    :align: center
+
+To do this the event processor calls the ``baking`` callback with an ENTRY_SIGNAL event:
+
+.. code-block:: python
+  :emphasize-lines: 3-5
+
+  def baking(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      print("baking")
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = heating
+      status = return_status.SUPER
+    return status
+
+**S** and **T** are now settled in the baking state, so the event processor
+sends an INIT_SIGNAL to the ``baking`` callback to see if it needs to transition
+deeper into the statechart.  There is no init handle for this state, so this
+event is ignored.
+
+.. note::
+
+  There is only one handled init signal in the whole design and it's in the
+  door_closed state.  It will never be called because we start the statechart in
+  the off state.  If were where to start the statechart in the door_closed
+  state, this init event would be triggered, causing the statemachine to
+  ultimately settle into the off state.
+
+
+Another run to completion process has been finished, so the oven thread, looks
+back to it's queue to see if any other thread posted event's to it while it was
+trying to toast something:
+
+.. image:: _static/ToasterOven_2_5_5.svg
+    :target: _static/ToasterOven_2_5_5.pdf
+    :align: center
+
+
+.. include:: i_navigation_2.rst
+
+.. _can_you_explain_how_this_statechart_bakes:
+
+**Can you explain how this statechart bakes?**
+
+.. include:: i_navigation_2.rst
+
+.. _can_you_explain_how_this_statechart_turns_off:
+
+**Can you explain how this statechart turns off?**
+
+.. include:: i_navigation_2.rst
+
+.. _why_are_you_putting_state_into_the_toasteroven_and_not_its_hsm:
+
+**Why are you putting state information into the ToasterOven and not its HSM?**
+
+.. include:: i_navigation_2.rst
+
+
+.. _iter3:
 
 Iteration 3: open door
 ----------------------
 * The toaster's heating element should turn off when the door is opened
 * The toaster should turn on it's light when the door is opened
 
+.. _iter4:
+
 Iteration 4: adding some history
 --------------------------------
 * When a customer closes the door, the toaster oven should go back to behaving
   like it was before.
 
+.. _iter5:
+
 Iteration 5: adding a buzzer
 ----------------------------
 * While the toaster oven is in any state the customer should be able to press a buzzer which will
   get the attention of anyone nearby.
+
+.. _iter6:
 
 Iteration 6: adding cook times
 ------------------------------

@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>11</zoom_level>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1155</x>
+      <y>385</y>
+      <w>319</w>
+      <h>176</h>
+    </coordinates>
+    <panel_attributes>  def off(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      print("off")
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = door_closed
+      status = return_status.SUPER
+    return status
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>517</x>
+      <y>374</y>
+      <w>330</w>
+      <h>231</h>
+    </coordinates>
+    <panel_attributes>  def heating(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.heater_on()
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      oven.heater_off()
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = door_closed
+      status = return_status.SUPER
+    return status
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>858</x>
+      <y>594</y>
+      <w>319</w>
+      <h>319</h>
+    </coordinates>
+    <panel_attributes>  def door_closed(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+    elif(e.signal == signals.Baking):
+      status = oven.trans(baking)
+    elif(e.signal == signals.Toasting):
+      status = oven.trans(toasting)
+		elif(e.signal == signals.INIT_SIGNAL):
+      status = oven.trans(off)
+    elif(e.signal == signals.Off):
+      status = oven.trans(off)
+    else:
+      oven.temp.fun = oven.top
+      status = return_status.SUPER
+    return status
+layer=1
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>748</x>
+      <y>176</y>
+      <w>308</w>
+      <h>176</h>
+    </coordinates>
+    <panel_attributes>  def toasting(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      print("toasting")
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = heating
+      status = return_status.SUPER
+    return status
+
+layer=1
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>330</x>
+      <y>165</y>
+      <w>308</w>
+      <h>176</h>
+    </coordinates>
+    <panel_attributes>  def baking(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      print("baking")
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = heating
+      status = return_status.SUPER
+    return status
+
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>253</x>
+      <y>121</y>
+      <w>33</w>
+      <h>814</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;720.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1111</x>
+      <y>539</y>
+      <w>88</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;60.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>770</x>
+      <y>528</y>
+      <w>121</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>715</x>
+      <y>330</y>
+      <w>77</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;50.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>473</x>
+      <y>308</y>
+      <w>88</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;60.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>220</x>
+      <y>77</y>
+      <w>110</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>behavioral
+complexity
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>352</x>
+      <y>264</y>
+      <w>220</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>
+bg=orange
+fg=orange
+layer=0
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>770</x>
+      <y>275</y>
+      <w>220</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>
+bg=orange
+fg=orange
+layer=0
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>539</x>
+      <y>517</y>
+      <w>220</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>
+bg=orange
+fg=orange
+layer=0
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>880</x>
+      <y>814</y>
+      <w>220</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>
+bg=orange
+fg=orange
+layer=0
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1177</x>
+      <y>484</y>
+      <w>220</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>
+bg=orange
+fg=orange
+layer=0
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1111</x>
+      <y>132</y>
+      <w>176</w>
+      <h>198</h>
+    </coordinates>
+    <panel_attributes>The state callbacks
+describe a
+directed acyclic graph
+(DAG)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>1199</x>
+      <y>286</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>
+bg=white
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>1232</x>
+      <y>253</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>
+bg=white
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>1166</x>
+      <y>253</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>
+bg=white
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>1133</x>
+      <y>220</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>
+bg=white
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>1199</x>
+      <y>220</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>
+bg=white
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1210</x>
+      <y>264</y>
+      <w>44</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;20.0;20.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1177</x>
+      <y>231</y>
+      <w>44</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;20.0;20.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1177</x>
+      <y>264</y>
+      <w>44</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;20.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1144</x>
+      <y>231</y>
+      <w>44</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;20.0;20.0</additional_attributes>
+  </element>
+</diagram>
