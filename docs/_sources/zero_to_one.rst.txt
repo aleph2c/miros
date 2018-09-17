@@ -431,8 +431,8 @@ universe into something legible for you and me:
 | Eve, "the goddess of law and order",| the event processor                     |
 | goddess of heaven                   |                                         |
 +-------------------------------------+-----------------------------------------+
-| Spike, "the source",                | current state, **S** of a statechart    |
-| god of the earth                    |                                         |
+| Spike, "the source",                | the source state, **S** of a statechart |
+| god of the earth                    | (the current state of the HSM)          |
 +-------------------------------------+-----------------------------------------+
 | Theo, "the solipsist"               | the thread that drives the              |
 | god of the underworld               | statechart                              |
@@ -1312,10 +1312,12 @@ Questions and Answers about code and results (iteration 2):
 * :ref:`How does this toaster oven example relate to humans in the story?<how_does_this_toaster_oven_example_relate_to_humans_in_the_story>`
 * :ref:`What does posting the events do exactly?<what_does_posting_the_events_do>`
 * :ref:`Where are the event names defined?<where_are_the_signal_names_defined>`
+* :ref:`What are S and T exactly? Why no just talk about S?<what_are_s_and_t_exactly_why_not_just_talk_about_s>`
 * :ref:`Can you explain how this statechart starts?<can_you_explain_how_this_statechart_starts>`
 * :ref:`Can you explain how this statechart can transition from off to toasting?<can_you_explain_how_this_statechart_toasts>`
 * :ref:`Can you explain how this statechart bakes?<can_you_explain_how_this_statechart_bakes>`
 * :ref:`Can you explain how this statechart turns off?<can_you_explain_how_this_statechart_turns_off>`
+
 * :ref:`Why are you putting state information into the ToasterOven and not its HSM?<why_are_you_putting_state_into_the_toasteroven_and_not_its_hsm>`
 
 
@@ -1760,6 +1762,88 @@ things before you use them.
 
 .. include:: i_navigation_2.rst
 
+.. _what_are_s_and_t_exactly_why_not_just_talk_about_s:
+
+**What are S and T exactly?  Why not just talk about S?**
+
+The event processor performs two different tasks, it discovers how your HSM is
+structured and it follows the entry, exit and init rules described above.  You
+can think of these tasks in more general terms as, *planning* and *acting*.
+
+The current state of your statemachine is called **S**, or the *source state*.
+If your statechart receives an event that is not handled within it's source state,
+the event processor will have to search the next most outer state, then its next
+most outer state, until it finds code that knows what to do with the event.
+While it searches a state, it marks them as **T**, which stands for the *target
+state*.
+
+The event processor's planning phase involves it moving **T** from **S**, and
+making a list of the things it needs to do.  When **T** stops on an outer state
+that can handle the event, by finding a ``trans`` call, the event processor
+stops planning and starts to act.
+
+To act on the plan, the event processor marches **S** outward, towards **T**.
+It's plan would be made up of a list of functions that need to be exited. 
+
+Once **S** is positioned in the state that had the ``trans`` call, the event
+processor would begin another planning stage.  It would place **T** on the inner
+target state, the argument to the ``trans`` call, and make a list of functions that
+have to be entered for **S** to march toward **T**.
+
+.. note::
+
+  The only way that the event processor knows that a ``trans`` call was found is
+  by monitoring the callback's return_status
+
+  .. code-block:: python
+
+      # ..
+      elif(e.signal == signals.Baking):
+        status = oven.trans(baking)
+      # ..
+      return status
+
+It would then act on the plan, and march **S** inward, back to **T**.
+
+Once **S** and **T** are back within the same state, the event processor looks
+to see if its init condition, the big black dot on the diagram, has another
+``trans`` call, or arrow pointing to another inner state.  If it does, it plans
+then acts on this call, and re-settles deeper within the HSM.  This process
+would repeat until there was nothing left to do.  
+
+If this isn't clear, the upcoming examples will show how these dynamics work.
+
+So why even mention **T**?  As an application developer, you only really care
+about **S** right?  Well, no, you can hack the planning stage of the event
+processor and make it do useful work.
+
+While **T** is leaving an inner state, looking for an outer state with a
+``trans`` call, you can create an elif clause that handles this event in an
+outer state, then instead of calling ``trans``, you just return HANDLED.  This
+will run your code then snap **T** back to **S** and the process is completed,
+this is called a hook.
+
+.. code-block:: python
+
+    # ..
+    elif(e.signal == signals.Baking):
+      # add your hook code here
+      # the planning state of the event processor will
+      # run this code, then just snap back to S
+      status = return_status.HANDLED
+    # ..
+    return status
+
+You can use hooks to define common behaviors in the outer states of your HSM.
+These behaviors can be shared by all of the inner states.  To get access to this
+behavior, you would send your statechart an event that would trigger the hook
+and your state machine would run the hook's code and not change states.
+
+This plan-hacking is a very powerful feature of the Miro Samek algorithm.  There
+are no hooks in this iteration.  They will be introduced in a future iteration.
+
+.. include:: i_navigation_2
+
 .. _can_you_explain_how_this_statechart_starts:
 
 **Can you explain how this statechart starts?**
@@ -1772,6 +1856,15 @@ state of the HSM.
 The event processor uses **T** to find the target, or where it wants to go, then
 it marches **S** toward that target until the space between **S** and **T** is
 completely contracted.
+
+Let's talk about how the statechart starts.  In code we see it build an oven,
+then started it in its off state:
+
+.. code-block:: python
+
+  oven = ToaterOven(name='oven')
+  oven.start_at(off)
+
 
 Before the oven is started, both **S** and **T**, start outside of the HSM:
 

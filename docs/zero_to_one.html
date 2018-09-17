@@ -385,7 +385,8 @@ goddess of heaven</td>
 </tr>
 <tr class="row-odd"><td>Spike, “the source”,
 god of the earth</td>
-<td>current state, <strong>S</strong> of a statechart</td>
+<td>the source state, <strong>S</strong> of a statechart
+(the current state of the HSM)</td>
 </tr>
 <tr class="row-even"><td>Theo, “the solipsist”
 god of the underworld</td>
@@ -1224,6 +1225,7 @@ off
 <li><a class="reference internal" href="#how-does-this-toaster-oven-example-relate-to-humans-in-the-story"><span class="std std-ref">How does this toaster oven example relate to humans in the story?</span></a></li>
 <li><a class="reference internal" href="#what-does-posting-the-events-do"><span class="std std-ref">What does posting the events do exactly?</span></a></li>
 <li><a class="reference internal" href="#where-are-the-signal-names-defined"><span class="std std-ref">Where are the event names defined?</span></a></li>
+<li><a class="reference internal" href="#what-are-s-and-t-exactly-why-not-just-talk-about-s"><span class="std std-ref">What are S and T exactly? Why no just talk about S?</span></a></li>
 <li><a class="reference internal" href="#can-you-explain-how-this-statechart-starts"><span class="std std-ref">Can you explain how this statechart starts?</span></a></li>
 <li><a class="reference internal" href="#can-you-explain-how-this-statechart-toasts"><span class="std std-ref">Can you explain how this statechart can transition from off to toasting?</span></a></li>
 <li><a class="reference internal" href="#can-you-explain-how-this-statechart-bakes"><span class="std std-ref">Can you explain how this statechart bakes?</span></a></li>
@@ -1577,6 +1579,69 @@ things before you use them.</p>
 <a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="what-are-s-and-t-exactly-why-not-just-talk-about-s"><strong>What are S and T exactly?  Why not just talk about S?</strong></p>
+<p>The event processor performs two different tasks, it discovers how your HSM is
+structured and it follows the entry, exit and init rules described above.  You
+can think of these tasks in more general terms as, <em>planning</em> and <em>acting</em>.</p>
+<p>The current state of your statemachine is called <strong>S</strong>, or the <em>source state</em>.
+If your statechart receives an event that is not handled within it’s source state,
+the event processor will have to search the next most outer state, then its next
+most outer state, until it finds code that knows what to do with the event.
+While it searches a state, it marks them as <strong>T</strong>, which stands for the <em>target
+state</em>.</p>
+<p>The event processor’s planning phase involves it moving <strong>T</strong> from <strong>S</strong>, and
+making a list of the things it needs to do.  When <strong>T</strong> stops on an outer state
+that can handle the event, by finding a <code class="docutils literal notranslate"><span class="pre">trans</span></code> call, the event processor
+stops planning and starts to act.</p>
+<p>To act on the plan, the event processor marches <strong>S</strong> outward, towards <strong>T</strong>.
+It’s plan would be made up of a list of functions that need to be exited.</p>
+<p>Once <strong>S</strong> is positioned in the state that had the <code class="docutils literal notranslate"><span class="pre">trans</span></code> call, the event
+processor would begin another planning stage.  It would place <strong>T</strong> on the inner
+target state, the argument to the <code class="docutils literal notranslate"><span class="pre">trans</span></code> call, and make a list of functions that
+have to be entered for <strong>S</strong> to march toward <strong>T</strong>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The only way that the event processor knows that a <code class="docutils literal notranslate"><span class="pre">trans</span></code> call was found is
+by monitoring the callback’s return_status</p>
+<div class="last highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ..</span>
+<span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Baking</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">baking</span><span class="p">)</span>
+<span class="c1"># ..</span>
+<span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+</div>
+<p>It would then act on the plan, and march <strong>S</strong> inward, back to <strong>T</strong>.</p>
+<p>Once <strong>S</strong> and <strong>T</strong> are back within the same state, the event processor looks
+to see if its init condition, the big black dot on the diagram, has another
+<code class="docutils literal notranslate"><span class="pre">trans</span></code> call, or arrow pointing to another inner state.  If it does, it plans
+then acts on this call, and re-settles deeper within the HSM.  This process
+would repeat until there was nothing left to do.</p>
+<p>If this isn’t clear, the upcoming examples will show how these dynamics work.</p>
+<p>So why even mention <strong>T</strong>?  As an application developer, you only really care
+about <strong>S</strong> right?  Well, no, you can hack the planning stage of the event
+processor and make it do useful work.</p>
+<p>While <strong>T</strong> is leaving an inner state, looking for an outer state with a
+<code class="docutils literal notranslate"><span class="pre">trans</span></code> call, you can create an elif clause that handles this event in an
+outer state, then instead of calling <code class="docutils literal notranslate"><span class="pre">trans</span></code>, you just return HANDLED.  This
+will run your code then snap <strong>T</strong> back to <strong>S</strong> and the process is completed,
+this is called a hook.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ..</span>
+<span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Baking</span><span class="p">):</span>
+  <span class="c1"># add your hook code here</span>
+  <span class="c1"># the planning state of the event processor will</span>
+  <span class="c1"># run this code, then just snap back to S</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="c1"># ..</span>
+<span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>You can use hooks to define common behaviors in the outer states of your HSM.
+These behaviors can be shared by all of the inner states.  To get access to this
+behavior, you would send your statechart an event that would trigger the hook
+and your state machine would run the hook’s code and not change states.</p>
+<p>This plan-hacking is a very powerful feature of the Miro Samek algorithm.  There
+are no hooks in this iteration.  They will be introduced in a future iteration.</p>
 <p id="can-you-explain-how-this-statechart-starts"><strong>Can you explain how this statechart starts?</strong></p>
 <p>The event processor identifies two different types of state’s in it’s dynamics,
 they are <strong>T</strong>, the target state, and <strong>S</strong> the source state.  The target state
@@ -1585,6 +1650,12 @@ state of the HSM.</p>
 <p>The event processor uses <strong>T</strong> to find the target, or where it wants to go, then
 it marches <strong>S</strong> toward that target until the space between <strong>S</strong> and <strong>T</strong> is
 completely contracted.</p>
+<p>Let’s talk about how the statechart starts.  In code we see it build an oven,
+then started it in its off state:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oven</span> <span class="o">=</span> <span class="n">ToaterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;oven&#39;</span><span class="p">)</span>
+<span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>Before the oven is started, both <strong>S</strong> and <strong>T</strong>, start outside of the HSM:</p>
 <a class="reference external image-reference" href="_static/ToasterOven_2_5_1.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_5_1.svg" src="_images/ToasterOven_2_5_1.svg" /></div>
 </a>
