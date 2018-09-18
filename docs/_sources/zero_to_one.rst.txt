@@ -1310,13 +1310,15 @@ Questions and Answers about code and results (iteration 2):
 * :ref:`How do I write my state callback functions based on the HSM diagram?<can_you_explain_how_the_callbacks_are_arranged_relative_to_each_other>`
 * :ref:`How do I use the return_status with these callbacks?<how_do_i_use_the_return_status_with_the_callbacks>`
 * :ref:`How does this toaster oven example relate to humans in the story?<how_does_this_toaster_oven_example_relate_to_humans_in_the_story>`
-* :ref:`What does posting the events do exactly?<what_does_posting_the_events_do>`
+* :ref:`What does posting the events do?<what_does_posting_the_events_do>`
 * :ref:`Where are the event names defined?<where_are_the_signal_names_defined>`
 * :ref:`What are S and T exactly? Why no just talk about S?<what_are_s_and_t_exactly_why_not_just_talk_about_s>`
 * :ref:`Can you explain how this statechart starts?<can_you_explain_how_this_statechart_starts>`
 * :ref:`Can you explain how this statechart can transition from off to toasting?<can_you_explain_how_this_statechart_toasts>`
+* :ref:`Is there a way I can get miros to show me what happened and how it happened?<is_there_a_way_i_can_get_miros_to_show_me_what_happened_and_how_it_happened>`
 * :ref:`Can you explain how this statechart bakes?<can_you_explain_how_this_statechart_bakes>`
 * :ref:`Can you explain how this statechart turns off?<can_you_explain_how_this_statechart_turns_off>`
+
 
 * :ref:`Why are you putting state information into the ToasterOven and not its HSM?<why_are_you_putting_state_into_the_toasteroven_and_not_its_hsm>`
 
@@ -1638,7 +1640,7 @@ Spike and Tara along, again, you use the ``trans`` method.
 
 .. _what_does_posting_the_events_do:
 
-**What does posting the events do exactly?**
+**What does posting the events do?**
 
 We post the events at the bottom part of our file:
 
@@ -1842,20 +1844,11 @@ and your state machine would run the hook's code and not change states.
 This plan-hacking is a very powerful feature of the Miro Samek algorithm.  There
 are no hooks in this iteration.  They will be introduced in a future iteration.
 
-.. include:: i_navigation_2
+.. include:: i_navigation_2.rst
 
 .. _can_you_explain_how_this_statechart_starts:
 
 **Can you explain how this statechart starts?**
-
-The event processor identifies two different types of state's in it's dynamics,
-they are **T**, the target state, and **S** the source state.  The target state
-**T** is used to search the HSM, and **S** can be thought of as the current
-state of the HSM.
-
-The event processor uses **T** to find the target, or where it wants to go, then
-it marches **S** toward that target until the space between **S** and **T** is
-completely contracted.
 
 Let's talk about how the statechart starts.  In code we see it build an oven,
 then started it in its off state:
@@ -1864,7 +1857,6 @@ then started it in its off state:
 
   oven = ToaterOven(name='oven')
   oven.start_at(off)
-
 
 Before the oven is started, both **S** and **T**, start outside of the HSM:
 
@@ -1879,8 +1871,11 @@ the event processor:
     :target: _static/ToasterOven_2_5_2.pdf
     :align: center
 
-Next, the **S** source will start walking through the entry conditions to re-join
-**T**; it's first step will trigger the entry condition of the door_closed state:
+The event processor constructs a plan for how to get **S** to **T**.
+
+Next, the plan is put into action;  **S** will start walking through
+the entry conditions to re-join **T**; it's first step will trigger the entry
+condition of the door_closed state:
 
 .. image:: _static/ToasterOven_2_5_3.svg
     :target: _static/ToasterOven_2_5_3.pdf
@@ -2051,10 +2046,10 @@ which is caught by an elif clause:
       status = return_status.SUPER
     return status
 
-The ``door_closed`` function reacts to the Baking event by uses the oven's
+The ``door_closed`` function reacts to the Baking event by using the oven's
 ``trans`` method to request a transition to the ``baking`` state.  It places the
 value of the ``trans`` method into it's status variable and returns whatever
-this information is to the event processor.
+this information is, to the event processor.
 
 .. note::
   
@@ -2168,8 +2163,132 @@ trying to toast something:
     :target: _static/ToasterOven_2_5_5.pdf
     :align: center
 
+.. include:: i_navigation_2.rst
+
+.. _is_there_a_way_i_can_get_miros_to_show_me_what_happened_and_how_it_happened:
+
+**Is there a way I can get miros to show me what happened and how it happened?**
+
+Yes, in fact there are two different ways to show you what happened and how it
+happened.  If you instrument your state callbacks using the ``spy_on``
+decorator, you can use either the ``trace`` or ``spy`` output.
+
+I will break this answer up into two parts, what you can see with either a
+trace or a spy, and how you can use these tools to make sense of your own
+designs.
+
+*What you can see with a trace:*
+
+We have talked about how the statecharts starts in the off state, now let's look
+at how this was reported by the ``trace`` instrumentation:
+
+.. code-block:: python
+
+	[2018-09-12 13:54:51.890583] [oven] e->start_at() top->off
+
+It describes:
+
+  * when the event happened,
+  * in what statechart: oven
+  * what event caused the transition: start_at
+  * the starting state: top
+  * the ending state: off.
+
+We have also talked about how the oven transitions from off to the toasting
+state.  Here is what was reported by the ``trace`` instrumentation:
+
+.. code-block:: python
+
+	[2018-09-12 13:54:51.891473] [oven] e->Toasting() off->toasting
+
+It describes:
+
+  * when the event happened,
+  * in what statechart: oven,
+  * what event caused the transition: "Toasting"
+  * the starting state: off
+  * the ending state: toasting
+
+The ``trace`` is a useful tool to get a very rough understanding about what has
+happened with a statechart, but consider all of the information that is missing:
+
+  * It does not report on the entry triggers and init triggers.  
+  * It does not describe how the event processor searched your callbacks to discover how the
+    HSM is structured.  
+
+To see this information you can use the ``spy`` instrumentation.
+
+*What you can see with the spy:*
+
+Here is the spy output resulting from the ``oven.start_at(off)`` call: 
+
+.. code-block:: python
+
+  START
+  SEARCH_FOR_SUPER_SIGNAL:off
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  ENTRY_SIGNAL:door_closed
+  ENTRY_SIGNAL:off
+  INIT_SIGNAL:off
+  <- Queued:(0) Deferred:(0)
+
+The spy output describes an event's signal name and which state it is expressed in.
+
+From the spy output we can monitor the event processor planning and acting
+stages.  For instance in the above spy output, we can see the event processor
+query the off state and door_closed state with the SEARCH_FOR_SUPER_SIGNAL
+event.  This is done so that it can know how to enter the statemachine, then it
+acts on this plan by entering the door_closed state, then the off state, then it
+settles into the off state by sending it an INIT_SIGNAL event.
+
+At the end of this RTC process, we see what is waiting in the queues for the next
+RTC process.  We have only been talking about one queue so far, and that is the
+first queue in the listing.  The Deferred queue is something you will learn
+about in the patterns section.
+
+Here is the spy output for the chart transitioning from the off state to the
+toasting state:
+
+.. code-block:: python
+
+  Toasting:off
+  Toasting:door_closed
+  EXIT_SIGNAL:off
+  SEARCH_FOR_SUPER_SIGNAL:toasting
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  SEARCH_FOR_SUPER_SIGNAL:heating
+  ENTRY_SIGNAL:heating
+  ENTRY_SIGNAL:toasting
+  INIT_SIGNAL:toasting
+  <- Queued:(2) Deferred:(0)
+
+The SEARCH_FOR_SUPER_SIGNAL event lines in the spy output can be confusing to look at.  Miro
+Samek's event processing algorithm has to consider 7 different graph topologies,
+so as an application developer you might know how and why these calls are taking
+place.  Instead, pay attention to the other things in the output:
+
+  * The off state is sent the Toasting event signal (which it doesn't handle)
+  * The door_closed state is sent the Toasting event (which causes a trans)
+  * The off state is sent the EXIT_SIGNAL event
+  * The heating state is sent the ENTRY_SIGNAL event
+  * The toasting state is sent the ENTRY_SIGNAL event
+  * The toasting state is sent the INIT_SIGNAL
+
+Finally, we see the line describing the state of the queues.  In this case their
+are two events pending in the queue, due to our code calling the ``post_fifo``
+method with a "Baking" and "Off" event.
+
+To turn on a live spy, replace the live_trace call with the live_spy call in
+your code:
+
+.. code-block:: python
+
+  oven.list_spy = True
+  oven.start_at(off)
+
 
 .. include:: i_navigation_2.rst
+
 
 .. _can_you_explain_how_this_statechart_bakes:
 

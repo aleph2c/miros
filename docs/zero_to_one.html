@@ -1223,11 +1223,12 @@ off
 <li><a class="reference internal" href="#can-you-explain-how-the-callbacks-are-arranged-relative-to-each-other"><span class="std std-ref">How do I write my state callback functions based on the HSM diagram?</span></a></li>
 <li><a class="reference internal" href="#how-do-i-use-the-return-status-with-the-callbacks"><span class="std std-ref">How do I use the return_status with these callbacks?</span></a></li>
 <li><a class="reference internal" href="#how-does-this-toaster-oven-example-relate-to-humans-in-the-story"><span class="std std-ref">How does this toaster oven example relate to humans in the story?</span></a></li>
-<li><a class="reference internal" href="#what-does-posting-the-events-do"><span class="std std-ref">What does posting the events do exactly?</span></a></li>
+<li><a class="reference internal" href="#what-does-posting-the-events-do"><span class="std std-ref">What does posting the events do?</span></a></li>
 <li><a class="reference internal" href="#where-are-the-signal-names-defined"><span class="std std-ref">Where are the event names defined?</span></a></li>
 <li><a class="reference internal" href="#what-are-s-and-t-exactly-why-not-just-talk-about-s"><span class="std std-ref">What are S and T exactly? Why no just talk about S?</span></a></li>
 <li><a class="reference internal" href="#can-you-explain-how-this-statechart-starts"><span class="std std-ref">Can you explain how this statechart starts?</span></a></li>
 <li><a class="reference internal" href="#can-you-explain-how-this-statechart-toasts"><span class="std std-ref">Can you explain how this statechart can transition from off to toasting?</span></a></li>
+<li><a class="reference internal" href="#is-there-a-way-i-can-get-miros-to-show-me-what-happened-and-how-it-happened"><span class="std std-ref">Is there a way I can get miros to show me what happened and how it happened?</span></a></li>
 <li><a class="reference internal" href="#can-you-explain-how-this-statechart-bakes"><span class="std std-ref">Can you explain how this statechart bakes?</span></a></li>
 <li><a class="reference internal" href="#can-you-explain-how-this-statechart-turns-off"><span class="std std-ref">Can you explain how this statechart turns off?</span></a></li>
 <li><a class="reference internal" href="#why-are-you-putting-state-into-the-toasteroven-and-not-its-hsm"><span class="std std-ref">Why are you putting state information into the ToasterOven and not its HSM?</span></a></li>
@@ -1480,7 +1481,7 @@ future design iteration.</p>
 <a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="what-does-posting-the-events-do"><strong>What does posting the events do exactly?</strong></p>
+<p id="what-does-posting-the-events-do"><strong>What does posting the events do?</strong></p>
 <p>We post the events at the bottom part of our file:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
@@ -1642,14 +1643,13 @@ behavior, you would send your statechart an event that would trigger the hook
 and your state machine would run the hook’s code and not change states.</p>
 <p>This plan-hacking is a very powerful feature of the Miro Samek algorithm.  There
 are no hooks in this iteration.  They will be introduced in a future iteration.</p>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="can-you-explain-how-this-statechart-starts"><strong>Can you explain how this statechart starts?</strong></p>
-<p>The event processor identifies two different types of state’s in it’s dynamics,
-they are <strong>T</strong>, the target state, and <strong>S</strong> the source state.  The target state
-<strong>T</strong> is used to search the HSM, and <strong>S</strong> can be thought of as the current
-state of the HSM.</p>
-<p>The event processor uses <strong>T</strong> to find the target, or where it wants to go, then
-it marches <strong>S</strong> toward that target until the space between <strong>S</strong> and <strong>T</strong> is
-completely contracted.</p>
 <p>Let’s talk about how the statechart starts.  In code we see it build an oven,
 then started it in its off state:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oven</span> <span class="o">=</span> <span class="n">ToaterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;oven&#39;</span><span class="p">)</span>
@@ -1663,8 +1663,10 @@ then started it in its off state:</p>
 the event processor:</p>
 <a class="reference external image-reference" href="_static/ToasterOven_2_5_2.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_5_2.svg" src="_images/ToasterOven_2_5_2.svg" /></div>
 </a>
-<p>Next, the <strong>S</strong> source will start walking through the entry conditions to re-join
-<strong>T</strong>; it’s first step will trigger the entry condition of the door_closed state:</p>
+<p>The event processor constructs a plan for how to get <strong>S</strong> to <strong>T</strong>.</p>
+<p>Next, the plan is put into action;  <strong>S</strong> will start walking through
+the entry conditions to re-join <strong>T</strong>; it’s first step will trigger the entry
+condition of the door_closed state:</p>
 <a class="reference external image-reference" href="_static/ToasterOven_2_5_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_5_3.svg" src="_images/ToasterOven_2_5_3.svg" /></div>
 </a>
 <p>This means that the event processor will call the door_closed state with an
@@ -1795,10 +1797,10 @@ which is caught by an elif clause:</p>
   <span class="k">return</span> <span class="n">status</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> function reacts to the Baking event by uses the oven’s
+<p>The <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> function reacts to the Baking event by using the oven’s
 <code class="docutils literal notranslate"><span class="pre">trans</span></code> method to request a transition to the <code class="docutils literal notranslate"><span class="pre">baking</span></code> state.  It places the
 value of the <code class="docutils literal notranslate"><span class="pre">trans</span></code> method into it’s status variable and returns whatever
-this information is to the event processor.</p>
+this information is, to the event processor.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This means that <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> is the least common ancestor, LCA, of <code class="docutils literal notranslate"><span class="pre">off</span></code>
@@ -1881,6 +1883,119 @@ back to it’s queue to see if any other thread posted event’s to it while it 
 trying to toast something:</p>
 <a class="reference external image-reference" href="_static/ToasterOven_2_5_5.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_5_5.svg" src="_images/ToasterOven_2_5_5.svg" /></div>
 </a>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="is-there-a-way-i-can-get-miros-to-show-me-what-happened-and-how-it-happened"><strong>Is there a way I can get miros to show me what happened and how it happened?</strong></p>
+<p>Yes, in fact there are two different ways to show you what happened and how it
+happened.  If you instrument your state callbacks using the <code class="docutils literal notranslate"><span class="pre">spy_on</span></code>
+decorator, you can use either the <code class="docutils literal notranslate"><span class="pre">trace</span></code> or <code class="docutils literal notranslate"><span class="pre">spy</span></code> output.</p>
+<p>I will break this answer up into two parts, what you can see with either a
+trace or a spy, and how you can use these tools to make sense of your own
+designs.</p>
+<p><em>What you can see with a trace:</em></p>
+<p>We have talked about how the statecharts starts in the off state, now let’s look
+at how this was reported by the <code class="docutils literal notranslate"><span class="pre">trace</span></code> instrumentation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">2018</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">12</span> <span class="mi">13</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">51.890583</span><span class="p">]</span> <span class="p">[</span><span class="n">oven</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">off</span>
+</pre></div>
+</div>
+<p>It describes:</p>
+<blockquote>
+<div><ul class="simple">
+<li>when the event happened,</li>
+<li>in what statechart: oven</li>
+<li>what event caused the transition: start_at</li>
+<li>the starting state: top</li>
+<li>the ending state: off.</li>
+</ul>
+</div></blockquote>
+<p>We have also talked about how the oven transitions from off to the toasting
+state.  Here is what was reported by the <code class="docutils literal notranslate"><span class="pre">trace</span></code> instrumentation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">2018</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">12</span> <span class="mi">13</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">51.891473</span><span class="p">]</span> <span class="p">[</span><span class="n">oven</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Toasting</span><span class="p">()</span> <span class="n">off</span><span class="o">-&gt;</span><span class="n">toasting</span>
+</pre></div>
+</div>
+<p>It describes:</p>
+<blockquote>
+<div><ul class="simple">
+<li>when the event happened,</li>
+<li>in what statechart: oven,</li>
+<li>what event caused the transition: “Toasting”</li>
+<li>the starting state: off</li>
+<li>the ending state: toasting</li>
+</ul>
+</div></blockquote>
+<p>The <code class="docutils literal notranslate"><span class="pre">trace</span></code> is a useful tool to get a very rough understanding about what has
+happened with a statechart, but consider all of the information that is missing:</p>
+<blockquote>
+<div><ul class="simple">
+<li>It does not report on the entry triggers and init triggers.</li>
+<li>It does not describe how the event processor searched your callbacks to discover how the
+HSM is structured.</li>
+</ul>
+</div></blockquote>
+<p>To see this information you can use the <code class="docutils literal notranslate"><span class="pre">spy</span></code> instrumentation.</p>
+<p><em>What you can see with the spy:</em></p>
+<p>Here is the spy output resulting from the <code class="docutils literal notranslate"><span class="pre">oven.start_at(off)</span></code> call:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">START</span>
+<span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">off</span>
+<span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">door_closed</span>
+<span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">door_closed</span>
+<span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">off</span>
+<span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">off</span>
+<span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The spy output describes an event’s signal name and which state it is expressed in.</p>
+<p>From the spy output we can monitor the event processor planning and acting
+stages.  For instance in the above spy output, we can see the event processor
+query the off state and door_closed state with the SEARCH_FOR_SUPER_SIGNAL
+event.  This is done so that it can know how to enter the statemachine, then it
+acts on this plan by entering the door_closed state, then the off state, then it
+settles into the off state by sending it an INIT_SIGNAL event.</p>
+<p>At the end of this RTC process, we see what is waiting in the queues for the next
+RTC process.  We have only been talking about one queue so far, and that is the
+first queue in the listing.  The Deferred queue is something you will learn
+about in the patterns section.</p>
+<p>Here is the spy output for the chart transitioning from the off state to the
+toasting state:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Toasting</span><span class="p">:</span><span class="n">off</span>
+<span class="n">Toasting</span><span class="p">:</span><span class="n">door_closed</span>
+<span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">off</span>
+<span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">toasting</span>
+<span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">door_closed</span>
+<span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">heating</span>
+<span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">heating</span>
+<span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">toasting</span>
+<span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">toasting</span>
+<span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">2</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The SEARCH_FOR_SUPER_SIGNAL event lines in the spy output can be confusing to look at.  Miro
+Samek’s event processing algorithm has to consider 7 different graph topologies,
+so as an application developer you might know how and why these calls are taking
+place.  Instead, pay attention to the other things in the output:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The off state is sent the Toasting event signal (which it doesn’t handle)</li>
+<li>The door_closed state is sent the Toasting event (which causes a trans)</li>
+<li>The off state is sent the EXIT_SIGNAL event</li>
+<li>The heating state is sent the ENTRY_SIGNAL event</li>
+<li>The toasting state is sent the ENTRY_SIGNAL event</li>
+<li>The toasting state is sent the INIT_SIGNAL</li>
+</ul>
+</div></blockquote>
+<p>Finally, we see the line describing the state of the queues.  In this case their
+are two events pending in the queue, due to our code calling the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code>
+method with a “Baking” and “Off” event.</p>
+<p>To turn on a live spy, replace the live_trace call with the live_spy call in
+your code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oven</span><span class="o">.</span><span class="n">list_spy</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+</pre></div>
+</div>
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,

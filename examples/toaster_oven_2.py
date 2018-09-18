@@ -90,7 +90,7 @@ def off(oven, e):
 
 if __name__ == "__main__":
   oven = ToasterOven(name="oven")
-  oven.live_trace = True
+  oven.live_spy = True
   oven.start_at(off)
   # toast something
   oven.post_fifo(Event(signal=signals.Toasting))
