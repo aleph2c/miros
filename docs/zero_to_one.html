@@ -41,11 +41,11 @@ and thou wilt have finished.</em></p>
 <h1>Zero To One<a class="headerlink" href="#zero-to-one" title="Permalink to this headline">¶</a></h1>
 <p>This is not a 5 minute blog read.  If you want to learn how statecharts
 work, this is your one stop shop, it will take you from 0 to 1, but it will
-require you to focus and actually work through the example.</p>
-<p>I’ll first try and show how a miros statecharts work, without using
-technical-language.  To do this, I’ll tell you a story about some characters
-interacting in a little universe.  Then I’ll show you how to make a reactive
-toaster oven.</p>
+require you to focus and actually work through an <a class="reference internal" href="#zero-to-one-a-simple-example"><span class="std std-ref">example</span></a>.</p>
+<p>But before I show you the <a class="reference internal" href="#zero-to-one-a-simple-example"><span class="std std-ref">example</span></a>, I’ll
+show how a miros statecharts work, without using technical-language.  To do
+this, I’ll tell you a story about some characters interacting in a little
+universe.  Then I’ll show you how to make a reactive toaster oven.</p>
 <p>The story will have some pictures, which I have created using a UML drawing
 tool.  The images are intended to get someone who hasn’t seen UML before,
 comfortable looking at statecharts drawn this way.  These pictures will act as a
@@ -63,8 +63,8 @@ especially if you are new to this type of technical language.  Read the hints
 after you have programmed your first working statechart.</p>
 <p>On your first pass just read the story and look over the pictures.</p>
 <p class="last">After you have completed the example, read the story again if your
-understanding of the dynamics aren’t clear.  At this point look at the hint
-boxes.</p>
+understanding of the dynamics aren’t clear, the hint boxes will serve as a
+bridge between the story and your technical work.</p>
 </div>
 <div class="section" id="story">
 <h2>Story<a class="headerlink" href="#story" title="Permalink to this headline">¶</a></h2>
@@ -458,25 +458,22 @@ to make a toaster oven:</p>
 <div class="section" id="a-simple-example-toaster-oven">
 <span id="zero-to-one-a-simple-example"></span><h2>A Simple Example: Toaster Oven<a class="headerlink" href="#a-simple-example-toaster-oven" title="Permalink to this headline">¶</a></h2>
 <p>To make this toaster oven statechart example seem like a real software project,
-I will break it’s design process up into 6 steps, or iterations.</p>
+I will break it’s design process up into 6 steps, or iterations.  We will use
+the <a class="reference external" href="https://www.youtube.com/watch?v=9bPgNEDdX3E">lean-start-up methodology</a>
+and discover our customers by having them interact with our product after each
+iteration.</p>
 <p>Each iteration will have a specification, a design diagram and the code needed
 to match the design diagram.  Then I will prove that the code works and I’ll
 provide links to a bunch of questions and answers about the code.</p>
 <p>You can use these links to choose the questions you want to see the answers to,
-or just skip onto the next iteration.</p>
-<p>Each iteration will be heavily linked so that you can quickly bounce around in
-its documentation.</p>
+or just skip onto the next iteration.  Each iteration is heavily linked so
+that you can quickly bounce around in its documentation.</p>
 <hr class="docutils" />
 <div class="section" id="iteration-1-setup">
 <h3>Iteration 1: setup<a class="headerlink" href="#iteration-1-setup" title="Permalink to this headline">¶</a></h3>
 <p>In this iteration I will talk about setting up our development environment.  We
-will built a very simple statechart example and confirm that it is working.</p>
-<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
-<a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
+will built a very simple statechart example and confirm that it is working.  We
+aren’t ready to talk to our customers yet.</p>
 <p id="iter1-spec">Iteration 1 specification:</p>
 <ul class="simple">
 <li>Ensure our Python version is 3.5 or greater (miros needs this to work)</li>
@@ -1055,7 +1052,7 @@ processing algorithm in Python, written with asyncio, check out <a class="refere
 <div class="section" id="iteration-2-basic-oven">
 <span id="iter2"></span><h3>Iteration 2: basic oven<a class="headerlink" href="#iteration-2-basic-oven" title="Permalink to this headline">¶</a></h3>
 <p>Now that we know miros will run on our system, lets use it to build a very basic
-toaster oven.</p>
+toaster oven.  The following describes our minimal viable product:</p>
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -1064,12 +1061,12 @@ toaster oven.</p>
 <a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="iter2-spec">Iteration 2 specification:</p>
 <ul class="simple">
-<li>The toaster oven will have a door, it will always be closed</li>
-<li>The toaster oven will have an oven light, which can be turned off and on</li>
-<li>The toaster oven will have a heater, which can be turned off and on</li>
+<li>The toaster oven will have a door, it will always be closed.</li>
+<li>The toaster oven will have an oven light, which can be turned on and off.</li>
+<li>The toaster oven will have a heater, which can be turned off and on.</li>
 <li>It will have two different heating modes, baking which can bake a potato
 and toasting which can toast some bread.</li>
-<li>The toaster oven should start in the off state</li>
+<li>The toaster oven should start in the off state.</li>
 <li>The toaster can only heat when the door is closed.</li>
 <li>The toaster’s light should be off when the door is closed.</li>
 </ul>
@@ -1232,6 +1229,8 @@ off
 <li><a class="reference internal" href="#can-you-explain-how-this-statechart-bakes"><span class="std std-ref">Can you explain how this statechart bakes?</span></a></li>
 <li><a class="reference internal" href="#can-you-explain-how-this-statechart-turns-off"><span class="std std-ref">Can you explain how this statechart turns off?</span></a></li>
 <li><a class="reference internal" href="#why-are-you-putting-state-into-the-toasteroven-and-not-its-hsm"><span class="std std-ref">Why are you putting state information into the ToasterOven and not its HSM?</span></a></li>
+<li><a class="reference internal" href="#how-does-your-proof-show-that-you-met-your-specification-2"><span class="std std-ref">How does your proof show that you met your specification?</span></a></li>
+<li><a class="reference internal" href="#how-do-i-put-something-in-the-oven-and-cook-it"><span class="std std-ref">How do I put something in the oven and cook it?</span></a></li>
 </ul>
 <p id="can-you-explain-how-the-picture-meets-the-design-specification"><strong>Can you explain how the picture meets the design specification?</strong></p>
 <p>Let’s break it down:</p>
@@ -2138,7 +2137,7 @@ transition took place:</p>
 <div>In a nutshell, it received the “Off” event in the baking state, then it let
 <strong>T</strong> fall outward until it reached the door_closed state, which knew what
 to do with the event.  The event processor moves <strong>S</strong> through the required
-exist conditions until it settles in the door_closed state.  Then it
+exit conditions until it settles in the door_closed state.  Then it
 places <strong>T</strong> in the off state, and creates a plan for how <strong>S</strong> can be with
 <strong>T</strong> again.  It acts on this plan by sending an ENTRY_SIGNAL to the off
 state.  Both <strong>S</strong> and <strong>T</strong> are settled in the off state, so the event
@@ -2153,6 +2152,97 @@ queue.</div></blockquote>
 <a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="why-are-you-putting-state-into-the-toasteroven-and-not-its-hsm"><strong>Why are you putting state information into the ToasterOven and not its HSM?</strong></p>
+<p>You can see that we have a <code class="docutils literal notranslate"><span class="pre">light_on</span></code> and <code class="docutils literal notranslate"><span class="pre">light_off</span></code> method, and the <code class="docutils literal notranslate"><span class="pre">heater_on</span></code> and
+<code class="docutils literal notranslate"><span class="pre">heater_off</span></code> method in the ToasterOven’s object:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2.svg" src="_images/ToasterOven_2.svg" /></div>
+</a>
+<p>If this were a real toaster oven, it’s state would occur in two different
+places.  The first would be in the physical world.  The actual light would be on
+or the light would be off.  The physical heater would be heating or that heater
+wouldn’t be heating.  The second, would be in our software.  The HSM would be in
+a state where the light/heater would either be on or off.  The code in the
+ToasterOven class would contain the drivers for making the physical equipment do
+what our HSM wants it to do.  So, the state would be kept in the HSM not within the
+ToasterOven object.</p>
+<p>This isn’t to say that you can’t track state information in your derived
+ActiveObject.  There may be situations where you want to do this, it is up to
+you.  For instance, if we added a bit more complexity to our design we could set
+the oven’s temperature.  This could be held in an attribute of the ToasterOven.
+You can think of a temperature value as being a kind of state, so, it is
+possible to smear state information between your HSM and your object.</p>
+<p>HSM’s are good at reacting to event’s and changing state: As a designer
+using miros, you would consider the trade-offs between putting state information
+in your object and into your HSM.  The goal would be to meet your specification
+while minimizing your design’s complexity.  To do this well will require you to
+practice.</p>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="how-does-your-proof-show-that-you-met-your-specification-2"><strong>How does your proof show that you met your specification?</strong></p>
+<p>From this design:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_2.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2.svg" src="_images/ToasterOven_2.svg" /></div>
+</a>
+<p>We preform these actions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+    <span class="c1"># toast something</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
+    <span class="c1"># bake something</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Baking</span><span class="p">))</span>
+    <span class="c1"># turn the oven off</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Off</span><span class="p">))</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We see this output to our terminal, which I have called proof that the design
+works:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">python3</span> <span class="n">toaster_oven_2</span><span class="o">.</span><span class="n">py</span>
+<span class="n">off</span>
+<span class="p">[</span><span class="mi">2018</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">12</span> <span class="mi">13</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">51.890583</span><span class="p">]</span> <span class="p">[</span><span class="n">oven</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">off</span>
+<span class="n">heater_on</span>
+<span class="n">toasting</span>
+<span class="p">[</span><span class="mi">2018</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">12</span> <span class="mi">13</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">51.891473</span><span class="p">]</span> <span class="p">[</span><span class="n">oven</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Toasting</span><span class="p">()</span> <span class="n">off</span><span class="o">-&gt;</span><span class="n">toasting</span>
+<span class="n">heater_off</span>
+<span class="n">heater_on</span>
+<span class="n">baking</span>
+<span class="p">[</span><span class="mi">2018</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">12</span> <span class="mi">13</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">51.891989</span><span class="p">]</span> <span class="p">[</span><span class="n">oven</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Baking</span><span class="p">()</span> <span class="n">toasting</span><span class="o">-&gt;</span><span class="n">baking</span>
+<span class="n">heater_off</span>
+<span class="n">off</span>
+<span class="p">[</span><span class="mi">2018</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">12</span> <span class="mi">13</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">51.892568</span><span class="p">]</span> <span class="p">[</span><span class="n">oven</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Off</span><span class="p">()</span> <span class="n">baking</span><span class="o">-&gt;</span><span class="n">off</span>
+</pre></div>
+</div>
+<p>The trace output happens after the statechart has reacted to an event, so all
+of the print statements should happen before the trace reports on what happened.</p>
+<p>We see that the oven starts in the off state, which reports an “off” to the
+terminal.</p>
+<p>The oven is then sent a “Toasting” event.  This causes a transition from the off
+state to the toasting state. To perform this transition the oven turns the
+heater on with its entry condition to the heating state.  We see this happened
+because our ToasterOven’s <code class="docutils literal notranslate"><span class="pre">heater_on</span></code> driver just writes “heater_on” to the
+terminal.  Then the toasting state’s entry condition prints “toasting” to the
+terminal.</p>
+<p>Next, we send a “Baking” event.  It exits the heating state, causing the
+“heater_off” to print, then it re-enters to the heating state, which causes the
+“heater_on” to print and the enters the baking state, causing it’s entry
+condition to print “baking”.</p>
+<p>Finally, we send the “Off” event to oven.  This causes a transition from baking
+to off.  To do this it prints “heater_off” from the exit condition of the
+heating state and prints “off” from the entry condition of the off state.</p>
+<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="how-do-i-put-something-in-the-oven-and-cook-it"><strong>How do I put something in the oven and cook it?</strong></p>
+<p>You can’t, we don’t even know if our customer’s want to cook anything, so we
+will ship it, discover what our customers want through the customer discovery
+process, then pivot if the need arises.</p>
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -2162,27 +2252,71 @@ queue.</div></blockquote>
 </div>
 <div class="section" id="iteration-3-open-door">
 <span id="iter3"></span><h3>Iteration 3: open door<a class="headerlink" href="#iteration-3-open-door" title="Permalink to this headline">¶</a></h3>
+<p>We have shipped our toaster ovens, and much to our surprise nobody bought any of
+them.</p>
+<p>Through a lengthy customer-discovery-process we learn that people would like to
+put food in the toaster ovens, which means that we should be able to open it’s
+door.</p>
+<p>So we iterate our existing product with the following additional specification:</p>
+<a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="iter3-spec">Iteration 3 specification:</p>
 <ul class="simple">
 <li>The toaster’s heating element should turn off when the door is opened</li>
 <li>The toaster should turn on it’s light when the door is opened</li>
 </ul>
 </div>
 <div class="section" id="iteration-4-adding-some-history">
-<span id="iter4"></span><h3>Iteration 4: adding some history<a class="headerlink" href="#iteration-4-adding-some-history" title="Permalink to this headline">¶</a></h3>
+<span id="iter4"></span><span id="iter3-questions"></span><span id="iter3-proof"></span><span id="iter3-code"></span><span id="iter3-design"></span><h3>Iteration 4: adding some history<a class="headerlink" href="#iteration-4-adding-some-history" title="Permalink to this headline">¶</a></h3>
+<p>Much to our surprise, through great effort and many additional customer interviews,
+we find our customer’s would like to close the door after they have opened it.</p>
+<p>We still haven’t sold an oven, but we know that they want to close the door and
+have it return to it’s previous state of operation when they do so.</p>
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="iter4-spec">Iteration 4 specification:</p>
 <ul class="simple">
 <li>When a customer closes the door, the toaster oven should go back to behaving
 like it was before.</li>
 </ul>
 </div>
 <div class="section" id="iteration-5-adding-a-buzzer">
-<span id="iter5"></span><h3>Iteration 5: adding a buzzer<a class="headerlink" href="#iteration-5-adding-a-buzzer" title="Permalink to this headline">¶</a></h3>
+<span id="iter5"></span><span id="iter4-questions"></span><span id="iter4-proof"></span><span id="iter4-code"></span><span id="iter4-design"></span><h3>Iteration 5: adding a buzzer<a class="headerlink" href="#iteration-5-adding-a-buzzer" title="Permalink to this headline">¶</a></h3>
+<p>We sold our first oven!  Our market segment has been labeled as
+barbie-oven-utilizers by our marketing department.  They want a buzzer and they
+want their ovens in pink.</p>
+<a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="iter5-spec">Iteration 5 specification:</p>
 <ul class="simple">
 <li>While the toaster oven is in any state the customer should be able to press a buzzer which will
 get the attention of anyone nearby.</li>
 </ul>
 </div>
 <div class="section" id="iteration-6-adding-cook-times">
-<span id="iter6"></span><h3>Iteration 6: adding cook times<a class="headerlink" href="#iteration-6-adding-cook-times" title="Permalink to this headline">¶</a></h3>
+<span id="iter6"></span><span id="iter5-questions"></span><span id="iter5-proof"></span><span id="iter5-code"></span><span id="iter5-design"></span><h3>Iteration 6: adding cook times<a class="headerlink" href="#iteration-6-adding-cook-times" title="Permalink to this headline">¶</a></h3>
+<p>Though our customer’s don’t care that our oven doesn’t actually heat anything
+for real (they don’t want this), they have asked that the toasting and baking
+states at least pretend to have different cooking durations.</p>
+<a class="reference internal" href="zero_to_one.html#iter6-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter7"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="iter6-spec">Iteration 6 specification:</p>
 <ul class="simple">
 <li>The toaster oven should stay in the baking state for twenty seconds, then buzz
 and turn off.</li>
@@ -2191,7 +2325,7 @@ and turn off.</li>
 <li>If the door is opened, then closed, the cooking time should be set back to
 it’s default time of ten or twenty seconds.</li>
 </ul>
-<a class="reference external image-reference" href="_static/ToastOven_1.pdf"><div align="center" class="align-center"><img alt="_static/ToastOven_1.svg" src="_static/ToastOven_1.svg" /></div>
+<a class="reference external image-reference" href="_static/ToasterOven_1.pdf" id="iter6-questions"><span id="iter6-proof"></span><span id="iter6-code"></span><span id="iter6-design"></span><div align="center" class="align-center"><img alt="_images/ToasterOven_1.svg" src="_images/ToasterOven_1.svg" /></div>
 </a>
 <a class="reference internal" href="quickstart.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="reading_diagrams.html"><span class="std std-ref">next</span></a></div>
 </div>

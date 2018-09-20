@@ -9,12 +9,12 @@ Zero To One
 ===========
 This is not a 5 minute blog read.  If you want to learn how statecharts
 work, this is your one stop shop, it will take you from 0 to 1, but it will
-require you to focus and actually work through the example.
+require you to focus and actually work through an :ref:`example <zero-to-one-a-simple-example>`.
 
-I'll first try and show how a miros statecharts work, without using
-technical-language.  To do this, I'll tell you a story about some characters
-interacting in a little universe.  Then I'll show you how to make a reactive
-toaster oven.
+But before I show you the :ref:`example <zero-to-one-a-simple-example>`, I'll
+show how a miros statecharts work, without using technical-language.  To do
+this, I'll tell you a story about some characters interacting in a little
+universe.  Then I'll show you how to make a reactive toaster oven.
   
 The story will have some pictures, which I have created using a UML drawing
 tool.  The images are intended to get someone who hasn't seen UML before,
@@ -38,8 +38,8 @@ reading, the statechart mechanics should become more clear for you.
   On your first pass just read the story and look over the pictures.
 
   After you have completed the example, read the story again if your
-  understanding of the dynamics aren't clear.  At this point look at the hint
-  boxes.
+  understanding of the dynamics aren't clear, the hint boxes will serve as a
+  bridge between the story and your technical work.
 
 Story
 ^^^^^
@@ -497,26 +497,26 @@ to make a toaster oven:
 A Simple Example: Toaster Oven
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To make this toaster oven statechart example seem like a real software project,
-I will break it's design process up into 6 steps, or iterations.
+I will break it's design process up into 6 steps, or iterations.  We will use
+the `lean-start-up methodology <https://www.youtube.com/watch?v=9bPgNEDdX3E>`_
+and discover our customers by having them interact with our product after each
+iteration.
 
 Each iteration will have a specification, a design diagram and the code needed
 to match the design diagram.  Then I will prove that the code works and I'll
 provide links to a bunch of questions and answers about the code.
 
 You can use these links to choose the questions you want to see the answers to,
-or just skip onto the next iteration.
-
-Each iteration will be heavily linked so that you can quickly bounce around in
-its documentation.
+or just skip onto the next iteration.  Each iteration is heavily linked so
+that you can quickly bounce around in its documentation.
 
 ----
 
 Iteration 1: setup
 ------------------
 In this iteration I will talk about setting up our development environment.  We
-will built a very simple statechart example and confirm that it is working.
-
-.. include:: i_navigation_1.rst
+will built a very simple statechart example and confirm that it is working.  We
+aren't ready to talk to our customers yet.
 
 .. _iter1_spec:
 
@@ -1146,7 +1146,7 @@ I'm not answering this question
 Iteration 2: basic oven
 -----------------------
 Now that we know miros will run on our system, lets use it to build a very basic
-toaster oven.
+toaster oven.  The following describes our minimal viable product:
 
 .. include:: i_navigation_2.rst
 
@@ -1154,12 +1154,12 @@ toaster oven.
 
 Iteration 2 specification:
 
-* The toaster oven will have a door, it will always be closed
-* The toaster oven will have an oven light, which can be turned off and on
-* The toaster oven will have a heater, which can be turned off and on
+* The toaster oven will have a door, it will always be closed.
+* The toaster oven will have an oven light, which can be turned on and off.
+* The toaster oven will have a heater, which can be turned off and on.
 * It will have two different heating modes, baking which can bake a potato
   and toasting which can toast some bread.
-* The toaster oven should start in the off state
+* The toaster oven should start in the off state.
 * The toaster can only heat when the door is closed.
 * The toaster's light should be off when the door is closed.
 
@@ -1319,7 +1319,8 @@ Questions and Answers about code and results (iteration 2):
 * :ref:`Can you explain how this statechart bakes?<can_you_explain_how_this_statechart_bakes>`
 * :ref:`Can you explain how this statechart turns off?<can_you_explain_how_this_statechart_turns_off>`
 * :ref:`Why are you putting state information into the ToasterOven and not its HSM?<why_are_you_putting_state_into_the_toasteroven_and_not_its_hsm>`
-
+* :ref:`How does your proof show that you met your specification?<how_does_your_proof_show_that_you_met_your_specification_2>`
+* :ref:`How do I put something in the oven and cook it?<how_do_i_put_something_in_the_oven_and_cook_it>`
 
 .. _can_you_explain_how_the_picture_meets_the_design_specification:
 
@@ -2438,7 +2439,7 @@ transition took place:
     In a nutshell, it received the "Off" event in the baking state, then it let
     **T** fall outward until it reached the door_closed state, which knew what
     to do with the event.  The event processor moves **S** through the required
-    exist conditions until it settles in the door_closed state.  Then it
+    exit conditions until it settles in the door_closed state.  Then it
     places **T** in the off state, and creates a plan for how **S** can be with
     **T** again.  It acts on this plan by sending an ENTRY_SIGNAL to the off
     state.  Both **S** and **T** are settled in the off state, so the event
@@ -2454,34 +2455,206 @@ You have now examined all of the possible transitions of this statemachine.
 
 **Why are you putting state information into the ToasterOven and not its HSM?**
 
+You can see that we have a ``light_on`` and ``light_off`` method, and the ``heater_on`` and
+``heater_off`` method in the ToasterOven's object:
+
+.. image:: _static/ToasterOven_2.svg
+    :target: _static/ToasterOven_2.pdf
+    :align: center
+
+If this were a real toaster oven, it's state would occur in two different
+places.  The first would be in the physical world.  The actual light would be on
+or the light would be off.  The physical heater would be heating or that heater
+wouldn't be heating.  The second, would be in our software.  The HSM would be in
+a state where the light/heater would either be on or off.  The code in the
+ToasterOven class would contain the drivers for making the physical equipment do
+what our HSM wants it to do.  So, the state would be kept in the HSM not within the
+ToasterOven object.
+
+This isn't to say that you can't track state information in your derived
+ActiveObject.  There may be situations where you want to do this, it is up to
+you.  For instance, if we added a bit more complexity to our design we could set
+the oven's temperature.  This could be held in an attribute of the ToasterOven.
+You can think of a temperature value as being a kind of state, so, it is
+possible to smear state information between your HSM and your object.
+
+HSM's are good at reacting to event's and changing state: As a designer
+using miros, you would consider the trade-offs between putting state information
+in your object and into your HSM.  The goal would be to meet your specification
+while minimizing your design's complexity.  To do this well will require you to
+practice.
+
 .. include:: i_navigation_2.rst
 
+.. _how_does_your_proof_show_that_you_met_your_specification_2:
+
+**How does your proof show that you met your specification?**
+
+From this design:
+
+.. image:: _static/ToasterOven_2.svg
+    :target: _static/ToasterOven_2.pdf
+    :align: center
+
+We preform these actions:
+
+.. code-block:: python
+
+  if __name__ == "__main__":
+      oven = ToasterOven(name="oven")
+      oven.live_trace = True
+      oven.start_at(off)
+      # toast something
+      oven.post_fifo(Event(signal=signals.Toasting))
+      # bake something
+      oven.post_fifo(Event(signal=signals.Baking))
+      # turn the oven off
+      oven.post_fifo(Event(signal=signals.Off))
+      time.sleep(0.01)
+
+We see this output to our terminal, which I have called proof that the design
+works:
+
+.. code-block:: python
+
+  > python3 toaster_oven_2.py
+  off
+  [2018-09-12 13:54:51.890583] [oven] e->start_at() top->off
+  heater_on
+  toasting
+  [2018-09-12 13:54:51.891473] [oven] e->Toasting() off->toasting
+  heater_off
+  heater_on
+  baking
+  [2018-09-12 13:54:51.891989] [oven] e->Baking() toasting->baking
+  heater_off
+  off
+  [2018-09-12 13:54:51.892568] [oven] e->Off() baking->off
+
+The trace output happens after the statechart has reacted to an event, so all
+of the print statements should happen before the trace reports on what happened.
+
+We see that the oven starts in the off state, which reports an "off" to the
+terminal.  
+
+The oven is then sent a "Toasting" event.  This causes a transition from the off
+state to the toasting state. To perform this transition the oven turns the
+heater on with its entry condition to the heating state.  We see this happened
+because our ToasterOven's ``heater_on`` driver just writes "heater_on" to the
+terminal.  Then the toasting state's entry condition prints "toasting" to the
+terminal.
+
+Next, we send a "Baking" event.  It exits the heating state, causing the
+"heater_off" to print, then it re-enters to the heating state, which causes the
+"heater_on" to print and the enters the baking state, causing it's entry
+condition to print "baking".
+
+Finally, we send the "Off" event to oven.  This causes a transition from baking
+to off.  To do this it prints "heater_off" from the exit condition of the
+heating state and prints "off" from the entry condition of the off state.
+
+.. include:: i_navigation_2.rst
+
+.. _how_do_i_put_something_in_the_oven_and_cook_it:
+
+**How do I put something in the oven and cook it?**
+
+You can't, we don't even know if our customer's want to cook anything, so we
+will ship it, discover what our customers want through the customer discovery
+process, then pivot if the need arises.
+
+.. include:: i_navigation_2.rst
 
 .. _iter3:
 
 Iteration 3: open door
 ----------------------
+We have shipped our toaster ovens, and much to our surprise nobody bought any of
+them.
+
+Through a lengthy customer-discovery-process we learn that people would like to
+put food in the toaster ovens, which means that we should be able to open it's
+door.
+
+So we iterate our existing product with the following additional specification:
+
+.. include:: i_navigation_3.rst
+
+.. _iter3_spec:
+
+Iteration 3 specification:
+
 * The toaster's heating element should turn off when the door is opened
 * The toaster should turn on it's light when the door is opened
+
+.. _iter3_design:
+.. _iter3_code:
+.. _iter3_proof:
+.. _iter3_questions:
 
 .. _iter4:
 
 Iteration 4: adding some history
 --------------------------------
+
+Much to our surprise, through great effort and many additional customer interviews,
+we find our customer's would like to close the door after they have opened it.
+
+We still haven't sold an oven, but we know that they want to close the door and
+have it return to it's previous state of operation when they do so.
+
+.. include:: i_navigation_4.rst
+
+.. _iter4_spec:
+
+Iteration 4 specification:
+
 * When a customer closes the door, the toaster oven should go back to behaving
   like it was before.
+
+.. _iter4_design:
+.. _iter4_code:
+.. _iter4_proof:
+.. _iter4_questions:
 
 .. _iter5:
 
 Iteration 5: adding a buzzer
 ----------------------------
+
+We sold our first oven!  Our market segment has been labeled as
+barbie-oven-utilizers by our marketing department.  They want a buzzer and they
+want their ovens in pink.
+
+.. include:: i_navigation_5.rst
+
+.. _iter5_spec:
+
+Iteration 5 specification:
+
 * While the toaster oven is in any state the customer should be able to press a buzzer which will
   get the attention of anyone nearby.
+
+.. _iter5_design:
+.. _iter5_code:
+.. _iter5_proof:
+.. _iter5_questions:
 
 .. _iter6:
 
 Iteration 6: adding cook times
 ------------------------------
+
+Though our customer's don't care that our oven doesn't actually heat anything
+for real (they don't want this), they have asked that the toasting and baking
+states at least pretend to have different cooking durations.
+
+.. include:: i_navigation_6.rst
+
+.. _iter6_spec:
+
+Iteration 6 specification:
+
 * The toaster oven should stay in the baking state for twenty seconds, then buzz
   and turn off.
 * The toaster oven should stay in the toasting state for ten seconds, then buzz
@@ -2489,11 +2662,14 @@ Iteration 6: adding cook times
 * If the door is opened, then closed, the cooking time should be set back to
   it's default time of ten or twenty seconds.
 
+.. _iter6_design:
+.. _iter6_code:
+.. _iter6_proof:
+.. _iter6_questions:
 
-.. image:: _static/ToastOven_1.svg
-    :target: _static/ToastOven_1.pdf
+.. image:: _static/ToasterOven_1.svg
+    :target: _static/ToasterOven_1.pdf
     :align: center
-
 
 .. raw:: html
 
