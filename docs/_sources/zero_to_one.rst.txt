@@ -1318,8 +1318,6 @@ Questions and Answers about code and results (iteration 2):
 * :ref:`Is there a way I can get miros to show me what happened and how it happened?<is_there_a_way_i_can_get_miros_to_show_me_what_happened_and_how_it_happened>`
 * :ref:`Can you explain how this statechart bakes?<can_you_explain_how_this_statechart_bakes>`
 * :ref:`Can you explain how this statechart turns off?<can_you_explain_how_this_statechart_turns_off>`
-
-
 * :ref:`Why are you putting state information into the ToasterOven and not its HSM?<why_are_you_putting_state_into_the_toasteroven_and_not_its_hsm>`
 
 
@@ -1850,6 +1848,25 @@ are no hooks in this iteration.  They will be introduced in a future iteration.
 
 **Can you explain how this statechart starts?**
 
+I'll answer this question in two different ways, with a short answer and a long
+answer.
+
+**Here is the short answer:**
+
+* The oven statechart is instantiated
+* **S** and **T** are outside the door_closed state
+* the ``start_at`` method of oven is called, it starts the oven's thread and
+  places **T** in the off state.
+* **S** begins to walk toward **T**, by sending an ENTRY_SIGNAL
+  event to the door_closed state callback function.
+* **S** lands in the same state as **T**, by sending an ENTRY_SIGNAL event to
+  the off state callback function.
+* Since **S** and **T** have settled in the same state, the event processor
+  sends an INIT_SIGNAL event to the off callback handler; the event is ignored.
+* The statechart stops processing and it's thread pends on it's queue
+
+**Here is the long answer:**
+
 Let's talk about how the statechart starts.  In code we see it build an oven,
 then started it in its off state:
 
@@ -1967,6 +1984,37 @@ process is completed and the oven's thread pends on its queue.
 .. _can_you_explain_how_this_statechart_toasts:
 
 **Can you explain how this statechart can transition from off to toasting?**
+
+
+I'll answer this question in two different ways, with a short answer and a long
+answer.
+
+**Here is the short answer:**
+
+* **S** and **T** are in the off state
+* A Toasting event is created an posted to the statechart's first in first out
+  queue.
+* This causes the event processor to react to the Toasting event in the off
+  state.
+* **T** begins its search in the off state callback, but no Toasting event handler is
+  found
+* **T** searches the ``door_closed``, finds that it wants to react to the
+  Toasting event by transitioning into the toasting state.
+* **T** stops in the door_closed state and waits for **S**
+* **S** exits the off state, by sending the EXIT_SIGNAL event to the off
+  callback, this event is ignored
+* **S** joins **T** in the door_closed state.
+* The event processor places **T** into the toasting state.
+* **S** starts marching to **T** by first entering the heating state, it does
+  this by sending an ENTRY_SIGNAL event to the heating state callback.
+* **S** enters the toasting state by sending it's callback an ENTRY_SIGNAL
+  event.
+* **S** and **T** are both settled in the toasting state so the event processor
+  sends an INIT_SIGNAL event to the toasting state callback, this event is
+  ignored.
+* The RTC process is finished, the oven thread pends on it's queue
+
+**Here is the long answer:**
 
 The starting state is ``off``, meaning that both **S** and **T** are in the off
 state.
@@ -2177,10 +2225,10 @@ I will break this answer up into two parts, what you can see with either a
 trace or a spy, and how you can use these tools to make sense of your own
 designs.
 
-*What you can see with a trace:*
+**What you can see with a trace:**
 
 We have talked about how the statecharts starts in the off state, now let's look
-at how this was reported by the ``trace`` instrumentation:
+at how this was reported by the ``trace``:
 
 .. code-block:: python
 
@@ -2195,7 +2243,7 @@ It describes:
   * the ending state: off.
 
 We have also talked about how the oven transitions from off to the toasting
-state.  Here is what was reported by the ``trace`` instrumentation:
+state.  Here is what was reported by the ``trace``:
 
 .. code-block:: python
 
@@ -2218,7 +2266,7 @@ happened with a statechart, but consider all of the information that is missing:
 
 To see this information you can use the ``spy`` instrumentation.
 
-*What you can see with the spy:*
+**What you can see with the spy:**
 
 Here is the spy output resulting from the ``oven.start_at(off)`` call: 
 
@@ -2242,7 +2290,7 @@ acts on this plan by entering the door_closed state, then the off state, then it
 settles into the off state by sending it an INIT_SIGNAL event.
 
 At the end of this RTC process, we see what is waiting in the queues for the next
-RTC process.  We have only been talking about one queue so far, and that is the
+run of the event processor.  We have only been talking about one queue so far, and that is the
 first queue in the listing.  The Deferred queue is something you will learn
 about in the patterns section.
 
@@ -2286,19 +2334,119 @@ your code:
   oven.list_spy = True
   oven.start_at(off)
 
-
 .. include:: i_navigation_2.rst
-
 
 .. _can_you_explain_how_this_statechart_bakes:
 
 **Can you explain how this statechart bakes?**
+
+To get the statechart to bake, you just send a Bake event to it.
+
+Now that we know how to use the trace tool, let's look at the trace output for
+this type of transition:
+
+.. code-block:: python
+
+	[2018-09-12 13:54:51.891989] [oven] e->Baking() toasting->baking
+
+We see that the Baking event will cause the statemachine to leave toasting, and
+enter the baking state.
+
+For more details, we could look at the spy output for the same transition:
+
+.. code-block:: python
+  
+  Baking:toasting  # T searching for Baking event in toasting state 1
+  Baking:heating   # T searching for Baking event in heating state  2
+  Baking:door_closed  # T searching for Baking in door_closed       3
+  EXIT_SIGNAL:toasting # S in toasting, exit event sent to toasting 4
+  EXIT_SIGNAL:heating  # S in heating, exit even sent to heating    5
+  SEARCH_FOR_SUPER_SIGNAL:heating # event processor searching ...   6
+  SEARCH_FOR_SUPER_SIGNAL:baking      #  ...
+  SEARCH_FOR_SUPER_SIGNAL:door_closed #  ...
+  SEARCH_FOR_SUPER_SIGNAL:heating     #  ...
+  ENTRY_SIGNAL:heating # S in heating, entry event sent to heating  7
+  ENTRY_SIGNAL:baking # S in baking, entry event sent to baking     8
+  INIT_SIGNAL:baking # S and T settled, init event sent to baking   9
+
+.. image:: _static/ToasterOven_2_7_1.svg
+    :target: _static/ToasterOven_2_7_1.pdf
+    :align: center
 
 .. include:: i_navigation_2.rst
 
 .. _can_you_explain_how_this_statechart_turns_off:
 
 **Can you explain how this statechart turns off?**
+
+The oven can be turned off while it already is off, or when it's baking or
+toasting.  We will examine how it is turned off while it is baking.
+
+As you have learned from the previous explanations, with a bit of practice, you
+can just see how your statechart will react to an event.
+
+To see what has happened this time, let's turn on the ``live_trace`` and
+``live_spy`` and examine their outputs.  Here is how to turn on both types of
+live instrumentation:
+
+.. code-block:: python
+  :emphasize-lines: 3,4,11
+  :linenos:
+
+  if __name__ == "__main__":
+    oven = ToasterOven(name="oven")
+    oven.live_trace = True
+    oven.live_spy = True
+    oven.start_at(off)
+    # toast something
+    oven.post_fifo(Event(signal=signals.Toasting))
+    # bake something
+    oven.post_fifo(Event(signal=signals.Baking))
+    # turn the oven off
+    oven.post_fifo(Event(signal=signals.Off))
+    time.sleep(0.01)
+
+To answer this question, we will be examining the behavior caused by the
+transition on line 11.  The system's reaction line 11 will have a trace and spy
+which will look like this:
+
+.. code-block:: python
+
+  [2018-09-20 07:55:43.449132] [oven] e->Off() baking->off
+  Off:baking
+  Off:heating
+  Off:door_closed
+  EXIT_SIGNAL:baking
+  EXIT_SIGNAL:heating
+  SEARCH_FOR_SUPER_SIGNAL:heating
+  SEARCH_FOR_SUPER_SIGNAL:off
+  ENTRY_SIGNAL:off
+  INIT_SIGNAL:off
+  <- Queued:(0) Deferred:(0)
+
+.. image:: _static/ToasterOven_3_0.svg
+    :target: _static/ToasterOven_3_0.pdf
+    :align: center
+
+
+The trace output describes that the "Off" event caused a transition from baking
+to off: ``e-Off() baking->off``.  
+
+The spy output describes some of the specifics about how the baking to off
+transition took place:
+
+    In a nutshell, it received the "Off" event in the baking state, then it let
+    **T** fall outward until it reached the door_closed state, which knew what
+    to do with the event.  The event processor moves **S** through the required
+    exist conditions until it settles in the door_closed state.  Then it
+    places **T** in the off state, and creates a plan for how **S** can be with
+    **T** again.  It acts on this plan by sending an ENTRY_SIGNAL to the off
+    state.  Both **S** and **T** are settled in the off state, so the event
+    processor sends it an INIT_SIGNAL, which is not handled so it is ignored.
+    The RTC process is completed and the thread goes back to pending on the
+    queue.
+
+You have now examined all of the possible transitions of this statemachine.
 
 .. include:: i_navigation_2.rst
 
