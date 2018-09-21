@@ -510,7 +510,8 @@ You can use these links to choose the questions you want to see the answers to,
 or just skip onto the next iteration.  Each iteration is heavily linked so
 that you can quickly bounce around in its documentation.
 
-----
+
+.. _iter1:
 
 Iteration 1: setup
 ------------------
@@ -520,7 +521,8 @@ aren't ready to talk to our customers yet.
 
 .. _iter1_spec:
 
-Iteration 1 specification:
+Iteration 1 specification
+"""""""""""""""""""""""""
 
 * Ensure our Python version is 3.5 or greater (miros needs this to work)
 * Install miros
@@ -552,6 +554,9 @@ type:
 
 .. _iter1_design:
 
+Iteration 1 design
+""""""""""""""""""
+
 Here is the design we will use to confirm that miros is working on your computer:
 
 .. image:: _static/ToasterOven_0.svg
@@ -562,7 +567,8 @@ Here is the design we will use to confirm that miros is working on your computer
 
 .. _iter1_code: 
 
-Here is the code:
+Iteration 1 code
+""""""""""""""""
 
 .. code-block:: python
 
@@ -600,6 +606,9 @@ Here is the code:
 
 .. _iter1_proof:
 
+Iteration 1 proof
+"""""""""""""""""
+
 Now to prove that the code works, in your terminal, run the program:
 
 .. code-block:: bash
@@ -612,6 +621,9 @@ Now to prove that the code works, in your terminal, run the program:
 .. include:: i_navigation_1.rst
 
 .. _iter1_questions:
+
+Iteration 1 questions
+"""""""""""""""""""""
 
 Questions and Answers about the code and the results:
 
@@ -1148,11 +1160,10 @@ Iteration 2: basic oven
 Now that we know miros will run on our system, lets use it to build a very basic
 toaster oven.  The following describes our minimal viable product:
 
-.. include:: i_navigation_2.rst
-
 .. _iter2_spec:
 
-Iteration 2 specification:
+Iteration 2 specification
+"""""""""""""""""""""""""
 
 * The toaster oven will have a door, it will always be closed.
 * The toaster oven will have an oven light, which can be turned on and off.
@@ -1167,6 +1178,9 @@ Iteration 2 specification:
 
 .. _iter2_design:
 
+Iteration 2 design
+"""""""""""""""""""
+
 .. image:: _static/ToasterOven_2.svg
     :target: _static/ToasterOven_2.pdf
     :align: center
@@ -1174,6 +1188,9 @@ Iteration 2 specification:
 .. include:: i_navigation_2.rst
 
 .. _iter2_code:
+
+Iteration 2 code
+""""""""""""""""
 
 .. code-block:: python
 
@@ -1284,6 +1301,9 @@ Iteration 2 specification:
 
 .. _iter2_proof:
 
+Iteration 2 proof
+"""""""""""""""""
+
 .. code-block:: bash
 
 	python3 toaster_oven_2.py
@@ -1303,6 +1323,9 @@ Iteration 2 specification:
 .. include:: i_navigation_2.rst
 
 .. _iter2_questions:
+
+Iteration 2 questions
+"""""""""""""""""""""
 
 Questions and Answers about code and results (iteration 2):
 
@@ -2567,14 +2590,15 @@ process, then pivot if the need arises.
 
 .. _iter3:
 
-Iteration 3: open door
-----------------------
+Iteration 3: history
+--------------------
 We have shipped our toaster ovens, and much to our surprise nobody bought any of
 them.
 
 Through a lengthy customer-discovery-process we learn that people would like to
 put food in the toaster ovens, which means that we should be able to open it's
-door.
+door then close it again.  When they close the door they want the toaster to act
+like it did before.
 
 So we iterate our existing product with the following additional specification:
 
@@ -2582,63 +2606,147 @@ So we iterate our existing product with the following additional specification:
 
 .. _iter3_spec:
 
-Iteration 3 specification:
+Iteration 3 specification
+"""""""""""""""""""""""""
 
 * The toaster's heating element should turn off when the door is opened
-* The toaster should turn on it's light when the door is opened
-
-.. _iter3_design:
-.. _iter3_code:
-.. _iter3_proof:
-.. _iter3_questions:
-
-.. _iter4:
-
-Iteration 4: adding some history
---------------------------------
-
-Much to our surprise, through great effort and many additional customer interviews,
-we find our customer's would like to close the door after they have opened it.
-
-We still haven't sold an oven, but we know that they want to close the door and
-have it return to it's previous state of operation when they do so.
-
-.. include:: i_navigation_4.rst
-
-.. _iter4_spec:
-
-Iteration 4 specification:
-
+* The toaster should turn on its light when the door is opened
 * When a customer closes the door, the toaster oven should go back to behaving
   like it was before.
 
-.. _iter4_design:
-.. _iter4_code:
-.. _iter4_proof:
-.. _iter4_questions:
+.. include:: i_navigation_3.rst
 
-.. _iter5:
+.. _iter3_design:
 
-Iteration 5: adding a buzzer
-----------------------------
+
+Iteration 3 design
+""""""""""""""""""
+
+.. include:: i_navigation_3.rst
+
+.. _iter3_code:
+
+
+Iteration 3 code
+""""""""""""""""
+
+.. include:: i_navigation_3.rst
+
+.. _iter3_proof:
+
+
+Iteration 3 proof
+"""""""""""""""""
+
+
+.. include:: i_navigation_3.rst
+
+.. _iter3_questions:
+
+
+Iteration 3 questions
+"""""""""""""""""
+
+.. include:: i_navigation_3.rst
+
+.. _iter4:
+
+Iteration 4: hook
+-----------------
 
 We sold our first oven!  Our market segment has been labeled as
 barbie-oven-utilizers by our marketing department.  They want a buzzer and they
 want their ovens in pink.
 
+.. include:: i_navigation_4.rst
+
+
+.. _iter4_spec:
+
+Iteration 4 specification
+"""""""""""""""""""""""""
+
+* While the toaster oven is in any state the customer should be able to press a
+  buzzer which will get the attention of anyone nearby.
+
+.. _iter4_design:
+
+Iteration 4 design
+""""""""""""""""""
+
+.. include:: i_navigation_4.rst
+
+.. _iter4_code:
+
+Iteration 4 code
+""""""""""""""""
+
+.. include:: i_navigation_4.rst
+
+.. _iter4_proof:
+
+Iteration 4 proof
+"""""""""""""""""
+
+.. include:: i_navigation_4.rst
+
+.. _iter4_questions:
+
+Iteration 4 questions
+"""""""""""""""""""""
+
+.. include:: i_navigation_4.rst
+
+.. _iter5:
+
+Iteration 5: one-shots
+----------------------
+
+Though our customer's don't care that our oven doesn't actually heat anything
+for real, they have asked that the toasting and baking states at least pretend
+to have different cooking durations.
+
 .. include:: i_navigation_5.rst
 
 .. _iter5_spec:
 
-Iteration 5 specification:
+Iteration 5 specification
+"""""""""""""""""""""""""
 
-* While the toaster oven is in any state the customer should be able to press a buzzer which will
-  get the attention of anyone nearby.
+* The toaster oven should stay in the baking state for twenty seconds, then buzz
+  and turn off.
+* The toaster oven should stay in the toasting state for ten seconds, then buzz
+  and turn off.
+* If the door is opened, then closed, the cooking time should be set back to
+  it's default time of ten or twenty seconds.
 
 .. _iter5_design:
+
+Iteration 5 design
+""""""""""""""""""
+
+.. include:: i_navigation_5.rst
+
 .. _iter5_code:
+
+Iteration 5 code
+""""""""""""""""
+
+.. include:: i_navigation_5.rst
+
 .. _iter5_proof:
+
+Iteration 5 proof
+"""""""""""""""""
+
+.. include:: i_navigation_5.rst
+
 .. _iter5_questions:
+
+Iteration 5 questions
+"""""""""""""""""
+
+.. include:: i_navigation_5.rst
 
 .. _iter6:
 
@@ -2653,6 +2761,9 @@ states at least pretend to have different cooking durations.
 
 .. _iter6_spec:
 
+Iteration 6 specification
+"""""""""""""""""""""""""
+
 Iteration 6 specification:
 
 * The toaster oven should stay in the baking state for twenty seconds, then buzz
@@ -2663,13 +2774,36 @@ Iteration 6 specification:
   it's default time of ten or twenty seconds.
 
 .. _iter6_design:
+
+Iteration 6 design
+""""""""""""""""""
+
+.. include:: i_navigation_6.rst
+
 .. _iter6_code:
+
+Iteration 6 code
+""""""""""""""""
+
+.. include:: i_navigation_6.rst
+
 .. _iter6_proof:
+
+Iteration 6 proof
+"""""""""""""""""
+
+.. include:: i_navigation_6.rst
+
 .. _iter6_questions:
+
+Iteration 6 questions
+"""""""""""""""""""""
 
 .. image:: _static/ToasterOven_1.svg
     :target: _static/ToasterOven_1.pdf
     :align: center
+
+.. include:: i_navigation_6.rst
 
 .. raw:: html
 

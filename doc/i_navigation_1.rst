@@ -2,6 +2,7 @@
 
 .. raw:: html
 
+  <a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
   <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
   <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
   <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,

@@ -468,13 +468,13 @@ provide links to a bunch of questions and answers about the code.</p>
 <p>You can use these links to choose the questions you want to see the answers to,
 or just skip onto the next iteration.  Each iteration is heavily linked so
 that you can quickly bounce around in its documentation.</p>
-<hr class="docutils" />
 <div class="section" id="iteration-1-setup">
-<h3>Iteration 1: setup<a class="headerlink" href="#iteration-1-setup" title="Permalink to this headline">¶</a></h3>
+<span id="iter1"></span><h3>Iteration 1: setup<a class="headerlink" href="#iteration-1-setup" title="Permalink to this headline">¶</a></h3>
 <p>In this iteration I will talk about setting up our development environment.  We
 will built a very simple statechart example and confirm that it is working.  We
 aren’t ready to talk to our customers yet.</p>
-<p id="iter1-spec">Iteration 1 specification:</p>
+<div class="section" id="iteration-1-specification">
+<span id="iter1-spec"></span><h4>Iteration 1 specification<a class="headerlink" href="#iteration-1-specification" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li>Ensure our Python version is 3.5 or greater (miros needs this to work)</li>
 <li>Install miros</li>
@@ -484,6 +484,7 @@ aren’t ready to talk to our customers yet.</p>
 <li>Add instrumentation to our state</li>
 <li>Use the instrumentation to confirm that the statechart is working.</li>
 </ul>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -505,16 +506,22 @@ pip install miros
 <p class="first admonition-title">Note</p>
 <p class="last">Miros is not dependent on any other packages.</p>
 </div>
-<p id="iter1-design">Here is the design we will use to confirm that miros is working on your computer:</p>
+</div>
+<div class="section" id="iteration-1-design">
+<span id="iter1-design"></span><h4>Iteration 1 design<a class="headerlink" href="#iteration-1-design" title="Permalink to this headline">¶</a></h4>
+<p>Here is the design we will use to confirm that miros is working on your computer:</p>
 <a class="reference external image-reference" href="_static/ToasterOven_0.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_0.svg" src="_images/ToasterOven_0.svg" /></div>
 </a>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="iter1-code">Here is the code:</p>
+</div>
+<div class="section" id="iteration-1-code">
+<span id="iter1-code"></span><h4>Iteration 1 code<a class="headerlink" href="#iteration-1-code" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># file named toaster_oven_1.py</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
@@ -546,26 +553,34 @@ pip install miros
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 </pre></div>
 </div>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="iter1-proof">Now to prove that the code works, in your terminal, run the program:</p>
+</div>
+<div class="section" id="iteration-1-proof">
+<span id="iter1-proof"></span><h4>Iteration 1 proof<a class="headerlink" href="#iteration-1-proof" title="Permalink to this headline">¶</a></h4>
+<p>Now to prove that the code works, in your terminal, run the program:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 toaster_oven_1.py
 hello world
 <span class="o">[</span><span class="m">2018</span>-09-11 <span class="m">09</span>:35:10.011526<span class="o">]</span> <span class="o">[</span>oven<span class="o">]</span> <span class="se">\</span>
   e-&gt;start_at<span class="o">()</span> top-&gt;some_state_to_prove_this_works
 </pre></div>
 </div>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="iter1-questions">Questions and Answers about the code and the results:</p>
+</div>
+<div class="section" id="iteration-1-questions">
+<span id="iter1-questions"></span><h4>Iteration 1 questions<a class="headerlink" href="#iteration-1-questions" title="Permalink to this headline">¶</a></h4>
+<p>Questions and Answers about the code and the results:</p>
 <ul class="simple">
 <li><a class="reference internal" href="#why-is-miros-onl"><span class="std std-ref">Why is miros only supported in Python 3.5 or greater?</span></a></li>
 <li><a class="reference internal" href="#can-you-explain"><span class="std std-ref">Can you explain what is going on with the imports on lines 1-6?</span></a></li>
@@ -585,6 +600,7 @@ hello world
 <li><a class="reference internal" href="#why-are-you-using-threads"><span class="std std-ref">Why are you using threads and not asyncio?</span></a></li>
 <li><a class="reference internal" href="#when-is-it-going-to-be-do"><span class="std std-ref">When is it going to be done?</span></a></li>
 </ul>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -596,6 +612,7 @@ hello world
 time, but I used the Python 3.5 feature of avoiding circular imports.  When I
 tried to run miros in 3.4 I got a lot of ImportErrors.  So there you go, it was
 an accidental limitation.</p>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -631,6 +648,7 @@ an accidental limitation.</p>
 <span class="kn">import</span> <span class="nn">time</span>
 </pre></div>
 </div>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -644,6 +662,7 @@ ToasterOven class.  The first argument given to any state callback function by
 the event processor will be a reference to a ToasterOven object. Now suppose
 this first argument was called <code class="docutils literal notranslate"><span class="pre">oven</span></code>, any state callback function could turn
 on the light with: <code class="docutils literal notranslate"><span class="pre">oven.light_on()</span></code></p>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -669,6 +688,7 @@ that it can be called later:</p>
 </div>
 <p>The states in our diagram are constructed as callback functions with a given
 signature.  The event processor will call these functions when it needs to.</p>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -735,6 +755,7 @@ return information that will tell the event processor to try our super state. Se
 </ul>
 </div></blockquote>
 <p>There are more things that can be returned, we will address them as the example continues.</p>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -757,6 +778,7 @@ class is just making the kinds of callback functions we are talking about here.<
 <p>It is easier to explain this library using the traditional techniques of engaging
 with the Miros Samek event processing algorithm than by just jumping into the
 Factory class.</p>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -769,6 +791,7 @@ the <a class="reference internal" href="recipes.html#recipes-boiler-plate-state-
 to match your design.</p>
 <p>Also, it is relatively easy to add this boiler plate code to whatever snippet
 technology you are using with your editor. I use Ultisnips in Vim.</p>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -788,6 +811,7 @@ the active object.</p>
 <p>The queues are missing from the UML as well:</p>
 <a class="reference external image-reference" href="_static/ToastOven_0_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_0_3.svg" src="_images/ToasterOven_0_3.svg" /></div>
 </a>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -821,6 +845,7 @@ faster, but it will be harder to debug.</p>
 <p class="last">The spy_on decorator needs to be placed on every callback that you want to
 monitor.  I usually place the spy_on decorator on all of the state callbacks.</p>
 </div>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -846,6 +871,7 @@ is returned to the event processor, letting it know to stop processing the
 </div>
 <p>The entry signal is sent to the callback as a result of the HSM being started in
 the <code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code> state.</p>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -859,6 +885,7 @@ will still call the function with the event named <code class="docutils literal 
 entered the <code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code> state, but it will be ignored.</p>
 <p>By only including the events that we need we keep our callback function small
 and easy to read.</p>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -909,7 +936,8 @@ argument given to the callback</li>
 clause is reached.</li>
 </ul>
 </div>
-<span class="target" id="how-does-the-live-trace-call-wo"></span><a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
+<span class="target" id="how-does-the-live-trace-call-wo"></span><a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-proof"<span class="std-ref">proof</span></a></span></a>,
@@ -958,6 +986,7 @@ processor attachment point touches the HSM.</p>
 <p class="last">I might remove some information from the timestamp in this documenation to make
 the text fit on the screen.</p>
 </div>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -983,6 +1012,7 @@ many needed entry events as required, then the init event in the state that
 <strong>T</strong> is in.</p>
 <p>In our example there isn’t much to talk about.  The entry clause of the
 <code class="docutils literal notranslate"><span class="pre">some_state_function</span></code> is called, printing “hello world”.</p>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -1009,6 +1039,7 @@ exits the program.</p>
 <p class="last">The miros package uses daemonic threads, which means that they will be shut
 down with the main thread stops running.</p>
 </div>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -1028,6 +1059,7 @@ print “hello world” to the terminal.</p>
 </pre></div>
 </div>
 <p>Which is exactly what were were expecting.</p>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -1042,6 +1074,7 @@ compliant.  I wrote miros so that it can use as much existing Python as possible
 processing algorithm in Python, written with asyncio, check out <a class="reference external" href="https://github.com/dwhall/pq">Dean Hall’s pq.</a></p>
 <p id="when-is-it-going-to-be-do"><strong>When is it going to be done?</strong></p>
 <p>I’m not answering this question</p>
+<a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-code"<span class="std-ref">code</span></a></span></a>,
@@ -1049,17 +1082,13 @@ processing algorithm in Python, written with asyncio, check out <a class="refere
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 </div>
+</div>
 <div class="section" id="iteration-2-basic-oven">
 <span id="iter2"></span><h3>Iteration 2: basic oven<a class="headerlink" href="#iteration-2-basic-oven" title="Permalink to this headline">¶</a></h3>
 <p>Now that we know miros will run on our system, lets use it to build a very basic
 toaster oven.  The following describes our minimal viable product:</p>
-<a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
-<a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="iter2-spec">Iteration 2 specification:</p>
+<div class="section" id="iteration-2-specification">
+<span id="iter2-spec"></span><h4>Iteration 2 specification<a class="headerlink" href="#iteration-2-specification" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li>The toaster oven will have a door, it will always be closed.</li>
 <li>The toaster oven will have an oven light, which can be turned on and off.</li>
@@ -1070,21 +1099,29 @@ and toasting which can toast some bread.</li>
 <li>The toaster can only heat when the door is closed.</li>
 <li>The toaster’s light should be off when the door is closed.</li>
 </ul>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
-<a class="reference external image-reference" href="_static/ToasterOven_2.pdf" id="iter2-design"><div align="center" class="align-center"><img alt="_images/ToasterOven_2.svg" src="_images/ToasterOven_2.svg" /></div>
+</div>
+<div class="section" id="iteration-2-design">
+<span id="iter2-design"></span><h4>Iteration 2 design<a class="headerlink" href="#iteration-2-design" title="Permalink to this headline">¶</a></h4>
+<a class="reference external image-reference" href="_static/ToasterOven_2.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2.svg" src="_images/ToasterOven_2.svg" /></div>
 </a>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
-<div class="highlight-python notranslate" id="iter2-code"><div class="highlight"><pre><span></span><span class="c1"># file named toaster_oven_2.py</span>
+</div>
+<div class="section" id="iteration-2-code">
+<span id="iter2-code"></span><h4>Iteration 2 code<a class="headerlink" href="#iteration-2-code" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># file named toaster_oven_2.py</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
@@ -1187,13 +1224,17 @@ and toasting which can toast some bread.</li>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
 </pre></div>
 </div>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
-<div class="highlight-bash notranslate" id="iter2-proof"><div class="highlight"><pre><span></span>python3 toaster_oven_2.py
+</div>
+<div class="section" id="iteration-2-proof">
+<span id="iter2-proof"></span><h4>Iteration 2 proof<a class="headerlink" href="#iteration-2-proof" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 toaster_oven_2.py
 off
 <span class="o">[</span><span class="m">2018</span>-09-12 <span class="m">13</span>:54:51.890583<span class="o">]</span> <span class="o">[</span>oven<span class="o">]</span> e-&gt;start_at<span class="o">()</span> top-&gt;off
 heater_on
@@ -1208,13 +1249,17 @@ off
 <span class="o">[</span><span class="m">2018</span>-09-12 <span class="m">13</span>:54:51.892568<span class="o">]</span> <span class="o">[</span>oven<span class="o">]</span> e-&gt;Off<span class="o">()</span> baking-&gt;off
 </pre></div>
 </div>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="iter2-questions">Questions and Answers about code and results (iteration 2):</p>
+</div>
+<div class="section" id="iteration-2-questions">
+<span id="iter2-questions"></span><h4>Iteration 2 questions<a class="headerlink" href="#iteration-2-questions" title="Permalink to this headline">¶</a></h4>
+<p>Questions and Answers about code and results (iteration 2):</p>
 <ul class="simple">
 <li><a class="reference internal" href="#can-you-explain-how-the-picture-meets-the-design-specification"><span class="std std-ref">Can you explain how the picture meets the design specification?</span></a></li>
 <li><a class="reference internal" href="#can-you-explain-how-the-callbacks-are-arranged-relative-to-each-other"><span class="std std-ref">How do I write my state callback functions based on the HSM diagram?</span></a></li>
@@ -1292,6 +1337,7 @@ specification.</p>
 off as the HSM transitions into the off state:</p>
 <a class="reference external image-reference" href="_static/ToasterOven_2_spec_7.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_spec_7.svg" src="_images/ToasterOven_2_spec_7.svg" /></div>
 </a>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -1331,6 +1377,7 @@ dimensions as a type of DAG:</p>
 <a class="reference external image-reference" href="_static/ToasterOven_2_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_3.svg" src="_images/ToasterOven_2_3.svg" /></div>
 </a>
 <p>The event processor will use this structure to determine how to behave.</p>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -1402,6 +1449,7 @@ the status variable:
 <p class="last">I haven’t talked about how to implement a hook yet, you will see this in a
 future design iteration.</p>
 </div>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -1474,6 +1522,7 @@ Spike and Tara along, again, you use the <code class="docutils literal notransla
 <p class="last">I haven’t talked about how to implement a hook yet, you will see this in a
 future design iteration.</p>
 </div>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -1535,6 +1584,7 @@ to exit.  If it were to exit, the oven thread wouldn’t get a chance to do all 
 it’s work.  It still needs to process the “Baking” and “Off” events.</p>
 <p>So, we place a <code class="docutils literal notranslate"><span class="pre">time.sleep(0.01)</span></code> at the end of our file, to let the oven
 thread finish its work before the main thread exits and kills the oven thread.</p>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -1573,6 +1623,7 @@ program.</p>
 <p>So do you need to care about this?  No, you just need to remember to type,
 <code class="docutils literal notranslate"><span class="pre">Event(signal=signals.&lt;whatever_name_you_want&gt;)</span></code> and not worry about defining
 things before you use them.</p>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -1642,6 +1693,7 @@ behavior, you would send your statechart an event that would trigger the hook
 and your state machine would run the hook’s code and not change states.</p>
 <p>This plan-hacking is a very powerful feature of the Miro Samek algorithm.  There
 are no hooks in this iteration.  They will be introduced in a future iteration.</p>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -1749,6 +1801,7 @@ the event processor that it doesn’t handle this condition by returning
 process is completed and the oven’s thread pends on its queue.</p>
 <a class="reference external image-reference" href="_static/ToasterOven_2_5_5.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_5_5.svg" src="_images/ToasterOven_2_5_5.svg" /></div>
 </a>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -1927,6 +1980,7 @@ back to it’s queue to see if any other thread posted event’s to it while it 
 trying to toast something:</p>
 <a class="reference external image-reference" href="_static/ToasterOven_2_5_5.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_5_5.svg" src="_images/ToasterOven_2_5_5.svg" /></div>
 </a>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -2040,6 +2094,7 @@ your code:</p>
 <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
 </pre></div>
 </div>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -2072,6 +2127,7 @@ enter the baking state.</p>
 </div>
 <a class="reference external image-reference" href="_static/ToasterOven_2_7_1.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_2_7_1.svg" src="_images/ToasterOven_2_7_1.svg" /></div>
 </a>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -2145,6 +2201,7 @@ processor sends it an INIT_SIGNAL, which is not handled so it is ignored.
 The RTC process is completed and the thread goes back to pending on the
 queue.</div></blockquote>
 <p>You have now examined all of the possible transitions of this statemachine.</p>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -2175,6 +2232,7 @@ using miros, you would consider the trade-offs between putting state information
 in your object and into your HSM.  The goal would be to meet your specification
 while minimizing your design’s complexity.  To do this well will require you to
 practice.</p>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -2233,6 +2291,7 @@ condition to print “baking”.</p>
 <p>Finally, we send the “Off” event to oven.  This causes a transition from baking
 to off.  To do this it prints “heater_off” from the exit condition of the
 heating state and prints “off” from the entry condition of the off state.</p>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -2243,6 +2302,7 @@ heating state and prints “off” from the entry condition of the off state.</p
 <p>You can’t, we don’t even know if our customer’s want to cook anything, so we
 will ship it, discover what our customers want through the customer discovery
 process, then pivot if the need arises.</p>
+<a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-code"<span class="std-ref">code</span></a></span></a>,
@@ -2250,73 +2310,154 @@ process, then pivot if the need arises.</p>
 <a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
 </div>
-<div class="section" id="iteration-3-open-door">
-<span id="iter3"></span><h3>Iteration 3: open door<a class="headerlink" href="#iteration-3-open-door" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="iteration-3-history">
+<span id="iter3"></span><h3>Iteration 3: history<a class="headerlink" href="#iteration-3-history" title="Permalink to this headline">¶</a></h3>
 <p>We have shipped our toaster ovens, and much to our surprise nobody bought any of
 them.</p>
 <p>Through a lengthy customer-discovery-process we learn that people would like to
 put food in the toaster ovens, which means that we should be able to open it’s
-door.</p>
+door then close it again.  When they close the door they want the toaster to act
+like it did before.</p>
 <p>So we iterate our existing product with the following additional specification:</p>
+<a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="iter3-spec">Iteration 3 specification:</p>
+<div class="section" id="iteration-3-specification">
+<span id="iter3-spec"></span><h4>Iteration 3 specification<a class="headerlink" href="#iteration-3-specification" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li>The toaster’s heating element should turn off when the door is opened</li>
-<li>The toaster should turn on it’s light when the door is opened</li>
+<li>The toaster should turn on its light when the door is opened</li>
+<li>When a customer closes the door, the toaster oven should go back to behaving
+like it was before.</li>
 </ul>
+<a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
 </div>
-<div class="section" id="iteration-4-adding-some-history">
-<span id="iter4"></span><span id="iter3-questions"></span><span id="iter3-proof"></span><span id="iter3-code"></span><span id="iter3-design"></span><h3>Iteration 4: adding some history<a class="headerlink" href="#iteration-4-adding-some-history" title="Permalink to this headline">¶</a></h3>
-<p>Much to our surprise, through great effort and many additional customer interviews,
-we find our customer’s would like to close the door after they have opened it.</p>
-<p>We still haven’t sold an oven, but we know that they want to close the door and
-have it return to it’s previous state of operation when they do so.</p>
+<div class="section" id="iteration-3-design">
+<span id="iter3-design"></span><h4>Iteration 3 design<a class="headerlink" href="#iteration-3-design" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+<div class="section" id="iteration-3-code">
+<span id="iter3-code"></span><h4>Iteration 3 code<a class="headerlink" href="#iteration-3-code" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+<div class="section" id="iteration-3-proof">
+<span id="iter3-proof"></span><h4>Iteration 3 proof<a class="headerlink" href="#iteration-3-proof" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+<div class="section" id="iteration-3-questions">
+<span id="iter3-questions"></span><h4>Iteration 3 questions<a class="headerlink" href="#iteration-3-questions" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+</div>
+<div class="section" id="iteration-4-hook">
+<span id="iter4"></span><h3>Iteration 4: hook<a class="headerlink" href="#iteration-4-hook" title="Permalink to this headline">¶</a></h3>
+<p>We sold our first oven!  Our market segment has been labeled as
+barbie-oven-utilizers by our marketing department.  They want a buzzer and they
+want their ovens in pink.</p>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="iter4-spec">Iteration 4 specification:</p>
+<div class="section" id="iteration-4-specification">
+<span id="iter4-spec"></span><h4>Iteration 4 specification<a class="headerlink" href="#iteration-4-specification" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li>When a customer closes the door, the toaster oven should go back to behaving
-like it was before.</li>
+<li>While the toaster oven is in any state the customer should be able to press a
+buzzer which will get the attention of anyone nearby.</li>
 </ul>
 </div>
-<div class="section" id="iteration-5-adding-a-buzzer">
-<span id="iter5"></span><span id="iter4-questions"></span><span id="iter4-proof"></span><span id="iter4-code"></span><span id="iter4-design"></span><h3>Iteration 5: adding a buzzer<a class="headerlink" href="#iteration-5-adding-a-buzzer" title="Permalink to this headline">¶</a></h3>
-<p>We sold our first oven!  Our market segment has been labeled as
-barbie-oven-utilizers by our marketing department.  They want a buzzer and they
-want their ovens in pink.</p>
+<div class="section" id="iteration-4-design">
+<span id="iter4-design"></span><h4>Iteration 4 design<a class="headerlink" href="#iteration-4-design" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+<div class="section" id="iteration-4-code">
+<span id="iter4-code"></span><h4>Iteration 4 code<a class="headerlink" href="#iteration-4-code" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+<div class="section" id="iteration-4-proof">
+<span id="iter4-proof"></span><h4>Iteration 4 proof<a class="headerlink" href="#iteration-4-proof" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+<div class="section" id="iteration-4-questions">
+<span id="iter4-questions"></span><h4>Iteration 4 questions<a class="headerlink" href="#iteration-4-questions" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+</div>
+<div class="section" id="iteration-5-one-shots">
+<span id="iter5"></span><h3>Iteration 5: one-shots<a class="headerlink" href="#iteration-5-one-shots" title="Permalink to this headline">¶</a></h3>
+<p>Though our customer’s don’t care that our oven doesn’t actually heat anything
+for real, they have asked that the toasting and baking states at least pretend
+to have different cooking durations.</p>
+<a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="iter5-spec">Iteration 5 specification:</p>
-<ul class="simple">
-<li>While the toaster oven is in any state the customer should be able to press a buzzer which will
-get the attention of anyone nearby.</li>
-</ul>
-</div>
-<div class="section" id="iteration-6-adding-cook-times">
-<span id="iter6"></span><span id="iter5-questions"></span><span id="iter5-proof"></span><span id="iter5-code"></span><span id="iter5-design"></span><h3>Iteration 6: adding cook times<a class="headerlink" href="#iteration-6-adding-cook-times" title="Permalink to this headline">¶</a></h3>
-<p>Though our customer’s don’t care that our oven doesn’t actually heat anything
-for real (they don’t want this), they have asked that the toasting and baking
-states at least pretend to have different cooking durations.</p>
-<a class="reference internal" href="zero_to_one.html#iter6-spec"<span class="std-ref">spec</span></a>,
-<a class="reference internal" href="zero_to_one.html#iter6-design"<span class="std-ref">design</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter6-code"<span class="std-ref">code</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter6-proof"<span class="std-ref">proof</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter6-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter7"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="iter6-spec">Iteration 6 specification:</p>
+<div class="section" id="iteration-5-specification">
+<span id="iter5-spec"></span><h4>Iteration 5 specification<a class="headerlink" href="#iteration-5-specification" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li>The toaster oven should stay in the baking state for twenty seconds, then buzz
 and turn off.</li>
@@ -2325,9 +2466,115 @@ and turn off.</li>
 <li>If the door is opened, then closed, the cooking time should be set back to
 it’s default time of ten or twenty seconds.</li>
 </ul>
-<a class="reference external image-reference" href="_static/ToasterOven_1.pdf" id="iter6-questions"><span id="iter6-proof"></span><span id="iter6-code"></span><span id="iter6-design"></span><div align="center" class="align-center"><img alt="_images/ToasterOven_1.svg" src="_images/ToasterOven_1.svg" /></div>
+</div>
+<div class="section" id="iteration-5-design">
+<span id="iter5-design"></span><h4>Iteration 5 design<a class="headerlink" href="#iteration-5-design" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+<div class="section" id="iteration-5-code">
+<span id="iter5-code"></span><h4>Iteration 5 code<a class="headerlink" href="#iteration-5-code" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+<div class="section" id="iteration-5-proof">
+<span id="iter5-proof"></span><h4>Iteration 5 proof<a class="headerlink" href="#iteration-5-proof" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+<div class="section" id="iteration-5-questions">
+<span id="iter5-questions"></span><h4>Iteration 5 questions<a class="headerlink" href="#iteration-5-questions" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+</div>
+<div class="section" id="iteration-6-adding-cook-times">
+<span id="iter6"></span><h3>Iteration 6: adding cook times<a class="headerlink" href="#iteration-6-adding-cook-times" title="Permalink to this headline">¶</a></h3>
+<p>Though our customer’s don’t care that our oven doesn’t actually heat anything
+for real (they don’t want this), they have asked that the toasting and baking
+states at least pretend to have different cooking durations.</p>
+<a class="reference internal" href="zero_to_one.html#iter5"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter7"><span class="std std-ref">next</span></a><hr class="docutils" />
+<div class="section" id="iteration-6-specification">
+<span id="iter6-spec"></span><h4>Iteration 6 specification<a class="headerlink" href="#iteration-6-specification" title="Permalink to this headline">¶</a></h4>
+<p>Iteration 6 specification:</p>
+<ul class="simple">
+<li>The toaster oven should stay in the baking state for twenty seconds, then buzz
+and turn off.</li>
+<li>The toaster oven should stay in the toasting state for ten seconds, then buzz
+and turn off.</li>
+<li>If the door is opened, then closed, the cooking time should be set back to
+it’s default time of ten or twenty seconds.</li>
+</ul>
+</div>
+<div class="section" id="iteration-6-design">
+<span id="iter6-design"></span><h4>Iteration 6 design<a class="headerlink" href="#iteration-6-design" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter5"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter7"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+<div class="section" id="iteration-6-code">
+<span id="iter6-code"></span><h4>Iteration 6 code<a class="headerlink" href="#iteration-6-code" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter5"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter7"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+<div class="section" id="iteration-6-proof">
+<span id="iter6-proof"></span><h4>Iteration 6 proof<a class="headerlink" href="#iteration-6-proof" title="Permalink to this headline">¶</a></h4>
+<a class="reference internal" href="zero_to_one.html#iter5"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter7"><span class="std std-ref">next</span></a><hr class="docutils" />
+</div>
+<div class="section" id="iteration-6-questions">
+<span id="iter6-questions"></span><h4>Iteration 6 questions<a class="headerlink" href="#iteration-6-questions" title="Permalink to this headline">¶</a></h4>
+<a class="reference external image-reference" href="_static/ToasterOven_1.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_1.svg" src="_images/ToasterOven_1.svg" /></div>
 </a>
+<a class="reference internal" href="zero_to_one.html#iter5"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter6-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter7"><span class="std std-ref">next</span></a><hr class="docutils" />
 <a class="reference internal" href="quickstart.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="reading_diagrams.html"><span class="std std-ref">next</span></a></div>
+</div>
 </div>
 </div>
 
@@ -2344,12 +2591,54 @@ it’s default time of ten or twenty seconds.</li>
 <li><a class="reference internal" href="#">Zero To One</a><ul>
 <li><a class="reference internal" href="#story">Story</a></li>
 <li><a class="reference internal" href="#a-simple-example-toaster-oven">A Simple Example: Toaster Oven</a><ul>
-<li><a class="reference internal" href="#iteration-1-setup">Iteration 1: setup</a></li>
-<li><a class="reference internal" href="#iteration-2-basic-oven">Iteration 2: basic oven</a></li>
-<li><a class="reference internal" href="#iteration-3-open-door">Iteration 3: open door</a></li>
-<li><a class="reference internal" href="#iteration-4-adding-some-history">Iteration 4: adding some history</a></li>
-<li><a class="reference internal" href="#iteration-5-adding-a-buzzer">Iteration 5: adding a buzzer</a></li>
-<li><a class="reference internal" href="#iteration-6-adding-cook-times">Iteration 6: adding cook times</a></li>
+<li><a class="reference internal" href="#iteration-1-setup">Iteration 1: setup</a><ul>
+<li><a class="reference internal" href="#iteration-1-specification">Iteration 1 specification</a></li>
+<li><a class="reference internal" href="#iteration-1-design">Iteration 1 design</a></li>
+<li><a class="reference internal" href="#iteration-1-code">Iteration 1 code</a></li>
+<li><a class="reference internal" href="#iteration-1-proof">Iteration 1 proof</a></li>
+<li><a class="reference internal" href="#iteration-1-questions">Iteration 1 questions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#iteration-2-basic-oven">Iteration 2: basic oven</a><ul>
+<li><a class="reference internal" href="#iteration-2-specification">Iteration 2 specification</a></li>
+<li><a class="reference internal" href="#iteration-2-design">Iteration 2 design</a></li>
+<li><a class="reference internal" href="#iteration-2-code">Iteration 2 code</a></li>
+<li><a class="reference internal" href="#iteration-2-proof">Iteration 2 proof</a></li>
+<li><a class="reference internal" href="#iteration-2-questions">Iteration 2 questions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#iteration-3-history">Iteration 3: history</a><ul>
+<li><a class="reference internal" href="#iteration-3-specification">Iteration 3 specification</a></li>
+<li><a class="reference internal" href="#iteration-3-design">Iteration 3 design</a></li>
+<li><a class="reference internal" href="#iteration-3-code">Iteration 3 code</a></li>
+<li><a class="reference internal" href="#iteration-3-proof">Iteration 3 proof</a></li>
+<li><a class="reference internal" href="#iteration-3-questions">Iteration 3 questions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#iteration-4-hook">Iteration 4: hook</a><ul>
+<li><a class="reference internal" href="#iteration-4-specification">Iteration 4 specification</a></li>
+<li><a class="reference internal" href="#iteration-4-design">Iteration 4 design</a></li>
+<li><a class="reference internal" href="#iteration-4-code">Iteration 4 code</a></li>
+<li><a class="reference internal" href="#iteration-4-proof">Iteration 4 proof</a></li>
+<li><a class="reference internal" href="#iteration-4-questions">Iteration 4 questions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#iteration-5-one-shots">Iteration 5: one-shots</a><ul>
+<li><a class="reference internal" href="#iteration-5-specification">Iteration 5 specification</a></li>
+<li><a class="reference internal" href="#iteration-5-design">Iteration 5 design</a></li>
+<li><a class="reference internal" href="#iteration-5-code">Iteration 5 code</a></li>
+<li><a class="reference internal" href="#iteration-5-proof">Iteration 5 proof</a></li>
+<li><a class="reference internal" href="#iteration-5-questions">Iteration 5 questions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#iteration-6-adding-cook-times">Iteration 6: adding cook times</a><ul>
+<li><a class="reference internal" href="#iteration-6-specification">Iteration 6 specification</a></li>
+<li><a class="reference internal" href="#iteration-6-design">Iteration 6 design</a></li>
+<li><a class="reference internal" href="#iteration-6-code">Iteration 6 code</a></li>
+<li><a class="reference internal" href="#iteration-6-proof">Iteration 6 proof</a></li>
+<li><a class="reference internal" href="#iteration-6-questions">Iteration 6 questions</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
