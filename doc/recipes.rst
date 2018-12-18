@@ -1313,7 +1313,7 @@ events, using one of two different strategies:
 2.  If it subscribes in a ``lifo`` way it will post using the :ref:`post_lifo<recipes-posting-an-event-to-the-lifo>` method.
 
 You can also set the priority of the event while it is in transit within the
-active fabric.  This would only be useful if you are expecting contension
+active fabric.  This would only be useful if you are expecting contention
 between various events being dispatched across your system.
 
 .. _recipes-subscribing-to-an-event-posted-by-another-active-object:
@@ -1329,7 +1329,8 @@ you would use the ``lifo`` technique:
 .. code-block:: python
 
   subscribing_ao = ActiveObject()
-  subscribing_ao.subscribe(signals.THING_SUBSCRIBING_AO_CARES_ABOUT,
+  subscribing_ao.subscribe(
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT),
     queue_type='lifo')
 
 This approach would make sense if you were subscribed to a timed heart beat
@@ -1346,8 +1347,8 @@ In most situations you can use the subscription defaults:
   subscribing_ao.subscribe(
     signals.THING_SUBSCRIBING_AO_CARES_ABOUT, queue_type='fifo')
 
-It seems a little bit strange to subscribe to an event, since an event is a
-specific thing in which belongs a general thing; the signal.  But the ``subscribe``
+It may seem a little bit strange to subscribe to an event, since an event is a
+specific thing, which contains a general thing; the signal.  But the ``subscribe``
 method supports subscribing to events so that it's method signature looks like
 the other method signatures in the library.  (Less things for you to remember)
 
