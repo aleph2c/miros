@@ -15,7 +15,6 @@ def test_active_fabric_singleton():
   af2 = ActiveFabric()
   assert(id(af1) == id(af2))
 
-
 # Confirm that we can start and stop the active fabric, otherwise we can't test
 # this system
 @pytest.mark.pubsub
@@ -110,6 +109,10 @@ def test_repeat_publish_subscribe(fabric_fixture):
 
 @pytest.mark.pubsub
 def test_subscribe_lilo(fabric_fixture):
+  '''the feature actually determines if we are using the post_lifo or post_fifo
+  method of the active object, so we just need to make sure our queues are
+  working for this part of the system... we do not need to change the ordering
+  of the items in the queue'''
   input_queue_1 = deque(maxlen=5)
   event_a       = Event(signal=signals.A)
   event_b       = Event(signal=signals.B)
