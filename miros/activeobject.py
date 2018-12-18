@@ -239,7 +239,7 @@ class ActiveFabricSource():
       2) last in first out  - lifo priority queue
 
     Both methods 1 and 2 have tasks with associated priority queues.
-    The fifo/lifo action only takes place at the momement the managing task puts
+    The fifo/lifo action only takes place at the moment the managing task puts
     an item into the external queue used as a registry object. For method 1, the
     task puts the event on the last location in the queue.  For method 2, the
     task puts the event at the beginning location of the queue.
@@ -354,7 +354,7 @@ class LockingDeque():
       lq.wait() # => task will stop until an item is appended
       print(lq.pop())
 
-    thread = Thread(target=example_task,args=(ld,))
+    thread = Thread(target=example_task, args=(ld,))
     thread.start()   # thread started and locked
     time.sleep(10)
     ld.append("bob") # thread prints "bob"
@@ -449,7 +449,7 @@ class ActiveObject(HsmWithQueues):
     self.queue = self.locking_deque
 
     # The active fabric is a singletlon that dispatches messages between all
-    # active objects.  It provides a publish/subscribe infrasture, and it will
+    # active objects.  It provides a publish/subscribe infrastructure, and it will
     # post directly into our locking_deque object, and as a result, provide the
     # 'get' method of this object to unlock our task.
     self.fabric = ActiveFabric()
@@ -554,7 +554,7 @@ class ActiveObject(HsmWithQueues):
       deferred = True
 
     thread_id = None
-    '''post to the fifo of the hsm locking deque'''
+    '''post using the HsmWithQueues's post_fifo api'''
     if period is None:
       super().post_fifo(e)
     else:
@@ -588,7 +588,8 @@ class ActiveObject(HsmWithQueues):
       deferred = True
 
     thread_id = None
-    '''post to the lifo of the hsm locking deque'''
+
+    '''post using the HsmWithQueues's post_lifo api'''
     if period is None:
       super().post_lifo(e)
     else:
