@@ -1308,7 +1308,7 @@ will post events to it using its <a class="reference internal" href="#recipes-po
 <li>If it subscribes in a <code class="docutils literal notranslate"><span class="pre">lifo</span></code> way it will post using the <a class="reference internal" href="#recipes-posting-an-event-to-the-lifo"><span class="std std-ref">post_lifo</span></a> method.</li>
 </ol>
 <p>You can also set the priority of the event while it is in transit within the
-active fabric.  This would only be useful if you are expecting contension
+active fabric.  This would only be useful if you are expecting contention
 between various events being dispatched across your system.</p>
 <div class="section" id="subscribing-to-an-event-posted-by-another-active-object">
 <span id="recipes-subscribing-to-an-event-posted-by-another-active-object"></span><h3>Subscribing to an Event Posted by Another Active Object<a class="headerlink" href="#subscribing-to-an-event-posted-by-another-active-object" title="Permalink to this headline">¶</a></h3>
@@ -1317,7 +1317,8 @@ between various events being dispatched across your system.</p>
 like a message to take priority over all other events waiting to be managed,
 you would use the <code class="docutils literal notranslate"><span class="pre">lifo</span></code> technique:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">subscribing_ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
-<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">,</span>
+<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">),</span>
   <span class="n">queue_type</span><span class="o">=</span><span class="s1">&#39;lifo&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1332,8 +1333,8 @@ safety related thing.</p>
   <span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">,</span> <span class="n">queue_type</span><span class="o">=</span><span class="s1">&#39;fifo&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>It seems a little bit strange to subscribe to an event, since an event is a
-specific thing in which belongs a general thing; the signal.  But the <code class="docutils literal notranslate"><span class="pre">subscribe</span></code>
+<p>It may seem a little bit strange to subscribe to an event, since an event is a
+specific thing, which contains a general thing; the signal.  But the <code class="docutils literal notranslate"><span class="pre">subscribe</span></code>
 method supports subscribing to events so that it’s method signature looks like
 the other method signatures in the library.  (Less things for you to remember)</p>
 <p>If you chose to subscribe to events and not directly to signals, think of your
