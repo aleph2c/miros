@@ -643,9 +643,6 @@ class ActiveObject(HsmWithQueues):
     if self.__thread_running() is False:
       self.thread = start_thread(self)
 
-    # crash if we can't start our thread
-    assert(self.thread.is_alive())
-
   def stop(self, stop_fabric=None):
     '''Stops the active object
 
@@ -671,8 +668,9 @@ class ActiveObject(HsmWithQueues):
     '''
     while task_event.is_set():
       queue.wait()  # wait for an event we have subscribed to
-      if self.queue.deque[0].signal_name != signals.stop_active_object:
-        self.next_rtc()
+      if len(self.queue) >= 1:
+        if self.queue.deque[0].signal_name != signals.stop_active_object:
+          self.next_rtc()
       queue.task_done()  # write this so that 'join' will work
 
   def trace(self):
