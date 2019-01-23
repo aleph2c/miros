@@ -669,8 +669,11 @@ class ActiveObject(HsmWithQueues):
     while task_event.is_set():
       queue.wait()  # wait for an event we have subscribed to
       if len(self.queue) >= 1:
-        if self.queue.deque[0].signal_name != signals.stop_active_object:
-          self.next_rtc()
+        try:
+          if self.queue.deque[0].signal_name != signals.stop_active_object:
+            self.next_rtc()
+        except:
+          pass
       queue.task_done()  # write this so that 'join' will work
 
   def trace(self):
