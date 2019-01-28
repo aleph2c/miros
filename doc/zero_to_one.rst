@@ -44,7 +44,6 @@ documentation.
   understanding of the dynamics aren't clear, the hint boxes will serve as a
   bridge between the story and your technical work.
 
-
 Story
 ^^^^^ 
 If you are like me, learning something entirely new can be very exhausting.  You
