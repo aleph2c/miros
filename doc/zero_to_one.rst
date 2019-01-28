@@ -7,24 +7,27 @@
 
 Zero To One
 ===========
-This is not a 5 minute blog read.  If you want to learn how statecharts
-work, this is your one stop shop, it will take you from 0 to 1, but it will
-require you to focus and actually work through an :ref:`example <zero-to-one-a-simple-example>`.
+This is not a 5-minute blog read.  But, if you want to learn how statecharts
+work, this is your one-stop shop, it will take you from 0 to 1.
 
-But before I show you the :ref:`example <zero-to-one-a-simple-example>`, I'll
-show how a miros statecharts work, without using technical-language.  To do
-this, I'll tell you a story about some characters interacting in a little
-universe.  Then I'll show you how to make a reactive toaster oven.
-  
-The story will have some pictures, which I have created using a UML drawing
-tool.  The images are intended to get someone who hasn't seen UML before,
-comfortable looking at statecharts drawn this way.  These pictures will act as a
-bridge between the story and how to program a statechart.  (If an image is too
-small in your browser, click on it to open it as a full-sized pdf.)
+First, I'll try to explain the statechart concepts, pictures and mechanics using
+a story.  At the end of the story I'll describe how the story's stage,
+characters and theme map back onto the things you need to know to be a
+statechart designer.  Don't worry if you are a little bit confused after reading
+the story; if a few things stick, great, proceed into the example, then re-read
+the story once you have written your first couple of statecharts.
 
-If you find the story is confusing, don't worry, a concrete and straightforward
-statechart :ref:`example <zero-to-one-a-simple-example>` will follow it.  With each
-reading, the statechart mechanics should become more clear for you.
+Secondly, we will work through an example together.  The example will be broken
+up into a set of iterations and each iteration will be broken into 4 parts:
+
+* `spec`, what are we trying to build and how do we know when we are done.
+* `design`, a picture, as a formal description of the thing we are trying to build
+* `code`, the code required to manifest the design
+* `proof`, proof that our code is actually matching our design
+* `questions`, a list of questions and answers
+
+Each iteration is heavily linked so that you can quickly bounce around in its
+documentation.
 
 .. admonition:: Scott Volk: 2018-09-09
 
@@ -41,23 +44,57 @@ reading, the statechart mechanics should become more clear for you.
   understanding of the dynamics aren't clear, the hint boxes will serve as a
   bridge between the story and your technical work.
 
+
 Story
-^^^^^
-Let's build a little universe.
+^^^^^ 
+If you are like me, learning something entirely new can be very exhausting.  You
+need to learn new words, new ideas and you have to juggle them in your head
+until you finally see how they interrelate.  This can be hard work.
 
-Our universe will consist of a heaven, an earth and an underworld.   The earth
-will be made up of a set of pubs, arranged on different terraces.  To get to a
-higher pub, you would first have to walk through a lower pub.  The lower pubs
-are for a more general audience, while the higher pubs, though having less space
-have a more specialized aesthetic.
+But stories about people moving around on a small stage are much easier to
+remember.  If it's a good story, it doesn't feel like work at all.
 
-On every terrace, there will be two bouncers a greeter and zero or more
-bartenders.   There will only be one set of stairs that can be used to enter or
-exit a pub, and this is where that pub's bouncers will be.
+So why don't we try to explain something that is hard to remember using
+something that is easier to remember?
 
-One bouncer will be facing in the direction of people entering the terrace and
-the other will be facing in the direction of people wanting to leave it.  The
-greeter will talk to anyone who has decided to stay on her terrace.
+I will do this now, I will use a story as a mental-scaffolding around the
+statechart ideas you need to know.
+
+.. raw:: html
+
+   <div class="story">
+   
+   <p><span class="story-intro">Our story will be placed in a little universe.</span>  This little universe will
+   consist of a heaven, an earth and an underworld.   The earth in the story
+   isn't round like ours.  It's a very small flat-earth, acting as a platform,
+   floating above the underworld.  On top of the earth are a set of pubs,
+   arranged on different terraces.
+   </p>
+
+   <p>
+   To get to a higher pub, you would first have to walk through a lower pub.  The
+   lower pubs are for a more general audience, while the higher pubs, though having
+   less space have a more specialized aesthetic. 
+   </p>
+   
+   <p>
+   Now let's add some characters and a bit more detail to the story.
+   </p>
+
+   <p>
+   On every terrace, there will be two bouncers a greeter and zero or more
+   bartenders.  There will only be one set of stairs that can be used to enter or
+   exit a pub, and this is where that pub's bouncers will sit.
+   </p>
+
+   <p>
+   One bouncer will be facing in the direction of people entering the terrace and
+   the other will be facing in the direction of people wanting to leave it.  The
+   greeter will talk to anyone who has decided to stay on her terrace.  If there is
+   a bartender on the terrace, he will serve drinks and sometimes he will have
+   secrets.
+   </p>
+   </div>
 
 .. image:: _static/md_terraced_pubs.svg
     :target: _static/md_terraced_pubs.pdf
@@ -78,12 +115,28 @@ greeter will talk to anyone who has decided to stay on her terrace.
   Likewise, the bartender is a clause where the application developer sets the
   event name.
 
-The heaven will have one goddess Eve, "the goddess of law and order" and the
-underworld will be ruled by Theo, "`the solipsist.
-<https://en.wikipedia.org/wiki/Solipsism>`_"  The earth will have a lazy god
-named Spike, "the source" who happens to be the only guy who can drink in the
-whole universe.  Spike will have a companion, who is a spirit, Tara "the
-explorer."
+.. raw:: html
+
+   <div class="story">
+
+   <p>
+   Now let's add some supernatural beings: three gods and a spirit.
+   </p>
+
+   <p>
+   The heaven will have one goddess Eve, "the goddess of law and order" and
+   the underworld will be ruled by Theo, <a href="https://en.wikipedia.org/wiki/Solipsism">the solipsist.</a> The earth
+   will have a lazy god named Spike, "the source" who happens to be the only guy
+   who can drink in the whole universe.  Spike will have a companion spirit,
+   named Tara "the explorer."
+   </p>
+
+   <p>
+   We know now about the entire cast of the story.  There are bouncers, greeters,
+   bartenders, three gods and one spirit.
+   </p>
+
+   </div>
 
 .. image:: _static/md_terraced_gods.svg
     :target: _static/md_terraced_gods.pdf
@@ -108,9 +161,21 @@ explorer."
   of the event processor, the source and target states or the thread.  This is
   why these characters are supernatural in the story; it's a mnemonic.
 
-Let's put our little universe into a small multiverse. Each universe will have
-it's own heaven and underworld, gods, people and explorer spirit, but its
-terraced architecture of pubs, can be shared across all connected worlds.
+.. raw:: html
+
+   <div class="story">
+
+   <p>
+   Let's put our little universe into a small multiverse. Each universe will have
+   it's own heaven and underworld, gods, people and explorer spirit, but its
+   terraced architecture of pubs, can be shared across all connected universes.
+   </p>
+
+   <p>
+   If this doesn't make any sense, don't worry about it.  Let's move on.
+   </p>
+
+   </div>
 
 .. image:: _static/md_multiverse.svg
     :target: _static/md_multiverse.pdf
@@ -127,11 +192,19 @@ terraced architecture of pubs, can be shared across all connected worlds.
   expected; there are no side effects.  In this way, many different active
   objects can use the same set of state callback functions.
 
-Eve, the goddess of heaven has a birds-eye view of our little world.  She rules
-over the people: the bouncers, greeters and bartenders and, Tara, "the explorer"
-spirit.  She took on her duty as "the goddess of law and order" with such gusto,
-that sometime in the world's history, she banned alcohol consumption for
-everyone on earth, except Spike, who she can't control.
+.. raw:: html
+
+   <div class="story">
+
+   <p>
+   Eve, the goddess of heaven has a birds-eye view of our little world.  She rules
+   over the people: the bouncers, greeters and bartenders and, Tara, "the explorer"
+   spirit.  She took on her duty as "the goddess of law and order" with such gusto,
+   that sometime in the world's history, she banned alcohol consumption for
+   everyone on earth, except Spike, who she can't control.
+   </p>
+
+   </div>
 
 .. image:: _static/md_eve.svg
     :target: _static/md_eve.pdf
@@ -151,16 +224,26 @@ everyone on earth, except Spike, who she can't control.
   while it is searching through a statemachine, we say that Eve rules over the
   people and Tara the "explorer spirit".
 
-Theo, "the solipsist" is the god of the underworld.  He is only called the
-"solipsist" by people outside of his universe, like us, because his universe
-only works and exists if he is thinking about it.  Nobody in his world is aware
-that he has this power.
+.. raw:: html
 
-One of Theo's duties is to join the little universe with other universes.  Theo
-watches a portal, which is connected to a loading dock which receives
-messages from different worlds, including ours.  He is extraordinarily attentive
-and enthusiastic.  He can motivate anyone he talks to or even looks upon, in
-fact, this is his supernatural ability.
+   <div class="story">
+
+   <p>
+   Theo, "the solipsist" is the god of the underworld.  He is only called the
+   "solipsist" by people outside of his universe, like you and me, because his
+   universe only works and exists if he is thinking about it.  Nobody in his world
+   is aware that he has this power.
+   </p>
+
+   <p>
+   One of Theo's duties is to join the little universe with other universes.  Theo
+   watches a portal, which is connected to a loading dock which receives
+   messages from different worlds, including ours.  He is extraordinarily attentive
+   and enthusiastic.  He can motivate anyone he talks to or even looks upon, in
+   fact, this is his supernatural ability.
+   </p>
+
+   </div>
 
 .. image:: _static/md_theo.svg
     :target: _static/md_theo.pdf
@@ -174,9 +257,17 @@ fact, this is his supernatural ability.
   and drive the event processor, which in turn, will call the functions
   making up the statemachine.
 
-When Theo receives a message from another universe, it appears as a round hollow
-orb which sometimes contains a scroll.  He calls these orbs "events", and if they
-have a scroll within them, he calls that scroll a "payload".
+
+.. raw:: html
+
+   <div class="story">
+
+   <p>
+   When Theo receives a message from another universe, it appears as a round hollow
+   orb which sometimes contains a scroll.  He calls these orbs "events", and if they
+   have a scroll within them, he calls that scroll a "payload".
+   </p>
+   </div>
 
 .. image:: _static/md_events.svg
     :target: _static/md_events.pdf
@@ -195,40 +286,66 @@ have a scroll within them, he calls that scroll a "payload".
 
   An event can have an optional payload.
 
-When an "event" comes through the portal, Theo will pick it up, marvel at it
-then in a reverent gesture, pass it to Eve.  They both become excited, maybe
-even a little nervous, because they know there universe is going to change; it
-will react to the event.
+.. raw:: html
 
-Theo encourages Eve to fly back up into the sky and to "follow the laws." Then
-he will watch as she gives her minions their marching orders.  Only after all of
-the activity stops, will he focus his attention back on the portal.
+   <div class="story">
 
-Feeling oddly refreshed and encouraged by Theo, Eve looks around the map until
-she see's Spike from her high vantage point.  Spike being the god of the earth,
-is easy to see and Eve knows that her underling-spirit Tara, "the explorer",  is
-always near him.
+   <p>
+   When an "event" comes through the portal, Theo will pick it up, marvel at it
+   then in a reverent gesture, pass it to Eve.  They both become excited, maybe
+   even a little nervous, because they know there universe is going to change; it
+   will react to the event.
+   </p>
 
-Eve flies done to Tara and gives her the event.  She says, "I want you to go to
-the terrace where there is a bartender who knows what to do with this event.
-Then I want you to go to wherever he tells you to take it.  Good luck Tara, I
-believe in you."
+   <p>
+   Theo encourages Eve to fly back up into the sky and to "follow the laws." Then
+   he will watch as she gives her minions their marching orders.  Only after all of
+   the activity stops, will he focus his attention back on the portal.
+   </p>
 
-Tara enjoys Spike's company, but she also loves adventure.
+   <p>
+   Feeling oddly refreshed and encouraged by Theo, Eve looks around the map until
+   she see's Spike from her high vantage point.  Spike being the god of the earth,
+   is easy to see and Eve knows that her underling-spirit Tara, "the explorer",  is
+   always near him.
+   </p>
 
-She looks down at the event to study it and notices that it has something written
-on it, a word, a phrase, it could be different every time, but it's a clue and
-Tara loves a puzzle.  She looks around the pub on her terrace and studies each
-of the bartender's name tags.  If she sees that a name tag matches the name on
-the event, she will approach that bartender and talk to him.
+   <p>
+   Eve flies done to Tara and gives her the event.  She says, "I want you to go to
+   the terrace where there is a bartender who knows what to do with this event.
+   Then I want you to go to wherever he tells you to take it.  Good luck Tara, I
+   believe in you."
+   </p>
+
+   <p>
+   Tara enjoys Spike's company, but she also loves adventure.
+   </p>
+
+   <p>
+   She looks down at the event to study it and notices that it has something written
+   on it, a word, a phrase, it could be different every time, but it's a clue and
+   Tara loves a puzzle.  She looks around the pub on her terrace and studies each
+   of the bartender's name tags.  If she sees that a name tag matches the name on
+   the event, she will approach that bartender and talk to him.
+   </p>
+
+   </div>
 
 .. image:: _static/md_events_bartenders.svg
     :target: _static/md_events_bartenders.pdf
     :align: center
 
-If there is no bartender to talk to on her terrace, she will go to it's exit
-staircase and descend to the next terrace.  Being a spirit, she is hard to see
-and the bouncers and greeters leave her alone when she is by herself.
+.. raw:: html
+
+   <div class="story">
+
+   <p>
+   If there is no bartender to talk to on her terrace, she will go to it's exit
+   staircase and descend to the next terrace.  Being a spirit, she is hard to see
+   and the bouncers and greeters leave her alone when she is by herself.
+   </p>
+
+   </div>
 
 .. admonition:: hint
 
@@ -242,11 +359,17 @@ and the bouncers and greeters leave her alone when she is by herself.
   The bartender also represents an if-elif clause that matches the name of the
   event given to that function.  
 
-She will continue to climb down the terraces until she comes to the edge of the
-universe.  If she can't find a bartender who can answer her question, she will
-take the event and throw it off the edge of the earth, into oblivion, then climb
-back up to rejoin Spike.  In such rare cases their universe doesn't react to the
-event.
+.. raw:: html
+
+   <div class="story">
+   <p>
+   She will continue to climb down the terraces until she comes to the edge of the
+   universe.  If she can't find a bartender who can answer her question, she will
+   take the event and throw it off the edge of the earth, into oblivion, then climb
+   back up to rejoin Spike.  In such rare cases their universe doesn't react to the
+   event.
+   </p>
+   </div>
 
 .. image:: _static/md_bartenders_on_the_hsm_oblivion.svg
     :target: _static/md_bartenders_on_the_hsm_oblivion.pdf
@@ -258,15 +381,22 @@ event.
   doesn't handle an event in any of it's callback functions, the event will be
   ignored.
 
-But if Tara does find a bartender who's name tag matches the name on the event,
-she will show it to him.  He will take it and study it, sometimes he might even
-take out it's scroll.  Then he will lean across the bar and whisper the answer
-into Tara's ear.
+.. raw:: html
 
-Sometimes the bartender says, "give me the event I'll handle it, don't worry
-about it anymore."  When this happens, Tara passes over the event, then rejoins
-Spike, who rejoices because he doesn't have to do anything.  For some reason
-Spike calls this a "hook".
+   <div class="story">
+   <p>
+   But if Tara does find a bartender who's name tag matches the name on the event,
+   she will show it to him.  He will take it and study it, sometimes he might even
+   take out it's scroll.  Then he will lean across the bar and whisper the answer
+   into Tara's ear.
+   </p>
+   <p>
+   Sometimes the bartender says, "give me the event I'll handle it, don't worry
+   about it anymore."  When this happens, Tara passes over the event, then rejoins
+   Spike, who rejoices because he doesn't have to do anything.  For some reason
+   Spike calls this a "hook".
+   </p>
+   </div>
 
 .. image:: _static/md_bartenders_on_the_hsm_hook.svg
     :target: _static/md_bartenders_on_the_hsm_hook.pdf
@@ -289,23 +419,35 @@ Spike calls this a "hook".
   perform this type of event handling.  For more details about this programming
   technique, read about the :ref:`ultimate hook pattern.<patterns-ultimate-hook>`
 
-Most of the time, however, the bartender will tell Tara where she has to take
-the event.  If she has to continue her journey, she will wait for Spike so she can
-tell him about it.
+.. raw:: html
+
+   <div class="story">
+   <p>
+   Most of the time, however, the bartender will tell Tara where she has to take
+   the event.  If she has to continue her journey, she will wait for Spike so she can
+   tell him about it.
+   </p>
+   </div>
 
 .. image:: _static/md_bartenders_on_the_hsm_reaction_1.svg
     :target: _static/md_bartenders_on_the_hsm_reaction_1.pdf
     :align: center
 
-Spike knows when Tara is waiting for him.  Though he is lazy, and drunk most of
-the time, he always has something interesting to say, and this is what Tara
-loves about him.  Having nothing else to do, he makes his way to the terrace
-where Tara has gotten her next clue.  He knows that she will want to talk to him
-about it.  As he approaches the exit, the exit bouncer puts up a hand, then
-looks at a clip board to see if Spike is on the guest list, which he always is,
-and then let's Spike pass to the next lower terrace.  You really can't stop the
-god of the earth.  For every terrace that Spike needs to leave so that he can
-rejoin with Tara, this futile ritual is repeated.
+.. raw:: html
+
+   <div class="story">
+   <p>
+   Spike knows when Tara is waiting for him.  Though he is lazy, and drunk most of
+   the time, he always has something interesting to say, and this is what Tara
+   loves about him.  Having nothing else to do, he makes his way to the terrace
+   where Tara has gotten her next clue.  He knows that she will want to talk to him
+   about it.  As he approaches the exit, the exit bouncer puts up a hand, then
+   looks at a clip board to see if Spike is on the guest list, which he always is,
+   and then let's Spike pass to the next lower terrace.  You really can't stop the
+   god of the earth.  For every terrace that Spike needs to leave so that he can
+   rejoin with Tara, this futile ritual is repeated.
+   </p>
+   </div>
 
 .. image:: _static/md_bartenders_on_the_hsm_reaction_2.svg
     :target: _static/md_bartenders_on_the_hsm_reaction_2.pdf
@@ -325,53 +467,83 @@ rejoin with Tara, this futile ritual is repeated.
   As an application developer, you don't really care about the LCA acronym.  You
   just need to understand the dynamics of how exits work.
 
-When Spike finally finds Tara he asks her what she learned.  Bubbling with
-excitement, she tells him about where the bartender said to take the event, to
-which he always says, "great I'll meet you there, but first I want to have a
-drink."  Tara takes the event and makes her way to the location that the
-bartender told her about.
+.. raw:: html
 
-Spike finishes his drink, then again starts to make his way toward Tara.  Before
-he can climb up to a new Terrace, he is stopped by the entry bouncer, who looks
-at his clip board to see if Spike is on the guest list, which he always is, then
-let's Spike proceed.  You really can't stop the god of the earth anyway.
+   <div class="story">
+   <p>
+   When Spike finally finds Tara he asks her what she learned.  Bubbling with
+   excitement, she tells him about where the bartender said to take the event, to
+   which he always says, "great I'll meet you there, but first I want to have a
+   drink."  Tara takes the event and makes her way to the location that the
+   bartender told her about.
+   </p>
+
+   <p>
+   Spike finishes his drink, then again starts to make his way toward Tara.  Before
+   he can climb up to a new Terrace, he is stopped by the entry bouncer, who looks
+   at his clip board to see if Spike is on the guest list, which he always is, then
+   let's Spike proceed.  You really can't stop the god of the earth anyway.
+   </p>
+   </div>
 
 .. image:: _static/md_bartenders_on_the_hsm_reaction_3.svg
     :target: _static/md_bartenders_on_the_hsm_reaction_3.pdf
     :align: center
 
-When Spike finally arrives on the Terrace where Tara is, a greeter approaches
-them.  She looks at Spike and feels slightly uncomfortable, because sometimes
-she needs to tell them that they can't stay on this terrace.  Instead of talking
-to Spike directly, gods are intimidating, she whisper's something into Tara's
-ear.  Both the greeter and Tara work for Eve after all.  Tara is always happy to
-hear that there is more to do, because she likes to explore the pubs on the
-different terraces.
+.. raw:: html
 
-If the greeter tells Tara that she needs to climb higher, Tara will relay the
-message to Spike who will answer, "great, I'll meet you there, but first I want
-to have a drink".
+   <div class="story">
 
-Tara climbs to the terrace where the greeter told her to go.  Spike finishes his
-drink and makes his way through the entry bouncers and finally arrives at the
-same terrace where Tara is waiting.  At which point there might be another
-greeter with another uncomfortable message.
+   <p>
+   When Spike finally arrives on the Terrace where Tara is, a greeter approaches
+   them.  She looks at Spike and feels slightly uncomfortable, because sometimes
+   she needs to tell them that they can't stay on this terrace.  Instead of talking
+   to Spike directly, gods are intimidating, she whisper's something into Tara's
+   ear.  Both the greeter and Tara work for Eve after all.  Tara is always happy to
+   hear that there is more to do, because she likes to explore the pubs on the
+   different terraces.
+   </p>
+
+   <p>
+   If the greeter tells Tara that she needs to climb higher, Tara will relay the
+   message to Spike who will answer, "great, I'll meet you there, but first I want
+   to have a drink".
+   </p>
+
+   <p>
+   Tara climbs to the terrace where the greeter told her to go.  Spike finishes his
+   drink and makes his way through the entry bouncers and finally arrives at the
+   same terrace where Tara is waiting.  At which point there might be another
+   greeter with another uncomfortable message.
+   </p>
+   </div>
 
 .. image:: _static/md_bartenders_on_the_hsm_reaction_4.svg
     :target: _static/md_bartenders_on_the_hsm_reaction_4.pdf
     :align: center
 
-If no greeter approaches them, Tara looks down at the event and watches with
-satisfaction, as it throbs with light, then slowly fades from existence.  To
-this, Spike smiles and looks towards heaven, as he raises a toast to Eve.  
+.. raw:: html
 
-When Eve, the goddess of heaven, see's this her shoulder's relax and the tension
-releases from her back: The laws were followed.
+   <div class="story">
 
-Theo, "the solipsist", god of the underworld, has been watching the whole scene,
-and its "run to completion".  Knowing there is nothing left to do in the
-universe, he turns his gaze back to the portal.  He waits patiently for an event
-to pass through the little universe's loading dock.  All is well.
+   <p>
+   If no greeter approaches them, Tara looks down at the event and watches with
+   satisfaction, as it throbs with light, then slowly fades from existence.  To
+   this, Spike smiles and looks towards heaven, as he raises a toast to Eve.  
+   </p>
+
+   <p>
+   When Eve, the goddess of heaven, see's this her shoulder's relax and the tension
+   releases from her back: The laws were followed.
+   </p>
+
+   <p>
+   Theo, "the solipsist", god of the underworld, has been watching the whole scene,
+   and its "run to completion".  Knowing there is nothing left to do in the
+   universe, he turns his gaze back to the portal.  He waits patiently for an event
+   to pass through the little universe's loading dock.  All is well.
+   </p>
+   </div>
 
 .. admonition:: hint
 
@@ -383,37 +555,60 @@ to pass through the little universe's loading dock.  All is well.
   For this reason, you should not put blocking code into your statecharts.  If
   you do, they will stop reacting to events and become unresponsive.
 
-But is it?  Sometimes when Theo, "the solipsist", god of the underworld, closes
-his eyes and daydreams; his attention briefly drifts back to his world.  This is
-enough to wake everyone up from their non-existence.
+.. raw:: html
 
-When the people wake up, they become listless. The bouncers who have had nothing
-to do since the prohibition was announced by Eve, are particularly frustrated
-with the meaninglessness of their jobs.  They only have one customer now.  Even
-if Spike wasn't always permitted to pass them, there is no way they could stop
-the god of earth. Why have a universe full of pubs if only one guy can drink?
-It seems so pointless.
+   <div class="story">
+   <p>
+   But is it?  Sometimes when Theo, "the solipsist", god of the underworld, closes
+   his eyes and daydreams; his attention briefly drifts back to his world.  This is
+   enough to wake everyone up from their non-existence.
+   </p>
 
-Then somehow they find out about you and me, fellow humans called developers.
+   <p>
+   When the people wake up, they become listless. The bouncers who have had nothing
+   to do since the prohibition was announced by Eve, are particularly frustrated
+   with the meaninglessness of their jobs.  They only have one customer now.  Even
+   if Spike wasn't always permitted to pass them, there is no way they could stop
+   the god of earth. Why have a universe full of pubs if only one guy can drink?
+   It seems so pointless.  It's lame.
+   </p>
 
-They learn that we, despite being human, are all powerful.  That we can build
-the pub terrace system to which their gods are subservient; that we can send the
-events and give the greeters and the bouncers their secret directions (arrows on
-the diagram).  That we can even built lots of different interconnected universes
-and have them communicate with each other.
+   <p>
+   Then somehow they find out about you and me, fellow humans called developers.
+   </p>
 
-They challenge us to make something useful out of their existence, even if they
-can't understand it from where they are, they need something to *mean
-something*.  So, they create an organized campaign: "hack the humans".  This is
-how it works: All of the humans in the little universe, open themselves to run
-code from our universe, while they are talking to either Tara or Spike.
+   <p>
+   They learn that we, despite being human, are all powerful.  That we can build
+   the pub terrace system to which their gods are subservient; that we can send the
+   events and give the greeters and the bouncers their secret directions (arrows on
+   the diagram).  That we can even built lots of different interconnected universes
+   and have them communicate with each other.
+   <p>
+
+   <p>
+   They challenge us to make something useful out of their existence, even if
+   they can't understand it from where they are, they need something to
+   <strong>mean something</strong>.  So, they create an organized campaign:
+   "hack the humans".  This is how it works: All of the humans in the little
+   universe, open themselves to run code from our universe, while they are
+   talking to either Tara or Spike.
+   </p>
+   </div>
+
 
 .. image:: _static/md_hack_the_humans.svg
     :target: _static/md_hack_the_humans.pdf
     :align: center
 
-To help us, they create a Rosetta stone, translating the concepts of their
-universe into something legible for you and me:
+.. raw:: html
+
+   <div class="story">
+   <p>
+   To help us, they create a Rosetta stone, translating the concepts of their
+   universe into something legible for you and me:
+   </p>
+   </div>
+
 
 +-------------------------------------+-----------------------------------------+
 | **Story Concept**                   | **Programming Concept**                 |
@@ -470,27 +665,44 @@ universe into something legible for you and me:
 | universe                            | technology called UML                   | 
 +-------------------------------------+-----------------------------------------+
 
-Here is a warning that they provide us about UML:
+.. raw:: html
+
+   <div class="story">
+   <p>
+   Here is a warning that they provide us about UML:
+   </p>
+   </div>
 
 .. image:: _static/md_translation_with_notes.svg
     :target: _static/md_translation_with_notes.pdf
     :align: center
 
-The above diagram shows us how a lot of information is missing from a "UML
-statechart".  The picture describes some class information, and a behavioural
-specification for the states provided as a bird's eye view of the terraced bar
-system, but there is no information about the thread, **S**, **T**, the deques,
-the events or any of the dynamics for the statechart.
+.. raw:: html
 
-So the human's provide us with the option of laying down a spy-carpet over any
-bar in their universe. If you lay this carpet down, it will record and report
-all activity that transpired between **T**, **S** and any human within that pub.
-To use this carpet, you place the **spy_on** decorator above any callback
-function representing a pub, or state in the HSM.  This is called
-instrumentation.
+   <div class="story">
+   <p>
+   The above diagram shows us how a lot of information is missing from a "UML
+   statechart".  The picture describes some class information, and a behavioural
+   specification for the states provided as a bird's eye view of the terraced
+   bar system, but there is no information about the thread, <strong>S</strong>,
+   <strong>T</strong>, the deques, the events or any of the dynamics for the
+   statechart.
+   </p>
 
-Let's answer their challenge for deep meaning, by using one of their universes
-to make a toaster oven:
+   <p>
+   So the human's provide us with the option of laying down a spy-carpet over
+   any bar in their universe. If you lay this carpet down, it will record and
+   report all activity that transpired between <strong>T</strong>,
+   <strong>S</strong> and any human within that pub.  To use this carpet, you
+   place the <strong>spy_on</strong> decorator above any callback function
+   representing a pub, or state in the HSM.  This is called instrumentation.
+   </p>
+
+   <p>
+   Let's answer their challenge for deep meaning, by using one of their universes
+   to make a toaster oven:
+   </p>
+   </div>
 
 .. _zero-to-one-a-simple-example:
 

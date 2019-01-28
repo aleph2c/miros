@@ -52,10 +52,13 @@ class Handler(watchdog.events.PatternMatchingEventHandler):
       p.wait()
       print("{}".format(cmd))
       print(output)
-      shutil.rmtree('./../docs')
-
-      shutil.copytree('./_build/html/', './../docs')
-      open('./../docs/.nojekyll', 'a').close()
+      try:
+        shutil.rmtree('./../docs')
+        shutil.copytree('./_build/html/', './../docs')
+        open('./../docs/.nojekyll', 'a').close()
+      except:
+        print("avoiding a file traffic jam")
+        time.sleep(5)
 
   on_created = on_modified
 
