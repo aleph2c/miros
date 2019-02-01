@@ -680,46 +680,6 @@ this trade off.  The `namedtuple is nice to work with
 
 .. _reading_diagrams-dealing-with-the-anti-brand:
 
-Dealing with the Anti-Brand
----------------------------
-People may roll their eyes when they see your pictures.
-
-A techno-anthropologist could build a career around looking at the history of
-UML.  In my own career I saw a strange kind of social stratum emerge between
-architects and practitioners, where architects had higher social status than the
-people implementing their vision.  The architects invented techno-babble to
-describe simple concepts and tried to present their work as a collection of open
-secrets and I don't think they did this on purpose.
-
-The developers, who were ultimately responsible for the delivery of working
-software would create something independent of this vision.  It wouldn't
-surprise me if the whole agile management movement was given birth because of
-this political tension.  It is a lot more interesting than this, but I'm not a
-historian.
-
-So, what do you do when people start rolling their eyes when you show them these
-pictures?  First of all, don't take it personally, they might have some well
-earned cynicism.  Just quickly explain what the pictures mean and show them how
-to draw their own pictures.  Show them why they are useful.  Explain things in
-plain English, don't use the language of professors or consultants.  You don't
-have to signal that you are clever, we are trying to expose ideas not to hide
-behind them.
-
-The Python programming language has moved well beyond UML.  In fact, it could be
-said that we don't really know how to program computers yet.  We might still be
-using Roman numerals; when Arabic numbers have yet to be discovered.  UML isn't
-the answer, it's a trajectory toward what we really want.  We want to be able
-to see our designs using the visual parts of our mind.  We want to be able to
-communicate our complex ideas to one another using a formalism that is
-expressive enough to solve our problems.
-
-If you can't sell your ideas to everyone, don't worry about it.  Their will
-always be people you can't reach, focus on what you can change instead.  This is
-the power of open source, you can always fork a project and go your own way.
-
-If a developer isn't diagramming their own software, then your organization is
-doing it wrong.
-
 .. raw:: html
 
   <a class="reference internal" href="zero_to_one.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="examples.html"><span class="std std-ref">next</span></a>

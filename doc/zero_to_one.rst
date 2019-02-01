@@ -11,14 +11,15 @@ This is not a 5-minute blog read.  But, if you want to learn how statecharts
 work, this is your one-stop shop, it will take you from 0 to 1.
 
 First, I'll try to explain the statechart concepts, pictures and mechanics using
-a story.  At the end of the story I'll describe how the story's stage,
+a :ref:`story <zero_to_one_story>`.  At the end of the story I'll describe how the story's stage,
 characters and theme map back onto the things you need to know to be a
 statechart designer.  Don't worry if you are a little bit confused after reading
 the story; if a few things stick, great, proceed into the example, then re-read
 the story once you have written your first couple of statecharts.
 
-Secondly, we will work through an example together.  The example will be broken
-up into a set of iterations and each iteration will be broken into 4 parts:
+Secondly, we will work through an :ref:`example <zero-to-one-a-simple-example>`
+together.  The example will be broken up into a set of iterations and each
+iteration will be broken into 4 parts:
 
 * `spec`, what are we trying to build and how do we know when we are done.
 * `design`, a picture, as a formal description of the thing we are trying to build
@@ -26,8 +27,11 @@ up into a set of iterations and each iteration will be broken into 4 parts:
 * `proof`, proof that our code is actually matching our design
 * `questions`, a list of questions and answers
 
-Each iteration is heavily linked so that you can quickly bounce around in its
-documentation.
+The questions section will provide you with a choose-your-own-adventure style of
+reading the documentation.
+
+Each iteration is heavily linked so that you can quickly bounce around between
+its various parts.
 
 .. admonition:: Scott Volk: 2018-09-09
 
@@ -43,6 +47,8 @@ documentation.
   After you have completed the example, read the story again if your
   understanding of the dynamics aren't clear, the hint boxes will serve as a
   bridge between the story and your technical work.
+
+.. _zero_to_one_story:
 
 Story
 ^^^^^ 
@@ -608,6 +614,7 @@ statechart ideas you need to know.
    </p>
    </div>
 
+.. _zero_to_one_rosetta:
 
 +-------------------------------------+-----------------------------------------+
 | **Story Concept**                   | **Programming Concept**                 |
@@ -631,7 +638,7 @@ statechart ideas you need to know.
 | Theo, "the solipsist"               | the thread that drives the              |
 | god of the underworld               | statechart                              |
 +-------------------------------------+-----------------------------------------+
-| Tara, "the explorer", spirit        | a search aspect, **T**, of the          |
+| Tara, "the explorer", spirit        | a search aspect, **T** (target), of the |
 |                                     | event processor                         |
 +-------------------------------------+-----------------------------------------+
 | bartender                           | arrow or hook on the HSM diagram,       |
@@ -679,6 +686,7 @@ statechart ideas you need to know.
 .. raw:: html
 
    <div class="story">
+
    <p>
    The above diagram shows us how a lot of information is missing from a "UML
    statechart".  The picture describes some class information, and a behavioural
@@ -688,12 +696,12 @@ statechart ideas you need to know.
    statechart.
    </p>
 
-   <p>
+   <p id="zero-to-one-spy-carpet">
    So the human's provide us with the option of laying down a spy-carpet over
    any bar in their universe. If you lay this carpet down, it will record and
    report all activity that transpired between <strong>T</strong>,
    <strong>S</strong> and any human within that pub.  To use this carpet, you
-   place the <strong>spy_on</strong> decorator above any callback function
+   place the <strong>@spy_on</strong> decorator above any callback function
    representing a pub, or state in the HSM.  This is called instrumentation.
    </p>
 
@@ -782,6 +790,7 @@ Iteration 1 code
 """"""""""""""""
 
 .. code-block:: python
+  :linenos:
 
   # file named toaster_oven_1.py
   from miros import ActiveObject
@@ -839,7 +848,7 @@ Iteration 1 questions
 Questions and Answers about the code and the results:
 
 * :ref:`Why is miros only supported in Python 3.5 or greater?<why_is_miros_onl>`                                                 
-* :ref:`Can you explain what is going on with the imports on lines 1-6?<can_you_explain_>`
+* :ref:`Can you explain what is going on with the imports on lines 1-7?<can_you_explain_>`
 * :ref:`Why bother making a ToasterOven that inherits from the ActiveObect, why not just use the ActiveObject?<why_bother_making>`
 * :ref:`You keep calling the state functions callbacks, what do you mean by this?<you_keep_calling>`
 * :ref:`What do you mean by a function signature?<what_do_you_mean>`
@@ -871,7 +880,7 @@ an accidental limitation.
 
 .. _can_you_explain_:
 
-**Can you explain what is going on with the imports on lines 1-6?**
+**Can you explain what is going on with the imports on lines 1-7?**
 
 I'll answer this question by putting a lot of comments into the code:
 
@@ -1028,7 +1037,7 @@ class is just making the kinds of callback functions we are talking about here.
 
 It is easier to explain this library using the traditional techniques of engaging
 with the Miros Samek event processing algorithm than by just jumping into the
-Factory class.
+Factory class. (I only program the statecharts using the Factory class)
 
 .. include:: i_navigation_1.rst
 
@@ -1055,8 +1064,7 @@ The thread is missing from the UML:
     :target: _static/ToastOven_0_1.pdf
     :align: center
 
-Unlike the thread the event processor is shown on the picture, though this is
-probably invalid UML:
+Unlike the thread the, event processor is actually shown on the picture:
 
 .. image:: _static/ToasterOven_0_2.svg
     :target: _static/ToastOven_0_2.pdf
@@ -1065,7 +1073,8 @@ probably invalid UML:
 I leave the event processor on my pictures so I can show the starting state of
 the active object.
 
-The queues are missing from the UML as well:
+The queues are missing from the UML as well, but they are contained within the
+ActiveObject class:
 
 .. image:: _static/ToasterOven_0_3.svg
     :target: _static/ToastOven_0_3.pdf
@@ -1156,7 +1165,22 @@ and easy to read.
 
 **Can you explain what is going on with the else clause?**
 
-The else clause is used by **T** to know how to search outward in a statechart.
+A callback function can land in its `else` clause for one of two reasons:
+
+1. The event processor is explicitly asking it for its super state callback function.
+2. The event processor has sent it an event it has received in the hopes that it
+   knows what to do with it, but the current state doesn't know what to do with
+   it.
+
+.. note::
+  
+   In the second case, :ref:`T <zero_to_one_rosetta>` has not found anything in the
+   current state that can handle its event and it needs to know how to descent outward in the HSM.
+
+Thankfully, your callback function doesn't have to care which of these two
+reasons were behind why it has landed in its ``else`` clause.  It just has set
+the ``tem.fun`` attribute of its first argument to the its parent callback
+function, and return ``return_status.SUPER``.
 
 .. code-block:: python
   :emphasize-lines: 6-8
@@ -1171,11 +1195,7 @@ The else clause is used by **T** to know how to search outward in a statechart.
       status = return_status.SUPER
     return status
 
-The callback functions report where they are in the HSM's hierarchy by setting
-the ``temp.fun`` of their active object.  They set this value to point to their
-super state, or the state that is outside their current state in the diagram.
-
-In this case, the ``some_state_to_prove_this_works`` state doesn't have an outer
+But in our example, the ``some_state_to_prove_this_works`` state doesn't have an outer
 state, so we set the ``oven.temp.fun`` attribute to ``oven.top``, to let the event
 processor know it has reached the outermost state of the HSM.
 
@@ -1187,15 +1207,6 @@ The returned value of the state callback function is set to
 ``return_status.SUPER`` so that your function can notify the event processor
 that it set the ``oven.temp.fun`` to its superstate's function.
 
-There are many different reasons the event processor might want to trigger the
-else clause in your callback function.  It could call the state callback with a
-reserved event, which it knows will not be in the if-elif structure -- it does
-this when it is trying to discover the hierarchy of your HSM.  It could also use
-the else clause to make **T** bubble out of the current state, when that state
-doesn't know what to do with a user defined event.  This is the power of an HSM.
-
-More will be said about this in the up coming iterations.
-
 .. note::
 
   How the else clause is called doesn't really matter to you as an application
@@ -1204,7 +1215,7 @@ More will be said about this in the up coming iterations.
   * set the ``oven.temp.fun`` to the callback function representing the
     superstate
   * if there is no superstate, set it to the ``top`` attribute of the first
-    argument given to the callback
+    argument given to the callback function
   * ensure that the callback function returns, return_state.SUPER if the else
     clause is reached.
 
@@ -1227,19 +1238,19 @@ statechart's thread is started:
     time.sleep(0.1)
 
 It output's the trace log as your statechart is reacting to events.  It can only
-work if the spy_on decorator is placed above the state functions in your HSM.
+work if the ``@spy_on`` decorator is placed above the state functions in your HSM.
 
 There are two different types of instrumentation output provided by miros.  The
 :ref:`trace <recipes-using-the-trace>` and the :ref:`spy
 <recipes-using-the-spy>`.  The trace provides information only if a state
-transition has occurred.  It reports is **S** has moved.  For each line in a
-trace log,  describes:
+transition has occurred.  It reports if :ref:`S <zero_to_one_rosetta>`
+has moved.  For each line in a trace log,  describes:
 
   * The time stamp of when the event was reacted to
   * The name of the statechart
   * The event that caused the transition
-  * The starting state of **S**
-  * The ending state of **S**
+  * The starting state of :ref:`S <zero_to_one_rosetta>` 
+  * The ending state of :ref:`S <zero_to_one_rosetta>`
 
 Our minimal example doesn't do much, it starts from outside of the HSM and then
 transitions into the ``some_state_to_prove_this_works``.
@@ -1249,17 +1260,17 @@ transitions into the ``some_state_to_prove_this_works``.
   [2018-09-11 09:35:10] [oven] e->start_at() top->some_state_to_prove_this_works
 
 In this example we see: when I ran the test.  That the statechart is called oven,
-that the starting state of **S** in this oven instance was ``top`` and the
-ending state of **S** was ``some_state_to_prove_this_works``.
+that the starting state of :ref:`S <zero_to_one_rosetta>` in this oven instance was ``top`` and the
+ending state of :ref:`S <zero_to_one_rosetta>` was ``some_state_to_prove_this_works``.
 
-There is no ``start_at`` event in miros.  But to keep the trace output useful
-for the person looking at it, I pretend that at a ``start_at`` event causes the
-initial transition into the HSM.  On the diagram, this will be where the event
-processor attachment point touches the HSM.
+There is no ``start_at`` event in miros.  But to keep the trace output useful, I
+write a fake ``start_at`` event as the cause of the initial transition into the
+HSM.  On the diagram, this will be where the event processor attachment point
+touches the HSM.
 
 .. note:: 
 
-  I might remove some information from the timestamp in this documenation to make
+  I might remove some information from the timestamp in this documentation to make
   the text fit on the screen.
 
 .. include:: i_navigation_1.rst
@@ -1281,11 +1292,13 @@ event processor in that thread.
 
     time.sleep(0.1)
 
-Before a statechart is started, **T** and **S** exist outside of the outermost
-state.  The ``start_at`` call, places **T** into the
-``some_state_to_prove_this_works``.  **S** marches towards **T** triggering as
+Before a statechart is started, :ref:`T <zero_to_one_rosetta>` and :ref:`S <zero_to_one_rosetta>`
+exist outside of the outermost
+state.  The ``start_at`` call, places :ref:`T <zero_to_one_rosetta>` into the
+``some_state_to_prove_this_works``.  :ref:`S <zero_to_one_rosetta>`
+marches towards :ref:`T <zero_to_one_rosetta>`, triggering as
 many needed entry events as required, then the init event in the state that
-**T** is in.
+:ref:`T <zero_to_one_rosetta>` is in.
 
 In our example there isn't much to talk about.  The entry clause of the
 ``some_state_function`` is called, printing "hello world".
@@ -1296,11 +1309,9 @@ In our example there isn't much to talk about.  The entry clause of the
 
 **Why are you placing a delay at the end of the code sample?**
 
-When you call the start_at method of the oven statechart, it starts a new
-thread. Then it runs the oven's event processor in that thread.  The main
-program runs in the main thread.
-
 .. code-block:: python
+  :emphasize-lines: 6
+  :linenos:
 
   if __name__ == "__main__":
     oven = ToasterOven(name="oven")
@@ -1323,6 +1334,7 @@ exits the program.
 .. _how_did_your_prove_that_your_code_work:
 
 **How did your prove that your code worked?**
+
 Looking at the design, we see that the starting state should be
 ``some_state_to_prove_this_works`` and that when it enters this state it should
 print "hello world" to the terminal.
@@ -1354,6 +1366,8 @@ compliant.  I wrote miros so that it can use as much existing Python as possible
 If you want to check out another implementation of the Miro Samek event
 processing algorithm in Python, written with asyncio, check out `Dean Hall's pq.
 <https://github.com/dwhall/pq>`_
+
+In the future I might port the miros threads to David Beazley's `thredo <https://github.com/dabeaz/thredo>`_ technology.
 
 .. _when_is_it_going_to_be_do:
 
@@ -1421,7 +1435,7 @@ Iteration 2 code
       print("light_on")
 
     def light_off(self):
-      print("light_on")
+      print("light_off")
 
     def heater_on(self):
       print("heater_on")
@@ -1864,11 +1878,6 @@ Spike and Tara along, again, you use the ``trans`` method.
 
     return status
 
-.. note::
-
-  I haven't talked about how to implement a hook yet, you will see this in a
-  future design iteration.
-
 .. include:: i_navigation_2.rst
 
 .. _what_does_posting_the_events_do:
@@ -2042,9 +2051,9 @@ It would then act on the plan, and march **S** inward, back to **T**.
 
 Once **S** and **T** are back within the same state, the event processor looks
 to see if its init condition, the big black dot on the diagram, has another
-``trans`` call, or arrow pointing to another inner state.  If it does, it plans
-then acts on this call, and re-settles deeper within the HSM.  This process
-would repeat until there was nothing left to do.  
+``trans`` call, or arrow pointing to another inner state.  If it does, it
+creates another plan and then acts on this plan, and re-settles deeper within
+the HSM.  This process would repeat until there was nothing left to do.  
 
 If this isn't clear, the upcoming examples will show how these dynamics work.
 
@@ -2453,12 +2462,27 @@ trying to toast something:
 **Is there a way I can get miros to show me what happened and how it happened?**
 
 Yes, in fact there are two different ways to show you what happened and how it
-happened.  If you instrument your state callbacks using the ``spy_on``
+happened.  If you instrument your state callbacks using the ``@spy_on``
 decorator, you can use either the ``trace`` or ``spy`` output.
 
 I will break this answer up into two parts, what you can see with either a
 trace or a spy, and how you can use these tools to make sense of your own
 designs.
+
+.. note::
+
+  The trace tracks movement of **S** through your HSM.  While the spy tracks
+  movements of **T**.  So, to remember which is which, remember that when it
+  comes to instrumentation there is an anti-mnemonic at play, ``spy`` tracks **T**
+  and the ``trace`` tracks **S**.
+
+  The ``spy`` name was used in miros, because the qp framework uses the word spy
+  to output how the event processor is working (how it tracks T).  I wanted the
+  concepts to remained consistent for embedded developers who were going to port the
+  Python designs into qp, so I kept the spy name, even though it's hard to
+  remember.
+  
+  The last time I checked there was no ``trace`` feature in the qp framework.
 
 **What you can see with a trace:**
 
@@ -2575,7 +2599,9 @@ your code:
 
 **Can you explain how this statechart bakes?**
 
-To get the statechart to bake, you just send a Bake event to it.
+To get the statechart to bake, you just send a Bake event to it.  (you can't
+open the door and puts things into your oven yet, so there little point to
+baking).
 
 Now that we know how to use the trace tool, let's look at the trace output for
 this type of transition:
@@ -2811,6 +2837,9 @@ put food in the toaster ovens, which means that we should be able to open it's
 door then close it again.  When they close the door they want the toaster to act
 like it did before.
 
+We would also like to remove the print statements from our code so that we don't
+clutter up our terminal's output while it is run.
+
 So we iterate our existing product with the following additional specification:
 
 .. include:: i_navigation_3.rst
@@ -2819,27 +2848,143 @@ So we iterate our existing product with the following additional specification:
 
 Iteration 3 specification
 """""""""""""""""""""""""
+The toaster oven should behave like it was before, and:
 
-* The toaster's heating element should turn off when the door is opened
+* A customer should be able to open and close the door of our toaster oven
 * The toaster should turn on its light when the door is opened
 * When a customer closes the door, the toaster oven should go back to behaving
-  like it was before.
+  like it did before.
+* Remove the print statements from your production code.
 
 .. include:: i_navigation_3.rst
 
 .. _iter3_design:
 
-
 Iteration 3 design
 """"""""""""""""""
+
+.. image:: _static/ToasterOven_3.svg
+   :target: _static/ToasterOven_3.pdf
+   :align: center
 
 .. include:: i_navigation_3.rst
 
 .. _iter3_code:
 
-
 Iteration 3 code
 """"""""""""""""
+
+.. code-block:: python
+  :emphasize-lines: 12, 40-41, 66, 78, 90, 97-107 
+  :linenos:
+
+   # zero_to_one.ipynb
+   from miros import ActiveObject
+   from miros import return_status
+   from miros import Event
+   from miros import signals
+   from miros import spy_on
+   import time
+
+   class ToasterOven(ActiveObject):
+     def __init__(self, name):
+       super().__init__(name)
+       self.history = None
+
+     def light_on(self):
+       self.scribble("light_on")
+
+     def light_off(self):
+       self.scribble("light_off")
+
+     def heater_on(self):
+       self.scribble("heater_on")
+
+     def heater_off(self):
+       self.scribble("heater_off")
+
+   @spy_on
+   def door_closed(oven, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       oven.light_off()
+       status = return_status.HANDLED
+     elif(e.signal == signals.Baking):
+       status = oven.trans(baking)
+     elif(e.signal == signals.Toasting):
+       status = oven.trans(toasting)
+     elif(e.signal == signals.INIT_SIGNAL):
+       status = oven.trans(off)
+     elif(e.signal == signals.Off):
+       status = oven.trans(off)
+     elif(e.signal == signals.Door_Open):
+       status = oven.trans(door_open)
+     else:
+       oven.temp.fun = oven.top
+       status = return_status.SUPER
+     return status
+
+   @spy_on
+   def heating(oven, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       oven.heater_on()
+       status = return_status.HANDLED
+     elif(e.signal == signals.EXIT_SIGNAL):
+       oven.heater_off()
+       status = return_status.HANDLED
+     else:
+       oven.temp.fun = door_closed
+       status = return_status.SUPER
+     return status
+
+   @spy_on
+   def baking(oven, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       oven.scribble("baking")
+       oven.history = baking
+       status = return_status.HANDLED
+     else:
+       oven.temp.fun = heating
+       status = return_status.SUPER
+     return status
+
+   @spy_on
+   def toasting(oven, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       oven.scribble("toasting")
+       oven.history = toasting
+       status = return_status.HANDLED
+     else:
+       oven.temp.fun = heating
+       status = return_status.SUPER
+     return status
+
+   @spy_on
+   def off(oven, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       oven.scribble("off")
+       oven.history = off
+       status = return_status.HANDLED
+     else:
+       oven.temp.fun = door_closed
+       status = return_status.SUPER
+     return status
+
+   @spy_on
+   def door_open(oven, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       oven.light_on()
+     elif(e.signal == signals.Door_Close):
+       status = oven.trans(oven.history)
+     else:
+       oven.temp.fun = oven.top
+       status = return_status.SUPER
+     return status
 
 .. include:: i_navigation_3.rst
 
@@ -2848,19 +2993,312 @@ Iteration 3 code
 
 Iteration 3 proof
 """""""""""""""""
+To prove our design works we could turn on the spy, then:
 
+   * start the oven 
+   * open the door
+   * close the door
+   * bake something
+   * open the door
+   * close the door
+   * toast something
+   * open the door
+   * close the door
+
+But the spy output would be tedious for you to read, so instead, I'll just
+turn on the trace, toast something, open the door, then close the door again,
+then ship the product. HeeHaw.
+
+.. code-block:: python
+
+   oven = ToasterOven(name="oven")
+   oven.live_trace = True
+   oven.start_at(off)
+
+   # toast something
+   oven.post_fifo(Event(signal=signals.Toasting))
+   # open the door
+   oven.post_fifo(Event(signal=signals.Door_Open))
+   # close the door
+   oven.post_fifo(Event(signal=signals.Door_Close))
+
+   time.sleep(0.01)
+
+Here are the results:
+
+.. code-block:: python
+   
+  [2019-01-31 06:32:28.095880] [oven] e->start_at() top->off
+  [2019-01-31 06:32:28.098218] [oven] e->Toasting() off->toasting
+  [2019-01-31 06:32:28.099014] [oven] e->Door_Open() toasting->door_open
+  [2019-01-31 06:32:28.099489] [oven] e->Door_Close() door_open->toasting
+
+That's kind of hard to read too, so here is a sequence diagram expressing the same
+information:
+
+.. code-block:: python
+
+  [Statechart: oven]
+         top              off           toasting         door_open
+          +---start_at()-->|                |                |
+          |      (1)       |                |                |
+          |                +---Toasting()-->|                |
+          |                |      (2)       |                |
+          |                |                +---Door_Open()->|
+          |                |                |      (3)       |
+          |                |                +<-Door_Close()--|
+          |                |                |      (4)       |
+
+1-2.  Same behavior as the previous design
+
+3. The ``door_open`` state can be transitioned to.
+
+4. While in the ``door_open`` state, a ``Door_Close`` event causes the unit to
+   go back into its previous state, the toasting state.
+
+As a first pass, this is looking good, but is it a proof that our system is
+working.  Not even close.
 
 .. include:: i_navigation_3.rst
 
 .. _iter3_questions:
 
-
 Iteration 3 questions
-"""""""""""""""""
+"""""""""""""""""""""
+
+* :ref:`Can you show the full proof that the system works? <zero_to_one-can-you-show-the-proof-that-the-system-works3>`
+* :ref:`What does the H with a star beside it mean? <zero_to_one-what-does-the-h-with-a-star-beside-it-mean3>`
+* :ref:`How does your code give me the deep history feature? <zero_to_one-how-does-your-code-give-me-the-deep-history-feature3>`
+* :ref:`Why don't you set the history attribute in the door_closed, off and heating states? <zero_to_one-why-don't-you-set-the-history-attribute-in-the-door_closed,-off-and-heating-states3>`
+* :ref:`Why is the state pattern oval put on the diagram? <zero_to_one-why-is-the-state-pattern-oval-put-on-the-diagram3>`
+* :ref:`Isnt the Deep history icon and the call to oven history redundant? <zero_to_one-isn't-the-deep-history-icon-and-the-call-to-oven-history-redundant3>`
+* :ref:`Why isn't the deep history handled by the framework? <zero_to_one-why-isn't-the-deep-history-handled-by-the-framework3>`
+* :ref:`What is the difference between deep and shallow history? <zero_to_one-what-is-the-difference-between-deep-and-shallow-history3>`
+
+
+
+.. _zero_to_one-can-you-show-the-proof-that-the-system-works3:
+
+**Can you show the full proof that the system works?**
+
+Ok, you asked for it:
+
+.. code-block:: python
+
+   oven = ToasterOven(name="oven")
+   oven.live_spy = True
+   oven.live_trace = True  # I'll add this to interleave the trace
+
+   # Start the oven in the Off state
+   oven.start_at(off)
+   # Open the door
+   oven.post_fifo(Event(signal=signals.Door_Open))
+   # Close the door
+   oven.post_fifo(Event(signal=signals.Door_Close))
+   # Bake something
+   oven.post_fifo(Event(signal=signals.Baking))
+   # Open the door
+   oven.post_fifo(Event(signal=signals.Door_Open))
+   # close the door
+   oven.post_fifo(Event(signal=signals.Door_Close))
+   # Toast something
+   oven.post_fifo(Event(signal=signals.Toasting))
+   # Open the door
+   oven.post_fifo(Event(signal=signals.Door_Open))
+   # Close the door
+   oven.post_fifo(Event(signal=signals.Door_Close))
+
+   time.sleep(0.1)
+
+Here is the output:
+
+.. code-block:: python
+  :emphasize-lines: 1, 6, 11, 19, 22, 29, 34, 47, 59, 62, 70, 77, 94, 106, 109, 117
+  :linenos:
+   
+  [2019-01-31 08:30:22.869093] [oven] e->start_at() top->off
+  START
+  SEARCH_FOR_SUPER_SIGNAL:off
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  ENTRY_SIGNAL:door_closed
+  light_off
+  ENTRY_SIGNAL:off
+  off
+  INIT_SIGNAL:off
+  <- Queued:(0) Deferred:(0)
+  [2019-01-31 08:30:22.873013] [oven] e->Door_Open() off->door_open
+  Door_Open:off
+  Door_Open:door_closed
+  EXIT_SIGNAL:off
+  SEARCH_FOR_SUPER_SIGNAL:door_open
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  EXIT_SIGNAL:door_closed
+  ENTRY_SIGNAL:door_open
+  light_on
+  INIT_SIGNAL:door_open
+  <- Queued:(7) Deferred:(0)
+  [2019-01-31 08:30:22.874019] [oven] e->Door_Close() door_open->off
+  Door_Close:door_open
+  SEARCH_FOR_SUPER_SIGNAL:off
+  SEARCH_FOR_SUPER_SIGNAL:door_open
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  EXIT_SIGNAL:door_open
+  ENTRY_SIGNAL:door_closed
+  light_off
+  ENTRY_SIGNAL:off
+  off
+  INIT_SIGNAL:off
+  <- Queued:(6) Deferred:(0)
+  [2019-01-31 08:30:22.875289] [oven] e->Baking() off->baking
+  Baking:off
+  Baking:door_closed
+  EXIT_SIGNAL:off
+  SEARCH_FOR_SUPER_SIGNAL:baking
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  SEARCH_FOR_SUPER_SIGNAL:heating
+  ENTRY_SIGNAL:heating
+  heater_on
+  ENTRY_SIGNAL:baking
+  baking
+  INIT_SIGNAL:baking
+  <- Queued:(5) Deferred:(0)
+  [2019-01-31 08:30:22.876085] [oven] e->Door_Open() baking->door_open
+  Door_Open:baking
+  Door_Open:heating
+  Door_Open:door_closed
+  EXIT_SIGNAL:baking
+  EXIT_SIGNAL:heating
+  heater_off
+  SEARCH_FOR_SUPER_SIGNAL:heating
+  SEARCH_FOR_SUPER_SIGNAL:door_open
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  EXIT_SIGNAL:door_closed
+  ENTRY_SIGNAL:door_open
+  light_on
+  INIT_SIGNAL:door_open
+  <- Queued:(4) Deferred:(0)
+  [2019-01-31 08:30:22.877258] [oven] e->Door_Close() door_open->baking
+  Door_Close:door_open
+  SEARCH_FOR_SUPER_SIGNAL:baking
+  SEARCH_FOR_SUPER_SIGNAL:door_open
+  SEARCH_FOR_SUPER_SIGNAL:heating
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  EXIT_SIGNAL:door_open
+  ENTRY_SIGNAL:door_closed
+  light_off
+  ENTRY_SIGNAL:heating
+  heater_on
+  ENTRY_SIGNAL:baking
+  baking
+  INIT_SIGNAL:baking
+  <- Queued:(3) Deferred:(0)
+  [2019-01-31 08:30:22.878420] [oven] e->Toasting() baking->toasting
+  Toasting:baking
+  Toasting:heating
+  Toasting:door_closed
+  EXIT_SIGNAL:baking
+  EXIT_SIGNAL:heating
+  heater_off
+  SEARCH_FOR_SUPER_SIGNAL:heating
+  SEARCH_FOR_SUPER_SIGNAL:toasting
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  SEARCH_FOR_SUPER_SIGNAL:heating
+  ENTRY_SIGNAL:heating
+  heater_on
+  ENTRY_SIGNAL:toasting
+  toasting
+  INIT_SIGNAL:toasting
+  <- Queued:(2) Deferred:(0)
+  [2019-01-31 08:30:22.879734] [oven] e->Door_Open() toasting->door_open
+  Door_Open:toasting
+  Door_Open:heating
+  Door_Open:door_closed
+  EXIT_SIGNAL:toasting
+  EXIT_SIGNAL:heating
+  heater_off
+  SEARCH_FOR_SUPER_SIGNAL:heating
+  SEARCH_FOR_SUPER_SIGNAL:door_open
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  EXIT_SIGNAL:door_closed
+  ENTRY_SIGNAL:door_open
+  light_on
+  INIT_SIGNAL:door_open
+  <- Queued:(1) Deferred:(0)
+  [2019-01-31 08:30:22.880552] [oven] e->Door_Close() door_open->toasting
+  Door_Close:door_open
+  SEARCH_FOR_SUPER_SIGNAL:toasting
+  SEARCH_FOR_SUPER_SIGNAL:door_open
+  SEARCH_FOR_SUPER_SIGNAL:heating
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  EXIT_SIGNAL:door_open
+  ENTRY_SIGNAL:door_closed
+  light_off
+  ENTRY_SIGNAL:heating
+  heater_on
+  ENTRY_SIGNAL:toasting
+  toasting
+  INIT_SIGNAL:toasting
+  <- Queued:(0) Deferred:(0)
 
 .. include:: i_navigation_3.rst
 
-.. _iter4:
+.. _zero_to_one-what-does-the-h-with-a-star-beside-it-mean3:
+
+**What does the H with a star beside it mean?**
+
+The H with a star beside it is called the :ref:`deep history <deep-history-icon>` pseudostate.  A
+pseudostate is any useful icon on a statechart, that isn't actually a state.
+
+.. image:: _static/ToasterOven_3.svg
+   :target: _static/ToasterOven_3.pdf
+   :align: center
+
+When an arrow points to a deep history pseudostate, it means, go back to the
+last activated state that was used in this region of the statechart.  In our
+example this could be ``door_closed``, ``heating``, ``baking``, ``toasting`` or ``off``
+states.
+
+.. include:: i_navigation_3.rst
+
+.. _zero_to_one-how-does-your-code-give-me-the-deep-history-feature3:
+
+**How does your code give me the deep history feature?**
+
+.. include:: i_navigation_3.rst
+
+.. _zero_to_one-why-don't-you-set-the-history-attribute-in-the-door_closed,-off-and-heating-states3:
+
+**Why don't you set the history attribute in the door_closed, off and heating states?**
+
+
+.. include:: i_navigation_3.rst
+
+.. _zero_to_one-why-is-the-state-pattern-oval-put-on-the-diagram3:
+
+**Why is the state pattern oval put on the diagram?**
+
+.. include:: i_navigation_3.rst
+
+
+.. _zero_to_one-isnt-the-deep-history-icon-and-the-call-to-oven-history-redundant3:
+
+**Isn't the Deep history icon and the call to oven history redundant?**
+
+.. include:: i_navigation_3.rst
+
+.. _zero_to_one-why-isn't-the-deep-history-handled-by-the-framework3:
+
+**Why isn't the deep history handled by the framework?**
+
+.. include:: i_navigation_3.rst
+
+
+
+.. _zero_to_one-what-is-the-difference-between-deep-and-shallow-history3:
+
+**What is the difference between deep and shallow history?**
+
+.. include:: i_navigation_3.rst
 
 Iteration 4: hook
 -----------------
