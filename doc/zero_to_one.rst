@@ -5,6 +5,12 @@
 
   -- Marcus Aurelius
 
+.. role:: dead_spec
+  :class: dead_spec
+
+.. role:: new_spec
+  :class: new_spec
+
 Zero To One
 ===========
 This is not a 5-minute blog read.  But, if you want to learn how statecharts
@@ -716,27 +722,21 @@ statechart ideas you need to know.
 A Simple Example: Toaster Oven
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To make this toaster oven statechart example seem like a real software project,
-I will break it's design process up into 6 steps, or iterations.  We will use
-the `lean-start-up methodology <https://www.youtube.com/watch?v=9bPgNEDdX3E>`_
-and discover our customers by having them interact with our product after each
-iteration.
+I will break it's design process up into 6 steps, or iterations.
 
 Each iteration will have a specification, a design diagram and the code needed
 to match the design diagram.  Then I will prove that the code works and I'll
 provide links to a bunch of questions and answers about the code.
 
-You can use these links to choose the questions you want to see the answers to,
-or just skip onto the next iteration.  Each iteration is heavily linked so
-that you can quickly bounce around in its documentation.
-
+Each iteration is heavily linked so that you can quickly bounce around in its
+documentation.
 
 .. _iter1:
 
 Iteration 1: setup
 ------------------
 In this iteration I will talk about setting up our development environment.  We
-will built a very simple statechart example and confirm that it is working.  We
-aren't ready to talk to our customers yet.
+will built a very simple statechart example and confirm that it is working.
 
 .. _iter1_spec:
 
@@ -1377,20 +1377,19 @@ I'm not answering this question
 
 .. include:: i_navigation_1.rst
 
-
 .. _iter2:
 
 Iteration 2: basic oven
 -----------------------
 Now that we know miros will run on our system, lets use it to build a very basic
-toaster oven.  The following describes our minimal viable product:
+toaster oven with a working HSM.
 
 .. _iter2_spec:
 
 Iteration 2 specification
 """""""""""""""""""""""""
 
-* The toaster oven will have a door, it will always be closed.
+* The toaster oven will have a door, it will always be closed (for now).
 * The toaster oven will have an oven light, which can be turned on and off.
 * The toaster oven will have a heater, which can be turned off and on.
 * It will have two different heating modes, baking which can bake a potato
@@ -1520,7 +1519,6 @@ Iteration 2 code
     # turn the oven off
     oven.post_fifo(Event(signal=signals.Off))
     time.sleep(0.01)
-
 
 .. include:: i_navigation_2.rst
 
@@ -2829,18 +2827,11 @@ process, then pivot if the need arises.
 
 Iteration 3: history
 --------------------
-We have shipped our toaster ovens, and much to our surprise nobody bought any of
-them.
+So far, we have miros working on our system and we have build a simple toaster
+oven. But, as it is currently written, the toaster oven is useless, because
+there is no way to open and close the door.
 
-Through a lengthy customer-discovery-process we learn that people would like to
-put food in the toaster ovens, which means that we should be able to open it's
-door then close it again.  When they close the door they want the toaster to act
-like it did before.
-
-We would also like to remove the print statements from our code so that we don't
-clutter up our terminal's output while it is run.
-
-So we iterate our existing product with the following additional specification:
+So, in this design iteration we will add the ability to open and close the door.  
 
 .. include:: i_navigation_3.rst
 
@@ -2848,13 +2839,26 @@ So we iterate our existing product with the following additional specification:
 
 Iteration 3 specification
 """""""""""""""""""""""""
-The toaster oven should behave like it was before, and:
+The toaster oven spec:
 
-* A customer should be able to open and close the door of our toaster oven
+* :dead_spec:`The toaster oven will have a door, it will always be closed.`
+* The toaster oven will have an oven light, which can be turned on and off.
+* The toaster oven will have a heater, which can be turned off and on.
+* It will have two different heating modes, baking which can bake a potato
+  and toasting which can toast some bread.
+* The toaster oven should start in the off state.
+* The toaster can only heat when the door is closed.
+* The toaster's light should be off when the door is closed.
 * The toaster should turn on its light when the door is opened
-* When a customer closes the door, the toaster oven should go back to behaving
-  like it did before.
-* Remove the print statements from your production code.
+* :new_spec:`A customer should be able to open and close the door of our toaster oven`
+* :new_spec:`When a customer closes the door, the toaster oven should go back to behaving
+  like it did before.`
+
+----
+
+**Technical Improvments**
+
+* :new_spec:`Remove the print statements from your production code.`
 
 .. include:: i_navigation_3.rst
 
@@ -2875,10 +2879,10 @@ Iteration 3 code
 """"""""""""""""
 
 .. code-block:: python
-  :emphasize-lines: 12, 40-41, 66, 78, 90, 97-107 
+  :emphasize-lines: 1, 12, 15, 18, 21, 24, 40-41, 65, 66, 78, 89, 90, 97-107 
   :linenos:
 
-   # zero_to_one.ipynb
+   # toaster oven iteration 3
    from miros import ActiveObject
    from miros import return_status
    from miros import Event
@@ -3059,6 +3063,8 @@ information:
 As a first pass, this is looking good, but is it a proof that our system is
 working.  Not even close.
 
+We will get serious about :ref:`testing in the next iteration <iter4_proof>`.
+
 .. include:: i_navigation_3.rst
 
 .. _iter3_questions:
@@ -3069,19 +3075,23 @@ Iteration 3 questions
 * :ref:`Can you show the full proof that the system works? <zero_to_one-can-you-show-the-proof-that-the-system-works3>`
 * :ref:`What does the H with a star beside it mean? <zero_to_one-what-does-the-h-with-a-star-beside-it-mean3>`
 * :ref:`How does your code give me the deep history feature? <zero_to_one-how-does-your-code-give-me-the-deep-history-feature3>`
-* :ref:`Why don't you set the history attribute in the door_closed, off and heating states? <zero_to_one-why-don't-you-set-the-history-attribute-in-the-door_closed,-off-and-heating-states3>`
+* :ref:`Why don't you set the history attribute in the door_closed and heating states? <zero_to_one-why-don-t-you-set-the-history-attribute-in-the-door_closed-off-and-heating-states3>`
+* :ref:`If you are removing unneeded things from your code, then what is the init event for? <zero_to_one-if-you-are-removing-unneeded-things-from-your-code,-then-what-is-the-init-signal-for3>`
 * :ref:`Why is the state pattern oval put on the diagram? <zero_to_one-why-is-the-state-pattern-oval-put-on-the-diagram3>`
-* :ref:`Isnt the Deep history icon and the call to oven history redundant? <zero_to_one-isn't-the-deep-history-icon-and-the-call-to-oven-history-redundant3>`
+* :ref:`Isn't the Deep history icon and the call to oven history redundant?  <bbbbbbbbbbbbbbb>`
 * :ref:`Why isn't the deep history handled by the framework? <zero_to_one-why-isn't-the-deep-history-handled-by-the-framework3>`
 * :ref:`What is the difference between deep and shallow history? <zero_to_one-what-is-the-difference-between-deep-and-shallow-history3>`
+* :ref:`Can you map this history idea back onto the story? <zero_to_one-can-you-map-this-history-idea-back-onto-the-story3>`
 
-
+.. include:: i_navigation_3.rst
 
 .. _zero_to_one-can-you-show-the-proof-that-the-system-works3:
 
 **Can you show the full proof that the system works?**
 
-Ok, you asked for it:
+We can turn on the `spy` and `trace` instrumentation and run the design
+through all of it's state transitions.  Then we can look at the
+instrumentation's output to see if it worked as expected.
 
 .. code-block:: python
 
@@ -3110,7 +3120,7 @@ Ok, you asked for it:
 
    time.sleep(0.1)
 
-Here is the output:
+Here is the instrumentation's live output:
 
 .. code-block:: python
   :emphasize-lines: 1, 6, 11, 19, 22, 29, 34, 47, 59, 62, 70, 77, 94, 106, 109, 117
@@ -3240,6 +3250,13 @@ Here is the output:
   INIT_SIGNAL:toasting
   <- Queued:(0) Deferred:(0)
 
+I have highlighted the lines the show us it is working.
+
+This is a reasonable spot check, but it's not really something you would want to
+leave as a regression test.
+
+A better testing approach is :ref:`demonstrated in the next iteration. <iter4_proof>`
+
 .. include:: i_navigation_3.rst
 
 .. _zero_to_one-what-does-the-h-with-a-star-beside-it-mean3:
@@ -3247,16 +3264,26 @@ Here is the output:
 **What does the H with a star beside it mean?**
 
 The H with a star beside it is called the :ref:`deep history <deep-history-icon>` pseudostate.  A
-pseudostate is any useful icon on a statechart, that isn't actually a state.
+pseudostate is any useful glyph that touches an arrow or event on a statechart, that isn't actually a state.
 
 .. image:: _static/ToasterOven_3.svg
    :target: _static/ToasterOven_3.pdf
    :align: center
 
 When an arrow points to a deep history pseudostate, it means, go back to the
-last activated state that was used in this region of the statechart.  In our
-example this could be ``door_closed``, ``heating``, ``baking``, ``toasting`` or ``off``
-states.
+last activated state that was used in that region of the statechart.  
+
+.. image:: _static/ToasterOven_3_Span.svg
+   :target: _static/ToasterOven_3_Span.pdf
+   :align: center
+
+In our example this could be anyone of the ``heating``, ``baking``, ``toasting``
+or ``off`` states.
+
+.. image:: _static/ToasterOven_3_Possible_States.svg
+   :target: _static/ToasterOven_3_Possible_States.pdf
+   :align: center
+
 
 .. include:: i_navigation_3.rst
 
@@ -3264,12 +3291,112 @@ states.
 
 **How does your code give me the deep history feature?**
 
+The event processor in miros doesn't support the deep history pattern directly.  
+
+To make a statechart that gives you the deep-history behaviour you can:
+
+   * add a ``history`` attribute to your ActiveObject derived class, in this
+     example the ToasterOven class.
+
+   * upon entering a state that is within a region spanned by a deep history
+     pseudostate, assign the state's name to the history attribute in that
+     state's entry condition.
+
+   * when you want to transition to history, transition to the state held in the
+     ``history`` attribute: ``status = oven.trans(oven.history)``
+
+If you look at the :ref:`code <iter3_code>` and compare it to the :ref:`design <iter3_design>` you will see that this is what I have done.
+
 .. include:: i_navigation_3.rst
 
-.. _zero_to_one-why-don't-you-set-the-history-attribute-in-the-door_closed,-off-and-heating-states3:
+.. _zero_to_one-why-don-t-you-set-the-history-attribute-in-the-door_closed-off-and-heating-states3:
 
-**Why don't you set the history attribute in the door_closed, off and heating states?**
+**Why don't you set the history attribute in the door_closed and heating states?**
 
+The ``door_closed`` and ``heating_states`` are transitory states; the toaster
+oven can't settle into either of these states.  So, the history attribute
+doesn't need to be assigned for them.
+
+.. image:: _static/ToasterOven_3.svg
+   :target: _static/ToasterOven_3.pdf
+   :align: center
+
+By making this design decision I am breaking the Harel formalism, a deep history
+icon should be able to go to the ``heating`` state too.  I'm not going to
+include it because I don't need it, and I can't test it anyway.
+
+.. include:: i_navigation_3.rst
+
+.. _zero_to_one-if-you-are-removing-unneeded-things-from-your-code,-then-what-is-the-init-signal-for3:
+
+**If you are removing unneeded things from your code, then what is the init event for?**
+
+Good point, if you look at the design, you see that the statechart starts in the
+``off`` state: ``oven.start_at(off)``.  There is no need for the init
+pseudostate in the ``door_closed`` region, at least when looking at how the
+toaster oven turns on.
+
+How about after the door has been closed?  Well as discussed in the previous
+answer, the unit can only transition back into the ``baking``, ``toasting`` or
+``off`` states after the door is closed; we still don't need that init pseudostate.
+
+Are there any other ways we can get into the ``door_closed`` region?  No.  So,
+this design doesn't need the ``door_closed`` init signal.
+
+.. image:: _static/ToasterOven_3.svg
+   :target: _static/ToasterOven_3.pdf
+   :align: center
+
+But if a maintenance developer were to change the ``oven.start_at(off)`` code to
+``oven.start_at(door_closed)`` our design would still work, because the init
+pseudostate would cause the system to settle into the off state.
+
+What would happen if the maintenance developer changed the
+``oven.start_at(off)`` to ``oven.start_at(heating)``?  Well, this would be a
+bug.  The unit would heat in an undefined way, it wouldn't be baking or
+toasting.
+
+.. note::
+
+  As a design evolves you will end up with a lot of vestigial parts.  Things
+  that used to be needed, but aren't needed anymore, like an appendix, or
+  tonsils.
+
+This illustrates two different design philosophies, we can be:
+
+   * minimalist
+
+   * or, hardened
+
+The minimalist approach would try to reduce the design to just what it needs to
+work.  The hardened approach would try and kind of future proof the design
+against changes made by a maintenance developer:
+
+.. image:: _static/ToasterOven_3_Hardened.svg
+   :target: _static/ToasterOven_3_Hardened.pdf
+   :align: center
+
+The above diagram describes a hardened design: all the intermediate states have
+init signals and all of the states in the deep history region assign their
+callback function's address to the ``oven.history`` attribute in their entry conditions.
+
+If we were to use the above design, we would now have a bug in our
+specification: there a is no description of the default
+behavior of our heating state. We could just go back and fix it, but this will
+clutter our specification with unneeded complexity.  We should keep the
+specifications short and legible.
+
+At first glance you might be tempted to take the hardened approach; but over a
+long period of time, your statecharts will have more and more unused, untested and
+unneeded code within them.  You will accumulate some technical debt.
+
+There is no right answer to this, but personally I lean towards keeping a design
+as simple as possible, I lean towards minimalism.  If I'm conscious of a choice between
+a complicated thing and a simple thing, I will pick the simple thing.
+
+I'll change the design in the next iteration so that the unit starts in the
+``door_closed`` state.  (I want that init event to be useful, because I'm
+trying to explain how statecharts work here)
 
 .. include:: i_navigation_3.rst
 
@@ -3277,12 +3404,47 @@ states.
 
 **Why is the state pattern oval put on the diagram?**
 
+.. image:: _static/ToasterOven_3.svg
+   :target: _static/ToasterOven_3.pdf
+   :align: center
+
+The statechart patterns use different parts of the diagram to work together to
+provide a global behavior described by that pattern.  To make it easier for
+someone to understand this, the oval is put on the diagram to announce what
+is going on.  
+
+If you don't know what the transition to history is, you can just :ref:`look it
+up <patterns>` and understand the designer's intention, then look and see how
+that pattern applies to the specific design.
+
 .. include:: i_navigation_3.rst
 
 
-.. _zero_to_one-isnt-the-deep-history-icon-and-the-call-to-oven-history-redundant3:
+.. _bbbbbbbbbbbbbbb:
 
 **Isn't the Deep history icon and the call to oven history redundant?**
+
+When we put our other arrows on this chart we didn't write their ``trans`` calls on
+them.  So, yes, the call to ``oven.trans(oven.history)`` is kind of
+redundant; the arrow to the deep history icon should be enough.  But, remember
+that the deep history feature isn't supported by this version of the statechart
+algorithm; so, let's help the person reading the page see explicitly how we are
+going to make the pattern work.
+
+We need the deep history icon as a clean shorthand, or we would have to draw
+arrows to all of our states (Super Ugly):
+
+.. image:: _static/ToasterOven_3_Redundant.svg
+   :target: _static/ToasterOven_3_Redundant
+   :align: center
+
+Versus (less Ugly):
+
+.. image:: _static/ToasterOven_3.svg
+   :target: _static/ToasterOven_3.pdf
+   :align: center
+
+So yes, the diagram has some redundancy in it and it is useful.
 
 .. include:: i_navigation_3.rst
 
@@ -3290,38 +3452,110 @@ states.
 
 **Why isn't the deep history handled by the framework?**
 
+The event processor in this library is based on the work published by Miro
+Samek, who is coming from an embedded background.  His algorithm is blazingly
+fast and his code had a tiny memory footprint; he wanted it to work on small
+processors.
+
+You can use his framework instead of having a real time operating system.  It
+includes it's own event loop and software bus.  It's really cool.
+
+What it didn't have was the high level statechart features like transition to
+deep history and transition to shallow history, or orthogonal regions, but he
+gave them to his audience through app-notes; "just write your code like this and
+you get the same effect".
+
+I haven't looked at his stuff lately, it wouldn't surprise me if he has the
+history features in his contemporary framework.  (embedded processors are much
+more powerful now).
+
 .. include:: i_navigation_3.rst
-
-
 
 .. _zero_to_one-what-is-the-difference-between-deep-and-shallow-history3:
 
 **What is the difference between deep and shallow history?**
 
+Shallow history pseudostates, only cause transitions into the first level of states within
+the region they span.   The shallow history icon is an H in a circle **without** the
+star beside it.
+
+If we replaced the deep history icon in this diagram with a shallow history
+icon, only the ``heating`` and ``off`` states could be reached with a Door_Close
+event.
+
+.. image:: _static/ToasterOven_3.svg
+   :target: _static/ToasterOven_3.pdf
+   :align: center
+
+I'm sure there are applications where the shallow history icon is useful; but I
+have never used one.
+
 .. include:: i_navigation_3.rst
 
-Iteration 4: hook
------------------
+.. _zero_to_one-can-you-map-this-history-idea-back-onto-the-story3:
 
-We sold our first oven!  Our market segment has been labeled as
-barbie-oven-utilizers by our marketing department.  They want a buzzer and they
-want their ovens in pink.
+**Can you map this history idea back onto the story?**
+
+Imagine that the bartender on the ``door_open`` bar has a pair of binoculars
+hanging around his neck (with a deep history icon painted on them as their brand).
+He uses them to watch where Tara and Spike drink when they are in any bar above
+the door_closed terrace, taking note of their last location.
+
+When Tara asks him for directions he whispers his answer in her ear.
+
+(if you can think of a better way of adding to this story email me)
+
+.. include:: i_navigation_3.rst
+
+.. _iter4:
+
+Iteration 4: hook and hardware abstraction
+------------------------------------------
+So far we have framed in a toaster oven statechart using miros.  
+
+Now let's give our toaster oven the ability to make a buzzing sound while it is
+running in any of it's states.
+
+Let's also ensure our design is modular by decoupling the testing of the code
+that runs the hardware from the code that controls the state of the unit.
 
 .. include:: i_navigation_4.rst
-
 
 .. _iter4_spec:
 
 Iteration 4 specification
 """""""""""""""""""""""""
 
-* While the toaster oven is in any state the customer should be able to press a
-  buzzer which will get the attention of anyone nearby.
+The toaster oven spec:
+
+* The toaster oven will have an oven light, which can be turned on and off.
+* The toaster oven will have a heater, which can be turned off and on.
+* It will have two different heating modes, baking which can bake a potato
+  and toasting which can toast some bread.
+* The toaster oven should start in the off state.
+* The toaster can only heat when the door is closed.
+* The toaster's light should be off when the door is closed.
+* The toaster should turn on its light when the door is opened
+* A customer should be able to open and close the door of our toaster oven
+* When a customer closes the door, the toaster oven should go back to behaving
+  like it did before.
+* :new_spec:`While the toaster oven is in any state the customer should be able to press a
+  buzzer which will get the attention of anyone nearby.`
+
+**Technical Improvements**
+
+* :new_spec:`Start the toaster oven in the door_closed state`
+* :new_spec:`Test the statechart off of the hardware target`
+* :new_spec:`Test the code the controls the hardware in isolation from the statechart code`
 
 .. _iter4_design:
 
 Iteration 4 design
 """"""""""""""""""
+
+.. image:: _static/ToasterOven_4.svg
+    :target: _static/ToasterOven_4.pdf
+    :align: center
 
 .. include:: i_navigation_4.rst
 
@@ -3330,12 +3564,302 @@ Iteration 4 design
 Iteration 4 code
 """"""""""""""""
 
+.. code-block:: python
+  :emphasize-lines: 9-27, 29-52, 54-64, 83, 142
+  :linenos:
+
+  # iteration 4 
+  from miros import ActiveObject
+  from miros import return_status
+  from miros import Event
+  from miros import signals
+  from miros import spy_on
+  import time
+  
+  class ToasterOvenMock(ActiveObject):
+    def __init__(self, name):
+      super().__init__(name)
+      self.history = None
+  
+    def light_on(self):
+      self.scribble("light_on")
+  
+    def light_off(self):
+      self.scribble("light_off")
+  
+    def heater_on(self):
+      self.scribble("heater_on")
+  
+    def heater_off(self):
+      self.scribble("heater_off")
+      
+    def buzz(self):
+      self.scribble("buzz")
+      
+  class ToasterOven(ActiveObject):
+    def __init__(self, name):
+      super().__init__(name)
+      self.history = None
+
+    def light_on(self):
+      # call to your hardware's light_on driver
+      pass
+
+    def light_off(self):
+      # call to your hardware's light_off driver
+      pass
+      
+    def heater_on(self):
+      # call to your hardware's heater on driver
+      pass
+
+    def heater_off(self):
+      # call to your hardware's heater off driver
+       pass
+      
+    def buzz(self):
+      # call to your hardware's buzzer
+      pass
+  
+  @spy_on
+  def common_features(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.Buzz):
+      print("buzz")
+      oven.buzz()
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = oven.top
+      status = return_status.SUPER
+    return status
+  
+  @spy_on
+  def door_closed(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.light_off()
+      status = return_status.HANDLED
+    elif(e.signal == signals.Baking):
+      status = oven.trans(baking)
+    elif(e.signal == signals.Toasting):
+      status = oven.trans(toasting)
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = oven.trans(off)
+    elif(e.signal == signals.Off):
+      status = oven.trans(off)
+    elif(e.signal == signals.Door_Open):
+      status = oven.trans(door_open)
+    else:
+      oven.temp.fun = common_features
+      status = return_status.SUPER
+    return status
+  
+  @spy_on
+  def heating(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.heater_on()
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      oven.heater_off()
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = door_closed
+      status = return_status.SUPER
+    return status
+  
+  @spy_on
+  def baking(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.history = baking
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = heating
+      status = return_status.SUPER
+    return status
+  
+  @spy_on
+  def toasting(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.history = toasting
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = heating
+      status = return_status.SUPER
+    return status
+  
+  @spy_on
+  def off(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.history = off
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = door_closed
+      status = return_status.SUPER
+    return status
+  
+  @spy_on
+  def door_open(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.light_on()
+    elif(e.signal == signals.Door_Close):
+      status = oven.trans(oven.history)
+    else:
+      oven.temp.fun = common_features
+      status = return_status.SUPER
+    return status
+
 .. include:: i_navigation_4.rst
 
 .. _iter4_proof:
 
 Iteration 4 proof
 """""""""""""""""
+To satisfy our modularity requirement, we create a new class called
+ToasterOvenMock.  The word `mock` is a common word in software testing, it
+describes any piece of code that can stand in for another more complicated piece
+of code. You would use a software mock to test one part of the system in
+isolation from another part of the system.
+
+.. image:: _static/ToasterOven_4.svg
+    :target: _static/ToasterOven_4.pdf
+    :align: center
+
+To separate the code that controls the hardware from the code that manages the
+feature-state of the product, we create a new class called ToasterOvenMock.  It
+will have the exact same API as the real ToasterOven class, but its methods
+won't make hardware calls that turn on and off lights/heaters and make buzzing sounds,
+instead they will drop debug-strings into the spy instrumentation stream using
+the ``scribble`` method.
+
+To test our actual hardware features, we would instantiate the ToasterOven class
+on our hardware and call the ``buzz``, ``heater_on``, ``heater_off``,
+``light_on`` and ``light_off`` methods and see if they work as advertised. (I
+won't show how to do this)
+
+To test the statemachine, we would use the ToasterOvenMock class, because all of
+it's hardware dependent calls have been mocked.  That makes the code portable,
+so it can be tested anywhere Python can run.
+
+We want to confirm that the code works like we have drawn it on our diagram.  We
+don't need to test the event processor because we trust that it is working, and
+we trust the formal set of behaviors that it follows.  This let's us simplify
+things a lot.
+
+Here is a regression test for this design:
+
+.. code-block:: python
+
+    import re
+    from miros import stripped
+
+    # test helper functions
+    def trace_through_all_states():
+      oven = ToasterOvenMock(name="oven")
+      oven.start_at(door_closed)
+      # Open the door
+      oven.post_fifo(Event(signal=signals.Door_Open))
+      # Close the door
+      oven.post_fifo(Event(signal=signals.Door_Close))
+      # Bake something
+      oven.post_fifo(Event(signal=signals.Baking))
+      # Open the door
+      oven.post_fifo(Event(signal=signals.Door_Open))
+      # Close the door
+      oven.post_fifo(Event(signal=signals.Door_Close))
+      # Toast something
+      oven.post_fifo(Event(signal=signals.Toasting))
+      # Open the door
+      oven.post_fifo(Event(signal=signals.Door_Open))
+      # Close the door
+      oven.post_fifo(Event(signal=signals.Door_Close))
+      time.sleep(0.01)
+      return oven.trace()
+    
+    def spy_on_light_on():
+      oven = ToasterOvenMock(name="oven")
+      oven.start_at(door_closed)
+      # Open the door to turn on the light
+      oven.post_fifo(Event(signal=signals.Door_Open))
+      time.sleep(0.01)
+      # turn our array into a paragraph
+      return "\n".join(oven.spy())
+    
+    def spy_on_light_off():
+      oven = ToasterOvenMock(name="oven")
+      # The light should be turned off when we start
+      oven.start_at(door_closed)
+      time.sleep(0.01)
+      # turn our array into a paragraph
+      return "\n".join(oven.spy())
+
+    def spy_on_heater_on():
+      oven = ToasterOvenMock(name="oven")
+      # The light should be turned off when we start
+      oven.start_at(door_closed)
+      oven.post_fifo(Event(signal=signals.Toasting))
+      time.sleep(0.01)
+      # turn our array into a paragraph
+      return "\n".join(oven.spy())
+
+    def spy_on_heater_off():
+      oven = ToasterOvenMock(name="oven")
+      # The light should be turned off when we start
+      oven.start_at(door_closed)
+      oven.post_fifo(Event(signal=signals.Toasting))
+      oven.clear_spy()
+      oven.post_fifo(Event(signal=signals.Off))
+      time.sleep(0.01)
+      # turn our array into a paragraph
+      return "\n".join(oven.spy())
+      
+    def spy_on_buzz():
+      oven = ToasterOvenMock(name="oven")
+      # Send the buzz event
+      oven.post_fifo(Event(signal=signals.Buzz))
+      time.sleep(0.01)
+      # turn our array into a paragraph
+      return "\n".join(oven.spy())
+
+    # Tests start here
+
+    # Confirm our state transitions work as designed
+    trace_target = """
+    [2019-02-04 06:37:04.538413] [oven] e->start_at() top->off
+    [2019-02-04 06:37:04.540290] [oven] e->Door_Open() off->door_open
+    [2019-02-04 06:37:04.540534] [oven] e->Door_Close() door_open->off
+    [2019-02-04 06:37:04.540825] [oven] e->Baking() off->baking
+    [2019-02-04 06:37:04.541109] [oven] e->Door_Open() baking->door_open
+    [2019-02-04 06:37:04.541393] [oven] e->Door_Close() door_open->baking
+    [2019-02-04 06:37:04.541751] [oven] e->Toasting() baking->toasting
+    [2019-02-04 06:37:04.542083] [oven] e->Door_Open() toasting->door_open
+    [2019-02-04 06:37:04.542346] [oven] e->Door_Close() door_open->toasting
+    """
+
+    with stripped(trace_target) as stripped_target, \
+         stripped(trace_through_all_states()) as stripped_trace_result:
+      
+      for target, result in zip(stripped_target, stripped_trace_result):
+        assert(target == result)
+
+    # Confirm our light turns off
+    assert re.search(r'off', spy_on_light_off())
+
+    # Confirm our light turns on
+    assert re.search(r'on', spy_on_light_on())
+
+    # Confirm the heater turns on
+    assert re.search(r'heater_on', spy_on_heater_on())
+
+    # Confirm the heater turns on
+    assert re.search(r'heater_off', spy_on_heater_off())
+
+    # Confirm our buzzer works
+    assert re.search(r'buzz', spy_on_buzz())
 
 .. include:: i_navigation_4.rst
 
@@ -3343,6 +3867,102 @@ Iteration 4 proof
 
 Iteration 4 questions
 """""""""""""""""""""
+* :ref:`Can you explain how the unit can buzz from any state? <zero_to_one-can-you-explain-how-the-unit-can-buzz-from-any-state4>`
+* :ref:`Can you relate the buzz hook to the story? <zero_to_one-can-you-relate-the-buzz-hook-to-the-story4>`
+* :ref:`Why don't you use one of those pattern bubbles to describe the hook? <zero_to_one-why-don't-you-use-one-of-those-pattern-bubbles-to-describe-the-hook4>`
+* :ref:`The buzz seems like a pointless feature, what's going on? <zero_to_one-the-buzz-seems-like-a-pointless-feature,-what's-going-on4>`
+* :ref:`Why did you add the common_features state? And why does it enclose everything? <zero_to_one-why-did-you-add-the-common_features-state,-and-why-does-it-enclose-everything4>`
+* :ref:`Why are you showing two classes on the diagram? <zero_to_one-why-are-you-showing-two-classes-on-the-diagram4>`
+* :ref:`Where is the hardware abstraction layer you listed in your title? <zero_to_one-where-is-the-hardware-abstraction-layer-you-listed-in-your-title4>`
+* :ref:`Why do you break the transition-tests apart from the other tests? <zero_to_one-in-your-tests,-why-do-you-break-transition-tests-apart-from-calls-to-light_on,-light_off-and-so-on4>` 
+* :ref:`What does scribble do and why do you have it in one class and not the other one? <zero_to_one-what-does-scribble-do-and-why-do-you-have-it-in-one-class-and-not-the-other-one4>`
+* :ref:`Why don't you just copy out your spy output and use it as the test target? <zero_to_one-why-don't-you-just-copy-out-your-spy-output-and-use-it-as-the-test-target4>`
+* :ref:`Where did you get your trace-test-target, and what is going on with that stripped call? <zero_to_one-where-did-you-get-your-trace-test-target,-and-what-is-going-on-with-that-stripped-call4>`
+* :ref:`Why don't you just copy out your trace output and use it as a test target? <zero_to_one-why-don't-you-just-copy-out-your-trace-output-and-use-it-as-a-test-target4>`
+* :ref:`Your light_on, light_off ... tests seem pretty light, are you sure you are testing these features? <zero_to_one-your-light_on,-light_off-...-tests-seem-pretty-light,-are-you-sure-you-are-testing-these-features4>`
+* :ref:`Can you really say you proved that the software works? <zero_to_one-can-you-really-say-you-proved-that-the-software-works4>`
+
+.. _zero_to_one-can-you-explain-how-the-unit-can-buzz-from-any-state4:
+
+**Can you explain how the unit can buzz from any state?**
+
+.. include:: i_navigation_4.rst
+
+.. _zero_to_one-can-you-relate-the-buzz-hook-to-the-story4:
+
+**Can you relate the buzz hook to the story?**
+
+.. include:: i_navigation_4.rst
+
+.. _zero_to_one-why-don't-you-use-one-of-those-pattern-bubbles-to-describe-the-hook4:
+
+**Why don't you use one of those pattern bubbles to describe the hook?**
+
+.. include:: i_navigation_4.rst
+
+.. _zero_to_one-the-buzz-seems-like-a-pointless-feature,-what's-going-on4:
+
+**The buzz seems like a pointless feature, what's going on?**
+
+.. include:: i_navigation_4.rst
+
+.. _zero_to_one-why-did-you-add-the-common_features-state,-and-why-does-it-enclose-everything4:
+
+**Why did you add the common_features state, and why does it enclose everything?**
+
+.. include:: i_navigation_4.rst
+
+.. _zero_to_one-why-are-you-showing-two-classes-on-the-diagram4:
+
+**Why are you showing two classes on the diagram?**
+
+.. include:: i_navigation_4.rst
+
+.. _zero_to_one-where-is-the-hardware-abstraction-layer-you-listed-in-your-title4:
+
+**Where is the hardware abstraction layer you listed in your title?**
+
+.. include:: i_navigation_4.rst
+
+.. _zero_to_one-what-does-scribble-do-and-why-do-you-have-it-in-one-class-and-not-the-other-one4:
+
+**What does scribble do and why do you have it in one class and not the other one?**
+
+.. include:: i_navigation_4.rst
+
+.. _zero_to_one-in-your-tests,-why-do-you-break-transition-tests-apart-from-calls-to-light_on,-light_off-and-so-on4:
+
+**Why do you break the transition-tests apart from the other tests?**
+
+.. include:: i_navigation_4.rst
+
+.. _zero_to_one-why-don't-you-just-copy-out-your-spy-output-and-use-it-as-the-test-target4:
+
+**Why don't you just copy out your spy output and use it as the test target?**
+
+.. include:: i_navigation_4.rst
+
+.. _zero_to_one-where-did-you-get-your-trace-test-target,-and-what-is-going-on-with-that-stripped-call4:
+
+**Where did you get your trace-test-target, and what is going on with that stripped call?**
+
+.. include:: i_navigation_4.rst
+
+.. _zero_to_one-why-don't-you-just-copy-out-your-trace-output-and-use-it-as-a-test-target4:
+
+**Why don't you just copy out your trace output and use it as a test target?**
+
+.. include:: i_navigation_4.rst
+
+.. _zero_to_one-your-light_on,-light_off-...-tests-seem-pretty-light,-are-you-sure-you-are-testing-these-features4:
+
+**Your light_on, light_off ... tests seem pretty light, are you sure you are testing these features?**
+
+.. include:: i_navigation_4.rst
+
+.. _zero_to_one-can-you-really-say-you-proved-that-the-software-works4:
+
+**Can you really say you proved that the software works?**
 
 .. include:: i_navigation_4.rst
 
@@ -3362,9 +3982,8 @@ to have different cooking durations.
 Iteration 5 specification
 """""""""""""""""""""""""
 
-* The toaster oven should stay in the baking state for twenty seconds, then buzz
-  and turn off.
-* The toaster oven should stay in the toasting state for ten seconds, then buzz
+* :dead_spec:`The toaster oven should stay in the baking state for twenty seconds, then buzz and turn off.`
+* :new_spec:`The toaster oven should stay in the toasting state for ten seconds, then buzz`
   and turn off.
 * If the door is opened, then closed, the cooking time should be set back to
   it's default time of ten or twenty seconds.

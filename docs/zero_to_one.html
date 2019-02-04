@@ -635,21 +635,16 @@ to make a toaster oven:
 <div class="section" id="a-simple-example-toaster-oven">
 <span id="zero-to-one-a-simple-example"></span><h2>A Simple Example: Toaster Oven<a class="headerlink" href="#a-simple-example-toaster-oven" title="Permalink to this headline">¶</a></h2>
 <p>To make this toaster oven statechart example seem like a real software project,
-I will break it’s design process up into 6 steps, or iterations.  We will use
-the <a class="reference external" href="https://www.youtube.com/watch?v=9bPgNEDdX3E">lean-start-up methodology</a>
-and discover our customers by having them interact with our product after each
-iteration.</p>
+I will break it’s design process up into 6 steps, or iterations.</p>
 <p>Each iteration will have a specification, a design diagram and the code needed
 to match the design diagram.  Then I will prove that the code works and I’ll
 provide links to a bunch of questions and answers about the code.</p>
-<p>You can use these links to choose the questions you want to see the answers to,
-or just skip onto the next iteration.  Each iteration is heavily linked so
-that you can quickly bounce around in its documentation.</p>
+<p>Each iteration is heavily linked so that you can quickly bounce around in its
+documentation.</p>
 <div class="section" id="iteration-1-setup">
 <span id="iter1"></span><h3>Iteration 1: setup<a class="headerlink" href="#iteration-1-setup" title="Permalink to this headline">¶</a></h3>
 <p>In this iteration I will talk about setting up our development environment.  We
-will built a very simple statechart example and confirm that it is working.  We
-aren’t ready to talk to our customers yet.</p>
+will built a very simple statechart example and confirm that it is working.</p>
 <div class="section" id="iteration-1-specification">
 <span id="iter1-spec"></span><h4>Iteration 1 specification<a class="headerlink" href="#iteration-1-specification" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
@@ -1301,11 +1296,11 @@ processing algorithm in Python, written with asyncio, check out <a class="refere
 <div class="section" id="iteration-2-basic-oven">
 <span id="iter2"></span><h3>Iteration 2: basic oven<a class="headerlink" href="#iteration-2-basic-oven" title="Permalink to this headline">¶</a></h3>
 <p>Now that we know miros will run on our system, lets use it to build a very basic
-toaster oven.  The following describes our minimal viable product:</p>
+toaster oven with a working HSM.</p>
 <div class="section" id="iteration-2-specification">
 <span id="iter2-spec"></span><h4>Iteration 2 specification<a class="headerlink" href="#iteration-2-specification" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li>The toaster oven will have a door, it will always be closed.</li>
+<li>The toaster oven will have a door, it will always be closed (for now).</li>
 <li>The toaster oven will have an oven light, which can be turned on and off.</li>
 <li>The toaster oven will have a heater, which can be turned off and on.</li>
 <li>It will have two different heating modes, baking which can bake a potato
@@ -2538,15 +2533,10 @@ process, then pivot if the need arises.</p>
 </div>
 <div class="section" id="iteration-3-history">
 <span id="iter3"></span><h3>Iteration 3: history<a class="headerlink" href="#iteration-3-history" title="Permalink to this headline">¶</a></h3>
-<p>We have shipped our toaster ovens, and much to our surprise nobody bought any of
-them.</p>
-<p>Through a lengthy customer-discovery-process we learn that people would like to
-put food in the toaster ovens, which means that we should be able to open it’s
-door then close it again.  When they close the door they want the toaster to act
-like it did before.</p>
-<p>We would also like to remove the print statements from our code so that we don’t
-clutter up our terminal’s output while it is run.</p>
-<p>So we iterate our existing product with the following additional specification:</p>
+<p>So far, we have miros working on our system and we have build a simple toaster
+oven. But, as it is currently written, the toaster oven is useless, because
+there is no way to open and close the door.</p>
+<p>So, in this design iteration we will add the ability to open and close the door.</p>
 <a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
@@ -2556,13 +2546,25 @@ clutter up our terminal’s output while it is run.</p>
 <a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
 <div class="section" id="iteration-3-specification">
 <span id="iter3-spec"></span><h4>Iteration 3 specification<a class="headerlink" href="#iteration-3-specification" title="Permalink to this headline">¶</a></h4>
-<p>The toaster oven should behave like it was before, and:</p>
+<p>The toaster oven spec:</p>
 <ul class="simple">
-<li>A customer should be able to open and close the door of our toaster oven</li>
+<li><span class="dead-spec">The toaster oven will have a door, it will always be closed.</span></li>
+<li>The toaster oven will have an oven light, which can be turned on and off.</li>
+<li>The toaster oven will have a heater, which can be turned off and on.</li>
+<li>It will have two different heating modes, baking which can bake a potato
+and toasting which can toast some bread.</li>
+<li>The toaster oven should start in the off state.</li>
+<li>The toaster can only heat when the door is closed.</li>
+<li>The toaster’s light should be off when the door is closed.</li>
 <li>The toaster should turn on its light when the door is opened</li>
-<li>When a customer closes the door, the toaster oven should go back to behaving
-like it did before.</li>
-<li>Remove the print statements from your production code.</li>
+<li><span class="new-spec">A customer should be able to open and close the door of our toaster oven</span></li>
+<li><span class="new-spec">When a customer closes the door, the toaster oven should go back to behaving
+like it did before.</span></li>
+</ul>
+<hr class="docutils" />
+<p><strong>Technical Improvments</strong></p>
+<ul class="simple">
+<li><span class="new-spec">Remove the print statements from your production code.</span></li>
 </ul>
 <a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
@@ -2692,8 +2694,8 @@ like it did before.</li>
 104
 105
 106
-107</pre></div></td><td class="code"><div class="highlight"><pre><span></span> <span class="c1"># zero_to_one.ipynb</span>
- <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+107</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="hll"> <span class="c1"># toaster oven iteration 3</span>
+</span> <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
  <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
  <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
  <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
@@ -2706,17 +2708,17 @@ like it did before.</li>
 <span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="bp">None</span>
 </span>
    <span class="k">def</span> <span class="nf">light_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;light_on&quot;</span><span class="p">)</span>
-
+<span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;light_on&quot;</span><span class="p">)</span>
+</span>
    <span class="k">def</span> <span class="nf">light_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;light_off&quot;</span><span class="p">)</span>
-
+<span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;light_off&quot;</span><span class="p">)</span>
+</span>
    <span class="k">def</span> <span class="nf">heater_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;heater_on&quot;</span><span class="p">)</span>
-
+<span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;heater_on&quot;</span><span class="p">)</span>
+</span>
    <span class="k">def</span> <span class="nf">heater_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;heater_off&quot;</span><span class="p">)</span>
-
+<span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;heater_off&quot;</span><span class="p">)</span>
+</span>
  <span class="nd">@spy_on</span>
  <span class="k">def</span> <span class="nf">door_closed</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
@@ -2756,8 +2758,8 @@ like it did before.</li>
  <span class="k">def</span> <span class="nf">baking</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-     <span class="n">oven</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;baking&quot;</span><span class="p">)</span>
-<span class="hll">     <span class="n">oven</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">baking</span>
+<span class="hll">     <span class="n">oven</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;baking&quot;</span><span class="p">)</span>
+</span><span class="hll">     <span class="n">oven</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">baking</span>
 </span>     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">else</span><span class="p">:</span>
      <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>
@@ -2780,8 +2782,8 @@ like it did before.</li>
  <span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-     <span class="n">oven</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
-<span class="hll">     <span class="n">oven</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">off</span>
+<span class="hll">     <span class="n">oven</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+</span><span class="hll">     <span class="n">oven</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">off</span>
 </span>     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">else</span><span class="p">:</span>
      <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
@@ -2871,6 +2873,7 @@ go back into its previous state, the toasting state.</li>
 </ol>
 <p>As a first pass, this is looking good, but is it a proof that our system is
 working.  Not even close.</p>
+<p>We will get serious about <a class="reference internal" href="#iter4-proof"><span class="std std-ref">testing in the next iteration</span></a>.</p>
 <a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
@@ -2885,14 +2888,25 @@ working.  Not even close.</p>
 <li><a class="reference internal" href="#zero-to-one-can-you-show-the-proof-that-the-system-works3"><span class="std std-ref">Can you show the full proof that the system works?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-what-does-the-h-with-a-star-beside-it-mean3"><span class="std std-ref">What does the H with a star beside it mean?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-how-does-your-code-give-me-the-deep-history-feature3"><span class="std std-ref">How does your code give me the deep history feature?</span></a></li>
-<li><a class="reference internal" href="#zero-to-one-why-don-t-you-set-the-history-attribute-in-the-door-closed-off-and-heating-states3"><span class="std std-ref">Why don’t you set the history attribute in the door_closed, off and heating states?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-why-don-t-you-set-the-history-attribute-in-the-door-closed-off-and-heating-states3"><span class="std std-ref">Why don’t you set the history attribute in the door_closed and heating states?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-if-you-are-removing-unneeded-things-from-your-code-then-what-is-the-init-signal-for3"><span class="std std-ref">If you are removing unneeded things from your code, then what is the init event for?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-why-is-the-state-pattern-oval-put-on-the-diagram3"><span class="std std-ref">Why is the state pattern oval put on the diagram?</span></a></li>
-<li><span class="xref std std-ref">Isnt the Deep history icon and the call to oven history redundant?</span></li>
+<li><a class="reference internal" href="#bbbbbbbbbbbbbbb"><span class="std std-ref">Isn’t the Deep history icon and the call to oven history redundant?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-why-isn-t-the-deep-history-handled-by-the-framework3"><span class="std std-ref">Why isn’t the deep history handled by the framework?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-what-is-the-difference-between-deep-and-shallow-history3"><span class="std std-ref">What is the difference between deep and shallow history?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-can-you-map-this-history-idea-back-onto-the-story3"><span class="std std-ref">Can you map this history idea back onto the story?</span></a></li>
 </ul>
+<a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-can-you-show-the-proof-that-the-system-works3"><strong>Can you show the full proof that the system works?</strong></p>
-<p>Ok, you asked for it:</p>
+<p>We can turn on the <cite>spy</cite> and <cite>trace</cite> instrumentation and run the design
+through all of it’s state transitions.  Then we can look at the
+instrumentation’s output to see if it worked as expected.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
 <span class="n">oven</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>  <span class="c1"># I&#39;ll add this to interleave the trace</span>
@@ -2919,7 +2933,7 @@ working.  Not even close.</p>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Here is the output:</p>
+<p>Here is the instrumentation’s live output:</p>
 <div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
   2
   3
@@ -3167,6 +3181,10 @@ working.  Not even close.</p>
 <span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
+<p>I have highlighted the lines the show us it is working.</p>
+<p>This is a reasonable spot check, but it’s not really something you would want to
+leave as a regression test.</p>
+<p>A better testing approach is <a class="reference internal" href="#iter4-proof"><span class="std std-ref">demonstrated in the next iteration.</span></a></p>
 <a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
@@ -3176,13 +3194,17 @@ working.  Not even close.</p>
 <a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-what-does-the-h-with-a-star-beside-it-mean3"><strong>What does the H with a star beside it mean?</strong></p>
 <p>The H with a star beside it is called the <span class="xref std std-ref">deep history</span> pseudostate.  A
-pseudostate is any useful icon on a statechart, that isn’t actually a state.</p>
+pseudostate is any useful glyph that touches an arrow or event on a statechart, that isn’t actually a state.</p>
 <a class="reference external image-reference" href="_static/ToasterOven_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_3.svg" src="_images/ToasterOven_3.svg" /></div>
 </a>
 <p>When an arrow points to a deep history pseudostate, it means, go back to the
-last activated state that was used in this region of the statechart.  In our
-example this could be <code class="docutils literal notranslate"><span class="pre">door_closed</span></code>, <code class="docutils literal notranslate"><span class="pre">heating</span></code>, <code class="docutils literal notranslate"><span class="pre">baking</span></code>, <code class="docutils literal notranslate"><span class="pre">toasting</span></code> or <code class="docutils literal notranslate"><span class="pre">off</span></code>
-states.</p>
+last activated state that was used in that region of the statechart.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_3_Span.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_3_Span.svg" src="_images/ToasterOven_3_Span.svg" /></div>
+</a>
+<p>In our example this could be anyone of the <code class="docutils literal notranslate"><span class="pre">heating</span></code>, <code class="docutils literal notranslate"><span class="pre">baking</span></code>, <code class="docutils literal notranslate"><span class="pre">toasting</span></code>
+or <code class="docutils literal notranslate"><span class="pre">off</span></code> states.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_3_Possible_States.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_3_Possible_States.svg" src="_images/ToasterOven_3_Possible_States.svg" /></div>
+</a>
 <a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
@@ -3191,6 +3213,20 @@ states.</p>
 <a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-how-does-your-code-give-me-the-deep-history-feature3"><strong>How does your code give me the deep history feature?</strong></p>
+<p>The event processor in miros doesn’t support the deep history pattern directly.</p>
+<p>To make a statechart that gives you the deep-history behaviour you can:</p>
+<blockquote>
+<div><ul class="simple">
+<li>add a <code class="docutils literal notranslate"><span class="pre">history</span></code> attribute to your ActiveObject derived class, in this
+example the ToasterOven class.</li>
+<li>upon entering a state that is within a region spanned by a deep history
+pseudostate, assign the state’s name to the history attribute in that
+state’s entry condition.</li>
+<li>when you want to transition to history, transition to the state held in the
+<code class="docutils literal notranslate"><span class="pre">history</span></code> attribute: <code class="docutils literal notranslate"><span class="pre">status</span> <span class="pre">=</span> <span class="pre">oven.trans(oven.history)</span></code></li>
+</ul>
+</div></blockquote>
+<p>If you look at the <a class="reference internal" href="#iter3-code"><span class="std std-ref">code</span></a> and compare it to the <a class="reference internal" href="#iter3-design"><span class="std std-ref">design</span></a> you will see that this is what I have done.</p>
 <a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
@@ -3198,7 +3234,76 @@ states.</p>
 <a class="reference internal" href="zero_to_one.html#iter3-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="zero-to-one-why-don-t-you-set-the-history-attribute-in-the-door-closed-off-and-heating-states3"><strong>Why don’t you set the history attribute in the door_closed, off and heating states?</strong></p>
+<p id="zero-to-one-why-don-t-you-set-the-history-attribute-in-the-door-closed-off-and-heating-states3"><strong>Why don’t you set the history attribute in the door_closed and heating states?</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> and <code class="docutils literal notranslate"><span class="pre">heating_states</span></code> are transitory states; the toaster
+oven can’t settle into either of these states.  So, the history attribute
+doesn’t need to be assigned for them.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_3.svg" src="_images/ToasterOven_3.svg" /></div>
+</a>
+<p>By making this design decision I am breaking the Harel formalism, a deep history
+icon should be able to go to the <code class="docutils literal notranslate"><span class="pre">heating</span></code> state too.  I’m not going to
+include it because I don’t need it, and I can’t test it anyway.</p>
+<a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-if-you-are-removing-unneeded-things-from-your-code-then-what-is-the-init-signal-for3"><strong>If you are removing unneeded things from your code, then what is the init event for?</strong></p>
+<p>Good point, if you look at the design, you see that the statechart starts in the
+<code class="docutils literal notranslate"><span class="pre">off</span></code> state: <code class="docutils literal notranslate"><span class="pre">oven.start_at(off)</span></code>.  There is no need for the init
+pseudostate in the <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> region, at least when looking at how the
+toaster oven turns on.</p>
+<p>How about after the door has been closed?  Well as discussed in the previous
+answer, the unit can only transition back into the <code class="docutils literal notranslate"><span class="pre">baking</span></code>, <code class="docutils literal notranslate"><span class="pre">toasting</span></code> or
+<code class="docutils literal notranslate"><span class="pre">off</span></code> states after the door is closed; we still don’t need that init pseudostate.</p>
+<p>Are there any other ways we can get into the <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> region?  No.  So,
+this design doesn’t need the <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> init signal.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_3.svg" src="_images/ToasterOven_3.svg" /></div>
+</a>
+<p>But if a maintenance developer were to change the <code class="docutils literal notranslate"><span class="pre">oven.start_at(off)</span></code> code to
+<code class="docutils literal notranslate"><span class="pre">oven.start_at(door_closed)</span></code> our design would still work, because the init
+pseudostate would cause the system to settle into the off state.</p>
+<p>What would happen if the maintenance developer changed the
+<code class="docutils literal notranslate"><span class="pre">oven.start_at(off)</span></code> to <code class="docutils literal notranslate"><span class="pre">oven.start_at(heating)</span></code>?  Well, this would be a
+bug.  The unit would heat in an undefined way, it wouldn’t be baking or
+toasting.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">As a design evolves you will end up with a lot of vestigial parts.  Things
+that used to be needed, but aren’t needed anymore, like an appendix, or
+tonsils.</p>
+</div>
+<p>This illustrates two different design philosophies, we can be:</p>
+<blockquote>
+<div><ul class="simple">
+<li>minimalist</li>
+<li>or, hardened</li>
+</ul>
+</div></blockquote>
+<p>The minimalist approach would try to reduce the design to just what it needs to
+work.  The hardened approach would try and kind of future proof the design
+against changes made by a maintenance developer:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_3_Hardened.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_3_Hardened.svg" src="_images/ToasterOven_3_Hardened.svg" /></div>
+</a>
+<p>The above diagram describes a hardened design: all the intermediate states have
+init signals and all of the states in the deep history region assign their
+callback function’s address to the <code class="docutils literal notranslate"><span class="pre">oven.history</span></code> attribute in their entry conditions.</p>
+<p>If we were to use the above design, we would now have a bug in our
+specification: there a is no description of the default
+behavior of our heating state. We could just go back and fix it, but this will
+clutter our specification with unneeded complexity.  We should keep the
+specifications short and legible.</p>
+<p>At first glance you might be tempted to take the hardened approach; but over a
+long period of time, your statecharts will have more and more unused, untested and
+unneeded code within them.  You will accumulate some technical debt.</p>
+<p>There is no right answer to this, but personally I lean towards keeping a design
+as simple as possible, I lean towards minimalism.  If I’m conscious of a choice between
+a complicated thing and a simple thing, I will pick the simple thing.</p>
+<p>I’ll change the design in the next iteration so that the unit starts in the
+<code class="docutils literal notranslate"><span class="pre">door_closed</span></code> state.  (I want that init event to be useful, because I’m
+trying to explain how statecharts work here)</p>
 <a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
@@ -3207,6 +3312,15 @@ states.</p>
 <a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-why-is-the-state-pattern-oval-put-on-the-diagram3"><strong>Why is the state pattern oval put on the diagram?</strong></p>
+<a class="reference external image-reference" href="_static/ToasterOven_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_3.svg" src="_images/ToasterOven_3.svg" /></div>
+</a>
+<p>The statechart patterns use different parts of the diagram to work together to
+provide a global behavior described by that pattern.  To make it easier for
+someone to understand this, the oval is put on the diagram to announce what
+is going on.</p>
+<p>If you don’t know what the transition to history is, you can just <a class="reference internal" href="patterns.html#patterns"><span class="std std-ref">look it
+up</span></a> and understand the designer’s intention, then look and see how
+that pattern applies to the specific design.</p>
 <a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
@@ -3214,7 +3328,21 @@ states.</p>
 <a class="reference internal" href="zero_to_one.html#iter3-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="zero-to-one-isnt-the-deep-history-icon-and-the-call-to-oven-history-redundant3"><strong>Isn’t the Deep history icon and the call to oven history redundant?</strong></p>
+<p id="bbbbbbbbbbbbbbb"><strong>Isn’t the Deep history icon and the call to oven history redundant?</strong></p>
+<p>When we put our other arrows on this chart we didn’t write their <code class="docutils literal notranslate"><span class="pre">trans</span></code> calls on
+them.  So, yes, the call to <code class="docutils literal notranslate"><span class="pre">oven.trans(oven.history)</span></code> is kind of
+redundant; the arrow to the deep history icon should be enough.  But, remember
+that the deep history feature isn’t supported by this version of the statechart
+algorithm; so, let’s help the person reading the page see explicitly how we are
+going to make the pattern work.</p>
+<p>We need the deep history icon as a clean shorthand, or we would have to draw
+arrows to all of our states (Super Ugly):</p>
+<a class="reference external image-reference" href="_static/ToasterOven_3_Redundant"><div align="center" class="align-center"><img alt="_images/ToasterOven_3_Redundant.svg" src="_images/ToasterOven_3_Redundant.svg" /></div>
+</a>
+<p>Versus (less Ugly):</p>
+<a class="reference external image-reference" href="_static/ToasterOven_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_3.svg" src="_images/ToasterOven_3.svg" /></div>
+</a>
+<p>So yes, the diagram has some redundancy in it and it is useful.</p>
 <a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
@@ -3223,6 +3351,19 @@ states.</p>
 <a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-why-isn-t-the-deep-history-handled-by-the-framework3"><strong>Why isn’t the deep history handled by the framework?</strong></p>
+<p>The event processor in this library is based on the work published by Miro
+Samek, who is coming from an embedded background.  His algorithm is blazingly
+fast and his code had a tiny memory footprint; he wanted it to work on small
+processors.</p>
+<p>You can use his framework instead of having a real time operating system.  It
+includes it’s own event loop and software bus.  It’s really cool.</p>
+<p>What it didn’t have was the high level statechart features like transition to
+deep history and transition to shallow history, or orthogonal regions, but he
+gave them to his audience through app-notes; “just write your code like this and
+you get the same effect”.</p>
+<p>I haven’t looked at his stuff lately, it wouldn’t surprise me if he has the
+history features in his contemporary framework.  (embedded processors are much
+more powerful now).</p>
 <a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
@@ -3231,20 +3372,46 @@ states.</p>
 <a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-what-is-the-difference-between-deep-and-shallow-history3"><strong>What is the difference between deep and shallow history?</strong></p>
+<p>Shallow history pseudostates, only cause transitions into the first level of states within
+the region they span.   The shallow history icon is an H in a circle <strong>without</strong> the
+star beside it.</p>
+<p>If we replaced the deep history icon in this diagram with a shallow history
+icon, only the <code class="docutils literal notranslate"><span class="pre">heating</span></code> and <code class="docutils literal notranslate"><span class="pre">off</span></code> states could be reached with a Door_Close
+event.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_3.svg" src="_images/ToasterOven_3.svg" /></div>
+</a>
+<p>I’m sure there are applications where the shallow history icon is useful; but I
+have never used one.</p>
 <a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-code"<span class="std-ref">code</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a></div>
+<a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-can-you-map-this-history-idea-back-onto-the-story3"><strong>Can you map this history idea back onto the story?</strong></p>
+<p>Imagine that the bartender on the <code class="docutils literal notranslate"><span class="pre">door_open</span></code> bar has a pair of binoculars
+hanging around his neck (with a deep history icon painted on them as their brand).
+He uses them to watch where Tara and Spike drink when they are in any bar above
+the door_closed terrace, taking note of their last location.</p>
+<p>When Tara asks him for directions he whispers his answer in her ear.</p>
+<p>(if you can think of a better way of adding to this story email me)</p>
+<a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
 </div>
-<hr class="docutils" />
-<div class="section" id="iteration-4-hook">
-<h3>Iteration 4: hook<a class="headerlink" href="#iteration-4-hook" title="Permalink to this headline">¶</a></h3>
-<p>We sold our first oven!  Our market segment has been labeled as
-barbie-oven-utilizers by our marketing department.  They want a buzzer and they
-want their ovens in pink.</p>
+</div>
+<div class="section" id="iteration-4-hook-and-hardware-abstraction">
+<span id="iter4"></span><h3>Iteration 4: hook and hardware abstraction<a class="headerlink" href="#iteration-4-hook-and-hardware-abstraction" title="Permalink to this headline">¶</a></h3>
+<p>So far we have framed in a toaster oven statechart using miros.</p>
+<p>Now let’s give our toaster oven the ability to make a buzzing sound while it is
+running in any of it’s states.</p>
+<p>Let’s also ensure our design is modular by decoupling the testing of the code
+that runs the hardware from the code that controls the state of the unit.</p>
 <a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
@@ -3254,13 +3421,33 @@ want their ovens in pink.</p>
 <a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
 <div class="section" id="iteration-4-specification">
 <span id="iter4-spec"></span><h4>Iteration 4 specification<a class="headerlink" href="#iteration-4-specification" title="Permalink to this headline">¶</a></h4>
+<p>The toaster oven spec:</p>
 <ul class="simple">
-<li>While the toaster oven is in any state the customer should be able to press a
-buzzer which will get the attention of anyone nearby.</li>
+<li>The toaster oven will have an oven light, which can be turned on and off.</li>
+<li>The toaster oven will have a heater, which can be turned off and on.</li>
+<li>It will have two different heating modes, baking which can bake a potato
+and toasting which can toast some bread.</li>
+<li>The toaster oven should start in the off state.</li>
+<li>The toaster can only heat when the door is closed.</li>
+<li>The toaster’s light should be off when the door is closed.</li>
+<li>The toaster should turn on its light when the door is opened</li>
+<li>A customer should be able to open and close the door of our toaster oven</li>
+<li>When a customer closes the door, the toaster oven should go back to behaving
+like it did before.</li>
+<li><span class="new-spec">While the toaster oven is in any state the customer should be able to press a
+buzzer which will get the attention of anyone nearby.</span></li>
+</ul>
+<p><strong>Technical Improvements</strong></p>
+<ul class="simple">
+<li><span class="new-spec">Start the toaster oven in the door_closed state</span></li>
+<li><span class="new-spec">Test the statechart off of the hardware target</span></li>
+<li><span class="new-spec">Test the code the controls the hardware in isolation from the statechart code</span></li>
 </ul>
 </div>
 <div class="section" id="iteration-4-design">
 <span id="iter4-design"></span><h4>Iteration 4 design<a class="headerlink" href="#iteration-4-design" title="Permalink to this headline">¶</a></h4>
+<a class="reference external image-reference" href="_static/ToasterOven_4.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_4.svg" src="_images/ToasterOven_4.svg" /></div>
+</a>
 <a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
@@ -3271,6 +3458,295 @@ buzzer which will get the attention of anyone nearby.</li>
 </div>
 <div class="section" id="iteration-4-code">
 <span id="iter4-code"></span><h4>Iteration 4 code<a class="headerlink" href="#iteration-4-code" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># iteration 4</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="hll"><span class="k">class</span> <span class="nc">ToasterOvenMock</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
+</span><span class="hll">  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+</span><span class="hll">    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="bp">None</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">def</span> <span class="nf">light_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;light_on&quot;</span><span class="p">)</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">def</span> <span class="nf">light_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;light_off&quot;</span><span class="p">)</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">def</span> <span class="nf">heater_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;heater_on&quot;</span><span class="p">)</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">def</span> <span class="nf">heater_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;heater_off&quot;</span><span class="p">)</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">def</span> <span class="nf">buzz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
+</span>
+<span class="hll"><span class="k">class</span> <span class="nc">ToasterOven</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
+</span><span class="hll">  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+</span><span class="hll">    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="bp">None</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">def</span> <span class="nf">light_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll">    <span class="c1"># call to your hardware&#39;s light_on driver</span>
+</span><span class="hll">    <span class="k">pass</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">def</span> <span class="nf">light_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll">    <span class="c1"># call to your hardware&#39;s light_off driver</span>
+</span><span class="hll">    <span class="k">pass</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">def</span> <span class="nf">heater_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll">    <span class="c1"># call to your hardware&#39;s heater on driver</span>
+</span><span class="hll">    <span class="k">pass</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">def</span> <span class="nf">heater_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll">    <span class="c1"># call to your hardware&#39;s heater off driver</span>
+</span><span class="hll">     <span class="k">pass</span>
+</span><span class="hll">
+</span><span class="hll">  <span class="k">def</span> <span class="nf">buzz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll">    <span class="c1"># call to your hardware&#39;s buzzer</span>
+</span><span class="hll">    <span class="k">pass</span>
+</span>
+<span class="hll"><span class="nd">@spy_on</span>
+</span><span class="hll"><span class="k">def</span> <span class="nf">common_features</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">):</span>
+</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">buzz</span><span class="p">()</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">door_closed</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">light_off</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Baking</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">baking</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">toasting</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Off</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Door_Open</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">door_open</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+<span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">common_features</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">heating</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">heater_on</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">heater_off</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">baking</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">baking</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">toasting</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">toasting</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">off</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">door_open</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">light_on</span><span class="p">()</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Door_Close</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">history</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+<span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">common_features</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</td></tr></table></div>
 <a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
@@ -3281,6 +3757,139 @@ buzzer which will get the attention of anyone nearby.</li>
 </div>
 <div class="section" id="iteration-4-proof">
 <span id="iter4-proof"></span><h4>Iteration 4 proof<a class="headerlink" href="#iteration-4-proof" title="Permalink to this headline">¶</a></h4>
+<p>To satisfy our modularity requirement, we create a new class called
+ToasterOvenMock.  The word <cite>mock</cite> is a common word in software testing, it
+describes any piece of code that can stand in for another more complicated piece
+of code. You would use a software mock to test one part of the system in
+isolation from another part of the system.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_4.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_4.svg" src="_images/ToasterOven_4.svg" /></div>
+</a>
+<p>To separate the code that controls the hardware from the code that manages the
+feature-state of the product, we create a new class called ToasterOvenMock.  It
+will have the exact same API as the real ToasterOven class, but its methods
+won’t make hardware calls that turn on and off lights/heaters and make buzzing sounds,
+instead they will drop debug-strings into the spy instrumentation stream using
+the <code class="docutils literal notranslate"><span class="pre">scribble</span></code> method.</p>
+<p>To test our actual hardware features, we would instantiate the ToasterOven class
+on our hardware and call the <code class="docutils literal notranslate"><span class="pre">buzz</span></code>, <code class="docutils literal notranslate"><span class="pre">heater_on</span></code>, <code class="docutils literal notranslate"><span class="pre">heater_off</span></code>,
+<code class="docutils literal notranslate"><span class="pre">light_on</span></code> and <code class="docutils literal notranslate"><span class="pre">light_off</span></code> methods and see if they work as advertised. (I
+won’t show how to do this)</p>
+<p>To test the statemachine, we would use the ToasterOvenMock class, because all of
+it’s hardware dependent calls have been mocked.  That makes the code portable,
+so it can be tested anywhere Python can run.</p>
+<p>We want to confirm that the code works like we have drawn it on our diagram.  We
+don’t need to test the event processor because we trust that it is working, and
+we trust the formal set of behaviors that it follows.  This let’s us simplify
+things a lot.</p>
+<p>Here is a regression test for this design:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">stripped</span>
+
+<span class="c1"># test helper functions</span>
+<span class="k">def</span> <span class="nf">trace_through_all_states</span><span class="p">():</span>
+  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOvenMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">door_closed</span><span class="p">)</span>
+  <span class="c1"># Open the door</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Door_Open</span><span class="p">))</span>
+  <span class="c1"># Close the door</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Door_Close</span><span class="p">))</span>
+  <span class="c1"># Bake something</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Baking</span><span class="p">))</span>
+  <span class="c1"># Open the door</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Door_Open</span><span class="p">))</span>
+  <span class="c1"># Close the door</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Door_Close</span><span class="p">))</span>
+  <span class="c1"># Toast something</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
+  <span class="c1"># Open the door</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Door_Open</span><span class="p">))</span>
+  <span class="c1"># Close the door</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Door_Close</span><span class="p">))</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">oven</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">spy_on_light_on</span><span class="p">():</span>
+  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOvenMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">door_closed</span><span class="p">)</span>
+  <span class="c1"># Open the door to turn on the light</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Door_Open</span><span class="p">))</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+  <span class="c1"># turn our array into a paragraph</span>
+  <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">spy_on_light_off</span><span class="p">():</span>
+  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOvenMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+  <span class="c1"># The light should be turned off when we start</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">door_closed</span><span class="p">)</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+  <span class="c1"># turn our array into a paragraph</span>
+  <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">spy_on_heater_on</span><span class="p">():</span>
+  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOvenMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+  <span class="c1"># The light should be turned off when we start</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">door_closed</span><span class="p">)</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+  <span class="c1"># turn our array into a paragraph</span>
+  <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">spy_on_heater_off</span><span class="p">():</span>
+  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOvenMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+  <span class="c1"># The light should be turned off when we start</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">door_closed</span><span class="p">)</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">clear_spy</span><span class="p">()</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Off</span><span class="p">))</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+  <span class="c1"># turn our array into a paragraph</span>
+  <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">spy_on_buzz</span><span class="p">():</span>
+  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOvenMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+  <span class="c1"># Send the buzz event</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">))</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+  <span class="c1"># turn our array into a paragraph</span>
+  <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+
+<span class="c1"># Tests start here</span>
+
+<span class="c1"># Confirm our state transitions work as designed</span>
+<span class="n">trace_target</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">[2019-02-04 06:37:04.538413] [oven] e-&gt;start_at() top-&gt;off</span>
+<span class="s2">[2019-02-04 06:37:04.540290] [oven] e-&gt;Door_Open() off-&gt;door_open</span>
+<span class="s2">[2019-02-04 06:37:04.540534] [oven] e-&gt;Door_Close() door_open-&gt;off</span>
+<span class="s2">[2019-02-04 06:37:04.540825] [oven] e-&gt;Baking() off-&gt;baking</span>
+<span class="s2">[2019-02-04 06:37:04.541109] [oven] e-&gt;Door_Open() baking-&gt;door_open</span>
+<span class="s2">[2019-02-04 06:37:04.541393] [oven] e-&gt;Door_Close() door_open-&gt;baking</span>
+<span class="s2">[2019-02-04 06:37:04.541751] [oven] e-&gt;Toasting() baking-&gt;toasting</span>
+<span class="s2">[2019-02-04 06:37:04.542083] [oven] e-&gt;Door_Open() toasting-&gt;door_open</span>
+<span class="s2">[2019-02-04 06:37:04.542346] [oven] e-&gt;Door_Close() door_open-&gt;toasting</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="k">with</span> <span class="n">stripped</span><span class="p">(</span><span class="n">trace_target</span><span class="p">)</span> <span class="k">as</span> <span class="n">stripped_target</span><span class="p">,</span> \
+     <span class="n">stripped</span><span class="p">(</span><span class="n">trace_through_all_states</span><span class="p">())</span> <span class="k">as</span> <span class="n">stripped_trace_result</span><span class="p">:</span>
+
+  <span class="k">for</span> <span class="n">target</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">stripped_target</span><span class="p">,</span> <span class="n">stripped_trace_result</span><span class="p">):</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">target</span> <span class="o">==</span> <span class="n">result</span><span class="p">)</span>
+
+<span class="c1"># Confirm our light turns off</span>
+<span class="k">assert</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;off&#39;</span><span class="p">,</span> <span class="n">spy_on_light_off</span><span class="p">())</span>
+
+<span class="c1"># Confirm our light turns on</span>
+<span class="k">assert</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;on&#39;</span><span class="p">,</span> <span class="n">spy_on_light_on</span><span class="p">())</span>
+
+<span class="c1"># Confirm the heater turns on</span>
+<span class="k">assert</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;heater_on&#39;</span><span class="p">,</span> <span class="n">spy_on_heater_on</span><span class="p">())</span>
+
+<span class="c1"># Confirm the heater turns on</span>
+<span class="k">assert</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;heater_off&#39;</span><span class="p">,</span> <span class="n">spy_on_heater_off</span><span class="p">())</span>
+
+<span class="c1"># Confirm our buzzer works</span>
+<span class="k">assert</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;buzz&#39;</span><span class="p">,</span> <span class="n">spy_on_buzz</span><span class="p">())</span>
+</pre></div>
+</div>
 <a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
@@ -3291,6 +3900,127 @@ buzzer which will get the attention of anyone nearby.</li>
 </div>
 <div class="section" id="iteration-4-questions">
 <span id="iter4-questions"></span><h4>Iteration 4 questions<a class="headerlink" href="#iteration-4-questions" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference internal" href="#zero-to-one-can-you-explain-how-the-unit-can-buzz-from-any-state4"><span class="std std-ref">Can you explain how the unit can buzz from any state?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-can-you-relate-the-buzz-hook-to-the-story4"><span class="std std-ref">Can you relate the buzz hook to the story?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-why-don-t-you-use-one-of-those-pattern-bubbles-to-describe-the-hook4"><span class="std std-ref">Why don’t you use one of those pattern bubbles to describe the hook?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-the-buzz-seems-like-a-pointless-feature-what-s-going-on4"><span class="std std-ref">The buzz seems like a pointless feature, what’s going on?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-why-did-you-add-the-common-features-state-and-why-does-it-enclose-everything4"><span class="std std-ref">Why did you add the common_features state? And why does it enclose everything?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-why-are-you-showing-two-classes-on-the-diagram4"><span class="std std-ref">Why are you showing two classes on the diagram?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-where-is-the-hardware-abstraction-layer-you-listed-in-your-title4"><span class="std std-ref">Where is the hardware abstraction layer you listed in your title?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-in-your-tests-why-do-you-break-transition-tests-apart-from-calls-to-light-on-light-off-and-so-on4"><span class="std std-ref">Why do you break the transition-tests apart from the other tests?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-what-does-scribble-do-and-why-do-you-have-it-in-one-class-and-not-the-other-one4"><span class="std std-ref">What does scribble do and why do you have it in one class and not the other one?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-why-don-t-you-just-copy-out-your-spy-output-and-use-it-as-the-test-target4"><span class="std std-ref">Why don’t you just copy out your spy output and use it as the test target?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-where-did-you-get-your-trace-test-target-and-what-is-going-on-with-that-stripped-call4"><span class="std std-ref">Where did you get your trace-test-target, and what is going on with that stripped call?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-why-don-t-you-just-copy-out-your-trace-output-and-use-it-as-a-test-target4"><span class="std std-ref">Why don’t you just copy out your trace output and use it as a test target?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-your-light-on-light-off-tests-seem-pretty-light-are-you-sure-you-are-testing-these-features4"><span class="std std-ref">Your light_on, light_off … tests seem pretty light, are you sure you are testing these features?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-can-you-really-say-you-proved-that-the-software-works4"><span class="std std-ref">Can you really say you proved that the software works?</span></a></li>
+</ul>
+<p id="zero-to-one-can-you-explain-how-the-unit-can-buzz-from-any-state4"><strong>Can you explain how the unit can buzz from any state?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-can-you-relate-the-buzz-hook-to-the-story4"><strong>Can you relate the buzz hook to the story?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-why-don-t-you-use-one-of-those-pattern-bubbles-to-describe-the-hook4"><strong>Why don’t you use one of those pattern bubbles to describe the hook?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-the-buzz-seems-like-a-pointless-feature-what-s-going-on4"><strong>The buzz seems like a pointless feature, what’s going on?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-why-did-you-add-the-common-features-state-and-why-does-it-enclose-everything4"><strong>Why did you add the common_features state, and why does it enclose everything?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-why-are-you-showing-two-classes-on-the-diagram4"><strong>Why are you showing two classes on the diagram?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-where-is-the-hardware-abstraction-layer-you-listed-in-your-title4"><strong>Where is the hardware abstraction layer you listed in your title?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-what-does-scribble-do-and-why-do-you-have-it-in-one-class-and-not-the-other-one4"><strong>What does scribble do and why do you have it in one class and not the other one?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-in-your-tests-why-do-you-break-transition-tests-apart-from-calls-to-light-on-light-off-and-so-on4"><strong>Why do you break the transition-tests apart from the other tests?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-why-don-t-you-just-copy-out-your-spy-output-and-use-it-as-the-test-target4"><strong>Why don’t you just copy out your spy output and use it as the test target?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-where-did-you-get-your-trace-test-target-and-what-is-going-on-with-that-stripped-call4"><strong>Where did you get your trace-test-target, and what is going on with that stripped call?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-why-don-t-you-just-copy-out-your-trace-output-and-use-it-as-a-test-target4"><strong>Why don’t you just copy out your trace output and use it as a test target?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-your-light-on-light-off-tests-seem-pretty-light-are-you-sure-you-are-testing-these-features4"><strong>Your light_on, light_off … tests seem pretty light, are you sure you are testing these features?</strong></p>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-can-you-really-say-you-proved-that-the-software-works4"><strong>Can you really say you proved that the software works?</strong></p>
 <a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
@@ -3315,9 +4045,8 @@ to have different cooking durations.</p>
 <div class="section" id="iteration-5-specification">
 <span id="iter5-spec"></span><h4>Iteration 5 specification<a class="headerlink" href="#iteration-5-specification" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li>The toaster oven should stay in the baking state for twenty seconds, then buzz
-and turn off.</li>
-<li>The toaster oven should stay in the toasting state for ten seconds, then buzz
+<li><span class="dead-spec">The toaster oven should stay in the baking state for twenty seconds, then buzz and turn off.</span></li>
+<li><span class="new-spec">The toaster oven should stay in the toasting state for ten seconds, then buzz</span>
 and turn off.</li>
 <li>If the door is opened, then closed, the cooking time should be set back to
 it’s default time of ten or twenty seconds.</li>
@@ -3472,7 +4201,7 @@ it’s default time of ten or twenty seconds.</li>
 <li><a class="reference internal" href="#iteration-3-questions">Iteration 3 questions</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#iteration-4-hook">Iteration 4: hook</a><ul>
+<li><a class="reference internal" href="#iteration-4-hook-and-hardware-abstraction">Iteration 4: hook and hardware abstraction</a><ul>
 <li><a class="reference internal" href="#iteration-4-specification">Iteration 4 specification</a></li>
 <li><a class="reference internal" href="#iteration-4-design">Iteration 4 design</a></li>
 <li><a class="reference internal" href="#iteration-4-code">Iteration 4 code</a></li>
