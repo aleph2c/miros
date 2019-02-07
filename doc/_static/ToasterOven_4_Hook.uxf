@@ -1,0 +1,1133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>11</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>264</x>
+      <y>132</y>
+      <w>495</w>
+      <h>363</h>
+    </coordinates>
+    <panel_attributes>*heating*
+--
+  entry/ oven.heater_on();
+  exit/ oven.heater_off();
+  
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>242</x>
+      <y>55</y>
+      <w>704</w>
+      <h>484</h>
+    </coordinates>
+    <panel_attributes>*door_closed*
+--
+  entry /
+    oven.light_off(oven)
+
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>286</x>
+      <y>242</y>
+      <w>231</w>
+      <h>231</h>
+    </coordinates>
+    <panel_attributes>*baking*
+--
+entry /
+  oven.history = baking
+  print("baking")
+
+    
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>528</x>
+      <y>242</y>
+      <w>220</w>
+      <h>231</h>
+    </coordinates>
+    <panel_attributes>*toasting*
+--
+entry /
+  oven.history = toasting
+  print("toasting")
+
+valign=top
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>770</x>
+      <y>242</y>
+      <w>154</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>*off*
+--
+entry / 
+  oven.history= off
+  print("off")
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>814</x>
+      <y>187</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>814</x>
+      <y>198</y>
+      <w>33</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>605</x>
+      <y>462</y>
+      <w>33</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>363</x>
+      <y>462</y>
+      <w>33</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>836</x>
+      <y>352</y>
+      <w>55</w>
+      <h>209</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Off</panel_attributes>
+    <additional_attributes>10.0;170.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>902</x>
+      <y>176</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>type=history_deep</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>913</x>
+      <y>176</y>
+      <w>242</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>200.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>1133</x>
+      <y>154</y>
+      <w>143</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>*door_open*
+--
+entry /
+  oven.light_on()
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>935</x>
+      <y>275</y>
+      <w>286</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;60.0;240.0;60.0;240.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1001</x>
+      <y>308</y>
+      <w>110</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>Door_Open
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>946</x>
+      <y>132</y>
+      <w>187</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>Door_Close /
+  oven.trans(oven.history)
+
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>374</x>
+      <y>495</y>
+      <w>66</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>Baking
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>616</x>
+      <y>495</y>
+      <w>77</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>Toasting
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>132</x>
+      <y>0</y>
+      <w>1166</w>
+      <h>561</h>
+    </coordinates>
+    <panel_attributes>*common_features*
+--
+
+
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>539</x>
+      <y>638</y>
+      <w>231</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>190.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>253</x>
+      <y>660</y>
+      <w>528</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>460.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>242</x>
+      <y>682</y>
+      <w>726</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>640.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>121</x>
+      <y>704</y>
+      <w>1199</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>1070.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>550</x>
+      <y>627</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>**S**
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>572</x>
+      <y>627</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>**T**
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>99</x>
+      <y>649</y>
+      <w>132</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>  Buzz /
+    print("buzz")
+    oven.buzz()
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>748</x>
+      <y>627</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>toasting
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>759</x>
+      <y>649</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>heating
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>946</x>
+      <y>671</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>door_closed
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1166</x>
+      <y>693</y>
+      <w>143</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>common_features
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>539</x>
+      <y>737</y>
+      <w>231</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>190.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>253</x>
+      <y>759</y>
+      <w>528</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>460.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>242</x>
+      <y>781</y>
+      <w>726</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>640.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>121</x>
+      <y>803</y>
+      <w>1199</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>1070.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>550</x>
+      <y>726</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>**S**
+style=wordwrap
+layer=3
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>264</x>
+      <y>748</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>**T**
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>99</x>
+      <y>748</y>
+      <w>132</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>  Buzz /
+    print("buzz")
+    oven.buzz()
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>748</x>
+      <y>726</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>toasting
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>759</x>
+      <y>748</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>heating
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>946</x>
+      <y>770</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>door_closed
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1166</x>
+      <y>792</y>
+      <w>143</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>common_features
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>539</x>
+      <y>836</y>
+      <w>231</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>190.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>253</x>
+      <y>858</y>
+      <w>528</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>460.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>242</x>
+      <y>880</y>
+      <w>726</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>640.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>121</x>
+      <y>902</y>
+      <w>1199</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>1070.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>550</x>
+      <y>825</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>**S**
+style=wordwrap
+layer=3
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>99</x>
+      <y>847</y>
+      <w>132</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>  Buzz /
+    print("buzz")
+    oven.buzz()
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>748</x>
+      <y>825</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>toasting
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>759</x>
+      <y>847</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>heating
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>946</x>
+      <y>869</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>door_closed
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1166</x>
+      <y>891</y>
+      <w>143</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>common_features
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>539</x>
+      <y>935</y>
+      <w>231</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>190.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>253</x>
+      <y>957</y>
+      <w>528</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>460.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>242</x>
+      <y>979</y>
+      <w>726</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>640.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>121</x>
+      <y>1001</y>
+      <w>1199</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>1070.0;20.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>550</x>
+      <y>924</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>**S**
+style=wordwrap
+layer=3
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>99</x>
+      <y>946</y>
+      <w>132</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>  Buzz /
+    print("buzz")
+    oven.buzz()
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>748</x>
+      <y>924</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>toasting
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>759</x>
+      <y>946</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>heating
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>946</x>
+      <y>968</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>door_closed
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1166</x>
+      <y>990</y>
+      <w>143</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>common_features
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>253</x>
+      <y>869</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>**T**
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>209</x>
+      <y>979</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>**T**
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>539</x>
+      <y>1034</y>
+      <w>231</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>190.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>253</x>
+      <y>1056</y>
+      <w>528</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>460.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>242</x>
+      <y>1078</y>
+      <w>726</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>640.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>121</x>
+      <y>1100</y>
+      <w>1199</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=-
+layer=3</panel_attributes>
+    <additional_attributes>1070.0;20.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>550</x>
+      <y>1023</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>**S**
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>99</x>
+      <y>1045</y>
+      <w>132</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>  Buzz /
+    print("buzz")
+    oven.buzz()
+style=wordwrap
+layer=3
+bg=black
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>748</x>
+      <y>1023</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>toasting
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>759</x>
+      <y>1045</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>heating
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>946</x>
+      <y>1067</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>door_closed
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1166</x>
+      <y>1089</y>
+      <w>143</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>common_features
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>572</x>
+      <y>1023</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>**T**
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>88</x>
+      <y>616</y>
+      <w>33</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3
+fg=gray</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>88</x>
+      <y>715</y>
+      <w>33</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>88</x>
+      <y>814</y>
+      <w>33</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3
+fg=gray</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>88</x>
+      <y>913</y>
+      <w>33</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>88</x>
+      <y>1012</y>
+      <w>33</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3
+fg=gray</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>66</x>
+      <y>660</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>1
+style=wordwrap
+layer=3
+fg=gray</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>66</x>
+      <y>748</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>2
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>66</x>
+      <y>858</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>3
+style=wordwrap
+layer=3
+fg=gray</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>66</x>
+      <y>957</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>4
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>66</x>
+      <y>1045</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>5
+style=wordwrap
+layer=3
+fg=gray</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>121</x>
+      <y>33</y>
+      <w>110</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>  Buzz /
+    print("buzz")
+    oven.buzz()
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

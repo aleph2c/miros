@@ -3390,10 +3390,11 @@ have never used one.</p>
 <a class="reference internal" href="zero_to_one.html#iter3-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-can-you-map-this-history-idea-back-onto-the-story3"><strong>Can you map this history idea back onto the story?</strong></p>
-<p>Imagine that the bartender on the <code class="docutils literal notranslate"><span class="pre">door_open</span></code> bar has a pair of binoculars
-hanging around his neck (with a deep history icon painted on them as their brand).
-He uses them to watch where Tara and Spike drink when they are in any bar above
-the door_closed terrace, taking note of their last location.</p>
+<p>Imagine that the bartender named <code class="docutils literal notranslate"><span class="pre">Door_Close</span></code> in the <code class="docutils literal notranslate"><span class="pre">door_open</span></code> bar has a
+pair of binoculars hanging around his neck (with a deep history icon painted on
+them as their brand).  He uses them to watch where Tara and Spike drink when
+they are in any bar above the door_closed terrace, taking note of their last
+location.</p>
 <p>When Tara asks him for directions he whispers his answer in her ear.</p>
 <p>(if you can think of a better way of adding to this story email me)</p>
 <a class="reference internal" href="zero_to_one.html#iter2"<span class="std-ref">prev</span></a>,
@@ -3407,11 +3408,12 @@ the door_closed terrace, taking note of their last location.</p>
 </div>
 <div class="section" id="iteration-4-hook-and-hardware-abstraction">
 <span id="iter4"></span><h3>Iteration 4: hook and hardware abstraction<a class="headerlink" href="#iteration-4-hook-and-hardware-abstraction" title="Permalink to this headline">¶</a></h3>
-<p>So far we have framed in a toaster oven statechart using miros.</p>
-<p>Now let’s give our toaster oven the ability to make a buzzing sound while it is
-running in any of it’s states.</p>
-<p>Let’s also ensure our design is modular by decoupling the testing of the code
-that runs the hardware from the code that controls the state of the unit.</p>
+<p>So far we have built a very basic toaster oven using a statechart.</p>
+<p>In this iteration we will change the design so that:</p>
+<ul class="simple">
+<li>The unit can make a buzzing sound from any state of operation.</li>
+<li>We can decouple our hardware tests from our statemachine tests.</li>
+</ul>
 <a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
@@ -3782,7 +3784,7 @@ don’t need to test the event processor because we trust that it is working, an
 we trust the formal set of behaviors that it follows.  This let’s us simplify
 things a lot.</p>
 <p>Here is a regression test for this design:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+<div class="highlight-python notranslate" id="iter4-proof-code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">stripped</span>
 
 <span class="c1"># test helper functions</span>
@@ -3854,7 +3856,6 @@ things a lot.</p>
   <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
 
 <span class="c1"># Tests start here</span>
-
 <span class="c1"># Confirm our state transitions work as designed</span>
 <span class="n">trace_target</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">[2019-02-04 06:37:04.538413] [oven] e-&gt;start_at() top-&gt;off</span>
@@ -3903,11 +3904,11 @@ things a lot.</p>
 <ul class="simple">
 <li><a class="reference internal" href="#zero-to-one-can-you-explain-how-the-unit-can-buzz-from-any-state4"><span class="std std-ref">Can you explain how the unit can buzz from any state?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-can-you-relate-the-buzz-hook-to-the-story4"><span class="std std-ref">Can you relate the buzz hook to the story?</span></a></li>
-<li><a class="reference internal" href="#zero-to-one-why-don-t-you-use-one-of-those-pattern-bubbles-to-describe-the-hook4"><span class="std std-ref">Why don’t you use one of those pattern bubbles to describe the hook?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-the-buzz-seems-like-a-pointless-feature-what-s-going-on4"><span class="std std-ref">The buzz seems like a pointless feature, what’s going on?</span></a></li>
-<li><a class="reference internal" href="#zero-to-one-why-did-you-add-the-common-features-state-and-why-does-it-enclose-everything4"><span class="std std-ref">Why did you add the common_features state? And why does it enclose everything?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-are-entry-and-exit-events-hooks-too4"><span class="std std-ref">Are entry and exit events hooks too?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-why-are-you-showing-two-classes-on-the-diagram4"><span class="std std-ref">Why are you showing two classes on the diagram?</span></a></li>
-<li><a class="reference internal" href="#zero-to-one-where-is-the-hardware-abstraction-layer-you-listed-in-your-title4"><span class="std std-ref">Where is the hardware abstraction layer you listed in your title?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-what-is-a-hardware-abstraction-layer4"><span class="std std-ref">What is a hardware abstraction layer?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-where-is-the-hardware-abstraction-layer-you-listed-in-your-title4"><span class="std std-ref">Where is the hardware abstraction you listed in your title?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-in-your-tests-why-do-you-break-transition-tests-apart-from-calls-to-light-on-light-off-and-so-on4"><span class="std std-ref">Why do you break the transition-tests apart from the other tests?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-what-does-scribble-do-and-why-do-you-have-it-in-one-class-and-not-the-other-one4"><span class="std std-ref">What does scribble do and why do you have it in one class and not the other one?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-why-don-t-you-just-copy-out-your-spy-output-and-use-it-as-the-test-target4"><span class="std std-ref">Why don’t you just copy out your spy output and use it as the test target?</span></a></li>
@@ -3917,6 +3918,225 @@ things a lot.</p>
 <li><a class="reference internal" href="#zero-to-one-can-you-really-say-you-proved-that-the-software-works4"><span class="std std-ref">Can you really say you proved that the software works?</span></a></li>
 </ul>
 <p id="zero-to-one-can-you-explain-how-the-unit-can-buzz-from-any-state4"><strong>Can you explain how the unit can buzz from any state?</strong></p>
+<p>Let’s send some Buzz events to our statechart and see how it behaves:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+
+<span class="c1"># start our oven</span>
+<span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">door_closed</span><span class="p">)</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>  <span class="c1"># let the oven thread catch up to main</span>
+
+<span class="c1"># What state?</span>
+<span class="k">print</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
+
+<span class="c1"># Trigger the buzzer</span>
+<span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="c1"># What state?</span>
+<span class="k">print</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
+
+<span class="c1"># Toast something</span>
+<span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="c1"># What state?</span>
+<span class="k">print</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
+
+<span class="c1"># Trigger the buzzer</span>
+<span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="c1"># What state?</span>
+<span class="k">print</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">off</span>
+<span class="n">buzz</span>
+<span class="n">off</span>
+<span class="n">toasting</span>
+<span class="n">buzz</span>
+<span class="n">toasting</span>
+</pre></div>
+</div>
+<p>The statechart reacts to the <code class="docutils literal notranslate"><span class="pre">Buzz</span></code> event without changing state.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_4.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_4.svg" src="_images/ToasterOven_4.svg" /></div>
+</a>
+<p>The buzz code is being hooked by the <code class="docutils literal notranslate"><span class="pre">common_features</span></code> state, you can see this
+by looking at the top left corner of its rectangle in the diagram:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># short hand for what we see in the</span>
+<span class="n">Buzz</span> <span class="o">/</span>
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">buzz</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To see how the code in the picture is manifested in our actual code, look at the
+<code class="docutils literal notranslate"><span class="pre">common_features</span></code> callback function that represents this state:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Legend for mapping code onto diagram:</span>
+<span class="c1"># s: draw as shorthand on your diagram</span>
+<span class="c1"># f: completely write as code on your diagram</span>
+<span class="c1"># g: drawn as a graph element on your diagram</span>
+<span class="c1"># !: don&#39;t draw this code on your diagram</span>
+
+<span class="nd">@spy_on</span>                             <span class="c1"># !</span>
+<span class="k">def</span> <span class="nf">common_features</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>       <span class="c1"># g</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>  <span class="c1"># !</span>
+<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">):</span>     <span class="c1"># s</span>
+</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>                   <span class="c1"># f</span>
+</span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">buzz</span><span class="p">()</span>                     <span class="c1"># f</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>  <span class="c1"># !</span>
+</span>  <span class="k">else</span><span class="p">:</span>                             <span class="c1"># !</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>        <span class="c1"># g</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>    <span class="c1"># !</span>
+<span class="hll">  <span class="k">return</span> <span class="n">status</span>                     <span class="c1"># !</span>
+</span></pre></div>
+</td></tr></table></div>
+<p>We see that when the <code class="docutils literal notranslate"><span class="pre">Buzz</span></code> event is reacted to by this function (10), it
+prints <code class="docutils literal notranslate"><span class="pre">buzz</span></code> (11) then calls the <code class="docutils literal notranslate"><span class="pre">oven.buzz()</span></code> code of it’s derived
+class (12), then returns <code class="docutils literal notranslate"><span class="pre">return_status.HANDLED</span></code> (13,17).</p>
+<p>When the event processor receives a <code class="docutils literal notranslate"><span class="pre">return_status.HANDLED</span></code> it knows it can
+stop searching, leaving its source state as it was.   Upon completing its search
+the event processor relinquishes control back to its thread, which in turn goes
+back to pending on its input queue.</p>
+<p>But how did the event processor call the <code class="docutils literal notranslate"><span class="pre">common_features</span></code> callback in the
+first place?</p>
+<p>I’ll answer this by first imagining that our oven has settled in the
+<code class="docutils literal notranslate"><span class="pre">toasting</span></code> state when it receives a <code class="docutils literal notranslate"><span class="pre">Buzz</span></code> event:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_4_Hook.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_4_Hook.svg" src="_images/ToasterOven_4_Hook.svg" /></div>
+</a>
+<ol class="arabic">
+<li><p class="first">The source state <strong>S</strong> and target state <strong>T</strong> are both set to the
+<code class="docutils literal notranslate"><span class="pre">toasting</span></code> state before the reaction.  Then the statechart receives the
+<code class="docutils literal notranslate"><span class="pre">Buzz</span></code> event from the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> call.</p>
+<p>The event processor begins its reaction to the <code class="docutils literal notranslate"><span class="pre">Buzz</span></code> event by sending the
+callback pointed to by <strong>T</strong> two arguments, a reference to the ToasterOven
+object which is called <code class="docutils literal notranslate"><span class="pre">oven</span></code> and <code class="docutils literal notranslate"><span class="pre">e</span></code> set to <code class="docutils literal notranslate"><span class="pre">Event(signal=signals.Buzz)</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">toaster</span></code> callback’s if-elif logical structure doesn’t handle a
+<code class="docutils literal notranslate"><span class="pre">Buzz</span></code> event so it passes control to its <code class="docutils literal notranslate"><span class="pre">else</span></code> clause.  The <code class="docutils literal notranslate"><span class="pre">else</span></code>
+clause updates the <strong>T</strong> to the parent state of the <code class="docutils literal notranslate"><span class="pre">toasting</span></code> state:
+<code class="docutils literal notranslate"><span class="pre">heating</span></code>.  The <code class="docutils literal notranslate"><span class="pre">toasting</span></code> callback returns <code class="docutils literal notranslate"><span class="pre">return_status.SUPER</span></code>,
+telling the event processor that the event was not handled.  The event
+processor continues searching.</p>
+</li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">toasting</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">toasting</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>  <span class="c1"># T is now set to heating</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+</span>  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<ol class="arabic" start="2">
+<li><p class="first">The source state <strong>S</strong> is <code class="docutils literal notranslate"><span class="pre">toasting</span></code> and the target state <strong>T</strong> is <code class="docutils literal notranslate"><span class="pre">heating</span></code>.</p>
+<p>The event processor sends the callback pointed to by <strong>T</strong> two arguments, a
+reference to the ToasterOven object which is called <code class="docutils literal notranslate"><span class="pre">oven</span></code> and <code class="docutils literal notranslate"><span class="pre">e</span></code> set to
+<code class="docutils literal notranslate"><span class="pre">Event(signal=signals.Buzz)</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">heating</span></code> callback’s <code class="docutils literal notranslate"><span class="pre">if-elif</span></code> logical structure doesn’t handle a
+<code class="docutils literal notranslate"><span class="pre">Buzz</span></code> event so it passes control to its <code class="docutils literal notranslate"><span class="pre">else</span></code> clause.  The <code class="docutils literal notranslate"><span class="pre">else</span></code>
+clause updates the <strong>T</strong> to the parent state of the <code class="docutils literal notranslate"><span class="pre">heating</span></code> state:
+<code class="docutils literal notranslate"><span class="pre">door_closed</span></code>.  The <code class="docutils literal notranslate"><span class="pre">heating</span></code> callback returns <code class="docutils literal notranslate"><span class="pre">return_status.SUPER</span></code>,
+telling the event processor that the event was not handled.  The event
+processor continues searching.</p>
+</li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">heating</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">heater_on</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">heater_off</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>  <span class="c1"># T is not set to door_closed</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+</span>  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<ol class="arabic" start="3">
+<li><p class="first">The source state <strong>S</strong> is <code class="docutils literal notranslate"><span class="pre">toasting</span></code> and the target state <strong>T</strong> is
+<code class="docutils literal notranslate"><span class="pre">door_closed</span></code>.</p>
+<p><strong>T</strong> doesn’t handle <code class="docutils literal notranslate"><span class="pre">Buzz</span></code>, <strong>T</strong> is set to <code class="docutils literal notranslate"><span class="pre">common_features</span></code> in the
+<code class="docutils literal notranslate"><span class="pre">else</span></code> clause. (same logic as above).  The <code class="docutils literal notranslate"><span class="pre">door_closed</span></code> callback returns
+return_status.SUPER, telling the event processor that the event was not
+handled. The event processor continues searching.</p>
+</li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">door_closed</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">light_off</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Baking</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">baking</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">toasting</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Off</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Door_Open</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">door_open</span><span class="p">)</span>
+<span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">common_features</span>  <span class="c1"># T set to common_features</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+</span>  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li>The source state <strong>S</strong> is <code class="docutils literal notranslate"><span class="pre">toasting</span></code> and the target state <strong>T</strong> is <code class="docutils literal notranslate"><span class="pre">common_features</span></code>.</li>
+</ol>
+<blockquote>
+<div><p>The event processor sends the callback pointed to by <strong>T</strong> two arguments, a
+reference to the ToasterOven object which is called <code class="docutils literal notranslate"><span class="pre">oven</span></code> and <code class="docutils literal notranslate"><span class="pre">e</span></code> set to
+<code class="docutils literal notranslate"><span class="pre">Event(signal=signals.Buzz)</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">common_features</span></code> callback’s <code class="docutils literal notranslate"><span class="pre">if-elif</span></code> logical structure handles
+a <code class="docutils literal notranslate"><span class="pre">Buzz</span></code> event.  It prints “buzz” then calls the <code class="docutils literal notranslate"><span class="pre">buzz</span></code> method of the
+oven object, then returns <code class="docutils literal notranslate"><span class="pre">return_status.HANDLED</span></code>.</p>
+<p>The event processor knows its search is complete.</p>
+</div></blockquote>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">common_features</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">):</span>
+</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">buzz</span><span class="p">()</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span>  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="5">
+<li><strong>T</strong> snaps back to <strong>S</strong>, <code class="docutils literal notranslate"><span class="pre">toasting</span></code>, the event processor stops searching
+and the RTC process is finished.</li>
+</ol>
+<p>Because the <code class="docutils literal notranslate"><span class="pre">common_features</span></code> state encloses all of the other states (all
+<code class="docutils literal notranslate"><span class="pre">else</span></code> clauses lead to it), it can hook any <code class="docutils literal notranslate"><span class="pre">Buzz</span></code> event from any state.</p>
+<p>This is an example of <strong>behavioral inheritance</strong>.</p>
 <a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
@@ -3925,15 +4145,65 @@ things a lot.</p>
 <a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-can-you-relate-the-buzz-hook-to-the-story4"><strong>Can you relate the buzz hook to the story?</strong></p>
-<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
-<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
-<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="zero-to-one-why-don-t-you-use-one-of-those-pattern-bubbles-to-describe-the-hook4"><strong>Why don’t you use one of those pattern bubbles to describe the hook?</strong></p>
-<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<p><strong>T</strong> represents Tara, the explorer spirit, in our story.</p>
+<div class="story">
+
+<p><span class="story-intro">While Tara and Spike</span> were spending time together on an
+upper terrace, someone from our world, put a "Buzz" event into their
+universe's portal.
+</p>
+
+<p>
+Theo, the god of their underworld (the statechart's thread), immediately notices
+this and pulls the event out of his side of the portal. He casts his gaze up
+into the sky to see Eve, the goddess of heaven (event processor). Eve awakens
+and takes the event from Theo. She looks down on the earth until she sees Spike,
+and beside him Tara.
+</p>
+
+<p>
+Eve flies done to Tara and gives her the event. Eve says, "Tara, I want you
+to go to the terrace where there is a bartender who knows what to do with
+this event.  Then I want you to go to wherever he tells you to take it. Good
+luck Tara, I believe in you."
+</p>
+
+<p>
+Tara, upon seeing that there was no bartender named Buzz on her current
+terrace, descends outward and downwards in the bar system.  She does this
+until she is at the lowest bar on the earth, the common_feature.  There she
+see's that there is a bartender named Buzz. she approaches him and asks if he
+knows what to do with the event.   He says, "give me the event, I'll handle it,
+don't worry about it anymore".
+</p>
+
+<p>
+What Tara and the gods don't know is that Buzz is a member of a subversive
+society called hack-the-humans.  He has some secret code which he will run
+when he is activated by Tara's event and awakened from nonexistence by Theo's
+attention.
+</p>
+
+<p>
+He carefully pulls his code out of his jacket pocket so nobody can see what
+he is doing, especially Eve, who he considers to be the worst kind of boss --
+a micromanager. He runs "print("oven"); oven.buzz()", smiles, then destroys
+the event.
+</p>
+
+<p>
+Meanwhile, Tara has gone back up the terrace system to rejoin Spike.  He asks
+her what happened (even though he knows already) and she tells him that the
+bartender handled the event, to which he yells out "hook!" and is happy,
+because he doesn't have to move.  Instead he orders another drink.
+</p>
+
+<p>
+Theo, the solipsist, sees that the work is done.  He pulls his gaze from his
+universe, freezing it into non-existence, and puts all of his attention back
+onto the portal connecting him with you and me.
+</p>
+</div><a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
@@ -3941,6 +4211,8 @@ things a lot.</p>
 <a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-the-buzz-seems-like-a-pointless-feature-what-s-going-on4"><strong>The buzz seems like a pointless feature, what’s going on?</strong></p>
+<p>In the next iteration we will tie the buzz event to a timer.  I’m trying to
+focus on hooks in isolation to make them easier to understand.</p>
 <a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
@@ -3948,7 +4220,72 @@ things a lot.</p>
 <a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="zero-to-one-why-did-you-add-the-common-features-state-and-why-does-it-enclose-everything4"><strong>Why did you add the common_features state, and why does it enclose everything?</strong></p>
+<p id="zero-to-one-are-entry-and-exit-events-hooks-too4"><strong>Are entry and exit events hooks too?</strong></p>
+<p>I can see why you asked this.  It looks like they are, doesn’t it?</p>
+<p>We can see this in the <code class="docutils literal notranslate"><span class="pre">heating</span></code> callback, which uses both an ENTRY_SIGNAL and
+an EXIT_SIGNAL:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">heating</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span>    <span class="n">oven</span><span class="o">.</span><span class="n">heater_on</span><span class="p">()</span>
+<span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+</span>    <span class="n">oven</span><span class="o">.</span><span class="n">heater_off</span><span class="p">()</span>
+<span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span>  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+<span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span></pre></div>
+</td></tr></table></div>
+<p>We see that the <code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code> is caught by the if statement on line 4 and the
+status is set to <code class="docutils literal notranslate"><span class="pre">return_status.HANDLED</span></code>.  Likewise the <code class="docutils literal notranslate"><span class="pre">EXIT_SIGNAL</span></code> is
+caught by line 7 and the status is set to <code class="docutils literal notranslate"><span class="pre">return_status.HANDLED</span></code> on line 9.</p>
+<p>And this looks the same as our hook in the <code class="docutils literal notranslate"><span class="pre">common_features</span></code> callback:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">common_features</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">):</span>
+</span>    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">buzz</span><span class="p">()</span>
+<span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span>  <span class="k">else</span><span class="p">:</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</td></tr></table></div>
+<p>So are the entry and exit events hooks?</p>
+<p>No, they aren’t.  If you don’t include the <code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code> or <code class="docutils literal notranslate"><span class="pre">EXIT_SIGNAL</span></code>
+catches in the <code class="docutils literal notranslate"><span class="pre">if-elif</span></code> logical structure of your callback, the entry and
+exit events will not propagate outward to be handled by some super state;
+instead, these events will just be ignored.</p>
+<p>If this weren’t the case, you would have to include the <code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code>,
+<code class="docutils literal notranslate"><span class="pre">EXIT_SIGNAL</span></code>, not to mention the <code class="docutils literal notranslate"><span class="pre">INIT_SIGNAL</span></code> in every single callback in
+your design.  That would be annoying.</p>
 <a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
@@ -3957,6 +4294,19 @@ things a lot.</p>
 <a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-why-are-you-showing-two-classes-on-the-diagram4"><strong>Why are you showing two classes on the diagram?</strong></p>
+<p>There are two classes on the diagram to show how we can test our design.</p>
+<p>We would like to test the code that is specific for the hardware, on that
+hardware and we would like to be able to test the statechart’s statemachine
+anywhere where Python can run.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_4.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_4.svg" src="_images/ToasterOven_4.svg" /></div>
+</a>
+<p>The ToasterOvenMock class is used to confirm that our statechart is working, and
+it can be run anywhere where Python can run, you can see the test code that
+confirms our design is working <a class="reference internal" href="#iter4-proof-code"><span class="std std-ref">here</span></a>.</p>
+<p>The ToasterOven object would run on the hardware.  The <code class="docutils literal notranslate"><span class="pre">buzz</span></code>, <code class="docutils literal notranslate"><span class="pre">light_on</span></code>,
+<code class="docutils literal notranslate"><span class="pre">light_off</span></code>, <code class="docutils literal notranslate"><span class="pre">heater_on</span></code> and <code class="docutils literal notranslate"><span class="pre">heater_off</span></code> methods of this ToasterOven
+object would call the hardware abstraction layer to make the hardware work the
+way it needs to work.</p>
 <a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
@@ -3964,7 +4314,61 @@ things a lot.</p>
 <a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="zero-to-one-where-is-the-hardware-abstraction-layer-you-listed-in-your-title4"><strong>Where is the hardware abstraction layer you listed in your title?</strong></p>
+<p id="zero-to-one-what-is-a-hardware-abstraction-layer4"><strong>What is a hardware abstraction layer?</strong></p>
+<p>The hardware abstraction layer (HAL) is code that separates your software from
+the hardware it runs on.</p>
+<p>If we were building a real toaster oven, the code would run on a processor
+inside of the toaster oven.  If you were making a toaster oven using the
+Raspberry Pi 3, this processor would be a quad-core ARM Cortext-A53 CPU.  Any
+code running inside of a CPU that is shipped with the product, is called
+embedded code, because it’s embedded in the processor which is embedded in a
+product.</p>
+<p>Typically embedded projects, put a layer of software between the code that
+provides the features that their customer’s want from the code that is needed to
+drive the CPU to do what it needs. This software acts as a buttress against the
+hardware. It doesn’t take a lot of effort to build, and it acts as cheap
+insurance for your company. But why would you want to protect your software from
+your CPU?  It’s not the CPU you have to worry about, it’s the price of the CPU
+that you have to worry about.</p>
+<p>Suppose that Larry Ellison, the guy currently <a class="reference external" href="https://en.wikipedia.org/wiki/Extortion">shaking down</a> the Java ecosystem, finds out that a
+lot of products have been built using the Raspberry Pi.  He discovers companies
+like using the Raspberry Pi, because it is cheap, has a nice stable version of
+Linux and is easy to use.  Smelling an opportunity, he buys up the Raspberry Pi
+foundation and immediately cranks up the price of the part from $35 to $500.</p>
+<p>If we wrote our embedded code using a hardware abstraction layer, we could
+quickly port our code over to the BeagleBoard-X15, which has an ARM Cortext-At15
+CPU and is also $35.  Sure, it would cost us a bit of money to switch our
+hardware and re-write the hardware drivers and part of the HAL, but we would
+rather do that than lose $465 per unit.</p>
+<a class="reference external image-reference" href="_static/HAL.pdf"><div align="center" class="align-center"><img alt="_images/HAL.svg" src="_images/HAL.svg" /></div>
+</a>
+<a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-code"<span class="std-ref">code</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-proof"<span class="std-ref">proof</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter4-questions"<span class="std-ref">questions</span></a></span></a>,
+<a class="reference internal" href="zero_to_one.html#iter5"><span class="std std-ref">next</span></a><hr class="docutils" />
+<p id="zero-to-one-where-is-the-hardware-abstraction-layer-you-listed-in-your-title4"><strong>Where is the hardware abstraction you listed in your title?</strong></p>
+<p>In our design we present two different classes and an HSM.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_4.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_4.svg" src="_images/ToasterOven_4.svg" /></div>
+</a>
+<p>The purpose of the ToasterOvenMock class is to give us the ability to watch how
+our statemachine would call out to the HAL as it reacts to different events.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_4_With_HAL.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_4_With_HAL.svg" src="_images/ToasterOven_4_With_HAL.svg" /></div>
+</a>
+<p>The ToasterOvenMock object calls out to the <code class="docutils literal notranslate"><span class="pre">spy</span></code> instrumentation, which acts
+as a fake HAL. This fake HAL can be queried by our test code, to see if a call
+to the hardware was made when we needed it to be made.</p>
+<p>The ToasterOvenMock object can be tested on your development machine, or on a
+continual integration server.  Once its statemachine has been proven to work,
+you can confidently attach it to the ToasterOven object running on the computer
+embedded in your product.</p>
+<p>So, the hardware abstraction described in the title of this iteration, is
+provided by the ToasterOvenMock and the code used to test it.  Once you prove
+that the statemachine reacts to events as you expect it to, and it makes the
+correct hardware calls when you expect it to, you have proven that you can drop
+it into your product and it will work as designed.</p>
 <a class="reference internal" href="zero_to_one.html#iter3"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter4-design"<span class="std-ref">design</span></a></span></a>,

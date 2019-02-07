@@ -13,6 +13,7 @@
 
 Zero To One
 ===========
+
 This is not a 5-minute blog read.  But, if you want to learn how statecharts
 work, this is your one-stop shop, it will take you from 0 to 1.
 
@@ -3496,10 +3497,11 @@ have never used one.
 
 **Can you map this history idea back onto the story?**
 
-Imagine that the bartender on the ``door_open`` bar has a pair of binoculars
-hanging around his neck (with a deep history icon painted on them as their brand).
-He uses them to watch where Tara and Spike drink when they are in any bar above
-the door_closed terrace, taking note of their last location.
+Imagine that the bartender named ``Door_Close`` in the ``door_open`` bar has a
+pair of binoculars hanging around his neck (with a deep history icon painted on
+them as their brand).  He uses them to watch where Tara and Spike drink when
+they are in any bar above the door_closed terrace, taking note of their last
+location.
 
 When Tara asks him for directions he whispers his answer in her ear.
 
@@ -3511,13 +3513,12 @@ When Tara asks him for directions he whispers his answer in her ear.
 
 Iteration 4: hook and hardware abstraction
 ------------------------------------------
-So far we have framed in a toaster oven statechart using miros.  
+So far we have built a very basic toaster oven using a statechart.
 
-Now let's give our toaster oven the ability to make a buzzing sound while it is
-running in any of it's states.
+In this iteration we will change the design so that:
 
-Let's also ensure our design is modular by decoupling the testing of the code
-that runs the hardware from the code that controls the state of the unit.
+* The unit can make a buzzing sound from any state of operation.
+* We can decouple our hardware tests from our statemachine tests.
 
 .. include:: i_navigation_4.rst
 
@@ -3678,7 +3679,7 @@ Iteration 4 code
       oven.temp.fun = heating
       status = return_status.SUPER
     return status
-  
+
   @spy_on
   def toasting(oven, e):
     status = return_status.UNHANDLED
@@ -3751,6 +3752,8 @@ we trust the formal set of behaviors that it follows.  This let's us simplify
 things a lot.
 
 Here is a regression test for this design:
+
+.. _iter4_proof_code:
 
 .. code-block:: python
 
@@ -3826,7 +3829,6 @@ Here is a regression test for this design:
       return "\n".join(oven.spy())
 
     # Tests start here
-
     # Confirm our state transitions work as designed
     trace_target = """
     [2019-02-04 06:37:04.538413] [oven] e->start_at() top->off
@@ -3869,11 +3871,11 @@ Iteration 4 questions
 """""""""""""""""""""
 * :ref:`Can you explain how the unit can buzz from any state? <zero_to_one-can-you-explain-how-the-unit-can-buzz-from-any-state4>`
 * :ref:`Can you relate the buzz hook to the story? <zero_to_one-can-you-relate-the-buzz-hook-to-the-story4>`
-* :ref:`Why don't you use one of those pattern bubbles to describe the hook? <zero_to_one-why-don't-you-use-one-of-those-pattern-bubbles-to-describe-the-hook4>`
 * :ref:`The buzz seems like a pointless feature, what's going on? <zero_to_one-the-buzz-seems-like-a-pointless-feature,-what's-going-on4>`
-* :ref:`Why did you add the common_features state? And why does it enclose everything? <zero_to_one-why-did-you-add-the-common_features-state,-and-why-does-it-enclose-everything4>`
+* :ref:`Are entry and exit events hooks too? <zero_to_one-are-entry-and-exit-events-hooks-too4>`
 * :ref:`Why are you showing two classes on the diagram? <zero_to_one-why-are-you-showing-two-classes-on-the-diagram4>`
-* :ref:`Where is the hardware abstraction layer you listed in your title? <zero_to_one-where-is-the-hardware-abstraction-layer-you-listed-in-your-title4>`
+* :ref:`What is a hardware abstraction layer? <zero_to_one-what-is-a-hardware-abstraction-layer4>`
+* :ref:`Where is the hardware abstraction you listed in your title? <zero_to_one-where-is-the-hardware-abstraction-layer-you-listed-in-your-title4>`
 * :ref:`Why do you break the transition-tests apart from the other tests? <zero_to_one-in-your-tests,-why-do-you-break-transition-tests-apart-from-calls-to-light_on,-light_off-and-so-on4>` 
 * :ref:`What does scribble do and why do you have it in one class and not the other one? <zero_to_one-what-does-scribble-do-and-why-do-you-have-it-in-one-class-and-not-the-other-one4>`
 * :ref:`Why don't you just copy out your spy output and use it as the test target? <zero_to_one-why-don't-you-just-copy-out-your-spy-output-and-use-it-as-the-test-target4>`
@@ -3886,17 +3888,305 @@ Iteration 4 questions
 
 **Can you explain how the unit can buzz from any state?**
 
+Let's send some Buzz events to our statechart and see how it behaves:
+
+.. code-block:: python
+
+   oven = ToasterOven(name="oven")
+
+   # start our oven
+   oven.start_at(door_closed)
+   time.sleep(0.01)  # let the oven thread catch up to main
+
+   # What state?
+   print(oven.state_name)
+
+   # Trigger the buzzer
+   oven.post_fifo(Event(signal=signals.Buzz))
+   time.sleep(0.01)
+
+   # What state?
+   print(oven.state_name)
+
+   # Toast something
+   oven.post_fifo(Event(signal=signals.Toasting))
+   time.sleep(0.01)
+
+   # What state?
+   print(oven.state_name)
+
+   # Trigger the buzzer
+   oven.post_fifo(Event(signal=signals.Buzz))
+   time.sleep(0.01)
+
+   # What state?
+   print(oven.state_name)
+
+.. code-block:: python
+
+   off
+   buzz
+   off
+   toasting
+   buzz
+   toasting
+
+The statechart reacts to the ``Buzz`` event without changing state.
+
+.. image:: _static/ToasterOven_4.svg
+   :target: _static/ToasterOven_4.pdf
+   :align: center
+
+The buzz code is being hooked by the ``common_features`` state, you can see this
+by looking at the top left corner of its rectangle in the diagram:
+
+.. code-block:: python
+
+   # short hand for what we see in the
+   Buzz /
+     print("buzz")
+     oven.buzz()
+
+To see how the code in the picture is manifested in our actual code, look at the
+``common_features`` callback function that represents this state:
+
+.. code-block:: python
+   :emphasize-lines: 10,11-13,17
+   :linenos:
+
+   # Legend for mapping code onto diagram:
+   # s: draw as shorthand on your diagram
+   # f: completely write as code on your diagram
+   # g: drawn as a graph element on your diagram
+   # !: don't draw this code on your diagram
+
+   @spy_on                             # !
+   def common_features(oven, e):       # g
+     status = return_status.UNHANDLED  # !
+     if(e.signal == signals.Buzz):     # s
+       print("buzz")                   # f
+       oven.buzz()                     # f
+       status = return_status.HANDLED  # !
+     else:                             # !
+       oven.temp.fun = oven.top        # g
+       status = return_status.SUPER    # !
+     return status                     # !
+
+We see that when the ``Buzz`` event is reacted to by this function (10), it
+prints ``buzz`` (11) then calls the ``oven.buzz()`` code of it's derived
+class (12), then returns ``return_status.HANDLED`` (13,17).
+
+When the event processor receives a ``return_status.HANDLED`` it knows it can
+stop searching, leaving its source state as it was.   Upon completing its search
+the event processor relinquishes control back to its thread, which in turn goes
+back to pending on its input queue.
+
+But how did the event processor call the ``common_features`` callback in the
+first place?
+
+I'll answer this by first imagining that our oven has settled in the
+``toasting`` state when it receives a ``Buzz`` event:
+
+.. image:: _static/ToasterOven_4_Hook.svg
+   :target: _static/ToasterOven_4_Hook.pdf
+   :align: center
+
+1. The source state **S** and target state **T** are both set to the
+   ``toasting`` state before the reaction.  Then the statechart receives the
+   ``Buzz`` event from the ``post_fifo`` call.  
+   
+   The event processor begins its reaction to the ``Buzz`` event by sending the
+   callback pointed to by **T** two arguments, a reference to the ToasterOven
+   object which is called ``oven`` and ``e`` set to ``Event(signal=signals.Buzz)``.
+
+   The ``toaster`` callback's if-elif logical structure doesn't handle a
+   ``Buzz`` event so it passes control to its ``else`` clause.  The ``else``
+   clause updates the **T** to the parent state of the ``toasting`` state:
+   ``heating``.  The ``toasting`` callback returns ``return_status.SUPER``,
+   telling the event processor that the event was not handled.  The event
+   processor continues searching.
+
+.. code-block:: python
+  :emphasize-lines: 7-9
+
+  @spy_on
+  def toasting(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.history = toasting
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = heating  # T is now set to heating
+      status = return_status.SUPER
+    return status
+   
+
+2. The source state **S** is ``toasting`` and the target state **T** is ``heating``.
+
+   The event processor sends the callback pointed to by **T** two arguments, a
+   reference to the ToasterOven object which is called ``oven`` and ``e`` set to
+   ``Event(signal=signals.Buzz)``.
+
+   The ``heating`` callback's ``if-elif`` logical structure doesn't handle a
+   ``Buzz`` event so it passes control to its ``else`` clause.  The ``else``
+   clause updates the **T** to the parent state of the ``heating`` state:
+   ``door_closed``.  The ``heating`` callback returns ``return_status.SUPER``,
+   telling the event processor that the event was not handled.  The event
+   processor continues searching.
+   
+.. code-block:: python
+  :emphasize-lines: 10-12
+
+  @spy_on
+  def heating(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.heater_on()
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      oven.heater_off()
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = door_closed  # T is not set to door_closed
+      status = return_status.SUPER
+    return status
+   
+   
+3. The source state **S** is ``toasting`` and the target state **T** is
+   ``door_closed``. 
+
+   **T** doesn't handle ``Buzz``, **T** is set to ``common_features`` in the
+   ``else`` clause. (same logic as above).  The ``door_closed`` callback returns
+   return_status.SUPER, telling the event processor that the event was not
+   handled. The event processor continues searching.
+
+.. code-block:: python
+  :emphasize-lines: 17-19
+   
+  @spy_on
+  def door_closed(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.light_off()
+      status = return_status.HANDLED
+    elif(e.signal == signals.Baking):
+      status = oven.trans(baking)
+    elif(e.signal == signals.Toasting):
+      status = oven.trans(toasting)
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = oven.trans(off)
+    elif(e.signal == signals.Off):
+      status = oven.trans(off)
+    elif(e.signal == signals.Door_Open):
+      status = oven.trans(door_open)
+    else:
+      oven.temp.fun = common_features  # T set to common_features
+      status = return_status.SUPER
+    return status
+
+4.  The source state **S** is ``toasting`` and the target state **T** is ``common_features``.
+
+   The event processor sends the callback pointed to by **T** two arguments, a
+   reference to the ToasterOven object which is called ``oven`` and ``e`` set to
+   ``Event(signal=signals.Buzz)``.
+   
+   The ``common_features`` callback's ``if-elif`` logical structure handles
+   a ``Buzz`` event.  It prints "buzz" then calls the ``buzz`` method of the
+   oven object, then returns ``return_status.HANDLED``.
+
+   The event processor knows its search is complete.
+
+.. code-block:: python
+  :emphasize-lines: 4-7
+
+  @spy_on                           
+  def common_features(oven, e):     
+    status = return_status.UNHANDLED
+    if(e.signal == signals.Buzz):   
+      print("buzz")                 
+      oven.buzz()                   
+      status = return_status.HANDLED
+    else:                           
+      oven.temp.fun = oven.top      
+      status = return_status.SUPER  
+    return status                   
+
+5. **T** snaps back to **S**, ``toasting``, the event processor stops searching
+   and the RTC process is finished.
+
+Because the ``common_features`` state encloses all of the other states (all
+``else`` clauses lead to it), it can hook any ``Buzz`` event from any state.
+
+This is an example of **behavioral inheritance**.
+
 .. include:: i_navigation_4.rst
 
 .. _zero_to_one-can-you-relate-the-buzz-hook-to-the-story4:
 
 **Can you relate the buzz hook to the story?**
 
-.. include:: i_navigation_4.rst
+**T** represents Tara, the explorer spirit, in our story.
 
-.. _zero_to_one-why-don't-you-use-one-of-those-pattern-bubbles-to-describe-the-hook4:
+.. raw:: html
 
-**Why don't you use one of those pattern bubbles to describe the hook?**
+   <div class="story">
+   
+   <p><span class="story-intro">While Tara and Spike</span> were spending time together on an
+   upper terrace, someone from our world, put a "Buzz" event into their
+   universe's portal.
+   </p>
+
+   <p>
+   Theo, the god of their underworld (the statechart's thread), immediately notices
+   this and pulls the event out of his side of the portal. He casts his gaze up
+   into the sky to see Eve, the goddess of heaven (event processor). Eve awakens
+   and takes the event from Theo. She looks down on the earth until she sees Spike,
+   and beside him Tara.
+   </p>
+
+   <p>
+   Eve flies done to Tara and gives her the event. Eve says, "Tara, I want you
+   to go to the terrace where there is a bartender who knows what to do with
+   this event.  Then I want you to go to wherever he tells you to take it. Good
+   luck Tara, I believe in you."
+   </p>
+
+   <p>
+   Tara, upon seeing that there was no bartender named Buzz on her current
+   terrace, descends outward and downwards in the bar system.  She does this
+   until she is at the lowest bar on the earth, the common_feature.  There she
+   see's that there is a bartender named Buzz. she approaches him and asks if he
+   knows what to do with the event.   He says, "give me the event, I'll handle it,
+   don't worry about it anymore".
+   </p>
+
+   <p>
+   What Tara and the gods don't know is that Buzz is a member of a subversive
+   society called hack-the-humans.  He has some secret code which he will run
+   when he is activated by Tara's event and awakened from nonexistence by Theo's
+   attention.
+   </p>
+
+   <p>
+   He carefully pulls his code out of his jacket pocket so nobody can see what
+   he is doing, especially Eve, who he considers to be the worst kind of boss --
+   a micromanager. He runs "print("oven"); oven.buzz()", smiles, then destroys
+   the event.
+   </p>
+
+   <p>
+   Meanwhile, Tara has gone back up the terrace system to rejoin Spike.  He asks
+   her what happened (even though he knows already) and she tells him that the
+   bartender handled the event, to which he yells out "hook!" and is happy,
+   because he doesn't have to move.  Instead he orders another drink.
+   </p>
+
+   <p>
+   Theo, the solipsist, sees that the work is done.  He pulls his gaze from his
+   universe, freezing it into non-existence, and puts all of his attention back
+   onto the portal connecting him with you and me.
+   </p>
+   </div>
 
 .. include:: i_navigation_4.rst
 
@@ -3904,11 +4194,70 @@ Iteration 4 questions
 
 **The buzz seems like a pointless feature, what's going on?**
 
+In the next iteration we will tie the buzz event to a timer.  I'm trying to
+focus on hooks in isolation to make them easier to understand.
+
 .. include:: i_navigation_4.rst
 
-.. _zero_to_one-why-did-you-add-the-common_features-state,-and-why-does-it-enclose-everything4:
+.. _zero_to_one-are-entry-and-exit-events-hooks-too4:
 
-**Why did you add the common_features state, and why does it enclose everything?**
+**Are entry and exit events hooks too?**
+
+I can see why you asked this.  It looks like they are, doesn't it? 
+
+We can see this in the ``heating`` callback, which uses both an ENTRY_SIGNAL and
+an EXIT_SIGNAL:
+
+.. code-block:: python
+  :emphasize-lines: 4, 6, 7, 9, 13
+  :linenos:
+
+  @spy_on
+  def heating(oven, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      oven.heater_on()
+      status = return_status.HANDLED
+    elif(e.signal == signals.EXIT_SIGNAL):
+      oven.heater_off()
+      status = return_status.HANDLED
+    else:
+      oven.temp.fun = door_closed
+      status = return_status.SUPER
+    return status
+
+We see that the ``ENTRY_SIGNAL`` is caught by the if statement on line 4 and the
+status is set to ``return_status.HANDLED``.  Likewise the ``EXIT_SIGNAL`` is
+caught by line 7 and the status is set to ``return_status.HANDLED`` on line 9.
+
+And this looks the same as our hook in the ``common_features`` callback: 
+
+.. code-block:: python
+  :emphasize-lines: 4, 7
+  :linenos:
+
+  @spy_on                           
+  def common_features(oven, e):     
+    status = return_status.UNHANDLED
+    if(e.signal == signals.Buzz):   
+      print("buzz")                 
+      oven.buzz()                   
+      status = return_status.HANDLED
+    else:                           
+      oven.temp.fun = oven.top      
+      status = return_status.SUPER  
+    return status                   
+
+So are the entry and exit events hooks?  
+
+No, they aren't.  If you don't include the ``ENTRY_SIGNAL`` or ``EXIT_SIGNAL``
+catches in the ``if-elif`` logical structure of your callback, the entry and
+exit events will not propagate outward to be handled by some super state;
+instead, these events will just be ignored.
+
+If this weren't the case, you would have to include the ``ENTRY_SIGNAL``,
+``EXIT_SIGNAL``, not to mention the ``INIT_SIGNAL`` in every single callback in
+your design.  That would be annoying.
 
 .. include:: i_navigation_4.rst
 
@@ -3916,11 +4265,99 @@ Iteration 4 questions
 
 **Why are you showing two classes on the diagram?**
 
+There are two classes on the diagram to show how we can test our design.
+
+We would like to test the code that is specific for the hardware, on that
+hardware and we would like to be able to test the statechart's statemachine
+anywhere where Python can run.
+
+.. image:: _static/ToasterOven_4.svg
+   :target: _static/ToasterOven_4.pdf
+   :align: center
+
+The ToasterOvenMock class is used to confirm that our statechart is working, and
+it can be run anywhere where Python can run, you can see the test code that
+confirms our design is working :ref:`here <iter4_proof_code>`.
+
+The ToasterOven object would run on the hardware.  The ``buzz``, ``light_on``,
+``light_off``, ``heater_on`` and ``heater_off`` methods of this ToasterOven
+object would call the hardware abstraction layer to make the hardware work the
+way it needs to work.
+
+.. include:: i_navigation_4.rst
+
+.. _zero_to_one-what-is-a-hardware-abstraction-layer4:
+
+**What is a hardware abstraction layer?**
+
+The hardware abstraction layer (HAL) is code that separates your software from
+the hardware it runs on.
+
+If we were building a real toaster oven, the code would run on a processor
+inside of the toaster oven.  If you were making a toaster oven using the
+Raspberry Pi 3, this processor would be a quad-core ARM Cortext-A53 CPU.  Any
+code running inside of a CPU that is shipped with the product, is called
+embedded code, because it's embedded in the processor which is embedded in a
+product.
+
+Typically embedded projects, put a layer of software between the code that
+provides the features that their customer's want from the code that is needed to
+drive the CPU to do what it needs. This software acts as a buttress against the
+hardware. It doesn't take a lot of effort to build, and it acts as cheap
+insurance for your company. But why would you want to protect your software from
+your CPU?  It's not the CPU you have to worry about, it's the price of the CPU
+that you have to worry about.
+
+Suppose that Larry Ellison, the guy currently `shaking down
+<https://en.wikipedia.org/wiki/Extortion>`_ the Java ecosystem, finds out that a
+lot of products have been built using the Raspberry Pi.  He discovers companies
+like using the Raspberry Pi, because it is cheap, has a nice stable version of
+Linux and is easy to use.  Smelling an opportunity, he buys up the Raspberry Pi
+foundation and immediately cranks up the price of the part from $35 to $500.
+
+If we wrote our embedded code using a hardware abstraction layer, we could
+quickly port our code over to the BeagleBoard-X15, which has an ARM Cortext-At15
+CPU and is also $35.  Sure, it would cost us a bit of money to switch our
+hardware and re-write the hardware drivers and part of the HAL, but we would
+rather do that than lose $465 per unit.
+
+.. image:: _static/HAL.svg
+  :target: _static/HAL.pdf
+  :align: center
+
 .. include:: i_navigation_4.rst
 
 .. _zero_to_one-where-is-the-hardware-abstraction-layer-you-listed-in-your-title4:
 
-**Where is the hardware abstraction layer you listed in your title?**
+**Where is the hardware abstraction you listed in your title?**
+
+In our design we present two different classes and an HSM.
+
+.. image:: _static/ToasterOven_4.svg
+   :target: _static/ToasterOven_4.pdf
+   :align: center
+
+The purpose of the ToasterOvenMock class is to give us the ability to watch how
+our statemachine would call out to the HAL as it reacts to different events.
+
+.. image:: _static/ToasterOven_4_With_HAL.svg
+   :target: _static/ToasterOven_4_With_HAL.pdf
+   :align: center
+
+The ToasterOvenMock object calls out to the ``spy`` instrumentation, which acts
+as a fake HAL. This fake HAL can be queried by our test code, to see if a call
+to the hardware was made when we needed it to be made.
+
+The ToasterOvenMock object can be tested on your development machine, or on a
+continual integration server.  Once its statemachine has been proven to work,
+you can confidently attach it to the ToasterOven object running on the computer
+embedded in your product.
+
+So, the hardware abstraction described in the title of this iteration, is
+provided by the ToasterOvenMock and the code used to test it.  Once you prove
+that the statemachine reacts to events as you expect it to, and it makes the
+correct hardware calls when you expect it to, you have proven that you can drop
+it into your product and it will work as designed.
 
 .. include:: i_navigation_4.rst
 
