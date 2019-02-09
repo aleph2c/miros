@@ -1148,7 +1148,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       # fn is _print_trace_if_live
       result = fn(self, initial_state)
       if self.instrumented and self.live_spy:
-        for line in self.rtc.spy:
+        for line in self.rtc.spy.copy():
           self.live_spy_callback(line)
       return result
     return _print_spy_if_live
