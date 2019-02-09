@@ -3511,7 +3511,7 @@ When Tara asks him for directions he whispers his answer in her ear.
 
 .. _iter4:
 
-Iteration 4: hook and hardware abstraction
+Iteration 4: hook, testing and hardware abstraction
 ------------------------------------------
 So far we have built a very basic toaster oven using a statechart.
 
@@ -3877,12 +3877,10 @@ Iteration 4 questions
 * :ref:`What is a hardware abstraction layer? <zero_to_one-what-is-a-hardware-abstraction-layer4>`
 * :ref:`Where is the hardware abstraction you listed in your title? <zero_to_one-where-is-the-hardware-abstraction-layer-you-listed-in-your-title4>`
 * :ref:`Why do you break the transition-tests apart from the other tests? <zero_to_one-in-your-tests,-why-do-you-break-transition-tests-apart-from-calls-to-light_on,-light_off-and-so-on4>` 
-* :ref:`What does scribble do and why do you have it in one class and not the other one? <zero_to_one-what-does-scribble-do-and-why-do-you-have-it-in-one-class-and-not-the-other-one4>`
 * :ref:`Why don't you just copy out your spy output and use it as the test target? <zero_to_one-why-don't-you-just-copy-out-your-spy-output-and-use-it-as-the-test-target4>`
 * :ref:`Where did you get your trace-test-target, and what is going on with that stripped call? <zero_to_one-where-did-you-get-your-trace-test-target,-and-what-is-going-on-with-that-stripped-call4>`
 * :ref:`Why don't you just copy out your trace output and use it as a test target? <zero_to_one-why-don't-you-just-copy-out-your-trace-output-and-use-it-as-a-test-target4>`
 * :ref:`Your light_on, light_off ... tests seem pretty light, are you sure you are testing these features? <zero_to_one-your-light_on,-light_off-...-tests-seem-pretty-light,-are-you-sure-you-are-testing-these-features4>`
-* :ref:`Can you really say you proved that the software works? <zero_to_one-can-you-really-say-you-proved-that-the-software-works4>`
 
 .. _zero_to_one-can-you-explain-how-the-unit-can-buzz-from-any-state4:
 
@@ -4194,8 +4192,8 @@ This is an example of **behavioral inheritance**.
 
 **The buzz seems like a pointless feature, what's going on?**
 
-In the next iteration we will tie the buzz event to a timer.  I'm trying to
-focus on hooks in isolation to make them easier to understand.
+In the next iteration we will tie the buzz event to a timer.  In this iteration
+I'm trying to focus on hooks in isolation to make them easier to understand.
 
 .. include:: i_navigation_4.rst
 
@@ -4279,10 +4277,9 @@ The ToasterOvenMock class is used to confirm that our statechart is working, and
 it can be run anywhere where Python can run, you can see the test code that
 confirms our design is working :ref:`here <iter4_proof_code>`.
 
-The ToasterOven object would run on the hardware.  The ``buzz``, ``light_on``,
-``light_off``, ``heater_on`` and ``heater_off`` methods of this ToasterOven
-object would call the hardware abstraction layer to make the hardware work the
-way it needs to work.
+The ToasterOven object would run on the computer inside of our toaster oven.
+The ``buzz``, ``light_on``, ``light_off``, ``heater_on`` and ``heater_off``
+methods of this ToasterOven object would call out to hardware abstraction layer.
 
 .. include:: i_navigation_4.rst
 
@@ -4354,16 +4351,7 @@ you can confidently attach it to the ToasterOven object running on the computer
 embedded in your product.
 
 So, the hardware abstraction described in the title of this iteration, is
-provided by the ToasterOvenMock and the code used to test it.  Once you prove
-that the statemachine reacts to events as you expect it to, and it makes the
-correct hardware calls when you expect it to, you have proven that you can drop
-it into your product and it will work as designed.
-
-.. include:: i_navigation_4.rst
-
-.. _zero_to_one-what-does-scribble-do-and-why-do-you-have-it-in-one-class-and-not-the-other-one4:
-
-**What does scribble do and why do you have it in one class and not the other one?**
+provided by the ToasterOvenMock and the code used to test it.
 
 .. include:: i_navigation_4.rst
 
@@ -4371,11 +4359,75 @@ it into your product and it will work as designed.
 
 **Why do you break the transition-tests apart from the other tests?**
 
+The transition-tests confirm that we can transition between all of the different parts of the state machine:
+
+.. code-block:: python
+
+  from miros import stripped
+
+  # test helper functions
+  def trace_through_all_states():
+    oven = ToasterOvenMock(name="oven")
+    oven.start_at(door_closed)
+    # Open the door
+    oven.post_fifo(Event(signal=signals.Door_Open))
+    # Close the door
+    oven.post_fifo(Event(signal=signals.Door_Close))
+    # Bake something
+    oven.post_fifo(Event(signal=signals.Baking))
+    # Open the door
+    oven.post_fifo(Event(signal=signals.Door_Open))
+    # Close the door
+    oven.post_fifo(Event(signal=signals.Door_Close))
+    # Toast something
+    oven.post_fifo(Event(signal=signals.Toasting))
+    # Open the door
+    oven.post_fifo(Event(signal=signals.Door_Open))
+    # Close the door
+    oven.post_fifo(Event(signal=signals.Door_Close))
+    time.sleep(0.01)
+    return oven.trace()
+
+  # Confirm our state transitions work as designed
+  trace_target = """
+  [2019-02-04 06:37:04.538413] [oven] e->start_at() top->off
+  [2019-02-04 06:37:04.540290] [oven] e->Door_Open() off->door_open
+  [2019-02-04 06:37:04.540534] [oven] e->Door_Close() door_open->off
+  [2019-02-04 06:37:04.540825] [oven] e->Baking() off->baking
+  [2019-02-04 06:37:04.541109] [oven] e->Door_Open() baking->door_open
+  [2019-02-04 06:37:04.541393] [oven] e->Door_Close() door_open->baking
+  [2019-02-04 06:37:04.541751] [oven] e->Toasting() baking->toasting
+  [2019-02-04 06:37:04.542083] [oven] e->Door_Open() toasting->door_open
+  [2019-02-04 06:37:04.542346] [oven] e->Door_Close() door_open->toasting
+  """
+
+  with stripped(trace_target) as stripped_target, \
+       stripped(trace_through_all_states()) as stripped_trace_result:
+
+    for target, result in zip(stripped_target, stripped_trace_result):
+      assert(target == result)
+
+They test the statemachine's graphical structure, using the ``trace``
+instrumentation.
+
+They don't test the statemachine's hooks or the use of the ToasterOven's methods.
+
+The are pulled out from the other tests, that use the ``spy`` instrumentation to
+keep the test code organized into two different ways of thinking:
+
+1. Is the graph working?
+2. Is the statechart making the correct calls to the ToasterOven class when they
+   need to be made?
+
 .. include:: i_navigation_4.rst
 
 .. _zero_to_one-why-don't-you-just-copy-out-your-spy-output-and-use-it-as-the-test-target4:
 
 **Why don't you just copy out your spy output and use it as the test target?**
+
+You could do this, but then your tests would be testing the event processor too.
+I'm trying to show how you can test your code so that it is just coupled to your
+design and not to the design of the miros library.  
 
 .. include:: i_navigation_4.rst
 
@@ -4383,11 +4435,67 @@ it into your product and it will work as designed.
 
 **Where did you get your trace-test-target, and what is going on with that stripped call?**
 
+I got the trace-test-target by running a live trace on the code. I visually
+inspected it and convinced myself that it was working.
+
+The ``stripped`` context manager pulls the time stamp off the front of the trace
+strings.  Once you get rid of the timestamps you can compare a new trace output
+against and old trace output:
+
+.. code-block:: python
+
+  from miros import stripped
+
+  # test helper functions
+  def trace_through_all_states():
+    oven = ToasterOvenMock(name="oven")
+    oven.start_at(door_closed)
+    # Open the door
+    oven.post_fifo(Event(signal=signals.Door_Open))
+    # Close the door
+    oven.post_fifo(Event(signal=signals.Door_Close))
+    # Bake something
+    oven.post_fifo(Event(signal=signals.Baking))
+    # Open the door
+    oven.post_fifo(Event(signal=signals.Door_Open))
+    # Close the door
+    oven.post_fifo(Event(signal=signals.Door_Close))
+    # Toast something
+    oven.post_fifo(Event(signal=signals.Toasting))
+    # Open the door
+    oven.post_fifo(Event(signal=signals.Door_Open))
+    # Close the door
+    oven.post_fifo(Event(signal=signals.Door_Close))
+    time.sleep(0.01)
+    return oven.trace()
+
+  # Confirm our state transitions work as designed
+  trace_target = """
+  [2019-02-04 06:37:04.538413] [oven] e->start_at() top->off
+  [2019-02-04 06:37:04.540290] [oven] e->Door_Open() off->door_open
+  [2019-02-04 06:37:04.540534] [oven] e->Door_Close() door_open->off
+  [2019-02-04 06:37:04.540825] [oven] e->Baking() off->baking
+  [2019-02-04 06:37:04.541109] [oven] e->Door_Open() baking->door_open
+  [2019-02-04 06:37:04.541393] [oven] e->Door_Close() door_open->baking
+  [2019-02-04 06:37:04.541751] [oven] e->Toasting() baking->toasting
+  [2019-02-04 06:37:04.542083] [oven] e->Door_Open() toasting->door_open
+  [2019-02-04 06:37:04.542346] [oven] e->Door_Close() door_open->toasting
+  """
+
+  with stripped(trace_target) as stripped_target, \
+       stripped(trace_through_all_states()) as stripped_trace_result:
+
+    for target, result in zip(stripped_target, stripped_trace_result):
+      assert(target == result)
+
+
 .. include:: i_navigation_4.rst
 
 .. _zero_to_one-why-don't-you-just-copy-out-your-trace-output-and-use-it-as-a-test-target4:
 
 **Why don't you just copy out your trace output and use it as a test target?**
+
+The timestamps wouldn't match, so your tests would always fail.
 
 .. include:: i_navigation_4.rst
 
@@ -4395,11 +4503,84 @@ it into your product and it will work as designed.
 
 **Your light_on, light_off ... tests seem pretty light, are you sure you are testing these features?**
 
-.. include:: i_navigation_4.rst
+Let's break down one of these tests, while looking at the toaster oven design:
 
-.. _zero_to_one-can-you-really-say-you-proved-that-the-software-works4:
+.. image:: _static/ToasterOven.svg
+   :target: _static/ToasterOven.pdf
+   :align: center
 
-**Can you really say you proved that the software works?**
+Suppose we want to test that the heater will turn on when we toast or bake
+something.  Let's toast something, and run a test:
+
+.. code-block:: python
+  :emphasize-lines: 14
+  :linenos:
+
+  import re
+
+  # make an oven and put it into a heating state
+  def spy_on_heater_on():
+    oven = ToasterOvenMock(name="oven")
+    # The light should be turned off when we start
+    oven.start_at(door_closed)
+    oven.post_fifo(Event(signal=signals.Toasting))
+    time.sleep(0.01)
+    # turn our array into a paragraph
+    return "\n".join(oven.spy())
+  
+  # Confirm the heater turns on in a heating state
+  assert re.search(r'heater_on', spy_on_heater_on())
+
+The highlighted code matches the ``heater_on`` string against the output of the
+``spy_on_heater_on`` test helper.  If this helper function weren't a part of the
+``assert`` statement, it would have outputted this string:
+
+.. code-block:: python
+  :emphasize-lines: 19
+  :linenos:
+
+  START
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  SEARCH_FOR_SUPER_SIGNAL:common_features
+  ENTRY_SIGNAL:common_features
+  ENTRY_SIGNAL:door_closed
+  light_off
+  INIT_SIGNAL:door_closed
+  SEARCH_FOR_SUPER_SIGNAL:off
+  ENTRY_SIGNAL:off
+  INIT_SIGNAL:off
+  <- Queued:(0) Deferred:(0)
+  Toasting:off
+  Toasting:door_closed
+  EXIT_SIGNAL:off
+  SEARCH_FOR_SUPER_SIGNAL:toasting
+  SEARCH_FOR_SUPER_SIGNAL:door_closed
+  SEARCH_FOR_SUPER_SIGNAL:heating
+  ENTRY_SIGNAL:heating
+  heater_on
+  ENTRY_SIGNAL:toasting
+  INIT_SIGNAL:toasting
+  <- Queued:(0) Deferred:(0)
+
+So our test code: ``assert re.search(r'heater_on', spy_on_heater_on())``, just
+searches through a bunch of lines from our spy instrumentation and returns
+``True`` if it sees, ``heater_on``, which it does, so the test passes.
+
+Should we now start our test again and send our statechart a `Bake`` event?  No,
+that would be a waste of time.  We tested that our transitions worked, so the
+graph is correct: Bake is inside of Heating.  We tested that the entry condition
+of the heating state calls out to our ``heater_on()`` code in the ToasterOvenMock, the
+formalism of the Harel statecharts says if it happens for one thing inside of a
+state, it will happen for all things inside that state.
+
+We are done testing this thing.
+
+The ``light_on``, ``light_off``, ``heater_off`` and ``buzz`` tests follow a very similar pattern.
+
+It is important to note that statecharts pack a lot of feature complexity into a
+very small amount of code.  If you over-test your statecharts, your test code
+will quickly balloon in size.  So use the statechart formalism to keep your test
+suites under control.
 
 .. include:: i_navigation_4.rst
 
