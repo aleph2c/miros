@@ -4586,8 +4586,8 @@ suites under control.
 
 .. _iter5:
 
-Iteration 5: one-shots
-----------------------
+Iteration 5: time and one-shots
+-------------------------------
 Now we have two different software artifacts, the production code from which we
 can make our toaster oven and some test code we can use to verify its
 state machine.
@@ -5132,7 +5132,187 @@ Calling our test helper functions to prove our design works:
 .. _iter5_questions:
 
 Iteration 5 questions
-"""""""""""""""""
+"""""""""""""""""""""
+* :ref:`What happens if they don't take out there food after a buzz rings? <zero_to_one-what-happens-if-they-don't-take-out-there-food-after-a-buzz-rings5>`
+* :ref:`What is a one shot? <zero_to_one-what-is-a-one-shot5>`
+* :ref:`How does a one shot work? <zero_to_one-how-does-a-one-shot-work5>`
+* :ref:`Why do you cancel the events in the exit states? <zero_to_one-why-do-you-cancel-the-events-in-the-exit-states5>`
+* :ref:`Can you relate a one shot to the story? <zero_to_one-can-you-relate-a-one-shot-to-the-story5>`
+* :ref:`What is the remind pattern? <zero_to_one-what-is-the-remind-pattern5>`
+* :ref:`Why did you turn ToasterOvenMock into a subclass of ToasterOven? <zero_to_one-why-did-you-turn-toasterovenmock-into-a-subclass-of-toasteroven5>`
+* :ref:`Why do you have docstrings in the test code and not elsewhere? <zero_to_one-why-do-you-have-docstrings-in-the-test-code-and-not-elsewhere5>`
+* :ref:`What is jitter? <zero_to_one-what-is-jitter5>`
+* :ref:`Why is your tolernance of jitter so high? <zero_to_one-why-is-your-tolernance-of-jitter-so-high5>`
+* :ref:`How can I reduce the jitter? <zero_to_one-how-can-i-reduce-the-jitter5>`
+* :ref:`Do you test things they way you are describing them here? <zero_to_one-do-you-test-things-they-way-you-are-describing-them-here5>`
+
+.. _zero_to_one-what-happens-if-they-don't-take-out-there-food-after-a-buzz-rings5:
+
+**What happens if they don't take out there food after a buzz rings?**
+
+It would not stop cooking.  This will be fixed in the next iteration.
+
+.. include:: i_navigation_5.rst
+
+.. _zero_to_one-what-is-a-one-shot5:
+
+**What is a one shot?**
+
+It is the code that issues an event to the statechart at a predetermined time in
+the future.
+
+Here is an example, when the following code is run, a ``Buzz`` event will be
+sent to the statechart in 10 seconds:
+
+.. code-block:: python
+
+  # send an Buzz event to this chart, 10 seconds from now
+  oven.post_fifo(
+    Event(signal=signal.Buzz),
+    times=1,
+    period=10.0,
+    deferred=True)
+
+An event which is issued by a one shot looks just like any other event that has
+been received from outside of the statechart.  Our design already accomodates
+Buzz events, they are handled by the ``common_features`` state.  
+
+.. include:: i_navigation_5.rst
+
+.. _zero_to_one-how-does-a-one-shot-work5:
+
+**How does a one shot work?**
+
+Any ``post_fifo`` or ``post_lifo`` call with the ``period`` argument set, spawns
+another python daemonic-thread with an internal timer.  It will issue as many
+events as indicated by the ``times`` argument; when it has completed its work,
+the thread will stop running and python will garbage collect it.
+
+.. note::
+
+  If the ``times`` argument is set to zero, the ``post_fifo`` or ``post_lifo``
+  will continue to post events until the program is stopped.
+
+.. include:: i_navigation_5.rst
+
+.. _zero_to_one-why-do-you-cancel-the-events-in-the-exit-states5:
+
+**Why do you cancel the events in the exit states?**
+
+The one-shot only makes sense when it is issued from the state it is constructed
+within.  If you leave this state, you should cancel your one-shot. Otherwise,
+your diagram will no longer act as a map from which you can understand your
+design.
+
+I'll illustrate this with an example.  Suppose we didn't cancel our one-shot
+events upon leaving either the baking or toasting events.
+
+Imagine that we toast something for 5 seconds, open the door, close the door,
+then immediately press the bake button.
+
+5 seconds after this moment we would hear a buzz, then 10 seconds after that,
+then 20 seconds after that.
+
+It's confusing, because the threads that have been initiated, which will post
+events back to the design know nothing about the state of our design, they just
+do what they are told.  
+
+However, if you cancel your one-shot upon exiting the state from which they were
+created, you will avoid these strange behaviours.  When you look at the baking
+or toasting states, you will know that if the unit remains in these states for
+their respective one-shot times, the oven will behave as you expect it to.  
+
+Let's reimagine our scenario with the one-shot cancellations in the exit states
+of baking and toasting.  We toast something for 5 seconds, open the door, close
+the door, then immediately press the bake button.  The buzzer will sound in 20
+seconds.
+
+.. include:: i_navigation_5.rst
+
+.. _zero_to_one-can-you-relate-a-one-shot-to-the-story5:
+
+**Can you relate a one shot to the story?**
+
+One-shot triggers and their cancellations can be initiated by any human when
+they talk to Spike or Tara.
+
+The one shot is a kind of event gun (``post_fifo`` or ``post_lifo``) which
+invents a small universe then tears a portal into it.  Through this portal, an
+event is placed in suspension for a given amount of time relative to our
+universe (a statechart has no such time dimension).  The portal closes and the
+universe (holding the event) persists for the duration of time specified by the
+period argument.  Once this time has elapsed, the event attaches itself into the
+portal that Theo is watching and the temporary universe is destroyed.
+ 
+When Theo receives such an event he marvels at it, believing that it came from
+some other universe, which is true, but he has no idea that it was initiated by
+one of the humans in his own domain.  He treats it as he would any other event.
+
+If the one shot was initiated using a ``post_fifo`` call, the event
+will be placed at the last location available in the deque.  
+
+.. image:: _static/ToasterOven_5_Theo_1.svg
+  :target: _static/ToasterOven_5_Theo_1.pdf
+  :align: center
+
+If the one shot was initiated by a ``post_lifo`` call, the event
+will barge its way to the front of the deque, shifting all other items to the
+right by one.  Such a call will put the event immediately in front of Theo once
+its time has elapsed.
+
+.. image:: _static/ToasterOven_5_Theo_2.svg
+  :target: _static/ToasterOven_5_Theo_2.pdf
+  :align: center
+
+``cancel_events`` can be thought of as a gun that shoots bullets that destroys
+bullets shot by other guns.  A call to ``cancel_events`` will tear into the
+great beyond, looking for all of the one-shots that haven't timeout out yet.  If
+the event name of the one shot matches that which was fed to the
+``cancel_events`` call, that universe is annihilated before it's event can be
+presented Theo.
+
+.. include:: i_navigation_5.rst
+
+.. _zero_to_one-what-is-the-remind-pattern5:
+
+**What is the remind pattern?**
+
+.. include:: i_navigation_5.rst
+
+.. _zero_to_one-why-did-you-turn-toasterovenmock-into-a-subclass-of-toasteroven5:
+
+**Why did you turn ToasterOvenMock into a subclass of ToasterOven?**
+
+.. include:: i_navigation_5.rst
+
+.. _zero_to_one-why-do-you-have-docstrings-in-the-test-code-and-not-elsewhere5:
+
+**Why do you have docstrings in the test code and not elsewhere?**
+
+.. include:: i_navigation_5.rst
+
+
+.. _zero_to_one-what-is-jitter5:
+
+**What is jitter?**
+
+.. include:: i_navigation_5.rst
+
+.. _zero_to_one-why-is-your-tolernance-of-jitter-so-high5:
+
+**Why is your tolernance of jitter so high?**
+
+.. include:: i_navigation_5.rst
+
+.. _zero_to_one-how-can-i-reduce-the-jitter5:
+
+**How can I reduce the jitter?**
+
+.. include:: i_navigation_5.rst
+
+.. _zero_to_one-do-you-test-things-they-way-you-are-describing-them-here5:
+
+**Do you test things they way you are describing them here?**
 
 .. include:: i_navigation_5.rst
 
