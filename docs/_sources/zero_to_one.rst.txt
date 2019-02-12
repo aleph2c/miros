@@ -5144,7 +5144,8 @@ Iteration 5 questions
 * :ref:`What is jitter? <zero_to_one-what-is-jitter5>`
 * :ref:`Why is your tolernance of jitter so high? <zero_to_one-why-is-your-tolernance-of-jitter-so-high5>`
 * :ref:`How can I reduce the jitter? <zero_to_one-how-can-i-reduce-the-jitter5>`
-* :ref:`Do you test things the way you are describing them here? <zero_to_one-do-you-test-things-they-way-you-are-describing-them-here5>`
+* :ref:`Do you test all of your designs with such rigor? <zero_to_one-do-you-test-all-of-your-designs-with-such-rigor5>`
+
 
 .. _zero_to_one-what-happens-if-they-don't-take-out-there-food-after-a-buzz-rings5:
 
@@ -5266,7 +5267,7 @@ its time has elapsed.
 
 ``cancel_events`` can be thought of as a gun that shoots bullets that destroys
 bullets shot by other guns.  A call to ``cancel_events`` will tear into the
-great beyond, looking for all of the one-shots that haven't timeout out yet.  If
+great beyond, looking for all of the one-shots that haven't timed-out yet.  If
 the event name of the one shot matches that which was fed to the
 ``cancel_events`` call, that universe is annihilated before it's event can be
 presented Theo.
@@ -5304,12 +5305,10 @@ automatically.
 **Why do you have docstrings in the test code and not elsewhere?**
 
 I found the testing code a bit confusing so I added some documentation.  You can
-see that I use some reStructuredText in my Docstring which adds some clutter.  I
-don't remember how to use reStructuredText; I have a snippet write it for me so
-that I can follow a documentation convention.
+see that I use some reStructuredText in my Docstring which adds some clutter.
 
-When a docstring written in this manner is parsed and turned into html it will
-produce a document that looks like `this
+When docstrings are written in this manner, then parsed and turned into
+html, they will produce a document that looks like `this
 <https://aleph2c.github.io/spaced/repetition.html#module-repetition>`_
 
 .. include:: i_navigation_5.rst
@@ -5346,7 +5345,7 @@ Cpython interpreter using Json over the ZeroMQ messaging protocol.
 
 The ``miros`` library uses Python threads, which is to say a single python
 thread.  To avoid concurrency problems -- deadlocks, priority-inversion etc,
-python uses something called the global interpreter lock.
+python uses something called the global interpreter lock (GIL).
 
 As a python programmer using Threads I really don't get to have access to the
 precise time features offered by my computer; especially if I am running code in
@@ -5362,7 +5361,7 @@ If you need tight time tolerances consider using the `qp framework
 **How can I reduce the jitter?**
 
 Well, don't run your program in Jupyter for one.  Consider using the `qp framework
-<https://www.state-machine.com/>`_.
+<https://www.state-machine.com/>`_. 
 
 In our design, we don't really care about the 2-5 ms latency, because it is
 0.02%-0.05% of the 10 second delay, and 0.01%-0.025% percent of the 20 second
@@ -5373,31 +5372,29 @@ toaster oven buzz.
 
 .. include:: i_navigation_5.rst
 
-.. _zero_to_one-do-you-test-things-they-way-you-are-describing-them-here5:
+.. _zero_to_one-do-you-test-all-of-your-designs-with-such-rigor5:
 
-**Do you test things the way you are describing them here?**
+**Do you test all of your designs with such rigor?**
 
-No, to be perfectly honest, in practice I run my code on the target with the
-``live_spy`` and ``live_trace`` enabled.   I inspect the output of the instrumentation
-and if happy, turn off the instrumentation and continue developing.
+No.  I typically use the instrumentation to verify my design.  I inspect the
+output and if I am happy with the results, continue development.
 
-However, knowing that the software community requires testing I wanted to tackle
-this here.  
+However, I wanted to demonstrate how to verify a design if it is an essential
+part of your software process.  It was a useful exercise for me.
 
-Statecharts are very good at packing feature complexity, so it should be of no
-surprise if the code required to completely test them because significantly
-longer and at least as hard to explain as the statechart itself.
+Statecharts pack a lot of complexity, so don't be surprised if your testing code
+become significantly longer than your production code, and much harder to
+explain than the designs they are intended to test.
 
 .. include:: i_navigation_5.rst
 
 .. _iter6:
 
-Iteration 6: adding cook times
-------------------------------
+Iteration 6: Turning off the Oven when the Cooking is Done
+-----------------------------------------------------------
 
-Though our customer's don't care that our oven doesn't actually heat anything
-for real (they don't want this), they have asked that the toasting and baking
-states at least pretend to have different cooking durations.
+Here we will wrap up our simple example by turning off the oven when the food
+has finished cooking.
 
 .. include:: i_navigation_6.rst
 
@@ -5408,12 +5405,27 @@ Iteration 6 specification
 
 Iteration 6 specification:
 
-* The toaster oven should stay in the baking state for twenty seconds, then buzz
-  and turn off.
-* The toaster oven should stay in the toasting state for ten seconds, then buzz
-  and turn off.
-* If the door is opened, then closed, the cooking time should be set back to
-  it's default time of ten or twenty seconds.
+The toaster oven spec:
+
+* The toaster oven will have an oven light, which can be turned on and off.
+* The toaster oven will have a heater, which can be turned on and off.
+* It will have two different heating modes, baking which can bake a potato
+  and toasting which can toast some bread.
+* The toaster oven should start in the off state.
+* The toaster can only heat when the door is closed.
+* The toaster's light should be off when the door is closed.
+* The toaster should turn on its light when the door is opened
+* A customer should be able to open and close the door of our toaster oven
+* When a customer closes the door, the toaster oven should go back to behaving
+  like it did before.
+* While the toaster oven is in any state the customer should be able to press a
+  buzzer which will get the attention of anyone nearby.
+* :dead_spec:`The buzzer will sound 20 seconds after a Baking event`
+* :dead_spec:`The buzzer will sound 10 seconds after a Toasting event`
+* :new_spec:`The buzzer will sound 20 seconds after a Baking event and the oven
+  will turn off`
+* :new_spec:`The buzzer will sound 10 seconds after a Toasting event and the
+  oven will turn off`
 
 .. _iter6_design:
 

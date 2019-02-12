@@ -5638,7 +5638,7 @@ buzzer which will get the attention of anyone nearby.</span></li>
 <li><a class="reference internal" href="#zero-to-one-what-is-jitter5"><span class="std std-ref">What is jitter?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-why-is-your-tolernance-of-jitter-so-high5"><span class="std std-ref">Why is your tolernance of jitter so high?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-how-can-i-reduce-the-jitter5"><span class="std std-ref">How can I reduce the jitter?</span></a></li>
-<li><a class="reference internal" href="#zero-to-one-do-you-test-things-they-way-you-are-describing-them-here5"><span class="std std-ref">Do you test things the way you are describing them here?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-do-you-test-all-of-your-designs-with-such-rigor5"><span class="std std-ref">Do you test all of your designs with such rigor?</span></a></li>
 </ul>
 <p id="zero-to-one-what-happens-if-they-don-t-take-out-there-food-after-a-buzz-rings5"><strong>What happens if they don’t take out there food after a buzz rings?</strong></p>
 <p>The toaster oven would continue to cook.  This will be fixed in the next iteration.</p>
@@ -5743,7 +5743,7 @@ its time has elapsed.</p>
 </a>
 <p><code class="docutils literal notranslate"><span class="pre">cancel_events</span></code> can be thought of as a gun that shoots bullets that destroys
 bullets shot by other guns.  A call to <code class="docutils literal notranslate"><span class="pre">cancel_events</span></code> will tear into the
-great beyond, looking for all of the one-shots that haven’t timeout out yet.  If
+great beyond, looking for all of the one-shots that haven’t timed-out yet.  If
 the event name of the one shot matches that which was fed to the
 <code class="docutils literal notranslate"><span class="pre">cancel_events</span></code> call, that universe is annihilated before it’s event can be
 presented Theo.</p>
@@ -5782,11 +5782,9 @@ automatically.</p>
 <a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-why-do-you-have-docstrings-in-the-test-code-and-not-elsewhere5"><strong>Why do you have docstrings in the test code and not elsewhere?</strong></p>
 <p>I found the testing code a bit confusing so I added some documentation.  You can
-see that I use some reStructuredText in my Docstring which adds some clutter.  I
-don’t remember how to use reStructuredText; I have a snippet write it for me so
-that I can follow a documentation convention.</p>
-<p>When a docstring written in this manner is parsed and turned into html it will
-produce a document that looks like <a class="reference external" href="https://aleph2c.github.io/spaced/repetition.html#module-repetition">this</a></p>
+see that I use some reStructuredText in my Docstring which adds some clutter.</p>
+<p>When docstrings are written in this manner, then parsed and turned into
+html, they will produce a document that looks like <a class="reference external" href="https://aleph2c.github.io/spaced/repetition.html#module-repetition">this</a></p>
 <a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
@@ -5820,7 +5818,7 @@ Windows Linux Subsystem.  The Jupyter web interface communicates with the
 Cpython interpreter using Json over the ZeroMQ messaging protocol.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">miros</span></code> library uses Python threads, which is to say a single python
 thread.  To avoid concurrency problems – deadlocks, priority-inversion etc,
-python uses something called the global interpreter lock.</p>
+python uses something called the global interpreter lock (GIL).</p>
 <p>As a python programmer using Threads I really don’t get to have access to the
 precise time features offered by my computer; especially if I am running code in
 Jupyter.</p>
@@ -5846,15 +5844,14 @@ toaster oven buzz.</p>
 <a class="reference internal" href="zero_to_one.html#iter5-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="zero-to-one-do-you-test-things-they-way-you-are-describing-them-here5"><strong>Do you test things the way you are describing them here?</strong></p>
-<p>No, to be perfectly honest, in practice I run my code on the target with the
-<code class="docutils literal notranslate"><span class="pre">live_spy</span></code> and <code class="docutils literal notranslate"><span class="pre">live_trace</span></code> enabled.   I inspect the output of the instrumentation
-and if happy, turn off the instrumentation and continue developing.</p>
-<p>However, knowing that the software community requires testing I wanted to tackle
-this here.</p>
-<p>Statecharts are very good at packing feature complexity, so it should be of no
-surprise if the code required to completely test them because significantly
-longer and at least as hard to explain as the statechart itself.</p>
+<p id="zero-to-one-do-you-test-all-of-your-designs-with-such-rigor5"><strong>Do you test all of your designs with such rigor?</strong></p>
+<p>No.  I typically use the instrumentation to verify my design.  I inspect the
+output and if I am happy with the results, continue development.</p>
+<p>However, I wanted to demonstrate how to verify a design if it is an essential
+part of your software process.  It was a useful exercise for me.</p>
+<p>Statecharts pack a lot of complexity, so don’t be surprised if your testing code
+become significantly longer than your production code, and much harder to
+explain than the designs they are intended to test.</p>
 <a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
@@ -5864,11 +5861,10 @@ longer and at least as hard to explain as the statechart itself.</p>
 <a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
 </div>
 </div>
-<div class="section" id="iteration-6-adding-cook-times">
-<span id="iter6"></span><h3>Iteration 6: adding cook times<a class="headerlink" href="#iteration-6-adding-cook-times" title="Permalink to this headline">¶</a></h3>
-<p>Though our customer’s don’t care that our oven doesn’t actually heat anything
-for real (they don’t want this), they have asked that the toasting and baking
-states at least pretend to have different cooking durations.</p>
+<div class="section" id="iteration-6-turning-off-the-oven-when-the-cooking-is-done">
+<span id="iter6"></span><h3>Iteration 6: Turning off the Oven when the Cooking is Done<a class="headerlink" href="#iteration-6-turning-off-the-oven-when-the-cooking-is-done" title="Permalink to this headline">¶</a></h3>
+<p>Here we will wrap up our simple example by turning off the oven when the food
+has finished cooking.</p>
 <a class="reference internal" href="zero_to_one.html#iter5"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6-design"<span class="std-ref">design</span></a></span></a>,
@@ -5879,13 +5875,27 @@ states at least pretend to have different cooking durations.</p>
 <div class="section" id="iteration-6-specification">
 <span id="iter6-spec"></span><h4>Iteration 6 specification<a class="headerlink" href="#iteration-6-specification" title="Permalink to this headline">¶</a></h4>
 <p>Iteration 6 specification:</p>
+<p>The toaster oven spec:</p>
 <ul class="simple">
-<li>The toaster oven should stay in the baking state for twenty seconds, then buzz
-and turn off.</li>
-<li>The toaster oven should stay in the toasting state for ten seconds, then buzz
-and turn off.</li>
-<li>If the door is opened, then closed, the cooking time should be set back to
-it’s default time of ten or twenty seconds.</li>
+<li>The toaster oven will have an oven light, which can be turned on and off.</li>
+<li>The toaster oven will have a heater, which can be turned on and off.</li>
+<li>It will have two different heating modes, baking which can bake a potato
+and toasting which can toast some bread.</li>
+<li>The toaster oven should start in the off state.</li>
+<li>The toaster can only heat when the door is closed.</li>
+<li>The toaster’s light should be off when the door is closed.</li>
+<li>The toaster should turn on its light when the door is opened</li>
+<li>A customer should be able to open and close the door of our toaster oven</li>
+<li>When a customer closes the door, the toaster oven should go back to behaving
+like it did before.</li>
+<li>While the toaster oven is in any state the customer should be able to press a
+buzzer which will get the attention of anyone nearby.</li>
+<li><span class="dead-spec">The buzzer will sound 20 seconds after a Baking event</span></li>
+<li><span class="dead-spec">The buzzer will sound 10 seconds after a Toasting event</span></li>
+<li><span class="new-spec">The buzzer will sound 20 seconds after a Baking event and the oven
+will turn off</span></li>
+<li><span class="new-spec">The buzzer will sound 10 seconds after a Toasting event and the
+oven will turn off</span></li>
 </ul>
 </div>
 <div class="section" id="iteration-6-design">
@@ -5988,7 +5998,7 @@ it’s default time of ten or twenty seconds.</li>
 <li><a class="reference internal" href="#iteration-5-questions">Iteration 5 questions</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#iteration-6-adding-cook-times">Iteration 6: adding cook times</a><ul>
+<li><a class="reference internal" href="#iteration-6-turning-off-the-oven-when-the-cooking-is-done">Iteration 6: Turning off the Oven when the Cooking is Done</a><ul>
 <li><a class="reference internal" href="#iteration-6-specification">Iteration 6 specification</a></li>
 <li><a class="reference internal" href="#iteration-6-design">Iteration 6 design</a></li>
 <li><a class="reference internal" href="#iteration-6-code">Iteration 6 code</a></li>
