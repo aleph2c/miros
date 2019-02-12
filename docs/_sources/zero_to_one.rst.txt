@@ -4616,8 +4616,8 @@ The toaster oven spec:
   like it did before.
 * :dead_spec:`While the toaster oven is in any state the customer should be able to press a
   buzzer which will get the attention of anyone nearby.`
-* :new_spec:`The buzzer will sound 20 seconds after a Baking event``
-* :new_spec:`The buzzer will sound 10 seconds after a Toasting event``
+* :new_spec:`The buzzer will sound 20 seconds after a Baking event`
+* :new_spec:`The buzzer will sound 10 seconds after a Toasting event`
 
 .. include:: i_navigation_5.rst
 
@@ -5055,7 +5055,7 @@ Here are our test helpers
   
     # allow for 5 milliseconds of jitter (needed in jupyter)
     try:
-      assert(95 <= delay_in_ms <= 105)
+      assert(100 <= delay_in_ms <= 105)
     except:
       print(delay_in_ms)
   
@@ -5077,7 +5077,7 @@ Here are our test helpers
   
     # allow for 5 milliseconds of jitter (needed in jupyter)
     try:
-      assert(195 <= delay_in_ms <= 205)
+      assert(200 <= delay_in_ms <= 205)
     except:
       print(delay_in_ms) 
 
@@ -5144,13 +5144,13 @@ Iteration 5 questions
 * :ref:`What is jitter? <zero_to_one-what-is-jitter5>`
 * :ref:`Why is your tolernance of jitter so high? <zero_to_one-why-is-your-tolernance-of-jitter-so-high5>`
 * :ref:`How can I reduce the jitter? <zero_to_one-how-can-i-reduce-the-jitter5>`
-* :ref:`Do you test things they way you are describing them here? <zero_to_one-do-you-test-things-they-way-you-are-describing-them-here5>`
+* :ref:`Do you test things the way you are describing them here? <zero_to_one-do-you-test-things-they-way-you-are-describing-them-here5>`
 
 .. _zero_to_one-what-happens-if-they-don't-take-out-there-food-after-a-buzz-rings5:
 
 **What happens if they don't take out there food after a buzz rings?**
 
-It would not stop cooking.  This will be fixed in the next iteration.
+The toaster oven would continue to cook.  This will be fixed in the next iteration.
 
 .. include:: i_navigation_5.rst
 
@@ -5277,11 +5277,25 @@ presented Theo.
 
 **What is the remind pattern?**
 
+When you invent an event within a statechart, then post it back into the same
+statechart, it is called the :ref:`reminder pattern <patterns-reminder>`.
+
 .. include:: i_navigation_5.rst
 
 .. _zero_to_one-why-did-you-turn-toasterovenmock-into-a-subclass-of-toasteroven5:
 
 **Why did you turn ToasterOvenMock into a subclass of ToasterOven?**
+
+A ToasterOvenMock object is intended to test a ToasterOven and its attached
+statemachine.
+
+In this iteration we introduced the ``toast_time_in_sec`` and
+``bake_time_in_sec`` attributes to the ToasterOven, and they are referenced within the
+statemachine.  This means that the ToasterOvenMock needs them too.
+
+To avoid repeating myself, by defining these attributes in both classes,
+ToasterOvenMock inherits from the ToasterOven so I get these attributes
+automatically.
 
 .. include:: i_navigation_5.rst
 
@@ -5289,12 +5303,35 @@ presented Theo.
 
 **Why do you have docstrings in the test code and not elsewhere?**
 
-.. include:: i_navigation_5.rst
+I found the testing code a bit confusing so I added some documentation.  You can
+see that I use some reStructuredText in my Docstring which adds some clutter.  I
+don't remember how to use reStructuredText; I have a snippet write it for me so
+that I can follow a documentation convention.
 
+When a docstring written in this manner is parsed and turned into html it will
+produce a document that looks like `this
+<https://aleph2c.github.io/spaced/repetition.html#module-repetition>`_
+
+.. include:: i_navigation_5.rst
 
 .. _zero_to_one-what-is-jitter5:
 
 **What is jitter?**
+
+"Jitter is the deviation from true periodicity of a presumable periodic signal,
+often in relation to a reference clock signal". -- Wikipedia
+
+In our test code we try to produce two signals, one with a period of 100 ms and
+the other 200 ms.  The signals only run once, but we still see evidence of
+jitter, because they arrive late.
+
+We account for this lateness in our test code by providing some tolerance:
+
+.. code-block:: python
+
+   assert(100 <= delay_in_ms <= 105)
+   # ..
+   assert(200 <= delay_in_ms <= 205)
 
 .. include:: i_navigation_5.rst
 
@@ -5302,17 +5339,54 @@ presented Theo.
 
 **Why is your tolernance of jitter so high?**
 
+I am testing this documentation using Jupyter (running in a web browser) which
+is talking to a CPython, Python implementation, which is running within the
+Windows Linux Subsystem.  The Jupyter web interface communicates with the
+Cpython interpreter using Json over the ZeroMQ messaging protocol.
+
+The ``miros`` library uses Python threads, which is to say a single python
+thread.  To avoid concurrency problems -- deadlocks, priority-inversion etc,
+python uses something called the global interpreter lock.
+
+As a python programmer using Threads I really don't get to have access to the
+precise time features offered by my computer; especially if I am running code in
+Jupyter.
+
+If you need tight time tolerances consider using the `qp framework
+<https://www.state-machine.com/>`_.
+
 .. include:: i_navigation_5.rst
 
 .. _zero_to_one-how-can-i-reduce-the-jitter5:
 
 **How can I reduce the jitter?**
 
+Well, don't run your program in Jupyter for one.  Consider using the `qp framework
+<https://www.state-machine.com/>`_.
+
+In our design, we don't really care about the 2-5 ms latency, because it is
+0.02%-0.05% of the 10 second delay, and 0.01%-0.025% percent of the 20 second
+delay.  
+
+Our customers won't notice if they have to wait an additional 5 ms to hear their
+toaster oven buzz.
+
 .. include:: i_navigation_5.rst
 
 .. _zero_to_one-do-you-test-things-they-way-you-are-describing-them-here5:
 
-**Do you test things they way you are describing them here?**
+**Do you test things the way you are describing them here?**
+
+No, to be perfectly honest, in practice I run my code on the target with the
+``live_spy`` and ``live_trace`` enabled.   I inspect the output of the instrumentation
+and if happy, turn off the instrumentation and continue developing.
+
+However, knowing that the software community requires testing I wanted to tackle
+this here.  
+
+Statecharts are very good at packing feature complexity, so it should be of no
+surprise if the code required to completely test them because significantly
+longer and at least as hard to explain as the statechart itself.
 
 .. include:: i_navigation_5.rst
 

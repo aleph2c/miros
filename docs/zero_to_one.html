@@ -4650,8 +4650,8 @@ and toasting which can toast some bread.</li>
 like it did before.</li>
 <li><span class="dead-spec">While the toaster oven is in any state the customer should be able to press a
 buzzer which will get the attention of anyone nearby.</span></li>
-<li><span class="new-spec">The buzzer will sound 20 seconds after a Baking event`</span></li>
-<li><span class="new-spec">The buzzer will sound 10 seconds after a Toasting event`</span></li>
+<li><span class="new-spec">The buzzer will sound 20 seconds after a Baking event</span></li>
+<li><span class="new-spec">The buzzer will sound 10 seconds after a Toasting event</span></li>
 </ul>
 <a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
@@ -5514,7 +5514,7 @@ buzzer which will get the attention of anyone nearby.</span></li>
 </span><span class="hll">
 </span><span class="hll">  <span class="c1"># allow for 5 milliseconds of jitter (needed in jupyter)</span>
 </span><span class="hll">  <span class="k">try</span><span class="p">:</span>
-</span><span class="hll">    <span class="k">assert</span><span class="p">(</span><span class="mi">95</span> <span class="o">&lt;=</span> <span class="n">delay_in_ms</span> <span class="o">&lt;=</span> <span class="mi">105</span><span class="p">)</span>
+</span><span class="hll">    <span class="k">assert</span><span class="p">(</span><span class="mi">100</span> <span class="o">&lt;=</span> <span class="n">delay_in_ms</span> <span class="o">&lt;=</span> <span class="mi">105</span><span class="p">)</span>
 </span><span class="hll">  <span class="k">except</span><span class="p">:</span>
 </span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="n">delay_in_ms</span><span class="p">)</span>
 </span>
@@ -5536,7 +5536,7 @@ buzzer which will get the attention of anyone nearby.</span></li>
 </span><span class="hll">
 </span><span class="hll">  <span class="c1"># allow for 5 milliseconds of jitter (needed in jupyter)</span>
 </span><span class="hll">  <span class="k">try</span><span class="p">:</span>
-</span><span class="hll">    <span class="k">assert</span><span class="p">(</span><span class="mi">195</span> <span class="o">&lt;=</span> <span class="n">delay_in_ms</span> <span class="o">&lt;=</span> <span class="mi">205</span><span class="p">)</span>
+</span><span class="hll">    <span class="k">assert</span><span class="p">(</span><span class="mi">200</span> <span class="o">&lt;=</span> <span class="n">delay_in_ms</span> <span class="o">&lt;=</span> <span class="mi">205</span><span class="p">)</span>
 </span><span class="hll">  <span class="k">except</span><span class="p">:</span>
 </span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="n">delay_in_ms</span><span class="p">)</span>
 </span></pre></div>
@@ -5638,10 +5638,10 @@ buzzer which will get the attention of anyone nearby.</span></li>
 <li><a class="reference internal" href="#zero-to-one-what-is-jitter5"><span class="std std-ref">What is jitter?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-why-is-your-tolernance-of-jitter-so-high5"><span class="std std-ref">Why is your tolernance of jitter so high?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-how-can-i-reduce-the-jitter5"><span class="std std-ref">How can I reduce the jitter?</span></a></li>
-<li><a class="reference internal" href="#zero-to-one-do-you-test-things-they-way-you-are-describing-them-here5"><span class="std std-ref">Do you test things they way you are describing them here?</span></a></li>
+<li><a class="reference internal" href="#zero-to-one-do-you-test-things-they-way-you-are-describing-them-here5"><span class="std std-ref">Do you test things the way you are describing them here?</span></a></li>
 </ul>
 <p id="zero-to-one-what-happens-if-they-don-t-take-out-there-food-after-a-buzz-rings5"><strong>What happens if they don’t take out there food after a buzz rings?</strong></p>
-<p>It would not stop cooking.  This will be fixed in the next iteration.</p>
+<p>The toaster oven would continue to cook.  This will be fixed in the next iteration.</p>
 <a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
@@ -5755,6 +5755,8 @@ presented Theo.</p>
 <a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-what-is-the-remind-pattern5"><strong>What is the remind pattern?</strong></p>
+<p>When you invent an event within a statechart, then post it back into the same
+statechart, it is called the <a class="reference internal" href="patterns.html#patterns-reminder"><span class="std std-ref">reminder pattern</span></a>.</p>
 <a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
@@ -5763,6 +5765,14 @@ presented Theo.</p>
 <a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-why-did-you-turn-toasterovenmock-into-a-subclass-of-toasteroven5"><strong>Why did you turn ToasterOvenMock into a subclass of ToasterOven?</strong></p>
+<p>A ToasterOvenMock object is intended to test a ToasterOven and its attached
+statemachine.</p>
+<p>In this iteration we introduced the <code class="docutils literal notranslate"><span class="pre">toast_time_in_sec</span></code> and
+<code class="docutils literal notranslate"><span class="pre">bake_time_in_sec</span></code> attributes to the ToasterOven, and they are referenced within the
+statemachine.  This means that the ToasterOvenMock needs them too.</p>
+<p>To avoid repeating myself, by defining these attributes in both classes,
+ToasterOvenMock inherits from the ToasterOven so I get these attributes
+automatically.</p>
 <a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
@@ -5771,6 +5781,12 @@ presented Theo.</p>
 <a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-why-do-you-have-docstrings-in-the-test-code-and-not-elsewhere5"><strong>Why do you have docstrings in the test code and not elsewhere?</strong></p>
+<p>I found the testing code a bit confusing so I added some documentation.  You can
+see that I use some reStructuredText in my Docstring which adds some clutter.  I
+don’t remember how to use reStructuredText; I have a snippet write it for me so
+that I can follow a documentation convention.</p>
+<p>When a docstring written in this manner is parsed and turned into html it will
+produce a document that looks like <a class="reference external" href="https://aleph2c.github.io/spaced/repetition.html#module-repetition">this</a></p>
 <a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
@@ -5779,6 +5795,17 @@ presented Theo.</p>
 <a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-what-is-jitter5"><strong>What is jitter?</strong></p>
+<p>“Jitter is the deviation from true periodicity of a presumable periodic signal,
+often in relation to a reference clock signal”. – Wikipedia</p>
+<p>In our test code we try to produce two signals, one with a period of 100 ms and
+the other 200 ms.  The signals only run once, but we still see evidence of
+jitter, because they arrive late.</p>
+<p>We account for this lateness in our test code by providing some tolerance:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span><span class="p">(</span><span class="mi">100</span> <span class="o">&lt;=</span> <span class="n">delay_in_ms</span> <span class="o">&lt;=</span> <span class="mi">105</span><span class="p">)</span>
+<span class="c1"># ..</span>
+<span class="k">assert</span><span class="p">(</span><span class="mi">200</span> <span class="o">&lt;=</span> <span class="n">delay_in_ms</span> <span class="o">&lt;=</span> <span class="mi">205</span><span class="p">)</span>
+</pre></div>
+</div>
 <a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
@@ -5787,6 +5814,17 @@ presented Theo.</p>
 <a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-why-is-your-tolernance-of-jitter-so-high5"><strong>Why is your tolernance of jitter so high?</strong></p>
+<p>I am testing this documentation using Jupyter (running in a web browser) which
+is talking to a CPython, Python implementation, which is running within the
+Windows Linux Subsystem.  The Jupyter web interface communicates with the
+Cpython interpreter using Json over the ZeroMQ messaging protocol.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">miros</span></code> library uses Python threads, which is to say a single python
+thread.  To avoid concurrency problems – deadlocks, priority-inversion etc,
+python uses something called the global interpreter lock.</p>
+<p>As a python programmer using Threads I really don’t get to have access to the
+precise time features offered by my computer; especially if I am running code in
+Jupyter.</p>
+<p>If you need tight time tolerances consider using the <a class="reference external" href="https://www.state-machine.com/">qp framework</a>.</p>
 <a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
@@ -5795,6 +5833,12 @@ presented Theo.</p>
 <a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-how-can-i-reduce-the-jitter5"><strong>How can I reduce the jitter?</strong></p>
+<p>Well, don’t run your program in Jupyter for one.  Consider using the <a class="reference external" href="https://www.state-machine.com/">qp framework</a>.</p>
+<p>In our design, we don’t really care about the 2-5 ms latency, because it is
+0.02%-0.05% of the 10 second delay, and 0.01%-0.025% percent of the 20 second
+delay.</p>
+<p>Our customers won’t notice if they have to wait an additional 5 ms to hear their
+toaster oven buzz.</p>
 <a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
@@ -5802,7 +5846,15 @@ presented Theo.</p>
 <a class="reference internal" href="zero_to_one.html#iter5-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="zero-to-one-do-you-test-things-they-way-you-are-describing-them-here5"><strong>Do you test things they way you are describing them here?</strong></p>
+<p id="zero-to-one-do-you-test-things-they-way-you-are-describing-them-here5"><strong>Do you test things the way you are describing them here?</strong></p>
+<p>No, to be perfectly honest, in practice I run my code on the target with the
+<code class="docutils literal notranslate"><span class="pre">live_spy</span></code> and <code class="docutils literal notranslate"><span class="pre">live_trace</span></code> enabled.   I inspect the output of the instrumentation
+and if happy, turn off the instrumentation and continue developing.</p>
+<p>However, knowing that the software community requires testing I wanted to tackle
+this here.</p>
+<p>Statecharts are very good at packing feature complexity, so it should be of no
+surprise if the code required to completely test them because significantly
+longer and at least as hard to explain as the statechart itself.</p>
 <a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
