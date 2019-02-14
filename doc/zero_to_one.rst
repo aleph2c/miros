@@ -5144,7 +5144,6 @@ Iteration 5 questions
 * :ref:`What is jitter? <zero_to_one-what-is-jitter5>`
 * :ref:`Why is your tolernance of jitter so high? <zero_to_one-why-is-your-tolernance-of-jitter-so-high5>`
 * :ref:`How can I reduce the jitter? <zero_to_one-how-can-i-reduce-the-jitter5>`
-* :ref:`Do you test all of your designs with such rigor? <zero_to_one-do-you-test-all-of-your-designs-with-such-rigor5>`
 
 
 .. _zero_to_one-what-happens-if-they-don't-take-out-there-food-after-a-buzz-rings5:
@@ -5200,33 +5199,47 @@ the thread will stop running and python will garbage collect it.
 
 **Why do you cancel the events in the exit states?**
 
-The one-shot only makes sense when it is issued from the state it is constructed
-within.  If you leave this state, you should cancel your one-shot. Otherwise,
-your diagram will no longer act as a map from which you can understand your
-design.
+The deferred one shot pushes a behavior into the future.  It's event will arrive
+as if it was posted from outside of the chart, with no regard for the chart's
+current state.  This can lead to some confusing behavior.
 
 I'll illustrate this with an example.  Suppose we didn't cancel our one-shot
-events upon leaving either the baking or toasting events.
+events upon leaving either the baking or toasting states:
 
-Imagine that we toast something for 5 seconds, open the door, close the door,
-then immediately press the bake button.
+.. image:: _static/ToasterOven_5_without_cancel.svg
+  :target: _static/ToasterOven_5_without_cancel.pdf
+  :align: center
+
+Imagine that we toast something for 5 seconds, then quickly open and close the
+door, then immediately press the bake button.
 
 5 seconds after this moment we would hear a buzz, then 10 seconds after that,
 then 20 seconds after that.
 
-It's confusing, because the threads that have been initiated, which will post
-events back to the design know nothing about the state of our design, they just
-do what they are told.  
+Without canceling our one shot, the diagram's fidelity is reduced, because you
+can't just see the behavior, instead you have to run a full simulation in your
+head.
 
 However, if you cancel your one-shot upon exiting the state from which they were
 created, you will avoid these strange behaviours.  When you look at the baking
 or toasting states, you will know that if the unit remains in these states for
 their respective one-shot times, the oven will behave as you expect it to.  
 
-Let's reimagine our scenario with the one-shot cancellations in the exit states
+.. image:: _static/ToasterOven.svg
+  :target: _static/ToasterOven.pdf
+  :align: center
+
+Let's re-imagine our scenario with the one-shot cancellations in the exit states
 of baking and toasting.  We toast something for 5 seconds, open the door, close
 the door, then immediately press the bake button.  The buzzer will sound in 20
 seconds.
+
+Typically, I cancel deferred events when exiting the states from which they were
+initiated.  If you see a diagram where this isn't the case; it might be a design 
+bug, or at least an indication that you have to think harder to understand what
+is going on.
+
+In the next iteration I will break this best-practice to make a different point.
 
 .. include:: i_navigation_5.rst
 
@@ -5238,7 +5251,7 @@ One-shot triggers and their cancellations can be initiated by any human when
 they talk to Spike or Tara.
 
 The one shot is a kind of event gun (``post_fifo`` or ``post_lifo``) which
-invents a small universe then tears a portal into it.  Through this portal, an
+invents a small universe then tears a portal to it.  Through this portal, an
 event is placed in suspension for a given amount of time relative to our
 universe (a statechart has no such time dimension).  The portal closes and the
 universe (holding the event) persists for the duration of time specified by the
@@ -5332,6 +5345,11 @@ We account for this lateness in our test code by providing some tolerance:
    # ..
    assert(200 <= delay_in_ms <= 205)
 
+.. note::
+
+  Our jitter is asymetric, an event will never arrive early; we slip into the
+  future.
+
 .. include:: i_navigation_5.rst
 
 .. _zero_to_one-why-is-your-tolernance-of-jitter-so-high5:
@@ -5343,16 +5361,18 @@ is talking to a CPython, Python implementation, which is running within the
 Windows Linux Subsystem.  The Jupyter web interface communicates with the
 Cpython interpreter using Json over the ZeroMQ messaging protocol.
 
-The ``miros`` library uses Python threads, which is to say a single python
-thread.  To avoid concurrency problems -- deadlocks, priority-inversion etc,
-python uses something called the global interpreter lock (GIL).
+The ``miros`` library uses Python threads, which is to say a single process on
+one CPU, that is shared between the threads.  To avoid concurrency problems --
+deadlocks, priority-inversion etc, python uses something called the global
+interpreter lock (GIL).
 
-As a python programmer using Threads I really don't get to have access to the
-precise time features offered by my computer; especially if I am running code in
-Jupyter.
+So there is a lot of technology between my demonstration-code and the actual CPU
+and its timers.  As a python programmer using Threads I really don't get to have
+access to the precise time features offered by my computer; especially if I am
+running code in Jupyter.
 
 If you need tight time tolerances consider using the `qp framework
-<https://www.state-machine.com/>`_.
+<https://www.state-machine.com/>`_ without an OS.
 
 .. include:: i_navigation_5.rst
 
@@ -5360,41 +5380,30 @@ If you need tight time tolerances consider using the `qp framework
 
 **How can I reduce the jitter?**
 
-Well, don't run your program in Jupyter for one.  Consider using the `qp framework
-<https://www.state-machine.com/>`_ or the `farc framework <https://github.com/dwhall/farc>`_.
+Well, don't run your program in Jupyter for one.  Consider using the `qp
+framework <https://www.state-machine.com/>`_ or its derived `farc framework
+<https://github.com/dwhall/farc>`_ in python.
 
 In our design, we don't really care about the 2-5 ms latency, because it is
 0.02%-0.05% of the 10 second delay, and 0.01%-0.025% percent of the 20 second
-delay.  
+delay.
 
 Our customers won't notice if they have to wait an additional 5 ms to hear their
 toaster oven buzz.
 
 .. include:: i_navigation_5.rst
 
-.. _zero_to_one-do-you-test-all-of-your-designs-with-such-rigor5:
-
-**Do you test all of your designs with such rigor?**
-
-No.  I typically use the instrumentation to verify my design.  I inspect the
-output and if I am happy with the results, continue development.
-
-However, I wanted to demonstrate how to verify a design if it is an essential
-part of your software process.  It was a useful exercise for me.
-
-Statecharts pack a lot of complexity, so don't be surprised if your testing code
-become significantly longer than your production code, and much harder to
-explain than the designs they are intended to test.
-
-.. include:: i_navigation_5.rst
-
 .. _iter6:
 
-Iteration 6: Turning off the Oven when the Cooking is Done
------------------------------------------------------------
+Iteration 6: Multi-Shot events and Payloads
+-------------------------------------------
+So far we have built a very basic toaster oven.
 
-Here we will wrap up our simple example by turning off the oven when the food
-has finished cooking.
+In this iteration we will add two new features:
+
+* We will notify our customer that the oven is almost done (buzz once)
+* We will notify our customer when the oven has finished cooking (buzz twice) and turn off
+  the oven.
 
 .. include:: i_navigation_6.rst
 
@@ -5414,18 +5423,17 @@ The toaster oven spec:
 * The toaster oven should start in the off state.
 * The toaster can only heat when the door is closed.
 * The toaster's light should be off when the door is closed.
-* The toaster should turn on its light when the door is opened
-* A customer should be able to open and close the door of our toaster oven
+* The toaster should turn on its light when the door is opened.
+* A customer should be able to open and close the door of our toaster oven.
 * When a customer closes the door, the toaster oven should go back to behaving
   like it did before.
-* While the toaster oven is in any state the customer should be able to press a
-  buzzer which will get the attention of anyone nearby.
-* :dead_spec:`The buzzer will sound 20 seconds after a Baking event`
-* :dead_spec:`The buzzer will sound 10 seconds after a Toasting event`
-* :new_spec:`The buzzer will sound 20 seconds after a Baking event and the oven
-  will turn off`
-* :new_spec:`The buzzer will sound 10 seconds after a Toasting event and the
-  oven will turn off`
+* :dead_spec:`The buzzer will sound 10 seconds after a Toasting event.`
+* :dead_spec:`The buzzer will sound 20 seconds after a Baking event.`
+* :new_spec:`The toasting mode will cook an item for 10 seconds then the oven will turn off`
+* :new_spec:`The baking mode will cook an item for 20 seconds then the oven will turn off`
+* :new_spec:`One buzz means, there is 1 second before something has finished cooking`
+* :new_spec:`Two buzzes mean something have finished cooking`
+* :new_spec:`Three buzzes mean the white walkers are coming`
 
 .. _iter6_design:
 
