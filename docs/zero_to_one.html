@@ -5638,7 +5638,6 @@ buzzer which will get the attention of anyone nearby.</span></li>
 <li><a class="reference internal" href="#zero-to-one-what-is-jitter5"><span class="std std-ref">What is jitter?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-why-is-your-tolernance-of-jitter-so-high5"><span class="std std-ref">Why is your tolernance of jitter so high?</span></a></li>
 <li><a class="reference internal" href="#zero-to-one-how-can-i-reduce-the-jitter5"><span class="std std-ref">How can I reduce the jitter?</span></a></li>
-<li><a class="reference internal" href="#zero-to-one-do-you-test-all-of-your-designs-with-such-rigor5"><span class="std std-ref">Do you test all of your designs with such rigor?</span></a></li>
 </ul>
 <p id="zero-to-one-what-happens-if-they-don-t-take-out-there-food-after-a-buzz-rings5"><strong>What happens if they don’t take out there food after a buzz rings?</strong></p>
 <p>The toaster oven would continue to cook.  This will be fixed in the next iteration.</p>
@@ -5690,27 +5689,35 @@ will continue to post events until the program is stopped.</p>
 <a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-why-do-you-cancel-the-events-in-the-exit-states5"><strong>Why do you cancel the events in the exit states?</strong></p>
-<p>The one-shot only makes sense when it is issued from the state it is constructed
-within.  If you leave this state, you should cancel your one-shot. Otherwise,
-your diagram will no longer act as a map from which you can understand your
-design.</p>
+<p>The deferred one shot pushes a behavior into the future.  It’s event will arrive
+as if it was posted from outside of the chart, with no regard for the chart’s
+current state.  This can lead to some confusing behavior.</p>
 <p>I’ll illustrate this with an example.  Suppose we didn’t cancel our one-shot
-events upon leaving either the baking or toasting events.</p>
-<p>Imagine that we toast something for 5 seconds, open the door, close the door,
-then immediately press the bake button.</p>
+events upon leaving either the baking or toasting states:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_5_without_cancel.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_5_without_cancel.svg" src="_images/ToasterOven_5_without_cancel.svg" /></div>
+</a>
+<p>Imagine that we toast something for 5 seconds, then quickly open and close the
+door, then immediately press the bake button.</p>
 <p>5 seconds after this moment we would hear a buzz, then 10 seconds after that,
 then 20 seconds after that.</p>
-<p>It’s confusing, because the threads that have been initiated, which will post
-events back to the design know nothing about the state of our design, they just
-do what they are told.</p>
+<p>Without canceling our one shot, the diagram’s fidelity is reduced, because you
+can’t just see the behavior, instead you have to run a full simulation in your
+head.</p>
 <p>However, if you cancel your one-shot upon exiting the state from which they were
 created, you will avoid these strange behaviours.  When you look at the baking
 or toasting states, you will know that if the unit remains in these states for
 their respective one-shot times, the oven will behave as you expect it to.</p>
-<p>Let’s reimagine our scenario with the one-shot cancellations in the exit states
+<a class="reference external image-reference" href="_static/ToasterOven.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven.svg" src="_images/ToasterOven.svg" /></div>
+</a>
+<p>Let’s re-imagine our scenario with the one-shot cancellations in the exit states
 of baking and toasting.  We toast something for 5 seconds, open the door, close
 the door, then immediately press the bake button.  The buzzer will sound in 20
 seconds.</p>
+<p>Typically, I cancel deferred events when exiting the states from which they were
+initiated.  If you see a diagram where this isn’t the case; it might be a design
+bug, or at least an indication that you have to think harder to understand what
+is going on.</p>
+<p>In the next iteration I will break this best-practice to make a different point.</p>
 <a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
@@ -5722,7 +5729,7 @@ seconds.</p>
 <p>One-shot triggers and their cancellations can be initiated by any human when
 they talk to Spike or Tara.</p>
 <p>The one shot is a kind of event gun (<code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> or <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code>) which
-invents a small universe then tears a portal into it.  Through this portal, an
+invents a small universe then tears a portal to it.  Through this portal, an
 event is placed in suspension for a given amount of time relative to our
 universe (a statechart has no such time dimension).  The portal closes and the
 universe (holding the event) persists for the duration of time specified by the
@@ -5804,6 +5811,11 @@ jitter, because they arrive late.</p>
 <span class="k">assert</span><span class="p">(</span><span class="mi">200</span> <span class="o">&lt;=</span> <span class="n">delay_in_ms</span> <span class="o">&lt;=</span> <span class="mi">205</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Our jitter is asymetric, an event will never arrive early; we slip into the
+future.</p>
+</div>
 <a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
@@ -5816,13 +5828,15 @@ jitter, because they arrive late.</p>
 is talking to a CPython, Python implementation, which is running within the
 Windows Linux Subsystem.  The Jupyter web interface communicates with the
 Cpython interpreter using Json over the ZeroMQ messaging protocol.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">miros</span></code> library uses Python threads, which is to say a single python
-thread.  To avoid concurrency problems – deadlocks, priority-inversion etc,
-python uses something called the global interpreter lock (GIL).</p>
-<p>As a python programmer using Threads I really don’t get to have access to the
-precise time features offered by my computer; especially if I am running code in
-Jupyter.</p>
-<p>If you need tight time tolerances consider using the <a class="reference external" href="https://www.state-machine.com/">qp framework</a>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">miros</span></code> library uses Python threads, which is to say a single process on
+one CPU, that is shared between the threads.  To avoid concurrency problems –
+deadlocks, priority-inversion etc, python uses something called the global
+interpreter lock (GIL).</p>
+<p>So there is a lot of technology between my demonstration-code and the actual CPU
+and its timers.  As a python programmer using Threads I really don’t get to have
+access to the precise time features offered by my computer; especially if I am
+running code in Jupyter.</p>
+<p>If you need tight time tolerances consider using the <a class="reference external" href="https://www.state-machine.com/">qp framework</a> without an OS.</p>
 <a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
@@ -5831,7 +5845,8 @@ Jupyter.</p>
 <a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-how-can-i-reduce-the-jitter5"><strong>How can I reduce the jitter?</strong></p>
-<p>Well, don’t run your program in Jupyter for one.  Consider using the <a class="reference external" href="https://www.state-machine.com/">qp framework</a>.</p>
+<p>Well, don’t run your program in Jupyter for one.  Consider using the <a class="reference external" href="https://www.state-machine.com/">qp
+framework</a> or its derived <a class="reference external" href="https://github.com/dwhall/farc">farc framework</a> in python.</p>
 <p>In our design, we don’t really care about the 2-5 ms latency, because it is
 0.02%-0.05% of the 10 second delay, and 0.01%-0.025% percent of the 20 second
 delay.</p>
@@ -5844,27 +5859,17 @@ toaster oven buzz.</p>
 <a class="reference internal" href="zero_to_one.html#iter5-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
-<p id="zero-to-one-do-you-test-all-of-your-designs-with-such-rigor5"><strong>Do you test all of your designs with such rigor?</strong></p>
-<p>No.  I typically use the instrumentation to verify my design.  I inspect the
-output and if I am happy with the results, continue development.</p>
-<p>However, I wanted to demonstrate how to verify a design if it is an essential
-part of your software process.  It was a useful exercise for me.</p>
-<p>Statecharts pack a lot of complexity, so don’t be surprised if your testing code
-become significantly longer than your production code, and much harder to
-explain than the designs they are intended to test.</p>
-<a class="reference internal" href="zero_to_one.html#iter4"<span class="std-ref">prev</span></a>,
-<a class="reference internal" href="zero_to_one.html#iter5-spec"<span class="std-ref">spec</span></a>,
-<a class="reference internal" href="zero_to_one.html#iter5-design"<span class="std-ref">design</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter5-code"<span class="std-ref">code</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter5-proof"<span class="std-ref">proof</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter5-questions"<span class="std-ref">questions</span></a></span></a>,
-<a class="reference internal" href="zero_to_one.html#iter6"><span class="std std-ref">next</span></a><hr class="docutils" />
 </div>
 </div>
-<div class="section" id="iteration-6-turning-off-the-oven-when-the-cooking-is-done">
-<span id="iter6"></span><h3>Iteration 6: Turning off the Oven when the Cooking is Done<a class="headerlink" href="#iteration-6-turning-off-the-oven-when-the-cooking-is-done" title="Permalink to this headline">¶</a></h3>
-<p>Here we will wrap up our simple example by turning off the oven when the food
-has finished cooking.</p>
+<div class="section" id="iteration-6-multi-shot-events-and-payloads">
+<span id="iter6"></span><h3>Iteration 6: Multi-Shot events and Payloads<a class="headerlink" href="#iteration-6-multi-shot-events-and-payloads" title="Permalink to this headline">¶</a></h3>
+<p>So far we have built a very basic toaster oven.</p>
+<p>In this iteration we will add two new features:</p>
+<ul class="simple">
+<li>We will notify our customer that the oven is almost done (buzz once)</li>
+<li>We will notify our customer when the oven has finished cooking (buzz twice) and turn off
+the oven.</li>
+</ul>
 <a class="reference internal" href="zero_to_one.html#iter5"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6-design"<span class="std-ref">design</span></a></span></a>,
@@ -5884,18 +5889,17 @@ and toasting which can toast some bread.</li>
 <li>The toaster oven should start in the off state.</li>
 <li>The toaster can only heat when the door is closed.</li>
 <li>The toaster’s light should be off when the door is closed.</li>
-<li>The toaster should turn on its light when the door is opened</li>
-<li>A customer should be able to open and close the door of our toaster oven</li>
+<li>The toaster should turn on its light when the door is opened.</li>
+<li>A customer should be able to open and close the door of our toaster oven.</li>
 <li>When a customer closes the door, the toaster oven should go back to behaving
 like it did before.</li>
-<li>While the toaster oven is in any state the customer should be able to press a
-buzzer which will get the attention of anyone nearby.</li>
-<li><span class="dead-spec">The buzzer will sound 20 seconds after a Baking event</span></li>
-<li><span class="dead-spec">The buzzer will sound 10 seconds after a Toasting event</span></li>
-<li><span class="new-spec">The buzzer will sound 20 seconds after a Baking event and the oven
-will turn off</span></li>
-<li><span class="new-spec">The buzzer will sound 10 seconds after a Toasting event and the
-oven will turn off</span></li>
+<li><span class="dead-spec">The buzzer will sound 10 seconds after a Toasting event.</span></li>
+<li><span class="dead-spec">The buzzer will sound 20 seconds after a Baking event.</span></li>
+<li><span class="new-spec">The toasting mode will cook an item for 10 seconds then the oven will turn off</span></li>
+<li><span class="new-spec">The baking mode will cook an item for 20 seconds then the oven will turn off</span></li>
+<li><span class="new-spec">One buzz means, there is 1 second before something has finished cooking</span></li>
+<li><span class="new-spec">Two buzzes mean something have finished cooking</span></li>
+<li><span class="new-spec">Three buzzes mean the white walkers are coming</span></li>
 </ul>
 </div>
 <div class="section" id="iteration-6-design">
@@ -5998,7 +6002,7 @@ oven will turn off</span></li>
 <li><a class="reference internal" href="#iteration-5-questions">Iteration 5 questions</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#iteration-6-turning-off-the-oven-when-the-cooking-is-done">Iteration 6: Turning off the Oven when the Cooking is Done</a><ul>
+<li><a class="reference internal" href="#iteration-6-multi-shot-events-and-payloads">Iteration 6: Multi-Shot events and Payloads</a><ul>
 <li><a class="reference internal" href="#iteration-6-specification">Iteration 6 specification</a></li>
 <li><a class="reference internal" href="#iteration-6-design">Iteration 6 design</a></li>
 <li><a class="reference internal" href="#iteration-6-code">Iteration 6 code</a></li>
