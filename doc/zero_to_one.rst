@@ -5401,9 +5401,8 @@ So far we have built a very basic toaster oven.
 
 In this iteration we will add two new features:
 
-* We will notify our customer that the oven is almost done (buzz once)
-* We will notify our customer when the oven has finished cooking (buzz twice) and turn off
-  the oven.
+* The oven will buzz once when it is almost done.
+* When the oven has finished cooking, it will buzz twice and turn off.
 
 .. include:: i_navigation_6.rst
 
@@ -5429,18 +5428,47 @@ The toaster oven spec:
   like it did before.
 * :dead_spec:`The buzzer will sound 10 seconds after a Toasting event.`
 * :dead_spec:`The buzzer will sound 20 seconds after a Baking event.`
-* :new_spec:`The toasting mode will cook an item for 10 seconds then the oven will turn off`
-* :new_spec:`The baking mode will cook an item for 20 seconds then the oven will turn off`
-* :new_spec:`One buzz means, there is 1 second before something has finished cooking`
-* :new_spec:`Two buzzes mean something have finished cooking`
-* :new_spec:`Three buzzes mean the white walkers are coming`
+* :new_spec:`The toasting mode will cook for 10 seconds, then turn off`
+* :new_spec:`The baking mode will cook for 20 seconds, then turn off`
+* :new_spec:`One buzz means get ready, there is 1 second left`
+* :new_spec:`Two buzzes means something has finished cooking`
+* :new_spec:`Three buzzes means the white walkers are coming`
 
 .. _iter6_design:
 
 Iteration 6 design
 """"""""""""""""""
+If you can't see the design in your browser, click on the diagram to look at the
+pdf file.
+
+.. image:: _static/ToasterOven_6.svg
+    :target: _static/ToasterOven_6.pdf
+    :align: center
+
+The entry condition of the baking state creates two deferred one-shot events,
+``Get_Ready`` and ``Done``.  Each of these events contain a buzz specification
+as a payload.
+
+When the ``Get_Ready`` event is received by the statechart, it creates a ``Buzz``
+one-shot which fires immediately.
+
+When the ``Done`` event is received, it creates a ``Buzz`` multishot (two
+buzzes) which begins firing immediately, then the oven turns off.
+
+The toasting state behaves exactly like the baking state, except it has a
+different cook time.  To avoid having code repetition, the code that is common
+between the ``baking`` and ``toasting`` states was pulled out of the
+statemachine and into the ``cook_time`` method of the ToasterOven.
+
+Here is a timing diagram describing how the statechart timing relates to the
+hardware timing:
+
+.. image:: _static/ToasterOven_6_Timing_Diagram.svg
+    :target: _static/ToasterOven_6_Timing_Diagram.pdf
+    :align: center
 
 .. include:: i_navigation_6.rst
+
 
 .. _iter6_code:
 

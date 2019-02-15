@@ -5866,9 +5866,8 @@ toaster oven buzz.</p>
 <p>So far we have built a very basic toaster oven.</p>
 <p>In this iteration we will add two new features:</p>
 <ul class="simple">
-<li>We will notify our customer that the oven is almost done (buzz once)</li>
-<li>We will notify our customer when the oven has finished cooking (buzz twice) and turn off
-the oven.</li>
+<li>The oven will buzz once when it is almost done.</li>
+<li>When the oven has finished cooking, it will buzz twice and turn off.</li>
 </ul>
 <a class="reference internal" href="zero_to_one.html#iter5"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6-spec"<span class="std-ref">spec</span></a>,
@@ -5895,15 +5894,34 @@ and toasting which can toast some bread.</li>
 like it did before.</li>
 <li><span class="dead-spec">The buzzer will sound 10 seconds after a Toasting event.</span></li>
 <li><span class="dead-spec">The buzzer will sound 20 seconds after a Baking event.</span></li>
-<li><span class="new-spec">The toasting mode will cook an item for 10 seconds then the oven will turn off</span></li>
-<li><span class="new-spec">The baking mode will cook an item for 20 seconds then the oven will turn off</span></li>
-<li><span class="new-spec">One buzz means, there is 1 second before something has finished cooking</span></li>
-<li><span class="new-spec">Two buzzes mean something have finished cooking</span></li>
-<li><span class="new-spec">Three buzzes mean the white walkers are coming</span></li>
+<li><span class="new-spec">The toasting mode will cook for 10 seconds, then turn off</span></li>
+<li><span class="new-spec">The baking mode will cook for 20 seconds, then turn off</span></li>
+<li><span class="new-spec">One buzz means get ready, there is 1 second left</span></li>
+<li><span class="new-spec">Two buzzes means something has finished cooking</span></li>
+<li><span class="new-spec">Three buzzes means the white walkers are coming</span></li>
 </ul>
 </div>
 <div class="section" id="iteration-6-design">
 <span id="iter6-design"></span><h4>Iteration 6 design<a class="headerlink" href="#iteration-6-design" title="Permalink to this headline">¶</a></h4>
+<p>If you can’t see the design in your browser, click on the diagram to look at the
+pdf file.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_6.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_6.svg" src="_images/ToasterOven_6.svg" /></div>
+</a>
+<p>The entry condition of the baking state creates two deferred one-shot events,
+<code class="docutils literal notranslate"><span class="pre">Get_Ready</span></code> and <code class="docutils literal notranslate"><span class="pre">Done</span></code>.  Each of these events contain a buzz specification
+as a payload.</p>
+<p>When the <code class="docutils literal notranslate"><span class="pre">Get_Ready</span></code> event is received by the statechart, it creates a <code class="docutils literal notranslate"><span class="pre">Buzz</span></code>
+one-shot which fires immediately.</p>
+<p>When the <code class="docutils literal notranslate"><span class="pre">Done</span></code> event is received, it creates a <code class="docutils literal notranslate"><span class="pre">Buzz</span></code> multishot (two
+buzzes) which begins firing immediately, then the oven turns off.</p>
+<p>The toasting state behaves exactly like the baking state, except it has a
+different cook time.  To avoid having code repetition, the code that is common
+between the <code class="docutils literal notranslate"><span class="pre">baking</span></code> and <code class="docutils literal notranslate"><span class="pre">toasting</span></code> states was pulled out of the
+statemachine and into the <code class="docutils literal notranslate"><span class="pre">cook_time</span></code> method of the ToasterOven.</p>
+<p>Here is a timing diagram describing how the statechart timing relates to the
+hardware timing:</p>
+<a class="reference external image-reference" href="_static/ToasterOven_6_Timing_Diagram.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_6_Timing_Diagram.svg" src="_images/ToasterOven_6_Timing_Diagram.svg" /></div>
+</a>
 <a class="reference internal" href="zero_to_one.html#iter5"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6-design"<span class="std-ref">design</span></a></span></a>,
