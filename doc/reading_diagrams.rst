@@ -657,28 +657,26 @@ while designing a reactive system will be a Sisyphean effort.
 
 Payloads
 --------
-Your statechart is running in it's own thread.  An event can be published from
+Your statechart is running in its own thread.  An event can be published from
 one thread and consumed by another thread.  This means if you put mutable data
-in your event's payload, you could be creating a shared global variable between two
-separating threads.  Shared global information should be locked and unlocked if
-it's being used by multiple concurrent processes.
+in your event's payload, you could be creating a shared global variable between
+two separate threads.  Shared global information should be locked and unlocked
+if it's being used by multiple concurrent processes.
 
 Instead of coming up with complicated locking mechanisms, wrap large common data
 structures within their own statecharts and copy smaller payloads into named
 tuples.  A named tuple is immutable, so you won't accidentally shoot yourself in
-the foot by accidentally creating a global variable.  You can draw your payloads
-into your statecharts like this:
+the foot by inadvertently creating a global variable shared between two
+different threads.  You can draw your payloads into your statecharts like this:
 
 .. image:: _static/immutable_payload.svg
     :target: _static/immutable_payload.pdf
     :align: center
 
-Pepper your payloads all over your drawings, you might be repeating yourself,
-but the quick understanding that you will be getting from a glance will pay for
-this trade off.  The `namedtuple is nice to work with
+Pepper these payload descriptions all over your drawings, you might be repeating
+yourself, but the quick understanding that you will be getting from a glance
+will pay for this trade-off.  The `namedtuple is nice to work with
 <https://docs.python.org/3.5/library/collections.html#collections.namedtuple>`_.
-
-.. _reading_diagrams-dealing-with-the-anti-brand:
 
 .. raw:: html
 

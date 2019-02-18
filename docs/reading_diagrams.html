@@ -511,21 +511,21 @@ while designing a reactive system will be a Sisyphean effort.</p>
 </div>
 <div class="section" id="payloads">
 <span id="reading-diagrams-payloads"></span><h2>Payloads<a class="headerlink" href="#payloads" title="Permalink to this headline">¶</a></h2>
-<p>Your statechart is running in it’s own thread.  An event can be published from
+<p>Your statechart is running in its own thread.  An event can be published from
 one thread and consumed by another thread.  This means if you put mutable data
-in your event’s payload, you could be creating a shared global variable between two
-separating threads.  Shared global information should be locked and unlocked if
-it’s being used by multiple concurrent processes.</p>
+in your event’s payload, you could be creating a shared global variable between
+two separate threads.  Shared global information should be locked and unlocked
+if it’s being used by multiple concurrent processes.</p>
 <p>Instead of coming up with complicated locking mechanisms, wrap large common data
 structures within their own statecharts and copy smaller payloads into named
 tuples.  A named tuple is immutable, so you won’t accidentally shoot yourself in
-the foot by accidentally creating a global variable.  You can draw your payloads
-into your statecharts like this:</p>
+the foot by inadvertently creating a global variable shared between two
+different threads.  You can draw your payloads into your statecharts like this:</p>
 <a class="reference external image-reference" href="_static/immutable_payload.pdf"><div align="center" class="align-center"><img alt="_images/immutable_payload.svg" src="_images/immutable_payload.svg" /></div>
 </a>
-<p>Pepper your payloads all over your drawings, you might be repeating yourself,
-but the quick understanding that you will be getting from a glance will pay for
-this trade off.  The <a class="reference external" href="https://docs.python.org/3.5/library/collections.html#collections.namedtuple">namedtuple is nice to work with</a>.</p>
+<p>Pepper these payload descriptions all over your drawings, you might be repeating
+yourself, but the quick understanding that you will be getting from a glance
+will pay for this trade-off.  The <a class="reference external" href="https://docs.python.org/3.5/library/collections.html#collections.namedtuple">namedtuple is nice to work with</a>.</p>
 <a class="reference internal" href="zero_to_one.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="examples.html"><span class="std std-ref">next</span></a><table class="docutils footnote" frame="void" id="id4" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">

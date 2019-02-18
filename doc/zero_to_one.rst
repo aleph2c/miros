@@ -94,7 +94,7 @@ statechart ideas you need to know.
    </p>
 
    <p>
-   On every terrace, there will be two bouncers a greeter and zero or more
+   On every terrace, there will be two bouncers, a greeter and zero or more
    bartenders.  There will only be one set of stairs that can be used to enter or
    exit a pub, and this is where that pub's bouncers will sit.
    </p>
@@ -1390,14 +1390,14 @@ toaster oven with a working HSM.
 Iteration 2 specification
 """""""""""""""""""""""""
 
-* The toaster oven will have a door, it will always be closed (for now).
-* The toaster oven will have an oven light, which can be turned on and off.
-* The toaster oven will have a heater, which can be turned off and on.
-* It will have two different heating modes, baking which can bake a potato
-  and toasting which can toast some bread.
-* The toaster oven should start in the off state.
-* The toaster can only heat when the door is closed.
-* The toaster's light should be off when the door is closed.
+* :new_spec:`The toaster oven will have a door, it will always be closed (for now)`
+* :new_spec:`The toaster oven will have an oven light, which can be turned on and off`
+* :new_spec:`The toaster oven will have a heater, which can be turned on and off`
+* :new_spec:`It will have two different heating modes, baking which can bake a potato
+  and toasting which can toast some bread`
+* :new_spec:`The toaster oven should start in the off state`
+* :new_spec:`The toaster can only heat when the door is closed`
+* :new_spec:`The toaster's light should be off when the door is closed`
 
 .. include:: i_navigation_2.rst
 
@@ -2842,15 +2842,15 @@ Iteration 3 specification
 """""""""""""""""""""""""
 The toaster oven spec:
 
-* :dead_spec:`The toaster oven will have a door, it will always be closed.`
-* The toaster oven will have an oven light, which can be turned on and off.
-* The toaster oven will have a heater, which can be turned off and on.
+* :dead_spec:`The toaster oven will have a door, it will always be closed`
+* The toaster oven will have an oven light, which can be turned on and off
+* The toaster oven will have a heater, which can be turned on and off
 * It will have two different heating modes, baking which can bake a potato
-  and toasting which can toast some bread.
-* The toaster oven should start in the off state.
-* The toaster can only heat when the door is closed.
-* The toaster's light should be off when the door is closed.
-* The toaster should turn on its light when the door is opened
+  and toasting which can toast some bread
+* The toaster oven should start in the off state
+* The toaster can only heat when the door is closed
+* The toaster's light should be off when the door is closed
+* :new_spec:`The toaster should turn on its light when the door is opened`
 * :new_spec:`A customer should be able to open and close the door of our toaster oven`
 * :new_spec:`When a customer closes the door, the toaster oven should go back to behaving
   like it did before.`
@@ -3529,19 +3529,19 @@ Iteration 4 specification
 
 The toaster oven spec:
 
-* The toaster oven will have an oven light, which can be turned on and off.
-* The toaster oven will have a heater, which can be turned on and off.
+* The toaster oven will have an oven light, which can be turned on and off
+* The toaster oven will have a heater, which can be turned off and on
 * It will have two different heating modes, baking which can bake a potato
-  and toasting which can toast some bread.
-* The toaster oven should start in the off state.
-* The toaster can only heat when the door is closed.
-* The toaster's light should be off when the door is closed.
+  and toasting which can toast some bread
+* The toaster oven should start in the off state
+* The toaster can only heat when the door is closed
+* The toaster's light should be off when the door is closed
 * The toaster should turn on its light when the door is opened
 * A customer should be able to open and close the door of our toaster oven
 * When a customer closes the door, the toaster oven should go back to behaving
-  like it did before.
+  like it did before
 * :new_spec:`While the toaster oven is in any state the customer should be able to press a
-  buzzer which will get the attention of anyone nearby.`
+  buzzer which will get the attention of anyone nearby`
 
 **Technical Improvements**
 
@@ -4603,17 +4603,17 @@ Iteration 5 specification
 """""""""""""""""""""""""
 The toaster oven spec:
 
-* The toaster oven will have an oven light, which can be turned on and off.
-* The toaster oven will have a heater, which can be turned on and off.
+* The toaster oven will have an oven light, which can be turned on and off
+* The toaster oven will have a heater, which can be turned on and off
 * It will have two different heating modes, baking which can bake a potato
-  and toasting which can toast some bread.
-* The toaster oven should start in the off state.
-* The toaster can only heat when the door is closed.
-* The toaster's light should be off when the door is closed.
+  and toasting which can toast some bread
+* The toaster oven should start in the off state
+* The toaster can only heat when the door is closed
+* The toaster's light should be off when the door is closed
 * The toaster should turn on its light when the door is opened
 * A customer should be able to open and close the door of our toaster oven
 * When a customer closes the door, the toaster oven should go back to behaving
-  like it did before.
+  like it did before
 * :dead_spec:`While the toaster oven is in any state the customer should be able to press a
   buzzer which will get the attention of anyone nearby.`
 * :new_spec:`The buzzer will sound 20 seconds after a Baking event`
@@ -5415,19 +5415,19 @@ Iteration 6 specification:
 
 The toaster oven spec:
 
-* The toaster oven will have an oven light, which can be turned on and off.
-* The toaster oven will have a heater, which can be turned on and off.
+* The toaster oven will have an oven light, which can be turned on and off
+* The toaster oven will have a heater, which can be turned on and off
 * It will have two different heating modes, baking which can bake a potato
-  and toasting which can toast some bread.
-* The toaster oven should start in the off state.
-* The toaster can only heat when the door is closed.
-* The toaster's light should be off when the door is closed.
-* The toaster should turn on its light when the door is opened.
-* A customer should be able to open and close the door of our toaster oven.
+  and toasting which can toast some bread
+* The toaster oven should start in the off state
+* The toaster can only heat when the door is closed
+* The toaster's light should be off when the door is closed
+* The toaster should turn on its light when the door is opened
+* A customer should be able to open and close the door of our toaster oven
 * When a customer closes the door, the toaster oven should go back to behaving
-  like it did before.
-* :dead_spec:`The buzzer will sound 10 seconds after a Toasting event.`
-* :dead_spec:`The buzzer will sound 20 seconds after a Baking event.`
+  like it did before
+* :dead_spec:`The buzzer will sound 10 seconds after a Toasting event`
+* :dead_spec:`The buzzer will sound 20 seconds after a Baking event`
 * :new_spec:`The toasting mode will cook for 10 seconds, then turn off`
 * :new_spec:`The baking mode will cook for 20 seconds, then turn off`
 * :new_spec:`One buzz means get ready, there is 1 second left`
@@ -6155,9 +6155,12 @@ Iteration 6 questions
 """""""""""""""""""""
 
 * :ref:`Do you really test things like this? <zero_to_one-do-you-really-test-things-like-this6>`
+* :ref:`Do you typically use timing diagrams with your design? <zero_to_one-do-you-typically-use-timing-diagrams-with-your-design6>`
 * :ref:`How do you generate the ASCII sequence diagrams from the trace? <zero_to_one-how-do-you-generate-the-ascii-sequence-diagrams-from-the-trace6>`
 * :ref:`What is a payload? <zero_to_one-what-is-a-payload6>`
 * :ref:`Why do you use a namedtuple to make a payload? <zero_to_one-why-do-you-use-a-namedtuple-to-make-a-payload6>`
+* :ref:`Why should payloads be immutable? <zero_to_one-why-should-payloads-be-immutable6>`
+* :ref:`Can you explain the timing diagram? <zero_to_one-can-you-explain-the-timing-diagram6>`
 
 .. _zero_to_one-do-you-really-test-things-like-this6:
 
@@ -6168,23 +6171,58 @@ is working or not.
 
 The graph confirmation and mock tests seem like a good idea to me; these can be
 added to a regression test without a lot of effort.  They won't slow down
-development progress and they aren't tightly coupled to the specifics of your
+development progress and they aren't tightly coupled to the specifics of the
 implementation.
 
 This can not be said for the timing tests.  They are expensive, because you need
 to:
 
-* parameterize your timing features so you can reduce the time it takes to make the test.  
+* parameterize your timing features so you can reduce the time it takes to make
+  the test. (complexity is added to make the system testable)
 * add tunable tolerancing to account for task jitter 
 * manage time wrapping when testing in the millisecond domain
 * explain how the test works to a maintenance developer in your docstrings.
 
 The burden of carrying these tests may outweigh the benefits they offer.
 
-Rigorous testing makes sense when it is difficult to decouple a system for
-debugging purposes.  But if you are using the statechart architectural pattern,
-it is trivial to build up an elaborate design using small and knowable parts, each
-part having its own diagram, and being rich with instrumentation.
+It is a worthwhile investment to pay the high cost of such rigorous regression
+tests, when it is difficult to decouple a system for debugging purposes.  It
+also makes sense when you can't see your code with a debugger, like if
+you are meta-programming with Ruby.  As far as I can tell the `test everything
+ethos came from this community
+<https://www.youtube.com/watch?time_continue=3&v=YX3iRjKj7C0>`_.
+
+But if you are using the statechart architectural pattern, it is trivial to
+build up an elaborate design using small and knowable parts, each part having
+its own diagram and rich instrumentation.  If you need to debug something, you
+can just drop into that part of the system and look at it's picture to
+understand how it works, then test it in isolation to see if it's misbehaving.
+
+.. include:: i_navigation_6.rst
+
+.. _zero_to_one-do-you-typically-use-timing-diagrams-with-your-design6:
+
+**Do you typically use timing diagrams with your design?**
+
+No. I think they look good, but they quickly add to your technical debt.  So
+only use them if you need them.
+
+To explain what I mean consider what would happen if I change the number of
+buzzes used to tell someone their food is done, from 2 to 3.
+
+Now I have to remember to go back into the timing diagram and mess about with
+the drawn pulses, I have to re-size the picture and make sure all of the words
+fit.  I'm not adding a lot of value here and this work would slow me down.
+
+In comparison, to change the number of pulses from 2 to 3 in the statechart
+diagram I would update one character in its picture, and I would be done.
+
+.. note::
+
+   Timing diagrams should be generative; they should automatically be
+   constructed from the instrumentation output.  I did this work for the
+   construction of the sequence diagrams but I did not do it for the timing
+   diagrams.
 
 .. include:: i_navigation_6.rst
 
@@ -6192,7 +6230,7 @@ part having its own diagram, and being rich with instrumentation.
 
 **How do you generate the ASCII sequence diagrams from the trace?**
 
-You can read about that :ref:`here <sequence-diagrams>`.
+You can read about that :ref:`here <reading_diagrams-sequence-diagrams>`.
 
 .. include:: i_navigation_6.rst
 
@@ -6200,7 +6238,18 @@ You can read about that :ref:`here <sequence-diagrams>`.
 
 **What is a payload?**
 
-It is something that travels within the event.  Therefore, it can be dispatched to a different statechart.
+The payload is the thing within the event.  You can use this to pass whatever
+information you want between threads.  In our case we use a payload to
+describe the number of buzz pulses:  The event is passed from the statechart to
+a one shot thread and then from the one shot thread back to the statechart.
+When the statechart receives the ``Get_Ready`` or ``Done`` events, it can look
+within those event payloads to get the number of times we want the buzzer to
+pulse:
+
+.. code-block:: python
+
+  # e is the event
+  e.payload.buzz_times
 
 .. include:: i_navigation_6.rst
 
@@ -6208,10 +6257,58 @@ It is something that travels within the event.  Therefore, it can be dispatched 
 
 **Why do you use a namedtuple to make a payload?**
 
-Name tuples are immutable and they are easy to make and describe, so they make
-great payload data structures.
+Nametuples are immutable and they are easy to make and describe; they make great payload data structures.
+
+You don't have to use a namedtuple; but I advice that you use something immutable.
 
 .. include:: i_navigation_6.rst
+
+.. _zero_to_one-why-should-payloads-be-immutable6:
+
+**Why should payloads be immutable?**
+
+Immutable means that it can't be changed once it's written.  This immutability
+is precisely what we want because we are sharing information between two
+different threads which operate at different times and have no knowledge of one
+another.  If both threads try to change the information they share, as some
+underlying process task-switches between them, the information will become
+scrambled for both threads.
+
+You can see how this could lead to a nasty bug.  These kinds of bugs appear to
+happen randomly; so they are extremely difficult to reproduce and fix.  In fact,
+this is why people advise against the use of threads.
+
+If you do share memory between threads, you need to provide a locking mechanism.
+
+.. note::
+  
+   This is what the `GIL
+   <https://realpython.com/python-gil/#what-problem-did-the-gil-solve-for-python>`_
+   does in Python, it's a locking mechanism that has gotten a lot of bad press.
+
+Or, you can take a Charlie Munger approach and just pre-avoid the mistake:
+
+Miros doesn't share memory, so it doesn't use a locking mechanism, it just
+copies the data from one thing into the queue of another thing.  But, there is a
+chance that Python won't actually make a copy of your data, it might use a
+reference (I can't claim to understand the implementation details of Python
+memory management.)
+
+So to pre-lock all of your data in the payload, use an immutable data structure.
+If you can't change the data once it is written, you can't have a bug.  This is
+why namedtuples are great event payloads.
+
+.. include:: i_navigation_6.rst
+
+.. _zero_to_one-can-you-explain-the-timing-diagram6:
+
+**Can you explain the timing diagram?**
+
+.. include:: i_navigation_6.rst
+
+.. image:: _static/ToasterOven_6_Timing_Diagram.svg
+    :target: _static/ToasterOven_6_Timing_Diagram.pdf
+    :align: center
 
 .. raw:: html
 
