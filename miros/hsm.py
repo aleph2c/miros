@@ -608,7 +608,7 @@ class HsmEventProcessor():
         while(True):
           tpath[ip](self, entry_e)
           ip -= 1
-          if(ip <= 0):
+          if(ip < 0):
             break
         t = tpath[0]
 
