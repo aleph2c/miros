@@ -24,7 +24,7 @@ setup(
     py_modules=['miros'],
 
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='2.0.16',
+    version='3.0.00',
 
     description='A statechart library for Python',
     long_description=long_description,
