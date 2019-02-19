@@ -287,7 +287,7 @@ always near him.
 </p>
 
 <p>
-Eve flies done to Tara and gives her the event.  She says, "I want you to go to
+Eve flies down to Tara and gives her the event.  She says, "I want you to go to
 the terrace where there is a bartender who knows what to do with this event.
 Then I want you to go to wherever he tells you to take it.  Good luck Tara, I
 believe in you."
@@ -7322,6 +7322,38 @@ why namedtuples are great event payloads.</p>
 <a class="reference internal" href="zero_to_one.html#iter6-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter7"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="zero-to-one-can-you-explain-the-timing-diagram6"><strong>Can you explain the timing diagram?</strong></p>
+<p>The timing diagram contains two signals: the “hardware Timing” as the blue line
+and the “Statemachine Timing” as the red line.  The horizontal axis is time and
+the vertical axis represents voltage.</p>
+<p>Monitoring a voltage change on the hardware makes sense but it doesn’t really
+make sense when we are thinking about the statemachine.  So we need to wave our
+hands and pretend we have peppered hardware-bit-toggling code through out the
+statemachine and we are monitoring the output of its pin’s voltage with an
+oscilloscope.  We aren’t going to do this, but you know it is possible.  If it
+where added to the code, the results would be used to construct the
+“Statemachine Timing” signal.</p>
+<p>The positive edge would map to the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> call initiating the oneshot and
+the negative edge would map to the moment the task managing the one shot
+began to run.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_6_Timing_Diagram.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_6_Timing_Diagram.svg" src="_images/ToasterOven_6_Timing_Diagram.svg" /></div>
+</a>
+<p>The “thread start latency” is the time between when we want to initiate a one-shot or
+multi-shot task, and when it actually starts.  This latency might be very small,
+but it will always be there.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This “thread start latency” will very depending upon which version of python
+you run, your os, your hardware etc.  It will not be reliably consistent.  If you need
+tight time tolerancing switch to qp.</p>
+</div>
+<p>Here is the timing diagram with the code that initiates the timing.</p>
+<a class="reference external image-reference" href="_static/ToasterOven_6_Timing_Diagram_2.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_6_Timing_Diagram_2.svg" src="_images/ToasterOven_6_Timing_Diagram_2.svg" /></div>
+</a>
+<p>The diagram displays two different kinds of deferred event patterns.  The
+“Get_Ready Oneshot” and “Done Oneshot” events occur sometime after they are
+initiated, they are deferred.</p>
+<p>This is not true for the buzz one-shot and multi-shot, they trigger almost
+immediately after being started.</p>
 <a class="reference internal" href="zero_to_one.html#iter5"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6-design"<span class="std-ref">design</span></a></span></a>,
@@ -7329,8 +7361,6 @@ why namedtuples are great event payloads.</p>
 <a class="reference internal" href="zero_to_one.html#iter6-proof"<span class="std-ref">proof</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter6-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter7"><span class="std std-ref">next</span></a><hr class="docutils" />
-<a class="reference external image-reference" href="_static/ToasterOven_6_Timing_Diagram.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_6_Timing_Diagram.svg" src="_images/ToasterOven_6_Timing_Diagram.svg" /></div>
-</a>
 <a class="reference internal" href="quickstart.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="reading_diagrams.html"><span class="std std-ref">next</span></a></div>
 </div>
 </div>

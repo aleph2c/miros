@@ -323,7 +323,7 @@ statechart ideas you need to know.
    </p>
 
    <p>
-   Eve flies done to Tara and gives her the event.  She says, "I want you to go to
+   Eve flies down to Tara and gives her the event.  She says, "I want you to go to
    the terrace where there is a bartender who knows what to do with this event.
    Then I want you to go to wherever he tells you to take it.  Good luck Tara, I
    believe in you."
@@ -6304,11 +6304,50 @@ why namedtuples are great event payloads.
 
 **Can you explain the timing diagram?**
 
-.. include:: i_navigation_6.rst
+The timing diagram contains two signals: the "hardware Timing" as the blue line
+and the "Statemachine Timing" as the red line.  The horizontal axis is time and
+the vertical axis represents voltage.
+
+Monitoring a voltage change on the hardware makes sense but it doesn't really
+make sense when we are thinking about the statemachine.  So we need to wave our
+hands and pretend we have peppered hardware-bit-toggling code through out the
+statemachine and we are monitoring the output of its pin's voltage with an
+oscilloscope.  We aren't going to do this, but you know it is possible.  If it
+where added to the code, the results would be used to construct the
+"Statemachine Timing" signal.
+
+The positive edge would map to the ``post_fifo`` call initiating the oneshot and
+the negative edge would map to the moment the task managing the one shot
+began to run.
 
 .. image:: _static/ToasterOven_6_Timing_Diagram.svg
     :target: _static/ToasterOven_6_Timing_Diagram.pdf
     :align: center
+
+The "thread start latency" is the time between when we want to initiate a one-shot or
+multi-shot task, and when it actually starts.  This latency might be very small,
+but it will always be there.
+
+.. note::
+
+   This "thread start latency" will very depending upon which version of python
+   you run, your os, your hardware etc.  It will not be reliably consistent.  If you need
+   tight time tolerancing switch to qp.
+
+Here is the timing diagram with the code that initiates the timing.
+
+.. image:: _static/ToasterOven_6_Timing_Diagram_2.svg
+    :target: _static/ToasterOven_6_Timing_Diagram_2.pdf
+    :align: center
+
+The diagram displays two different kinds of deferred event patterns.  The
+"Get_Ready Oneshot" and "Done Oneshot" events occur sometime after they are
+initiated, they are deferred.
+
+This is not true for the buzz one-shot and multi-shot, they trigger almost
+immediately after being started.
+
+.. include:: i_navigation_6.rst
 
 .. raw:: html
 
