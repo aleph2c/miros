@@ -1,5 +1,6 @@
 import sys
 import time
+from miros import pp
 from miros import Event
 from miros import spy_on
 from miros import signals
@@ -15,48 +16,52 @@ class ExampleStatechart(ActiveObject):
     self.foo = None
 
   def write(self, string):
-    print(string, end=';')
+    try:
+      print(string, end=';')
+    except:
+      pass
 
 class HsmTester(Thread):
 
   def __init__(self, chart):
     super().__init__()
     self.thread_event = ThreadEvent()
-
-    def make_post_function(signal):
-      def post_function():
-        chart.post_fifo(Event(signal=signal))
-      def quit_function():
+    self.chart = chart
+    def make_post_function(signal_name):
+      def post_event():
+        chart.post_fifo(Event(signal=signal_name))
+      def quit():
         self.thread_event.clear()
-      return quit_function if signal == 'Q' else post_function
-
+      return quit if signal_name == 'T' else post_event
     self.thread_event.set()
-    self.fns = {character : make_post_function(character) for character in 'ABCDEFGHIQ'}
-    self.available_signals = list(self.fns.keys())
+    self.post_functions = {
+      character:make_post_function(character) for character in 'ABCDEFGHIT'}
 
   def run(self):
-
-    def make_signal_output_function():
-      def print_signal_char_on_windows(character):
-        print(" {}".format(character))  # ugly, but it works in dos
-      def print_signal_chart_on_linux(character):
-        print("\033[F:{}  ".format(character), end='')  # print on the same line
-      return print_signal_chart_on_linux if sys.platform == 'linux' else print_signal_char_on_windows
-
-    pfn = make_signal_output_function()
-
+    def print_signal_char_on_windows(character):
+      '''print a character in dos'''
+      print(" {}".format(character))
+    def print_signal_char(character):
+      '''print a character on the same line that we received input in linux'''
+      print("\033[F:{}  ".format(character), end='')  # print on the same line
+    pfn = print_signal_char_on_windows if sys.platform == 'win32' else print_signal_char
     while self.thread_event.is_set():
       character = input("\n:")
       character = character.upper()
       pfn(character)  # print the signal we are going to send to the terminal
-      if len(character) != 1 or character not in self.available_signals: 
+      if len(character) != 1 or character not in self.post_functions: 
         print("Event not defined.") 
       else:
-        self.fns[character]()  # call the post function
+        self.post_functions[character]()  # call the post function
       time.sleep(0.1)
-    print ("Exiting ")
 
+    pp(self.chart.spy())
+    print(self.chart.trace())
+    self.chart.stop()  # not needed, active object threads are daemonic
 
+    print ("Terminating")
+
+@spy_on
 def s(me, e):
   status = return_status.UNHANDLED
 
@@ -82,6 +87,7 @@ def s(me, e):
     status = return_status.SUPER
   return status
 
+@spy_on
 def s1(me, e):
   status = return_status.UNHANDLED
   
@@ -120,6 +126,7 @@ def s1(me, e):
     status = return_status.SUPER
   return status   
 
+@spy_on
 def s11(me, e):
   status = return_status.UNHANDLED
 
@@ -131,10 +138,11 @@ def s11(me, e):
     status = return_status.HANDLED
   elif(e.signal == signals.D):
     me.write('s11-D')
-    status = return_status.HANDLED
     if me.foo:
       me.foo = 0; me.write("foo = 0")
       status = me.trans(s1)      
+    else:
+      status = return_status.HANDLED
   elif(e.signal == signals.G):
     me.write('s11-G')
     status = me.trans(s211)
@@ -146,6 +154,7 @@ def s11(me, e):
     status = return_status.SUPER
   return status
 
+@spy_on
 def s2(me, e):
   status = return_status.UNHANDLED
 
@@ -160,9 +169,9 @@ def s2(me, e):
     status = return_status.HANDLED  
   elif(e.signal == signals.I):
     me.write('s2-I')
-    status = return_status.HANDLED
     if not me.foo:
       me.foo = 1; me.write("foo = 1")
+    status = return_status.HANDLED
   elif(e.signal == signals.C):
     me.write('s2-C')
     status = me.trans(s1)
@@ -224,10 +233,12 @@ def s211(me, e):
 
 if __name__ == "__main__":
   me = ExampleStatechart(name='me')
-  me.write('foo = 0')
-  me.foo = 0
+  me.instrumented = False
+  # To Do:
+  # when the instrumentation is false, spy() and trace() should output nothing
+  # the statechart is currently broke (e, g) if no spy_on and me.instrumented=True (default)
+  me.foo = 0; me.write('foo = 0')
   me.start_at(s2)  
   hsm_tester = HsmTester(me)
   hsm_tester.start()
-  
   
