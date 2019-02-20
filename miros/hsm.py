@@ -167,6 +167,9 @@ def spy_on(fn):
     else:
       e = args[-1]
 
+    if not chart.instrumented:
+      return fn(chart, e)
+
     name = fn.__name__
     chart.state_name = name
     chart.state_fn   = fn
