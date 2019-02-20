@@ -178,4 +178,12 @@ def test_for_broken_init_bug(spy_chart):
   with stripped(expected_trace) as stripped_target, stripped(chart.trace()) as stripped_result:
    assert(stripped_target == stripped_result)
 
-  
+@pytest.mark.francis
+def test_for_broken_H(spy_chart):
+  chart = DemoChart(name='demochart1')
+  chart.start_at(s2)
+  chart.post_fifo(Event(signal=signals.E))
+  chart.post_fifo(Event(signal=signals.H))
+  time.sleep(1)
+  print(chart.trace())
+  pp(chart.spy())

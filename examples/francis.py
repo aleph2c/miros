@@ -1,236 +1,233 @@
-from miros import (Event, signals, return_status, spy_on, ActiveObject)
-import threading
-import time
 import sys
+import time
+from miros import Event
+from miros import spy_on
+from miros import signals
+from threading import Thread
+from miros import ActiveObject
+from miros import return_status
+from threading import Event as ThreadEvent
 
-class DemoChart(ActiveObject):
+class ExampleStatechart(ActiveObject):
+
   def __init__(self, name):
     super().__init__(name)
     self.foo = None
 
-class HSMTesterThread(threading.Thread):
-    def __init__(self, chart):
-        threading.Thread.__init__(self)
-        self.chart = chart
-        self.boolKeepOnGoing = True
-        self.dictsigcall = {'A' : self.callA,
-                            'B' : self.callB,
-                            'C' : self.callC,
-                            'D' : self.callD,
-                            'E' : self.callE,
-                            'F' : self.callF,
-                            'G' : self.callG,
-                            'H' : self.callH,
-                            'I' : self.callI,
-                            'Q' : self.quit}
-        self.siglist = list(self.dictsigcall.keys())
+  def write(self, string):
+    print(string, end=';')
 
-    def run(self):
-        #print ("Starting")
+class HsmTester(Thread):
 
-        while self.boolKeepOnGoing:
+  def __init__(self, chart):
+    super().__init__()
+    self.thread_event = ThreadEvent()
 
-            inputsingal = input("\nEnter Signal:")
-            inputsingal = inputsingal.upper()
+    def make_post_function(signal):
+      def post_function():
+        chart.post_fifo(Event(signal=signal))
+      def quit_function():
+        self.thread_event.clear()
+      return quit_function if signal == 'Q' else post_function
 
-            if len(inputsingal) != 1 or inputsingal not in self.siglist: 
-                print("Event not defined.") 
-            else:
-                self.dictsigcall[inputsingal]()
+    self.thread_event.set()
+    self.fns = {character : make_post_function(character) for character in 'ABCDEFGHIQ'}
+    self.available_signals = list(self.fns.keys())
 
-            time.sleep(.1)
+  def run(self):
 
-        print ("Exiting " + self.name)
+    def make_signal_output_function():
+      def print_signal_char_on_windows(character):
+        print(" {}".format(character))  # ugly, but it works in dos
+      def print_signal_chart_on_linux(character):
+        print("\033[F:{}  ".format(character), end='')  # print on the same line
+      return print_signal_chart_on_linux if sys.platform == 'linux' else print_signal_char_on_windows
 
-    def callA(self):
-        self.chart.post_fifo(Event(signal=signals.A))
+    pfn = make_signal_output_function()
 
-    def callB(self):
-        self.chart.post_fifo(Event(signal=signals.B))
-
-    def callC(self):
-        self.chart.post_fifo(Event(signal=signals.C))
-
-    def callD(self):
-        self.chart.post_fifo(Event(signal=signals.D))
-
-    def callE(self):
-        self.chart.post_fifo(Event(signal=signals.E))
-
-    def callF(self):
-        self.chart.post_fifo(Event(signal=signals.F))
-
-    def callG(self):
-        self.chart.post_fifo(Event(signal=signals.G))
-
-    def callH(self):
-        self.chart.post_fifo(Event(signal=signals.H))
-
-    def callI(self):
-        self.chart.post_fifo(Event(signal=signals.I))
-
-    def quit(self):
-        self.boolKeepOnGoing = False
-
-@spy_on
-def s(demochart, e):
-    status = return_status.UNHANDLED
-
-    if(e.signal == signals.ENTRY_SIGNAL):
-        sys.stdout.write('s-Entry;')
-        status = return_status.HANDLED
-    elif(e.signal == signals.INIT_SIGNAL):
-        sys.stdout.write('s-Init;')
-        status = demochart.trans(s11)
-    elif(e.signal == signals.EXIT_SIGNAL):
-        sys.stdout.write('s-Exit;')
-        status = return_status.HANDLED
-    elif(e.signal == signals.E):
-        sys.stdout.write('s-E;')
-        status = demochart.trans(s11)
-    elif(e.signal == signals.I):
-        if demochart.foo:
-            demochart.scribble("settin foo to 0")
-            demochart.foo = 0
-        status = return_status.HANDLED
-    else:
-        demochart.temp.fun = demochart.top
-        status = return_status.SUPER
-    return status
+    while self.thread_event.is_set():
+      character = input("\n:")
+      character = character.upper()
+      pfn(character)  # print the signal we are going to send to the terminal
+      if len(character) != 1 or character not in self.available_signals: 
+        print("Event not defined.") 
+      else:
+        self.fns[character]()  # call the post function
+      time.sleep(0.1)
+    print ("Exiting ")
 
 
-@spy_on
-def s1(demochart, e):
-    status = return_status.UNHANDLED
-    
-    if(e.signal == signals.ENTRY_SIGNAL):    
-        sys.stdout.write('s1-Entry;')
-        status = return_status.HANDLED
-    elif (e.signal == signals.INIT_SIGNAL):
-        sys.stdout.write('s1-Init;')
-        status = demochart.trans(s11)
-    elif(e.signal == signals.EXIT_SIGNAL):
-        sys.stdout.write('s1-Exit;')
-        status = return_status.HANDLED
-    elif(e.signal == signals.A):
-        sys.stdout.write('s1-A;')
-        status = demochart.trans(s1)
-    elif(e.signal == signals.B):
-        status = demochart.trans(s11)
-    elif(e.signal == signals.C):
-        status = demochart.trans(s2)
-    elif(e.signal == signals.D):
-        if demochart.foo == 0:
-            demochart.foo = 1
-            status = demochart.trans(s)
-    elif(e.signal == signals.F):
-        status = demochart.trans(s211)
-    else:
-        demochart.temp.fun = s
-        status = return_status.SUPER
-    return status   
+def s(me, e):
+  status = return_status.UNHANDLED
 
-@spy_on
-def s11(demochart, e):
-    status = return_status.UNHANDLED
+  if(e.signal == signals.ENTRY_SIGNAL):
+    me.write('s-ENTRY')
+    status = return_status.HANDLED
+  elif(e.signal == signals.INIT_SIGNAL):
+    me.write('s-INIT')
+    status = me.trans(s11)
+  elif(e.signal == signals.EXIT_SIGNAL):
+    me.write('s-EXIT')
+    status = return_status.HANDLED
+  elif(e.signal == signals.E):
+    me.write('s-E')
+    status = me.trans(s11)
+  elif(e.signal == signals.I):
+    me.write('s-I')
+    status = return_status.HANDLED
+    if me.foo:
+      me.foo = 0; me.write("foo = 0")
+  else:
+    me.temp.fun = me.top
+    status = return_status.SUPER
+  return status
 
-    if(e.signal == signals.ENTRY_SIGNAL):    
-        sys.stdout.write('s11-Entry;')
-        status = return_status.HANDLED
-    elif(e.signal == signals.EXIT_SIGNAL):
-        sys.stdout.write('s11-Exit;')
-        status = return_status.HANDLED
-    elif(e.signal == signals.D):
-        if demochart.foo:
-            demochart.scribble("settin foo to 0")
-            demochart.foo = 0
-            status = demochart.trans(s1)            
-    elif(e.signal == signals.G):
-        status = demochart.trans(s211)
-    elif(e.signal == signals.H):
-        status = demochart.trans(s)
-    else:
-        demochart.temp.fun = s1
-        status = return_status.SUPER
-    return status
+def s1(me, e):
+  status = return_status.UNHANDLED
+  
+  if(e.signal == signals.ENTRY_SIGNAL):  
+    me.write('s1-ENTRY')
+    status = return_status.HANDLED
+  elif (e.signal == signals.INIT_SIGNAL):
+    me.write('s1-INIT')
+    status = me.trans(s11)
+  elif(e.signal == signals.EXIT_SIGNAL):
+    me.write('s1-EXIT')
+    status = return_status.HANDLED
+  elif(e.signal == signals.A):
+    me.write("s1-A")
+    status = me.trans(s1)
+  elif(e.signal == signals.B):
+    me.write("s1-B")
+    status = me.trans(s11)
+  elif(e.signal == signals.C):
+    me.write("s1-C")
+    status = me.trans(s2)
+  elif(e.signal == signals.D):
+    me.write("s1-D")
+    status = return_status.HANDLED
+    if me.foo == 0:
+      me.foo = 1; me.write("foo = 1")
+      status = me.trans(s)
+  elif(e.signal == signals.F):
+    me.write("s1-F")
+    status = me.trans(s211)
+  elif(e.signal == signals.I):
+    me.write("s1-I")
+    status = return_status.HANDLED
+  else:
+    me.temp.fun = s
+    status = return_status.SUPER
+  return status   
 
-@spy_on
-def s2(demochart, e):
-    status = return_status.UNHANDLED
+def s11(me, e):
+  status = return_status.UNHANDLED
 
-    if(e.signal == signals.ENTRY_SIGNAL):    
-        sys.stdout.write('s2-Entry;')
-        status = return_status.HANDLED
-    elif(e.signal == signals.INIT_SIGNAL):
-        sys.stdout.write('s2-Init;')
-        status = demochart.trans(s211)
-    elif(e.signal == signals.EXIT_SIGNAL):
-        sys.stdout.write('s2-Exit;')
-        status = return_status.HANDLED    
-    elif(e.signal == signals.I):
-        if not demochart.foo:
-            demochart.scribble("settin foo to 1")
-            demochart.foo = 1
-        status = return_status.HANDLED
-    elif(e.signal == signals.C):
-        status = demochart.trans(s1)
-    elif(e.signal == signals.F):
-        status = demochart.trans(s11)
-    else:
-        demochart.temp.fun = s
-        status = return_status.SUPER
-    return status
+  if(e.signal == signals.ENTRY_SIGNAL):  
+    me.write('s11-ENTRY')
+    status = return_status.HANDLED
+  elif(e.signal == signals.EXIT_SIGNAL):
+    me.write('s11-EXIT')
+    status = return_status.HANDLED
+  elif(e.signal == signals.D):
+    me.write('s11-D')
+    status = return_status.HANDLED
+    if me.foo:
+      me.foo = 0; me.write("foo = 0")
+      status = me.trans(s1)      
+  elif(e.signal == signals.G):
+    me.write('s11-G')
+    status = me.trans(s211)
+  elif(e.signal == signals.H):
+    me.write('s11-H')
+    status = me.trans(s)
+  else:
+    me.temp.fun = s1
+    status = return_status.SUPER
+  return status
+
+def s2(me, e):
+  status = return_status.UNHANDLED
+
+  if(e.signal == signals.ENTRY_SIGNAL):  
+    me.write('s2-ENTRY')
+    status = return_status.HANDLED
+  elif(e.signal == signals.INIT_SIGNAL):
+    me.write('s2-INIT')
+    status = me.trans(s211)
+  elif(e.signal == signals.EXIT_SIGNAL):
+    me.write('s2-EXIT')
+    status = return_status.HANDLED  
+  elif(e.signal == signals.I):
+    me.write('s2-I')
+    status = return_status.HANDLED
+    if not me.foo:
+      me.foo = 1; me.write("foo = 1")
+  elif(e.signal == signals.C):
+    me.write('s2-C')
+    status = me.trans(s1)
+  elif(e.signal == signals.F):
+    me.write('s2-F')
+    status = me.trans(s11)
+  else:
+    me.temp.fun = s
+    status = return_status.SUPER
+  return status
 
 @spy_on
-def s21(demochart, e):
-    status = return_status.UNHANDLED
-    if(e.signal == signals.ENTRY_SIGNAL):    
-        sys.stdout.write('s21-Entry;')
-        import pdb; pdb.set_trace()
-        status = return_status.HANDLED
-    elif(e.signal == signals.INIT_SIGNAL):
-        sys.stdout.write('s21-Init;')
-        status = demochart.trans(s211)
-    elif(e.signal == signals.EXIT_SIGNAL):
-        sys.stdout.write('s21-Exit;')
-        status = return_status.HANDLED 
-    elif(e.signal == signals.A):
-        status = demochart.trans(s21)
-    elif(e.signal == signals.B):
-        status = demochart.trans(s211)
-    elif(e.signal == signals.G):
-        status = demochart.trans(s11)
-    else:
-        demochart.temp.fun = s2
-        status = return_status.SUPER
-    return status
+def s21(me, e):
+  status = return_status.UNHANDLED
+
+  if(e.signal == signals.ENTRY_SIGNAL):  
+    me.write('s21-ENTRY')
+    status = return_status.HANDLED
+  elif(e.signal == signals.INIT_SIGNAL):
+    me.write('s21-INIT')
+    status = me.trans(s211)
+  elif(e.signal == signals.EXIT_SIGNAL):
+    me.write('s21-EXIT')
+    status = return_status.HANDLED 
+  elif(e.signal == signals.A):
+    me.write('s21-A')
+    status = me.trans(s21)
+  elif(e.signal == signals.B):
+    me.write('s21-B')
+    status = me.trans(s211)
+  elif(e.signal == signals.G):
+    me.write('s21-G')
+    status = me.trans(s11)
+  else:
+    me.temp.fun = s2
+    status = return_status.SUPER
+  return status
 
 @spy_on
-def s211(demochart, e):
-    status = return_status.UNHANDLED
-    
-    if(e.signal == signals.ENTRY_SIGNAL):    
-        sys.stdout.write('s211-Entry;')
-        status = return_status.HANDLED
-    elif(e.signal == signals.EXIT_SIGNAL):
-        sys.stdout.write('s211-Exit;')
-        status = return_status.HANDLED   
-    elif(e.signal == signals.D):
-        status = demochart.trans(s21)
-    elif(e.signal == signals.H):
-        status = demochart.trans(s)
-    else:
-        demochart.temp.fun = s21
-        status = return_status.SUPER
-    return status
+def s211(me, e):
+  status = return_status.UNHANDLED
+
+  if(e.signal == signals.ENTRY_SIGNAL):  
+    me.write('s211-ENTRY')
+    status = return_status.HANDLED
+  elif(e.signal == signals.EXIT_SIGNAL):
+    me.write('s211-EXIT')
+    status = return_status.HANDLED   
+  elif(e.signal == signals.D):
+    me.write('s211-D')
+    status = me.trans(s21)
+  elif(e.signal == signals.H):
+    me.write('s211-H')
+    status = me.trans(s)
+  else:
+    me.temp.fun = s21
+    status = return_status.SUPER
+  return status
 
 if __name__ == "__main__":
-    chart = DemoChart(name='demochart1')
-    #chart.live_trace = True
-    #chart.live_spy = True
-    chart.start_at(s2)    
-    
-    hsmtester = HSMTesterThread(chart)
-    hsmtester.start()
-    
-    
+  me = ExampleStatechart(name='me')
+  me.write('foo = 0')
+  me.foo = 0
+  me.start_at(s2)  
+  hsm_tester = HsmTester(me)
+  hsm_tester.start()
+  
+  
