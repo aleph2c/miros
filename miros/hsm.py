@@ -127,7 +127,6 @@ SpyTuple = namedtuple('SpyTuple', ['signal',    'state',
                                    'post_fifo', 'post_defer',
                                    'recall',    'datetime'])
 
-
 def spy_tuple(signal     = None,
               state      = None,
               hook       = False,
@@ -161,18 +160,20 @@ def spy_on(fn):
   '''Instrument a state handling method'''
   @wraps(fn)
   def _spy_on(chart, *args):
-
+    chart.spied_on = True
     if len(args) == 1:
       e = args[0]
     else:
       e = args[-1]
 
-    if not chart.instrumented:
-      return fn(chart, e)
-
     name = fn.__name__
     chart.state_name = name
-    chart.state_fn   = fn
+    chart.state_fn = fn
+
+    if not chart.instrumented:
+      # call the original handler
+      return fn(chart, e)
+    
     # if the chart is not instrumented, don't try to wrap it
     if hasattr(chart, 'rtc') is False:
       # call the original handler and exit
@@ -233,7 +234,22 @@ def spy_on_start(fn):
   '''instrument the on_start method into the spy log'''
   @wraps(fn)
   def _spy_on_start(self, initial_state):
+    # if there is no decorator, the instrumentation is off
+    if initial_state.__closure__ is None:
+      self.instrumented = False
+    else:
+      # if there is a decorator check to see if it is a spy_on
+      # decorator, if it isn't, the instrumentation is off
+      m = re.search(r'spy_on', str(initial_state.__code__))
+      if not m:
+        self.instrumented = False
+
+    if not self.instrumented:
+      # fn is start_at
+      return fn(self, initial_state)
+
     self.init_rtc()
+
     self.rtc.spy.append("START")
     sr = SpyTuple(
         signal="",       state="",
@@ -267,17 +283,18 @@ def trace_on_start(fn):
   def _trace_on_start(self, initial_state):
     # fn is _spy_on_start
     status = fn(self, initial_state)
-    if self.rtc.tuples[0].start:
-      t = self.TraceTuple(
-           datetime=stdlib_datetime.now(),
-           start_state = 'top',
-           signal      = None,
-           payload     = None,
-           end_state   =
-             self.temp.fun(self,
-               Event(signal=signals.REFLECTION_SIGNAL))
-         )
-      self.full.trace.append(t)
+    if self.instrumented:
+      if self.rtc.tuples[0].start:
+        t = self.TraceTuple(
+             datetime=stdlib_datetime.now(),
+             start_state = 'top',
+             signal      = None,
+             payload     = None,
+             end_state   =
+               self.temp.fun(self,
+                 Event(signal=signals.REFLECTION_SIGNAL))
+           )
+        self.full.trace.append(t)
     return status
   return _trace_on_start
 
@@ -286,8 +303,9 @@ def append_queue_reflection_after_start(fn):
   @wraps(fn)
   def _append_queue_reflection_after_start(self, initial_state):
     result = fn(self, initial_state)
-    self.rtc.spy.append(self.queue_reflection())
-    self.full.spy.append(self.queue_reflection())
+    if self.instrumented:
+      self.rtc.spy.append(self.queue_reflection())
+      self.full.spy.append(self.queue_reflection())
     return result
   return _append_queue_reflection_after_start
 
@@ -539,6 +557,14 @@ class HsmEventProcessor():
       if r is None:
         raise(HsmTopologyException(
             "state handler {} is not returning a valid status".format(s)))
+
+      # if the event is unhandled due to a guard, send it a signal
+      # which will force it to return the return_status.SUPER, as a
+      # side effect, r will be set to the super state of the function 
+      # being guarded
+      if r == return_status.UNHANDLED:
+        r = s(self, Event(signal=signals.EMPTY_SIGNAL))
+
       if(r != return_status.SUPER):
         # S in now stored in s
         break
@@ -813,7 +839,7 @@ class HsmEventProcessor():
               else:
                 r = self.temp.fun(self, super_e)
 
-            if(iq is 0):
+            if(iq == 0):
               # s contains S
               # set self.temp.fun to S->super
               s(self, exit_e)
@@ -1019,7 +1045,7 @@ class HsmEventProcessor():
       setattr(self, name, other)
     else:
       pass
-    if(relationship is not None and relationship is "mutual"):
+    if(relationship is not None and relationship == "mutual"):
       other.augment(other=self, name=self.name, relationship=None)
 
 
@@ -1030,6 +1056,10 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
 
   def __init__(self):
     super().__init__()
+
+    # by default we turn on instrumentation, but it can be turned off
+    self.instrumented = True
+
     # used by spy/trace
     self.full  = Attribute()
     self.rtc   = Attribute()
@@ -1039,7 +1069,6 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
 
     # used to build trace
     self.full.trace = deque(maxlen=HsmEventProcessor.TRC_RING_BUFFER_SIZE)
-    self.init_rtc()
     self.TraceTuple = namedtuple('TraceTuple',
                                             ['datetime',
                                              'start_state',
@@ -1059,14 +1088,19 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
   def append_to_full_spy(fn):
     @wraps(fn)
     def _append_to_full_spy(self, e):
-      self.rtc.spy.clear()
-      # fn is dispatch
-      fn(self, e)
-      self.full.spy.extend(self.rtc.spy)
+      if not self.instrumented:
+        # fn is dispatch
+        fn(self, e)
+      else:
+        self.rtc.spy.clear()
+        # fn is dispatch
+        fn(self, e)
+        self.full.spy.extend(self.rtc.spy)
     return _append_to_full_spy
 
   def scribble(self, string):
-    self.rtc.spy.append(string)
+    if self.instrumented:
+      self.rtc.spy.append(string)
 
   def append_to_full_trace(fn):
     @wraps(fn)
@@ -1082,22 +1116,26 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
       return (signal_name, hooked, dt)
 
     def _append_to_full_trace(self, e):
-      start_state = self.state.fun(self, Event(signal=signals.REFLECTION_SIGNAL))
-      self.rtc.tuples.clear()
-      # fn is append_to_full_spy
-      fn(self, e)
-      signal, hooked, dt = is_signal_hooked(self)
-      if hooked is False and self.event.ignored is False:
-        t = self.TraceTuple(
-              datetime    = dt,
-              start_state = start_state,
-              signal      = signal,
-              payload     = '',
-              end_state   =
-                self.state.fun(
-                  self, Event(signal=signals.REFLECTION_SIGNAL)))
+      if not self.instrumented:
+        # fn is append_to_full_spy
+        fn(self, e)
+      else:
+        start_state = self.state.fun(self, Event(signal=signals.REFLECTION_SIGNAL))
+        self.rtc.tuples.clear()
+        # fn is append_to_full_spy
+        fn(self, e)
+        signal, hooked, dt = is_signal_hooked(self)
+        if hooked is False and self.event.ignored is False:
+          t = self.TraceTuple(
+                datetime    = dt,
+                start_state = start_state,
+                signal      = signal,
+                payload     = '',
+                end_state   =
+                  self.state.fun(
+                    self, Event(signal=signals.REFLECTION_SIGNAL)))
 
-        self.full.trace.append(t)
+          self.full.trace.append(t)
     return _append_to_full_trace
 
   @append_to_full_spy
@@ -1119,6 +1157,8 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     else:
       # run as fast as possible
       self.instrumented = False
+
+    self.spied_on = False
 
     self.queue       = deque(maxlen = self.__class__.QUEUE_SIZE)
     self.defer_queue = deque(maxlen = self.__class__.QUEUE_SIZE)
@@ -1320,7 +1360,8 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
   @print_trace_after_rtc_if_live
   @append_queue_reflection_to_spy
   def next_rtc(self):
-    self.rtc.spy.clear()
+    if self.instrumented:
+      self.rtc.spy.clear()
     action_taken = True
     if(len(self.queue) != 0):
       event = self.queue.popleft()
@@ -1355,6 +1396,9 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
         [05:23:25.314420] [c] F: hsm_queues_graph_g1_s01->hsm_queues_graph_g1_s2111
         [05:23:25.314420] [c] A: hsm_queues_graph_g1_s2111->hsm_queues_graph_g1_s321
     '''
+    if not self.instrumented:
+      return None
+
     strace = "\n"
     for tr in self.full.trace:
       strace += self.trace_tuple_to_formatted_string(tr)
@@ -1367,9 +1411,12 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     return list(self.full.spy)
 
   def spy(self):
-    return self.spy_full()
-
-    return return_status.HANDLED
+    #if not self.instrumented or not self.spied_on:
+    #  return None
+    result = None
+    if self.instrumented:
+      result = self.spy_full()
+    return result
 
   def register_signal_callback(self, state_method, signal, fn):
     '''
@@ -1523,14 +1570,14 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       if i == 0:
         code += "def {}(chart, e):\n".format(state_method)
         code += "  status = return_status.UNHANDLED\n"
-        if if_tuple.callback is None or if_tuple.callback is 'handled':
+        if if_tuple.callback is None or if_tuple.callback == 'handled':
           code += "  if(e.signal == signals.{}):\n".format(if_tuple.signal_name)
           code += "    status = return_status.HANDLED\n"
         else:
           code += "  if(e.signal == signals.{}):\n".format(if_tuple.signal_name)
           code += "    status = {}(chart, e)\n".format(if_tuple.callback)
       else:
-        if if_tuple.callback is None or if_tuple.callback is 'handled':
+        if if_tuple.callback is None or if_tuple.callback == 'handled':
           code += "  elif(e.signal == signals.{}):\n".format(if_tuple.signal_name)
           code += "    status = return_status.HANDLED\n"
         else:

@@ -13,10 +13,7 @@
 --
 entry / me.write('s-ENTRY)
 exit / me.write('s-EXIT')
-I / 
-  me.write('s-I') 
-  if me.foo
-    me.foo = 0; me.write('foo = 0')
+I [me.write('s-I') and me.foo] me.foo = 0; me.write('foo = 0')
 valign=top
 layer=0
 </panel_attributes>
@@ -28,7 +25,7 @@ layer=0
       <x>207</x>
       <y>459</y>
       <w>396</w>
-      <h>378</h>
+      <h>369</h>
     </coordinates>
     <panel_attributes>*s1*
 --
@@ -59,30 +56,28 @@ layer=2
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>738</x>
+      <x>729</x>
       <y>378</y>
-      <w>567</w>
+      <w>576</w>
       <h>441</h>
     </coordinates>
     <panel_attributes>*s2*
 --
 entry / me.write('s2-ENTRY)
 exit / me.write('s2-EXIT')
-I / 
-  me.write('s2-I') 
-  if me.foo
-    me.foo = 0; me.write('foo = 0')
+I [me.write('s2-I') and not me.foo] / me.foo = 1; me.write('foo = 1')
 valign=top
 layer=0
-</panel_attributes>
+
+fg=blue</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>774</x>
+      <x>765</x>
       <y>495</y>
-      <w>405</w>
+      <w>414</w>
       <h>306</h>
     </coordinates>
     <panel_attributes>*s21*
@@ -240,7 +235,7 @@ layer=3</panel_attributes>
     <id>UMLSpecialState</id>
     <coordinates>
       <x>378</x>
-      <y>387</y>
+      <y>423</y>
       <w>18</w>
       <h>18</h>
     </coordinates>
@@ -252,19 +247,19 @@ layer=3</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>378</x>
-      <y>396</y>
+      <y>423</y>
       <w>27</w>
-      <h>180</h>
+      <h>153</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 layer=3</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;180.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;150.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>387</x>
-      <y>414</y>
+      <x>405</x>
+      <y>423</y>
       <w>126</w>
       <h>27</h>
     </coordinates>
@@ -303,12 +298,12 @@ layer=3</panel_attributes>
     <coordinates>
       <x>522</x>
       <y>711</y>
-      <w>270</w>
+      <w>261</w>
       <h>27</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 layer=3</panel_attributes>
-    <additional_attributes>280.0;10.0;10.0;10.0</additional_attributes>
+    <additional_attributes>270.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
@@ -328,12 +323,12 @@ layer=3</panel_attributes>
     <coordinates>
       <x>594</x>
       <y>504</y>
-      <w>162</w>
+      <w>153</w>
       <h>27</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 layer=3</panel_attributes>
-    <additional_attributes>10.0;10.0;160.0;10.0</additional_attributes>
+    <additional_attributes>10.0;10.0;150.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
@@ -378,12 +373,12 @@ layer=3</panel_attributes>
     <coordinates>
       <x>594</x>
       <y>549</y>
-      <w>162</w>
+      <w>153</w>
       <h>27</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 layer=3</panel_attributes>
-    <additional_attributes>160.0;10.0;10.0;10.0</additional_attributes>
+    <additional_attributes>150.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
@@ -428,12 +423,12 @@ layer=3</panel_attributes>
     <coordinates>
       <x>522</x>
       <y>603</y>
-      <w>270</w>
+      <w>261</w>
       <h>27</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 layer=3</panel_attributes>
-    <additional_attributes>280.0;10.0;10.0;10.0</additional_attributes>
+    <additional_attributes>270.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
@@ -452,19 +447,19 @@ layer=3</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>459</x>
-      <y>504</y>
+      <y>495</y>
       <w>27</w>
-      <h>72</h>
+      <h>81</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 layer=3</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
       <x>477</x>
-      <y>522</y>
+      <y>513</y>
       <w>126</w>
       <h>27</h>
     </coordinates>
@@ -488,37 +483,37 @@ layer=3</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>342</x>
-      <y>765</y>
-      <w>27</w>
-      <h>90</h>
+      <x>225</x>
+      <y>747</y>
+      <w>117</w>
+      <h>99</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 layer=3</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+    <additional_attributes>110.0;10.0;10.0;10.0;10.0;90.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>351</x>
+      <x>234</x>
       <y>774</y>
-      <w>108</w>
-      <h>63</h>
+      <w>234</w>
+      <h>54</h>
     </coordinates>
-    <panel_attributes>D / 
+    <panel_attributes>D [me.foo] /
   me.write('s11-D')
-  if me.foo:
-    me.foo = 0
+  me.foo = 0; me.write("foo=0")
   
 
 style=wordwrap
-layer=0</panel_attributes>
+layer=0
+fg=blue</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>468</x>
+      <x>432</x>
       <y>765</y>
       <w>27</w>
       <h>117</h>
@@ -530,10 +525,10 @@ layer=3</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>477</x>
+      <x>450</x>
       <y>792</y>
       <w>135</w>
-      <h>27</h>
+      <h>18</h>
     </coordinates>
     <panel_attributes>H / me.write('s11-H')
 style=wordwrap
@@ -544,7 +539,7 @@ layer=3</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>198</x>
-      <y>693</y>
+      <y>675</y>
       <w>144</w>
       <h>27</h>
     </coordinates>
@@ -556,7 +551,7 @@ layer=3</panel_attributes>
     <id>Text</id>
     <coordinates>
       <x>207</x>
-      <y>675</y>
+      <y>657</y>
       <w>144</w>
       <h>36</h>
     </coordinates>
@@ -655,7 +650,7 @@ layer=3</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>981</x>
+      <x>1017</x>
       <y>729</y>
       <w>27</w>
       <h>90</h>
@@ -667,7 +662,7 @@ layer=3</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>990</x>
+      <x>1026</x>
       <y>756</y>
       <w>144</w>
       <h>36</h>
@@ -680,19 +675,19 @@ layer=3</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>837</x>
+      <x>882</x>
       <y>729</y>
-      <w>27</w>
+      <w>81</w>
       <h>153</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 layer=3</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;150.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0;70.0;60.0;70.0;150.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>846</x>
+      <x>891</x>
       <y>747</y>
       <w>135</w>
       <h>27</h>
@@ -731,7 +726,7 @@ layer=0</panel_attributes>
     <id>UMLSpecialState</id>
     <coordinates>
       <x>945</x>
-      <y>432</y>
+      <y>459</y>
       <w>18</w>
       <h>18</h>
     </coordinates>
@@ -743,19 +738,19 @@ layer=3</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>945</x>
-      <y>432</y>
+      <y>459</y>
       <w>27</w>
-      <h>144</h>
+      <h>117</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 layer=3</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;140.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;110.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>954</x>
-      <y>450</y>
+      <x>963</x>
+      <y>468</y>
       <w>126</w>
       <h>27</h>
     </coordinates>
@@ -877,5 +872,33 @@ layer=3</panel_attributes>
     <panel_attributes>lt=&lt;&lt;-
 layer=3</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>531</x>
+      <y>819</y>
+      <w>27</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>540</x>
+      <y>828</y>
+      <w>387</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>D [not me.foo] me.write('s1-D'); me.foo = 1; me.write('foo=1')
+  
+
+style=wordwrap
+layer=0
+fg=blue</panel_attributes>
+    <additional_attributes/>
   </element>
 </diagram>

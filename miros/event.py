@@ -104,7 +104,8 @@ class SignalSource(OrderedDictWithParams):
     self['EXIT_SIGNAL']             = 2
     self['INIT_SIGNAL']             = 3
     self['REFLECTION_SIGNAL']       = 4
-    self['SEARCH_FOR_SUPER_SIGNAL'] = 5
+    self['EMPTY_SIGNAL']            = 5
+    self['SEARCH_FOR_SUPER_SIGNAL'] = 6
 
   def append(self, string):
     if string in self:

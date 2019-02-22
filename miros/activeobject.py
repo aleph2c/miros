@@ -309,7 +309,7 @@ class ActiveFabricSource():
     if queue_type is None:
       queue_type = 'fifo'
 
-    if queue_type is 'lifo':
+    if queue_type == 'lifo':
       signal_name = _subscribe(self.lifo_subscriptions, event_or_signal)
     else:
       signal_name = _subscribe(self.fifo_subscriptions, event_or_signal)
@@ -687,6 +687,8 @@ class ActiveObject(HsmWithQueues):
       [05:23:25.314420] [<state_name>] F->(): hsm_queues_graph_g1_s01->hsm_queues_graph_g1_s2111
       [05:23:25.314420] [<state_name>] A->(): hsm_queues_graph_g1_s2111->hsm_queues_graph_g1_s321
     '''
+    if not self.instrumented or not self.spied_on:
+      return None
     strace = "\n"
     for tr in self.full.trace:
       strace += self.trace_tuple_to_formatted_string(tr)
@@ -782,8 +784,8 @@ class ActiveObject(HsmWithQueues):
       times = 1
     # if our times are set to 1 and there is no period then just post our event
     # to the fifo/lifo
-    if times is 1 and period is None:
-      if queue_type is 'fifo':
+    if times == 1 and period is None:
+      if queue_type == 'fifo':
         self.post_fifo(e, period=None)
       else:
         self.post_lifo(e, period=None)
@@ -823,13 +825,13 @@ class ActiveObject(HsmWithQueues):
             break
 
           times_activated += 1
-          if spec.queue_type is 'fifo':
+          if spec.queue_type == 'fifo':
             self.post_fifo(spec.event)
           else:
             self.post_lifo(spec.event)
 
           # If we don't want to run forever we can clear our own Event
-          if spec.total_times is not 0:
+          if spec.total_times != 0:
             if(times_activated >= spec.total_times):
               spec.task_run_event.clear()
 

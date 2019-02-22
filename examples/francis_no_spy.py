@@ -2,7 +2,6 @@ import sys
 import time
 from miros import pp
 from miros import Event
-from miros import spy_on
 from miros import signals
 from threading import Thread
 from miros import ActiveObject
@@ -40,13 +39,11 @@ class HsmTester(Thread):
   def run(self):
     def print_signal_char_on_windows(character):
       '''print a character in dos'''
-      print("posting {}".format(character))
+      print(" {}".format(character))
     def print_signal_char(character):
       '''print a character on the same line that we received input in linux'''
       print("\033[F:{}  ".format(character), end='')  # print on the same line
     pfn = print_signal_char_on_windows if sys.platform == 'win32' else print_signal_char
-    if self.chart.instrumented and (self.chart.live_trace or self.chart.live_spy):
-      pfn = print_signal_char_on_windows
     while self.thread_event.is_set():
       character = input("\n:")
       character = character.upper()
@@ -63,7 +60,6 @@ class HsmTester(Thread):
 
     print ("Terminating")
 
-@spy_on
 def s(me, e):
   status = return_status.UNHANDLED
 
@@ -89,7 +85,6 @@ def s(me, e):
     status = return_status.SUPER
   return status
 
-@spy_on
 def s1(me, e):
   status = return_status.UNHANDLED
   
@@ -125,7 +120,6 @@ def s1(me, e):
     status = return_status.SUPER
   return status   
 
-@spy_on
 def s11(me, e):
   status = return_status.UNHANDLED
 
@@ -152,7 +146,6 @@ def s11(me, e):
     status = return_status.SUPER
   return status
 
-@spy_on
 def s2(me, e):
   status = return_status.UNHANDLED
 
@@ -181,7 +174,6 @@ def s2(me, e):
     status = return_status.SUPER
   return status
 
-@spy_on
 def s21(me, e):
   status = return_status.UNHANDLED
 
@@ -208,7 +200,6 @@ def s21(me, e):
     status = return_status.SUPER
   return status
 
-@spy_on
 def s211(me, e):
   status = return_status.UNHANDLED
 
@@ -231,8 +222,7 @@ def s211(me, e):
 
 if __name__ == "__main__":
   me = ExampleStatechart(name='me')
-  me.instrumented = True
-  me.live_spy = True
+  #me.instrumented = False 
   # To Do:
   # when the instrumentation is false, spy() and trace() should output nothing
   # the statechart is currently broke (e, g) if no spy_on and me.instrumented=True (default)
@@ -241,7 +231,6 @@ if __name__ == "__main__":
   me.start_at(s2)  
   #me.post_fifo(Event(signal=signals.E))
   #print("")
-  #time.sleep(1)
   #me.post_fifo(Event(signal=signals.D))
   #print("")
   #time.sleep(1000)

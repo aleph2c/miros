@@ -6,6 +6,45 @@ import threading
 import time
 import sys
 
+# -----------------------------------------------------------------------------
+# | test scenarios | spy_on_decorators | instrumented | live_spy | live_trace |
+# | Test_Group_1   | no                | no           | no       | no         |
+# | Test_Group_2   | no                | no           | no       | yes        |
+# | Test_Group_3   | no                | no           | yes      | no         |
+# | Test_Group_4   | no                | no           | yes      | yes        |
+# | Test_Group_5   | no                | yes          | no       | no         |
+# | Test_Group_6   | no                | yes          | no       | yes        |
+# | Test_Group_7   | no                | yes          | yes      | no         |
+# | Test_Group_8   | no                | yes          | yes      | yes        |
+# | Test_Group_9   | yes               | no           | no       | no         |
+# | Test_Group_10  | yes               | no           | no       | yes        |
+# | Test_Group_11  | yes               | no           | yes      | no         |
+# | Test_Group_12  | yes               | no           | yes      | yes        |
+# | Test_Group_13  | yes               | yes          | no       | no         |
+# | Test_Group_14  | yes               | yes          | no       | yes        |
+# | Test_Group_15  | yes               | yes          | yes      | no         |
+# | Test_Group_16  | yes               | yes          | yes      | yes        |
+# -----------------------------------------------------------------------------
+
+# typical test:
+# 
+# a,b,d,h,g,c,c,f,e,f,f,a,b,d,h
+# start:     foo = 0;s-ENTRY;s2-ENTRY;s2-INIT;s21-ENTRY;s211-ENTRY;
+# 
+# :A  s21-A;s211-EXIT;s21-EXIT;s21-ENTRY;s21-INIT;s211-ENTRY;
+# :B  s21-B;s211-EXIT;s211-ENTRY;
+# :D  s211-D;s211-EXIT;s21-INIT;s211-ENTRY;
+# :H  s211-H;s211-EXIT;s21-EXIT;s2-EXIT;s-INIT;s1-ENTRY;s11-ENTRY;
+# :G  s11-G;s11-EXIT;s1-EXIT;s2-ENTRY;s21-ENTRY;s211-ENTRY;
+# :C  s2-C;s211-EXIT;s21-EXIT;s2-EXIT;s1-ENTRY;s1-INIT;s11-ENTRY;
+# :C  s1-C;s11-EXIT;s1-EXIT;s2-ENTRY;s2-INIT;s21-ENTRY;s211-ENTRY;
+# :F  s2-F;s211-EXIT;s21-EXIT;s2-EXIT;s1-ENTRY;s11-ENTRY;
+# :E  s-E;s11-EXIT;s1-EXIT;s1-ENTRY;s11-ENTRY;
+# :F  s1-F;s11-EXIT;s1-EXIT;s2-ENTRY;s21-ENTRY;s211-ENTRY;
+# :F  s2-F;s211-EXIT;s21-EXIT;s2-EXIT;s1-ENTRY;s11-ENTRY;
+# :A  s1-A;s11-EXIT;s1-EXIT;s1-ENTRY;s1-INIT;s11-ENTRY;
+
+
 class ExampleStatechart(ActiveObject):
 
   def __init__(self, name):
@@ -94,9 +133,7 @@ def s11(me, e):
     me.write('s11-D')
     if me.foo:
       me.foo = 0; me.write("foo = 0")
-      status = me.trans(s1)      
-    else:
-      status = return_status.HANDLED
+    status = me.trans(s1)      
   elif(e.signal == signals.G):
     me.write('s11-G')
     status = me.trans(s211)
