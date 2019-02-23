@@ -12,7 +12,7 @@ class ExampleStatechart(ActiveObject):
 
   def __init__(self, name):
     super().__init__(name)
-    self.foo = None
+    self.foo = 0
 
   def write(self, string):
     try:

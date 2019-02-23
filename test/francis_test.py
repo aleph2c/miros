@@ -1,10 +1,14 @@
+import time
 import pprint
 import pytest
 import traceback
-from miros import (Event, signals, return_status, spy_on, ActiveObject, pp, stripped)
-import threading
-import time
-import sys
+from miros import pp
+from miros import Event
+from miros import signals
+from threading import Thread
+from miros import ActiveObject
+from miros import return_status
+from threading import Event as ThreadEvent
 
 # -----------------------------------------------------------------------------
 # | test scenarios | spy_on_decorators | instrumented | live_spy | live_trace |
@@ -54,7 +58,19 @@ class ExampleStatechart(ActiveObject):
   def write(self, string):
     print(string, end=';')
 
-@spy_on
+
+class ExampleStatechartMock(ExampleStatechart):
+
+  def __init__(self, name="mock"):
+    super().__init__(name)
+    self.results = ""
+
+  def write(self, string):
+    self.results += string + ";"
+
+  def clear(self):
+    self.results = ""
+
 def s(me, e):
   status = return_status.UNHANDLED
 
@@ -80,7 +96,6 @@ def s(me, e):
     status = return_status.SUPER
   return status
 
-@spy_on
 def s1(me, e):
   status = return_status.UNHANDLED
   
@@ -103,23 +118,19 @@ def s1(me, e):
     me.write("s1-C")
     status = me.trans(s2)
   elif(e.signal == signals.D):
-    me.write("s1-D")
-    status = return_status.HANDLED
-    if me.foo == 0:
+    status = return_status.UNHANDLED
+    if not me.foo:
+      me.write("s1-D")
       me.foo = 1; me.write("foo = 1")
       status = me.trans(s)
   elif(e.signal == signals.F):
     me.write("s1-F")
     status = me.trans(s211)
-  elif(e.signal == signals.I):
-    me.write("s1-I")
-    status = return_status.HANDLED
   else:
     me.temp.fun = s
     status = return_status.SUPER
   return status   
 
-@spy_on
 def s11(me, e):
   status = return_status.UNHANDLED
 
@@ -130,10 +141,11 @@ def s11(me, e):
     me.write('s11-EXIT')
     status = return_status.HANDLED
   elif(e.signal == signals.D):
-    me.write('s11-D')
+    status = return_status.UNHANDLED
     if me.foo:
+      me.write('s11-D')
       me.foo = 0; me.write("foo = 0")
-    status = me.trans(s1)      
+      status = me.trans(s1)      
   elif(e.signal == signals.G):
     me.write('s11-G')
     status = me.trans(s211)
@@ -145,7 +157,6 @@ def s11(me, e):
     status = return_status.SUPER
   return status
 
-@spy_on
 def s2(me, e):
   status = return_status.UNHANDLED
 
@@ -174,7 +185,6 @@ def s2(me, e):
     status = return_status.SUPER
   return status
 
-@spy_on
 def s21(me, e):
   status = return_status.UNHANDLED
 
@@ -201,7 +211,6 @@ def s21(me, e):
     status = return_status.SUPER
   return status
 
-@spy_on
 def s211(me, e):
   status = return_status.UNHANDLED
 
@@ -222,60 +231,171 @@ def s211(me, e):
     status = return_status.SUPER
   return status
 
-@pytest.mark.francis
-def test_for_broken_init_bug(spy_chart):
-  chart = ExampleStatechart(name='demochart1')
+#@pytest.mark.francis
+#def test_for_broken_init_bug(spy_chart):
+#  chart = ExampleStatechart(name='demochart1')
+#  chart.start_at(s2)
+#  chart.post_fifo(Event(signal=signals.E))
+#  time.sleep(0.1)
+#  chart.clear_spy()
+#  chart.clear_trace()
+#  chart.post_fifo(Event(signal=signals.C))
+#  time.sleep(0.1)
+#  expected_spy = \
+#    ['C:s11',
+#     'C:s1',
+#     'EXIT_SIGNAL:s11',
+#     'SEARCH_FOR_SUPER_SIGNAL:s11',
+#     'SEARCH_FOR_SUPER_SIGNAL:s2',
+#     'SEARCH_FOR_SUPER_SIGNAL:s1',
+#     'EXIT_SIGNAL:s1',
+#     'ENTRY_SIGNAL:s2',
+#     'INIT_SIGNAL:s2',
+#     'SEARCH_FOR_SUPER_SIGNAL:s211',
+#     'SEARCH_FOR_SUPER_SIGNAL:s21',
+#     'ENTRY_SIGNAL:s21',
+#     'ENTRY_SIGNAL:s211',
+#     'INIT_SIGNAL:s211',
+#     '<- Queued:(0) Deferred:(0)']
+#  assert(chart.spy() == expected_spy)
+#
+#  expected_trace = '''
+#    [2019-02-19 11:47:14.617768] [demochart1] e->C() s11->s211'''
+#  with stripped(expected_trace) as stripped_target, stripped(chart.trace()) as stripped_result:
+#   assert(stripped_target == stripped_result)
+#
+#@pytest.mark.francis
+#def test_for_broken_H(spy_chart):
+#  chart = ExampleStatechart(name='demochart1')
+#  chart.start_at(s2)
+#  chart.post_fifo(Event(signal=signals.E))
+#  chart.post_fifo(Event(signal=signals.H))
+#  time.sleep(1)
+#  print(chart.trace())
+#  pp(chart.spy())
+#
+#
+#@pytest.mark.francis
+#def test_for_broken_G(spy_chart):
+#  chart = ExampleStatechart(name='demochart1')
+#  chart.start_at(s2)
+#  time.sleep(1)
+#  chart.post_fifo(Event(signal=signals.E))
+#  print()
+#  time.sleep(1)
+#  chart.post_fifo(Event(signal=signals.G))
+#  print()
+#  time.sleep(1)
+#  print(chart.trace())
+#  pp(chart.spy())
+
+@pytest.mark.comprehensive
+def test_group_1():
+  chart = ExampleStatechartMock(name='test_group_2')
   chart.start_at(s2)
-  chart.post_fifo(Event(signal=signals.E))
   time.sleep(0.1)
-  chart.clear_spy()
-  chart.clear_trace()
+  assert(chart.results == \
+    "s-ENTRY;s2-ENTRY;s2-INIT;s21-ENTRY;s211-ENTRY;")
+
+  chart.clear()
+  chart.post_fifo(Event(signal=signals.A))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s21-A;s211-EXIT;s21-EXIT;s21-ENTRY;s21-INIT;s211-ENTRY;")
+
+  chart.clear()
+  chart.post_fifo(Event(signal=signals.B))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s21-B;s211-EXIT;s211-ENTRY;")
+
+  chart.clear()
+  chart.post_fifo(Event(signal=signals.D))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s211-D;s211-EXIT;s21-INIT;s211-ENTRY;")
+
+  chart.clear()
+  chart.post_fifo(Event(signal=signals.H))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s211-H;s211-EXIT;s21-EXIT;s2-EXIT;s-INIT;s1-ENTRY;s11-ENTRY;")
+
+  chart.clear()
+  chart.post_fifo(Event(signal=signals.G))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s11-G;s11-EXIT;s1-EXIT;s2-ENTRY;s21-ENTRY;s211-ENTRY;")
+
+  chart.clear()
   chart.post_fifo(Event(signal=signals.C))
   time.sleep(0.1)
-  expected_spy = \
-    ['C:s11',
-     'C:s1',
-     'EXIT_SIGNAL:s11',
-     'SEARCH_FOR_SUPER_SIGNAL:s11',
-     'SEARCH_FOR_SUPER_SIGNAL:s2',
-     'SEARCH_FOR_SUPER_SIGNAL:s1',
-     'EXIT_SIGNAL:s1',
-     'ENTRY_SIGNAL:s2',
-     'INIT_SIGNAL:s2',
-     'SEARCH_FOR_SUPER_SIGNAL:s211',
-     'SEARCH_FOR_SUPER_SIGNAL:s21',
-     'ENTRY_SIGNAL:s21',
-     'ENTRY_SIGNAL:s211',
-     'INIT_SIGNAL:s211',
-     '<- Queued:(0) Deferred:(0)']
-  assert(chart.spy() == expected_spy)
+  assert(chart.results == \
+    "s2-C;s211-EXIT;s21-EXIT;s2-EXIT;s1-ENTRY;s1-INIT;s11-ENTRY;")
 
-  expected_trace = '''
-    [2019-02-19 11:47:14.617768] [demochart1] e->C() s11->s211'''
-  with stripped(expected_trace) as stripped_target, stripped(chart.trace()) as stripped_result:
-   assert(stripped_target == stripped_result)
+  chart.clear()
+  chart.post_fifo(Event(signal=signals.C))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s1-C;s11-EXIT;s1-EXIT;s2-ENTRY;s2-INIT;s21-ENTRY;s211-ENTRY;")
 
-@pytest.mark.francis
-def test_for_broken_H(spy_chart):
-  chart = ExampleStatechart(name='demochart1')
-  chart.start_at(s2)
+  chart.clear()
+  chart.post_fifo(Event(signal=signals.F))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s2-F;s211-EXIT;s21-EXIT;s2-EXIT;s1-ENTRY;s11-ENTRY;")
+
+  chart.clear()
   chart.post_fifo(Event(signal=signals.E))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s-E;s11-EXIT;s1-EXIT;s1-ENTRY;s11-ENTRY;")
+
+  chart.clear()
+  chart.post_fifo(Event(signal=signals.F))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s1-F;s11-EXIT;s1-EXIT;s2-ENTRY;s21-ENTRY;s211-ENTRY;")
+
+  chart.clear()
+  chart.post_fifo(Event(signal=signals.F))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s2-F;s211-EXIT;s21-EXIT;s2-EXIT;s1-ENTRY;s11-ENTRY;")
+
+  chart.clear()
+  chart.post_fifo(Event(signal=signals.A))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s1-A;s11-EXIT;s1-EXIT;s1-ENTRY;s1-INIT;s11-ENTRY;")
+
+  chart.clear()
+  chart.post_fifo(Event(signal=signals.B))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s1-B;s11-EXIT;s11-ENTRY;")
+
+  chart.clear()
+  chart.post_fifo(Event(signal=signals.D))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s1-D;foo = 1;s11-EXIT;s1-EXIT;s-INIT;s1-ENTRY;s11-ENTRY;")
+
+  chart.clear()
   chart.post_fifo(Event(signal=signals.H))
-  time.sleep(1)
-  print(chart.trace())
-  pp(chart.spy())
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s11-H;s11-EXIT;s1-EXIT;s-INIT;s1-ENTRY;s11-ENTRY;")
 
+  chart.clear()
+  chart.post_fifo(Event(signal=signals.D))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s11-D;foo = 0;s11-EXIT;s1-INIT;s11-ENTRY;")
 
-@pytest.mark.francis
-def test_for_broken_G(spy_chart):
-  chart = ExampleStatechart(name='demochart1')
-  chart.start_at(s2)
-  time.sleep(1)
-  chart.post_fifo(Event(signal=signals.E))
-  print()
-  time.sleep(1)
-  chart.post_fifo(Event(signal=signals.G))
-  print()
-  time.sleep(1)
-  print(chart.trace())
-  pp(chart.spy())
+  chart.clear()
+  chart.post_fifo(Event(signal=signals.D))
+  time.sleep(0.1)
+  assert(chart.results == \
+    "s1-D;foo = 1;s11-EXIT;s1-EXIT;s-INIT;s1-ENTRY;s11-ENTRY;")
+
