@@ -93,6 +93,8 @@ class ExampleStatechartMock(ExampleStatechart):
 ################################################################################
 #                             Non-Instrumented HSM                             #
 ################################################################################
+# The Diagram can be found here:
+# https://github.com/aleph2c/miros/blob/master/doc/_static/comprehensive_1.pdf
 def s(me, e):
   status = return_status.UNHANDLED
 
@@ -255,6 +257,8 @@ def s211(me, e):
 ################################################################################
 #                               Instrumented HSM                               #
 ################################################################################
+# The Diagram can be found here:
+# https://github.com/aleph2c/miros/blob/master/doc/_static/comprehensive_2.pdf
 @spy_on
 def ss(me, e):
   status = return_status.UNHANDLED
