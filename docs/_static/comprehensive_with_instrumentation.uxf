@@ -1,0 +1,1459 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>8</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>216</x>
+      <y>296</y>
+      <w>1104</w>
+      <h>504</h>
+    </coordinates>
+    <panel_attributes>*s*
+--
+entry / 
+  me.mode = Mode('mode')
+  me.mode.start_at(mode_control)
+  me.write = me.mode.write_wrapper(me, me._write)
+  me.write('foo = {}'.format(me.foo))
+  me.write('s-Entry')
+exit / me.write('s-EXIT')
+I [me.write('s-I') and me.foo] / me.foo = 0; me.write('foo = 0')
+M /
+  me.mode.dispatch(e)
+  me.write = me.mode.wrapper(me, me._write)
+  me.write('s-M')
+valign=top
+layer=0
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>320</x>
+      <y>488</y>
+      <w>352</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>*s1*
+--
+entry / me.write('s1-ENTRY)
+exit / me.write('s1-EXIT')
+valign=top
+layer=0
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>424</x>
+      <y>552</y>
+      <w>184</w>
+      <h>176</h>
+    </coordinates>
+    <panel_attributes>*s11*
+--
+entry / me.write('s11-ENTRY)
+exit / me.write('s11-EXIT')
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>784</x>
+      <y>376</y>
+      <w>512</w>
+      <h>392</h>
+    </coordinates>
+    <panel_attributes>*s2*
+--
+entry / me.write('s2-ENTRY)
+exit / me.write('s2-EXIT')
+I [me.write('s2-I') and not me.foo] / me.foo = 1; me.write('foo = 1')
+valign=top
+layer=0
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>816</x>
+      <y>480</y>
+      <w>368</w>
+      <h>272</h>
+    </coordinates>
+    <panel_attributes>*s21*
+--
+entry / me.write('s21-ENTRY)
+exit / me.write('s21-EXIT')
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>872</x>
+      <y>536</y>
+      <w>200</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>*s211*
+--
+entry / me.write('s211-ENTRY)
+exit / me.write('s211-EXIT')
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>760</x>
+      <y>136</y>
+      <w>176</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>*ExampleStateChart*
+--
+foo
+*write*
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>976</x>
+      <y>184</y>
+      <w>160</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+Event Processor
+layer=2
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>808</x>
+      <y>264</y>
+      <w>24</w>
+      <h>136</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;150.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>800</x>
+      <y>216</y>
+      <w>56</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>lt=[^]-(
+layer=3</panel_attributes>
+    <additional_attributes>50.0;10.0;20.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>608</x>
+      <y>136</y>
+      <w>120</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>*HsmTester*
+--
+chart
+*post_action*
+thread_event
+post_functions
+chart
+mode_chart
+--
+run()
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>720</x>
+      <y>152</y>
+      <w>56</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>464</x>
+      <y>136</y>
+      <w>112</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>Accepts user
+input and posts
+events to the 
+ExampleStateChart
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>568</x>
+      <y>152</y>
+      <w>56</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>50.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>832</x>
+      <y>248</y>
+      <w>216</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>me = ExampleStateChart(name='me')
+me.foo = 0;
+me.start_at(s2)
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>472</x>
+      <y>456</y>
+      <w>16</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>472</x>
+      <y>448</y>
+      <w>24</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;130.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>488</x>
+      <y>456</y>
+      <w>112</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>me.write('s-INIT')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>208</x>
+      <y>584</y>
+      <w>232</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;270.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>224</x>
+      <y>576</y>
+      <w>120</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>E / me.write('s-E')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>600</x>
+      <y>672</y>
+      <w>232</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>270.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>672</x>
+      <y>656</y>
+      <w>128</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>F / me.write('s21-F')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>664</x>
+      <y>496</y>
+      <w>136</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;30.0;40.0;10.0;150.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>680</x>
+      <y>480</y>
+      <w>128</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>C / me.write('s1-C')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>664</x>
+      <y>648</y>
+      <w>224</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;100.0;220.0;100.0;220.0;10.0;260.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>672</x>
+      <y>704</y>
+      <w>128</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>F / me.write('s1-C')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>664</x>
+      <y>536</y>
+      <w>136</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>150.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>672</x>
+      <y>520</y>
+      <w>128</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>C / me.write('s2-C')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>672</x>
+      <y>608</y>
+      <w>128</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>G / me.write('s11-G')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>600</x>
+      <y>624</y>
+      <w>288</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;340.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>600</x>
+      <y>576</y>
+      <w>232</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>270.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>672</x>
+      <y>560</y>
+      <w>128</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>G / me.write('s21-G')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>544</x>
+      <y>512</y>
+      <w>24</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>560</x>
+      <y>512</y>
+      <w>112</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>me.write('s1-INIT')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>544</x>
+      <y>520</y>
+      <w>16</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>336</x>
+      <y>704</y>
+      <w>104</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>110.0;10.0;10.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>344</x>
+      <y>720</y>
+      <w>208</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>D [me.foo] /
+  me.write('s11-D')
+  me.foo = 0; me.write("foo=0")
+  
+
+style=wordwrap
+layer=0
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>520</x>
+      <y>720</y>
+      <w>24</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>536</x>
+      <y>744</y>
+      <w>120</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>H / me.write('s11-H')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>312</x>
+      <y>640</y>
+      <w>128</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;140.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>320</x>
+      <y>624</y>
+      <w>128</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>B / me.write('s1-B')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>680</y>
+      <w>96</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>100.0;10.0;10.0;10.0;10.0;90.0;100.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>216</x>
+      <y>672</y>
+      <w>120</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>A / me.write('s1-A')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1064</x>
+      <y>608</y>
+      <w>136</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;150.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1072</x>
+      <y>592</y>
+      <w>128</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>B / me.write('s21-B')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>1040</x>
+      <y>504</y>
+      <w>16</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1040</x>
+      <y>504</y>
+      <w>24</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1056</x>
+      <y>512</y>
+      <w>112</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>me.write('s21-INIT')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1040</x>
+      <y>688</y>
+      <w>24</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1048</x>
+      <y>712</y>
+      <w>128</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>D / me.write('s21-B')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>920</x>
+      <y>688</y>
+      <w>72</w>
+      <h>128</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0;70.0;50.0;70.0;140.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>928</x>
+      <y>704</y>
+      <w>120</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>H / me.write('s211-H')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1176</x>
+      <y>568</y>
+      <w>72</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;70.0;10.0;70.0;90.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1184</x>
+      <y>552</y>
+      <w>120</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>A / me.write('s21-A')
+style=wordwrap
+layer=0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>976</x>
+      <y>448</y>
+      <w>16</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>976</x>
+      <y>448</y>
+      <w>24</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;110.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>992</x>
+      <y>456</y>
+      <w>112</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>me.write('s2-INIT')
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>1184</x>
+      <y>344</y>
+      <w>16</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>type=final
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1192</x>
+      <y>344</y>
+      <w>144</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>160.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>240</x>
+      <y>192</y>
+      <w>400</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>python comprehensive.py
+foo = 0;s-ENTRY;s2-ENTRY;s2-INIT;s21-ENTRY;s211-ENTRY;
+:A  s21-A;s211-EXIT;s21-EXIT;s21-ENTRY;s21-INIT;s211-ENTRY;
+:B  s21-B;s211-EXIT;s211-ENTRY;
+:C  s2-C;s211-EXIT;s21-EXIT;s2-EXIT;s1-ENTRY;s1-INIT;s11-ENTRY;
+:T  Terminating
+
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>336</x>
+      <y>160</y>
+      <w>144</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;40.0;160.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>800</x>
+      <y>88</y>
+      <w>80</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>ActiveObject</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>832</x>
+      <y>104</y>
+      <w>24</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>632</x>
+      <y>88</y>
+      <w>80</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>Thread</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>664</x>
+      <y>104</y>
+      <w>24</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>600</x>
+      <y>768</y>
+      <w>24</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>616</x>
+      <y>776</y>
+      <w>344</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>D [not me.foo] me.write('s1-D'); me.foo = 1; me.write('foo=1')
+  
+
+style=wordwrap
+layer=0
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>280</x>
+      <y>984</y>
+      <w>240</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>*no_instrumentation_mode*
+--
+entry / 
+  mode.write_wrapper = \
+    InstrumentationMode._write
+    
+  model.post_action_wrapper = \
+    InstrumentationMode._no_instrumentation
+valign=top
+layer=2
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>672</x>
+      <y>984</y>
+      <w>208</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>*trace_mode*
+--
+entry / 
+  mode.write_wrapper = \
+    InstrumentationMode._muted_write
+    
+  model.post_action_wrapper = \
+    InstrumentationMode._trace
+valign=top
+layer=2
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>1056</x>
+      <y>984</y>
+      <w>192</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>*spy_mode*
+--
+entry / 
+  mode.write_wrapper = \
+    InstrumentationMode._scribble
+    
+  model.post_action_wrapper = \
+    InstrumentationMode._spy
+valign=top
+layer=2
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>512</x>
+      <y>1000</y>
+      <w>176</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+M
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;20.0;200.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>872</x>
+      <y>1000</y>
+      <w>200</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+M
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;20.0;230.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>360</x>
+      <y>1080</y>
+      <w>808</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+M
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>990.0;10.0;990.0;40.0;10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>992</x>
+      <y>8</y>
+      <w>112</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>HsmWithQueues</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>832</x>
+      <y>8</y>
+      <w>176</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>200.0;10.0;10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>968</x>
+      <y>48</y>
+      <w>176</w>
+      <h>192</h>
+    </coordinates>
+    <panel_attributes>*InstrumentationMode*
+--
+*write_wrapper*
+*post_action_wrapper*
+--
+_write(other, fn)
+_muted_write(other, fn)
+_scribble(other, fn)
+--
+_no_instrumentation(other, fn)
+_trace(other, fn)
+_spy(other, fn)
+layer=1
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>768</x>
+      <y>184</y>
+      <w>160</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+Event Processor
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1032</x>
+      <y>216</y>
+      <w>40</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>lt=[^]-(
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>20.0;10.0;20.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>432</x>
+      <y>264</y>
+      <w>928</w>
+      <h>616</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>770.0;10.0;1140.0;10.0;1140.0;710.0;10.0;710.0;10.0;750.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1040</x>
+      <y>24</y>
+      <w>24</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>928</x>
+      <y>152</y>
+      <w>56</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>80</x>
+      <y>496</y>
+      <w>136</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>lt=.
+&lt;&lt;statepattern&gt;&gt;
+Othogonal Component
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>136</x>
+      <y>432</y>
+      <w>104</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;80.0;110.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>136</x>
+      <y>552</y>
+      <w>160</w>
+      <h>480</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;450.0;180.0;580.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>576</x>
+      <y>392</y>
+      <w>136</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>lt=.
+&lt;&lt;statepattern&gt;
+Ultimate Hook
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>704</x>
+      <y>416</y>
+      <w>96</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;100.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>512</x>
+      <y>408</y>
+      <w>80</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>104</x>
+      <y>400</y>
+      <w>104</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>M changes the 
+instrumentation
+mode 
+      
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>200</x>
+      <y>416</y>
+      <w>32</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;20.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>280</x>
+      <y>1152</y>
+      <w>168</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>write prints to screen
+no trace
+no spy
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>304</x>
+      <y>1080</y>
+      <w>24</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>672</x>
+      <y>1152</y>
+      <w>184</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>write does nothing
+trace output after event processed
+no spy
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>688</x>
+      <y>1080</y>
+      <w>24</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1064</x>
+      <y>1152</y>
+      <w>208</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>write scribbles on spy instrumentation
+no trace
+spy output after event processed
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1072</x>
+      <y>1080</y>
+      <w>24</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>256</x>
+      <y>856</y>
+      <w>1016</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes>*mode_control*
+--
+valign=top
+layer=2
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1200</x>
+      <y>320</y>
+      <w>128</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>T /
+  me.mode.dispatch(e)
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>672</x>
+      <y>896</y>
+      <w>208</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>*terminate*
+--
+entry /
+  model.post_action_wrapper = \
+    InstrumentationMode._terminate
+valign=top
+layer=2
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>872</x>
+      <y>912</y>
+      <w>416</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>T
+lt=-&gt;
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>500.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>312</x>
+      <y>920</y>
+      <w>16</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>312</x>
+      <y>928</y>
+      <w>24</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>448</x>
+      <y>904</y>
+      <w>184</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>shut down the:
+* thread running the chart
+* thread running the program
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>624</x>
+      <y>920</y>
+      <w>64</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1056</x>
+      <y>320</y>
+      <w>88</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>T terminates
+the program
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1136</x>
+      <y>320</y>
+      <w>80</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>704</x>
+      <y>96</y>
+      <w>112</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>120.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>

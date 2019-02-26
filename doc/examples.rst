@@ -9,6 +9,7 @@ Examples
    :maxdepth: 1
    :caption: Single Chart Examples:
 
+   comprehensive
    singlechartexample
    postingexample
    scribbleexample

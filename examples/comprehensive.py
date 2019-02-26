@@ -15,21 +15,43 @@ class ExampleStatechart(ActiveObject):
   def __init__(self, name):
     super().__init__(name)
     self.foo = None
-    self.mode = InstrumentationMode('mode')
-    self.mode.start_at(naked_mode)
-    self.write = self.mode.wrapper(self, self._write)
 
   def _write(self, string):
+    '''the default write behavior; do nothing let the wrappers control the behavior'''
     pass
 
-class InstrumentationMode(HsmWithQueues):
+class Mode(HsmWithQueues):
+  '''Mode is an HsmWithQueues without a thread.  To have its event processor respond to
+  events, you will have to use its ``dispatch`` method.
+
+  The Mode object contains function wrappers (decorators) which can control the
+  write functionality of the ExampleStatechart object and the post_action
+  functionality of the HsmTester thread.  The write functionality will change
+  the behavior of the ``write`` calls seen in the ExampleStatechart HSM.  The
+  post_action functionality can output instrumentation results or even terminate
+  the program.
+
+  The wrappers are just object attributes that are set by the attached HSM; mode
+  control.
+  '''
 
   def __init__(self, name):
     super().__init__(name)
-    self.wrapper = InstrumentationMode._write
+    self.write_wrapper = Mode._write
+    self.post_action_wrapper = Mode._no_instrumentation
 
   @staticmethod
   def _write(other, fn):
+    '''ExampleStatechart write decorator: write output to terminal
+
+    **Note**:
+       Wraps the empty _write function of the example state chart object, giving
+       it its true write functionality based on the mode of operation.
+
+       | ``other`` (ActiveObject): example state chart
+       | ``fn`` (type1): our main chart's _write method
+
+    '''
     def write(string):
       print(string, end=';')
       fn(string)
@@ -37,82 +59,202 @@ class InstrumentationMode(HsmWithQueues):
 
   @staticmethod
   def _muted_write(other, fn):
+    '''ExampleStatechart write decorator: write nothing from example state chart 
+
+    **Note**:
+       Wraps the empty _write function of the example state chart object, giving
+       it its true write functionality based on the mode of operation.
+
+       | ``other`` (ActiveObject): example state chart
+       | ``fn`` (type1): our main chart's _write method
+
+    '''
     def write(string):
       fn(string)
     return write
 
   @staticmethod
   def _scribble(other, fn):
+    '''ExampleStatechart write decorator: write directly into the example state
+    chart's spy instrumentation stream using its scribble method
+
+    **Note**:
+       Wraps the empty _write function of the example state chart object, giving
+       it its true write functionality based on the mode of operation.
+
+       | ``other`` (ActiveObject): example state chart
+       | ``fn`` (type1): our main chart's _write method
+
+    '''
     def write(string):
-      other.scribble(string)
+      other.scribble("write('{}')".format(string))
       fn(string)
     return write
+    
+  @staticmethod
+  def _no_instrumentation(other, fn):
+    '''HsmTester post_action decorator: output no instrumentation, clear both
+    instrumentation streams
+
+    **Note**:
+       Wraps the empty _post_action function of the HsmTester thread, this
+       allows us to write instrumentation, clear instrumenation buffers or even
+       terminate the program. (see above for this wrapper's purpose)
+
+       | ``other`` (Thread): hsm tester thread
+       | ``fn`` (type1): hsm tester thread's _post_action function
+
+    '''
+    def post_action():
+      '''don't write instrumentation after transitions are complete, but clear the
+         instrumenation buffers'''
+      other.chart.clear_trace()
+      other.chart.clear_spy()
+    return post_action
+
+  @staticmethod
+  def _trace(other, fn):
+    '''HsmTester post_action decorator: output trace instrumentation, clear both
+    instrumentation streams
+
+    **Note**:
+       Wraps the empty _post_action function of the HsmTester thread, this
+       allows us to write instrumentation, clear instrumenation buffers or even
+       terminate the program. (see above for this wrapper's purpose)
+
+       | ``other`` (Thread): hsm tester thread
+       | ``fn`` (type1): hsm tester thread's _post_action function
+
+    '''
+    def post_action():
+      trace = other.chart.trace()
+      if trace == '\n':
+        print("", end='')
+      else:
+        print(trace[1:-1], end='')
+      other.chart.clear_trace()
+      other.chart.clear_spy()
+    return post_action
+
+  @staticmethod
+  def _spy(other, fn):
+    '''HsmTester post_action decorator: output spy instrumentation, clear both
+    instrumentation streams
+
+    **Note**:
+       Wraps the empty _post_action function of the HsmTester thread, this
+       allows us to write instrumentation, clear instrumenation buffers or even
+       terminate the program. (see above for this wrapper's purpose)
+
+       | ``other`` (Thread): hsm tester thread
+       | ``fn`` (type1): hsm tester thread's _post_action function
+
+    '''
+    def post_action():
+      print("\n"+"- "*35)
+      for item in other.chart.spy():
+        print(item)
+      print("- "*35, end='')
+      other.chart.clear_trace()
+      other.chart.clear_spy()
+    return post_action
+
+  @staticmethod
+  def _terminate(other, fn):
+    '''HsmTester post_action decorator: clear the thread event, causing the main
+    program to exit, stop the chart's thread, then print 'Terminate' so user
+    knows they have shut down the program.
+
+    **Note**:
+       Wraps the empty _post_action function of the HsmTester thread, this
+       allows us to write instrumentation, clear instrumenation buffers or even
+       terminate the program. (see above for this wrapper's purpose)
+
+       | ``other`` (Thread): hsm tester thread
+       | ``fn`` (type1): hsm tester thread's _post_action function
+
+    '''
+    def post_action():
+      other.thread_event.clear()
+      other.chart.stop()
+      print ("Terminating")
+    return post_action
 
 class HsmTester(Thread):
+  '''Creates the ExampleStatechart object, attach it to it's HSM, then
+  dispatches the user input to the ExampleStatechart's HSM.'''
 
   def __init__(self, chart):
     super().__init__()
-    self.thread_event = ThreadEvent()
     self.chart = chart
-    def make_post_function(signal_name):
-      def post_event():
-        self.chart.post_fifo(Event(signal=signal_name))
-      def quit():
-        self.thread_event.clear()
-      return quit if signal_name == 'T' else post_event
+    self.thread_event = ThreadEvent()
+    self.signal_names = 'ABCDEFGHIMT'
+    self.post_action = self._post_action
+
     self.thread_event.set()
-    self.post_functions = {
-      character:make_post_function(character) for character in 'ABCDEFGHIMT'}
+
+  def _post_action(self):
+    '''the default post_action; do nothing let the wrappers control the behavior'''
+    pass
 
   def run(self):
 
     def print_signal_char_on_windows(character):
-      print("{}:{}".format(character))
+      print("- "*35)
+      print("{} {}".format("posting", character))
 
     def print_signal_char(character):
+      # keeps input and output on oneline (looks better)
       print("\033[F{}:{}  ".format(self.chart.mode.state_name[0], character), end='')
 
-    pfn = print_signal_char_on_windows if sys.platform == 'win32' else print_signal_char
+    print_signal = print_signal_char_on_windows \
+      if sys.platform == 'win32' else print_signal_char
 
     while self.thread_event.is_set():
-      self.chart.clear_spy()
-      self.chart.clear_trace()
+
+      # indicate the mode state with one character in the signal input prompt
       character = input("\n{}:".format(self.chart.mode.state_name[0]))
       character = character.upper()
-      pfn(character)  # print the signal we are going to send to the terminal
-      if len(character) != 1 or character not in self.post_functions: 
+
+      print_signal(character)
+
+      if len(character) != 1 or character not in self.signal_names: 
         print("Event not defined.") 
       else:
-        self.post_functions[character]()  # call the post function with our event
-      time.sleep(0.01) # give the statechart's thread a moment to catch up
+        self.chart.post_fifo(Event(signal=character))
 
-      if self.chart.mode.state_name == 'trace_mode':
-        trace = self.chart.trace()
-        if trace == '\n':
-          print("", end='')
-        else:
-          print(trace[1:-1], end='')
+      # give the statechart's thread a moment to catch up
+      time.sleep(0.01)
 
-      elif self.chart.mode.state_name == 'spy_mode':
-        print("\n"+"-"*78)
-        for item in self.chart.spy():
-          print(item)
-        print("-"*78)
+      # after the statemachine has finished its work we may want to look
+      # at its instrumentation output (depending on the mode of operation),
+      # or even terminate the program.
+      self.post_action = self.chart.mode.post_action_wrapper(self, self._post_action)
+      self.post_action()
       time.sleep(0.1)
 
-    print ("Terminating")
-    self.chart.stop()  # not needed, active object threads are daemonic
+def mode_control(mode, e):
+  status = return_status.UNHANDLED
+  if(e.signal == signals.INIT_SIGNAL):
+    status = mode.trans(no_instrumentation_mode)
+  elif(e.signal == signals.T):
+    status = mode.trans(terminate)
+  else:
+    mode.temp.fun = mode.top
+    status = return_status.SUPER
+  return status
 
-def naked_mode(mode, e):
+def no_instrumentation_mode(mode, e):
   status = return_status.UNHANDLED
 
   if(e.signal == signals.ENTRY_SIGNAL):
-    mode.wrapper = InstrumentationMode._write
+    mode.write_wrapper = Mode._write
+    mode.post_action_wrapper = Mode._no_instrumentation
     status = return_status.HANDLED
   elif(e.signal == signals.M):
     status = mode.trans(trace_mode)
   else:
-    mode.temp.fun = mode.top
+    mode.temp.fun = mode_control
     status = return_status.SUPER
   return status
 
@@ -120,12 +262,13 @@ def trace_mode(mode, e):
   status = return_status.UNHANDLED
 
   if(e.signal == signals.ENTRY_SIGNAL):
-    mode.wrapper = InstrumentationMode._muted_write
+    mode.write_wrapper = Mode._muted_write
+    mode.post_action_wrapper = Mode._trace
     status = return_status.HANDLED
   elif(e.signal == signals.M):
     status = mode.trans(spy_mode)
   else:
-    mode.temp.fun = mode.top
+    mode.temp.fun = mode_control
     status = return_status.SUPER
   return status
 
@@ -133,12 +276,23 @@ def spy_mode(mode, e):
   status = return_status.UNHANDLED
 
   if(e.signal == signals.ENTRY_SIGNAL):
-    mode.wrapper = InstrumentationMode._scribble
+    mode.write_wrapper = Mode._scribble
+    mode.post_action_wrapper = Mode._spy
     status = return_status.HANDLED
   elif(e.signal == signals.M):
-    status = mode.trans(naked_mode)
+    status = mode.trans(no_instrumentation_mode)
   else:
-    mode.temp.fun = mode.top
+    mode.temp.fun = mode_control
+    status = return_status.SUPER
+  return status
+
+def terminate(mode, e):
+  status = return_status.UNHANDLED
+
+  if(e.signal == signals.ENTRY_SIGNAL):
+    mode.post_action_wrapper = Mode._terminate
+  else:
+    mode.temp.fun = mode_control
     status = return_status.SUPER
   return status
 
@@ -147,6 +301,9 @@ def s(me, e):
   status = return_status.UNHANDLED
 
   if(e.signal == signals.ENTRY_SIGNAL):
+    me.mode = Mode('mode')
+    me.mode.start_at(mode_control)
+    me.write = me.mode.write_wrapper(me, me._write)
     me.write('foo = {}'.format(me.foo))
     me.write('s-ENTRY')
     status = return_status.HANDLED
@@ -166,8 +323,11 @@ def s(me, e):
       me.foo = 0; me.write("foo = 0")
   elif(e.signal == signals.M):
     me.mode.dispatch(e)
-    me.write = me.mode.wrapper(me, me._write)
+    me.write = me.mode.write_wrapper(me, me._write)
     me.write('s-M')
+    status = return_status.HANDLED
+  elif(e.signal == signals.T):
+    me.mode.dispatch(e)
     status = return_status.HANDLED
   else:
     me.temp.fun = me.top

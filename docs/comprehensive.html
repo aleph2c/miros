@@ -1,0 +1,185 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Comprehensive &#8212; miros 2.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Active Object Example" href="singlechartexample.html" />
+    <link rel="prev" title="Examples" href="examples.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="comprehensive">
+<h1>Comprehensive<a class="headerlink" href="#comprehensive" title="Permalink to this headline">¶</a></h1>
+<p>Here is a statechart you can play with.  Click on the diagram to see a bigger
+version of it.</p>
+<p>It hasn’t been instrumented, but <code class="docutils literal notranslate"><span class="pre">write</span></code> statements have been placed all over
+its HSM so you can see when events activate it’s different parts.</p>
+<a class="reference external image-reference" href="_static/comprehensive_no_instrumentation.pdf"><div align="center" class="align-center"><img alt="_images/comprehensive_no_instrumentation.svg" src="_images/comprehensive_no_instrumentation.svg" /></div>
+</a>
+<p>The code to interact with this design can be found <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/comprehensive_no_instrumentation.py">here</a>,
+and to run it, type:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">comprehensive_no_instrumentation</span><span class="o">.</span><span class="n">py</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span><span class="n">s</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span><span class="n">s2</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span><span class="n">s2</span><span class="o">-</span><span class="n">INIT</span><span class="p">;</span><span class="n">s21</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span><span class="n">s211</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span>
+<span class="p">:</span><span class="n">C</span>  <span class="n">s2</span><span class="o">-</span><span class="n">C</span><span class="p">;</span><span class="n">s211</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s21</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s2</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s1</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span><span class="n">s1</span><span class="o">-</span><span class="n">INIT</span><span class="p">;</span><span class="n">s11</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span>
+<span class="p">:</span><span class="n">C</span>  <span class="n">s1</span><span class="o">-</span><span class="n">C</span><span class="p">;</span><span class="n">s11</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s1</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s2</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span><span class="n">s2</span><span class="o">-</span><span class="n">INIT</span><span class="p">;</span><span class="n">s21</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span><span class="n">s211</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span>
+<span class="p">:</span><span class="n">G</span>  <span class="n">s21</span><span class="o">-</span><span class="n">G</span><span class="p">;</span><span class="n">s211</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s21</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s2</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s1</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span><span class="n">s11</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span>
+<span class="p">:</span><span class="n">E</span>  <span class="n">s</span><span class="o">-</span><span class="n">E</span><span class="p">;</span><span class="n">s11</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s1</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s1</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span><span class="n">s11</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span>
+<span class="p">:</span><span class="n">D</span>  <span class="n">s1</span><span class="o">-</span><span class="n">D</span><span class="p">;</span><span class="n">foo</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="n">s11</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s1</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s</span><span class="o">-</span><span class="n">INIT</span><span class="p">;</span><span class="n">s1</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span><span class="n">s11</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span>
+<span class="p">:</span><span class="n">D</span>  <span class="n">s11</span><span class="o">-</span><span class="n">D</span><span class="p">;</span><span class="n">foo</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span><span class="n">s11</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s1</span><span class="o">-</span><span class="n">INIT</span><span class="p">;</span><span class="n">s11</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span>
+<span class="p">:</span><span class="n">T</span>
+<span class="n">Terminating</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="comprehensive-with-instrumentation">
+<h1>Comprehensive with Instrumentation<a class="headerlink" href="#comprehensive-with-instrumentation" title="Permalink to this headline">¶</a></h1>
+<p>It is inconvenient to leave <code class="docutils literal notranslate"><span class="pre">write</span></code> statements all over a design to
+troubleshoot it, so miros comes with two different types of instrumentation
+built into the library.  The instrumentation allows you to query the chart as if
+the write statements were written on every transition and hook.</p>
+<p>To enable this instrumentation, you place the <code class="docutils literal notranslate"><span class="pre">spy_on</span></code> decorator above your
+state call back functions.</p>
+<p>Here is another design (click on it to see a bigger version of it), containing
+the same comprehensive chart described in the previous section, but with an
+additional <code class="docutils literal notranslate"><span class="pre">M</span></code> signal.  The <code class="docutils literal notranslate"><span class="pre">M</span></code> signal causes the chart to switch from
+<code class="docutils literal notranslate"><span class="pre">normal</span></code> to <code class="docutils literal notranslate"><span class="pre">trace</span></code> to <code class="docutils literal notranslate"><span class="pre">spy</span></code> and back to <code class="docutils literal notranslate"><span class="pre">normal</span></code> mode.</p>
+<a class="reference external image-reference" href="_static/comprehensive_with_instrumentation.pdf"><div align="center" class="align-center"><img alt="_images/comprehensive_with_instrumentation.svg" src="_images/comprehensive_with_instrumentation.svg" /></div>
+</a>
+<p>In <code class="docutils literal notranslate"><span class="pre">normal</span></code> mode, the write statements work as they did in the previous
+uninstrumented design.  In <code class="docutils literal notranslate"><span class="pre">trace</span></code> mode the trace instrumentation is shown
+after your chart reacts to an event and the <code class="docutils literal notranslate"><span class="pre">write</span></code> methods are muted so
+nothing is printed to the screen.  In <code class="docutils literal notranslate"><span class="pre">spy</span></code> mode the <code class="docutils literal notranslate"><span class="pre">write</span></code> methods write
+their contents into the <code class="docutils literal notranslate"><span class="pre">spy</span></code> stream then the full <code class="docutils literal notranslate"><span class="pre">spy</span></code> instrumentation is
+shown after the chart reacts to an event.</p>
+<p>The design was also adjusted to include the <code class="docutils literal notranslate"><span class="pre">T</span></code>, terminate event within the
+model_control statemachine managing the instrumentation mode of the chart.  At
+any time you can terminate the program by sending a <code class="docutils literal notranslate"><span class="pre">T</span></code> event.</p>
+<p>The code to interact with this design can be found <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/comprehensive.py">here</a>,
+and to run it, type:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">comprehensive</span><span class="o">.</span><span class="n">py</span>
+
+<span class="n">foo</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span><span class="n">s</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span><span class="n">s2</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span><span class="n">s2</span><span class="o">-</span><span class="n">INIT</span><span class="p">;</span><span class="n">s21</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span><span class="n">s211</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span>
+<span class="n">n</span><span class="p">:</span><span class="n">C</span>  <span class="n">s2</span><span class="o">-</span><span class="n">C</span><span class="p">;</span><span class="n">s211</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s21</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s2</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s1</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span><span class="n">s1</span><span class="o">-</span><span class="n">INIT</span><span class="p">;</span><span class="n">s11</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span>
+<span class="n">n</span><span class="p">:</span><span class="n">D</span>  <span class="n">s1</span><span class="o">-</span><span class="n">D</span><span class="p">;</span><span class="n">foo</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="n">s11</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s1</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s</span><span class="o">-</span><span class="n">INIT</span><span class="p">;</span><span class="n">s1</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span><span class="n">s11</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span>
+<span class="n">n</span><span class="p">:</span><span class="n">D</span>  <span class="n">s11</span><span class="o">-</span><span class="n">D</span><span class="p">;</span><span class="n">foo</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span><span class="n">s11</span><span class="o">-</span><span class="n">EXIT</span><span class="p">;</span><span class="n">s1</span><span class="o">-</span><span class="n">INIT</span><span class="p">;</span><span class="n">s11</span><span class="o">-</span><span class="n">ENTRY</span><span class="p">;</span>
+<span class="n">n</span><span class="p">:</span><span class="n">M</span>
+<span class="n">t</span><span class="p">:</span><span class="n">C</span>  <span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">02</span><span class="o">-</span><span class="mi">26</span> <span class="mo">07</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mf">02.937057</span><span class="p">]</span> <span class="p">[</span><span class="n">me</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">C</span><span class="p">()</span> <span class="n">s11</span><span class="o">-&gt;</span><span class="n">s211</span>
+<span class="n">t</span><span class="p">:</span><span class="n">C</span>  <span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">02</span><span class="o">-</span><span class="mi">26</span> <span class="mo">07</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mf">04.933100</span><span class="p">]</span> <span class="p">[</span><span class="n">me</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">C</span><span class="p">()</span> <span class="n">s211</span><span class="o">-&gt;</span><span class="n">s11</span>
+<span class="n">t</span><span class="p">:</span><span class="n">M</span>
+<span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span>
+<span class="n">M</span><span class="p">:</span><span class="n">s11</span>
+<span class="n">M</span><span class="p">:</span><span class="n">s1</span>
+<span class="n">M</span><span class="p">:</span><span class="n">s</span>
+<span class="n">write</span><span class="p">(</span><span class="s1">&#39;s-M&#39;</span><span class="p">)</span>
+<span class="n">M</span><span class="p">:</span><span class="n">s</span><span class="p">:</span><span class="n">HOOK</span>
+<span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span>
+<span class="n">s</span><span class="p">:</span><span class="n">I</span>
+<span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span>
+<span class="n">I</span><span class="p">:</span><span class="n">s11</span>
+<span class="n">I</span><span class="p">:</span><span class="n">s1</span>
+<span class="n">I</span><span class="p">:</span><span class="n">s</span>
+<span class="n">write</span><span class="p">(</span><span class="s1">&#39;s-I&#39;</span><span class="p">)</span>
+<span class="n">I</span><span class="p">:</span><span class="n">s</span><span class="p">:</span><span class="n">HOOK</span>
+<span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span>
+<span class="n">s</span><span class="p">:</span><span class="n">T</span>  <span class="n">Terminating</span>
+</pre></div>
+</div>
+<p>The design uses the orthogonal component pattern to build an HSM within an HSM;
+the <code class="docutils literal notranslate"><span class="pre">mode_control</span></code> is built in the entry condition of the <code class="docutils literal notranslate"><span class="pre">s</span></code> state, and its
+event’s are dispatched to it using the <code class="docutils literal notranslate"><span class="pre">M</span></code> and <code class="docutils literal notranslate"><span class="pre">T</span></code> hooks of the <code class="docutils literal notranslate"><span class="pre">s</span></code> state.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">post_action</span></code> method of the HsmTester thread is controlled by the
+<code class="docutils literal notranslate"><span class="pre">mode_control</span></code> state, as is the <code class="docutils literal notranslate"><span class="pre">write</span></code> method of the ExampleStateChart.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">I</span></code> event is an example of the ultimate hook pattern, and pay special
+attention to how <code class="docutils literal notranslate"><span class="pre">D</span></code> behaves while in the <code class="docutils literal notranslate"><span class="pre">s11</span></code> state.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
+  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
+</a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Comprehensive</a></li>
+<li><a class="reference internal" href="#comprehensive-with-instrumentation">Comprehensive with Instrumentation</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="examples.html">Examples</a><ul>
+      <li>Previous: <a href="examples.html" title="previous chapter">Examples</a></li>
+      <li>Next: <a href="singlechartexample.html" title="next chapter">Active Object Example</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/comprehensive.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Scott Volk.
+      
+      |
+      <a href="_sources/comprehensive.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
