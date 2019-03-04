@@ -10,6 +10,7 @@ Examples
    :caption: Single Chart Examples:
 
    comprehensive
+   cellular_automata
    singlechartexample
    postingexample
    scribbleexample

@@ -1,0 +1,210 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Cellular Automata &#8212; miros 2.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Active Object Example" href="singlechartexample.html" />
+    <link rel="prev" title="Comprehensive" href="comprehensive.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <blockquote>
+<div><p><em>Making the simple complicated is commonplace; making the complicated simple, awesomely simple, that’s creativity.</em></p>
+<p class="attribution">&mdash;Charlie Mingus</p>
+</div></blockquote>
+<div class="section" id="cellular-automata">
+<h1>Cellular Automata<a class="headerlink" href="#cellular-automata" title="Permalink to this headline">¶</a></h1>
+<p>Here is a picture of the predatory snail, <a class="reference external" href="https://www.youtube.com/watch?v=JjHMGSI_h0Q">conus textile</a>:</p>
+<a class="reference external image-reference" href="https://en.wikipedia.org/wiki/Cellular_automaton#/media/File:Textile_cone.JPG"><img alt="_images/Conus_textile.JPG" class="align-center" src="_images/Conus_textile.JPG" /></a>
+By Richard Ling - Own work; Location: Cod Hole, Great Barrier Reef, Australia, <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=293495">Link</a><p>The pattern on its shell is an example of a 2D cellular automata.  The shell is
+grown by a kind of organic line of printer heads along the shell’s lip.  These
+printer heads, called pigment cells, can extrude colored calcium cement.  The
+color choice of a pigment cell is dependent upon the color choice of it’s two
+adjacent pigment cells.  The rules governing this process are simple, yet a very
+complex shell color pattern emerges.</p>
+<p>A 2D cellular automata exists on a 2D grid of cells; like graphing paper, and it
+is governed by a simple set of rules.  How you color in a square is dependent
+upon the coloring of the three squares above it.  If we decided to only use
+black and white coloring, a square’s color would be dependent upon eight
+different permutations of the three squares above it.  The governing rules of a
+2D cellular automata could be described by drawing out these eight pictures.</p>
+<p>But before we begin to fill in our drawings we would have to decide how to start
+them.  Typically you color the middle square of the top line on your graphing
+paper black, then begin coloring the squares of the second line using the rules.
+Of course you don’t have to do this, you can start however you like.  But how
+you start is called the initial condition, and as you will see, the initial
+conditions have a huge effect on the overall emergent pattern of your drawing.</p>
+<p>In 1983 Stephen Wolfram discovered a 2D cellular automata which created patterns
+that look like the shell of the conus textile snail.  He called this program,
+<a class="reference external" href="https://en.wikipedia.org/wiki/Rule_30">Rule 30</a>.</p>
+<p>Let’s explore how to make a Rule 30, 2D cellular automata, by looking at the
+instructions which govern it:</p>
+<blockquote>
+<div><em>“First, look at each cell and it’s right-hand neighbor.  If both of these were
+white on the previous step, then take the new color of the cell to be whatever
+the previous color of its left-hand neighbor was.  Otherwise, take the new
+color to be the opposite of that.”</em> <a class="footnote-reference" href="#id2" id="id1">[1]</a></div></blockquote>
+<p>Here are these instructions as a picture:</p>
+<a class="reference external image-reference" href="_static/rule_30_rule_in_pictures.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_rule_in_pictures.svg" src="_images/rule_30_rule_in_pictures.svg" /></div>
+</a>
+<p>Now let’s start a drawing: we will place a black square in the middle of the
+first line then follow the rules to fill in the 4 lines below it.</p>
+<a class="reference external image-reference" href="_static/rule_30_by_hand.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_by_hand.svg" src="_images/rule_30_by_hand.svg" /></div>
+</a>
+<p>If you look at the diagram and compare it to the rules described as a paragraph,
+then to the pictures describing this same rule, you will see how it works.</p>
+<p>Now what do we do about the edges of our graphing paper?  We could just pretend
+they aren’t there, making the automata infinite.  Or, we could wrap the paper
+into a tube so that there is no edge.  I have seen that both of these things
+have been done before, but I haven’t seen anyone just force a color onto the
+edge, like a wall.  The guys that invented and played with automata are really
+smart, and they follow a disciplined mathematical aesthetic.  So let’s do
+something they wouldn’t, do let’s take their beautiful little program and run it
+into something completely arbitrary, let’s build that wall and try to make
+something new.</p>
+<p>This will give us a chance to have two state machines interact in the same
+cellular automata.  We need two different machines, a rule 30 machine and a wall
+machine.  The wall machine should be able to be white or black.  Here is a basic
+design diagram including two finite state machines (FSMs) that will do the job:</p>
+<a class="reference external image-reference" href="_static/rule_30_basic_design.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design.svg" src="_images/rule_30_basic_design.svg" /></div>
+</a>
+<p>At the top of the diagram is our automata which provides some context and
+describes our design goal.  Below that is a small UML diagram showing how some
+classes relate to each other.  We see that a <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class <em>has a</em>
+<code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> class.  This <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> class <em>has many</em>
+<code class="docutils literal notranslate"><span class="pre">Rule30</span></code> and <code class="docutils literal notranslate"><span class="pre">Wall</span></code> classes.  The <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class will draw our diagrams
+and animations, the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> will be responsible for creating
+any automata given a <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class and a <code class="docutils literal notranslate"><span class="pre">Rule</span></code> class.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> class will have three attributes describing the machine on the
+left and right and its color.  The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> machine will be inherited from the
+<code class="docutils literal notranslate"><span class="pre">Wall</span></code> class, so we only have to write our color worker method,
+<code class="docutils literal notranslate"><span class="pre">color_number</span></code>, in one spot (the <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class).  The <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class is
+inherited from the <code class="docutils literal notranslate"><span class="pre">HsmWithQueues</span></code>, which means that these statemachines won’t
+be running in their own threads (like they would be if they were derived from
+the <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code> class).  To have them react to events, we will have to use
+their <code class="docutils literal notranslate"><span class="pre">dispatch</span></code> method and they will have to run within the thread of some
+sort of governing program.</p>
+<p>The statemachine under the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> class will provide the behavior described
+by the squares at the top of the page.  The statemachine under the <code class="docutils literal notranslate"><span class="pre">Wall</span></code>
+class consists of two states which can only be gotten to using the <code class="docutils literal notranslate"><span class="pre">start_at</span></code>
+method, no event will cause a transition between these states.  The <code class="docutils literal notranslate"><span class="pre">Wall</span></code>
+objects are intended to interface with the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> objects so that a
+<code class="docutils literal notranslate"><span class="pre">Rule30</span></code> cell can’t tell if it is working with an actual machine or
+just a wall.</p>
+<p>How do we build a <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class to get the feedback needed to see what is
+going on with our program?</p>
+<p>If we were using Stephen Wolfram’s Mathematica this work would be trivial; but
+we are using Python, so we will have to stitch some things together before we
+can visualize our work.</p>
+<p>To make the <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class provide animations and graphics ability, I will use
+the matplotlib library.  <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> will act as a wrapper to the
+<code class="docutils literal notranslate"><span class="pre">matplotlib.FuncAnimation</span></code> class which can be used to make <code class="docutils literal notranslate"><span class="pre">mp4</span></code> videos and
+the <code class="docutils literal notranslate"><span class="pre">matplotlib.savefig</span></code> which can make the <code class="docutils literal notranslate"><span class="pre">SVG</span></code> and <code class="docutils literal notranslate"><span class="pre">PDF</span></code> diagrams
+needed for this document.  The main thing to know about the
+<code class="docutils literal notranslate"><span class="pre">matplolib.FuncAnimation</span></code> class is that it takes an <code class="docutils literal notranslate"><span class="pre">init_func</span></code> and a
+<code class="docutils literal notranslate"><span class="pre">func</span></code> argument which can be filled with functions that initialize the
+animation and that will be called for every frame of the animation.  So if we
+can make functions that initialize some data and change it in every frame,
+then we can make our movie.  But what do we want to show in each frame?  We want a
+grid with colors.  This can be displayed with something called the
+<code class="docutils literal notranslate"><span class="pre">pcolormesh</span></code> which accepts a 2D array and some color codes to map onto the 2D
+array.  Let’s try an draw these broad strokes into a diagram:</p>
+</div>
+<div class="section" id="random-number-generation">
+<h1>Random Number Generation<a class="headerlink" href="#random-number-generation" title="Permalink to this headline">¶</a></h1>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Stephen Wolfram (2002). <a class="reference external" href="https://www.wolframscience.com/">A New Kind of Science.</a> (p27)</td></tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
+  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
+</a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Cellular Automata</a></li>
+<li><a class="reference internal" href="#random-number-generation">Random Number Generation</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="examples.html">Examples</a><ul>
+      <li>Previous: <a href="comprehensive.html" title="previous chapter">Comprehensive</a></li>
+      <li>Next: <a href="singlechartexample.html" title="next chapter">Active Object Example</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/cellular_automata.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Scott Volk.
+      
+      |
+      <a href="_sources/cellular_automata.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
