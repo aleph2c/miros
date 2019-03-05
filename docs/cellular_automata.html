@@ -85,14 +85,18 @@ they aren’t there, making the automata infinite.  Or, we could wrap the paper
 into a tube so that there is no edge.  I have seen that both of these things
 have been done before, but I haven’t seen anyone just force a color onto the
 edge, like a wall.  The guys that invented and played with automata are really
-smart, and they follow a disciplined mathematical aesthetic.  So let’s do
-something they wouldn’t, do let’s take their beautiful little program and run it
-into something completely arbitrary, let’s build that wall and try to make
-something new.</p>
+<em>really</em> smart, and they follow a disciplined mathematical aesthetic.  So let’s
+do something they wouldn’t do, let’s take their beautiful little program and run
+it into something completely arbitrary, let’s build that wall!</p>
 <p>This will give us a chance to have two state machines interact in the same
 cellular automata.  We need two different machines, a rule 30 machine and a wall
-machine.  The wall machine should be able to be white or black.  Here is a basic
-design diagram including two finite state machines (FSMs) that will do the job:</p>
+machine.  The wall machine should be able to be white or black.</p>
+<p>Let’s design a system, then build it and run it (not necessarily in that order)
+and see if we can make something new.</p>
+<div class="section" id="design-and-code">
+<span id="cellular-automata-design"></span><h2>Design and Code<a class="headerlink" href="#design-and-code" title="Permalink to this headline">¶</a></h2>
+<p>Here is a basic design diagram including two finite state machines (FSMs) that
+will do the job:</p>
 <a class="reference external image-reference" href="_static/rule_30_basic_design.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design.svg" src="_images/rule_30_basic_design.svg" /></div>
 </a>
 <p>At the top of the diagram is our automata which provides some context and
@@ -101,7 +105,8 @@ classes relate to each other.  We see that a <code class="docutils literal notra
 <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> class.  This <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> class <em>has many</em>
 <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> and <code class="docutils literal notranslate"><span class="pre">Wall</span></code> classes.  The <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class will draw our diagrams
 and animations, the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> will be responsible for creating
-any automata given a <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class and a <code class="docutils literal notranslate"><span class="pre">Rule</span></code> class.</p>
+any automata given a <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class and a <code class="docutils literal notranslate"><span class="pre">Rule</span></code> class.  That seems simple
+enough.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> class will have three attributes describing the machine on the
 left and right and its color.  The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> machine will be inherited from the
 <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class, so we only have to write our color worker method,
@@ -116,26 +121,419 @@ by the squares at the top of the page.  The statemachine under the <code class="
 class consists of two states which can only be gotten to using the <code class="docutils literal notranslate"><span class="pre">start_at</span></code>
 method, no event will cause a transition between these states.  The <code class="docutils literal notranslate"><span class="pre">Wall</span></code>
 objects are intended to interface with the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> objects so that a
-<code class="docutils literal notranslate"><span class="pre">Rule30</span></code> cell can’t tell if it is working with an actual machine or
-just a wall.</p>
+<code class="docutils literal notranslate"><span class="pre">Rule30</span></code> cell can’t tell if it is working with an actual machine or just a
+wall.</p>
+<div class="section" id="canvas">
+<span id="cellular-automata-canvas"></span><h3>Canvas<a class="headerlink" href="#canvas" title="Permalink to this headline">¶</a></h3>
 <p>How do we build a <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class to get the feedback needed to see what is
 going on with our program?</p>
-<p>If we were using Stephen Wolfram’s Mathematica this work would be trivial; but
-we are using Python, so we will have to stitch some things together before we
-can visualize our work.</p>
-<p>To make the <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class provide animations and graphics ability, I will use
-the matplotlib library.  <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> will act as a wrapper to the
-<code class="docutils literal notranslate"><span class="pre">matplotlib.FuncAnimation</span></code> class which can be used to make <code class="docutils literal notranslate"><span class="pre">mp4</span></code> videos and
-the <code class="docutils literal notranslate"><span class="pre">matplotlib.savefig</span></code> which can make the <code class="docutils literal notranslate"><span class="pre">SVG</span></code> and <code class="docutils literal notranslate"><span class="pre">PDF</span></code> diagrams
-needed for this document.  The main thing to know about the
-<code class="docutils literal notranslate"><span class="pre">matplolib.FuncAnimation</span></code> class is that it takes an <code class="docutils literal notranslate"><span class="pre">init_func</span></code> and a
-<code class="docutils literal notranslate"><span class="pre">func</span></code> argument which can be filled with functions that initialize the
-animation and that will be called for every frame of the animation.  So if we
-can make functions that initialize some data and change it in every frame,
-then we can make our movie.  But what do we want to show in each frame?  We want a
-grid with colors.  This can be displayed with something called the
-<code class="docutils literal notranslate"><span class="pre">pcolormesh</span></code> which accepts a 2D array and some color codes to map onto the 2D
-array.  Let’s try an draw these broad strokes into a diagram:</p>
+<p>If we were using Stephen Wolfram’s Mathematica software this work would be
+trivial. Even if we were using Matlab, it wouldn’t be too hard to see these
+automata, but we are using Python, so we will have to stitch a few things
+together before we can visualize our work.</p>
+<p>Let’s go technology shopping.</p>
+<p>A few years ago Python borg’d Matlab, into its <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy</span></code> and
+<code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> packages, so the Matlab type interfaces have been assimilated
+into the Python collective: resistance is futile.  We can use the <code class="docutils literal notranslate"><span class="pre">numpy</span></code> and
+<code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> libraries to get the Matlab features we need to build and animate
+our automata.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> library can animate graphs, so we will use that.  The
+graphing paper look that we want is provided by its <code class="docutils literal notranslate"><span class="pre">matplotlib.pcolormesh</span></code>
+graphing object, so we will use that too.  Animations are provided by the
+<code class="docutils literal notranslate"><span class="pre">matplotlib.FuncAnimation</span></code> class, which takes a reference to the figure you
+are drawing on, information about how many frames you want in your movie and how
+often you want to show them, and some callback functions that effect the data
+(your picture) for each frame.  The callback functions will be very useful,
+because it means we can pull the operation of our automata away from the
+<code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class and we can make the animation callback call out to a coroutine,
+so we can run an automata forever (if we wanted that).</p>
+<p>Under the hood <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> calls out to <code class="docutils literal notranslate"><span class="pre">FFmpeg</span></code>, which is an open source
+project which makes videos.  Let’s install what we need and get back to our
+design:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">ffmpeg</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">numpy</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">matplotlib</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">I’m assuming you are working within a virtual enviroment.  If you are on
+windows, go and get the ubuntu app, and run this code within your Windows
+Linux Subsystem (WLS).  If you are on a mac, you can use <code class="docutils literal notranslate"><span class="pre">brew</span></code> to get
+ffmpeg.</p>
+</div>
+<p>Here is a UML drawing of the Canvas class:</p>
+<a class="reference external image-reference" href="_static/rule_30_canvas.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_canvas.svg" src="_images/rule_30_canvas.svg" /></div>
+</a>
+<p>The diagram isn’t that useful, and it’s reproducing information that is already
+in the code.  It might have been easier to see this same information using your
+editor’s code browser.  But, remember, UML is from the 90’s.</p>
+<p>But it does describe some emphasis: it show’s us that the <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class will
+have a <code class="docutils literal notranslate"><span class="pre">FuncAnimation</span></code> object and a <code class="docutils literal notranslate"><span class="pre">LinearSegmentedColormap</span></code> (used for
+making colors), and it shows us how we want to make the object and how we want
+to use it with the <code class="docutils literal notranslate"><span class="pre">run_animation</span></code> and <code class="docutils literal notranslate"><span class="pre">save</span></code> methods.</p>
+<p>It also shows us that the Canvas calls will have a <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code>
+object, which will be created elsewhere, then passed to it.</p>
+<p>Here is the <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Canvas</span><span class="p">():</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">automata</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Animate 2D graphing paper, or static file describing a automata</span>
+
+<span class="sd">    Given an autonoma, which has a ``_Generation`` coroutine generator, an</span>
+<span class="sd">    animation can be build by calling this coroutine for as many generations</span>
+<span class="sd">    are required.</span>
+
+<span class="sd">    **Note**:</span>
+<span class="sd">       This ``automata`` object needs to provide a ``_Generation`` method</span>
+<span class="sd">       which returns a coroutine which can be called with ``next``.</span>
+
+<span class="sd">    **Args**:</span>
+<span class="sd">       | ``automata`` (TwoDCellularAutomata):</span>
+<span class="sd">       | ``title=None`` (string): An optional title</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">       (Canvas): this object</span>
+
+<span class="sd">    **Example(s)**:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">       eco1 = Canvas(autonoma)</span>
+<span class="sd">       eco1.run_animation(1200, interval=10)  # 10 ms</span>
+<span class="sd">       eco1.save(&#39;eco1.mp4&#39;)</span>
+
+<span class="sd">       eco2 = Canvas(automata)</span>
+<span class="sd">       eco2 = save(&#39;eco2.pdf, generations=100)</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">automata</span> <span class="o">=</span> <span class="n">automata</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">generation</span> <span class="o">=</span> <span class="n">automata</span><span class="o">.</span><span class="n">_Generation</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="c1"># seventies orange/browns looking color map</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span>
+      <span class="s1">&#39;oranges&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;#ffffff&#39;</span><span class="p">,</span> <span class="s1">&#39;#ffa501&#39;</span><span class="p">,</span> <span class="s1">&#39;#b27300&#39;</span><span class="p">,</span> <span class="s1">&#39;#191000&#39;</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generation</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cmap</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;animation initialization callback</span>
+
+<span class="sd">    **Note**:</span>
+<span class="sd">       This not needed by our animation, but it is needed by the library we</span>
+<span class="sd">       are calling, so we just stub it out</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">       (tuple): (self.grid,)</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,)</span>
+
+  <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;animation callback.</span>
+
+<span class="sd">    This method will be called for each i frame of the animation.  It creates</span>
+<span class="sd">    the next generation of the automata then it updates the pcolormesh using</span>
+<span class="sd">    the set_array method.</span>
+
+<span class="sd">    **Args**:</span>
+<span class="sd">       | ``i`` (int): animation frame number</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">       (tuple): (self.grid,)</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generation</span><span class="p">)</span>
+    <span class="c1"># set_array only accepts a 1D argument</span>
+    <span class="c1"># so flatten Z before feeding it into the grid arg</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">set_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+    <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,)</span>
+
+  <span class="k">def</span> <span class="nf">run_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generations</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Run an animation of the automata.</span>
+
+<span class="sd">    **Args**:</span>
+<span class="sd">       | ``generations`` (int): number of automata generations</span>
+<span class="sd">       | ``interval`` (int): movie frame interval in ms</span>
+
+<span class="sd">    **Example(s)**:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">      eco = Canvas(automata)</span>
+<span class="sd">      eco.run_animation(1200, interval=20)  # 20 ms</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">anim</span> <span class="o">=</span> <span class="n">animation</span><span class="o">.</span><span class="n">FuncAnimation</span><span class="p">(</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">animate</span><span class="p">,</span> <span class="n">init_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span>
+      <span class="n">frames</span><span class="o">=</span><span class="n">generations</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span>
+      <span class="n">blit</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;save an animation or run for a given number of generations and save as a</span>
+<span class="sd">       static file (pdf, svg, .. etc)</span>
+
+<span class="sd">    **Note**:</span>
+<span class="sd">       This function will save as many different static file formats as are</span>
+<span class="sd">       supported by matplot lib, since it uses matplotlib.</span>
+
+<span class="sd">    **Args**:</span>
+<span class="sd">       | ``filename=None`` (string): name of the file</span>
+<span class="sd">       | ``generations=0`` (int): generations to run if the files doesn&#39;t have</span>
+<span class="sd">       |                          an &#39;mp4&#39; extension and hasn&#39;t been</span>
+<span class="sd">       |                          animated before</span>
+
+
+<span class="sd">    **Example(s)**:</span>
+
+<span class="sd">       eco1 = Canvas(autonoma)</span>
+<span class="sd">       eco1.run_animation(50, 10)</span>
+<span class="sd">       eco1.save(&#39;rule_30.mp4)</span>
+<span class="sd">       eco1.save(&#39;rule_30.pdf)</span>
+
+<span class="sd">       eco2 = Canvas(autonoma)</span>
+<span class="sd">       eco1.save(&#39;rule_30.pdf&#39;, generations=40)</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+  <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;.mp4&#39;</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">anim</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">automata</span><span class="o">.</span><span class="n">generation</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">automata</span><span class="o">.</span><span class="n">generations</span><span class="p">):</span>
+          <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">automata</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cmap</span><span class="p">)</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">I didn’t write the <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class out of thin air, I created a 2 dimensional
+array and some functions that would randomize this array, then I fed these
+functions into the code that I built up using examples from the internet until
+I got something working.  Only then did I feed it the 2TwoDCellularAutomata
+class, which originally didn’t use a co-routine; that was added later.</p>
+</div>
+</div>
+<div class="section" id="twodcellularautomata">
+<span id="cellular-automata-two2automato"></span><h3>TwoDCellularAutomata<a class="headerlink" href="#twodcellularautomata" title="Permalink to this headline">¶</a></h3>
+<p>Let’s give our basic design another look:</p>
+<a class="reference external image-reference" href="_static/rule_30_basic_design.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design.svg" src="_images/rule_30_basic_design.svg" /></div>
+</a>
+<p>The <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> object will be responsible for applying the rules
+to our graphing paper, and for setting it into it’s initial condition (the black
+square in the middle of the top line).</p>
+<p>To do this <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> will provide a two dimensional array, Z,
+containing color codes, to be used by our Canvas to draw things.  It also
+builds a lot of <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> and <code class="docutils literal notranslate"><span class="pre">Wall</span></code> statemachines and links them to other
+machines so that they can read the <code class="docutils literal notranslate"><span class="pre">left.color</span></code> and <code class="docutils literal notranslate"><span class="pre">right.color</span></code> attributes
+of their adjacent cells.  <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> needs to set up some initial
+conditions; how the machines are started on the first line of our graphing
+paper.  The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> statemachines respond to <code class="docutils literal notranslate"><span class="pre">Next</span></code> events, which cause
+them to react and change if they need to change, so the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code>
+will need to dispatch this event into all of the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> objects to make a
+new line as the automata propagates downward.</p>
+<p>To make the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> object generic, we will feed it it’s
+automata rule and wall rules as classes.  To make the wall behavior
+parameterizable, so I’ll add some new wall rule classes that hold the left and
+right colors in their class attributes:</p>
+<a class="reference external image-reference" href="_static/rule_30_basic_design_1.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design_1.svg" src="_images/rule_30_basic_design_1.svg" /></div>
+</a>
+<p>Here is a UML diagram of the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> class:</p>
+<a class="reference external image-reference" href="_static/rule_30_twodcellularautomata.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_twodcellularautomata.svg" src="_images/rule_30_twodcellularautomata.svg" /></div>
+</a>
+<p>There is a bunch of stuff in this diagram that I don’t know how to draw using
+UML.  For instance, how do I show a class that I have sent it a class, so it
+knows how to build something?  How do I draw something that makes a co-routine?
+Well, I don’t know, so I’ll try and make something that isn’t too confusing and
+explain what I meant here with a few words.</p>
+<p>The few key take aways from the drawing are how the constructor works, we feed
+it in the rule and wall classes so that it can generically construct an
+automata.  We also show the function that returns the co-routine.  Each time,
+next is called it advances to the next yield statement.  So, the first time the
+coroutine is activated it will initialize the automata and then every activation
+after that will cause it to descend one row down.</p>
+<p>Here is the code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TwoDCellularAutomata</span><span class="p">():</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+      <span class="n">generations</span><span class="p">,</span>
+      <span class="n">cells_per_generation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">initial_condition_index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">machine_cls</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">wall_cls</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Build a two dimensional cellular automata object which can be advanced</span>
+<span class="sd">       with a coroutine.</span>
+
+<span class="sd">    **Args**:</span>
+<span class="sd">       | ``generations`` (int): how many generations to run (vertical cells)</span>
+<span class="sd">       | ``cells_per_generation=None`` (int): how many cells across</span>
+<span class="sd">       | ``initial_condition_index=None`` (int): the starting index cell (make</span>
+<span class="sd">       |                                         black)</span>
+<span class="sd">       | ``machine_cls=None`` (Rule): which automata rule to follow</span>
+<span class="sd">       | ``wall_cls=None`` (Wall): which wall rules to follow</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">       (TwoDCellularAutonomata): an automata object</span>
+
+<span class="sd">    **Example(s)**:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">      # build an automata using rule 30 with white walls</span>
+<span class="sd">      # it should be 50 cells across</span>
+<span class="sd">      # and it should run for 1000 generations</span>
+<span class="sd">      autonoma = TwoDCellularAutomata(</span>
+<span class="sd">        machine_cls=Rule30,</span>
+<span class="sd">        generations=1000,</span>
+<span class="sd">        wall_cls=WallLeftWhiteRightWhite,</span>
+<span class="sd">        cells_per_generation=50</span>
+<span class="sd">      )</span>
+
+<span class="sd">      # to get the generator for this automata</span>
+<span class="sd">      generation = automata.make_generation_coroutine()</span>
+
+<span class="sd">      # to advance a generation (first one will initialize it)</span>
+<span class="sd">      next(generation)</span>
+
+<span class="sd">      # to get the color codes from it&#39;s two dimension array</span>
+<span class="sd">      automata.Z</span>
+
+<span class="sd">      # to advance a generation</span>
+<span class="sd">      next(generation)</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># python automatically places the classes passed into this object as</span>
+    <span class="c1"># tuples, this is surprising behavior but it is how it works, so we go</span>
+    <span class="c1"># with it</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">machine_cls</span> <span class="o">=</span> <span class="n">machine_cls</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">wall_cls</span> <span class="o">=</span> <span class="n">wall_cls</span>
+
+    <span class="k">if</span> <span class="n">machine_cls</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">machine_cls</span> <span class="o">=</span> <span class="n">Rule30</span>
+
+    <span class="k">if</span> <span class="n">wall_cls</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">wall_cls</span> <span class="o">=</span> <span class="n">WallLeftWhiteRightWhite</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">generations</span> <span class="o">=</span> <span class="n">generations</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cells_per_generation</span> <span class="o">=</span> <span class="n">cells_per_generation</span>
+
+    <span class="c1"># if they haven&#39;t specified cells_per_generation set it</span>
+    <span class="c1"># so that the cells appear square on most terminals</span>
+    <span class="k">if</span> <span class="n">cells_per_generation</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="c1"># this number was discovered through trial and error</span>
+      <span class="c1"># matplotlib seems to be ignoring the aspect ratio</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cells_per_generation</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">generations</span><span class="o">*</span><span class="mi">17</span><span class="o">/</span><span class="mi">12</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">initial_condition_index</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cells_per_generation</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span> \
+      <span class="k">if</span> <span class="n">initial_condition_index</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">initial_condition_index</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">generation</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">left_wall</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_cls</span><span class="o">.</span><span class="n">left_wall</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">right_wall</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_cls</span><span class="o">.</span><span class="n">right_wall</span>
+
+  <span class="k">def</span> <span class="nf">make_and_start_left_wall_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;make and start the left wall based on the wall_cls&#39;&#39;&#39;</span>
+    <span class="n">wall</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wall_cls</span><span class="p">()</span>
+    <span class="n">wall</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_cls</span><span class="o">.</span><span class="n">left_wall</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wall</span>
+
+  <span class="k">def</span> <span class="nf">make_and_start_right_wall_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;make and start the right wall based on the wall_cls&#39;&#39;&#39;</span>
+    <span class="n">wall</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wall_cls</span><span class="p">()</span>
+    <span class="n">wall</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_cls</span><span class="o">.</span><span class="n">right_wall</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wall</span>
+
+  <span class="k">def</span> <span class="nf">initial_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;initialize the 2d cellular automata&#39;&#39;&#39;</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">generations</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_per_generation</span><span class="p">],</span> <span class="n">Black</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="c1"># create a collections of unstarted machines</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">machines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cells_per_generation</span><span class="o">-</span><span class="mi">2</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">machines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_cls</span><span class="p">())</span>
+
+    <span class="n">left_wall</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_and_start_left_wall_machine</span><span class="p">()</span>
+    <span class="n">right_wall</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_and_start_right_wall_machine</span><span class="p">()</span>
+
+    <span class="c1"># unstarted machines sandwiched between unstarted boundaries</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">machines</span> <span class="o">=</span> <span class="p">[</span><span class="n">left_wall</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">machines</span> <span class="o">+</span> <span class="p">[</span><span class="n">right_wall</span><span class="p">]</span>
+
+    <span class="c1"># start the boundaries in their holding color</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">machines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">fake_white</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">machines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">fake_white</span><span class="p">)</span>
+
+    <span class="c1"># start most of the machines in white except for the one at the</span>
+    <span class="c1"># intial_condition_index</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machines</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_condition_index</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">machines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">white</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">machines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">black</span><span class="p">)</span>
+
+    <span class="c1"># we have created a generation, so count down by one</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">generation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generations</span><span class="o">-</span><span class="mi">1</span>
+
+    <span class="c1"># create some initial walls in Z</span>
+    <span class="n">Z</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">machines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">color_number</span><span class="p">()</span>
+    <span class="n">Z</span><span class="p">[:,</span> <span class="n">Z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">machines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">color_number</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span>
+
+  <span class="k">def</span> <span class="nf">next_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;create the next row of the 2d cellular automata&#39;&#39;&#39;</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">generations</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+      <span class="c1"># draw the first row</span>
+      <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">machine</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machines</span><span class="p">):</span>
+        <span class="n">Z</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">generations</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">machine</span><span class="o">.</span><span class="n">color_number</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="c1"># draw every other row</span>
+      <span class="n">Z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span>
+      <span class="n">new_machines</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machines</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)):</span>
+        <span class="n">old_left_machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">machines</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">old_machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">machines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">old_right_machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">machines</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">new_machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_cls</span><span class="p">()</span>
+        <span class="n">new_machine</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">old_machine</span><span class="o">.</span><span class="n">state_fn</span><span class="p">)</span>
+        <span class="n">new_machine</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">old_left_machine</span>
+        <span class="n">new_machine</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">old_right_machine</span>
+        <span class="n">new_machines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_machine</span><span class="p">)</span>
+
+      <span class="n">left_wall</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_and_start_left_wall_machine</span><span class="p">()</span>
+      <span class="n">right_wall</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_and_start_right_wall_machine</span><span class="p">()</span>
+      <span class="n">new_machines</span> <span class="o">=</span> <span class="p">[</span><span class="n">left_wall</span><span class="p">]</span> <span class="o">+</span> <span class="n">new_machines</span> <span class="o">+</span> <span class="p">[</span><span class="n">right_wall</span><span class="p">]</span>
+
+      <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">machine</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_machines</span><span class="p">):</span>
+        <span class="n">machine</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Next</span><span class="p">))</span>
+        <span class="n">Z</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">generation</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">machine</span><span class="o">.</span><span class="n">color_number</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">machines</span> <span class="o">=</span> <span class="n">new_machines</span><span class="p">[:]</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">generation</span> <span class="o">-=</span> <span class="mi">1</span>
+
+  <span class="k">def</span> <span class="nf">make_generation_coroutine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;create the automata coroutine&#39;&#39;&#39;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">initial_state</span><span class="p">()</span>
+    <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">next_generation</span><span class="p">()</span>
+      <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span>
+</pre></div>
+</div>
+</div>
+</div>
 </div>
 <div class="section" id="random-number-generation">
 <h1>Random Number Generation<a class="headerlink" href="#random-number-generation" title="Permalink to this headline">¶</a></h1>
@@ -158,7 +556,14 @@ array.  Let’s try an draw these broad strokes into a diagram:</p>
 </a></p>
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Cellular Automata</a></li>
+<li><a class="reference internal" href="#">Cellular Automata</a><ul>
+<li><a class="reference internal" href="#design-and-code">Design and Code</a><ul>
+<li><a class="reference internal" href="#canvas">Canvas</a></li>
+<li><a class="reference internal" href="#twodcellularautomata">TwoDCellularAutomata</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#random-number-generation">Random Number Generation</a></li>
 </ul>
 <div class="relations">

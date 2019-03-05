@@ -68,15 +68,24 @@ they aren't there, making the automata infinite.  Or, we could wrap the paper
 into a tube so that there is no edge.  I have seen that both of these things
 have been done before, but I haven't seen anyone just force a color onto the
 edge, like a wall.  The guys that invented and played with automata are really
-smart, and they follow a disciplined mathematical aesthetic.  So let's do
-something they wouldn't, do let's take their beautiful little program and run it
-into something completely arbitrary, let's build that wall and try to make
-something new.
+*really* smart, and they follow a disciplined mathematical aesthetic.  So let's
+do something they wouldn't do, let's take their beautiful little program and run
+it into something completely arbitrary, let's build that wall!
 
 This will give us a chance to have two state machines interact in the same
 cellular automata.  We need two different machines, a rule 30 machine and a wall
-machine.  The wall machine should be able to be white or black.  Here is a basic
-design diagram including two finite state machines (FSMs) that will do the job:
+machine.  The wall machine should be able to be white or black.
+
+Let's design a system, then build it and run it (not necessarily in that order)
+and see if we can make something new.
+
+.. _cellular_automata-design:
+
+Design and Code
+---------------
+
+Here is a basic design diagram including two finite state machines (FSMs) that
+will do the job:
 
 .. image:: _static/rule_30_basic_design.svg
     :target: _static/rule_30_basic_design.pdf
@@ -88,7 +97,8 @@ classes relate to each other.  We see that a ``Canvas`` class *has a*
 ``TwoDCellularAutomata`` class.  This ``TwoDCellularAutomata`` class *has many*
 ``Rule30`` and ``Wall`` classes.  The ``Canvas`` class will draw our diagrams
 and animations, the ``TwoDCellularAutomata`` will be responsible for creating
-any automata given a ``Wall`` class and a ``Rule`` class.
+any automata given a ``Wall`` class and a ``Rule`` class.  That seems simple
+enough.
 
 The ``Rule30`` class will have three attributes describing the machine on the
 left and right and its color.  The ``Rule30`` machine will be inherited from the
@@ -105,30 +115,452 @@ by the squares at the top of the page.  The statemachine under the ``Wall``
 class consists of two states which can only be gotten to using the ``start_at``
 method, no event will cause a transition between these states.  The ``Wall``
 objects are intended to interface with the ``Rule30`` objects so that a
-``Rule30`` cell can't tell if it is working with an actual machine or
-just a wall.
+``Rule30`` cell can't tell if it is working with an actual machine or just a
+wall.
+
+.. _cellular_automata-canvas:
+
+Canvas
+^^^^^^
 
 How do we build a ``Canvas`` class to get the feedback needed to see what is
 going on with our program?
 
-If we were using Stephen Wolfram's Mathematica this work would be trivial; but
-we are using Python, so we will have to stitch some things together before we
-can visualize our work.
+If we were using Stephen Wolfram's Mathematica software this work would be
+trivial. Even if we were using Matlab, it wouldn't be too hard to see these
+automata, but we are using Python, so we will have to stitch a few things
+together before we can visualize our work.
 
-To make the ``Canvas`` class provide animations and graphics ability, I will use
-the matplotlib library.  ``Canvas`` will act as a wrapper to the
-``matplotlib.FuncAnimation`` class which can be used to make ``mp4`` videos and
-the ``matplotlib.savefig`` which can make the ``SVG`` and ``PDF`` diagrams
-needed for this document.  The main thing to know about the
-``matplolib.FuncAnimation`` class is that it takes an ``init_func`` and a
-``func`` argument which can be filled with functions that initialize the
-animation and that will be called for every frame of the animation.  So if we
-can make functions that initialize some data and change it in every frame,
-then we can make our movie.  But what do we want to show in each frame?  We want a
-grid with colors.  This can be displayed with something called the
-``pcolormesh`` which accepts a 2D array and some color codes to map onto the 2D
-array.  Let's try an draw these broad strokes into a diagram:
+Let's go technology shopping.
 
+A few years ago Python borg'd Matlab, into its ``numpy``, ``scipy`` and
+``matplotlib`` packages, so the Matlab type interfaces have been assimilated
+into the Python collective: resistance is futile.  We can use the ``numpy`` and
+``matplotlib`` libraries to get the Matlab features we need to build and animate
+our automata.
+
+The ``matplotlib`` library can animate graphs, so we will use that.  The
+graphing paper look that we want is provided by its ``matplotlib.pcolormesh``
+graphing object, so we will use that too.  Animations are provided by the
+``matplotlib.FuncAnimation`` class, which takes a reference to the figure you
+are drawing on, information about how many frames you want in your movie and how
+often you want to show them, and some callback functions that effect the data
+(your picture) for each frame.  The callback functions will be very useful,
+because it means we can pull the operation of our automata away from the
+``Canvas`` class and we can make the animation callback call out to a coroutine,
+so we can run an automata forever (if we wanted that).
+
+Under the hood ``matplotlib`` calls out to ``FFmpeg``, which is an open source
+project which makes videos.  Let's install what we need and get back to our
+design:
+
+.. code-block:: python
+
+   sudo apt-get install ffmpeg
+   pip install numpy
+   pip install matplotlib
+
+.. note::
+
+  I'm assuming you are working within a virtual enviroment.  If you are on
+  windows, go and get the ubuntu app, and run this code within your Windows
+  Linux Subsystem (WLS).  If you are on a mac, you can use ``brew`` to get
+  ffmpeg.
+
+Here is a UML drawing of the Canvas class:
+
+.. image:: _static/rule_30_canvas.svg
+    :target: _static/rule_30_canvas.pdf
+    :align: center
+
+The diagram isn't that useful, and it's reproducing information that is already
+in the code.  It might have been easier to see this same information using your
+editor's code browser.  But, remember, UML is from the 90's.
+
+But it does describe some emphasis: it show's us that the ``Canvas`` class will
+have a ``FuncAnimation`` object and a ``LinearSegmentedColormap`` (used for
+making colors), and it shows us how we want to make the object and how we want
+to use it with the ``run_animation`` and ``save`` methods.
+
+It also shows us that the Canvas calls will have a ``TwoDCellularAutomata``
+object, which will be created elsewhere, then passed to it.
+
+Here is the ``Canvas`` code:
+
+.. code-block:: python
+
+  class Canvas():
+    def __init__(self, automata, title=None):
+      '''Animate 2D graphing paper, or static file describing a automata
+
+      Given an autonoma, which has a ``_Generation`` coroutine generator, an
+      animation can be build by calling this coroutine for as many generations
+      are required.
+
+      **Note**:
+         This ``automata`` object needs to provide a ``_Generation`` method
+         which returns a coroutine which can be called with ``next``.
+
+      **Args**:
+         | ``automata`` (TwoDCellularAutomata): 
+         | ``title=None`` (string): An optional title
+
+      **Returns**:
+         (Canvas): this object
+
+      **Example(s)**:
+        
+      .. code-block:: python
+         
+         eco1 = Canvas(autonoma)
+         eco1.run_animation(1200, interval=10)  # 10 ms
+         eco1.save('eco1.mp4')
+
+         eco2 = Canvas(automata)
+         eco2 = save('eco2.pdf, generations=100)
+
+      '''
+      self.fig, self.ax = plt.subplots()
+      if title:
+        self.ax.set_title(title)
+      self.automata = automata
+      self.generation = automata._Generation()
+      self.ax.set_yticklabels([])
+      self.ax.set_xticklabels([])
+      self.ax.set_aspect(1.0)
+      self.ax.xaxis.set_ticks_position('none')
+      self.ax.yaxis.set_ticks_position('none')
+      self.fig.tight_layout()
+      # seventies orange/browns looking color map
+      self.cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
+        'oranges', ['#ffffff', '#ffa501', '#b27300', '#191000'])
+      self.grid = self.ax.pcolormesh(next(self.generation), cmap=self.cmap)
+
+    def init(self):
+      '''animation initialization callback
+
+      **Note**:
+         This not needed by our animation, but it is needed by the library we
+         are calling, so we just stub it out
+
+      **Returns**:
+         (tuple): (self.grid,)
+
+      '''
+      return (self.grid,)
+
+    def animate(self, i):
+      '''animation callback.
+
+      This method will be called for each i frame of the animation.  It creates
+      the next generation of the automata then it updates the pcolormesh using
+      the set_array method.
+
+      **Args**:
+         | ``i`` (int): animation frame number
+
+      **Returns**:
+         (tuple): (self.grid,)
+
+      '''
+      self.Z = next(self.generation)
+      # set_array only accepts a 1D argument
+      # so flatten Z before feeding it into the grid arg
+      self.grid.set_array(self.Z.ravel())
+      return (self.grid,)
+    
+    def run_animation(self, generations, interval):
+      '''Run an animation of the automata.
+
+      **Args**:
+         | ``generations`` (int): number of automata generations
+         | ``interval`` (int): movie frame interval in ms
+
+      **Example(s)**:
+        
+      .. code-block:: python
+         
+        eco = Canvas(automata)
+        eco.run_animation(1200, interval=20)  # 20 ms
+
+      '''
+      self.anim = animation.FuncAnimation(
+        self.fig, self.animate, init_func=self.init,
+        frames=generations, interval=interval,
+        blit=False)
+
+    def save(self, filename=None, generations=0):
+      '''save an animation or run for a given number of generations and save as a
+         static file (pdf, svg, .. etc)
+
+      **Note**:
+         This function will save as many different static file formats as are
+         supported by matplot lib, since it uses matplotlib.
+
+      **Args**:
+         | ``filename=None`` (string): name of the file
+         | ``generations=0`` (int): generations to run if the files doesn't have
+         |                          an 'mp4' extension and hasn't been
+         |                          animated before
+
+
+      **Example(s)**:
+
+         eco1 = Canvas(autonoma)
+         eco1.run_animation(50, 10)
+         eco1.save('rule_30.mp4)
+         eco1.save('rule_30.pdf)
+
+         eco2 = Canvas(autonoma)
+         eco1.save('rule_30.pdf', generations=40)
+
+      '''
+    def save(self, filename=None, generations=0):
+
+      if pathlib.Path(filename).suffix == '.mp4':
+        self.anim.save(filename) 
+      else:
+        if self.automata.generation > 0:
+          for i in range(self.automata.generations):
+            next(self.generation)
+          self.ax.pcolormesh(self.automata.Z, cmap=self.cmap)
+        plt.savefig(filename) 
+
+
+.. note::
+
+  I didn't write the ``Canvas`` class out of thin air, I created a 2 dimensional
+  array and some functions that would randomize this array, then I fed these
+  functions into the code that I built up using examples from the internet until
+  I got something working.  Only then did I feed it the 2TwoDCellularAutomata
+  class, which originally didn't use a co-routine; that was added later.
+
+.. _cellular_automata-two2Automato:
+
+TwoDCellularAutomata
+^^^^^^^^^^^^^^^^^^^^
+Let's give our basic design another look:
+
+.. image:: _static/rule_30_basic_design.svg
+    :target: _static/rule_30_basic_design.pdf
+    :align: center
+
+The ``TwoDCellularAutomata`` object will be responsible for applying the rules
+to our graphing paper, and for setting it into it's initial condition (the black
+square in the middle of the top line).
+
+To do this ``TwoDCellularAutomata`` will provide a two dimensional array, Z,
+containing color codes, to be used by our Canvas to draw things.  It also
+builds a lot of ``Rule30`` and ``Wall`` statemachines and links them to other
+machines so that they can read the ``left.color`` and ``right.color`` attributes
+of their adjacent cells.  ``TwoDCellularAutomata`` needs to set up some initial
+conditions; how the machines are started on the first line of our graphing
+paper.  The ``Rule30`` statemachines respond to ``Next`` events, which cause
+them to react and change if they need to change, so the ``TwoDCellularAutomata``
+will need to dispatch this event into all of the ``Rule30`` objects to make a
+new line as the automata propagates downward.
+
+To make the ``TwoDCellularAutomata`` object generic, we will feed it it's
+automata rule and wall rules as classes.  To make the wall behavior
+parameterizable, so I'll add some new wall rule classes that hold the left and
+right colors in their class attributes:
+
+.. image:: _static/rule_30_basic_design_1.svg
+    :target: _static/rule_30_basic_design_1.pdf
+    :align: center
+
+Here is a UML diagram of the ``TwoDCellularAutomata`` class:
+
+.. image:: _static/rule_30_twodcellularautomata.svg
+    :target: _static/rule_30_twodcellularautomata.pdf
+    :align: center
+
+There is a bunch of stuff in this diagram that I don't know how to draw using
+UML.  For instance, how do I show a class that I have sent it a class, so it
+knows how to build something?  How do I draw something that makes a co-routine?
+Well, I don't know, so I'll try and make something that isn't too confusing and
+explain what I meant here with a few words.
+
+The few key take aways from the drawing are how the constructor works, we feed
+it in the rule and wall classes so that it can generically construct an
+automata.  We also show the function that returns the co-routine.  Each time,
+next is called it advances to the next yield statement.  So, the first time the
+coroutine is activated it will initialize the automata and then every activation
+after that will cause it to descend one row down.
+
+Here is the code:
+
+.. code-block:: python
+
+  class TwoDCellularAutomata():
+    def __init__(self,
+        generations,
+        cells_per_generation=None,
+        initial_condition_index=None,
+        machine_cls=None, 
+        wall_cls=None,
+        ):
+      '''Build a two dimensional cellular automata object which can be advanced
+         with a coroutine.  
+
+      **Args**:
+         | ``generations`` (int): how many generations to run (vertical cells)
+         | ``cells_per_generation=None`` (int): how many cells across
+         | ``initial_condition_index=None`` (int): the starting index cell (make
+         |                                         black)
+         | ``machine_cls=None`` (Rule): which automata rule to follow
+         | ``wall_cls=None`` (Wall): which wall rules to follow
+
+      **Returns**:
+         (TwoDCellularAutonomata): an automata object
+
+      **Example(s)**:
+        
+      .. code-block:: python
+       
+        # build an automata using rule 30 with white walls
+        # it should be 50 cells across
+        # and it should run for 1000 generations
+        autonoma = TwoDCellularAutomata(
+          machine_cls=Rule30,
+          generations=1000,
+          wall_cls=WallLeftWhiteRightWhite,
+          cells_per_generation=50
+        )
+
+        # to get the generator for this automata
+        generation = automata.make_generation_coroutine()
+
+        # to advance a generation (first one will initialize it)
+        next(generation)
+
+        # to get the color codes from it's two dimension array
+        automata.Z
+
+        # to advance a generation
+        next(generation)
+
+      '''
+      # python automatically places the classes passed into this object as
+      # tuples, this is surprising behavior but it is how it works, so we go
+      # with it
+      self.machine_cls = machine_cls
+      self.wall_cls = wall_cls
+
+      if machine_cls is None:
+        self.machine_cls = Rule30
+
+      if wall_cls is None:
+        self.wall_cls = WallLeftWhiteRightWhite
+
+      self.generations = generations
+      self.cells_per_generation = cells_per_generation
+
+      # if they haven't specified cells_per_generation set it
+      # so that the cells appear square on most terminals
+      if cells_per_generation is None:
+        # this number was discovered through trial and error
+        # matplotlib seems to be ignoring the aspect ratio
+        self.cells_per_generation = round(generations*17/12)
+
+      self.initial_condition_index = round(self.cells_per_generation/2.0) \
+        if initial_condition_index is None else initial_condition_index
+
+      self.generation = None
+
+      self.left_wall=self.wall_cls.left_wall
+      self.right_wall=self.wall_cls.right_wall
+
+    def make_and_start_left_wall_machine(self):
+      '''make and start the left wall based on the wall_cls'''
+      wall = self.wall_cls()
+      wall.start_at(self.wall_cls.left_wall)
+      return wall
+
+    def make_and_start_right_wall_machine(self):
+      '''make and start the right wall based on the wall_cls'''
+      wall = self.wall_cls()
+      wall.start_at(self.wall_cls.right_wall)
+      return wall
+
+    def initial_state(self):
+      '''initialize the 2d cellular automata'''
+      Z = np.full([self.generations, self.cells_per_generation], Black,
+                  dtype=np.float32)
+
+      # create a collections of unstarted machines
+      self.machines = []
+      for i in range(self.cells_per_generation-2):
+        self.machines.append(self.machine_cls())
+
+      left_wall = self.make_and_start_left_wall_machine()
+      right_wall = self.make_and_start_right_wall_machine()
+
+      # unstarted machines sandwiched between unstarted boundaries
+      self.machines = [left_wall] + self.machines + [right_wall]
+
+      # start the boundaries in their holding color
+      self.machines[0].start_at(fake_white)
+      self.machines[-1].start_at(fake_white)
+
+      # start most of the machines in white except for the one at the
+      # intial_condition_index
+      for i in range(1, len(self.machines)-1):
+        if i != self.initial_condition_index:
+          self.machines[i].start_at(white)
+        else:
+          self.machines[i].start_at(black)
+
+      # we have created a generation, so count down by one
+      self.generation = self.generations-1
+
+      # create some initial walls in Z
+      Z[:, 0] = self.machines[0].color_number()
+      Z[:, Z.shape[-1]-1] = self.machines[-1].color_number()
+
+      self.Z = Z
+
+    def next_generation(self):
+      '''create the next row of the 2d cellular automata'''
+      Z = self.Z
+      if self.generation == self.generations-1:
+        # draw the first row
+        for i, machine in enumerate(self.machines):
+          Z[self.generations-1, i] = machine.color_number()
+      else:
+        # draw every other row
+        Z = self.Z
+        new_machines = []
+        for i in range(1, (len(self.machines)-1)):
+          old_left_machine = self.machines[i-1]
+          old_machine = self.machines[i]
+          old_right_machine = self.machines[i+1]
+          
+          new_machine = self.machine_cls()
+          new_machine.start_at(old_machine.state_fn)
+          new_machine.left = old_left_machine
+          new_machine.right = old_right_machine
+          new_machines.append(new_machine)
+
+        left_wall = self.make_and_start_left_wall_machine()
+        right_wall = self.make_and_start_right_wall_machine()
+        new_machines = [left_wall] + new_machines + [right_wall]
+
+        for i, machine in enumerate(new_machines):
+          machine.dispatch(Event(signal=signals.Next))
+          Z[self.generation, i] = machine.color_number()
+        self.machines = new_machines[:]
+
+      self.Z = Z
+      self.generation -= 1
+
+    def make_generation_coroutine(self):
+      '''create the automata coroutine'''
+      self.initial_state()
+      yield self.Z
+      while True:
+        self.next_generation()
+        yield self.Z
 
 
 Random Number Generation

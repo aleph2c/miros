@@ -4,25 +4,24 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>570</x>
-      <y>110</y>
+      <x>770</x>
+      <y>200</y>
       <w>250</w>
-      <h>220</h>
+      <h>200</h>
     </coordinates>
     <panel_attributes>*Canvas*
 --
 _fig
 _ax
-_evolution
+_automata
 _generation
 _cmap
 _grid
 --
 _init()
 _animate(i)
-run_animation(generation, interval)
-save(generations, filename)
-save_animation(filename)
+run_animation(generations, interval)
+save(filename, generations=0)
 
 layer=1</panel_attributes>
     <additional_attributes/>
@@ -30,8 +29,8 @@ layer=1</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>230</x>
-      <y>150</y>
+      <x>430</x>
+      <y>240</y>
       <w>290</w>
       <h>30</h>
     </coordinates>
@@ -41,8 +40,8 @@ layer=1</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>280</x>
-      <y>110</y>
+      <x>480</x>
+      <y>200</y>
       <w>240</w>
       <h>30</h>
     </coordinates>
@@ -52,8 +51,8 @@ layer=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>510</x>
-      <y>120</y>
+      <x>710</x>
+      <y>210</y>
       <w>80</w>
       <h>30</h>
     </coordinates>
@@ -63,8 +62,8 @@ layer=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>510</x>
-      <y>160</y>
+      <x>710</x>
+      <y>250</y>
       <w>80</w>
       <h>30</h>
     </coordinates>
@@ -74,8 +73,8 @@ layer=1</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>230</x>
-      <y>200</y>
+      <x>430</x>
+      <y>290</y>
       <w>290</w>
       <h>30</h>
     </coordinates>
@@ -85,8 +84,8 @@ layer=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>510</x>
-      <y>210</y>
+      <x>710</x>
+      <y>300</y>
       <w>80</w>
       <h>30</h>
     </coordinates>
@@ -96,22 +95,26 @@ layer=1</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>860</x>
-      <y>180</y>
-      <w>200</w>
-      <h>70</h>
+      <x>1060</x>
+      <y>210</y>
+      <w>210</w>
+      <h>130</h>
     </coordinates>
     <panel_attributes>coroutine to make
-new Z data to be graphed by
-matplotlib
-layer=3</panel_attributes>
+new Z data color map to 
+be graphed by matplotlib.
+
+To make the next generation:
+
+next(self.generation)
+</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>650</x>
-      <y>180</y>
+      <x>850</x>
+      <y>270</y>
       <w>230</w>
       <h>30</h>
     </coordinates>
@@ -122,14 +125,14 @@ layer=3</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>570</x>
-      <y>350</y>
+      <x>730</x>
+      <y>110</y>
       <w>340</w>
       <h>80</h>
     </coordinates>
     <panel_attributes>eco = Canvas(automata)
 eco.run_animation(generations=1000, interval=10)
-eco.save_animation('rule_30.mp4')
+eco.save('rule_30.mp4')
 eco.save('rule_30.pdf)
 eco.save('rule_30.pdf)
 style=wordwrap
@@ -137,15 +140,33 @@ layer=3</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1060</x>
+      <y>360</y>
+      <w>210</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>runs the automata's coroutine
+'generations' number of times
+creating a new picture each time
+
+The video will show a picture
+for 'interval' ms, before 
+showing the next picture
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
     <id>Relation</id>
     <coordinates>
-      <x>370</x>
-      <y>220</y>
-      <w>220</w>
-      <h>160</h>
+      <x>990</x>
+      <y>360</y>
+      <w>90</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=.
 layer=3</panel_attributes>
-    <additional_attributes>10.0;10.0;200.0;140.0</additional_attributes>
+    <additional_attributes>10.0;10.0;70.0;10.0</additional_attributes>
   </element>
 </diagram>
