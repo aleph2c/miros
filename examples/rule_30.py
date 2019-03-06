@@ -95,6 +95,22 @@ def white(cell, e):
     status = return_status.SUPER
   return status
 
+def black(cell, e):
+  status = return_status.UNHANDLED
+
+  if(e.signal == signals.ENTRY_SIGNAL):
+    cell.color = 'black'
+    status = return_status.HANDLED
+  elif(e.signal == signals.Next):
+    if cell.left.color == 'black':
+      status = cell.trans(white)
+    else:
+      status = return_status.HANDLED
+  else:
+    cell.temp.fun = cell.top
+    status = return_status.SUPER
+  return status
+
 class Rule30WithQueueDepth(Rule30):
 
   def __init__(self, name='cell'):
@@ -123,21 +139,6 @@ class Rule30WithQueueDepth(Rule30):
     qd = math.floor(qd)
     return qd
 
-def black(cell, e):
-  status = return_status.UNHANDLED
-
-  if(e.signal == signals.ENTRY_SIGNAL):
-    cell.color = 'black'
-    status = return_status.HANDLED
-  elif(e.signal == signals.Next):
-    if cell.left.color == 'black':
-      status = cell.trans(white)
-    else:
-      status = return_status.HANDLED
-  else:
-    cell.temp.fun = cell.top
-    status = return_status.SUPER
-  return status
 
 class TwoDCellularAutomata():
   def __init__(self,
@@ -341,8 +342,6 @@ class TwoDCellularAutonomataWallRecursion(TwoDCellularAutomata):
 
 
     '''
-    
-
     super().__init__(
       generations,
       cells_per_generation,
@@ -551,7 +550,7 @@ class Canvas():
         self.ax.pcolormesh(self.automata.Z, cmap=self.cmap)
       plt.savefig(filename) 
 
-generations = 20
+generations = 200
 
 ## Eye scans
 ## 12, 2 * pump -- no repeat after 1200
@@ -559,18 +558,18 @@ generations = 20
 ## 10, 1 * pump -- peudo-repeat seen within 1200
 ## 10, 2 * pump -- repeat seen within 1200
 ## 10, 3 * pump -- repeat seen within 1200
-autonoma = TwoDCellularAutonomataWallRecursion(
-  generations=generations,
-  machine_cls=Rule30WithQueueDepth,
-  cells_per_generation=15,
-  order_scalar=1,
-  )
-
-#autonoma = TwoDCellularAutomata(
+#autonoma = TwoDCellularAutonomataWallRecursion(
 #  generations=generations,
-#  machine_cls=Rule30,
-#  cells_per_generation=50
+#  machine_cls=Rule30WithQueueDepth,
+#  cells_per_generation=15,
+#  order_scalar=1,
 #  )
+
+autonoma = TwoDCellularAutomata(
+  generations=generations,
+  machine_cls=Rule30,
+  wall_cls=WallLeftWhiteRightWhite
+  )
 
 eco = Canvas(autonoma)
 # 43 seconds with generations = 200
@@ -579,7 +578,7 @@ eco.save('rule_30.mp4')
 
 # 43 seconds with generations = 200
 eco.save('rule_30.pdf')
-#eco.save('rule_30.svg')
+eco.save('rule_30.svg')
 
 cmd = 'cmd.exe /C {} &'.format('rule_30.mp4')
 subprocess.Popen(cmd, shell=True)

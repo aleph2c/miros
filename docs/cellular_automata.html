@@ -41,7 +41,7 @@
 </div></blockquote>
 <div class="section" id="cellular-automata">
 <h1>Cellular Automata<a class="headerlink" href="#cellular-automata" title="Permalink to this headline">¶</a></h1>
-<p>Here is a picture of the predatory snail, <a class="reference external" href="https://www.youtube.com/watch?v=JjHMGSI_h0Q">conus textile</a>:</p>
+<p>Here is a picture of the predatory snail, <a class="reference external" href="https://www.youtube.com/watch?v=JjHMGSI_h0Q">Conus Textile</a>:</p>
 <a class="reference external image-reference" href="https://en.wikipedia.org/wiki/Cellular_automaton#/media/File:Textile_cone.JPG"><img alt="_images/Conus_textile.JPG" class="align-center" src="_images/Conus_textile.JPG" /></a>
 By Richard Ling - Own work; Location: Cod Hole, Great Barrier Reef, Australia, <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=293495">Link</a><p>The pattern on its shell is an example of a 2D cellular automata.  The shell is
 grown by a kind of organic line of printer heads along the shell’s lip.  These
@@ -51,18 +51,18 @@ adjacent pigment cells.  The rules governing this process are simple, yet a very
 complex shell color pattern emerges.</p>
 <p>A 2D cellular automata exists on a 2D grid of cells; like graphing paper, and it
 is governed by a simple set of rules.  How you color in a square is dependent
-upon the coloring of the three squares above it.  If we decided to only use
+upon the coloring of the three squares above it.  If we decided only to use
 black and white coloring, a square’s color would be dependent upon eight
 different permutations of the three squares above it.  The governing rules of a
 2D cellular automata could be described by drawing out these eight pictures.</p>
 <p>But before we begin to fill in our drawings we would have to decide how to start
 them.  Typically you color the middle square of the top line on your graphing
-paper black, then begin coloring the squares of the second line using the rules.
-Of course you don’t have to do this, you can start however you like.  But how
+paper black, then begin painting the squares of the second line using the rules.
+Of course, you don’t have to do this, you can start however you like.  But how
 you start is called the initial condition, and as you will see, the initial
 conditions have a huge effect on the overall emergent pattern of your drawing.</p>
 <p>In 1983 Stephen Wolfram discovered a 2D cellular automata which created patterns
-that look like the shell of the conus textile snail.  He called this program,
+that look like the shell of the Conus Textile snail.  He called this program,
 <a class="reference external" href="https://en.wikipedia.org/wiki/Rule_30">Rule 30</a>.</p>
 <p>Let’s explore how to make a Rule 30, 2D cellular automata, by looking at the
 instructions which govern it:</p>
@@ -79,13 +79,13 @@ first line then follow the rules to fill in the 4 lines below it.</p>
 <a class="reference external image-reference" href="_static/rule_30_by_hand.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_by_hand.svg" src="_images/rule_30_by_hand.svg" /></div>
 </a>
 <p>If you look at the diagram and compare it to the rules described as a paragraph,
-then to the pictures describing this same rule, you will see how it works.</p>
-<p>Now what do we do about the edges of our graphing paper?  We could just pretend
+then to the pictures illustrating this same rule, you will see how it works.</p>
+<p>Now, what do we do about the edges of our graphing paper?  We could just pretend
 they aren’t there, making the automata infinite.  Or, we could wrap the paper
 into a tube so that there is no edge.  I have seen that both of these things
 have been done before, but I haven’t seen anyone just force a color onto the
 edge, like a wall.  The guys that invented and played with automata are really
-<em>really</em> smart, and they follow a disciplined mathematical aesthetic.  So let’s
+<em>really</em> smart, and they follow a disciplined, mathematical aesthetic.  So let’s
 do something they wouldn’t do, let’s take their beautiful little program and run
 it into something completely arbitrary, let’s build that wall!</p>
 <p>This will give us a chance to have two state machines interact in the same
@@ -111,42 +111,42 @@ enough.</p>
 left and right and its color.  The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> machine will be inherited from the
 <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class, so we only have to write our color worker method,
 <code class="docutils literal notranslate"><span class="pre">color_number</span></code>, in one spot (the <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class).  The <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class is
-inherited from the <code class="docutils literal notranslate"><span class="pre">HsmWithQueues</span></code>, which means that these statemachines won’t
-be running in their own threads (like they would be if they were derived from
-the <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code> class).  To have them react to events, we will have to use
-their <code class="docutils literal notranslate"><span class="pre">dispatch</span></code> method and they will have to run within the thread of some
-sort of governing program.</p>
-<p>The statemachine under the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> class will provide the behavior described
-by the squares at the top of the page.  The statemachine under the <code class="docutils literal notranslate"><span class="pre">Wall</span></code>
-class consists of two states which can only be gotten to using the <code class="docutils literal notranslate"><span class="pre">start_at</span></code>
-method, no event will cause a transition between these states.  The <code class="docutils literal notranslate"><span class="pre">Wall</span></code>
-objects are intended to interface with the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> objects so that a
+inherited from the <code class="docutils literal notranslate"><span class="pre">HsmWithQueues</span></code>, which means that these state machines
+won’t be running in their own threads (like they would be if they were derived
+from the <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code> class).  To have them react to events, we will have to
+use their <code class="docutils literal notranslate"><span class="pre">dispatch</span></code> method, and they will have to run within the thread of
+some sort of governing program.</p>
+<p>The state machine under the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> class will provide the behaviour
+described by the squares at the top of the page.  The state machine under the
+<code class="docutils literal notranslate"><span class="pre">Wall</span></code> class consists of two states which can only be gotten to using the
+<code class="docutils literal notranslate"><span class="pre">start_at</span></code> method, no event will cause a transition between these states.  The
+<code class="docutils literal notranslate"><span class="pre">Wall</span></code> objects are intended to interface with the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> objects so that a
 <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> cell can’t tell if it is working with an actual machine or just a
 wall.</p>
-<div class="section" id="canvas">
-<span id="cellular-automata-canvas"></span><h3>Canvas<a class="headerlink" href="#canvas" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="canvas-class">
+<span id="cellular-automata-canvas"></span><h3>Canvas Class<a class="headerlink" href="#canvas-class" title="Permalink to this headline">¶</a></h3>
 <p>How do we build a <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class to get the feedback needed to see what is
 going on with our program?</p>
-<p>If we were using Stephen Wolfram’s Mathematica software this work would be
+<p>If we were using Stephen Wolfram’s Mathematica software, this work would be
 trivial. Even if we were using Matlab, it wouldn’t be too hard to see these
-automata, but we are using Python, so we will have to stitch a few things
+automata, but we are using Python so we will have to stitch a few things
 together before we can visualize our work.</p>
 <p>Let’s go technology shopping.</p>
-<p>A few years ago Python borg’d Matlab, into its <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy</span></code> and
-<code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> packages, so the Matlab type interfaces have been assimilated
-into the Python collective: resistance is futile.  We can use the <code class="docutils literal notranslate"><span class="pre">numpy</span></code> and
-<code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> libraries to get the Matlab features we need to build and animate
-our automata.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> library can animate graphs, so we will use that.  The
-graphing paper look that we want is provided by its <code class="docutils literal notranslate"><span class="pre">matplotlib.pcolormesh</span></code>
-graphing object, so we will use that too.  Animations are provided by the
+<p>A few years ago Python <a class="reference external" href="https://www.youtube.com/watch?v=AyenRCJ_4Ww">borg’d</a>
+Matlab, into its <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy</span></code> and <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> packages, so the Matlab
+type interfaces have been assimilated into the Python collective: resistance is
+futile.  We can use the <code class="docutils literal notranslate"><span class="pre">numpy</span></code> and <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> libraries to get the Matlab
+features we need to build and animate our automata.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> library can animate graphs so we will use that.  The graphing
+paper look that we want is provided by its <code class="docutils literal notranslate"><span class="pre">matplotlib.pcolormesh</span></code> graphing
+object so we will use that too.  Animations are provided by the
 <code class="docutils literal notranslate"><span class="pre">matplotlib.FuncAnimation</span></code> class, which takes a reference to the figure you
 are drawing on, information about how many frames you want in your movie and how
-often you want to show them, and some callback functions that effect the data
+often you want to show them, and some callback functions that affect the data
 (your picture) for each frame.  The callback functions will be very useful,
 because it means we can pull the operation of our automata away from the
 <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class and we can make the animation callback call out to a coroutine,
-so we can run an automata forever (if we wanted that).</p>
+so we can run our automata forever (if we wanted that).</p>
 <p>Under the hood <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> calls out to <code class="docutils literal notranslate"><span class="pre">FFmpeg</span></code>, which is an open source
 project which makes videos.  Let’s install what we need and get back to our
 design:</p>
@@ -167,14 +167,13 @@ ffmpeg.</p>
 </a>
 <p>The diagram isn’t that useful, and it’s reproducing information that is already
 in the code.  It might have been easier to see this same information using your
-editor’s code browser.  But, remember, UML is from the 90’s.</p>
+editor’s code browser.  But, remember, UML is from the ’90s.</p>
 <p>But it does describe some emphasis: it show’s us that the <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class will
 have a <code class="docutils literal notranslate"><span class="pre">FuncAnimation</span></code> object and a <code class="docutils literal notranslate"><span class="pre">LinearSegmentedColormap</span></code> (used for
 making colors), and it shows us how we want to make the object and how we want
 to use it with the <code class="docutils literal notranslate"><span class="pre">run_animation</span></code> and <code class="docutils literal notranslate"><span class="pre">save</span></code> methods.</p>
 <p>It also shows us that the Canvas calls will have a <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code>
 object, which will be created elsewhere, then passed to it.</p>
-<p>Here is the <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Canvas</span><span class="p">():</span>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">automata</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Animate 2D graphing paper, or static file describing a automata</span>
@@ -315,33 +314,34 @@ object, which will be created elsewhere, then passed to it.</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">I didn’t write the <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class out of thin air, I created a 2 dimensional
-array and some functions that would randomize this array, then I fed these
-functions into the code that I built up using examples from the internet until
-I got something working.  Only then did I feed it the 2TwoDCellularAutomata
-class, which originally didn’t use a co-routine; that was added later.</p>
+<p class="last">On construction: I didn’t write the <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class out of thin air, I
+created a 2 dimensional array and some functions that would randomize this
+array, then I fed these functions into the code that I built up using examples
+from the internet until I got something working.  Only then did I feed it the
+2TwoDCellularAutomata class, which originally didn’t use a co-routine; that
+was added later.</p>
 </div>
 </div>
-<div class="section" id="twodcellularautomata">
-<span id="cellular-automata-two2automato"></span><h3>TwoDCellularAutomata<a class="headerlink" href="#twodcellularautomata" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="the-twodcellularautomata-class">
+<span id="cellular-automata-two2automato"></span><h3>The TwoDCellularAutomata Class<a class="headerlink" href="#the-twodcellularautomata-class" title="Permalink to this headline">¶</a></h3>
 <p>Let’s give our basic design another look:</p>
 <a class="reference external image-reference" href="_static/rule_30_basic_design.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design.svg" src="_images/rule_30_basic_design.svg" /></div>
 </a>
 <p>The <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> object will be responsible for applying the rules
-to our graphing paper, and for setting it into it’s initial condition (the black
+to our graphing paper, and for setting it into its initial condition (the black
 square in the middle of the top line).</p>
-<p>To do this <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> will provide a two dimensional array, Z,
-containing color codes, to be used by our Canvas to draw things.  It also
-builds a lot of <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> and <code class="docutils literal notranslate"><span class="pre">Wall</span></code> statemachines and links them to other
-machines so that they can read the <code class="docutils literal notranslate"><span class="pre">left.color</span></code> and <code class="docutils literal notranslate"><span class="pre">right.color</span></code> attributes
-of their adjacent cells.  <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> needs to set up some initial
+<p>To do this <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> will provide a two-dimensional array, Z,
+containing color codes, to be used by our Canvas to draw things.  It also builds
+a lot of <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> and <code class="docutils literal notranslate"><span class="pre">Wall</span></code> state machines and links them to other machines
+so that they can read the <code class="docutils literal notranslate"><span class="pre">left.color</span></code> and <code class="docutils literal notranslate"><span class="pre">right.color</span></code> attributes of their
+adjacent cells.  <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> needs to set up some initial
 conditions; how the machines are started on the first line of our graphing
-paper.  The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> statemachines respond to <code class="docutils literal notranslate"><span class="pre">Next</span></code> events, which cause
+paper.  The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> state machines respond to <code class="docutils literal notranslate"><span class="pre">Next</span></code> events, which cause
 them to react and change if they need to change, so the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code>
 will need to dispatch this event into all of the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> objects to make a
-new line as the automata propagates downward.</p>
-<p>To make the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> object generic, we will feed it it’s
-automata rule and wall rules as classes.  To make the wall behavior
+new line as the automata propagate downward.</p>
+<p>To make the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> object generic, we will feed it its
+automata rule and wall rules as classes.  To make the wall behaviour
 parameterizable, so I’ll add some new wall rule classes that hold the left and
 right colors in their class attributes:</p>
 <a class="reference external image-reference" href="_static/rule_30_basic_design_1.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design_1.svg" src="_images/rule_30_basic_design_1.svg" /></div>
@@ -351,15 +351,16 @@ right colors in their class attributes:</p>
 </a>
 <p>There is a bunch of stuff in this diagram that I don’t know how to draw using
 UML.  For instance, how do I show a class that I have sent it a class, so it
-knows how to build something?  How do I draw something that makes a co-routine?
-Well, I don’t know, so I’ll try and make something that isn’t too confusing and
-explain what I meant here with a few words.</p>
-<p>The few key take aways from the drawing are how the constructor works, we feed
-it in the rule and wall classes so that it can generically construct an
-automata.  We also show the function that returns the co-routine.  Each time,
-next is called it advances to the next yield statement.  So, the first time the
-coroutine is activated it will initialize the automata and then every activation
-after that will cause it to descend one row down.</p>
+knows how to build something, using the class I just gave it?  How do I draw
+something that makes a co-routine?  Well, I don’t know, so I’ll try and scribble
+down something that isn’t too confusing and explain what I meant here with a few
+words.</p>
+<p>The few key takeaways from the drawing are how the constructor works, we feed it
+in the rule and wall classes so that it can generically construct automata.  We
+also show the function that returns the co-routine.  Each time <code class="docutils literal notranslate"><span class="pre">next</span></code> is
+called it advances to the next yield statement.  So, the first time the
+coroutine is activated, it will initialize the automata, and then every
+activation after that will cause it to descend one row down.</p>
 <p>Here is the code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TwoDCellularAutomata</span><span class="p">():</span>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
@@ -532,6 +533,140 @@ after that will cause it to descend one row down.</p>
       <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">On construction:  Initially I build the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> without a
+coroutine.</p>
+</div>
+</div>
+<div class="section" id="rule30-and-the-wall-classes">
+<span id="cellular-automata-rule30-and-the-walls"></span><h3>Rule30 and the Wall Classes<a class="headerlink" href="#rule30-and-the-wall-classes" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">Rule30</span></code> is a class which describes the attributes and methods needed by our
+rule30 state machine.   The rule30 state machine really isn’t described anywhere
+as an individual entity, it is two callback functions that attach to a
+<code class="docutils literal notranslate"><span class="pre">Rule30</span></code> object.  You can see it here:</p>
+<a class="reference external image-reference" href="_static/rule_30_basic_design_1.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design_1.svg" src="_images/rule_30_basic_design_1.svg" /></div>
+</a>
+<p>To see if the rule 30 machine is designed properly, put your eyes on one of the
+clusters-of-four-squares at the top of the diagram.  Now imagine the state
+machine was started in the color of the middle of the top three squares of this
+cluster.  Send the <code class="docutils literal notranslate"><span class="pre">Next</span></code> event to the machine and see if you can get it to
+transition to the color of the bottom square of the cluster.</p>
+<p>Let’s do the first one together:</p>
+<a class="reference external image-reference" href="_static/rule_30_does_it_work.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_does_it_work.svg" src="_images/rule_30_does_it_work.svg" /></div>
+</a>
+<p>If you repeat this exercise for each of the cluster-of-four-squares, and you are
+satisfied, then this state machine’s design will give us the rule 30 behavior.</p>
+<p>The wall is an even simpler machine, it starts in one color state and remains
+that way forever.</p>
+<p>Here is the code for our <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> and <code class="docutils literal notranslate"><span class="pre">Wall</span></code> classes:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Wall</span><span class="p">(</span><span class="n">HsmWithQueues</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;wall&#39;</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">None</span>
+
+  <span class="k">def</span> <span class="nf">color_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Black</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="s1">&#39;black&#39;</span> <span class="k">else</span> <span class="n">White</span>
+
+<span class="k">def</span> <span class="nf">fake_white</span><span class="p">(</span><span class="n">wall</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">wall</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;white&#39;</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Next</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">wall</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">wall</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">def</span> <span class="nf">fake_black</span><span class="p">(</span><span class="n">wall</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">wall</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Next</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">wall</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">wall</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">class</span> <span class="nc">WallLeftWhiteRightWhite</span><span class="p">(</span><span class="n">Wall</span><span class="p">):</span>
+  <span class="n">left_wall</span> <span class="o">=</span> <span class="n">fake_white</span>
+  <span class="n">right_wall</span> <span class="o">=</span> <span class="n">fake_white</span>
+
+<span class="k">class</span> <span class="nc">WallLeftWhiteRightBlack</span><span class="p">(</span><span class="n">Wall</span><span class="p">):</span>
+  <span class="n">left_wall</span> <span class="o">=</span> <span class="n">fake_white</span>
+  <span class="n">right_wall</span> <span class="o">=</span> <span class="n">fake_black</span>
+
+<span class="k">class</span> <span class="nc">WallLeftBlackRightWhite</span><span class="p">(</span><span class="n">Wall</span><span class="p">):</span>
+  <span class="n">left_wall</span> <span class="o">=</span> <span class="n">fake_black</span>
+  <span class="n">right_wall</span> <span class="o">=</span> <span class="n">fake_white</span>
+
+<span class="k">class</span> <span class="nc">WallLeftBlackRightBlack</span><span class="p">(</span><span class="n">Wall</span><span class="p">):</span>
+  <span class="n">left_wall</span> <span class="o">=</span> <span class="n">fake_black</span>
+  <span class="n">right_wall</span> <span class="o">=</span> <span class="n">fake_black</span>
+
+<span class="k">class</span> <span class="nc">Rule30</span><span class="p">(</span><span class="n">Wall</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;cell&#39;</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">None</span>
+
+<span class="k">def</span> <span class="nf">white</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">cell</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;white&#39;</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Next</span><span class="p">):</span>
+    <span class="k">if</span><span class="p">((</span><span class="n">cell</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="s1">&#39;black&#39;</span> <span class="ow">and</span>
+        <span class="n">cell</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="s1">&#39;white&#39;</span><span class="p">)</span> <span class="ow">or</span>
+       <span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="s1">&#39;white&#39;</span> <span class="ow">and</span>
+        <span class="n">cell</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="s1">&#39;black&#39;</span><span class="p">)):</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">black</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">cell</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="running-and-visualizing-the-cellular-automata">
+<span id="cellular-automata-running-and-visualizing-the-automata"></span><h3>Running and Visualizing the Cellular Automata<a class="headerlink" href="#running-and-visualizing-the-cellular-automata" title="Permalink to this headline">¶</a></h3>
+<p>Now that we have all the parts we need let’s stitch them together and see what
+happens.  We will build an automata using rule 30 with some white walls. Then we
+will feed the automata into a canvas, and use the canvas to print an ‘svg’ file,
+a ‘pdf’ file and an ‘mp4’ movie:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">generations</span> <span class="o">=</span> <span class="mi">200</span>
+
+<span class="n">automata</span> <span class="o">=</span> <span class="n">TwoDCellularAutomata</span><span class="p">(</span>
+  <span class="n">generations</span><span class="o">=</span><span class="n">generations</span><span class="p">,</span>
+  <span class="n">machine_cls</span><span class="o">=</span><span class="n">Rule30</span><span class="p">,</span>
+  <span class="n">wall_cls</span><span class="o">=</span><span class="n">WallLeftWhiteRightWhite</span><span class="p">)</span>
+
+<span class="n">ecosystem</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">(</span><span class="n">automata</span><span class="p">)</span>
+<span class="n">ecosystem</span><span class="o">.</span><span class="n">run_animation</span><span class="p">(</span><span class="n">generations</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>  <span class="c1"># 50 ms</span>
+<span class="n">eco</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;rule_30_white_walls_200_generations.mp4&#39;</span><span class="p">)</span>
+<span class="n">eco</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;rule_30_white_walls_200_generations.pdf&#39;</span><span class="p">)</span>
+<span class="n">eco</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;rule_30_white_walls_200_generations.svg&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here is the movie:</p>
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/lJJvy9QXcuc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></center><p>Here is the ‘svg’ diagram, click on it to see the pdf version of the same
+picture:</p>
+<a class="reference external image-reference" href="_static/rule_30_white_walls_200_generations.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_white_walls_200_generations.svg" src="_images/rule_30_white_walls_200_generations.svg" /></div>
+</a>
+<p>b</p>
 </div>
 </div>
 </div>
@@ -558,8 +693,10 @@ after that will cause it to descend one row down.</p>
   <ul>
 <li><a class="reference internal" href="#">Cellular Automata</a><ul>
 <li><a class="reference internal" href="#design-and-code">Design and Code</a><ul>
-<li><a class="reference internal" href="#canvas">Canvas</a></li>
-<li><a class="reference internal" href="#twodcellularautomata">TwoDCellularAutomata</a></li>
+<li><a class="reference internal" href="#canvas-class">Canvas Class</a></li>
+<li><a class="reference internal" href="#the-twodcellularautomata-class">The TwoDCellularAutomata Class</a></li>
+<li><a class="reference internal" href="#rule30-and-the-wall-classes">Rule30 and the Wall Classes</a></li>
+<li><a class="reference internal" href="#running-and-visualizing-the-cellular-automata">Running and Visualizing the Cellular Automata</a></li>
 </ul>
 </li>
 </ul>

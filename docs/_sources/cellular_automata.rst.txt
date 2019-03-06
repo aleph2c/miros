@@ -4,7 +4,7 @@
 
 Cellular Automata
 =================
-Here is a picture of the predatory snail, `conus textile <https://www.youtube.com/watch?v=JjHMGSI_h0Q>`_:
+Here is a picture of the predatory snail, `Conus Textile <https://www.youtube.com/watch?v=JjHMGSI_h0Q>`_:
 
 .. image:: _static/Conus_textile.JPG
     :target: https://en\.wikipedia\.org/wiki/Cellular_automaton#/media/File:Textile_cone\.JPG
@@ -23,20 +23,20 @@ complex shell color pattern emerges.
 
 A 2D cellular automata exists on a 2D grid of cells; like graphing paper, and it
 is governed by a simple set of rules.  How you color in a square is dependent
-upon the coloring of the three squares above it.  If we decided to only use 
+upon the coloring of the three squares above it.  If we decided only to use
 black and white coloring, a square's color would be dependent upon eight
 different permutations of the three squares above it.  The governing rules of a
 2D cellular automata could be described by drawing out these eight pictures.
 
 But before we begin to fill in our drawings we would have to decide how to start
 them.  Typically you color the middle square of the top line on your graphing
-paper black, then begin coloring the squares of the second line using the rules.
-Of course you don't have to do this, you can start however you like.  But how
+paper black, then begin painting the squares of the second line using the rules.
+Of course, you don't have to do this, you can start however you like.  But how
 you start is called the initial condition, and as you will see, the initial
 conditions have a huge effect on the overall emergent pattern of your drawing.
 
 In 1983 Stephen Wolfram discovered a 2D cellular automata which created patterns
-that look like the shell of the conus textile snail.  He called this program,
+that look like the shell of the Conus Textile snail.  He called this program,
 `Rule 30 <https://en.wikipedia.org/wiki/Rule_30>`_.  
 
 Let's explore how to make a Rule 30, 2D cellular automata, by looking at the
@@ -61,14 +61,14 @@ first line then follow the rules to fill in the 4 lines below it.
     :align: center
 
 If you look at the diagram and compare it to the rules described as a paragraph,
-then to the pictures describing this same rule, you will see how it works.
+then to the pictures illustrating this same rule, you will see how it works.
 
-Now what do we do about the edges of our graphing paper?  We could just pretend
+Now, what do we do about the edges of our graphing paper?  We could just pretend
 they aren't there, making the automata infinite.  Or, we could wrap the paper
 into a tube so that there is no edge.  I have seen that both of these things
 have been done before, but I haven't seen anyone just force a color onto the
 edge, like a wall.  The guys that invented and played with automata are really
-*really* smart, and they follow a disciplined mathematical aesthetic.  So let's
+*really* smart, and they follow a disciplined, mathematical aesthetic.  So let's
 do something they wouldn't do, let's take their beautiful little program and run
 it into something completely arbitrary, let's build that wall!
 
@@ -104,51 +104,50 @@ The ``Rule30`` class will have three attributes describing the machine on the
 left and right and its color.  The ``Rule30`` machine will be inherited from the
 ``Wall`` class, so we only have to write our color worker method,
 ``color_number``, in one spot (the ``Wall`` class).  The ``Wall`` class is
-inherited from the ``HsmWithQueues``, which means that these statemachines won't
-be running in their own threads (like they would be if they were derived from
-the ``ActiveObject`` class).  To have them react to events, we will have to use
-their ``dispatch`` method and they will have to run within the thread of some
-sort of governing program.
+inherited from the ``HsmWithQueues``, which means that these state machines
+won't be running in their own threads (like they would be if they were derived
+from the ``ActiveObject`` class).  To have them react to events, we will have to
+use their ``dispatch`` method, and they will have to run within the thread of
+some sort of governing program.
 
-The statemachine under the ``Rule30`` class will provide the behavior described
-by the squares at the top of the page.  The statemachine under the ``Wall``
-class consists of two states which can only be gotten to using the ``start_at``
-method, no event will cause a transition between these states.  The ``Wall``
-objects are intended to interface with the ``Rule30`` objects so that a
+The state machine under the ``Rule30`` class will provide the behaviour
+described by the squares at the top of the page.  The state machine under the
+``Wall`` class consists of two states which can only be gotten to using the
+``start_at`` method, no event will cause a transition between these states.  The
+``Wall`` objects are intended to interface with the ``Rule30`` objects so that a
 ``Rule30`` cell can't tell if it is working with an actual machine or just a
 wall.
 
 .. _cellular_automata-canvas:
 
-Canvas
-^^^^^^
-
+Canvas Class
+^^^^^^^^^^^^
 How do we build a ``Canvas`` class to get the feedback needed to see what is
 going on with our program?
 
-If we were using Stephen Wolfram's Mathematica software this work would be
+If we were using Stephen Wolfram's Mathematica software, this work would be
 trivial. Even if we were using Matlab, it wouldn't be too hard to see these
-automata, but we are using Python, so we will have to stitch a few things
+automata, but we are using Python so we will have to stitch a few things
 together before we can visualize our work.
 
 Let's go technology shopping.
 
-A few years ago Python borg'd Matlab, into its ``numpy``, ``scipy`` and
-``matplotlib`` packages, so the Matlab type interfaces have been assimilated
-into the Python collective: resistance is futile.  We can use the ``numpy`` and
-``matplotlib`` libraries to get the Matlab features we need to build and animate
-our automata.
+A few years ago Python `borg'd <https://www.youtube.com/watch?v=AyenRCJ_4Ww>`_
+Matlab, into its ``numpy``, ``scipy`` and ``matplotlib`` packages, so the Matlab
+type interfaces have been assimilated into the Python collective: resistance is
+futile.  We can use the ``numpy`` and ``matplotlib`` libraries to get the Matlab
+features we need to build and animate our automata.
 
-The ``matplotlib`` library can animate graphs, so we will use that.  The
-graphing paper look that we want is provided by its ``matplotlib.pcolormesh``
-graphing object, so we will use that too.  Animations are provided by the
+The ``matplotlib`` library can animate graphs so we will use that.  The graphing
+paper look that we want is provided by its ``matplotlib.pcolormesh`` graphing
+object so we will use that too.  Animations are provided by the
 ``matplotlib.FuncAnimation`` class, which takes a reference to the figure you
 are drawing on, information about how many frames you want in your movie and how
-often you want to show them, and some callback functions that effect the data
+often you want to show them, and some callback functions that affect the data
 (your picture) for each frame.  The callback functions will be very useful,
 because it means we can pull the operation of our automata away from the
 ``Canvas`` class and we can make the animation callback call out to a coroutine,
-so we can run an automata forever (if we wanted that).
+so we can run our automata forever (if we wanted that).
 
 Under the hood ``matplotlib`` calls out to ``FFmpeg``, which is an open source
 project which makes videos.  Let's install what we need and get back to our
@@ -175,7 +174,7 @@ Here is a UML drawing of the Canvas class:
 
 The diagram isn't that useful, and it's reproducing information that is already
 in the code.  It might have been easier to see this same information using your
-editor's code browser.  But, remember, UML is from the 90's.
+editor's code browser.  But, remember, UML is from the '90s.
 
 But it does describe some emphasis: it show's us that the ``Canvas`` class will
 have a ``FuncAnimation`` object and a ``LinearSegmentedColormap`` (used for
@@ -184,8 +183,6 @@ to use it with the ``run_animation`` and ``save`` methods.
 
 It also shows us that the Canvas calls will have a ``TwoDCellularAutomata``
 object, which will be created elsewhere, then passed to it.
-
-Here is the ``Canvas`` code:
 
 .. code-block:: python
 
@@ -329,16 +326,17 @@ Here is the ``Canvas`` code:
 
 .. note::
 
-  I didn't write the ``Canvas`` class out of thin air, I created a 2 dimensional
-  array and some functions that would randomize this array, then I fed these
-  functions into the code that I built up using examples from the internet until
-  I got something working.  Only then did I feed it the 2TwoDCellularAutomata
-  class, which originally didn't use a co-routine; that was added later.
+  On construction: I didn't write the ``Canvas`` class out of thin air, I
+  created a 2 dimensional array and some functions that would randomize this
+  array, then I fed these functions into the code that I built up using examples
+  from the internet until I got something working.  Only then did I feed it the
+  2TwoDCellularAutomata class, which originally didn't use a co-routine; that
+  was added later.
 
 .. _cellular_automata-two2Automato:
 
-TwoDCellularAutomata
-^^^^^^^^^^^^^^^^^^^^
+The TwoDCellularAutomata Class
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Let's give our basic design another look:
 
 .. image:: _static/rule_30_basic_design.svg
@@ -346,22 +344,22 @@ Let's give our basic design another look:
     :align: center
 
 The ``TwoDCellularAutomata`` object will be responsible for applying the rules
-to our graphing paper, and for setting it into it's initial condition (the black
+to our graphing paper, and for setting it into its initial condition (the black
 square in the middle of the top line).
 
-To do this ``TwoDCellularAutomata`` will provide a two dimensional array, Z,
-containing color codes, to be used by our Canvas to draw things.  It also
-builds a lot of ``Rule30`` and ``Wall`` statemachines and links them to other
-machines so that they can read the ``left.color`` and ``right.color`` attributes
-of their adjacent cells.  ``TwoDCellularAutomata`` needs to set up some initial
+To do this ``TwoDCellularAutomata`` will provide a two-dimensional array, Z,
+containing color codes, to be used by our Canvas to draw things.  It also builds
+a lot of ``Rule30`` and ``Wall`` state machines and links them to other machines
+so that they can read the ``left.color`` and ``right.color`` attributes of their
+adjacent cells.  ``TwoDCellularAutomata`` needs to set up some initial
 conditions; how the machines are started on the first line of our graphing
-paper.  The ``Rule30`` statemachines respond to ``Next`` events, which cause
+paper.  The ``Rule30`` state machines respond to ``Next`` events, which cause
 them to react and change if they need to change, so the ``TwoDCellularAutomata``
 will need to dispatch this event into all of the ``Rule30`` objects to make a
-new line as the automata propagates downward.
+new line as the automata propagate downward.
 
-To make the ``TwoDCellularAutomata`` object generic, we will feed it it's
-automata rule and wall rules as classes.  To make the wall behavior
+To make the ``TwoDCellularAutomata`` object generic, we will feed it its
+automata rule and wall rules as classes.  To make the wall behaviour
 parameterizable, so I'll add some new wall rule classes that hold the left and
 right colors in their class attributes:
 
@@ -377,16 +375,17 @@ Here is a UML diagram of the ``TwoDCellularAutomata`` class:
 
 There is a bunch of stuff in this diagram that I don't know how to draw using
 UML.  For instance, how do I show a class that I have sent it a class, so it
-knows how to build something?  How do I draw something that makes a co-routine?
-Well, I don't know, so I'll try and make something that isn't too confusing and
-explain what I meant here with a few words.
+knows how to build something, using the class I just gave it?  How do I draw
+something that makes a co-routine?  Well, I don't know, so I'll try and scribble
+down something that isn't too confusing and explain what I meant here with a few
+words.
 
-The few key take aways from the drawing are how the constructor works, we feed
-it in the rule and wall classes so that it can generically construct an
-automata.  We also show the function that returns the co-routine.  Each time,
-next is called it advances to the next yield statement.  So, the first time the
-coroutine is activated it will initialize the automata and then every activation
-after that will cause it to descend one row down.
+The few key takeaways from the drawing are how the constructor works, we feed it
+in the rule and wall classes so that it can generically construct automata.  We
+also show the function that returns the co-routine.  Each time ``next`` is
+called it advances to the next yield statement.  So, the first time the
+coroutine is activated, it will initialize the automata, and then every
+activation after that will cause it to descend one row down.
 
 Here is the code:
 
@@ -562,6 +561,164 @@ Here is the code:
         self.next_generation()
         yield self.Z
 
+.. note::
+
+  On construction:  Initially I build the ``TwoDCellularAutomata`` without a
+  coroutine.
+
+.. _cellular_automata-rule30-and-the-walls:
+
+Rule30 and the Wall Classes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``Rule30`` is a class which describes the attributes and methods needed by our
+rule30 state machine.   The rule30 state machine really isn't described anywhere
+as an individual entity, it is two callback functions that attach to a
+``Rule30`` object.  You can see it here:
+
+.. image:: _static/rule_30_basic_design_1.svg
+    :target: _static/rule_30_basic_design_1.pdf
+    :align: center
+
+To see if the rule 30 machine is designed properly, put your eyes on one of the
+clusters-of-four-squares at the top of the diagram.  Now imagine the state
+machine was started in the color of the middle of the top three squares of this
+cluster.  Send the ``Next`` event to the machine and see if you can get it to
+transition to the color of the bottom square of the cluster.
+
+Let's do the first one together:
+
+.. image:: _static/rule_30_does_it_work.svg
+    :target: _static/rule_30_does_it_work.pdf
+    :align: center
+
+If you repeat this exercise for each of the cluster-of-four-squares, and you are
+satisfied, then this state machine's design will give us the rule 30 behavior.
+
+The wall is an even simpler machine, it starts in one color state and remains
+that way forever.
+
+Here is the code for our ``Rule30`` and ``Wall`` classes:
+
+.. code-block:: python
+
+   class Wall(HsmWithQueues):
+
+     def __init__(self, name='wall'):
+       super().__init__(name)
+       self.color = None
+
+     def color_number(self):
+       return Black if self.color == 'black' else White
+
+   def fake_white(wall, e):
+     status = return_status.UNHANDLED
+
+     if(e.signal == signals.ENTRY_SIGNAL):
+       wall.color = 'white'
+       status = return_status.HANDLED
+     elif(e.signal == signals.Next):
+       status = return_status.HANDLED
+     else:
+       wall.temp.fun = wall.top
+       status = return_status.SUPER
+     return status
+
+   def fake_black(wall, e):
+     status = return_status.UNHANDLED
+
+     if(e.signal == signals.ENTRY_SIGNAL):
+       wall.color = 'black'
+       status = return_status.HANDLED
+     elif(e.signal == signals.Next):
+       status = return_status.HANDLED
+     else:
+       wall.temp.fun = wall.top
+       status = return_status.SUPER
+     return status
+
+   class WallLeftWhiteRightWhite(Wall):
+     left_wall = fake_white
+     right_wall = fake_white
+
+   class WallLeftWhiteRightBlack(Wall):
+     left_wall = fake_white
+     right_wall = fake_black
+
+   class WallLeftBlackRightWhite(Wall):
+     left_wall = fake_black
+     right_wall = fake_white
+
+   class WallLeftBlackRightBlack(Wall):
+     left_wall = fake_black
+     right_wall = fake_black
+
+   class Rule30(Wall):
+
+     def __init__(self, name='cell'):
+       super().__init__(name)
+       self.left = None
+       self.right = None
+       self.color = None
+
+   def white(cell, e):
+     status = return_status.UNHANDLED
+
+     if(e.signal == signals.ENTRY_SIGNAL):
+       cell.color = 'white'
+       status = return_status.HANDLED
+     elif(e.signal == signals.Next):
+       if((cell.right.color == 'black' and
+           cell.left.color == 'white') or 
+          (cell.right.color == 'white' and
+           cell.left.color == 'black')):
+         status = cell.trans(black)
+       else:
+         status = return_status.HANDLED
+     else:
+       cell.temp.fun = cell.top
+       status = return_status.SUPER
+     return status
+
+.. _cellular_automata-running-and-visualizing-the-automata:
+
+Running and Visualizing the Cellular Automata
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Now that we have all the parts we need let's stitch them together and see what
+happens.  We will build an automata using rule 30 with some white walls. Then we
+will feed the automata into a canvas, and use the canvas to print an 'svg' file,
+a 'pdf' file and an 'mp4' movie:
+
+.. code-block:: python
+
+   generations = 200
+
+   automata = TwoDCellularAutomata(
+     generations=generations,
+     machine_cls=Rule30,
+     wall_cls=WallLeftWhiteRightWhite)
+
+   ecosystem = Canvas(automata)
+   ecosystem.run_animation(generations, interval=50)  # 50 ms
+   eco.save('rule_30_white_walls_200_generations.mp4')
+   eco.save('rule_30_white_walls_200_generations.pdf')
+   eco.save('rule_30_white_walls_200_generations.svg')
+
+Here is the movie:
+
+.. raw:: html
+
+   <center>
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/lJJvy9QXcuc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></center>
+
+Here is the 'svg' diagram, click on it to see the pdf version of the same
+picture:
+
+.. image:: _static/rule_30_white_walls_200_generations.svg
+    :target: _static/rule_30_white_walls_200_generations.pdf
+    :align: center
+
+b
 
 Random Number Generation
 ==========================
