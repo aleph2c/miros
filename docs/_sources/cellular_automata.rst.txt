@@ -686,7 +686,7 @@ Running and Visualizing the Cellular Automata
 
 Now that we have all the parts we need let's stitch them together and see what
 happens.  We will build an automata using rule 30 with some white walls. Then we
-will feed the automata into a canvas, and use the canvas to print an 'svg' file,
+will feed the automata into a canvas, and use the canvas to print an 'png' file,
 a 'pdf' file and an 'mp4' movie:
 
 .. code-block:: python
@@ -702,7 +702,7 @@ a 'pdf' file and an 'mp4' movie:
    ecosystem.run_animation(generations, interval=50)  # 50 ms
    eco.save('rule_30_white_walls_200_generations.mp4')
    eco.save('rule_30_white_walls_200_generations.pdf')
-   eco.save('rule_30_white_walls_200_generations.svg')
+   eco.save('rule_30_white_walls_200_generations.png')
 
 Here is the movie:
 
@@ -711,10 +711,10 @@ Here is the movie:
    <center>
    <iframe width="560" height="315" src="https://www.youtube.com/embed/lJJvy9QXcuc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></center>
 
-Here is the 'svg' diagram, click on it to see the pdf version of the same
+Here is the 'pgn' diagram, click on it to see the 'pdf' version of the same
 picture:
 
-.. image:: _static/rule_30_white_walls_200_generations.svg
+.. image:: _static/rule_30_white_walls_200_generations.png
     :target: _static/rule_30_white_walls_200_generations.pdf
     :align: center
 

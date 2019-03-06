@@ -578,7 +578,7 @@ eco.save('rule_30.mp4')
 
 # 43 seconds with generations = 200
 eco.save('rule_30.pdf')
-eco.save('rule_30.svg')
+eco.save('rule_30.png')
 
 cmd = 'cmd.exe /C {} &'.format('rule_30.mp4')
 subprocess.Popen(cmd, shell=True)
