@@ -550,7 +550,6 @@ class Canvas():
         self.ax.pcolormesh(self.automata.Z, cmap=self.cmap)
       plt.savefig(filename) 
 
-generations = 200
 
 ## Eye scans
 ## 12, 2 * pump -- no repeat after 1200
@@ -565,25 +564,29 @@ generations = 200
 #  order_scalar=1,
 #  )
 
+generations = 100
+filename = "rule_30_white_walls_100_generations_width_30"
+
 autonoma = TwoDCellularAutomata(
   generations=generations,
   machine_cls=Rule30,
-  wall_cls=WallLeftWhiteRightWhite
+  wall_cls=WallLeftWhiteRightWhite,
+  cells_per_generation=30
   )
 
 eco = Canvas(autonoma)
 # 43 seconds with generations = 200
-eco.run_animation(generations, interval=10)
-eco.save('rule_30.mp4')
+eco.run_animation(generations, interval=100)
+eco.save('{}.mp4'.format(filename))
 
 # 43 seconds with generations = 200
-eco.save('rule_30.pdf')
-eco.save('rule_30.png')
+eco.save('{}.pdf'.format(filename))
+eco.save('{}.png'.format(filename))
 
-cmd = 'cmd.exe /C {} &'.format('rule_30.mp4')
+cmd = 'cmd.exe /C {} &'.format('{}.mp4'.format(filename))
 subprocess.Popen(cmd, shell=True)
 
-cmd = 'cmd.exe /C {} &'.format('rule_30.pdf')
+cmd = 'cmd.exe /C {} &'.format('{}.pdf'.format(filename))
 subprocess.Popen(cmd, shell=True)
 #
 #cell = Rule30('bob')

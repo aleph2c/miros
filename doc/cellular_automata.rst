@@ -12,7 +12,7 @@ Here is a picture of the predatory snail, `Conus Textile <https://www.youtube.co
 
 .. raw:: html
 
-   By Richard Ling - Own work; Location: Cod Hole, Great Barrier Reef, Australia, <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=293495">Link</a>
+   <div class=body>By Richard Ling - Own work; Location: Cod Hole, Great Barrier Reef, Australia, <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=293495">Link</a></div>
 
 The pattern on its shell is an example of a 2D cellular automata.  The shell is
 grown by a kind of organic line of printer heads along the shell's lip.  These
@@ -35,9 +35,10 @@ Of course, you don't have to do this, you can start however you like.  But how
 you start is called the initial condition, and as you will see, the initial
 conditions have a huge effect on the overall emergent pattern of your drawing.
 
-In 1983 Stephen Wolfram discovered a 2D cellular automata which created patterns
-that look like the shell of the Conus Textile snail.  He called this program,
-`Rule 30 <https://en.wikipedia.org/wiki/Rule_30>`_.  
+In 1983 `Stephen Wolfram <https://www.youtube.com/watch?v=60P7717-XOQ>`_
+discovered a 2D cellular automata which created patterns that look like the
+shell of the Conus Textile snail.  He called this program, `Rule 30
+<https://en.wikipedia.org/wiki/Rule_30>`_.  
 
 Let's explore how to make a Rule 30, 2D cellular automata, by looking at the
 instructions which govern it:
@@ -172,12 +173,14 @@ Here is a UML drawing of the Canvas class:
     :target: _static/rule_30_canvas.pdf
     :align: center
 
-The diagram isn't that useful, and it's reproducing information that is already
-in the code.  It might have been easier to see this same information using your
-editor's code browser.  But, remember, UML is from the '90s.
+.. note::
+  
+   The diagram isn't that useful, and it's reproducing information that is already
+   in the code.  It might have been easier to see this same information using your
+   editor's code browser.  But, remember, UML is from the '90s.
 
-But it does describe some emphasis: it show's us that the ``Canvas`` class will
-have a ``FuncAnimation`` object and a ``LinearSegmentedColormap`` (used for
+The diagram may not be that useful, but it emphasizes that the ``Canvas`` class
+will have a ``FuncAnimation`` object and a ``LinearSegmentedColormap`` (used for
 making colors), and it shows us how we want to make the object and how we want
 to use it with the ``run_animation`` and ``save`` methods.
 
@@ -360,7 +363,7 @@ new line as the automata propagate downward.
 
 To make the ``TwoDCellularAutomata`` object generic, we will feed it its
 automata rule and wall rules as classes.  To make the wall behaviour
-parameterizable, so I'll add some new wall rule classes that hold the left and
+parameterizable, I'll add some new wall rule classes that hold the left and
 right colors in their class attributes:
 
 .. image:: _static/rule_30_basic_design_1.svg
@@ -570,6 +573,7 @@ Here is the code:
 
 Rule30 and the Wall Classes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 ``Rule30`` is a class which describes the attributes and methods needed by our
 rule30 state machine.   The rule30 state machine really isn't described anywhere
 as an individual entity, it is two callback functions that attach to a
@@ -686,8 +690,8 @@ Running and Visualizing the Cellular Automata
 
 Now that we have all the parts we need let's stitch them together and see what
 happens.  We will build an automata using rule 30 with some white walls. Then we
-will feed the automata into a canvas, and use the canvas to print an 'png' file,
-a 'pdf' file and an 'mp4' movie:
+will feed the automata into a canvas, and use the canvas to print a `png` file,
+a `pdf` file and an `mp4` movie:
 
 .. code-block:: python
 
@@ -711,14 +715,103 @@ Here is the movie:
    <center>
    <iframe width="560" height="315" src="https://www.youtube.com/embed/lJJvy9QXcuc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></center>
 
-Here is the 'pgn' diagram, click on it to see the 'pdf' version of the same
-picture:
+Here is the `pgn` diagram, click on it to see the `pdf` version of the same picture:
 
 .. image:: _static/rule_30_white_walls_200_generations.png
     :target: _static/rule_30_white_walls_200_generations.pdf
     :align: center
 
-b
+Let's try it with black walls
+
+.. code-block:: python
+
+   generations = 200
+
+   automata = TwoDCellularAutomata(
+     generations=generations,
+     machine_cls=Rule30,
+     wall_cls=WallLeftBlackRightBlack)
+
+   ecosystem = Canvas(automata)
+   ecosystem.run_animation(generations, interval=50)  # 50 ms
+   eco.save('rule_30_black_walls_200_generations.mp4')
+   eco.save('rule_30_black_walls_200_generations.pdf')
+   eco.save('rule_30_black_walls_200_generations.png')
+
+Here is a `link <https://youtu.be/9j2P53svDo8>`_ to the resulting video, and below you can see what happens when we run 200 generations of rule 30 with black walls.
+
+.. image:: _static/rule_30_black_walls_200_generations.png
+    :target: _static/rule_30_black_walls_200_generations.pdf
+    :align: center
+
+`Running it again for 500 generations <https://youtu.be/r24NV8vQPKc>`_ and with white walls results in this:
+
+.. image:: _static/rule_30_white_walls_500_generations.png
+    :target: _static/rule_30_white_walls_500_generations.pdf
+    :align: center
+
+On this diagram we can see order imposing itself from the left white wall, and a `kind of repeating pattern on the left side of the triangle <https://blog.stephenwolfram.com/data/uploads/2017/05/5.png>`_ which emerges from our initial conditions.  The center and right part of the results seem to be full of disorder.
+
+.. note::
+
+   On limitations:
+
+   The pdf resulting from the 500 generation run of our automata is over 5 MB;
+   this is a lot of data to add to your computer if you want to clone the miros
+   library, so I will refrain from going bigger.
+
+   It took a long time to render the 500 generation automata.  I don't know
+   where the computational bottle-neck is coming from; if it were important to
+   me I could profile the different parts of the code until I found my issue,
+   but the issue could be Python itself.  Mathematica has no such obvious
+   limitation. If you want to do a deep dive into this subject and don't have
+   the resources to buy a Mathematica licence, you can buy a Raspberry Pi with
+   the NOOBs OS, then VNC onto the device from your desktop.  Wolfram Alpha is
+   being given away on this platform.
+
+
+.. _cellular_automata-the-nothing:
+
+The Nothing
+^^^^^^^^^^^
+
+The white and black walls force order into the automata; causing a kind of
+pattern crystallization to propagate across our results.  We lose the incredible
+complexity of rule 30, to this ordering pattern, which I will call the `nothing
+<https://www.youtube.com/watch?v=_-5QTdC7hOo>`_. Order imposes itself like a
+prion does in the brain of someone with Alzheimer's.  We have seen that this
+effect takes place with both white and black walls, the key is that there is an
+inflexible minority on the walls, imposing itself on a flexible majority.
+Nassim Nicholas Taleb calls this kind of thing `a normalization
+<https://medium.com/incerto/the-most-intolerant-wins-the-dictatorship-of-the-small-minority-3f1f83ce4e15>`_.
+
+Let's study it in a bit more detail.  I will shrink the width of our graphing
+paper to 30 cells and watch the nothing destroy rule 30's beautiful complexity
+over 100 generations.
+
+.. code-block:: python
+  :emphasize-lines: 7
+
+   generations = 100
+
+   automata = TwoDCellularAutomata(
+     generations=generations,
+     machine_cls=Rule30,
+     wall_cls=WallLeftWhiteRightWhite,
+     cells_per_generation=30)
+
+   ecosystem = Canvas(automata)
+   ecosystem.run_animation(generations, interval=500)  # 500 ms
+   eco.save('rule_30_white_walls_100_generations_width_30.mp4')
+
+Here is the video (I will store the results on you tube from now on, to save
+disk space):
+
+.. raw:: html
+
+   <center>
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/oadp1sh69jE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   </center>
 
 Random Number Generation
 ==========================

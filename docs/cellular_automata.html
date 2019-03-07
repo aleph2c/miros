@@ -43,7 +43,7 @@
 <h1>Cellular Automata<a class="headerlink" href="#cellular-automata" title="Permalink to this headline">¶</a></h1>
 <p>Here is a picture of the predatory snail, <a class="reference external" href="https://www.youtube.com/watch?v=JjHMGSI_h0Q">Conus Textile</a>:</p>
 <a class="reference external image-reference" href="https://en.wikipedia.org/wiki/Cellular_automaton#/media/File:Textile_cone.JPG"><img alt="_images/Conus_textile.JPG" class="align-center" src="_images/Conus_textile.JPG" /></a>
-By Richard Ling - Own work; Location: Cod Hole, Great Barrier Reef, Australia, <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=293495">Link</a><p>The pattern on its shell is an example of a 2D cellular automata.  The shell is
+<div class=body>By Richard Ling - Own work; Location: Cod Hole, Great Barrier Reef, Australia, <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=293495">Link</a></div><p>The pattern on its shell is an example of a 2D cellular automata.  The shell is
 grown by a kind of organic line of printer heads along the shell’s lip.  These
 printer heads, called pigment cells, can extrude colored calcium cement.  The
 color choice of a pigment cell is dependent upon the color choice of it’s two
@@ -61,9 +61,9 @@ paper black, then begin painting the squares of the second line using the rules.
 Of course, you don’t have to do this, you can start however you like.  But how
 you start is called the initial condition, and as you will see, the initial
 conditions have a huge effect on the overall emergent pattern of your drawing.</p>
-<p>In 1983 Stephen Wolfram discovered a 2D cellular automata which created patterns
-that look like the shell of the Conus Textile snail.  He called this program,
-<a class="reference external" href="https://en.wikipedia.org/wiki/Rule_30">Rule 30</a>.</p>
+<p>In 1983 <a class="reference external" href="https://www.youtube.com/watch?v=60P7717-XOQ">Stephen Wolfram</a>
+discovered a 2D cellular automata which created patterns that look like the
+shell of the Conus Textile snail.  He called this program, <a class="reference external" href="https://en.wikipedia.org/wiki/Rule_30">Rule 30</a>.</p>
 <p>Let’s explore how to make a Rule 30, 2D cellular automata, by looking at the
 instructions which govern it:</p>
 <blockquote>
@@ -165,11 +165,14 @@ ffmpeg.</p>
 <p>Here is a UML drawing of the Canvas class:</p>
 <a class="reference external image-reference" href="_static/rule_30_canvas.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_canvas.svg" src="_images/rule_30_canvas.svg" /></div>
 </a>
-<p>The diagram isn’t that useful, and it’s reproducing information that is already
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The diagram isn’t that useful, and it’s reproducing information that is already
 in the code.  It might have been easier to see this same information using your
 editor’s code browser.  But, remember, UML is from the ’90s.</p>
-<p>But it does describe some emphasis: it show’s us that the <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class will
-have a <code class="docutils literal notranslate"><span class="pre">FuncAnimation</span></code> object and a <code class="docutils literal notranslate"><span class="pre">LinearSegmentedColormap</span></code> (used for
+</div>
+<p>The diagram may not be that useful, but it emphasizes that the <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class
+will have a <code class="docutils literal notranslate"><span class="pre">FuncAnimation</span></code> object and a <code class="docutils literal notranslate"><span class="pre">LinearSegmentedColormap</span></code> (used for
 making colors), and it shows us how we want to make the object and how we want
 to use it with the <code class="docutils literal notranslate"><span class="pre">run_animation</span></code> and <code class="docutils literal notranslate"><span class="pre">save</span></code> methods.</p>
 <p>It also shows us that the Canvas calls will have a <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code>
@@ -342,7 +345,7 @@ will need to dispatch this event into all of the <code class="docutils literal n
 new line as the automata propagate downward.</p>
 <p>To make the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> object generic, we will feed it its
 automata rule and wall rules as classes.  To make the wall behaviour
-parameterizable, so I’ll add some new wall rule classes that hold the left and
+parameterizable, I’ll add some new wall rule classes that hold the left and
 right colors in their class attributes:</p>
 <a class="reference external image-reference" href="_static/rule_30_basic_design_1.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design_1.svg" src="_images/rule_30_basic_design_1.svg" /></div>
 </a>
@@ -644,8 +647,8 @@ that way forever.</p>
 <span id="cellular-automata-running-and-visualizing-the-automata"></span><h3>Running and Visualizing the Cellular Automata<a class="headerlink" href="#running-and-visualizing-the-cellular-automata" title="Permalink to this headline">¶</a></h3>
 <p>Now that we have all the parts we need let’s stitch them together and see what
 happens.  We will build an automata using rule 30 with some white walls. Then we
-will feed the automata into a canvas, and use the canvas to print an ‘png’ file,
-a ‘pdf’ file and an ‘mp4’ movie:</p>
+will feed the automata into a canvas, and use the canvas to print a <cite>png</cite> file,
+a <cite>pdf</cite> file and an <cite>mp4</cite> movie:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">generations</span> <span class="o">=</span> <span class="mi">200</span>
 
 <span class="n">automata</span> <span class="o">=</span> <span class="n">TwoDCellularAutomata</span><span class="p">(</span>
@@ -662,11 +665,74 @@ a ‘pdf’ file and an ‘mp4’ movie:</p>
 </div>
 <p>Here is the movie:</p>
 <center>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/lJJvy9QXcuc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></center><p>Here is the ‘pgn’ diagram, click on it to see the ‘pdf’ version of the same
-picture:</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/lJJvy9QXcuc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></center><p>Here is the <cite>pgn</cite> diagram, click on it to see the <cite>pdf</cite> version of the same picture:</p>
 <a class="reference external image-reference" href="_static/rule_30_white_walls_200_generations.pdf"><img alt="_images/rule_30_white_walls_200_generations.png" class="align-center" src="_images/rule_30_white_walls_200_generations.png" /></a>
-<p>b</p>
+<p>Let’s try it with black walls</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">generations</span> <span class="o">=</span> <span class="mi">200</span>
+
+<span class="n">automata</span> <span class="o">=</span> <span class="n">TwoDCellularAutomata</span><span class="p">(</span>
+  <span class="n">generations</span><span class="o">=</span><span class="n">generations</span><span class="p">,</span>
+  <span class="n">machine_cls</span><span class="o">=</span><span class="n">Rule30</span><span class="p">,</span>
+  <span class="n">wall_cls</span><span class="o">=</span><span class="n">WallLeftBlackRightBlack</span><span class="p">)</span>
+
+<span class="n">ecosystem</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">(</span><span class="n">automata</span><span class="p">)</span>
+<span class="n">ecosystem</span><span class="o">.</span><span class="n">run_animation</span><span class="p">(</span><span class="n">generations</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>  <span class="c1"># 50 ms</span>
+<span class="n">eco</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;rule_30_black_walls_200_generations.mp4&#39;</span><span class="p">)</span>
+<span class="n">eco</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;rule_30_black_walls_200_generations.pdf&#39;</span><span class="p">)</span>
+<span class="n">eco</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;rule_30_black_walls_200_generations.png&#39;</span><span class="p">)</span>
+</pre></div>
 </div>
+<p>Here is a <a class="reference external" href="https://youtu.be/9j2P53svDo8">link</a> to the resulting video, and below you can see what happens when we run 200 generations of rule 30 with black walls.</p>
+<a class="reference external image-reference" href="_static/rule_30_black_walls_200_generations.pdf"><img alt="_images/rule_30_black_walls_200_generations.png" class="align-center" src="_images/rule_30_black_walls_200_generations.png" /></a>
+<p><a class="reference external" href="https://youtu.be/r24NV8vQPKc">Running it again for 500 generations</a> and with white walls results in this:</p>
+<a class="reference external image-reference" href="_static/rule_30_white_walls_500_generations.pdf"><img alt="_images/rule_30_white_walls_500_generations.png" class="align-center" src="_images/rule_30_white_walls_500_generations.png" /></a>
+<p>On this diagram we can see order imposing itself from the left white wall, and a <a class="reference external" href="https://blog.stephenwolfram.com/data/uploads/2017/05/5.png">kind of repeating pattern on the left side of the triangle</a> which emerges from our initial conditions.  The center and right part of the results seem to be full of disorder.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>On limitations:</p>
+<p>The pdf resulting from the 500 generation run of our automata is over 5 MB;
+this is a lot of data to add to your computer if you want to clone the miros
+library, so I will refrain from going bigger.</p>
+<p class="last">It took a long time to render the 500 generation automata.  I don’t know
+where the computational bottle-neck is coming from; if it were important to
+me I could profile the different parts of the code until I found my issue,
+but the issue could be Python itself.  Mathematica has no such obvious
+limitation. If you want to do a deep dive into this subject and don’t have
+the resources to buy a Mathematica licence, you can buy a Raspberry Pi with
+the NOOBs OS, then VNC onto the device from your desktop.  Wolfram Alpha is
+being given away on this platform.</p>
+</div>
+</div>
+<div class="section" id="the-nothing">
+<span id="cellular-automata-the-nothing"></span><h3>The Nothing<a class="headerlink" href="#the-nothing" title="Permalink to this headline">¶</a></h3>
+<p>The white and black walls force order into the automata; causing a kind of
+pattern crystallization to propagate across our results.  We lose the incredible
+complexity of rule 30, to this ordering pattern, which I will call the <a class="reference external" href="https://www.youtube.com/watch?v=_-5QTdC7hOo">nothing</a>. Order imposes itself like a
+prion does in the brain of someone with Alzheimer’s.  We have seen that this
+effect takes place with both white and black walls, the key is that there is an
+inflexible minority on the walls, imposing itself on a flexible majority.
+Nassim Nicholas Taleb calls this kind of thing <a class="reference external" href="https://medium.com/incerto/the-most-intolerant-wins-the-dictatorship-of-the-small-minority-3f1f83ce4e15">a normalization</a>.</p>
+<p>Let’s study it in a bit more detail.  I will shrink the width of our graphing
+paper to 30 cells and watch the nothing destroy rule 30’s beautiful complexity
+over 100 generations.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">generations</span> <span class="o">=</span> <span class="mi">100</span>
+
+ <span class="n">automata</span> <span class="o">=</span> <span class="n">TwoDCellularAutomata</span><span class="p">(</span>
+   <span class="n">generations</span><span class="o">=</span><span class="n">generations</span><span class="p">,</span>
+   <span class="n">machine_cls</span><span class="o">=</span><span class="n">Rule30</span><span class="p">,</span>
+   <span class="n">wall_cls</span><span class="o">=</span><span class="n">WallLeftWhiteRightWhite</span><span class="p">,</span>
+<span class="hll">   <span class="n">cells_per_generation</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+</span>
+ <span class="n">ecosystem</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">(</span><span class="n">automata</span><span class="p">)</span>
+ <span class="n">ecosystem</span><span class="o">.</span><span class="n">run_animation</span><span class="p">(</span><span class="n">generations</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>  <span class="c1"># 500 ms</span>
+ <span class="n">eco</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;rule_30_white_walls_100_generations_width_30.mp4&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here is the video (I will store the results on you tube from now on, to save
+disk space):</p>
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/oadp1sh69jE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center></div>
 </div>
 </div>
 <div class="section" id="random-number-generation">
@@ -696,6 +762,7 @@ picture:</p>
 <li><a class="reference internal" href="#the-twodcellularautomata-class">The TwoDCellularAutomata Class</a></li>
 <li><a class="reference internal" href="#rule30-and-the-wall-classes">Rule30 and the Wall Classes</a></li>
 <li><a class="reference internal" href="#running-and-visualizing-the-cellular-automata">Running and Visualizing the Cellular Automata</a></li>
+<li><a class="reference internal" href="#the-nothing">The Nothing</a></li>
 </ul>
 </li>
 </ul>
