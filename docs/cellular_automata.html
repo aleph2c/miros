@@ -152,8 +152,8 @@ often you want to show them, and some callback functions that affect the data
 because it means we can pull the operation of our automata away from the
 <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class and we can make the animation callback call out to a coroutine,
 so we can run our automata forever (if we wanted that).</p>
-<p>Under the hood <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> calls out to <code class="docutils literal notranslate"><span class="pre">FFmpeg</span></code>, which is an open source
-project which makes videos.  Let’s install what we need and get back to our
+<p>Under the hood <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> calls out to <code class="docutils literal notranslate"><span class="pre">FFmpeg</span></code>, which is some open source
+software that makes videos.  Let’s install what we need and get back to our
 design:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">ffmpeg</span>
 <span class="n">pip</span> <span class="n">install</span> <span class="n">numpy</span>
@@ -329,7 +329,7 @@ object, which will be created elsewhere, then passed to it.</p>
 created a 2 dimensional array and some functions that would randomize this
 array, then I fed these functions into the code that I built up using examples
 from the internet until I got something working.  Only then did I feed it the
-2TwoDCellularAutomata class, which originally didn’t use a co-routine; that
+2TwoDCellularAutomata class, which originally didn’t use a co-routine; it
 was added later.</p>
 </div>
 </div>
@@ -855,6 +855,11 @@ searching for.</p>
 function of the graphing paper width:</p>
 <a class="reference external image-reference" href="_static/cells_per_generation_vrs_angle_of_n_phenomenon.pdf"><div align="center" class="align-center"><img alt="_images/cells_per_generation_vrs_angle_of_n_phenomenon.svg" src="_images/cells_per_generation_vrs_angle_of_n_phenomenon.svg" /></div>
 </a>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The angle is still an approximation, since as you will see shortly, the
+n-phenomenon is not a straight line.</p>
+</div>
 <p>Here is a video of 196 different renderings of rule thirty within white walls.
 The video starts with 2 rule 30 machines squished between two white walls.
 For each frame advance of the video, a cell is added to the width of the
@@ -869,21 +874,50 @@ through the diagram as the width of the graphing paper increases.  The left side
 will cause an avalanche for two frames, then the right side will cause an
 avalanche for two frames, then the left side again and so on and so forth.</p>
 <p>You can see when the patterns are going to shift by watching for the “left white
-_|” and the “black right L”.  Both mini-patterns representing that the avalanche
-on their side of the diagram is over, and to move your eyes to the other side of
-the page for the next frame.</p>
+_|” and the “black right L”.  If either of these mini-patterns appear, it will
+tell you that the avalanche on their side of the diagram is over, and to move
+your eyes to the other side of the page for the next frame.</p>
+<p>As tempting as it is to think that this 2 beat oscillation is a feature of the
+automata, it probably isn’t.  The 2 beat oscillation is the result of the
+divide-by-2-and-round-the-result mixed with the
+expansion-of-the-size-of-the-page.  Essentially we are changing the initial
+conditions on one side of the page for 2 beats, then the other side for two
+beats.  Because rule 30 creates a chaotic system that is highly sensitive to its
+initial conditions we have avalanches of change in response to a new
+partial-starting-state. The initial conditions remain the same for the top part
+of the diagram, but are expressed when the rule 30 body hits the new wall
+condition.</p>
+<p>The video makes me think about time traveling stories.  If we imagine the new
+starting condition as the location of a time traveler arriving in the past from
+the future (to change one thing and then leave), we can see how he effects
+history as the change-avalanche on his side of the video frame.  The entire past
+isn’t changed, just the side that was within the causal cone of his avalanche.</p>
+<p>The rule 30 states only one square can be effected each generation; so the
+maximum theoretical propagation of a historical distortion is 45 degrees.  In
+our reality we also have such a causal limitation, it is the speed of light, c.</p>
+<p>Here is another video of 196 different renderings with a white left wall and
+black right wall:</p>
 <center>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/DtDaKKeOsOg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</center><center>
+</center><p>Black left, white right wall:</p>
+<center>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/gO-Y6UfMj70" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</center><center>
+</center><p>Left and right walls set to black:</p>
+<center>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/z1R8-gZd5wQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center></div>
 </div>
 </div>
 <div class="section" id="random-number-generation">
 <h1>Random Number Generation<a class="headerlink" href="#random-number-generation" title="Permalink to this headline">¶</a></h1>
-<p>The float left seems to be killing my page</p>
+<p>Let’s try and build a random number generator using a simple python program.</p>
+<p>First we should discuss our constraints.  Rule 30 provides interesting chaotic
+phenomenon, we would like to use this rule versus another rule, or we may
+accidentally lose our ability to generate chaos.  If we make our graphing paper
+very wide, then we need more computer memory and more computing resources to
+construct the next generation of our automata.  If we use walls, then we have
+order imposing itself into the body of the chaos, as the n-phenomenon, over only
+a few generations.</p>
 <table class="docutils footnote" frame="void" id="id2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">

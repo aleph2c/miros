@@ -155,8 +155,8 @@ because it means we can pull the operation of our automata away from the
 ``Canvas`` class and we can make the animation callback call out to a coroutine,
 so we can run our automata forever (if we wanted that).
 
-Under the hood ``matplotlib`` calls out to ``FFmpeg``, which is an open source
-project which makes videos.  Let's install what we need and get back to our
+Under the hood ``matplotlib`` calls out to ``FFmpeg``, which is some open source
+software that makes videos.  Let's install what we need and get back to our
 design:
 
 .. code-block:: python
@@ -341,7 +341,7 @@ object, which will be created elsewhere, then passed to it.
   created a 2 dimensional array and some functions that would randomize this
   array, then I fed these functions into the code that I built up using examples
   from the internet until I got something working.  Only then did I feed it the
-  2TwoDCellularAutomata class, which originally didn't use a co-routine; that
+  2TwoDCellularAutomata class, which originally didn't use a co-routine; it
   was added later.
 
 .. _cellular_automata-two2Automato:
@@ -959,6 +959,11 @@ function of the graphing paper width:
     :target: _static/cells_per_generation_vrs_angle_of_n_phenomenon.pdf
     :align: center
 
+.. note::
+
+  The angle is still an approximation, since as you will see shortly, the
+  n-phenomenon is not a straight line.
+
 Here is a video of 196 different renderings of rule thirty within white walls.
 The video starts with 2 rule 30 machines squished between two white walls.
 For each frame advance of the video, a cell is added to the width of the
@@ -979,9 +984,33 @@ will cause an avalanche for two frames, then the right side will cause an
 avalanche for two frames, then the left side again and so on and so forth.
 
 You can see when the patterns are going to shift by watching for the "left white
-_|" and the "black right L".  Both mini-patterns representing that the avalanche
-on their side of the diagram is over, and to move your eyes to the other side of
-the page for the next frame.
+_|" and the "black right L".  If either of these mini-patterns appear, it will
+tell you that the avalanche on their side of the diagram is over, and to move
+your eyes to the other side of the page for the next frame.
+
+As tempting as it is to think that this 2 beat oscillation is a feature of the
+automata, it probably isn't.  The 2 beat oscillation is the result of the
+divide-by-2-and-round-the-result mixed with the
+expansion-of-the-size-of-the-page.  Essentially we are changing the initial
+conditions on one side of the page for 2 beats, then the other side for two
+beats.  Because rule 30 creates a chaotic system that is highly sensitive to its
+initial conditions we have avalanches of change in response to a new
+partial-starting-state. The initial conditions remain the same for the top part
+of the diagram, but are expressed when the rule 30 body hits the new wall
+condition.
+
+The video makes me think about time traveling stories.  If we imagine the new
+starting condition as the location of a time traveler arriving in the past from
+the future (to change one thing and then leave), we can see how he effects
+history as the change-avalanche on his side of the video frame.  The entire past
+isn't changed, just the side that was within the causal cone of his avalanche.
+
+The rule 30 states only one square can be effected each generation; so the
+maximum theoretical propagation of a historical distortion is 45 degrees.  In
+our reality we also have such a causal limitation, it is the speed of light, c.
+
+Here is another video of 196 different renderings with a white left wall and
+black right wall:
 
 .. raw:: html
    
@@ -989,11 +1018,15 @@ the page for the next frame.
    <iframe width="560" height="315" src="https://www.youtube.com/embed/DtDaKKeOsOg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
    </center>
 
+Black left, white right wall:
+
 .. raw:: html
    
    <center>
    <iframe width="560" height="315" src="https://www.youtube.com/embed/gO-Y6UfMj70" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> 
    </center>
+
+Left and right walls set to black:
 
 .. raw:: html
    
@@ -1001,10 +1034,19 @@ the page for the next frame.
    <iframe width="560" height="315" src="https://www.youtube.com/embed/z1R8-gZd5wQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
    </center>
 
-
 Random Number Generation
 ==========================
 
-The float left seems to be killing my page
+Let's try and build a random number generator using a simple python program.
+
+First we should discuss our constraints.  Rule 30 provides interesting chaotic
+phenomenon, we would like to use this rule versus another rule, or we may
+accidentally lose our ability to generate chaos.  If we make our graphing paper
+very wide, then we need more computer memory and more computing resources to
+construct the next generation of our automata.  If we use walls, then we have
+order imposing itself into the body of the chaos, as the n-phenomenon, over only
+a few generations.
+
+
 
 .. [#] Stephen Wolfram (2002). `A New Kind of Science.  <https://www.wolframscience.com/>`_ (p27)
