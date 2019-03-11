@@ -57,7 +57,7 @@ class Handler(watchdog.events.PatternMatchingEventHandler):
       to_system = partial(_to_system, queue=deque(maxlen=2))
 
       # remove the old artifacts from this directory
-      to_system('make clean')
+      # to_system('make clean')
 
       # generate the api docs
       to_system('sphinx-apidoc -f -o ./../miros .')
@@ -65,10 +65,10 @@ class Handler(watchdog.events.PatternMatchingEventHandler):
       # make the new html
       to_system('make html')
 
-      if os.path.isdir('./../docs'):
-        to_system('rm -rf ./../docs')
+      #if os.path.isdir('./../docs'):
+      #  to_system('rm -rf ./../docs')
 
-      to_system('cp -r ./_build/html/ ./../docs')
+      to_system('rsync -a ./_build/html/ ./../docs')
       to_system('touch ./../docs/.nojekyll')
       time.sleep(2)
 

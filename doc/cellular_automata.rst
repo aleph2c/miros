@@ -54,6 +54,11 @@ Here are these instructions as a picture:
     :target: _static/rule_30_rule_in_pictures.pdf
     :align: center
 
+.. note::
+
+  If you look carefully at the picture version of the rule, you will see two
+  rows of binary numbers, and the reason why rule 30 is called rule 30.
+
 Now let's start a drawing: we will place a black square in the middle of the
 first line then follow the rules to fill in the 4 lines below it.
 
@@ -189,6 +194,11 @@ object, which will be created elsewhere, then passed to it.
 
 .. code-block:: python
 
+  import pathlib
+  import matplotlib
+  import matplotlib.pyplot as plt
+  import matplotlib.animation as animation
+
   class Canvas():
     def __init__(self, automata, title=None):
       '''Animate 2D graphing paper, or static file describing a automata
@@ -315,8 +325,6 @@ object, which will be created elsewhere, then passed to it.
          eco1.save('rule_30.pdf', generations=40)
 
       '''
-    def save(self, filename=None, generations=0):
-
       if pathlib.Path(filename).suffix == '.mp4':
         self.anim.save(filename) 
       else:
@@ -379,9 +387,9 @@ Here is a UML diagram of the ``TwoDCellularAutomata`` class:
 There is a bunch of stuff in this diagram that I don't know how to draw using
 UML.  For instance, how do I show a class that I have sent it a class, so it
 knows how to build something, using the class I just gave it?  How do I draw
-something that makes a co-routine?  Well, I don't know, so I'll try and scribble
+something that makes a co-routine?  Well, I don't know, so I will just scribble
 down something that isn't too confusing and explain what I meant here with a few
-words.
+words:
 
 The few key takeaways from the drawing are how the constructor works, we feed it
 in the rule and wall classes so that it can generically construct automata.  We
@@ -393,6 +401,12 @@ activation after that will cause it to descend one row down.
 Here is the code:
 
 .. code-block:: python
+
+  import numpy as np
+  from miros import Event
+
+  White = 0.1
+  Black = 0.9
 
   class TwoDCellularAutomata():
     def __init__(self,
@@ -605,6 +619,11 @@ Here is the code for our ``Rule30`` and ``Wall`` classes:
 
 .. code-block:: python
 
+   from miros import Event
+   from miros import signals
+   from miros import HsmWithQueues
+   from miros import return_status
+
    class Wall(HsmWithQueues):
 
      def __init__(self, name='wall'):
@@ -703,7 +722,7 @@ a `pdf` file and an `mp4` movie:
      wall_cls=WallLeftWhiteRightWhite)
 
    ecosystem = Canvas(automata)
-   ecosystem.run_animation(generations, interval=50)  # 50 ms
+   ecosystem.run_animation(generations, interval=100)  # 100 ms
    eco.save('rule_30_white_walls_200_generations.mp4')
    eco.save('rule_30_white_walls_200_generations.pdf')
    eco.save('rule_30_white_walls_200_generations.png')
@@ -713,7 +732,8 @@ Here is the movie:
 .. raw:: html
 
    <center>
-   <iframe width="560" height="315" src="https://www.youtube.com/embed/lJJvy9QXcuc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></center>
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/lB3oZ5DkPks" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   </center>
 
 Here is the `pgn` diagram, click on it to see the `pdf` version of the same picture:
 
@@ -738,7 +758,7 @@ Let's try it with black walls
    eco.save('rule_30_black_walls_200_generations.pdf')
    eco.save('rule_30_black_walls_200_generations.png')
 
-Here is a `link <https://youtu.be/9j2P53svDo8>`_ to the resulting video, and below you can see what happens when we run 200 generations of rule 30 with black walls.
+Here is a `link <https://www.youtube.com/watch?v=qSsddlg9o2M&feature=youtu.be>`_ to the resulting video, and below you can see what happens when we run 200 generations of rule 30 with black walls.
 
 .. image:: _static/rule_30_black_walls_200_generations.png
     :target: _static/rule_30_black_walls_200_generations.pdf
@@ -772,22 +792,24 @@ On this diagram we can see order imposing itself from the left white wall, and a
 
 .. _cellular_automata-the-nothing:
 
-The Nothing
-^^^^^^^^^^^
+The Nothing (n-phenomenon)
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The white and black walls force order into the automata; causing a kind of
 pattern crystallization to propagate across our results.  We lose the incredible
-complexity of rule 30, to this ordering pattern, which I will call the `nothing
-<https://www.youtube.com/watch?v=_-5QTdC7hOo>`_. Order imposes itself like a
-prion does in the brain of someone with Alzheimer's.  We have seen that this
-effect takes place with both white and black walls, the key is that there is an
-inflexible minority on the walls, imposing itself on a flexible majority.
-Nassim Nicholas Taleb calls this kind of thing `a normalization
-<https://medium.com/incerto/the-most-intolerant-wins-the-dictatorship-of-the-small-minority-3f1f83ce4e15>`_.
+complexity of rule 30, to this ordering pattern, which I think of as the
+`nothing <https://www.youtube.com/watch?v=_-5QTdC7hOo>`_. Order imposes itself
+like a prion does in the brain of someone with Alzheimer's.  We have seen that
+this effect takes place with both white and black walls, the key is that there
+is an inflexible minority on the walls, imposing itself on a flexible majority.
+(Nassim Nicholas Taleb calls this kind of thing `a normalization
+<https://medium.com/incerto/the-most-intolerant-wins-the-dictatorship-of-the-small-minority-3f1f83ce4e15>`_.)
+
+I will call this destructive ordering, the n-phenomenon.
 
 Let's study it in a bit more detail.  I will shrink the width of our graphing
-paper to 30 cells and watch the nothing destroy rule 30's beautiful complexity
-over 100 generations.
+paper to 30 cells and watch the n-phenomenon completely destroy rule 30's beautiful
+complexity over 100 generations.
 
 .. code-block:: python
   :emphasize-lines: 7
@@ -804,16 +826,185 @@ over 100 generations.
    ecosystem.run_animation(generations, interval=500)  # 500 ms
    eco.save('rule_30_white_walls_100_generations_width_30.mp4')
 
-Here is the video (I will store the results on you tube from now on, to save
-disk space):
-
 .. raw:: html
 
    <center>
    <iframe width="560" height="315" src="https://www.youtube.com/embed/oadp1sh69jE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
    </center>
 
+It seems that the n-phenomenon has a pattern velocity; resulting in an angle.
+My protractor tells me that the ordered crystallization, caused by the white
+minority at the wall, spreads downward at an angle of about 20 degrees.
+
+If we reduce the width of the graphing paper, this pattern seems to
+advance quicker into the chaos:
+
+.. code-block:: python
+  :emphasize-lines: 7
+
+   generations = 100
+
+   automata = TwoDCellularAutomata(
+     generations=generations,
+     machine_cls=Rule30,
+     wall_cls=WallLeftWhiteRightWhite,
+     cells_per_generation=15)
+
+   ecosystem = Canvas(automata)
+   ecosystem.run_animation(generations, interval=500)  # 500 ms
+   eco.save('rule_30_white_walls_100_generations_width_30.mp4')
+
+Compare the 30 cell width result to the 15 cell width result:
+
+.. raw:: html
+
+   <center>
+   <div style="float:left;">
+   <iframe width="330" height="315" src="https://www.youtube.com/embed/oadp1sh69jE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   </div>
+   
+   <div style="float:left;">
+   <iframe width="330" height="315" src="https://www.youtube.com/embed/IVLnbYamjXk" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   </div>
+   <div style="clear:both;"></div> 
+   </center>
+
+Let's try going thinner, here is a 15 cell width result beside a 10 cell width result:
+
+.. raw:: html
+
+   <center>
+
+   <div style="float:left;">
+   <iframe width="330" height="315" src="https://www.youtube.com/embed/IVLnbYamjXk" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   </div>
+   <div style="float:left;">
+  <iframe width="330" height="315" src="https://www.youtube.com/embed/whmwZEoYDz8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> 
+   </div>
+   <div style="clear:both;"></div> 
+   </center>
+
+So the angle of the n-phenomenon does not necessarily shrink with a reduction in
+the graphing paper's width.
+
+Let's write some code that can calculate the angle of the n-phenomenon.
+
+We will set the walls to be white and the initial condition is a single black
+rule 30 machine, sandwiched between other rule 30 machines started in the white
+state:
+
+.. image:: _static/rule_30_twodcellularautomata_with_angle.svg
+    :target: _static/rule_30_twodcellularautomata_with_angle.pdf
+    :align: center
+
+The blue object in the diagram represents the disordered part of a rule 30
+simulation contained by white walls.  The cyan circle is the angle, in degrees, we are
+searching for.
+
+.. code-block:: python
+
+  class TwoDCellularAutomataWithAngleDiscovery(TwoDCellularAutomata):
+
+    def __init__(self, 
+        generations, 
+        cells_per_generation=None, 
+        initial_condition_index=None,
+        machine_cls=None,
+        wall_cls=None):
+
+      super().__init__(
+        generations,
+        cells_per_generation,
+        initial_condition_index,
+        machine_cls,
+        wall_cls)
+
+      self.black_mask = np.array([Black], dtype=np.float32)
+      self.white_mask = np.array([White], dtype=np.float32)
+      self.n_mask = np.concatenate(
+         (self.white_mask, self.black_mask), axis=0)
+      self.n_angle = 90
+
+    def build_next_mask(self):
+      if abs(self.n_mask[-1] - White) < 0.001:
+        self.n_mask = np.concatenate(
+          (self.n_mask, self.black_mask), axis=0)
+      else:
+        self.n_mask = np.concatenate(
+          (self.n_mask, self.white_mask), axis=0)
+
+    def update_angle(self):
+
+      previous_generation = self.generation+1
+      row_to_check = self.Z[previous_generation]
+      sub_row_to_check = row_to_check[0:len(self.n_mask)]
+
+      if np.array_equal(self.n_mask, sub_row_to_check):
+
+        self.nothing_at_row = self.generations-previous_generation + 1
+        adjacent = self.nothing_at_row - self.cells_per_generation / 2.0
+        opposite = self.cells_per_generation
+        self.n_angle = math.degrees(math.atan(opposite/adjacent))
+
+        self.build_next_mask()
+
+    def next_generation(self):
+      super().next_generation()
+      self.update_angle()
+
+With this code we can plot how the angle of the n-phenomenon changes as a
+function of the graphing paper width:
+
+.. image:: _static/cells_per_generation_vrs_angle_of_n_phenomenon.svg
+    :target: _static/cells_per_generation_vrs_angle_of_n_phenomenon.pdf
+    :align: center
+
+Here is a video of 196 different renderings of rule thirty within white walls.
+The video starts with 2 rule 30 machines squished between two white walls.
+For each frame advance of the video, a cell is added to the width of the
+graphing paper and the automata is restarted an run with a black machine
+at the top and middle of the simulation.
+
+.. raw:: html
+
+   <center>
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/8aHWeo_dgs0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   </center>
+
+The top part of the video remains constant as the width of the graphing paper
+expands, which makes sense, since that part of the diagram experiences the same
+set of initial conditions.  What is surprising is how avalanches perpetuate
+through the diagram as the width of the graphing paper increases.  The left side
+will cause an avalanche for two frames, then the right side will cause an
+avalanche for two frames, then the left side again and so on and so forth.
+
+You can see when the patterns are going to shift by watching for the "left white
+_|" and the "black right L".  Both mini-patterns representing that the avalanche
+on their side of the diagram is over, and to move your eyes to the other side of
+the page for the next frame.
+
+.. raw:: html
+   
+   <center>
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/DtDaKKeOsOg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   </center>
+
+.. raw:: html
+   
+   <center>
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/gO-Y6UfMj70" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> 
+   </center>
+
+.. raw:: html
+   
+   <center>
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/z1R8-gZd5wQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   </center>
+
+
 Random Number Generation
 ==========================
+
+The float left seems to be killing my page
 
 .. [#] Stephen Wolfram (2002). `A New Kind of Science.  <https://www.wolframscience.com/>`_ (p27)

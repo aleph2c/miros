@@ -9,14 +9,295 @@ from miros import signals
 from miros import HsmWithQueues
 from miros import return_status
 
-from collections import deque
 import math
 import pathlib
+from collections import deque
+from collections import namedtuple
 
-Black   = 0.9
-Default = 0.5
+import csv
+from functools import reduce
+import os
+import re
+
 White   = 0.1
+Default = 0.5
+Black   = 0.9
 
+class NCache:
+
+  Bottom_Width = 4
+  Spec = namedtuple('Spec', ['width', 'angle_degrees'])
+
+  def __init__(self):
+
+    def by_angle(spec):
+      return spec.angle_degrees
+
+    def by_width(spec):
+      return spec.width
+
+    self.by_angle = by_angle
+    self.by_width = by_width
+    self._lookup = {}
+    self._lookup[4] = 73.7
+    self._lookup[5] = 55.3
+    self._lookup[6] = 65.3
+    self._lookup[7] = 28.2
+    self._lookup[8] = 35.2
+    self._lookup[9] = 35.5
+    self._lookup[10] = 35.7
+    self._lookup[11] = 44.4
+    self._lookup[12] = 36.0
+    self._lookup[13] = 27.7
+    self._lookup[14] = 30.2
+    self._lookup[15] = 39.2
+    self._lookup[16] = 34.0
+    self._lookup[17] = 35.3
+    self._lookup[18] = 27.7
+    self._lookup[19] = 27.5
+    self._lookup[20] = 21.9
+    self._lookup[21] = 23.1
+    self._lookup[22] = 24.0
+    self._lookup[23] = 27.7
+    self._lookup[24] = 27.5
+    self._lookup[25] = 26.9
+    self._lookup[26] = 24.7
+    self._lookup[27] = 27.0
+    self._lookup[28] = 28.7
+    self._lookup[29] = 26.4
+    self._lookup[30] = 21.9
+    self._lookup[31] = 28.5
+    self._lookup[32] = 37.7
+    self._lookup[33] = 37.7
+    self._lookup[34] = 26.9
+    self._lookup[35] = 21.9
+    self._lookup[36] = 23.6
+    self._lookup[37] = 25.7
+    self._lookup[38] = 25.4
+    self._lookup[39] = 25.3
+    self._lookup[40] = 26.6
+    self._lookup[41] = 23.6
+    self._lookup[42] = 28.5
+    self._lookup[43] = 25.1
+    self._lookup[44] = 21.0
+    self._lookup[45] = 22.8
+    self._lookup[46] = 23.6
+    self._lookup[47] = 24.4
+    self._lookup[48] = 23.6
+    self._lookup[49] = 27.2
+    self._lookup[50] = 19.6
+    self._lookup[51] = 26.4
+    self._lookup[52] = 27.4
+    self._lookup[53] = 26.2
+    self._lookup[54] = 29.9
+    self._lookup[55] = 23.7
+    self._lookup[56] = 23.6
+    self._lookup[57] = 24.4
+    self._lookup[58] = 26.6
+    self._lookup[59] = 25.8
+    self._lookup[60] = 25.2
+    self._lookup[61] = 24.2
+    self._lookup[62] = 26.9
+    self._lookup[63] = 25.8
+    self._lookup[64] = 25.1
+    self._lookup[65] = 26.0
+    self._lookup[66] = 20.6
+    self._lookup[67] = 25.3
+    self._lookup[68] = 23.3
+    self._lookup[69] = 24.7
+    self._lookup[70] = 24.4
+    self._lookup[71] = 24.5
+    self._lookup[72] = 26.7
+    self._lookup[73] = 25.0
+    self._lookup[74] = 20.2
+    self._lookup[75] = 22.2
+    self._lookup[76] = 23.9
+    self._lookup[77] = 22.4
+    self._lookup[78] = 27.7
+    self._lookup[79] = 24.2
+    self._lookup[80] = 22.9
+    self._lookup[81] = 23.6
+    self._lookup[82] = 23.0
+    self._lookup[83] = 19.1
+    self._lookup[84] = 19.9
+    self._lookup[85] = 21.0
+    self._lookup[86] = 20.0
+    self._lookup[87] = 26.2
+    self._lookup[88] = 27.7
+    self._lookup[89] = 23.8
+    self._lookup[90] = 23.1
+    self._lookup[91] = 25.2
+    self._lookup[92] = 22.5
+    self._lookup[93] = 22.8
+    self._lookup[94] = 26.4
+    self._lookup[95] = 20.7
+    self._lookup[96] = 20.8
+    self._lookup[97] = 20.1
+    self._lookup[98] = 22.6
+    self._lookup[99] = 21.3
+    self._lookup[100] = 23.4
+    self._lookup[100] = 23.4
+    self._lookup[101] = 21.5
+    self._lookup[102] = 21.7
+    self._lookup[103] = 23.1
+    self._lookup[104] = 23.0
+    self._lookup[105] = 22.4
+    self._lookup[106] = 24.7
+    self._lookup[107] = 21.4
+    self._lookup[108] = 22.1
+    self._lookup[109] = 21.7
+    self._lookup[109] = 21.7
+    self._lookup[110] = 25.3
+    self._lookup[111] = 24.0
+    self._lookup[112] = 25.6
+    self._lookup[113] = 23.6
+    self._lookup[114] = 24.8
+    self._lookup[115] = 23.3
+    self._lookup[116] = 23.6
+    self._lookup[117] = 24.9
+    self._lookup[118] = 22.6
+    self._lookup[119] = 21.4
+    self._lookup[120] = 21.1
+    self._lookup[121] = 21.5
+    self._lookup[122] = 25.2
+    self._lookup[123] = 24.7
+    self._lookup[124] = 23.0
+    self._lookup[125] = 23.1
+    self._lookup[126] = 24.2
+    self._lookup[127] = 20.4
+    self._lookup[128] = 21.3
+    self._lookup[129] = 22.1
+    self._lookup[130] = 21.6
+    self._lookup[131] = 22.8
+    self._lookup[132] = 23.0
+    self._lookup[133] = 25.0
+    self._lookup[134] = 23.9
+    self._lookup[135] = 22.6
+    self._lookup[136] = 23.4
+    self._lookup[137] = 20.7
+    self._lookup[138] = 21.7
+    self._lookup[139] = 22.2
+    self._lookup[140] = 22.0
+    self._lookup[141] = 23.1
+    self._lookup[142] = 23.0
+    self._lookup[143] = 21.8
+    self._lookup[144] = 22.2
+    self._lookup[145] = 22.1
+    self._lookup[146] = 24.4
+    self._lookup[147] = 22.5
+
+  def get_angle(cells_per_generation):
+    result = None
+
+    if cells_per_generation in self.lookup:
+      result = self._lookup[cells_per_generation]
+    elif cells_per_generation < NCache.Bottom_Width:
+      result = None
+    else:
+      def do_sum(x1, x2):
+        return x1+x2
+      result = reduce(do_sum, self.widest()[15])/15
+    return result
+
+  def slowest_n_phenom(self):
+    fastest = sorted(
+      [NCache.Spec(k,v) for (k,v) in self._lookup.items()],
+      key=self.by_angle
+    )
+    return fastest
+
+  def slowest_n_phenom(self):
+    slowest = sorted(
+      [NCache.Spec(k,v) for (k,v) in self._lookup.items()],
+      key=self.by_angle,
+      reverse=True
+    )
+    return slowest
+
+  def widest(self):
+    w = sorted(
+      [NCache.Spec(k,v) for (k,v) in self._lookup.items()],
+      key=self.by_width,
+      reverse=True
+    )
+    return w
+
+  def thinnest(self):
+    w = sorted(
+      [NCache.Spec(k,v) for (k,v) in self._lookup.items()],
+      key=self.by_width,
+    )
+    return w
+
+  def build_cache_csv(self, wall_cls, start_at, upto):
+
+    m = re.search(r"(Wall.+)'", str(wall_cls))
+    if m: 
+      file_start = "rule{}".format(
+        re.sub(r'([A-Z]+)', r'_\1', m.group(1)).lower())
+    basename = '{}_{}_to_{}'.format(file_start, start_at, upto)
+    csv_filename = '{}.csv'.format(basename)
+    png_filename = '{}_'.format(basename)
+
+    with open(csv_filename, 'w') as fh:
+      writer = csv.writer(fh)
+      writer.writerows([['width', 'angle_in_degrees']])
+
+    generations = 50
+    width = start_at
+    while width < upto:
+      filename = "{}{}".format(png_filename, width)
+      automata = TwoDCellularAutomataWithAngleDiscovery(
+        generations=generations,
+        machine_cls=Rule30,
+        wall_cls=wall_cls,
+        cells_per_generation=width
+        )
+      eco = Canvas(automata)
+      eco.save('{}.png'.format(filename), dpi=300)
+      angle_degrees = automata.n_angle
+      #cmd = 'cmd.exe /C {} &'.format('{}.png'.format(filename))
+      #subprocess.Popen(cmd, shell=True)
+
+      if wall_cls == WallLeftWhiteRightWhite or wall_cls == WallLeftBlackRightWhite \
+          and (automata.cells_per_generation - len(automata.n_mask) >= 2):
+        generations += 50
+      elif wall_cls == WallLeftWhiteRightBlack or wall_cls == WallLeftBlackRightBlack \
+          and (automata.cells_per_generation - len(automata.n_mask) >= 4):
+        generations += 50
+      else:
+        print(width)
+        print(generations)
+        print(angle_degrees)
+        print(automata.n_mask)
+        with open(csv_filename, 'a') as fh:
+          writer = csv.writer(fh)
+          writer.writerows([[str(width), "{0:0.1f}".format(angle_degrees)]])
+        width += 1
+        eco.close()
+    movie_filename = "{}.mp4".format(png_filename)
+    os.system("ffmpeg -f image2 -r 1 -i ./{}\%01d.png -vcodec mpeg4 -y ./{}".format(png_filename, movie_filename))
+    return csv_filename, movie_filename
+
+  def plot_csv(self, csv_filename):
+    x = []
+    y = []
+    with open(csv_filename, 'r') as csvfile:
+      plots = csv.reader(csvfile, delimiter=',')
+      for row in plots:
+        try:
+          x.append(int(row[0]))
+          y.append(float(row[1]))
+        except:
+          pass
+    plt.plot(x, y, label='cells versus angle')
+    plt.xlabel('cells per generation')
+    plt.ylabel('angle of n phenomenon [degrees]')
+    plt.savefig('cells_per_generation_vrs_angle_of_n_phenomenon.svg')
+    plt.savefig('cells_per_generation_vrs_angle_of_n_phenomenon.pdf')
+    plt.close()
+
+    
 class Wall(HsmWithQueues):
 
   def __init__(self, name='wall'):
@@ -167,7 +448,7 @@ class TwoDCellularAutomata():
       # build an automata using rule 30 with white walls
       # it should be 50 cells across
       # and it should run for 1000 generations
-      autonoma = TwoDCellularAutomata(
+      ma = TwoDCellularAutomata(
         machine_cls=Rule30,
         generations=1000,
         wall_cls=WallLeftWhiteRightWhite,
@@ -306,6 +587,75 @@ class TwoDCellularAutomata():
       self.next_generation()
       yield self.Z
 
+class TwoDCellularAutomataWithAngleDiscovery(TwoDCellularAutomata):
+
+    def __init__(self, 
+        generations, 
+        cells_per_generation=None, 
+        initial_condition_index=None,
+        machine_cls=None,
+        wall_cls=None):
+
+      super().__init__(
+        generations,
+        cells_per_generation,
+        initial_condition_index,
+        machine_cls,
+        wall_cls)
+
+      self.black_mask = np.array([Black], dtype=np.float32)
+      self.white_mask = np.array([White], dtype=np.float32)
+      
+      if self.wall_cls == WallLeftWhiteRightBlack or \
+        self.wall_cls == WallLeftWhiteRightWhite:
+        self.n_mask = np.concatenate(
+           (self.white_mask, self.black_mask), axis=0)
+      else:
+        self.n_mask = np.concatenate(
+           (self.black_mask, self.white_mask), axis=0)
+      self.n_angle = 90
+
+    def build_next_mask(self):
+
+      if self.wall_cls == WallLeftBlackRightBlack or \
+        self.wall_cls == WallLeftBlackRightWhite:
+
+        if abs(self.n_mask[-1] - White) < 0.001:
+          self.n_mask = np.concatenate(
+            (self.n_mask, self.black_mask), axis=0)
+        else:
+          self.n_mask = np.concatenate(
+            (self.n_mask, self.white_mask), axis=0)
+      else:
+        if abs(self.n_mask[-1] - White) < 0.001:
+          self.n_mask = np.concatenate(
+            (self.n_mask, self.black_mask), axis=0)
+        else:
+          self.n_mask = np.concatenate(
+            (self.n_mask, self.white_mask), axis=0)
+
+    def update_angle(self):
+
+      previous_generation = self.generation+1
+      row_to_check = self.Z[previous_generation]
+      sub_row_to_check = row_to_check[0:len(self.n_mask)]
+
+      if np.array_equal(self.n_mask, sub_row_to_check):
+
+        self.nothing_at_row = self.generations-previous_generation + 1
+        adjacent = self.nothing_at_row
+        adjacent -= (self.cells_per_generation / math.sqrt(2.0))
+        opposite = self.cells_per_generation
+        self.n_angle = math.degrees(math.atan(opposite/adjacent))
+
+        self.build_next_mask()
+
+    def next_generation(self):
+      super().next_generation()
+      self.update_angle()
+
+
+
 class TwoDCellularAutonomataWallRecursion(TwoDCellularAutomata):
 
   def __init__(self, 
@@ -334,12 +684,6 @@ class TwoDCellularAutonomataWallRecursion(TwoDCellularAutomata):
        (type): 
 
     **Example(s)**:
-      
-    .. code-block:: python
-       
-       >>> [factorial(n) for n in range(6)]
-       [1, 1, 2, 6, 24, 120]
-
 
     '''
     super().__init__(
@@ -418,7 +762,7 @@ class Canvas():
   def __init__(self, automata, title=None):
     '''Animate 2D graphing paper, or static file describing a automata
 
-    Given an autonoma, which has a ``make_generation_coroutine`` coroutine generator, an
+    Given an ma, which has a ``make_generation_coroutine`` coroutine generator, an
     animation can be build by calling this coroutine for as many generations are
     required.
 
@@ -437,7 +781,7 @@ class Canvas():
       
     .. code-block:: python
        
-       eco1 = Canvas(autonoma)
+       eco1 = Canvas(ma)
        eco1.run_animation(1200, interval=10)  # 10 ms
        eco1.save('eco1.mp4')
 
@@ -530,16 +874,16 @@ class Canvas():
 
     **Example(s)**:
 
-       eco1 = Canvas(autonoma)
+       eco1 = Canvas(ma)
        eco1.run_animation(50, 10)
        eco1.save('rule_30.mp4)
        eco1.save('rule_30.pdf)
 
-       eco2 = Canvas(autonoma)
+       eco2 = Canvas(ma)
        eco1.save('rule_30.pdf', generations=40)
 
     '''
-  def save(self, filename=None, generations=0):
+  def save(self, filename=None, generations=0, dpi=100):
 
     if pathlib.Path(filename).suffix == '.mp4':
       self.anim.save(filename) 
@@ -548,8 +892,10 @@ class Canvas():
         for i in range(self.automata.generations):
           next(self.generation)
         self.ax.pcolormesh(self.automata.Z, cmap=self.cmap)
-      plt.savefig(filename) 
+      plt.savefig(filename, dpi=dpi) 
 
+  def close(self):
+    plt.close(self.fig)
 
 ## Eye scans
 ## 12, 2 * pump -- no repeat after 1200
@@ -557,36 +903,39 @@ class Canvas():
 ## 10, 1 * pump -- peudo-repeat seen within 1200
 ## 10, 2 * pump -- repeat seen within 1200
 ## 10, 3 * pump -- repeat seen within 1200
-#autonoma = TwoDCellularAutonomataWallRecursion(
+#ma = TwoDCellularAutonomataWallRecursion(
 #  generations=generations,
 #  machine_cls=Rule30WithQueueDepth,
 #  cells_per_generation=15,
 #  order_scalar=1,
 #  )
 
-generations = 100
-filename = "rule_30_white_walls_100_generations_width_30"
-
-autonoma = TwoDCellularAutomata(
-  generations=generations,
-  machine_cls=Rule30,
-  wall_cls=WallLeftWhiteRightWhite,
-  cells_per_generation=30
-  )
-
-eco = Canvas(autonoma)
+nc = NCache()
+csv_filename, movie_filename = nc.build_cache_csv(WallLeftBlackRightBlack,
+    start_at=4, upto=200)
+nc.plot_csv(csv_filename)
+#filename = "rule_30_white_walls_{}_generations_width_{}".format(generations, width)
+#ma = TwoDCellularAutomataWithAngleDiscovery(
+#  generations=generations,
+#  machine_cls=Rule30,
+#  wall_cls=WallLeftWhiteRightWhite,
+#  cells_per_generation=width
+#  )
+#eco = Canvas(ma)
 # 43 seconds with generations = 200
-eco.run_animation(generations, interval=100)
-eco.save('{}.mp4'.format(filename))
+#eco.run_animation(generations, interval=100)
+#eco.save('{}.mp4'.format(filename))
 
 # 43 seconds with generations = 200
-eco.save('{}.pdf'.format(filename))
-eco.save('{}.png'.format(filename))
+#eco.save('{}.pdf'.format(filename))
+#eco.save('{}.png'.format(filename))
 
-cmd = 'cmd.exe /C {} &'.format('{}.mp4'.format(filename))
+cmd = 'cmd.exe /C {} &'.format(movie_filename)
 subprocess.Popen(cmd, shell=True)
 
-cmd = 'cmd.exe /C {} &'.format('{}.pdf'.format(filename))
-subprocess.Popen(cmd, shell=True)
+#cmd = 'cmd.exe /C {} &'.format('{}.png'.format(filename))
+#subprocess.Popen(cmd, shell=True)
+#print(width)
+#print(ma.n_angle)
 #
 #cell = Rule30('bob')
