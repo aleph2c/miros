@@ -14,19 +14,19 @@ Here is a picture of the predatory snail, `Conus Textile <https://www.youtube.co
 
    <div class=body>By Richard Ling - Own work; Location: Cod Hole, Great Barrier Reef, Australia, <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=293495">Link</a></div>
 
-The pattern on its shell is an example of a 2D cellular automata.  The shell is
+The pattern on its shell is an example of a 1D cellular automata.  The shell is
 grown by a kind of organic line of printer heads along the shell's lip.  These
 printer heads, called pigment cells, can extrude colored calcium cement.  The
 color choice of a pigment cell is dependent upon the color choice of it's two
 adjacent pigment cells.  The rules governing this process are simple, yet a very
 complex shell color pattern emerges.
 
-A 2D cellular automata exists on a 2D grid of cells; like graphing paper, and it
+A 1D cellular automata exists on a 2D grid of cells; like graphing paper, and it
 is governed by a simple set of rules.  How you color in a square is dependent
 upon the coloring of the three squares above it.  If we decided only to use
 black and white coloring, a square's color would be dependent upon eight
 different permutations of the three squares above it.  The governing rules of a
-2D cellular automata could be described by drawing out these eight pictures.
+1D cellular automata could be described by drawing out these eight pictures.
 
 But before we begin to fill in our drawings we would have to decide how to start
 them.  Typically you color the middle square of the top line on your graphing
@@ -36,11 +36,11 @@ you start is called the initial condition, and as you will see, the initial
 conditions have a huge effect on the overall emergent pattern of your drawing.
 
 In 1983 `Stephen Wolfram <https://www.youtube.com/watch?v=60P7717-XOQ>`_
-discovered a 2D cellular automata which created patterns that look like the
+discovered a 1D cellular automata which created patterns that look like the
 shell of the Conus Textile snail.  He called this program, `Rule 30
 <https://en.wikipedia.org/wiki/Rule_30>`_.  
 
-Let's explore how to make a Rule 30, 2D cellular automata, by looking at the
+Let's explore how to make a Rule 30, 1D cellular automata, by looking at the
 instructions which govern it:
 
    *"First, look at each cell and it's right-hand neighbor.  If both of these were
@@ -100,9 +100,9 @@ will do the job:
 At the top of the diagram is our automata which provides some context and
 describes our design goal.  Below that is a small UML diagram showing how some
 classes relate to each other.  We see that a ``Canvas`` class *has a*
-``TwoDCellularAutomata`` class.  This ``TwoDCellularAutomata`` class *has many*
+``OneDCellularAutomata`` class.  This ``OneDCellularAutomata`` class *has many*
 ``Rule30`` and ``Wall`` classes.  The ``Canvas`` class will draw our diagrams
-and animations, the ``TwoDCellularAutomata`` will be responsible for creating
+and animations, the ``OneDCellularAutomata`` will be responsible for creating
 any automata given a ``Wall`` class and a ``Rule`` class.  That seems simple
 enough.
 
@@ -189,7 +189,7 @@ will have a ``FuncAnimation`` object and a ``LinearSegmentedColormap`` (used for
 making colors), and it shows us how we want to make the object and how we want
 to use it with the ``run_animation`` and ``save`` methods.
 
-It also shows us that the Canvas calls will have a ``TwoDCellularAutomata``
+It also shows us that the Canvas calls will have a ``OneDCellularAutomata``
 object, which will be created elsewhere, then passed to it.
 
 .. code-block:: python
@@ -212,7 +212,7 @@ object, which will be created elsewhere, then passed to it.
          which returns a coroutine which can be called with ``next``.
 
       **Args**:
-         | ``automata`` (TwoDCellularAutomata): 
+         | ``automata`` (OneDCellularAutomata): 
          | ``title=None`` (string): An optional title
 
       **Returns**:
@@ -341,12 +341,12 @@ object, which will be created elsewhere, then passed to it.
   created a 2 dimensional array and some functions that would randomize this
   array, then I fed these functions into the code that I built up using examples
   from the internet until I got something working.  Only then did I feed it the
-  2TwoDCellularAutomata class, which originally didn't use a co-routine; it
+  OneDCellularAutomata class, which originally didn't use a co-routine; it
   was added later.
 
 .. _cellular_automata-two2Automato:
 
-The TwoDCellularAutomata Class
+The OneDCellularAutomata Class
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Let's give our basic design another look:
 
@@ -354,22 +354,22 @@ Let's give our basic design another look:
     :target: _static/rule_30_basic_design.pdf
     :align: center
 
-The ``TwoDCellularAutomata`` object will be responsible for applying the rules
+The ``OneDCellularAutomata`` object will be responsible for applying the rules
 to our graphing paper, and for setting it into its initial condition (the black
 square in the middle of the top line).
 
-To do this ``TwoDCellularAutomata`` will provide a two-dimensional array, Z,
+To do this ``OneDCellularAutomata`` will provide a two-dimensional array, Z,
 containing color codes, to be used by our Canvas to draw things.  It also builds
 a lot of ``Rule30`` and ``Wall`` state machines and links them to other machines
 so that they can read the ``left.color`` and ``right.color`` attributes of their
-adjacent cells.  ``TwoDCellularAutomata`` needs to set up some initial
+adjacent cells.  ``OneDCellularAutomata`` needs to set up some initial
 conditions; how the machines are started on the first line of our graphing
 paper.  The ``Rule30`` state machines respond to ``Next`` events, which cause
-them to react and change if they need to change, so the ``TwoDCellularAutomata``
+them to react and change if they need to change, so the ``OneDCellularAutomata``
 will need to dispatch this event into all of the ``Rule30`` objects to make a
 new line as the automata propagate downward.
 
-To make the ``TwoDCellularAutomata`` object generic, we will feed it its
+To make the ``OneDCellularAutomata`` object generic, we will feed it its
 automata rule and wall rules as classes.  To make the wall behaviour
 parameterizable, I'll add some new wall rule classes that hold the left and
 right colors in their class attributes:
@@ -378,7 +378,7 @@ right colors in their class attributes:
     :target: _static/rule_30_basic_design_1.pdf
     :align: center
 
-Here is a UML diagram of the ``TwoDCellularAutomata`` class:
+Here is a UML diagram of the ``OneDCellularAutomata`` class:
 
 .. image:: _static/rule_30_twodcellularautomata.svg
     :target: _static/rule_30_twodcellularautomata.pdf
@@ -408,7 +408,7 @@ Here is the code:
   White = 0.1
   Black = 0.9
 
-  class TwoDCellularAutomata():
+  class OneDCellularAutomata():
     def __init__(self,
         generations,
         cells_per_generation=None,
@@ -428,7 +428,7 @@ Here is the code:
          | ``wall_cls=None`` (Wall): which wall rules to follow
 
       **Returns**:
-         (TwoDCellularAutonomata): an automata object
+         (OneDCellularAutonomata): an automata object
 
       **Example(s)**:
         
@@ -437,7 +437,7 @@ Here is the code:
         # build an automata using rule 30 with white walls
         # it should be 50 cells across
         # and it should run for 1000 generations
-        autonoma = TwoDCellularAutomata(
+        autonoma = OneDCellularAutomata(
           machine_cls=Rule30,
           generations=1000,
           wall_cls=WallLeftWhiteRightWhite,
@@ -500,7 +500,7 @@ Here is the code:
       return wall
 
     def initial_state(self):
-      '''initialize the 2d cellular automata'''
+      '''initialize the 1d cellular automata'''
       Z = np.full([self.generations, self.cells_per_generation], Black,
                   dtype=np.float32)
 
@@ -537,7 +537,7 @@ Here is the code:
       self.Z = Z
 
     def next_generation(self):
-      '''create the next row of the 2d cellular automata'''
+      '''create the next row of the 1d cellular automata'''
       Z = self.Z
       if self.generation == self.generations-1:
         # draw the first row
@@ -580,7 +580,7 @@ Here is the code:
 
 .. note::
 
-  On construction:  Initially I build the ``TwoDCellularAutomata`` without a
+  On construction:  Initially I build the ``OneDCellularAutomata`` without a
   coroutine.
 
 .. _cellular_automata-rule30-and-the-walls:
@@ -716,7 +716,7 @@ a `pdf` file and an `mp4` movie:
 
    generations = 200
 
-   automata = TwoDCellularAutomata(
+   automata = OneDCellularAutomata(
      generations=generations,
      machine_cls=Rule30,
      wall_cls=WallLeftWhiteRightWhite)
@@ -747,7 +747,7 @@ Let's try it with black walls
 
    generations = 200
 
-   automata = TwoDCellularAutomata(
+   automata = OneDCellularAutomata(
      generations=generations,
      machine_cls=Rule30,
      wall_cls=WallLeftBlackRightBlack)
@@ -816,7 +816,7 @@ complexity over 100 generations.
 
    generations = 100
 
-   automata = TwoDCellularAutomata(
+   automata = OneDCellularAutomata(
      generations=generations,
      machine_cls=Rule30,
      wall_cls=WallLeftWhiteRightWhite,
@@ -844,7 +844,7 @@ advance quicker into the chaos:
 
    generations = 100
 
-   automata = TwoDCellularAutomata(
+   automata = OneDCellularAutomata(
      generations=generations,
      machine_cls=Rule30,
      wall_cls=WallLeftWhiteRightWhite,
@@ -903,7 +903,7 @@ searching for.
 
 .. code-block:: python
 
-  class TwoDCellularAutomataWithAngleDiscovery(TwoDCellularAutomata):
+  class OneDCellularAutomataWithAngleDiscovery(OneDCellularAutomata):
 
     def __init__(self, 
         generations, 
@@ -1037,16 +1037,65 @@ Left and right walls set to black:
 Random Number Generation
 ==========================
 
-Let's try and build a random number generator using a simple python program.
+Let's try and build a random number generator using a simple Python program.
 
-First we should discuss our constraints.  Rule 30 provides interesting chaotic
-phenomenon, we would like to use this rule versus another rule, or we may
-accidentally lose our ability to generate chaos.  If we make our graphing paper
-very wide, then we need more computer memory and more computing resources to
-construct the next generation of our automata.  If we use walls, then we have
-order imposing itself into the body of the chaos, as the n-phenomenon, over only
-a few generations.
+First we should discuss our constraints.  Rule 30 provides an interesting
+chaotic phenomenon, we would like to use this rule versus another rule, or we
+may accidentally lose our ability to generate chaos.  If we make our graphing
+paper very wide, then we need more computer memory and more computing resources
+to construct the next generation of automata.  If we use walls, then we have
+order imposing itself back into the body of the chaos, as the n-phenomenon, over
+only a few generations.  Even if we can perfectly manage this n-phenomenon,
+there are only so many permutations that can be held within the bounds of our
+rectangle, and if we repeat a pattern we are not generating a random number, but
+rather a long periodic number; a pseudo-random number.
 
+.. note::
+
+  Our universe seems to have set rules (the laws of physics) but it will not run
+  into this n-phenomenon, repetition issue; because it doesn't seem to be
+  confined within walls or have limited memory: the universe is expanding at an
+  accelerating rate.
+
+  Maybe it would have been wiped out by an n-phenomenon if it weren't expanding.
+
+So there seems to be a theoretical upper bound to what we can generate using
+limited memory given that the rule doesn't change and the state of the program
+is held within a bounded rectangle. My first guess at what our upper bound is:
+``2**n`` where ``n`` is the number of states within the rectangle, and the ``2``
+is selected because we are only tracking two colors, black and white.
+
+First things first, let's deal with the n-phenomenon coming from the walls.  We
+have control of the walls, and we have a chaos generator, so let's feed the
+chaos back into the walls.  Let's make `some spooky action at a
+distance <https://www.youtube.com/watch?v=ZuvK-od647c>`_:
+
+.. image:: _static/rule_30_chaos_to_walls_1.svg
+    :target: _static/rule_30_chaos_to_walls_1.pdf
+    :align: center
+
+We can write the colors of our center column into a deque, and use the top two
+colors of this deque to set the color of the walls.  Let's call this deque the
+``core_colors``.  To begin with we set all of the ``core_colors`` to white, so
+that the walls will remain white for the first ``len(core_colors)`` generations.
+For every ``Next`` event, the ``core_colors`` deque is pushed one spot downward
+into the center of our automata, where it is painted with the color of the core
+at that spot.
+
+We will use the last two elements of our ``core_colors`` to determine the color
+of our walls.  These last two spots will act as a 2 digit binary number, holding
+the values of ``WallLeftWhiteRightWhite``, ``WallLeftWhiteRightBlack``,
+``WallLeftBlackRightWhite`` and ``WallLeftBlackRightBlack``.  How this rule is
+applied isn't that important, it just has to consistently map the center's chaos
+onto the walls.
+
+So, how long do we make this ``core_colors`` deque?  My intuition is to feed it
+as much chaos as rule 30 can generate, then feed this back into the automata
+before the n-phenomenon destroys the disorder.
+
+Every intuition I have had so far about rule 30 has been wrong, so I'll probably
+be wrong about this too.  I need some way to measure if my prediction is correct
+or incorrect
 
 
 .. [#] Stephen Wolfram (2002). `A New Kind of Science.  <https://www.wolframscience.com/>`_ (p27)

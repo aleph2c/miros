@@ -43,18 +43,18 @@
 <h1>Cellular Automata<a class="headerlink" href="#cellular-automata" title="Permalink to this headline">¶</a></h1>
 <p>Here is a picture of the predatory snail, <a class="reference external" href="https://www.youtube.com/watch?v=JjHMGSI_h0Q">Conus Textile</a>:</p>
 <a class="reference external image-reference" href="https://en.wikipedia.org/wiki/Cellular_automaton#/media/File:Textile_cone.JPG"><img alt="_images/Conus_textile.JPG" class="align-center" src="_images/Conus_textile.JPG" /></a>
-<div class=body>By Richard Ling - Own work; Location: Cod Hole, Great Barrier Reef, Australia, <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=293495">Link</a></div><p>The pattern on its shell is an example of a 2D cellular automata.  The shell is
+<div class=body>By Richard Ling - Own work; Location: Cod Hole, Great Barrier Reef, Australia, <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=293495">Link</a></div><p>The pattern on its shell is an example of a 1D cellular automata.  The shell is
 grown by a kind of organic line of printer heads along the shell’s lip.  These
 printer heads, called pigment cells, can extrude colored calcium cement.  The
 color choice of a pigment cell is dependent upon the color choice of it’s two
 adjacent pigment cells.  The rules governing this process are simple, yet a very
 complex shell color pattern emerges.</p>
-<p>A 2D cellular automata exists on a 2D grid of cells; like graphing paper, and it
+<p>A 1D cellular automata exists on a 2D grid of cells; like graphing paper, and it
 is governed by a simple set of rules.  How you color in a square is dependent
 upon the coloring of the three squares above it.  If we decided only to use
 black and white coloring, a square’s color would be dependent upon eight
 different permutations of the three squares above it.  The governing rules of a
-2D cellular automata could be described by drawing out these eight pictures.</p>
+1D cellular automata could be described by drawing out these eight pictures.</p>
 <p>But before we begin to fill in our drawings we would have to decide how to start
 them.  Typically you color the middle square of the top line on your graphing
 paper black, then begin painting the squares of the second line using the rules.
@@ -62,9 +62,9 @@ Of course, you don’t have to do this, you can start however you like.  But how
 you start is called the initial condition, and as you will see, the initial
 conditions have a huge effect on the overall emergent pattern of your drawing.</p>
 <p>In 1983 <a class="reference external" href="https://www.youtube.com/watch?v=60P7717-XOQ">Stephen Wolfram</a>
-discovered a 2D cellular automata which created patterns that look like the
+discovered a 1D cellular automata which created patterns that look like the
 shell of the Conus Textile snail.  He called this program, <a class="reference external" href="https://en.wikipedia.org/wiki/Rule_30">Rule 30</a>.</p>
-<p>Let’s explore how to make a Rule 30, 2D cellular automata, by looking at the
+<p>Let’s explore how to make a Rule 30, 1D cellular automata, by looking at the
 instructions which govern it:</p>
 <blockquote>
 <div><em>“First, look at each cell and it’s right-hand neighbor.  If both of these were
@@ -107,9 +107,9 @@ will do the job:</p>
 <p>At the top of the diagram is our automata which provides some context and
 describes our design goal.  Below that is a small UML diagram showing how some
 classes relate to each other.  We see that a <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class <em>has a</em>
-<code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> class.  This <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> class <em>has many</em>
+<code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> class.  This <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> class <em>has many</em>
 <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> and <code class="docutils literal notranslate"><span class="pre">Wall</span></code> classes.  The <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class will draw our diagrams
-and animations, the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> will be responsible for creating
+and animations, the <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> will be responsible for creating
 any automata given a <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class and a <code class="docutils literal notranslate"><span class="pre">Rule</span></code> class.  That seems simple
 enough.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> class will have three attributes describing the machine on the
@@ -180,7 +180,7 @@ editor’s code browser.  But, remember, UML is from the ’90s.</p>
 will have a <code class="docutils literal notranslate"><span class="pre">FuncAnimation</span></code> object and a <code class="docutils literal notranslate"><span class="pre">LinearSegmentedColormap</span></code> (used for
 making colors), and it shows us how we want to make the object and how we want
 to use it with the <code class="docutils literal notranslate"><span class="pre">run_animation</span></code> and <code class="docutils literal notranslate"><span class="pre">save</span></code> methods.</p>
-<p>It also shows us that the Canvas calls will have a <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code>
+<p>It also shows us that the Canvas calls will have a <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code>
 object, which will be created elsewhere, then passed to it.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pathlib</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span>
@@ -200,7 +200,7 @@ object, which will be created elsewhere, then passed to it.</p>
 <span class="sd">       which returns a coroutine which can be called with ``next``.</span>
 
 <span class="sd">    **Args**:</span>
-<span class="sd">       | ``automata`` (TwoDCellularAutomata):</span>
+<span class="sd">       | ``automata`` (OneDCellularAutomata):</span>
 <span class="sd">       | ``title=None`` (string): An optional title</span>
 
 <span class="sd">    **Returns**:</span>
@@ -329,35 +329,35 @@ object, which will be created elsewhere, then passed to it.</p>
 created a 2 dimensional array and some functions that would randomize this
 array, then I fed these functions into the code that I built up using examples
 from the internet until I got something working.  Only then did I feed it the
-2TwoDCellularAutomata class, which originally didn’t use a co-routine; it
+OneDCellularAutomata class, which originally didn’t use a co-routine; it
 was added later.</p>
 </div>
 </div>
-<div class="section" id="the-twodcellularautomata-class">
-<span id="cellular-automata-two2automato"></span><h3>The TwoDCellularAutomata Class<a class="headerlink" href="#the-twodcellularautomata-class" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="the-onedcellularautomata-class">
+<span id="cellular-automata-two2automato"></span><h3>The OneDCellularAutomata Class<a class="headerlink" href="#the-onedcellularautomata-class" title="Permalink to this headline">¶</a></h3>
 <p>Let’s give our basic design another look:</p>
 <a class="reference external image-reference" href="_static/rule_30_basic_design.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design.svg" src="_images/rule_30_basic_design.svg" /></div>
 </a>
-<p>The <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> object will be responsible for applying the rules
+<p>The <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> object will be responsible for applying the rules
 to our graphing paper, and for setting it into its initial condition (the black
 square in the middle of the top line).</p>
-<p>To do this <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> will provide a two-dimensional array, Z,
+<p>To do this <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> will provide a two-dimensional array, Z,
 containing color codes, to be used by our Canvas to draw things.  It also builds
 a lot of <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> and <code class="docutils literal notranslate"><span class="pre">Wall</span></code> state machines and links them to other machines
 so that they can read the <code class="docutils literal notranslate"><span class="pre">left.color</span></code> and <code class="docutils literal notranslate"><span class="pre">right.color</span></code> attributes of their
-adjacent cells.  <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> needs to set up some initial
+adjacent cells.  <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> needs to set up some initial
 conditions; how the machines are started on the first line of our graphing
 paper.  The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> state machines respond to <code class="docutils literal notranslate"><span class="pre">Next</span></code> events, which cause
-them to react and change if they need to change, so the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code>
+them to react and change if they need to change, so the <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code>
 will need to dispatch this event into all of the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> objects to make a
 new line as the automata propagate downward.</p>
-<p>To make the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> object generic, we will feed it its
+<p>To make the <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> object generic, we will feed it its
 automata rule and wall rules as classes.  To make the wall behaviour
 parameterizable, I’ll add some new wall rule classes that hold the left and
 right colors in their class attributes:</p>
 <a class="reference external image-reference" href="_static/rule_30_basic_design_1.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design_1.svg" src="_images/rule_30_basic_design_1.svg" /></div>
 </a>
-<p>Here is a UML diagram of the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> class:</p>
+<p>Here is a UML diagram of the <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> class:</p>
 <a class="reference external image-reference" href="_static/rule_30_twodcellularautomata.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_twodcellularautomata.svg" src="_images/rule_30_twodcellularautomata.svg" /></div>
 </a>
 <p>There is a bunch of stuff in this diagram that I don’t know how to draw using
@@ -379,7 +379,7 @@ activation after that will cause it to descend one row down.</p>
 <span class="n">White</span> <span class="o">=</span> <span class="mf">0.1</span>
 <span class="n">Black</span> <span class="o">=</span> <span class="mf">0.9</span>
 
-<span class="k">class</span> <span class="nc">TwoDCellularAutomata</span><span class="p">():</span>
+<span class="k">class</span> <span class="nc">OneDCellularAutomata</span><span class="p">():</span>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
       <span class="n">generations</span><span class="p">,</span>
       <span class="n">cells_per_generation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -399,7 +399,7 @@ activation after that will cause it to descend one row down.</p>
 <span class="sd">       | ``wall_cls=None`` (Wall): which wall rules to follow</span>
 
 <span class="sd">    **Returns**:</span>
-<span class="sd">       (TwoDCellularAutonomata): an automata object</span>
+<span class="sd">       (OneDCellularAutonomata): an automata object</span>
 
 <span class="sd">    **Example(s)**:</span>
 
@@ -408,7 +408,7 @@ activation after that will cause it to descend one row down.</p>
 <span class="sd">      # build an automata using rule 30 with white walls</span>
 <span class="sd">      # it should be 50 cells across</span>
 <span class="sd">      # and it should run for 1000 generations</span>
-<span class="sd">      autonoma = TwoDCellularAutomata(</span>
+<span class="sd">      autonoma = OneDCellularAutomata(</span>
 <span class="sd">        machine_cls=Rule30,</span>
 <span class="sd">        generations=1000,</span>
 <span class="sd">        wall_cls=WallLeftWhiteRightWhite,</span>
@@ -471,7 +471,7 @@ activation after that will cause it to descend one row down.</p>
     <span class="k">return</span> <span class="n">wall</span>
 
   <span class="k">def</span> <span class="nf">initial_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;initialize the 2d cellular automata&#39;&#39;&#39;</span>
+    <span class="sd">&#39;&#39;&#39;initialize the 1d cellular automata&#39;&#39;&#39;</span>
     <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">generations</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_per_generation</span><span class="p">],</span> <span class="n">Black</span><span class="p">,</span>
                 <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
@@ -508,7 +508,7 @@ activation after that will cause it to descend one row down.</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span>
 
   <span class="k">def</span> <span class="nf">next_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;create the next row of the 2d cellular automata&#39;&#39;&#39;</span>
+    <span class="sd">&#39;&#39;&#39;create the next row of the 1d cellular automata&#39;&#39;&#39;</span>
     <span class="n">Z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">generations</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
       <span class="c1"># draw the first row</span>
@@ -552,7 +552,7 @@ activation after that will cause it to descend one row down.</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">On construction:  Initially I build the <code class="docutils literal notranslate"><span class="pre">TwoDCellularAutomata</span></code> without a
+<p class="last">On construction:  Initially I build the <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> without a
 coroutine.</p>
 </div>
 </div>
@@ -670,7 +670,7 @@ will feed the automata into a canvas, and use the canvas to print a <cite>png</c
 a <cite>pdf</cite> file and an <cite>mp4</cite> movie:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">generations</span> <span class="o">=</span> <span class="mi">200</span>
 
-<span class="n">automata</span> <span class="o">=</span> <span class="n">TwoDCellularAutomata</span><span class="p">(</span>
+<span class="n">automata</span> <span class="o">=</span> <span class="n">OneDCellularAutomata</span><span class="p">(</span>
   <span class="n">generations</span><span class="o">=</span><span class="n">generations</span><span class="p">,</span>
   <span class="n">machine_cls</span><span class="o">=</span><span class="n">Rule30</span><span class="p">,</span>
   <span class="n">wall_cls</span><span class="o">=</span><span class="n">WallLeftWhiteRightWhite</span><span class="p">)</span>
@@ -690,7 +690,7 @@ a <cite>pdf</cite> file and an <cite>mp4</cite> movie:</p>
 <p>Let’s try it with black walls</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">generations</span> <span class="o">=</span> <span class="mi">200</span>
 
-<span class="n">automata</span> <span class="o">=</span> <span class="n">TwoDCellularAutomata</span><span class="p">(</span>
+<span class="n">automata</span> <span class="o">=</span> <span class="n">OneDCellularAutomata</span><span class="p">(</span>
   <span class="n">generations</span><span class="o">=</span><span class="n">generations</span><span class="p">,</span>
   <span class="n">machine_cls</span><span class="o">=</span><span class="n">Rule30</span><span class="p">,</span>
   <span class="n">wall_cls</span><span class="o">=</span><span class="n">WallLeftBlackRightBlack</span><span class="p">)</span>
@@ -739,7 +739,7 @@ paper to 30 cells and watch the n-phenomenon completely destroy rule 30’s beau
 complexity over 100 generations.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">generations</span> <span class="o">=</span> <span class="mi">100</span>
 
- <span class="n">automata</span> <span class="o">=</span> <span class="n">TwoDCellularAutomata</span><span class="p">(</span>
+ <span class="n">automata</span> <span class="o">=</span> <span class="n">OneDCellularAutomata</span><span class="p">(</span>
    <span class="n">generations</span><span class="o">=</span><span class="n">generations</span><span class="p">,</span>
    <span class="n">machine_cls</span><span class="o">=</span><span class="n">Rule30</span><span class="p">,</span>
    <span class="n">wall_cls</span><span class="o">=</span><span class="n">WallLeftWhiteRightWhite</span><span class="p">,</span>
@@ -759,7 +759,7 @@ minority at the wall, spreads downward at an angle of about 20 degrees.</p>
 advance quicker into the chaos:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">generations</span> <span class="o">=</span> <span class="mi">100</span>
 
- <span class="n">automata</span> <span class="o">=</span> <span class="n">TwoDCellularAutomata</span><span class="p">(</span>
+ <span class="n">automata</span> <span class="o">=</span> <span class="n">OneDCellularAutomata</span><span class="p">(</span>
    <span class="n">generations</span><span class="o">=</span><span class="n">generations</span><span class="p">,</span>
    <span class="n">machine_cls</span><span class="o">=</span><span class="n">Rule30</span><span class="p">,</span>
    <span class="n">wall_cls</span><span class="o">=</span><span class="n">WallLeftWhiteRightWhite</span><span class="p">,</span>
@@ -801,7 +801,7 @@ state:</p>
 <p>The blue object in the diagram represents the disordered part of a rule 30
 simulation contained by white walls.  The cyan circle is the angle, in degrees, we are
 searching for.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TwoDCellularAutomataWithAngleDiscovery</span><span class="p">(</span><span class="n">TwoDCellularAutomata</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">OneDCellularAutomataWithAngleDiscovery</span><span class="p">(</span><span class="n">OneDCellularAutomata</span><span class="p">):</span>
 
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
       <span class="n">generations</span><span class="p">,</span>
@@ -910,14 +910,55 @@ black right wall:</p>
 </div>
 <div class="section" id="random-number-generation">
 <h1>Random Number Generation<a class="headerlink" href="#random-number-generation" title="Permalink to this headline">¶</a></h1>
-<p>Let’s try and build a random number generator using a simple python program.</p>
-<p>First we should discuss our constraints.  Rule 30 provides interesting chaotic
-phenomenon, we would like to use this rule versus another rule, or we may
-accidentally lose our ability to generate chaos.  If we make our graphing paper
-very wide, then we need more computer memory and more computing resources to
-construct the next generation of our automata.  If we use walls, then we have
-order imposing itself into the body of the chaos, as the n-phenomenon, over only
-a few generations.</p>
+<p>Let’s try and build a random number generator using a simple Python program.</p>
+<p>First we should discuss our constraints.  Rule 30 provides an interesting
+chaotic phenomenon, we would like to use this rule versus another rule, or we
+may accidentally lose our ability to generate chaos.  If we make our graphing
+paper very wide, then we need more computer memory and more computing resources
+to construct the next generation of automata.  If we use walls, then we have
+order imposing itself back into the body of the chaos, as the n-phenomenon, over
+only a few generations.  Even if we can perfectly manage this n-phenomenon,
+there are only so many permutations that can be held within the bounds of our
+rectangle, and if we repeat a pattern we are not generating a random number, but
+rather a long periodic number; a pseudo-random number.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Our universe seems to have set rules (the laws of physics) but it will not run
+into this n-phenomenon, repetition issue; because it doesn’t seem to be
+confined within walls or have limited memory: the universe is expanding at an
+accelerating rate.</p>
+<p class="last">Maybe it would have been wiped out by an n-phenomenon if it weren’t expanding.</p>
+</div>
+<p>So there seems to be a theoretical upper bound to what we can generate using
+limited memory given that the rule doesn’t change and the state of the program
+is held within a bounded rectangle. My first guess at what our upper bound is:
+<code class="docutils literal notranslate"><span class="pre">2**n</span></code> where <code class="docutils literal notranslate"><span class="pre">n</span></code> is the number of states within the rectangle, and the <code class="docutils literal notranslate"><span class="pre">2</span></code>
+is selected because we are only tracking two colors, black and white.</p>
+<p>First things first, let’s deal with the n-phenomenon coming from the walls.  We
+have control of the walls, and we have a chaos generator, so let’s feed the
+chaos back into the walls.  Let’s make <a class="reference external" href="https://www.youtube.com/watch?v=ZuvK-od647c">some spooky action at a
+distance</a>:</p>
+<a class="reference external image-reference" href="_static/rule_30_chaos_to_walls_1.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_chaos_to_walls_1.svg" src="_images/rule_30_chaos_to_walls_1.svg" /></div>
+</a>
+<p>We can write the colors of our center column into a deque, and use the top two
+colors of this deque to set the color of the walls.  Let’s call this deque the
+<code class="docutils literal notranslate"><span class="pre">core_colors</span></code>.  To begin with we set all of the <code class="docutils literal notranslate"><span class="pre">core_colors</span></code> to white, so
+that the walls will remain white for the first <code class="docutils literal notranslate"><span class="pre">len(core_colors)</span></code> generations.
+For every <code class="docutils literal notranslate"><span class="pre">Next</span></code> event, the <code class="docutils literal notranslate"><span class="pre">core_colors</span></code> deque is pushed one spot downward
+into the center of our automata, where it is painted with the color of the core
+at that spot.</p>
+<p>We will use the last two elements of our <code class="docutils literal notranslate"><span class="pre">core_colors</span></code> to determine the color
+of our walls.  These last two spots will act as a 2 digit binary number, holding
+the values of <code class="docutils literal notranslate"><span class="pre">WallLeftWhiteRightWhite</span></code>, <code class="docutils literal notranslate"><span class="pre">WallLeftWhiteRightBlack</span></code>,
+<code class="docutils literal notranslate"><span class="pre">WallLeftBlackRightWhite</span></code> and <code class="docutils literal notranslate"><span class="pre">WallLeftBlackRightBlack</span></code>.  How this rule is
+applied isn’t that important, it just has to consistently map the center’s chaos
+onto the walls.</p>
+<p>So, how long do we make this <code class="docutils literal notranslate"><span class="pre">core_colors</span></code> deque?  My intuition is to feed it
+as much chaos as rule 30 can generate, then feed this back into the automata
+before the n-phenomenon destroys the disorder.</p>
+<p>Every intuition I have had so far about rule 30 has been wrong, so I’ll probably
+be wrong about this too.  I need some way to measure if my prediction is correct
+or incorrect</p>
 <table class="docutils footnote" frame="void" id="id2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
@@ -940,7 +981,7 @@ a few generations.</p>
 <li><a class="reference internal" href="#">Cellular Automata</a><ul>
 <li><a class="reference internal" href="#design-and-code">Design and Code</a><ul>
 <li><a class="reference internal" href="#canvas-class">Canvas Class</a></li>
-<li><a class="reference internal" href="#the-twodcellularautomata-class">The TwoDCellularAutomata Class</a></li>
+<li><a class="reference internal" href="#the-onedcellularautomata-class">The OneDCellularAutomata Class</a></li>
 <li><a class="reference internal" href="#rule30-and-the-wall-classes">Rule30 and the Wall Classes</a></li>
 <li><a class="reference internal" href="#running-and-visualizing-the-cellular-automata">Running and Visualizing the Cellular Automata</a></li>
 <li><a class="reference internal" href="#the-nothing-n-phenomenon">The Nothing (n-phenomenon)</a></li>

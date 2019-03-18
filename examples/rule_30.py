@@ -19,6 +19,8 @@ from functools import reduce
 import os
 import re
 
+from scipy import fft
+
 White   = 0.1
 Default = 0.5
 Black   = 0.9
@@ -29,7 +31,19 @@ class NCache:
   Spec = namedtuple('Spec', ['width', 'angle_degrees'])
 
   def __init__(self):
+    '''Used to store and describe the characteristics of rule30 within walls
 
+    **Returns**:
+       (Ncache): This object
+
+    **Example(s)**:
+
+      nc = NCache()
+      csv_filename, movie_filename = nc.build_cache_csv(WallLeftBlackRightBlack,
+          start_at=4, upto=200)
+      nc.plot_csv(csv_filename)
+
+    '''
     def by_angle(spec):
       return spec.angle_degrees
 
@@ -186,10 +200,31 @@ class NCache:
     self._lookup[146] = 24.4
     self._lookup[147] = 22.5
 
-  def get_angle(cells_per_generation):
+    
+  def get_angle(self, cells_per_generation):
+    '''Get the angle of the n-phenomenon for a rule 30 automata held between
+    white walls.
+
+
+    **Note**:
+       The angle only applies to rule 30 between white walls
+
+    **Args**:
+       | ``cells_per_generation`` (int): how wide is your graphing paper
+
+    **Returns**:
+       (float): The observed angle of n-phenomenon for this width of graphing
+       paper
+
+    **Example(s)**:
+
+
+    '''
+    
     result = None
 
-    if cells_per_generation in self.lookup:
+
+    if cells_per_generation in self._lookup:
       result = self._lookup[cells_per_generation]
     elif cells_per_generation < NCache.Bottom_Width:
       result = None
@@ -247,7 +282,7 @@ class NCache:
     width = start_at
     while width < upto:
       filename = "{}{}".format(png_filename, width)
-      automata = TwoDCellularAutomataWithAngleDiscovery(
+      automata = OneDCellularAutomataWithAngleDiscovery(
         generations=generations,
         machine_cls=Rule30,
         wall_cls=wall_cls,
@@ -266,10 +301,6 @@ class NCache:
           and (automata.cells_per_generation - len(automata.n_mask) >= 4):
         generations += 50
       else:
-        print(width)
-        print(generations)
-        print(angle_degrees)
-        print(automata.n_mask)
         with open(csv_filename, 'a') as fh:
           writer = csv.writer(fh)
           writer.writerows([[str(width), "{0:0.1f}".format(angle_degrees)]])
@@ -400,28 +431,24 @@ class Rule30WithQueueDepth(Rule30):
   @staticmethod
   def queue_depth(cells_per_generation): 
 
-    # From visual inspection with a protractor:
-    # 15 cell_per_generation -> 50 degrees
-    # 20 cell_per_generation -> 50, then 60
-    # 25 cell_per_generation -> 50, then 60, then 65
-    # 30 cell_per_generation -> 50, then 60, then 70
-    # 40 cell_per_generation -> around 70
-    # 50 cell_per_generation -> around 70
-    if cells_per_generation <= 15:
-      degrees = 50
-    elif cells_per_generation <= 20:
-      degrees = 60
-    elif cells_per_generation <= 25:
-      degrees = 65
-    else:
-      degrees = 70
+    n_cache = NCache()
+    degrees = n_cache.get_angle(cells_per_generation)
+    print(degrees)
+
     qd = 1 + math.tan(math.radians(degrees))
     qd *= 0.5*cells_per_generation
     qd = math.floor(qd)
+
+    qd =  0.5 * math.tan(math.radians(degrees))
+    qd += 1.0 / math.sqrt(2)
+    qd *= cells_per_generation
+    qd = math.floor(qd)
+    #print(qd)
+    #qd = 1
     return qd
 
 
-class TwoDCellularAutomata():
+class OneDCellularAutomata():
   def __init__(self,
       generations,
       cells_per_generation=None,
@@ -439,7 +466,7 @@ class TwoDCellularAutomata():
        | ``wall_cls=None`` (Wall): which wall rules to follow
 
     **Returns**:
-       (TwoDCellularAutonomata): an automata object
+       (OneDCellularAutonomata): an automata object
 
     **Example(s)**:
       
@@ -448,7 +475,7 @@ class TwoDCellularAutomata():
       # build an automata using rule 30 with white walls
       # it should be 50 cells across
       # and it should run for 1000 generations
-      ma = TwoDCellularAutomata(
+      ma = OneDCellularAutomata(
         machine_cls=Rule30,
         generations=1000,
         wall_cls=WallLeftWhiteRightWhite,
@@ -587,7 +614,7 @@ class TwoDCellularAutomata():
       self.next_generation()
       yield self.Z
 
-class TwoDCellularAutomataWithAngleDiscovery(TwoDCellularAutomata):
+class OneDCellularAutomataWithAngleDiscovery(OneDCellularAutomata):
 
     def __init__(self, 
         generations, 
@@ -605,7 +632,7 @@ class TwoDCellularAutomataWithAngleDiscovery(TwoDCellularAutomata):
 
       self.black_mask = np.array([Black], dtype=np.float32)
       self.white_mask = np.array([White], dtype=np.float32)
-      
+
       if self.wall_cls == WallLeftWhiteRightBlack or \
         self.wall_cls == WallLeftWhiteRightWhite:
         self.n_mask = np.concatenate(
@@ -656,7 +683,7 @@ class TwoDCellularAutomataWithAngleDiscovery(TwoDCellularAutomata):
 
 
 
-class TwoDCellularAutonomataWallRecursion(TwoDCellularAutomata):
+class OneDCellularAutonomataWallRecursion(OneDCellularAutomata):
 
   def __init__(self, 
       generations, 
@@ -708,6 +735,8 @@ class TwoDCellularAutonomataWallRecursion(TwoDCellularAutomata):
 
     self.core_colors = deque(maxlen=queue_depth)
     self.core_code = []
+    self.middle_numbers = []
+    self.for_pattern_search = [[] for i in range(self.cells_per_generation)]
 
     for i in range(4):
       self.core_colors.append('white')
@@ -718,11 +747,16 @@ class TwoDCellularAutonomataWallRecursion(TwoDCellularAutomata):
   def initial_state(self):
     super().initial_state()
     self.update_core_code()
+    self.core_code = [1 if i == 'black' else 0 for i in self.core_colors]
     self.set_wall_class()
 
   def next_generation(self):
     super().next_generation()
     self.update_core_code()
+    row_number = self.generation+1
+    for col_number in range(self.Z.shape[1]):
+      middle_color = self.Z[row_number, col_number]
+      self.for_pattern_search[col_number].append(1.0 if abs(middle_color-Black)<0.01 else 0.0)
     self.set_wall_class()
 
   def update_core_code(self):
@@ -771,7 +805,7 @@ class Canvas():
        returns a coroutine which can be called with ``next``.
 
     **Args**:
-       | ``automata`` (TwoDCellularAutomata): 
+       | ``automata`` (OneDCellularAutomata): 
        | ``title=None`` (string): An optional title
 
     **Returns**:
@@ -903,38 +937,82 @@ class Canvas():
 ## 10, 1 * pump -- peudo-repeat seen within 1200
 ## 10, 2 * pump -- repeat seen within 1200
 ## 10, 3 * pump -- repeat seen within 1200
-#ma = TwoDCellularAutonomataWallRecursion(
-#  generations=generations,
-#  machine_cls=Rule30WithQueueDepth,
-#  cells_per_generation=15,
-#  order_scalar=1,
-#  )
+width = 20
+generations = 2000
+ma = OneDCellularAutonomataWallRecursion(
+  generations=generations,
+  machine_cls=Rule30WithQueueDepth,
+  cells_per_generation=width,
+  order_scalar=1,
+  )
+# no pattern found for 12/2
+# 15: 32768, 1022
 
-nc = NCache()
-csv_filename, movie_filename = nc.build_cache_csv(WallLeftBlackRightBlack,
-    start_at=4, upto=200)
-nc.plot_csv(csv_filename)
-#filename = "rule_30_white_walls_{}_generations_width_{}".format(generations, width)
-#ma = TwoDCellularAutomataWithAngleDiscovery(
+#nc = NCache()
+#csv_filename, movie_filename = nc.build_cache_csv(WallLeftBlackRightBlack,
+#    start_at=4, upto=200)
+#nc.plot_csv(csv_filename)
+filename = "rule_30_white_walls_{}_generations_width_{}".format(generations, width)
+#ma = OneDCellularAutomataWithAngleDiscovery(
 #  generations=generations,
 #  machine_cls=Rule30,
 #  wall_cls=WallLeftWhiteRightWhite,
 #  cells_per_generation=width
 #  )
-#eco = Canvas(ma)
+eco = Canvas(ma)
 # 43 seconds with generations = 200
-#eco.run_animation(generations, interval=100)
-#eco.save('{}.mp4'.format(filename))
+eco.run_animation(generations, interval=100)
+movie_filename = '{}.mp4'.format(filename)
+eco.save(movie_filename)
 
-# 43 seconds with generations = 200
-#eco.save('{}.pdf'.format(filename))
-#eco.save('{}.png'.format(filename))
+eco.save('{}.pdf'.format(filename))
+eco.close()
+cmd = 'cmd.exe /C {} &'.format('{}.pdf'.format(filename))
+subprocess.Popen(cmd, shell=True)
+
+#plt.acorr(ma.middle_numbers, usevlines=True, normed=True, maxlags=None, lw=2)
+def autocorrelate(x):
+  result = np.correlate(x, x, mode='full')
+  # don't include the corriletion with itself
+  result[result.size//2] = 0
+  return result[result.size//2:]
+
+# a specific column can repeat, while the other columns change
+# for this reason we need to multiply the spectrums together so
+# as to find where the real pattern repetitions take place
+max_c_indexs = []
+column_correlations = []
+for i in range(width):
+  column_correlations.append(autocorrelate(ma.for_pattern_search[i]))
+  max_index = np.argmax(column_correlations[-1])
+  max_c_indexs.append(max_index)
+
+collective_correlations = column_correlations[0]
+for correlation in column_correlations[1:]:
+  collective_correlations = np.multiply(collective_correlations, correlation)
+
+
+#max_index = np.argmax(collective_correlations)
+#max_value = collective_correlations[max_index]
+#collective_correlations = np.clip(collective_correlations, 1, max_value)
+#collective_correlations = np.log(collective_correlations)
+
+# the answer is the max_index (it holds the highest energy)
+max_index = np.argmax(collective_correlations)
+
+fig = plt.figure()
+autocorrelation_filename = "autocorrection.pdf"
+#plt.plot(pattern_index, collective_autocorrelation_fft_product)
+#plt.plot(pattern_index, cc)
+plt.plot([i for i in range(len(collective_correlations))], collective_correlations)
+plt.savefig(autocorrelation_filename, dpi=300)
+print(max_index)
 
 cmd = 'cmd.exe /C {} &'.format(movie_filename)
 subprocess.Popen(cmd, shell=True)
 
-#cmd = 'cmd.exe /C {} &'.format('{}.png'.format(filename))
-#subprocess.Popen(cmd, shell=True)
+cmd = 'cmd.exe /C {} &'.format(autocorrelation_filename)
+subprocess.Popen(cmd, shell=True)
 #print(width)
 #print(ma.n_angle)
 #
