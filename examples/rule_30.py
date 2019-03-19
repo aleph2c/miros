@@ -433,7 +433,7 @@ class Rule30WithQueueDepth(Rule30):
 
     n_cache = NCache()
     degrees = n_cache.get_angle(cells_per_generation)
-    print(degrees)
+    print("degrees {}".format(degrees))
 
     qd = 1 + math.tan(math.radians(degrees))
     qd *= 0.5*cells_per_generation
@@ -681,9 +681,110 @@ class OneDCellularAutomataWithAngleDiscovery(OneDCellularAutomata):
       super().next_generation()
       self.update_angle()
 
-
-
 class OneDCellularAutonomataWallRecursion(OneDCellularAutomata):
+
+  def __init__(self, 
+      generations, 
+      cells_per_generation=None, 
+      initial_condition_index=None,
+      machine_cls=None,
+      wall_cls=None,
+      queue_depth=None):
+    '''short description
+
+    longer description
+
+    **Note**:
+       Do this not that recommendation
+
+    **Args**:
+       | ``generations`` (type1): 
+       | ``cell_per_generation`` (type1): 
+       | ``initial_condition_index`` (type1): 
+       | ``machine_cls`` (type1): 
+       | ``wall_cls`` (type1): 
+
+    **Returns**:
+       (type): 
+
+    **Example(s)**:
+
+    '''
+    super().__init__(
+      generations,
+      cells_per_generation,
+      initial_condition_index,
+      machine_cls,
+      wall_cls)
+
+    half_point = round(self.cells_per_generation/2.0)
+    self.core_machine_index = half_point
+
+    if queue_depth is None:
+      queue_depth = 1
+    else:
+      queue_depth = queue_depth
+
+    self.core_colors = deque(maxlen=queue_depth)
+    self.core_code = []
+    self.middle_numbers = []
+    self.for_pattern_search = [[] for i in range(self.cells_per_generation)]
+
+    for i in range(4):
+      self.core_colors.append('white')
+      self.core_code.append(0)
+    self.wall_cls = WallLeftWhiteRightWhite
+
+  def initial_state(self):
+    super().initial_state()
+    self.update_core_code()
+    self.core_code = [1 if i == 'black' else 0 for i in self.core_colors]
+    self.set_wall_class()
+
+  def next_generation(self):
+    super().next_generation()
+    self.update_core_code()
+    row_number = self.generation+1
+    for col_number in range(self.Z.shape[1]):
+      middle_color = self.Z[row_number, col_number]
+      self.for_pattern_search[col_number].append(1.0 if abs(middle_color-Black)<0.01 else 0.0)
+    self.set_wall_class()
+
+  def update_core_code(self):
+    self.core_colors.append(self.machines[self.core_machine_index].color)
+    self.core_code = [1 if i == 'black' else 0 for i in self.core_colors]
+
+  def set_wall_class(self):
+
+    number = 0
+    for index, value in enumerate(self.core_code[0:4]):
+      number += value * 2**index
+
+    if number == 1:
+      cls = WallLeftWhiteRightBlack
+    elif number == 2:
+      cls = WallLeftBlackRightWhite
+    elif number == 3:
+      cls = WallLeftBlackRightBlack
+    else:
+      cls = WallLeftWhiteRightWhite
+
+    self.wall_cls = cls
+
+  def make_and_start_left_wall_machine(self):
+    cls = self.wall_cls
+    wall = cls()
+    wall.start_at(cls.left_wall)
+    return wall
+
+  def make_and_start_right_wall_machine(self):
+    cls = self.wall_cls
+    wall = cls()
+    wall.start_at(cls.right_wall)
+    return wall
+
+
+class OneDCellularAutonomataWallRecursionUsingAngle(OneDCellularAutomata):
 
   def __init__(self, 
       generations, 
@@ -732,6 +833,7 @@ class OneDCellularAutonomataWallRecursion(OneDCellularAutomata):
     else:
       queue_depth = self.cells_per_generation*self.order_scalar/2.0
     queue_depth = math.floor(queue_depth)
+    print(queue_depth)
 
     self.core_colors = deque(maxlen=queue_depth)
     self.core_code = []
@@ -880,9 +982,9 @@ class Canvas():
        | ``interval`` (int): movie frame interval in ms
 
     **Example(s)**:
-      
+
     .. code-block:: python
-       
+
       eco = Canvas(automata)
       eco.run_animation(1200, interval=20)  # 20 ms
 
@@ -937,14 +1039,183 @@ class Canvas():
 ## 10, 1 * pump -- peudo-repeat seen within 1200
 ## 10, 2 * pump -- repeat seen within 1200
 ## 10, 3 * pump -- repeat seen within 1200
-width = 20
-generations = 2000
+width = 17
+generations = 5000
+# 10, queue_depth = 2, 37
+# 10, queue_depth = 3, 51
+# 10, queue_depth = 4, 14
+# 10, queue_depth = 5, 16
+# 10, queue_depth = 6, 35
+# 10, queue_depth = 7, 30  # lots of veritical lines
+# 10, queue_depth = 8, 65  #
+# 10, queue_depth = 9, 24  #
+# 10, queue_depth = 10, 52 (degrees 35.7)
+# 10, queue_depth = 11, 110
+# 10, queue_depth = 12, 30
+# 10, queue_depth = 13, 32
+# 11, queue_depth = 2, 53
+# 11, queue_depth = 3, 5
+# 11, queue_depth = 4, 24
+# 11, queue_depth = 5, 57
+# 11, queue_depth = 6, 28
+# 11, queue_depth = 7, 30
+# 11, queue_depth = 8, 32
+# 11, queue_depth = 9, 27
+# 11, queue_depth = 10, 36
+# 11, queue_depth = 11, 42
+# 11, queue_depth = 12, 80
+# 11, queue_depth = 13, 42 (degrees 44.4)
+# 11, queue_depth = 14, 84
+# 11, queue_depth = 15, 46
+# 11, queue_depth = 16, 48
+# 11, queue_depth = 17, 50
+# 11, queue_depth = 18, 52
+# 12, queue_depth = 2, 16
+# 12, queue_depth = 3, 35
+# 12, queue_depth = 4, 24
+# 12, queue_depth = 5, 26
+# 12, queue_depth = 6, 39
+# 12, queue_depth = 7, 58
+# 12, queue_depth = 8, 19
+# 12, queue_depth = 9, 14
+# 12, queue_depth = 10, 46
+# 12, queue_depth = 11, 36
+# 12, queue_depth = 12, 53 (degrees 36.0)
+# 12, queue_depth = 13, 32
+# 12, queue_depth = 14, 42  # need 600 to find it
+# 12, queue_depth = 15, 276
+# 12, queue_depth = 16, 46
+# 12, queue_depth = 17, 13
+# 12, queue_depth = 18, 25
+# 13, queue_depth = 2, 16
+# 13, queue_depth = 3, 5 
+# 13, queue_depth = 4, 9 
+# 13, queue_depth = 5, 12
+# 13, queue_depth = 6, 46
+# 13, queue_depth = 7, 34
+# 13, queue_depth = 8, 15
+# 13, queue_depth = 9, 65
+# 13, queue_depth = 10, 139
+# 13, queue_depth = 11, 24
+# 13, queue_depth = 12, 44 (degrees 27.7)
+# 13, queue_depth = 13, 121
+# 13, queue_depth = 14, 35
+# 13, queue_depth = 15, 157
+# 13, queue_depth = 16, 318
+# 13, queue_depth = 17, 465
+# 13, queue_depth = 18, 278
+# 13, queue_depth = 19, 76
+# 13, queue_depth = 20, 225
+# 13, queue_depth = 21, 197
+# 13, queue_depth = 22, 384
+# 13, queue_depth = 23, 30
+# 13, queue_depth = 24, 162
+# 14, queue_depth = 2, 42
+# 14, queue_depth = 3, 43
+# 14, queue_depth = 4, 13
+# 14, queue_depth = 5, 20
+# 14, queue_depth = 6, 26
+# 14, queue_depth = 7, 9
+# 14, queue_depth = 8, 32
+# 14, queue_depth = 9, 176
+# 14, queue_depth = 10, 271
+# 14, queue_depth = 11, 279
+# 14, queue_depth = 12, 20
+# 14, queue_depth = 13, 236 (degrees 30.2)
+# 14, queue_depth = 14, 395
+# 14, queue_depth = 15, 66
+# 14, queue_depth = 16, 208
+# 14, queue_depth = 17, 13
+# 14, queue_depth = 18, 338
+# 14, queue_depth = 19, 195
+# 14, queue_depth = 20, 228
+# 14, queue_depth = 21, 98
+# 14, queue_depth = 22, 210
+# 14, queue_depth = 23, 255
+# 14, queue_depth = 24, 1450
+# 14, queue_depth = 25, 32
+# 14, queue_depth = 26, 1223
+# 14, queue_depth = 27, 287
+# 14, queue_depth = 28, 1012
+# 14, queue_depth = 29, 610
+# 15, queue_depth = 4, 44
+# 15, queue_depth = 5, 160
+# 15, queue_depth = 6, 134
+# 15, queue_depth = 7, 60
+# 15, queue_depth = 8, 58
+# 15, queue_depth = 9, 48
+# 15, queue_depth = 10, 52
+# 15, queue_depth = 11, 200
+# 15, queue_depth = 12, 160
+# 15, queue_depth = 13, 74
+# 15, queue_depth = 14, 429
+# 15, queue_depth = 15, 541
+# 15, queue_depth = 16, 1022 (39.2)
+# 15, queue_depth = 17, 73
+# 15, queue_depth = 18, 17
+# 15, queue_depth = 19, 271
+# 15, queue_depth = 20, 232
+# 15, queue_depth = 21, 534
+# 15, queue_depth = 22, 564
+# 15, queue_depth = 23, 1210
+# 15, queue_depth = 24, 258
+# 15, queue_depth = 25, 630
+# 16, queue_depth = 2, 111
+# 16, queue_depth = 3, 18
+# 16, queue_depth = 4, 42
+# 16, queue_depth = 5, 123
+# 16, queue_depth = 6, 74
+# 16, queue_depth = 7, 35
+# 16, queue_depth = 8, 288
+# 16, queue_depth = 9, 310
+# 16, queue_depth = 10, 42
+# 16, queue_depth = 11, 582
+# 16, queue_depth = 12, 46
+# 16, queue_depth = 13, 40
+# 16, queue_depth = 14, 86
+# 16, queue_depth = 15, 252
+# 16, queue_depth = 16, 378 (34.0 degrees)
+# 16, queue_depth = 17, 180
+# 16, queue_depth = 18, 900
+# 16, queue_depth = 19, 288
+# 16, queue_depth = 20, 541
+# 16, queue_depth = 21, 1746
+# 16, queue_depth = 22, 1017
+# 16, queue_depth = 23, 117
+# 16, queue_depth = 24, 1162
+# 16, queue_depth = 25, 551
+# 16, queue_depth = 26, 1182
+# 17, queue_depth = 5, 36
+# 17, queue_depth = 6, 47
+# 17, queue_depth = 7, 270
+# 17, queue_depth = 8, 164
+# 17, queue_depth = 9, 92
+# 17, queue_depth = 10, 42
+# 17, queue_depth = 11, 179
+# 17, queue_depth = 12, 433
+# 17, queue_depth = 13, 448
+# 17, queue_depth = 14, 238
+# 17, queue_depth = 15, 120
+# 17, queue_depth = 16, 60
+# 17, queue_depth = 17, 1054
+# 17, queue_depth = 18, 441
+# 17, queue_depth = 19, 1149
+# 17, queue_depth = 20, 390
+# 17, queue_depth = 21, 1582
+# 17, queue_depth = 22, 600
+# 17, queue_depth = 23, 600
+
 ma = OneDCellularAutonomataWallRecursion(
   generations=generations,
   machine_cls=Rule30WithQueueDepth,
   cells_per_generation=width,
-  order_scalar=1,
+  queue_depth=23,
   )
+#ma = OneDCellularAutonomataWallRecursionUsingAngle(
+#  generations=generations,
+#  machine_cls=Rule30WithQueueDepth,
+#  cells_per_generation=width,
+#  )
 # no pattern found for 12/2
 # 15: 32768, 1022
 
@@ -998,7 +1269,6 @@ for correlation in column_correlations[1:]:
 #collective_correlations = np.log(collective_correlations)
 
 # the answer is the max_index (it holds the highest energy)
-max_index = np.argmax(collective_correlations)
 
 fig = plt.figure()
 autocorrelation_filename = "autocorrection.pdf"
@@ -1006,7 +1276,15 @@ autocorrelation_filename = "autocorrection.pdf"
 #plt.plot(pattern_index, cc)
 plt.plot([i for i in range(len(collective_correlations))], collective_correlations)
 plt.savefig(autocorrelation_filename, dpi=300)
-print(max_index)
+
+
+of_interest = []
+for i in range(10):
+  max_index = np.argmax(collective_correlations)
+  of_interest.append(max_index)
+  collective_correlations[max_index] = 0
+
+print(of_interest)
 
 cmd = 'cmd.exe /C {} &'.format(movie_filename)
 subprocess.Popen(cmd, shell=True)
