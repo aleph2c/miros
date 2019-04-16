@@ -1037,8 +1037,8 @@ class Canvas():
     plt.close(self.fig)
 
 #width = 22
-width = 22
-generations = 148
+width = 19
+generations = 1480
 # 10, queue_depth = 2, 37
 # 10, queue_depth = 3, 51
 # 10, queue_depth = 4, 14
@@ -1340,13 +1340,13 @@ generations = 148
 # 22, queue_depth = 27, 1138
 # 22, queue_depth = 28, at 3383 overtaken by the nothing
 # 22, queue_depth = 29, at 3562 overtaken by the nothing
-# 22, queue_depth = 30, at 3562 overtaken by the nothing
+# 22, queue_depth = 30, at 148 overtaken by the nothing
 # 22, queue_depth = 31, at 4611 overtaken by the nothing
 ma = OneDCellularAutonomataWallRecursion(
   generations=generations,
   machine_cls=Rule30WithQueueDepth,
   cells_per_generation=width,
-  queue_depth=30,
+  queue_depth=10,
   )
 #ma = OneDCellularAutonomataWallRecursionUsingAngle(
 #  generations=generations,
