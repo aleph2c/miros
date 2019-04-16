@@ -1028,19 +1028,17 @@ class Canvas():
         for i in range(self.automata.generations):
           next(self.generation)
         self.ax.pcolormesh(self.automata.Z, cmap=self.cmap)
+      #for item in [self.fig, self.ax]:
+      #  item.patch.set_visible(False)
+      self.ax.axis('off')
       plt.savefig(filename, dpi=dpi) 
 
   def close(self):
     plt.close(self.fig)
 
-## Eye scans
-## 12, 2 * pump -- no repeat after 1200
-## 11, 2 * pump -- no repeat after 1200
-## 10, 1 * pump -- peudo-repeat seen within 1200
-## 10, 2 * pump -- repeat seen within 1200
-## 10, 3 * pump -- repeat seen within 1200
-width = 17
-generations = 5000
+#width = 22
+width = 22
+generations = 148
 # 10, queue_depth = 2, 37
 # 10, queue_depth = 3, 51
 # 10, queue_depth = 4, 14
@@ -1198,18 +1196,157 @@ generations = 5000
 # 17, queue_depth = 15, 120
 # 17, queue_depth = 16, 60
 # 17, queue_depth = 17, 1054
-# 17, queue_depth = 18, 441
+# 17, queue_depth = 18, 441 (35.3)
 # 17, queue_depth = 19, 1149
 # 17, queue_depth = 20, 390
 # 17, queue_depth = 21, 1582
 # 17, queue_depth = 22, 600
-# 17, queue_depth = 23, 600
-
+# 17, queue_depth = 23, 3305
+# 17, queue_depth = 24, 214
+# 17, queue_depth = 25, 2810
+# 18, queue_depth = 4, 97
+# 18, queue_depth = 5, 90
+# 18, queue_depth = 6, 158
+# 18, queue_depth = 7, 82
+# 18, queue_depth = 8, 192
+# 18, queue_depth = 9, n-ph at 319
+# 18, queue_depth = 10, 70
+# 18, queue_depth = 11, 101
+# 18, queue_depth = 12, 200
+# 18, queue_depth = 13, 586
+# 18, queue_depth = 14, 597
+# 18, queue_depth = 15, 24
+# 18, queue_depth = 16, 430
+# 18, queue_depth = 17, 860 (27.7 degrees)
+# 18, queue_depth = 18, 459
+# 18, queue_depth = 19, 605
+# 18, queue_depth = 20, 532
+# 18, queue_depth = 21, 609
+# 18, queue_depth = 22, 2356
+# 18, queue_depth = 23, 1730
+# 18, queue_depth = 24, 908
+# 18, queue_depth = 25, 734
+# 18, queue_depth = 26, 1513
+# 18, queue_depth = 27, 1653
+# 18, queue_depth = 28, 165
+# 18, queue_depth = 29, 954
+# 18, queue_depth = 30, 682
+# 19, queue_depth = 4, 11
+# 19, queue_depth = 5, 75
+# 19, queue_depth = 6, 91
+# 19, queue_depth = 7, 99
+# 19, queue_depth = 8, 43
+# 19, queue_depth = 9, 33
+# 19, queue_depth = 10, 33
+# 19, queue_depth = 11, 144
+# 19, queue_depth = 12, 134
+# 19, queue_depth = 13, 70
+# 19, queue_depth = 14, 252
+# 19, queue_depth = 15, 250
+# 19, queue_depth = 16, 155
+# 19, queue_depth = 17, 677
+# 19, queue_depth = 18, 1943 (27.5)
+# 19, queue_depth = 19, 1299
+# 19, queue_depth = 20, 130
+# 19, queue_depth = 21, 2689
+# 19, queue_depth = 22, 5168
+# 19, queue_depth = 23, 1602
+# 19, queue_depth = 24, 922
+# 19, queue_depth = 25, 2080
+# 19, queue_depth = 26, 2895
+# 19, queue_depth = 27, 5341
+# 19, queue_depth = 28, 3520
+# 20, queue_depth = 4, 11
+# 20, queue_depth = 5, 75
+# 20, queue_depth = 6, 91
+# 20, queue_depth = 7, 99
+# 20, queue_depth = 8, 43
+# 20, queue_depth = 9, 279
+# 20, queue_depth = 10, 213
+# 20, queue_depth = 11, 202
+# 20, queue_depth = 12, 327
+# 20, queue_depth = 13, 792
+# 20, queue_depth = 14, 490
+# 20, queue_depth = 15, 1436
+# 20, queue_depth = 16, 1349
+# 20, queue_depth = 17, 556
+# 20, queue_depth = 18, 1171 (21.9 degrees)
+# 20, queue_depth = 19, 172
+# 20, queue_depth = 20, 333
+# 20, queue_depth = 21, 2912
+# 20, queue_depth = 22, 2054
+# 20, queue_depth = 23, 5769
+# 20, queue_depth = 24, 1546
+# 20, queue_depth = 25, 579
+# 20, queue_depth = 26, 400
+# 20, queue_depth = 27, 4535
+# 20, queue_depth = 28, 9075
+# 20, queue_depth = 29, 9709
+# 20, queue_depth = 30, 1697
+# 21, queue_depth = 2, 615
+# 21, queue_depth = 3, 333
+# 21, queue_depth = 4, 2912
+# 21, queue_depth = 5, 422
+# 21, queue_depth = 6, 534
+# 21, queue_depth = 7, 113
+# 21, queue_depth = 8, 429
+# 21, queue_depth = 9, 82
+# 21, queue_depth = 10, 79
+# 21, queue_depth = 11, 551
+# 21, queue_depth = 12, 862
+# 21, queue_depth = 13, 2159
+# 21, queue_depth = 14, 91
+# 21, queue_depth = 15, 526
+# 21, queue_depth = 16, 1327
+# 21, queue_depth = 17, 837
+# 21, queue_depth = 18, 1429
+# 21, queue_depth = 19, 1173 (degrees 23.1)
+# 21, queue_depth = 20, 220
+# 21, queue_depth = 21, 3706
+# 21, queue_depth = 22, 300
+# 21, queue_depth = 23, 27
+# 21, queue_depth = 24, 3090
+# 21, queue_depth = 25, 6036
+# 21, queue_depth = 26, 44
+# 21, queue_depth = 27, 3416
+# 21, queue_depth = 28, 9032
+# 21, queue_depth = 29, 2067
+# 21, queue_depth = 30, 9151
+# 22, queue_depth = 2, 113
+# 22, queue_depth = 3, 58
+# 22, queue_depth = 4, 350
+# 22, queue_depth = 5, 120
+# 22, queue_depth = 6, at 197 overtaken
+# 22, queue_depth = 7, at 135 overtaken
+# 22, queue_depth = 8, at 169 overtaken
+# 22, queue_depth = 9, 47
+# 22, queue_depth = 10, at 123 overtaken
+# 22, queue_depth = 11, at 330 overtaken
+# 22, queue_depth = 12, at 219
+# 22, queue_depth = 13, at 981 overtaken
+# 22, queue_depth = 14, at 569 overtaken
+# 22, queue_depth = 15, at 763 overtaken (12 starts)
+# 22, queue_depth = 16, at 398 overtaken (12 starts)
+# 22, queue_depth = 17, 694
+# 22, queue_depth = 18, 584
+# 22, queue_depth = 19, 373
+# 22, queue_depth = 20, at 357 overtaken by the nothing (24.0 degrees)
+# 22, queue_depth = 21, at 759 overtaken by the nothing
+# 22, queue_depth = 22, at 433 overtaken by the nothing
+# 22, queue_depth = 23, at 266 overtaken by the nothing
+# 22, queue_depth = 24, 204
+# 22, queue_depth = 25, at 4395 overtaken by the nothing
+# 22, queue_depth = 26, 527
+# 22, queue_depth = 27, 1138
+# 22, queue_depth = 28, at 3383 overtaken by the nothing
+# 22, queue_depth = 29, at 3562 overtaken by the nothing
+# 22, queue_depth = 30, at 3562 overtaken by the nothing
+# 22, queue_depth = 31, at 4611 overtaken by the nothing
 ma = OneDCellularAutonomataWallRecursion(
   generations=generations,
   machine_cls=Rule30WithQueueDepth,
   cells_per_generation=width,
-  queue_depth=23,
+  queue_depth=30,
   )
 #ma = OneDCellularAutonomataWallRecursionUsingAngle(
 #  generations=generations,
@@ -1223,7 +1360,7 @@ ma = OneDCellularAutonomataWallRecursion(
 #csv_filename, movie_filename = nc.build_cache_csv(WallLeftBlackRightBlack,
 #    start_at=4, upto=200)
 #nc.plot_csv(csv_filename)
-filename = "rule_30_white_walls_{}_generations_width_{}".format(generations, width)
+filename = "rule_30_white_walls_{}_generations_{}".format(width, generations)
 #ma = OneDCellularAutomataWithAngleDiscovery(
 #  generations=generations,
 #  machine_cls=Rule30,
