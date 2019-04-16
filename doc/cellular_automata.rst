@@ -73,10 +73,7 @@ Now, what do we do about the edges of our graphing paper?  We could just pretend
 they aren't there, making the automata infinite.  Or, we could wrap the paper
 into a tube so that there is no edge.  I have seen that both of these things
 have been done before, but I haven't seen anyone just force a color onto the
-edge, like a wall.  The guys that invented and played with automata are really
-*really* smart, and they follow a disciplined, mathematical aesthetic.  So let's
-do something they wouldn't do, let's take their beautiful little program and run
-it into something completely arbitrary, let's build that wall!
+edge, like a wall.  So, let's do that, let's build a wall.
 
 This will give us a chance to have two state machines interact in the same
 cellular automata.  We need two different machines, a rule 30 machine and a wall
@@ -90,45 +87,66 @@ and see if we can make something new.
 Design and Code
 ---------------
 
-Here is a basic design diagram including two finite state machines (FSMs) that
-will do the job:
+Before we start let's draw some pictures that will guide our thinking.  We would
+like to see:
+
+* A small example of the automata running inside of walls.
+* A general idea about how to get visual feedback from our code and how that
+  will relate to our automata. (we will figure out the specifics later)
+* Some drawings of the state machines needed to make the automata.
+
+I'll pack all three of these things onto one drawing:
 
 .. image:: _static/rule_30_basic_design.svg
     :target: _static/rule_30_basic_design.pdf
     :align: center
 
-At the top of the diagram is our automata which provides some context and
-describes our design goal.  Below that is a small UML diagram showing how some
-classes relate to each other.  We see that a ``Canvas`` class *has a*
-``OneDCellularAutomata`` class.  This ``OneDCellularAutomata`` class *has many*
-``Rule30`` and ``Wall`` classes.  The ``Canvas`` class will draw our diagrams
-and animations, the ``OneDCellularAutomata`` will be responsible for creating
-any automata given a ``Wall`` class and a ``Rule`` class.  That seems simple
-enough.
+At the top of the diagram is the small example of the automata running inside of
+walls.  It provides some context and describes our design goal.
 
-The ``Rule30`` class will have three attributes describing the machine on the
-left and right and its color.  The ``Rule30`` machine will be inherited from the
-``Wall`` class, so we only have to write our color worker method,
-``color_number``, in one spot (the ``Wall`` class).  The ``Wall`` class is
-inherited from the ``HsmWithQueues``, which means that these state machines
-won't be running in their own threads (like they would be if they were derived
-from the ``ActiveObject`` class).  To have them react to events, we will have to
-use their ``dispatch`` method, and they will have to run within the thread of
-some sort of governing program.
+Below that is a small UML diagram describing the general idea about how to get
+visual feedback from our code and how that will relate to our automata.  This
+diagram shows how some classes might relate to each other.
 
-The state machine under the ``Rule30`` class will provide the behaviour
-described by the squares at the top of the page.  The state machine under the
-``Wall`` class consists of two states which can only be gotten to using the
-``start_at`` method, no event will cause a transition between these states.  The
-``Wall`` objects are intended to interface with the ``Rule30`` objects so that a
-``Rule30`` cell can't tell if it is working with an actual machine or just a
-wall.
+.. note::
+  
+   We see that a ``Canvas`` class *has a* ``OneDCellularAutomata`` class.  This
+   ``OneDCellularAutomata`` class *has many* ``Rule30`` and ``Wall`` classes.
+   The ``Canvas`` class will draw our diagrams and animations, the
+   ``OneDCellularAutomata`` will be responsible for creating any automata given
+   a ``Wall`` class and a ``Rule`` class.  That seems simple enough.
+
+   The ``Rule30`` class will have three attributes describing the machine on the
+   left and right and its color.  The ``Rule30`` machine will be inherited from the
+   ``Wall`` class, so we only have to write our color worker method,
+   ``color_number``, in one spot (the ``Wall`` class).  The ``Wall`` class is
+   inherited from the ``HsmWithQueues``, which means that these state machines
+   won't be running in their own threads (like they would be if they were derived
+   from the ``ActiveObject`` class).  To have them react to events, we will have to
+   use their ``dispatch`` method, and they will have to run within the thread of
+   some sort of governing program.
+
+At the bottom of the drawing there are two finite state machines (FSMs), drawn
+in high enough detail to see if they match the rules described at the top of the
+page.
+
+.. note::
+  
+   The state machine under the ``Rule30`` class will provide the behaviour
+   described by the squares at the top of the page.  The state machine under the
+   ``Wall`` class consists of two states which can only be gotten to using the
+   ``start_at`` method, no event will cause a transition between these states.  The
+   ``Wall`` objects are intended to interface with the ``Rule30`` objects so that a
+   ``Rule30`` cell can't tell if it is working with an actual machine or just a
+   wall.
 
 .. _cellular_automata-canvas:
 
 Canvas Class
 ^^^^^^^^^^^^
-How do we build a ``Canvas`` class to get the feedback needed to see what is
+The ``Canvas`` class will provide visual feedback.
+
+But, how will we build a ``Canvas`` class to get the feedback needed to see what is
 going on with our program?
 
 If we were using Stephen Wolfram's Mathematica software, this work would be
@@ -152,8 +170,8 @@ are drawing on, information about how many frames you want in your movie and how
 often you want to show them, and some callback functions that affect the data
 (your picture) for each frame.  The callback functions will be very useful,
 because it means we can pull the operation of our automata away from the
-``Canvas`` class and we can make the animation callback call out to a coroutine,
-so we can run our automata forever (if we wanted that).
+``Canvas`` class and we can make the animation callback call out to a Python
+coroutine, so we can run our automata forever (if we wanted that).
 
 Under the hood ``matplotlib`` calls out to ``FFmpeg``, which is some open source
 software that makes videos.  Let's install what we need and get back to our
@@ -178,16 +196,10 @@ Here is a UML drawing of the Canvas class:
     :target: _static/rule_30_canvas.pdf
     :align: center
 
-.. note::
-  
-   The diagram isn't that useful, and it's reproducing information that is already
-   in the code.  It might have been easier to see this same information using your
-   editor's code browser.  But, remember, UML is from the '90s.
-
-The diagram may not be that useful, but it emphasizes that the ``Canvas`` class
-will have a ``FuncAnimation`` object and a ``LinearSegmentedColormap`` (used for
-making colors), and it shows us how we want to make the object and how we want
-to use it with the ``run_animation`` and ``save`` methods.
+The ``Canvas`` class will have a ``FuncAnimation`` object and a
+``LinearSegmentedColormap`` (used for making colors), and it shows us how we
+want to make the object and how we want to use it with the ``run_animation`` and
+``save`` methods.
 
 It also shows us that the Canvas calls will have a ``OneDCellularAutomata``
 object, which will be created elsewhere, then passed to it.
@@ -1067,8 +1079,7 @@ is selected because we are only tracking two colors, black and white.
 
 First things first, let's deal with the n-phenomenon coming from the walls.  We
 have control of the walls, and we have a chaos generator, so let's feed the
-chaos back into the walls.  Let's make `some spooky action at a
-distance <https://www.youtube.com/watch?v=ZuvK-od647c>`_:
+chaos back into the walls.
 
 .. image:: _static/rule_30_chaos_to_walls_1.svg
     :target: _static/rule_30_chaos_to_walls_1.pdf

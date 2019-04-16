@@ -89,10 +89,7 @@ then to the pictures illustrating this same rule, you will see how it works.</p>
 they aren’t there, making the automata infinite.  Or, we could wrap the paper
 into a tube so that there is no edge.  I have seen that both of these things
 have been done before, but I haven’t seen anyone just force a color onto the
-edge, like a wall.  The guys that invented and played with automata are really
-<em>really</em> smart, and they follow a disciplined, mathematical aesthetic.  So let’s
-do something they wouldn’t do, let’s take their beautiful little program and run
-it into something completely arbitrary, let’s build that wall!</p>
+edge, like a wall.  So, let’s do that, let’s build a wall.</p>
 <p>This will give us a chance to have two state machines interact in the same
 cellular automata.  We need two different machines, a rule 30 machine and a wall
 machine.  The wall machine should be able to be white or black.</p>
@@ -100,19 +97,30 @@ machine.  The wall machine should be able to be white or black.</p>
 and see if we can make something new.</p>
 <div class="section" id="design-and-code">
 <span id="cellular-automata-design"></span><h2>Design and Code<a class="headerlink" href="#design-and-code" title="Permalink to this headline">¶</a></h2>
-<p>Here is a basic design diagram including two finite state machines (FSMs) that
-will do the job:</p>
+<p>Before we start let’s draw some pictures that will guide our thinking.  We would
+like to see:</p>
+<ul class="simple">
+<li>A small example of the automata running inside of walls.</li>
+<li>A general idea about how to get visual feedback from our code and how that
+will relate to our automata. (we will figure out the specifics later)</li>
+<li>Some drawings of the state machines needed to make the automata.</li>
+</ul>
+<p>I’ll pack all three of these things onto one drawing:</p>
 <a class="reference external image-reference" href="_static/rule_30_basic_design.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design.svg" src="_images/rule_30_basic_design.svg" /></div>
 </a>
-<p>At the top of the diagram is our automata which provides some context and
-describes our design goal.  Below that is a small UML diagram showing how some
-classes relate to each other.  We see that a <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class <em>has a</em>
-<code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> class.  This <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> class <em>has many</em>
-<code class="docutils literal notranslate"><span class="pre">Rule30</span></code> and <code class="docutils literal notranslate"><span class="pre">Wall</span></code> classes.  The <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class will draw our diagrams
-and animations, the <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> will be responsible for creating
-any automata given a <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class and a <code class="docutils literal notranslate"><span class="pre">Rule</span></code> class.  That seems simple
-enough.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> class will have three attributes describing the machine on the
+<p>At the top of the diagram is the small example of the automata running inside of
+walls.  It provides some context and describes our design goal.</p>
+<p>Below that is a small UML diagram describing the general idea about how to get
+visual feedback from our code and how that will relate to our automata.  This
+diagram shows how some classes might relate to each other.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>We see that a <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class <em>has a</em> <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> class.  This
+<code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> class <em>has many</em> <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> and <code class="docutils literal notranslate"><span class="pre">Wall</span></code> classes.
+The <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class will draw our diagrams and animations, the
+<code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> will be responsible for creating any automata given
+a <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class and a <code class="docutils literal notranslate"><span class="pre">Rule</span></code> class.  That seems simple enough.</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> class will have three attributes describing the machine on the
 left and right and its color.  The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> machine will be inherited from the
 <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class, so we only have to write our color worker method,
 <code class="docutils literal notranslate"><span class="pre">color_number</span></code>, in one spot (the <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class).  The <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class is
@@ -121,16 +129,24 @@ won’t be running in their own threads (like they would be if they were derived
 from the <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code> class).  To have them react to events, we will have to
 use their <code class="docutils literal notranslate"><span class="pre">dispatch</span></code> method, and they will have to run within the thread of
 some sort of governing program.</p>
-<p>The state machine under the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> class will provide the behaviour
+</div>
+<p>At the bottom of the drawing there are two finite state machines (FSMs), drawn
+in high enough detail to see if they match the rules described at the top of the
+page.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The state machine under the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> class will provide the behaviour
 described by the squares at the top of the page.  The state machine under the
 <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class consists of two states which can only be gotten to using the
 <code class="docutils literal notranslate"><span class="pre">start_at</span></code> method, no event will cause a transition between these states.  The
 <code class="docutils literal notranslate"><span class="pre">Wall</span></code> objects are intended to interface with the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> objects so that a
 <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> cell can’t tell if it is working with an actual machine or just a
 wall.</p>
+</div>
 <div class="section" id="canvas-class">
 <span id="cellular-automata-canvas"></span><h3>Canvas Class<a class="headerlink" href="#canvas-class" title="Permalink to this headline">¶</a></h3>
-<p>How do we build a <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class to get the feedback needed to see what is
+<p>The <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class will provide visual feedback.</p>
+<p>But, how will we build a <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class to get the feedback needed to see what is
 going on with our program?</p>
 <p>If we were using Stephen Wolfram’s Mathematica software, this work would be
 trivial. Even if we were using Matlab, it wouldn’t be too hard to see these
@@ -150,8 +166,8 @@ are drawing on, information about how many frames you want in your movie and how
 often you want to show them, and some callback functions that affect the data
 (your picture) for each frame.  The callback functions will be very useful,
 because it means we can pull the operation of our automata away from the
-<code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class and we can make the animation callback call out to a coroutine,
-so we can run our automata forever (if we wanted that).</p>
+<code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class and we can make the animation callback call out to a Python
+coroutine, so we can run our automata forever (if we wanted that).</p>
 <p>Under the hood <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> calls out to <code class="docutils literal notranslate"><span class="pre">FFmpeg</span></code>, which is some open source
 software that makes videos.  Let’s install what we need and get back to our
 design:</p>
@@ -170,16 +186,10 @@ ffmpeg.</p>
 <p>Here is a UML drawing of the Canvas class:</p>
 <a class="reference external image-reference" href="_static/rule_30_canvas.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_canvas.svg" src="_images/rule_30_canvas.svg" /></div>
 </a>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The diagram isn’t that useful, and it’s reproducing information that is already
-in the code.  It might have been easier to see this same information using your
-editor’s code browser.  But, remember, UML is from the ’90s.</p>
-</div>
-<p>The diagram may not be that useful, but it emphasizes that the <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class
-will have a <code class="docutils literal notranslate"><span class="pre">FuncAnimation</span></code> object and a <code class="docutils literal notranslate"><span class="pre">LinearSegmentedColormap</span></code> (used for
-making colors), and it shows us how we want to make the object and how we want
-to use it with the <code class="docutils literal notranslate"><span class="pre">run_animation</span></code> and <code class="docutils literal notranslate"><span class="pre">save</span></code> methods.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class will have a <code class="docutils literal notranslate"><span class="pre">FuncAnimation</span></code> object and a
+<code class="docutils literal notranslate"><span class="pre">LinearSegmentedColormap</span></code> (used for making colors), and it shows us how we
+want to make the object and how we want to use it with the <code class="docutils literal notranslate"><span class="pre">run_animation</span></code> and
+<code class="docutils literal notranslate"><span class="pre">save</span></code> methods.</p>
 <p>It also shows us that the Canvas calls will have a <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code>
 object, which will be created elsewhere, then passed to it.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pathlib</span>
@@ -936,8 +946,7 @@ is held within a bounded rectangle. My first guess at what our upper bound is:
 is selected because we are only tracking two colors, black and white.</p>
 <p>First things first, let’s deal with the n-phenomenon coming from the walls.  We
 have control of the walls, and we have a chaos generator, so let’s feed the
-chaos back into the walls.  Let’s make <a class="reference external" href="https://www.youtube.com/watch?v=ZuvK-od647c">some spooky action at a
-distance</a>:</p>
+chaos back into the walls.</p>
 <a class="reference external image-reference" href="_static/rule_30_chaos_to_walls_1.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_chaos_to_walls_1.svg" src="_images/rule_30_chaos_to_walls_1.svg" /></div>
 </a>
 <p>We can write the colors of our center column into a deque, and use the top two
