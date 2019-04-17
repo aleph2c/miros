@@ -495,8 +495,6 @@ class OneDCellularAutomata():
       next(generation)
 
     '''
-    # python automatically places the classes passed into this object as tuples,
-    # this is surprising behavior but it is how it works, so we go with it
     self.machine_cls = machine_cls
     self.wall_cls = wall_cls
 
@@ -1381,7 +1379,7 @@ subprocess.Popen(cmd, shell=True)
 #plt.acorr(ma.middle_numbers, usevlines=True, normed=True, maxlags=None, lw=2)
 def autocorrelate(x):
   result = np.correlate(x, x, mode='full')
-  # don't include the corriletion with itself
+  # don't include the correletion with itself
   result[result.size//2] = 0
   return result[result.size//2:]
 

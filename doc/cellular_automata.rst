@@ -69,11 +69,13 @@ first line then follow the rules to fill in the 4 lines below it.
 If you look at the diagram and compare it to the rules described as a paragraph,
 then to the pictures illustrating this same rule, you will see how it works.
 
-Now, what do we do about the edges of our graphing paper?  We could just pretend
+Let's write some Python code that can build something like this.
+
+But before we start, what do we do about the edges of our graphing paper?  We could just pretend
 they aren't there, making the automata infinite.  Or, we could wrap the paper
-into a tube so that there is no edge.  I have seen that both of these things
-have been done before, but I haven't seen anyone just force a color onto the
-edge, like a wall.  So, let's do that, let's build a wall.
+into a tube so that there is no edge.  Both of these things have been done
+before, but I haven't seen anyone just force a color onto the edge of the
+graphing paper, like a wall.  So, let's do that, let's build a wall.
 
 This will give us a chance to have two state machines interact in the same
 cellular automata.  We need two different machines, a rule 30 machine and a wall
@@ -84,61 +86,111 @@ and see if we can make something new.
 
 .. _cellular_automata-design:
 
-Design and Code
----------------
+High Level Sketches
+-------------------
 
-Before we start let's draw some pictures that will guide our thinking.  We would
-like to see:
+Before we start writing our code let's sketch out some pictures which will help
+guide our thinking.  We would like to see:
 
-* A small example of the automata running inside of walls.
-* A general idea about how to get visual feedback from our code and how that
-  will relate to our automata. (we will figure out the specifics later)
-* Some drawings of the state machines needed to make the automata.
+* :ref:`a small example of the automata running inside of walls.<cellular_automata-a-small-example-of-the-automata-running-inside-of-walls>`
+* :ref:`a general idea about how to get visual feedback from our code and how that
+  will relate to our automata.<cellular_automata-a-highlevel-diagram>` (we will figure out the specifics later)
+* :ref:`some drawings of the state machines needed to make the automata.<cellular_automata-state-machines-needed-to-build-automata>`
 
-I'll pack all three of these things onto one drawing:
+.. _cellular_automata-a-small-example-of-the-automata-running-inside-of-walls:
 
-.. image:: _static/rule_30_basic_design.svg
-    :target: _static/rule_30_basic_design.pdf
+Automata Running Inside of Walls
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Here is a small example of the rule 30 automata running inside of walls:
+
+.. image:: _static/rule_30_basic_design_0.svg
+    :target: _static/rule_30_basic_design_0.pdf
     :align: center
 
-At the top of the diagram is the small example of the automata running inside of
-walls.  It provides some context and describes our design goal.
+This sketch is a mock-up of the output we would like our code to create.  It also
+shows the rules which govern how the picture is made, some terminology and some
+examples about how some of the components could be build with Python.
 
-Below that is a small UML diagram describing the general idea about how to get
-visual feedback from our code and how that will relate to our automata.  This
-diagram shows how some classes might relate to each other.
+The top of the diagram describes rule 30 in pictures and the main part of the
+drawing shows an example of the one dimensional automata we want to build.
 
-.. note::
-  
-   We see that a ``Canvas`` class *has a* ``OneDCellularAutomata`` class.  This
-   ``OneDCellularAutomata`` class *has many* ``Rule30`` and ``Wall`` classes.
-   The ``Canvas`` class will draw our diagrams and animations, the
-   ``OneDCellularAutomata`` will be responsible for creating any automata given
-   a ``Wall`` class and a ``Rule`` class.  That seems simple enough.
+The one dimensional automata is made up of individual cells, which will be
+governed by two different sets of rules.  A cell can be derived from either a
+``Rule30`` class which is governed by the rules described at the top of the page
+or a ``Wall`` class, which is given a color to start at and remains in that color
+forever.  Once a cell is instantiated, it is started in the color we want it to
+appear in on our drawing.  The walls of the diagram are colored orange so that
+we can distinguish them from the bulk of the drawing which is made up of rule 30
+cells.
 
-   The ``Rule30`` class will have three attributes describing the machine on the
-   left and right and its color.  The ``Rule30`` machine will be inherited from the
-   ``Wall`` class, so we only have to write our color worker method,
-   ``color_number``, in one spot (the ``Wall`` class).  The ``Wall`` class is
-   inherited from the ``HsmWithQueues``, which means that these state machines
-   won't be running in their own threads (like they would be if they were derived
-   from the ``ActiveObject`` class).  To have them react to events, we will have to
-   use their ``dispatch`` method, and they will have to run within the thread of
-   some sort of governing program.
+We would like our code to be able to run for a programmable number of
+``generations``.  A single generation is a row of the one dimensional automata.
+The ``Next`` event, will be used to tell the code representing the diagram, to
+build its next generation.
 
-At the bottom of the drawing there are two finite state machines (FSMs), drawn
-in high enough detail to see if they match the rules described at the top of the
-page.
+We would also like our code to be able to build any width of cells.
 
-.. note::
-  
-   The state machine under the ``Rule30`` class will provide the behaviour
-   described by the squares at the top of the page.  The state machine under the
-   ``Wall`` class consists of two states which can only be gotten to using the
-   ``start_at`` method, no event will cause a transition between these states.  The
-   ``Wall`` objects are intended to interface with the ``Rule30`` objects so that a
-   ``Rule30`` cell can't tell if it is working with an actual machine or just a
-   wall.
+The ``Z`` object represents the 2D binary matrix which will describe our
+drawing.  This matrix will be used to analyze our automata as it runs.
+
+
+.. _cellular_automata-a-highlevel-diagram:
+
+High Level Design Diagram
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Now that we know what kind of output we want, we need to think about how we will
+structure a program to give us this output.
+
+We need something that can make our one dimensional cellular automata and we
+need some way to look at it.  Let's call the thing that we will use to visualize
+our automata, a canvas.
+
+Our canvas will be given an automata object which it will draw.  Our automata
+object will have many rule 30 objects and many wall objects.
+
+Here is what we wrote above, expressed as a UML diagram:
+
+.. image:: _static/rule_30_basic_design_1.svg
+    :target: _static/rule_30_basic_design_1.pdf
+    :align: center
+
+The ``Canvas`` class *has a* ``OneDCellularAutomata`` class.  This
+``OneDCellularAutomata`` class *has many* ``Rule30`` and ``Wall`` classes.
+Seems simple enough.
+
+Let's build the ``Canvas`` class so that it can both draw our diagrams and make
+video animations. Let's make the ``OneDCellularAutomata`` responsible for
+creating any automata given a ``Wall`` class and a ``Rule`` class.
+
+.. _cellular_automata-state-machines-needed-to-build-automata:
+
+Statemachines Needed to Build Rule 30 in Walls
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We have drawn the ``Rule30`` and ``Wall`` classes as abstract blocks in the
+previous high level diagram. But we know how they work, so let's re-draw them
+now in more detail:
+
+.. image:: _static/rule_30_basic_design_2.svg
+    :target: _static/rule_30_basic_design_2.pdf
+    :align: center
+
+The state machine under the ``Rule30`` class will provide the behaviour
+described by the squares at the top of the page.  The state machine under the
+``Wall`` class consists of two states which can only be gotten to using the
+``start_at`` method, no event will cause a transition between these states.  The
+``Wall`` objects are intended to interface with the ``Rule30`` objects so that a
+``Rule30`` cell can't tell if it is working with an actual machine or just a
+wall.
+
+.. _cellular_automata-design-and-code:
+
+Design and Code
+---------------
+Now that we know what we want to build, let's make our designs more detailed and
+write the Python code required to make the design work.
 
 .. _cellular_automata-canvas:
 
@@ -399,9 +451,10 @@ Here is a UML diagram of the ``OneDCellularAutomata`` class:
 There is a bunch of stuff in this diagram that I don't know how to draw using
 UML.  For instance, how do I show a class that I have sent it a class, so it
 knows how to build something, using the class I just gave it?  How do I draw
-something that makes a co-routine?  Well, I don't know, so I will just scribble
-down something that isn't too confusing and explain what I meant here with a few
-words:
+something that makes a co-routine?
+
+Well, I don't know, so I will just scribble down something that isn't too
+confusing and explain what I meant here with a few words:
 
 The few key takeaways from the drawing are how the constructor works, we feed it
 in the rule and wall classes so that it can generically construct automata.  We
@@ -469,9 +522,6 @@ Here is the code:
         next(generation)
 
       '''
-      # python automatically places the classes passed into this object as
-      # tuples, this is surprising behavior but it is how it works, so we go
-      # with it
       self.machine_cls = machine_cls
       self.wall_cls = wall_cls
 
@@ -717,7 +767,7 @@ Here is the code for our ``Rule30`` and ``Wall`` classes:
 .. _cellular_automata-running-and-visualizing-the-automata:
 
 Running and Visualizing the Cellular Automata
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------------------
 
 Now that we have all the parts we need let's stitch them together and see what
 happens.  We will build an automata using rule 30 with some white walls. Then we
@@ -805,7 +855,7 @@ On this diagram we can see order imposing itself from the left white wall, and a
 .. _cellular_automata-the-nothing:
 
 The Nothing (n-phenomenon)
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------
 
 The white and black walls force order into the automata; causing a kind of
 pattern crystallization to propagate across our results.  We lose the incredible
@@ -818,6 +868,15 @@ is an inflexible minority on the walls, imposing itself on a flexible majority.
 <https://medium.com/incerto/the-most-intolerant-wins-the-dictatorship-of-the-small-minority-3f1f83ce4e15>`_.)
 
 I will call this destructive ordering, the n-phenomenon.
+
+.. note::
+
+  Our universe seems to have set rules (the laws of physics) but it will not run
+  into this n-phenomenon, repetition issue; because it doesn't seem to be
+  confined within walls or have limited memory: the universe is expanding at an
+  accelerating rate.
+
+  Maybe it would have been wiped out by an n-phenomenon if it weren't expanding.
 
 Let's study it in a bit more detail.  I will shrink the width of our graphing
 paper to 30 cells and watch the n-phenomenon completely destroy rule 30's beautiful
@@ -1062,15 +1121,6 @@ there are only so many permutations that can be held within the bounds of our
 rectangle, and if we repeat a pattern we are not generating a random number, but
 rather a long periodic number; a pseudo-random number.
 
-.. note::
-
-  Our universe seems to have set rules (the laws of physics) but it will not run
-  into this n-phenomenon, repetition issue; because it doesn't seem to be
-  confined within walls or have limited memory: the universe is expanding at an
-  accelerating rate.
-
-  Maybe it would have been wiped out by an n-phenomenon if it weren't expanding.
-
 So there seems to be a theoretical upper bound to what we can generate using
 limited memory given that the rule doesn't change and the state of the program
 is held within a bounded rectangle. My first guess at what our upper bound is:
@@ -1105,8 +1155,9 @@ as much chaos as rule 30 can generate, then feed this back into the automata
 before the n-phenomenon destroys the disorder.
 
 Every intuition I have had so far about rule 30 has been wrong, so I'll probably
-be wrong about this too.  I need some way to measure if my prediction is correct
-or incorrect
+be wrong about this too.  I need some way to to disprove my prediction, and I
+can't eye-ball repeating patterns reliably beyond 30 generations, so I will
+adjust the code to inform on it's own periodicity using an autocorrelation.
 
 +----------------------+------------+--------------------------+----------+
 | Cell Width and angle | Queue Depth| Unique Pattern Duration  | Repeats? |

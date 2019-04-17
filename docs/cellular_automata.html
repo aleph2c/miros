@@ -85,57 +85,80 @@ first line then follow the rules to fill in the 4 lines below it.</p>
 </a>
 <p>If you look at the diagram and compare it to the rules described as a paragraph,
 then to the pictures illustrating this same rule, you will see how it works.</p>
-<p>Now, what do we do about the edges of our graphing paper?  We could just pretend
+<p>Let’s write some Python code that can build something like this.</p>
+<p>But before we start, what do we do about the edges of our graphing paper?  We could just pretend
 they aren’t there, making the automata infinite.  Or, we could wrap the paper
-into a tube so that there is no edge.  I have seen that both of these things
-have been done before, but I haven’t seen anyone just force a color onto the
-edge, like a wall.  So, let’s do that, let’s build a wall.</p>
+into a tube so that there is no edge.  Both of these things have been done
+before, but I haven’t seen anyone just force a color onto the edge of the
+graphing paper, like a wall.  So, let’s do that, let’s build a wall.</p>
 <p>This will give us a chance to have two state machines interact in the same
 cellular automata.  We need two different machines, a rule 30 machine and a wall
 machine.  The wall machine should be able to be white or black.</p>
 <p>Let’s design a system, then build it and run it (not necessarily in that order)
 and see if we can make something new.</p>
-<div class="section" id="design-and-code">
-<span id="cellular-automata-design"></span><h2>Design and Code<a class="headerlink" href="#design-and-code" title="Permalink to this headline">¶</a></h2>
-<p>Before we start let’s draw some pictures that will guide our thinking.  We would
-like to see:</p>
+<div class="section" id="high-level-sketches">
+<span id="cellular-automata-design"></span><h2>High Level Sketches<a class="headerlink" href="#high-level-sketches" title="Permalink to this headline">¶</a></h2>
+<p>Before we start writing our code let’s sketch out some pictures which will help
+guide our thinking.  We would like to see:</p>
 <ul class="simple">
-<li>A small example of the automata running inside of walls.</li>
-<li>A general idea about how to get visual feedback from our code and how that
-will relate to our automata. (we will figure out the specifics later)</li>
-<li>Some drawings of the state machines needed to make the automata.</li>
+<li><a class="reference internal" href="#cellular-automata-a-small-example-of-the-automata-running-inside-of-walls"><span class="std std-ref">a small example of the automata running inside of walls.</span></a></li>
+<li><a class="reference internal" href="#cellular-automata-a-highlevel-diagram"><span class="std std-ref">a general idea about how to get visual feedback from our code and how that
+will relate to our automata.</span></a> (we will figure out the specifics later)</li>
+<li><a class="reference internal" href="#cellular-automata-state-machines-needed-to-build-automata"><span class="std std-ref">some drawings of the state machines needed to make the automata.</span></a></li>
 </ul>
-<p>I’ll pack all three of these things onto one drawing:</p>
-<a class="reference external image-reference" href="_static/rule_30_basic_design.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design.svg" src="_images/rule_30_basic_design.svg" /></div>
+<div class="section" id="automata-running-inside-of-walls">
+<span id="cellular-automata-a-small-example-of-the-automata-running-inside-of-walls"></span><h3>Automata Running Inside of Walls<a class="headerlink" href="#automata-running-inside-of-walls" title="Permalink to this headline">¶</a></h3>
+<p>Here is a small example of the rule 30 automata running inside of walls:</p>
+<a class="reference external image-reference" href="_static/rule_30_basic_design_0.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design_0.svg" src="_images/rule_30_basic_design_0.svg" /></div>
 </a>
-<p>At the top of the diagram is the small example of the automata running inside of
-walls.  It provides some context and describes our design goal.</p>
-<p>Below that is a small UML diagram describing the general idea about how to get
-visual feedback from our code and how that will relate to our automata.  This
-diagram shows how some classes might relate to each other.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p>We see that a <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class <em>has a</em> <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> class.  This
-<code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> class <em>has many</em> <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> and <code class="docutils literal notranslate"><span class="pre">Wall</span></code> classes.
-The <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class will draw our diagrams and animations, the
-<code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> will be responsible for creating any automata given
-a <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class and a <code class="docutils literal notranslate"><span class="pre">Rule</span></code> class.  That seems simple enough.</p>
-<p class="last">The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> class will have three attributes describing the machine on the
-left and right and its color.  The <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> machine will be inherited from the
-<code class="docutils literal notranslate"><span class="pre">Wall</span></code> class, so we only have to write our color worker method,
-<code class="docutils literal notranslate"><span class="pre">color_number</span></code>, in one spot (the <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class).  The <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class is
-inherited from the <code class="docutils literal notranslate"><span class="pre">HsmWithQueues</span></code>, which means that these state machines
-won’t be running in their own threads (like they would be if they were derived
-from the <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code> class).  To have them react to events, we will have to
-use their <code class="docutils literal notranslate"><span class="pre">dispatch</span></code> method, and they will have to run within the thread of
-some sort of governing program.</p>
+<p>This sketch is a mock-up of the output we would like our code to create.  It also
+shows the rules which govern how the picture is made, some terminology and some
+examples about how some of the components could be build with Python.</p>
+<p>The top of the diagram describes rule 30 in pictures and the main part of the
+drawing shows an example of the one dimensional automata we want to build.</p>
+<p>The one dimensional automata is made up of individual cells, which will be
+governed by two different sets of rules.  A cell can be derived from either a
+<code class="docutils literal notranslate"><span class="pre">Rule30</span></code> class which is governed by the rules described at the top of the page
+or a <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class, which is given a color to start at and remains in that color
+forever.  Once a cell is instantiated, it is started in the color we want it to
+appear in on our drawing.  The walls of the diagram are colored orange so that
+we can distinguish them from the bulk of the drawing which is made up of rule 30
+cells.</p>
+<p>We would like our code to be able to run for a programmable number of
+<code class="docutils literal notranslate"><span class="pre">generations</span></code>.  A single generation is a row of the one dimensional automata.
+The <code class="docutils literal notranslate"><span class="pre">Next</span></code> event, will be used to tell the code representing the diagram, to
+build its next generation.</p>
+<p>We would also like our code to be able to build any width of cells.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Z</span></code> object represents the 2D binary matrix which will describe our
+drawing.  This matrix will be used to analyze our automata as it runs.</p>
 </div>
-<p>At the bottom of the drawing there are two finite state machines (FSMs), drawn
-in high enough detail to see if they match the rules described at the top of the
-page.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The state machine under the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> class will provide the behaviour
+<div class="section" id="high-level-design-diagram">
+<span id="cellular-automata-a-highlevel-diagram"></span><h3>High Level Design Diagram<a class="headerlink" href="#high-level-design-diagram" title="Permalink to this headline">¶</a></h3>
+<p>Now that we know what kind of output we want, we need to think about how we will
+structure a program to give us this output.</p>
+<p>We need something that can make our one dimensional cellular automata and we
+need some way to look at it.  Let’s call the thing that we will use to visualize
+our automata, a canvas.</p>
+<p>Our canvas will be given an automata object which it will draw.  Our automata
+object will have many rule 30 objects and many wall objects.</p>
+<p>Here is what we wrote above, expressed as a UML diagram:</p>
+<a class="reference external image-reference" href="_static/rule_30_basic_design_1.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design_1.svg" src="_images/rule_30_basic_design_1.svg" /></div>
+</a>
+<p>The <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class <em>has a</em> <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> class.  This
+<code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> class <em>has many</em> <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> and <code class="docutils literal notranslate"><span class="pre">Wall</span></code> classes.
+Seems simple enough.</p>
+<p>Let’s build the <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class so that it can both draw our diagrams and make
+video animations. Let’s make the <code class="docutils literal notranslate"><span class="pre">OneDCellularAutomata</span></code> responsible for
+creating any automata given a <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class and a <code class="docutils literal notranslate"><span class="pre">Rule</span></code> class.</p>
+</div>
+<div class="section" id="statemachines-needed-to-build-rule-30-in-walls">
+<span id="cellular-automata-state-machines-needed-to-build-automata"></span><h3>Statemachines Needed to Build Rule 30 in Walls<a class="headerlink" href="#statemachines-needed-to-build-rule-30-in-walls" title="Permalink to this headline">¶</a></h3>
+<p>We have drawn the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> and <code class="docutils literal notranslate"><span class="pre">Wall</span></code> classes as abstract blocks in the
+previous high level diagram. But we know how they work, so let’s re-draw them
+now in more detail:</p>
+<a class="reference external image-reference" href="_static/rule_30_basic_design_2.pdf"><div align="center" class="align-center"><img alt="_images/rule_30_basic_design_2.svg" src="_images/rule_30_basic_design_2.svg" /></div>
+</a>
+<p>The state machine under the <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> class will provide the behaviour
 described by the squares at the top of the page.  The state machine under the
 <code class="docutils literal notranslate"><span class="pre">Wall</span></code> class consists of two states which can only be gotten to using the
 <code class="docutils literal notranslate"><span class="pre">start_at</span></code> method, no event will cause a transition between these states.  The
@@ -143,6 +166,11 @@ described by the squares at the top of the page.  The state machine under the
 <code class="docutils literal notranslate"><span class="pre">Rule30</span></code> cell can’t tell if it is working with an actual machine or just a
 wall.</p>
 </div>
+</div>
+<div class="section" id="design-and-code">
+<span id="cellular-automata-design-and-code"></span><h2>Design and Code<a class="headerlink" href="#design-and-code" title="Permalink to this headline">¶</a></h2>
+<p>Now that we know what we want to build, let’s make our designs more detailed and
+write the Python code required to make the design work.</p>
 <div class="section" id="canvas-class">
 <span id="cellular-automata-canvas"></span><h3>Canvas Class<a class="headerlink" href="#canvas-class" title="Permalink to this headline">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">Canvas</span></code> class will provide visual feedback.</p>
@@ -373,9 +401,9 @@ right colors in their class attributes:</p>
 <p>There is a bunch of stuff in this diagram that I don’t know how to draw using
 UML.  For instance, how do I show a class that I have sent it a class, so it
 knows how to build something, using the class I just gave it?  How do I draw
-something that makes a co-routine?  Well, I don’t know, so I will just scribble
-down something that isn’t too confusing and explain what I meant here with a few
-words:</p>
+something that makes a co-routine?</p>
+<p>Well, I don’t know, so I will just scribble down something that isn’t too
+confusing and explain what I meant here with a few words:</p>
 <p>The few key takeaways from the drawing are how the constructor works, we feed it
 in the rule and wall classes so that it can generically construct automata.  We
 also show the function that returns the co-routine.  Each time <code class="docutils literal notranslate"><span class="pre">next</span></code> is
@@ -438,9 +466,6 @@ activation after that will cause it to descend one row down.</p>
 <span class="sd">      next(generation)</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="c1"># python automatically places the classes passed into this object as</span>
-    <span class="c1"># tuples, this is surprising behavior but it is how it works, so we go</span>
-    <span class="c1"># with it</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">machine_cls</span> <span class="o">=</span> <span class="n">machine_cls</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">wall_cls</span> <span class="o">=</span> <span class="n">wall_cls</span>
 
@@ -672,8 +697,9 @@ that way forever.</p>
 </pre></div>
 </div>
 </div>
+</div>
 <div class="section" id="running-and-visualizing-the-cellular-automata">
-<span id="cellular-automata-running-and-visualizing-the-automata"></span><h3>Running and Visualizing the Cellular Automata<a class="headerlink" href="#running-and-visualizing-the-cellular-automata" title="Permalink to this headline">¶</a></h3>
+<span id="cellular-automata-running-and-visualizing-the-automata"></span><h2>Running and Visualizing the Cellular Automata<a class="headerlink" href="#running-and-visualizing-the-cellular-automata" title="Permalink to this headline">¶</a></h2>
 <p>Now that we have all the parts we need let’s stitch them together and see what
 happens.  We will build an automata using rule 30 with some white walls. Then we
 will feed the automata into a canvas, and use the canvas to print a <cite>png</cite> file,
@@ -734,7 +760,7 @@ being given away on this platform.</p>
 </div>
 </div>
 <div class="section" id="the-nothing-n-phenomenon">
-<span id="cellular-automata-the-nothing"></span><h3>The Nothing (n-phenomenon)<a class="headerlink" href="#the-nothing-n-phenomenon" title="Permalink to this headline">¶</a></h3>
+<span id="cellular-automata-the-nothing"></span><h2>The Nothing (n-phenomenon)<a class="headerlink" href="#the-nothing-n-phenomenon" title="Permalink to this headline">¶</a></h2>
 <p>The white and black walls force order into the automata; causing a kind of
 pattern crystallization to propagate across our results.  We lose the incredible
 complexity of rule 30, to this ordering pattern, which I think of as the
@@ -744,6 +770,14 @@ this effect takes place with both white and black walls, the key is that there
 is an inflexible minority on the walls, imposing itself on a flexible majority.
 (Nassim Nicholas Taleb calls this kind of thing <a class="reference external" href="https://medium.com/incerto/the-most-intolerant-wins-the-dictatorship-of-the-small-minority-3f1f83ce4e15">a normalization</a>.)</p>
 <p>I will call this destructive ordering, the n-phenomenon.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Our universe seems to have set rules (the laws of physics) but it will not run
+into this n-phenomenon, repetition issue; because it doesn’t seem to be
+confined within walls or have limited memory: the universe is expanding at an
+accelerating rate.</p>
+<p class="last">Maybe it would have been wiped out by an n-phenomenon if it weren’t expanding.</p>
+</div>
 <p>Let’s study it in a bit more detail.  I will shrink the width of our graphing
 paper to 30 cells and watch the n-phenomenon completely destroy rule 30’s beautiful
 complexity over 100 generations.</p>
@@ -917,7 +951,6 @@ black right wall:</p>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/z1R8-gZd5wQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center></div>
 </div>
-</div>
 <div class="section" id="random-number-generation">
 <h1>Random Number Generation<a class="headerlink" href="#random-number-generation" title="Permalink to this headline">¶</a></h1>
 <p>Let’s try and build a random number generator using a simple Python program.</p>
@@ -931,14 +964,6 @@ only a few generations.  Even if we can perfectly manage this n-phenomenon,
 there are only so many permutations that can be held within the bounds of our
 rectangle, and if we repeat a pattern we are not generating a random number, but
 rather a long periodic number; a pseudo-random number.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p>Our universe seems to have set rules (the laws of physics) but it will not run
-into this n-phenomenon, repetition issue; because it doesn’t seem to be
-confined within walls or have limited memory: the universe is expanding at an
-accelerating rate.</p>
-<p class="last">Maybe it would have been wiped out by an n-phenomenon if it weren’t expanding.</p>
-</div>
 <p>So there seems to be a theoretical upper bound to what we can generate using
 limited memory given that the rule doesn’t change and the state of the program
 is held within a bounded rectangle. My first guess at what our upper bound is:
@@ -966,8 +991,9 @@ onto the walls.</p>
 as much chaos as rule 30 can generate, then feed this back into the automata
 before the n-phenomenon destroys the disorder.</p>
 <p>Every intuition I have had so far about rule 30 has been wrong, so I’ll probably
-be wrong about this too.  I need some way to measure if my prediction is correct
-or incorrect</p>
+be wrong about this too.  I need some way to to disprove my prediction, and I
+can’t eye-ball repeating patterns reliably beyond 30 generations, so I will
+adjust the code to inform on it’s own periodicity using an autocorrelation.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="31%" />
@@ -2021,14 +2047,20 @@ time, but before this a nice, richly chaotic pattern existed.</p>
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Cellular Automata</a><ul>
+<li><a class="reference internal" href="#high-level-sketches">High Level Sketches</a><ul>
+<li><a class="reference internal" href="#automata-running-inside-of-walls">Automata Running Inside of Walls</a></li>
+<li><a class="reference internal" href="#high-level-design-diagram">High Level Design Diagram</a></li>
+<li><a class="reference internal" href="#statemachines-needed-to-build-rule-30-in-walls">Statemachines Needed to Build Rule 30 in Walls</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#design-and-code">Design and Code</a><ul>
 <li><a class="reference internal" href="#canvas-class">Canvas Class</a></li>
 <li><a class="reference internal" href="#the-onedcellularautomata-class">The OneDCellularAutomata Class</a></li>
 <li><a class="reference internal" href="#rule30-and-the-wall-classes">Rule30 and the Wall Classes</a></li>
-<li><a class="reference internal" href="#running-and-visualizing-the-cellular-automata">Running and Visualizing the Cellular Automata</a></li>
-<li><a class="reference internal" href="#the-nothing-n-phenomenon">The Nothing (n-phenomenon)</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#running-and-visualizing-the-cellular-automata">Running and Visualizing the Cellular Automata</a></li>
+<li><a class="reference internal" href="#the-nothing-n-phenomenon">The Nothing (n-phenomenon)</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#random-number-generation">Random Number Generation</a></li>
