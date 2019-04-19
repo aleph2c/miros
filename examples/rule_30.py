@@ -744,8 +744,8 @@ class OneDCellularAutonomataWallRecursion(OneDCellularAutomata):
     self.update_core_code()
     row_number = self.generation+1
     for col_number in range(self.Z.shape[1]):
-      middle_color = self.Z[row_number, col_number]
-      self.for_pattern_search[col_number].append(1.0 if abs(middle_color-Black)<0.01 else 0.0)
+      cell_color = self.Z[row_number, col_number]
+      self.for_pattern_search[col_number].append(1.0 if abs(cell_color-Black)<0.01 else 0.0)
     self.set_wall_class()
 
   def update_core_code(self):
@@ -855,8 +855,8 @@ class OneDCellularAutonomataWallRecursionUsingAngle(OneDCellularAutomata):
     self.update_core_code()
     row_number = self.generation+1
     for col_number in range(self.Z.shape[1]):
-      middle_color = self.Z[row_number, col_number]
-      self.for_pattern_search[col_number].append(1.0 if abs(middle_color-Black)<0.01 else 0.0)
+      cell_color = self.Z[row_number, col_number]
+      self.for_pattern_search[col_number].append(1.0 if abs(cell_color-Black)<0.01 else 0.0)
     self.set_wall_class()
 
   def update_core_code(self):
@@ -1034,9 +1034,12 @@ class Canvas():
   def close(self):
     plt.close(self.fig)
 
+
+
 #width = 22
-width = 19
-generations = 1480
+width = 22
+generations = 400
+queue_depth = 20
 # 10, queue_depth = 2, 37
 # 10, queue_depth = 3, 51
 # 10, queue_depth = 4, 14
@@ -1344,7 +1347,7 @@ ma = OneDCellularAutonomataWallRecursion(
   generations=generations,
   machine_cls=Rule30WithQueueDepth,
   cells_per_generation=width,
-  queue_depth=10,
+  queue_depth=queue_depth,
   )
 #ma = OneDCellularAutonomataWallRecursionUsingAngle(
 #  generations=generations,
@@ -1358,7 +1361,7 @@ ma = OneDCellularAutonomataWallRecursion(
 #csv_filename, movie_filename = nc.build_cache_csv(WallLeftBlackRightBlack,
 #    start_at=4, upto=200)
 #nc.plot_csv(csv_filename)
-filename = "rule_30_white_walls_{}_generations_{}".format(width, generations)
+filename = "rule_30_rec_walls_{}_queue_{}_gen_{}".format(width, queue_depth, generations)
 #ma = OneDCellularAutomataWithAngleDiscovery(
 #  generations=generations,
 #  machine_cls=Rule30,
@@ -1370,14 +1373,25 @@ eco = Canvas(ma)
 eco.run_animation(generations, interval=100)
 movie_filename = '{}.mp4'.format(filename)
 eco.save(movie_filename)
+png = '{}.png'.format(filename)
+eco.save(png)
 
 eco.save('{}.pdf'.format(filename))
 eco.close()
 cmd = 'cmd.exe /C {} &'.format('{}.pdf'.format(filename))
 subprocess.Popen(cmd, shell=True)
 
-#plt.acorr(ma.middle_numbers, usevlines=True, normed=True, maxlags=None, lw=2)
 def autocorrelate(x):
+  '''
+
+  compute the autocorrelation of vector x
+
+  **Args**:
+     | ``x`` (list): a list containing where each element is a 1.0 or 0.0
+
+  **Returns**:
+     (list): the autocorrelation for the list
+  '''
   result = np.correlate(x, x, mode='full')
   # don't include the correletion with itself
   result[result.size//2] = 0
@@ -1397,21 +1411,12 @@ collective_correlations = column_correlations[0]
 for correlation in column_correlations[1:]:
   collective_correlations = np.multiply(collective_correlations, correlation)
 
-
-#max_index = np.argmax(collective_correlations)
-#max_value = collective_correlations[max_index]
-#collective_correlations = np.clip(collective_correlations, 1, max_value)
-#collective_correlations = np.log(collective_correlations)
-
-# the answer is the max_index (it holds the highest energy)
-
 fig = plt.figure()
 autocorrelation_filename = "autocorrection.pdf"
 #plt.plot(pattern_index, collective_autocorrelation_fft_product)
 #plt.plot(pattern_index, cc)
 plt.plot([i for i in range(len(collective_correlations))], collective_correlations)
 plt.savefig(autocorrelation_filename, dpi=300)
-
 
 of_interest = []
 for i in range(10):

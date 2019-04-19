@@ -1128,8 +1128,8 @@ is held within a bounded rectangle. My first guess at what our upper bound is:
 is selected because we are only tracking two colors, black and white.
 
 First things first, let's deal with the n-phenomenon coming from the walls.  We
-have control of the walls, and we have a chaos generator, so let's feed the
-chaos back into the walls.
+have control of the walls, and we have a chaos generator, so let's mine the
+chaos and feed it back into the walls.
 
 .. image:: _static/rule_30_chaos_to_walls_1.svg
     :target: _static/rule_30_chaos_to_walls_1.pdf
@@ -1138,10 +1138,10 @@ chaos back into the walls.
 We can write the colors of our center column into a deque, and use the top two
 colors of this deque to set the color of the walls.  Let's call this deque the
 ``core_colors``.  To begin with we set all of the ``core_colors`` to white, so
-that the walls will remain white for the first ``len(core_colors)`` generations.
-For every ``Next`` event, the ``core_colors`` deque is pushed one spot downward
-into the center of our automata, where it is painted with the color of the core
-at that spot.
+that the walls will remain white for at least the first ``len(core_colors) - 2``
+generations.  For every ``Next`` event, the ``core_colors`` deque is pushed one
+spot downward into the center of our automata, where it is painted with the
+color of the core at that spot.
 
 We will use the last two elements of our ``core_colors`` to determine the color
 of our walls.  These last two spots will act as a 2 digit binary number, holding
@@ -1152,12 +1152,30 @@ onto the walls.
 
 So, how long do we make this ``core_colors`` deque?  My intuition is to feed it
 as much chaos as rule 30 can generate, then feed this back into the automata
-before the n-phenomenon destroys the disorder.
+before the n-phenomenon destroys the disorder.  I predict that we will have a
+very long unique pattern when the length of the center column's deque depth is
+equal to the number of cells from the top to where the n-phenomenon eats away
+the chaos.  I will mark this queue depth estimate with a ``*`` in my data.
 
-Every intuition I have had so far about rule 30 has been wrong, so I'll probably
-be wrong about this too.  I need some way to to disprove my prediction, and I
-can't eye-ball repeating patterns reliably beyond 30 generations, so I will
-adjust the code to inform on it's own periodicity using an autocorrelation.
+.. note::
+
+   You might be asking yourself, "Why don't we pull the chaos from its deepest
+   well: the far right side of the bulk of the rule 30 cells in the body of our
+   automata."  I was originally going to do this, until I saw the effect of the
+   time traveler videos in the previous section.  The cone of causality
+   propagates from the walls.  If we mine the chaos from the right side, there
+   won't be a chance for the rule30 interactions on the right side to feel the
+   effect of the bulk and as a result we will end up with a very narrow feedback
+   loop despite having a deeper deque.  This theory could be tested and
+   disproved, but my program is inefficient and my computer is very slow, so I
+   took the center path.
+
+The length of the unique pattern duration will be too much to measure manually,
+so I will adjust the code to report the unique pattern duration for a specific
+combination of cell width and queue depth.  I'll explain how I
+did this after I present my data and results.
+
+Let's start with the discovered data:
 
 +----------------------+------------+--------------------------+----------+
 | Cell Width and angle | Queue Depth| Unique Pattern Duration  | Repeats? |
@@ -1769,9 +1787,57 @@ adjust the code to inform on it's own periodicity using an autocorrelation.
 |                      | 31         | 4611                     | False    |
 +----------------------+------------+--------------------------+----------+
 
-** means, that there is a kind of n-phenomenon pattern that emerges after some
-time, but before this a nice, richly chaotic pattern existed.
+.. note::
 
+   ``**`` means, that there is a kind of n-phenomenon pattern that emerges after some
+   time, but before this occurs there is a a nice, richly chaotic pattern.
 
+So, my prediction wasn't terrible.  It turns out that as far as guesses
+go, if we set the ``core_color`` deque length to the number of cells from the
+top of the automata to where the n-phenomenon would overtake the chaos (leaving
+the walls white), then you get some decent periodicity.  However, we
+consistently observed that just above my predicted optimal number, there is a
+very large swell in the length of unique pattern duration.
+
+Another strange thing was observed: the length of a unique pattern duration
+increases as we increase the ``core_color`` deque length.  In some cases we seem
+to be getting massive gains with tiny marginal increases in the ``core_color``
+deque length.  Are we getting something from nothing?  No, it turns out you get
+massive increases in the unique pattern duration but you don't have consistent
+chaos in the pattern:  the chaos is marbled with the n-phenomenon.  You can see
+this effect in this video of rule 30 within recursive walls, 12 cells wide, with
+a ``core_color`` deque length of 40, run for 400 generations (settles into a
+loop of 47 cells):
+
+.. raw:: html
+   
+   <center>
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/IiC2OwuSusM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   </center>
+
+There are other incidence were a different repeating pattern emerges after a
+long burst of rich chaos.  The repeating pattern is much more complex than the
+n-phenomenon, but much less complex than its preceding chaos.
+
+For width 22 we see something really cool.  The chaos just stops, there is no
+repetition of a complex pattern, we get to see it once, then never again.  This
+has a nice effect of hiding the pattern's duration from my autocorrelation
+routine.  To measure the duration of the chaos burst I had to manually read it
+from the picture, this was very time consuming.  For width 22, the
+``core_color`` deque is often infected with the n-phenomenon despite our best
+efforts to feed it's chaos into the walls.  Given that this phenomenon was
+discovered within the first 12 tested rectangle widths, it is not unreasonable
+to assume that is a common occurrence; there will probably be a lot of widths and
+queue depth combinations that result in the ultimate destruction of the chaos
+generator.  You can see
+this effect in this video of rule 30 within recursive walls, 22 cells wide, with
+a ``core_color`` deque length of 20, run for 400 generations (one unique pattern
+for 357 cells):
+
+.. raw:: html
+   
+   <center>
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/fUHrhfaaIqw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   </center>
 
 .. [#] Stephen Wolfram (2002). `A New Kind of Science.  <https://www.wolframscience.com/>`_ (p27)
