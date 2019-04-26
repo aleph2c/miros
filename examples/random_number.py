@@ -20,10 +20,110 @@ import os
 import re
 
 from scipy import fft
+from functools import reduce
 
-White   = 0.1
-Default = 0.5
-Black   = 0.9
+White   = 0
+Black   = 1
+
+def build_rule_function(number):
+  if number > 2**8:
+    print('not supported')
+  number_as_binary_string = "{0:b}".format(number)
+  number_as_binary_string = number_as_binary_string.rjust(8, '0')
+  masks = {}
+  masks[0] = number_as_binary_string[7] == '1'
+  masks[1] = number_as_binary_string[6] == '1'
+  masks[2] = number_as_binary_string[5] == '1'
+  masks[3] = number_as_binary_string[4] == '1'
+  masks[4] = number_as_binary_string[3] == '1'
+  masks[5] = number_as_binary_string[2] == '1'
+  masks[6] = number_as_binary_string[1] == '1'
+  masks[7] = number_as_binary_string[0] == '1'
+  def fn(left, middle, right):
+    left_bit = 1 if left else 0
+    middle_bit = 1 if middle else 0
+    right_bit = 1 if right else 0
+    number = left_bit << 2
+    number += middle_bit << 1
+    number += right_bit
+    return masks[number]
+  return fn
+
+
+rule_30_fn = build_rule_function(30)
+assert rule_30_fn(False, False, False) == False
+assert rule_30_fn(False, False, True) == True
+assert rule_30_fn(False, True, False) == True
+assert rule_30_fn(False, True, True) == True
+assert rule_30_fn(True, False, False) == True
+assert rule_30_fn(True, False, True) == False
+assert rule_30_fn(True, True, False) == False
+assert rule_30_fn(True, True, True) == False
+
+# credit agf from stackoverlow
+# https://stackoverflow.com/questions/6800193/what-is-the-most-efficient-way-of-finding-all-the-factors-of-a-number-in-python 
+def factors(n):
+  return set(reduce(list.__add__,
+    ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0 )))
+
+period_lookup = {}
+period_lookup[(10, 4)] = 14
+period_lookup[(10, 5)] = 16
+period_lookup[(10, 6)] = 35
+period_lookup[(10, 7)] = 30
+period_lookup[(10, 8)] = 65
+period_lookup[(10, 9)] = 24
+period_lookup[(10, 10)] = 52
+period_lookup[(10, 11)] = 110
+period_lookup[(10, 12)] = 30
+period_lookup[(10, 13)] = 32
+period_lookup[(11, 4)] = 24
+period_lookup[(11, 5)] = 57
+period_lookup[(11, 6)] = 28
+period_lookup[(11, 7)] = 30
+period_lookup[(11, 8)] = 32
+period_lookup[(11, 9)] = 27
+period_lookup[(11, 10)] = 36
+period_lookup[(11, 11)] = 42
+period_lookup[(11, 12)] = 80
+period_lookup[(11, 13)] = 42
+period_lookup[(11, 14)] = 84
+period_lookup[(11, 15)] = 46
+period_lookup[(11, 16)] = 48
+period_lookup[(11, 17)] = 50
+period_lookup[(11, 18)] = 52
+period_lookup[(12, 4)] = 24
+period_lookup[(12, 5)] = 26
+period_lookup[(12, 6)] = 39
+period_lookup[(12, 7)] = 58
+period_lookup[(12, 8)] = 19
+period_lookup[(12, 9)] = 14
+period_lookup[(12, 10)] = 46
+period_lookup[(12, 11)] = 36
+period_lookup[(12, 12)] = 53
+period_lookup[(12, 13)] = 32
+period_lookup[(12, 14)] = 42
+period_lookup[(13, 10)] = 139
+period_lookup[(13, 15)] = 157
+period_lookup[(13, 21)] = 197
+period_lookup[(14, 3)] = 43
+period_lookup[(14, 4)] = 13
+period_lookup[(14, 9)] = 176
+period_lookup[(14, 10)] = 271
+
+def automata_period(num1, num2):
+  num1 = int(num1)
+  num2 = int(num2)
+  product = num1 * num2
+  divisor = max(factors(num1).intersection(factors(num2)))
+  if divisor == 0:
+    raise("0 illegal in period_lookup")
+  return int(product/divisor)
+
+def periodicity(*args):
+  list_of_variables = args
+  unique_pattern_durations = [period_lookup[(pattern.width, pattern.depth)] for pattern in list_of_variables]
+  return reduce(automata_period, unique_pattern_durations)
 
 class Wall(HsmWithQueues):
 
@@ -143,7 +243,6 @@ class Rule30WithQueueDepth(Rule30):
     #qd = 1
     return qd
 
-
 class OneDCellularAutomata():
   def __init__(self,
       generations,
@@ -232,7 +331,7 @@ class OneDCellularAutomata():
 
   def initial_state(self):
     '''initialize the 2d cellular automata'''
-    Z = np.full([self.generations, self.cells_per_generation], Black, dtype=np.float32)
+    Z = np.full([self.generations, self.cells_per_generation], Black, dtype=np.bool)
 
     # create a collections of unstarted machines
     self.machines = []
@@ -552,20 +651,169 @@ class Canvas():
   def close(self):
     plt.close(self.fig)
 
+class ODCAVariable(OneDCellularAutonomataWallRecursion):
+  def __init__(self, width, depth, generations):
+    self.width = width
+    self.depth = depth
+    super().__init__(
+      generations=generations,
+      machine_cls=Rule30WithQueueDepth,
+      cells_per_generation=width,
+      queue_depth=depth,
+      )
 
-width = 22
-generations = 400
+class ODCAXEquation:
+  def __init__(self, odcavar, generations, width_alg='max'):
+    self.automata = [odcavar]
+    self.width_alg = width_alg
+    self.width = odcavar.width
+    self.max_width = odcavar.width
+    self.min_width = odcavar.width
+    self.generations = generations
+
+  def load(self, odcarvar):
+    self.automata.append(odcarvar)
+    # the max_width is the maximum max_width
+    self.max_width = max([automata.cells_per_generation for automata in self.automata])
+    self.min_width = min([automata.cells_per_generation for automata in self.automata])
+    self.width = self.max_width if self.width_alg == 'max' else self.min_width
+
+  def __xor__(self, vector):
+    self.load(vector)
+    return self
+
+  def pad_width_to_max(self, vector):
+    '''Wrap pad a row in the provided vector
+
+    **Note**:
+       Do this not that recommendation
+
+    **Args**:
+       | ``vector`` (1d ndarray): The vector row you want to pad
+
+    **Returns**:
+       (1d ndarray): The vector padded so that its width is self.width.  The
+       begging part of the vector is placed on the end until the row width of
+       the vector is equal to the self.width of this obj
+    '''
+    padding_needed = self.max_width - vector.size
+    if padding_needed > 0:
+      # keep all the rows and get rid of the first columns added by the pad command
+      result = np.lib.pad(vector, (0, padding_needed), mode='wrap')
+    else:
+      result = vector
+    return result
+
+
+  def trim_width_to_min(self, vector):
+    size_needed = vector.size - (vector.size - self.min_width)
+    result = vector[0:size_needed]
+    return result
+
+  def initial_state(self):
+    '''initialize the 2d cellular automata'''
+
+    if self.width_alg == 'max':
+      self.for_pattern_search = [[] for i in range(self.max_width)]
+      self.Z = np.full([self.generations, self.max_width], Black, dtype=np.bool)
+    else:
+      self.for_pattern_search = [[] for i in range(self.min_width)]
+      self.Z = np.full([self.generations, self.min_width], Black, dtype=np.bool)
+
+  def make_generation_coroutine(self):
+
+    def xor_row(row1, row2):
+      if self.width_alg == 'max':
+        padded_row1 = self.pad_width_to_max(row1)
+        padded_row2 = self.pad_width_to_max(row2)
+      else:
+        padded_row1 = self.trim_width_to_min(row1)
+        padded_row2 = self.trim_width_to_min(row2)
+      return np.bitwise_xor(padded_row1, padded_row2)
+
+    # to multiply on variable's current generation by another 
+    # self.for_pattern_search = [[] for i in range(self.automata[0].cells_per_generation)]
+    self.initial_state()
+    [obj.initial_state() for obj in self.automata]
+    # pull the last row vector out of each automata and make a list of vectors
+    # multiply each of these vectors together for the row_result
+    g = self.automata[0].generation
+    self.row_result = reduce(xor_row, [obj.Z[g, :] for obj in self.automata])
+    self.Z[0, :] = self.row_result
+    self.generation = self.automata[0].generation
+    yield self.Z
+    while True:
+      [obj.next_generation() for obj in self.automata]
+      # pull the last row vector out of each automata and make a list of vectors
+      # multiply each of these vectors together for the row_result
+      g = self.automata[0].generation
+      self.row_result = reduce(xor_row, [obj.Z[g+1, :] for obj in self.automata])
+      self.Z[g+1, :] = self.row_result
+      self.generation = self.automata[0].generation
+      row_number = self.generation + 1
+      for col_number in range(self.Z.shape[1]):
+        cell_color = self.Z[row_number, col_number]
+        self.for_pattern_search[col_number].append(1.0 if abs(cell_color - Black)<0.01 else 0.0)
+      yield self.Z
+
+
+
+width       = 11
 queue_depth = 20
+generations = 5000
 
+# 16 * 28 * 26 = 11648
+# 16 * 39 = 624
+# 35 * 39 = 1366
+# 10, 4: 14
+# 10, 5: 16
+# 10, 6: 35
+# 11, 4: 24
+# 11, 5: 57
+# 11, 6: 28
+# 12, 5: 26
+# 13, 4: 9
+# 13, 5: 12
+# 13, 6: 46
+# (10, 5)^(10, 6) = 560
+# (11, 5)^(11, 6) = 1596
+# (10, 5)^(11, 5) = 912
+# (10, 6)^(11, 6) = 980
+# (10, 5)^(13, 5) = 192
+# (10, 5)^(13, 5) = 48
+# (10, 5)^(13, 5)^(11, 5) = 16*12*57 = 10944 (too big to see), but 912
+# 10944/912 -> 12
+# (10, 4)^(11, 4)^(13^4) = 14*24*9 = 3024
+# 2*7 2*2*2*3 3*3
+# changing the order didn't increase the periodicity
+# 456
+# (10, 5)^(13, 5)^(11, 5)^(12, 5) = 456
+# 16, 12, 57, 26 ?-> 456
 
-ma = OneDCellularAutonomataWallRecursion(
-  generations=generations,
-  machine_cls=Rule30WithQueueDepth,
-  cells_per_generation=width,
-  queue_depth=queue_depth,
-  )
-filename = "rule_30_rec_walls_{}_queue_{}_gen_{}".format(width, queue_depth, generations)
-eco = Canvas(ma)
+a = ODCAVariable(width=10, depth=4, generations=generations)
+b = ODCAVariable(width=10, depth=5, generations=generations)
+c = ODCAVariable(width=10, depth=12, generations=generations)
+d = ODCAVariable(width=12, depth=5, generations=generations)
+
+equation = ODCAXEquation(a, generations=generations, width_alg='min')
+equation ^= b
+equation ^= c
+
+#print(periodicity(a, b, c))
+print(periodicity(a, b, c, d))
+exit(0)
+
+#equation ^= d
+
+#ma = OneDCellularAutonomataWallRecursion(
+#  generations=generations,
+#  machine_cls=Rule30WithQueueDepth,
+#  cells_per_generation=width,
+#  queue_depth=queue_depth,
+#  )
+
+filename = "equation_rec_walls_{}_queue_{}_gen_{}".format(width, queue_depth, generations)
+eco = Canvas(equation)
 eco.run_animation(generations, interval=100)
 movie_filename = '{}.mp4'.format(filename)
 eco.save(movie_filename)
@@ -598,8 +846,9 @@ def autocorrelate(x):
 # as to find where the real pattern repetitions take place
 max_c_indexs = []
 column_correlations = []
+width = equation.width
 for i in range(width):
-  column_correlations.append(autocorrelate(ma.for_pattern_search[i]))
+  column_correlations.append(autocorrelate(equation.for_pattern_search[i]))
   max_index = np.argmax(column_correlations[-1])
   max_c_indexs.append(max_index)
 
