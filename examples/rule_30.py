@@ -1037,9 +1037,9 @@ class Canvas():
 
 
 #width = 22
-width = 22
+width = 10
 generations = 400
-queue_depth = 20
+queue_depth = 3 
 # 10, queue_depth = 2, 37
 # 10, queue_depth = 3, 51
 # 10, queue_depth = 4, 14

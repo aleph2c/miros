@@ -67,6 +67,7 @@ def factors(n):
     ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0 )))
 
 period_lookup = {}
+period_lookup[(10, 3)] = 51
 period_lookup[(10, 4)] = 14
 period_lookup[(10, 5)] = 16
 period_lookup[(10, 6)] = 35
@@ -176,13 +177,27 @@ class WallLeftBlackRightBlack(Wall):
   left_wall = fake_black
   right_wall = fake_black
 
-class Rule30(Wall):
+class Rule(Wall):
+  def __init__(self, name='cell'):
+    super().__init__(name)
+    self.left = None
+    self.right = None
+    self.color = None
+
+  def result(self, left, middle, right):
+    inputs_as_bool = [True if cell.color == 'black' else False for cell in [left, middle, right]]
+    output_as_bool = self.rule_fn(*inputs_as_bool)
+    output_as_color = 'black' if output_as_bool else 'white'
+    return output_as_color
+
+class Rule30(Rule):
 
   def __init__(self, name='cell'):
     super().__init__(name)
     self.left = None
     self.right = None
     self.color = None
+    self.rule_fn = build_rule_function(30)
 
 def white(cell, e):
   status = return_status.UNHANDLED
@@ -191,13 +206,19 @@ def white(cell, e):
     cell.color = 'white'
     status = return_status.HANDLED
   elif(e.signal == signals.Next):
-    if((cell.right.color == 'black' and
-        cell.left.color == 'white') or 
-       (cell.right.color == 'white' and
-        cell.left.color == 'black')):
+    next_color = cell.result(cell.left, cell, cell.right)
+    if next_color == 'black':
       status = cell.trans(black)
     else:
       status = return_status.HANDLED
+
+    #if((cell.right.color == 'black' and
+    #    cell.left.color == 'white') or 
+    #   (cell.right.color == 'white' and
+    #    cell.left.color == 'black')):
+    #  status = cell.trans(black)
+    #else:
+    #  status = return_status.HANDLED
   else:
     cell.temp.fun = cell.top
     status = return_status.SUPER
@@ -210,7 +231,8 @@ def black(cell, e):
     cell.color = 'black'
     status = return_status.HANDLED
   elif(e.signal == signals.Next):
-    if cell.left.color == 'black':
+    next_color = cell.result(cell.left, cell, cell.right)
+    if next_color == 'white':
       status = cell.trans(white)
     else:
       status = return_status.HANDLED
@@ -756,11 +778,43 @@ class ODCAXEquation:
         self.for_pattern_search[col_number].append(1.0 if abs(cell_color - Black)<0.01 else 0.0)
       yield self.Z
 
+# Goal, for a given width, find the optimal queue depth:
+# 
+# Need a new class that can detect it's own periodicity using two masks.  We
+# have done both before, so you will have to dig into your old code and find:
+# * mask1 for finding the n-phenomenon across the bulk
+# * mask2 (new) for finding the n-phenomenon at the middle point
+# * size of the queue length
 
+# Goal, for a given width and queue depth, find the recursive wall object's
+# periodicity
+#
+# Create another class that can make itself based on either provided parameters
+# or by building the previous object to find it's queue length.  The resulting
+# object will be used to build recursive wall objects.
+# 
+# Create another class that can find the periodicity of the previous object, or
+# find if it has petered out by masking for the n-phenomenon
+#
+
+# Build a table, which will have a maximum size and will grow by one when it has
+# run out of periodicity.  When it needs to drop a number, it will drop the
+# number that is the smallest non-prime
+
+# The table will be used to figure out which combinations of machines should be
+# xor'd together.  Look at set hacking to get an idea about how this will be
+# done, the new pioneered number will be combined with every other item in the
+# list, with a number of picks == round(len(table)/2)
+
+# question, does the n-phenomenon express itself exactly the same in reverse?
+# rule 135
+
+# Since the entropy generator will need access to computation, turn it into a
+# daemon and have it send entropy back to the main process
 
 width       = 11
 queue_depth = 20
-generations = 5000
+generations = 380
 
 # 16 * 28 * 26 = 11648
 # 16 * 39 = 624
@@ -790,27 +844,29 @@ generations = 5000
 # (10, 5)^(13, 5)^(11, 5)^(12, 5) = 456
 # 16, 12, 57, 26 ?-> 456
 
-a = ODCAVariable(width=10, depth=4, generations=generations)
+a = ODCAVariable(width=10, depth=3, generations=generations)
 b = ODCAVariable(width=10, depth=5, generations=generations)
-c = ODCAVariable(width=10, depth=12, generations=generations)
-d = ODCAVariable(width=12, depth=5, generations=generations)
+#c = ODCAVariable(width=10, depth=12, generations=generations)
+#d = ODCAVariable(width=12, depth=5, generations=generations)
 
+# commutative (order) indifferent
+# associative (grouping) indifferent
 equation = ODCAXEquation(a, generations=generations, width_alg='min')
 equation ^= b
-equation ^= c
+#equation ^= c
 
-#print(periodicity(a, b, c))
-print(periodicity(a, b, c, d))
-exit(0)
+print(periodicity(a, b))
+#print(periodicity(a, b, c, d))
+#exit(0)
 
 #equation ^= d
 
-#ma = OneDCellularAutonomataWallRecursion(
-#  generations=generations,
-#  machine_cls=Rule30WithQueueDepth,
-#  cells_per_generation=width,
-#  queue_depth=queue_depth,
-#  )
+ma = OneDCellularAutonomataWallRecursion(
+  generations=generations,
+  machine_cls=Rule30WithQueueDepth,
+  cells_per_generation=width,
+  queue_depth=queue_depth,
+  )
 
 filename = "equation_rec_walls_{}_queue_{}_gen_{}".format(width, queue_depth, generations)
 eco = Canvas(equation)
