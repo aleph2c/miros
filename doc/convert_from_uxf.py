@@ -13,6 +13,28 @@ from pathlib import PurePath
 
 Windows_Path_To_UMLet = r'C:\Users\lincoln\Desktop\Umlet\umlet.exe'
 
+def shell_cmd(cmd, timeout=None, output_file=None):
+  if timeout is None:
+    timeout = 10
+    try:
+      cmd_as_list = shlex.split(cmd)
+      if output_file:
+        output = subprocess.run(
+        cmd_as_list,
+        stdout=open(output_file, "w"),
+        timeout=timeout,
+        check=True)
+      else:
+        output = subprocess.run(
+          cmd_as_list,
+          timeout=timeout,
+          check=True)
+    except TimeoutExpired:
+      raise
+    except CalledProcessError:
+      raise
+  return output
+
 def convert_uxf_to_other_format(filename, convertion_type):
   '''
   Uses the umlet command line to convert an umlet drawing into another format.
@@ -41,10 +63,16 @@ def convert_uxf_to_other_format(filename, convertion_type):
 
   basename = Path(filename).resolve().stem
   basepath = str(path.parents[0])
-  shutil.move(
-    basepath + '/' + basename + ".uxf.{}".format(convertion_type),
-    basepath + '/' + basename + '.{}'.format(convertion_type)
-  )
+  try:
+    # old version of umlet mislabel files, here we name them what they should be
+    # named
+    shutil.move(
+      basepath + '/' + basename + ".uxf.{}".format(convertion_type),
+      basepath + '/' + basename + '.{}'.format(convertion_type)
+    )
+  except:
+    pass
+
 
 class Handler(watchdog.events.PatternMatchingEventHandler):
   '''
