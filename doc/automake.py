@@ -13,7 +13,7 @@ from collections import deque
 from threading import Thread
 
 with open("automakeconfig.yaml") as f:
-  config = yaml.load(f)
+  config = yaml.load(f, yaml.FullLoader)
 
 class Handler(watchdog.events.PatternMatchingEventHandler):
 
