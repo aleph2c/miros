@@ -14,10 +14,7 @@ To install:
 
 .. code-block:: bash
 
-  python3 -m venv
-  . ./venv/bin/activate
   pip install miros
-
 
 Miros has been tested on Python 3.5 and is only dependent upon the Python
 standard library.

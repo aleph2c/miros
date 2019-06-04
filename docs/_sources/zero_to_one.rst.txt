@@ -1,9 +1,10 @@
 .. _zero_to_one-zero-to-one:
 
-  *Begin.  To Begin is half the work, let half still remain; again begin this,
-  and thou wilt have finished.*
+  *You should focus relentlessly on something that you're good at doing, but
+  before that you must think hard about whether it will be valuable in the
+  future.*
 
-  -- Marcus Aurelius
+  -- Peter Thiel, Zero to One: Notes on Startups, or How to build the Future
 
 .. role:: dead_spec
   :class: dead_spec

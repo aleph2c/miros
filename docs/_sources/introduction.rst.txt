@@ -10,55 +10,89 @@
 
 Introduction
 ============
-Miros is a statechart library written in Python.  A statechart is a hierarchical
-state machine (HSM), running within it's own thread.  If you program using
-statecharts, you will have the ability to :ref:`quickly translate your design goals into working and robust code <quick-start>`.
+Miros is a statechart library written in Python.  A statechart is a
+`hierarchical state machine (HSM)
+<https://en.wikipedia.org/wiki/UML_state_machine>`_, running within it's own
+thread.  If you program using statecharts, you will have the ability to :ref:`quickly
+translate your design goals into robust working code <quick-start>`.
 
-An HSM follows an intuitive set of rules called the `Harel formalism
-<http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf>`_.
-This formalism was invented by the mathematician, Dr. David Harel in the 1980s
-to help the Israeli air force construct better software for their jet fighters.
+The problem with most software systems is that they are too complex to
+understand without a picture.  The lion's share of a programmer's time is spent
+troubleshooting their software, instead of adding working features.  This
+is because it's difficult to see how a specific portion of code interacts with
+the overall design.  Most developers are in the dark, armed only with a flashlight.
 
-His innovation was to take the sentences that you would find in a specification
-and quickly translate them into an easily understood picture.
+Let's turn the light on.  We can start by drawing pictures in a way that we can
+see the full system at once while allowing other people to understand our
+thinking.  The pictures will guide how we write our code.
 
-These pictures reduce the cognitive load you experience while designing and
-building your system.  Think about how hard it would be to perform a double
-digit multiplication problem using Roman numerals, whereas the same problem can
-effortlessly be done by a child in grade 3 using Arabic numbers.  A hard
-problem can be transformed into an easy problem by using the correct type of
-abstraction.
+But we tried this before in the 1990s with `UML (Universal Modeling Language)
+<https://en.wikipedia.org/wiki/Unified_Modeling_Language>`_.  The group behind
+this movement promised systems understanding through pictures.  To do this they
+pulled together 14 different ways that people were drawing software systems
+under one standard.
 
-If you use this library you do not have to write your own state-machine event
-processing engine.  It is provided, batteries included.  The library is named,
-miros, in honour of the person who wrote it's HSM event processing algorithm,
-used by its event processing engine; `Dr. Miro Samek`_.
+Then the movement lost momentum, because they drew the wrong pictures: they
+emphasized class diagrams instead of statechart diagrams.  Then they tried to
+take over programming entirely with pictures, instead of letting the pictures
+act as guidance for thinking and communicating designs.  They ended up
+separating the people who drew pictures from the people who wrote the code.  The
+language around diagramming techniques became so flowery that only the people
+drawing the images understood what they meant.
 
+But amoungst the rubble of this failed movement are some useful gems.  In this
+documentation we will use the good parts of UML.  We won't become enamored with
+our pictures, but keep them small and easy to change.
+
+To use this library is to program in Python, not pictures; so there is no
+picture-to-code compiler here.  This means you can use whatever picture drawing
+technology you want, from a napkin to `UMLet`_... it's up to you.
+
+We will learn some simple, formal rules for drawing statecharts. These drawing
+rules will help us draw our ideas with a picture and then link that picture to
+our code.  The same rules will describe how our code is expected to interact
+with the world.  These statechart drawing and behavioral rules are called the
+`Harel formalism
+<http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf>`_,
+named after `Dr. David Harel`_, a mathematician who invented the statechart in
+1987 at the request of the Israeli airforce.  The statechart picture is only 1
+of the 14 UML drawing types.
+
+In the early 2000s `Dr. Miro Samek`_ implemented a statechart framework in
+c/C++.  As a firmware developer Dr. Samek ran into the tight memory and
+processing constraints that confine a developer while they write code for small
+processors.  He refactored the Harel formalism to be more performant and then he
+published a core part of the algorithm that lets a statechart designer translate
+their picture into working code: the event processing algorithm.
+
+This library uses Miros Samek's event processing algorithm and this is why it is
+called miros.
 
 .. note:: 
 
-  In fact the whole miros library has been constructed to help send some
-  business Miro's way.  He runs an embedded consulting company call Quantum
-  Leaps.  If you write code using this library, it should be fairly straight
-  forward to port it to c/C++ if you would like to transfer your design to his
-  `QP framework`_ (for a huge performance gain).
+  If you would like to translate your design into Miro Samek's `QP framework`_
+  (for a huge performance gain), it should be fairly straight forward to port
+  your Python code to c/C++.
 
-The miros package is not a drawing tool.  It is a way to express your drawings
-as running software.  There are a lot of open source drawing tools that can be
-used to draw your statecharts.  I use a tool called `UMLet`_.
+As the author of this library I can't expect you to know UML.  So I will include
+instructions on how to draw enough of these pictures to help guide your
+thinking.
+
+I will explain how statecharts work, and what they are, then I will show you how
+to use this library to program with them.
 
 This package is only dependent upon the Python standard library.
 
-I have tried to document this project so that you can learn how to:
+From this documentation you can learn how to:
+  * understand how statecharts work
   * translate your design goals into statechart pictures
-  * program these pictures in Python so that they will use the Harel
-    formalism.
-  * use the various statechart patterns, or idioms.
+  * quickly look up the specifics about how to do something
+  * have a set of examples to work from
   * reflect upon the behavior of your state machines
+  * test your code
   * create federations of statecharts that work together
-  * to test your work
 
-If you would like to network your statechart, you can use the `miros-rabbitmq
+If you would like to network your statecharts, you can use the `miros-rabbitmq
 <https://aleph2c.github.io/miros-rabbitmq/index.html>`_ plugin.
 
 .. raw:: html
@@ -72,7 +106,7 @@ If you would like to network your statechart, you can use the `miros-rabbitmq
 .. _QP framework: http://www.state-machine.com/
 .. _Dr. Miro Samek: https://www.linkedin.com/in/samek
 .. _UMLet: http://www.umlet.com
-
+.. _Dr. David Harel: https://en.wikipedia.org/wiki/David_Harel
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
