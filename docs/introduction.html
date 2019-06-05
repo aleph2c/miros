@@ -46,31 +46,36 @@
 <div class="section" id="introduction">
 <span id="introduction-introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <p>Miros is a statechart library written in Python.  A statechart is a
-<a class="reference external" href="https://en.wikipedia.org/wiki/UML_state_machine">hierarchical state machine (HSM)</a>, running within it’s own
+<a class="reference external" href="https://en.wikipedia.org/wiki/UML_state_machine">hierarchical state machine (HSM)</a>, running within its own
 thread.  If you program using statecharts, you will have the ability to <a class="reference internal" href="quickstart.html#quick-start"><span class="std std-ref">quickly
-translate your design goals into robust working code</span></a>.</p>
+translate your design goals into robust, understandable, working code</span></a>.</p>
 <p>The problem with most software systems is that they are too complex to
 understand without a picture.  The lion’s share of a programmer’s time is spent
-troubleshooting their software, instead of adding working features.  This
+troubleshooting the behavior of their software, instead of adding working features.  This
 is because it’s difficult to see how a specific portion of code interacts with
 the overall design.  Most developers are in the dark, armed only with a flashlight.</p>
-<p>Let’s turn the light on.  We can start by drawing pictures in a way that we can
+<p>Let’s turn the lights on.  We can start by drawing pictures in a way that we can
 see the full system at once while allowing other people to understand our
 thinking.  The pictures will guide how we write our code.</p>
 <p>But we tried this before in the 1990s with <a class="reference external" href="https://en.wikipedia.org/wiki/Unified_Modeling_Language">UML (Universal Modeling Language)</a>.  The group behind
 this movement promised systems understanding through pictures.  To do this they
 pulled together 14 different ways that people were drawing software systems
-under one standard.</p>
-<p>Then the movement lost momentum, because they drew the wrong pictures: they
-emphasized class diagrams instead of statechart diagrams.  Then they tried to
-take over programming entirely with pictures, instead of letting the pictures
-act as guidance for thinking and communicating designs.  They ended up
-separating the people who drew pictures from the people who wrote the code.  The
-language around diagramming techniques became so flowery that only the people
-drawing the images understood what they meant.</p>
-<p>But amoungst the rubble of this failed movement are some useful gems.  In this
-documentation we will use the good parts of UML.  We won’t become enamored with
-our pictures, but keep them small and easy to change.</p>
+into one standard.</p>
+<p>Then the movement lost momentum, because <em>they drew the wrong pictures</em>: they
+emphasized class diagrams without statechart diagrams.</p>
+<p>A class diagram only shows how code is structured, but a statechart diagram
+tells you how code will <em>behave</em>.</p>
+<a class="reference external image-reference" href="_static/intro_1.pdf"><div align="center" class="align-center"><img alt="_images/intro_1.svg" src="_images/intro_1.svg" /></div>
+</a>
+<p>It is easy to manifest a class diagram in Python, since Python is an object
+oriented programming language.  But how to you create the code that is described
+by a behavioral statechart diagram?  Well, that’s the point of this library: it
+provides you with the syntax, threading and queuing infrastructure needed to
+make it work.</p>
+<p>UML never really went away.  Let’s use their theory, let’s use their tooling and
+let’s learn from their mistakes:  We won’t become enamored with our pictures,
+but keep them small, useful and easy to change.  We won’t separate the person
+who draws and understands the picture, from the person implementing it in code.</p>
 <p>To use this library is to program in Python, not pictures; so there is no
 picture-to-code compiler here.  This means you can use whatever picture drawing
 technology you want, from a napkin to <a class="reference external" href="http://www.umlet.com">UMLet</a>… it’s up to you.</p>
@@ -80,8 +85,7 @@ our code.  The same rules will describe how our code is expected to interact
 with the world.  These statechart drawing and behavioral rules are called the
 <a class="reference external" href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">Harel formalism</a>,
 named after <a class="reference external" href="https://en.wikipedia.org/wiki/David_Harel">Dr. David Harel</a>, a mathematician who invented the statechart in
-1987 at the request of the Israeli airforce.  The statechart picture is only 1
-of the 14 UML drawing types.</p>
+1987.  The statechart picture is only 1 of the 14 UML drawing types.</p>
 <p>In the early 2000s <a class="reference external" href="https://www.linkedin.com/in/samek">Dr. Miro Samek</a> implemented a statechart framework in
 c/C++.  As a firmware developer Dr. Samek ran into the tight memory and
 processing constraints that confine a developer while they write code for small
@@ -96,26 +100,24 @@ called miros.</p>
 (for a huge performance gain), it should be fairly straight forward to port
 your Python code to c/C++.</p>
 </div>
-<p>As the author of this library I can’t expect you to know UML.  So I will include
-instructions on how to draw enough of these pictures to help guide your
-thinking.</p>
-<p>I will explain how statecharts work, and what they are, then I will show you how
-to use this library to program with them.</p>
+<p>I can’t expect you to know UML.  So I will include instructions on how to draw
+enough of these pictures to help guide your thinking.</p>
+<p>I will explain how statecharts work, and what they are in detail, then I will
+show you how to use this library to program with them.</p>
 <p>This package is only dependent upon the Python standard library.</p>
-<dl class="docutils">
-<dt>From this documentation you can learn how to:</dt>
-<dd><ul class="first last simple">
-<li>understand how statecharts work</li>
-<li>translate your design goals into statechart pictures</li>
+<p>From this documentation you can learn how to:</p>
+<ul class="simple">
+<li>understand the Harel-Miro statechart formalism (drawing rules and meaning)</li>
+<li>understand how to design systems with statechart diagrams</li>
+<li>understand how the event processor works</li>
 <li>quickly look up the specifics about how to do something</li>
-<li>have a set of examples to work from</li>
+<li>find an example to work from</li>
 <li>reflect upon the behavior of your state machines</li>
 <li>test your code</li>
-<li>create federations of statecharts that work together</li>
+<li>create concurrent statecharts that work together</li>
 </ul>
-</dd>
-</dl>
-<p>If you would like to network your statecharts, you can use the <a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq</a> plugin.</p>
+<p>If you would like to link your statecharts across a computer network (for IOT
+applications), you can use the <a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq</a> plugin.</p>
 <a class="reference internal" href="installation.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="quickstart.html"><span class="std std-ref">next</span></a><div class="toctree-wrapper compound">
 </div>
 </div>
