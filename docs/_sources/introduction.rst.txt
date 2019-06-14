@@ -48,10 +48,11 @@ by a behavioral statechart diagram?  Well, that's the point of this library: it
 provides you with the syntax, threading and queuing infrastructure needed to
 make it work.
 
-UML never really went away.  Let's use their theory, let's use their tooling and
-let's learn from their mistakes:  We won't become enamored with our pictures,
-but keep them small, useful and easy to change.  We won't separate the person
-who draws and understands the picture, from the person implementing it in code.
+UML never really went away.  So, let's use their theory, let's use their tooling
+and let's learn from their mistakes:  We won't become enamored with our
+pictures, but keep them small, useful and easy to change.  We won't separate the
+person who draws and understands the picture, from the person implementing it in
+code.
 
 To use this library is to program in Python, not pictures; so there is no
 picture-to-code compiler here.  This means you can use whatever picture drawing

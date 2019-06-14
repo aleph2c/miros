@@ -1291,8 +1291,130 @@ reaction to it.</p>
 </div>
 </div>
 </div>
+<div class="section" id="getting-information-from-your-statechart">
+<h2>Getting Information from your Statechart<a class="headerlink" href="#getting-information-from-your-statechart" title="Permalink to this headline">¶</a></h2>
+<p>You will find yourself in situations where you would like to read information
+that has asynchronously been gathered by your statechart from your main program.
+This may happen if you have built a statechart to monitor an external device, or
+to listen to pricing signals coming in from the internet, or to track the
+weather… whatever your application, there will be times when you want the
+synchronous part of your program, main, to get information from the
+asynchronous part of your program, the statechart.</p>
+<p>But, your main program and your statechart run in different threads.  If they share a
+global variable, and one thread writes to it while the other thread reads from
+the variable, or they both partially write to the same variable at the same
+time, you have created an extremely pernicious bug called a ‘race condition’.</p>
+<p>These kinds of bugs do not behave deterministicly, because the timing between
+your threads is managed by the OS in a layer of the system you have no
+visibility into.  Worse yet, they can happen very infrequently and leave very
+little evidence for why your program failed.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you would like to share information between statecharts, you have the same
+thread sharing problem; but it is mostly solved by the framework
+(publish/subscribe with namedtuples (immutable objects).  The namedtuples
+carrying your payload.</p>
+</div>
+<p>If you would like to share information between different threads you can use a
+“Threadsafe data type” like a Queue or a deque.  In this recipe I’ll show a
+simple example of the main program calling a statechart’s object method, the
+statechart will serve up information it got asynchronously to this method as
+if it were captured in a synchronous manner.</p>
+<p>Here is a picture of our design:</p>
+<a class="reference external image-reference" href="_static/sharing_information.pdf"><div align="center" class="align-center"><img alt="_images/sharing_information.svg" src="_images/sharing_information.svg" /></div>
+</a>
+<p>The <code class="docutils literal notranslate"><span class="pre">SimpleAsyncExample</span></code> statechart is built with the miros Factory.  The
+statechart within the <code class="docutils literal notranslate"><span class="pre">SimpleAcyncExample</span></code> asynchronously posts information to
+itself every 0, 1, or 2 seconds. The main part of the program creates a
+<code class="docutils literal notranslate"><span class="pre">SimpleAcyncExample</span></code> which starts a statechart running in a separate thread.
+Main then waits three seconds and then calls the <code class="docutils literal notranslate"><span class="pre">SimpleAsyncExample</span></code>’s
+synchronous <code class="docutils literal notranslate"><span class="pre">get_weather</span></code> method which can return, ‘raining’, ‘sunny’ or
+‘snowing’.</p>
+<p>Here is the code (asynchronous parts highlighted):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+<span class="n">WeatherReport</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;WeatherReport&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;latest&#39;</span><span class="p">])</span>
+
+<span class="k">class</span> <span class="nc">SimpleAcyncExample</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+
+  <span class="n">Name</span> <span class="o">=</span> <span class="s1">&#39;weather_reader&#39;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span> <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">SimpleAcyncExample</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">weather</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_queue</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">watch_external_weather_api</span> <span class="o">=</span> \
+      <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;watch_external_weather_api&quot;</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+          <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">watch_external_weather_api_entry</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">weather_report</span><span class="p">,</span>
+          <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">watch_external_weather_api_weather_report</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">watch_external_weather_api</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">watch_external_weather_api</span><span class="p">)</span>
+</span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">watch_external_weather_api_entry</span><span class="p">(</span><span class="n">weather</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="c1"># weather is like self in a typical method</span>
+</span><span class="hll">    <span class="n">weather</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;raining&#39;</span><span class="p">,</span> <span class="s1">&#39;sunny&#39;</span><span class="p">,</span> <span class="s1">&#39;snowing&#39;</span><span class="p">]</span>
+</span><span class="hll">    <span class="n">index_and_time_delay</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">weather</span><span class="o">.</span><span class="n">choices</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span><span class="hll">
+</span><span class="hll">    <span class="c1"># post a fake weather report 0, 1, or 2 seconds from now</span>
+</span><span class="hll">    <span class="n">weather</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+</span><span class="hll">      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">weather_report</span><span class="p">,</span>
+</span><span class="hll">        <span class="n">payload</span><span class="o">=</span>
+</span><span class="hll">          <span class="n">WeatherReport</span><span class="p">(</span><span class="n">latest</span><span class="o">=</span><span class="n">weather</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="n">index_and_time_delay</span><span class="p">])),</span>
+</span><span class="hll">      <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+</span><span class="hll">      <span class="n">period</span><span class="o">=</span><span class="n">index_and_time_delay</span><span class="p">,</span>
+</span><span class="hll">      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class="hll">
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">watch_external_weather_api_weather_report</span><span class="p">(</span><span class="n">weather</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="n">weather</span><span class="o">.</span><span class="n">thread_safe_queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">latest</span><span class="p">)</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+  <span class="k">def</span> <span class="nf">get_weather</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_queue</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">LookupError</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_queue</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+  <span class="c1"># create and start the asynchronous part of our program</span>
+  <span class="n">tracker</span> <span class="o">=</span> <span class="n">SimpleAcyncExample</span><span class="p">(</span><span class="s1">&#39;weather_tracker&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="c1"># [07:36:47.80] [weather_tracker] e-&gt;start_at() top-&gt;watch_external_weather_api</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+  <span class="c1"># have the synchronous part of our program get information from the</span>
+  <span class="c1"># asynchronous part of our program</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">tracker</span><span class="o">.</span><span class="n">get_weather</span><span class="p">())</span>  <span class="c1">#=&gt; sunny</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="multiple-statecharts">
-<span id="recipes-multiple-statecharts"></span><span id="seeing-what-is-going-on"></span><h2>Multiple Statecharts<a class="headerlink" href="#multiple-statecharts" title="Permalink to this headline">¶</a></h2>
+<span id="recipes-multiple-statecharts"></span><h2>Multiple Statecharts<a class="headerlink" href="#multiple-statecharts" title="Permalink to this headline">¶</a></h2>
 <p>Break your design down into different interacting charts by using the
 ActiveFabric.</p>
 <p>The active fabric is a set of background tasks which act together to dispatch
@@ -1387,8 +1509,8 @@ are given a priority of 1000.  If two events have the same priority the queue
 will behave like a first in first out queue.</p>
 </div>
 </div>
-<div class="section" id="recipes-seeing-what-is">
-<span id="id5"></span><h2>Seeing What is Going On<a class="headerlink" href="#recipes-seeing-what-is" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="seeing-what-is-going-on">
+<span id="recipes-seeing-what-is"></span><h2>Seeing What is Going On<a class="headerlink" href="#seeing-what-is-going-on" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="determining-the-current-state">
 <span id="recipes-determining-the-current-state"></span><h3>Determining the Current State<a class="headerlink" href="#determining-the-current-state" title="Permalink to this headline">¶</a></h3>
 <p>To see what state your chart is in:</p>
@@ -1933,7 +2055,7 @@ a trace output as the target for a regression test, you would:</p>
 <li>Run your program and print your trace to the output.</li>
 <li>Copy this trace as the target behavior of your test.</li>
 <li>Run this trace target and the future output of the statechart trace through
-the <a class="reference internal" href="reflection.html#stripped-example"><span class="std std-ref">stripped context manager</span></a> to remove the date
+the <a class="reference internal" href="#stripped-example"><span class="std std-ref">stripped context manager</span></a> to remove the date
 timestamp information.</li>
 <li>Compare your target with the results.</li>
 </ol>
@@ -2109,12 +2231,13 @@ specification.</p>
 <li><a class="reference internal" href="#determining-if-an-event-has-a-payload">Determining if an Event Has a Payload</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#getting-information-from-your-statechart">Getting Information from your Statechart</a></li>
 <li><a class="reference internal" href="#multiple-statecharts">Multiple Statecharts</a><ul>
 <li><a class="reference internal" href="#subscribing-to-an-event-posted-by-another-active-object">Subscribing to an Event Posted by Another Active Object</a></li>
 <li><a class="reference internal" href="#publishing-events-to-other-active-objects">Publishing events to other Active Objects</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#recipes-seeing-what-is">Seeing What is Going On</a><ul>
+<li><a class="reference internal" href="#seeing-what-is-going-on">Seeing What is Going On</a><ul>
 <li><a class="reference internal" href="#determining-the-current-state">Determining the Current State</a></li>
 <li><a class="reference internal" href="#seeing-what-signals-you-have-in-your-system">Seeing what Signals You Have In Your System</a></li>
 <li><a class="reference internal" href="#using-the-trace">Using the Trace</a></li>

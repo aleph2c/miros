@@ -8,7 +8,6 @@ Recipes
    :maxdepth: 2
    :caption: Contents:
 
-
 .. _recipes-states:
 
 States
@@ -1286,9 +1285,140 @@ To determine if an event has a payload:
   assert(e1.has_payload() == True)
   assert(e2.has_payload() == False)
 
-.. _seeing_what_is_going_on:
+
+.. _recipes-getting-information-from-your-statecchart
+
+Getting Information from your Statechart
+----------------------------------------
+You will find yourself in situations where you would like to read information
+that has asynchronously been gathered by your statechart from your main program.
+This may happen if you have built a statechart to monitor an external device, or
+to listen to pricing signals coming in from the internet, or to track the
+weather... whatever your application, there will be times when you want the
+synchronous part of your program, main, to get information from the
+asynchronous part of your program, the statechart.
+
+But, your main program and your statechart run in different threads.  If they share a
+global variable, and one thread writes to it while the other thread reads from
+the variable, or they both partially write to the same variable at the same
+time, you have created an extremely pernicious bug called a 'race condition'.
+
+These kinds of bugs do not behave deterministicly, because the timing between
+your threads is managed by the OS in a layer of the system you have no
+visibility into.  Worse yet, they can happen very infrequently and leave very
+little evidence for why your program failed.
+
+.. note::
+
+   If you would like to share information between statecharts, you have the same
+   thread sharing problem; but it is mostly solved by the framework
+   (publish/subscribe with namedtuples (immutable objects).  The namedtuples
+   carrying your payload.
+
+If you would like to share information between different threads you can use a
+"Threadsafe data type" like a Queue or a deque.  In this recipe I'll show a
+simple example of the main program calling a statechart's object method, the
+statechart will serve up information it got asynchronously to this method as
+if it were captured in a synchronous manner.
+
+Here is a picture of our design:
+
+.. image:: _static/sharing_information.svg
+    :target: _static/sharing_information.pdf
+    :align: center
+
+The ``SimpleAsyncExample`` statechart is built with the miros Factory.  The
+statechart within the ``SimpleAcyncExample`` asynchronously posts information to
+itself every 0, 1, or 2 seconds. The main part of the program creates a
+``SimpleAcyncExample`` which starts a statechart running in a separate thread.
+Main then waits three seconds and then calls the ``SimpleAsyncExample``'s
+synchronous ``get_weather`` method which can return, 'raining', 'sunny' or
+'snowing'.
+
+Here is the code (asynchronous parts highlighted):
+
+.. code-block:: python
+  :emphasize-lines: 35, 38-54, 56-60
+
+  import time
+  import random
+  from collections import deque
+  from collections import namedtuple
+
+  from miros import Event
+  from miros import Factory
+  from miros import signals
+  from miros import return_status
+
+  WeatherReport = namedtuple('WeatherReport', ['latest'])
+
+  class SimpleAcyncExample(Factory):
+
+    Name = 'weather_reader'
+
+    def __init__(self, name=None, live_trace=None, live_spy=None):
+
+      super().__init__(name if name != None else SimpleAcyncExample.Name)
+      self.weather = []
+      self.thread_safe_queue = deque(maxlen=1)
+
+      self.live_trace = False if live_trace == None else live_trace
+      self.live_spy = False if live_spy == None else live_spy
+
+      self.watch_external_weather_api = \
+        self.create(state="watch_external_weather_api"). \
+          catch(signal=signals.ENTRY_SIGNAL,
+            handler=self.watch_external_weather_api_entry). \
+          catch(signal=signals.weather_report,
+            handler=self.watch_external_weather_api_weather_report). \
+          to_method()
+
+      self.nest(self.watch_external_weather_api, parent=None)
+      self.start_at(self.watch_external_weather_api)
+      time.sleep(0.01)
+
+    @staticmethod
+    def watch_external_weather_api_entry(weather, e):
+      status = return_status.HANDLED
+      # weather is like self in a typical method
+      weather.choices = ['raining', 'sunny', 'snowing']
+      index_and_time_delay = random.randint(0, len(weather.choices)-1)
+
+      # post a fake weather report 0, 1, or 2 seconds from now
+      weather.post_fifo(
+        Event(signal=signals.weather_report, 
+          payload=
+            WeatherReport(latest=weather.choices[index_and_time_delay])),
+        times=1,
+        period=index_and_time_delay,
+        deferred=True)
+
+      return status
+
+    @staticmethod
+    def watch_external_weather_api_weather_report(weather, e):
+      status = return_status.HANDLED
+      weather.thread_safe_queue.append(e.payload.latest)
+      return status
+
+    def get_weather(self):
+      result = None
+      if len(self.thread_safe_queue) == 0:
+        raise LookupError
+      else:
+        result = self.thread_safe_queue.popleft()
+      return result
 
 
+  if __name__ == '__main__':
+    # create and start the asynchronous part of our program
+    tracker = SimpleAcyncExample('weather_tracker', live_trace=True)
+    # [07:36:47.80] [weather_tracker] e->start_at() top->watch_external_weather_api
+    time.sleep(3)
+
+    # have the synchronous part of our program get information from the
+    # asynchronous part of our program
+    print(tracker.get_weather())  #=> sunny
 .. _recipes-multiple-statecharts:
 
 Multiple Statecharts

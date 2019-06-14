@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>315</x>
+      <y>153</y>
+      <w>549</w>
+      <h>378</h>
+    </coordinates>
+    <panel_attributes>*SimpleAsyncExample*
+--
+weather = [ ]
+thread_safe_queue = deque(maxlen=1)
+--
+get_weather(self):
+  if len(self.buffer) == 0:
+    raise LookupError
+  result = self.thread_safe_queue.popleft()
+  return result
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>459</x>
+      <y>585</y>
+      <w>405</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>if "__name__" == "__main__":
+  tracker = SimpleAsyncExample('asynchronous_statechart_thread')
+  time.sleep(3)
+  print(tracker.get_weather())
+
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>900</x>
+      <y>315</y>
+      <w>207</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Asynchronous Statechart Thread
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>819</x>
+      <y>315</y>
+      <w>99</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;40.0;90.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>900</x>
+      <y>567</y>
+      <w>171</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Synchronous Main Thread
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>360</x>
+      <y>315</y>
+      <w>468</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>*watching_external_weather_api*
+--
+entry /
+  weather.choices = ['raining', 'sunny', 'snowing']
+  index_and_time_delay = random.randint(0, len(weather.choice)-1)
+
+  weather.post_fifo(
+    Event(signal=signals.weather_report,
+      payload = \
+        WeatherReport(latest=weather.choice[index_and_time_delay])))
+
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>765</x>
+      <y>288</y>
+      <w>27</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>675</x>
+      <y>216</y>
+      <w>180</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+Event Processor
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>756</x>
+      <y>252</y>
+      <w>45</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=[^]-(
+layer=3</panel_attributes>
+    <additional_attributes>20.0;10.0;20.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>378</x>
+      <y>459</y>
+      <w>432</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0;460.0;60.0;460.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>900</x>
+      <y>369</y>
+      <w>198</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>WeatherReport = namedtuple(
+  'WeatherReport', ['latest'])
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>423</x>
+      <y>477</y>
+      <w>342</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>weather_report as e /
+  weather.thread_safe_queue.append(e.payload.latest)
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>774</x>
+      <y>108</y>
+      <w>90</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Factory</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>810</x>
+      <y>126</y>
+      <w>27</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>819</x>
+      <y>567</y>
+      <w>99</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;40.0;90.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>747</x>
+      <y>378</y>
+      <w>171</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;70.0;170.0;10.0</additional_attributes>
+  </element>
+</diagram>
