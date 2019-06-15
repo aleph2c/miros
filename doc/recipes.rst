@@ -1728,7 +1728,6 @@ The same process applies for a state method built using the ``Factory``:
 To see how to unwind an auto-generated statechart read
 :ref:`unwinding a state method<towardsthefactoryexample-unwinding-a-factory-state-method>`
 
-
 .. _recipes-describing-your-work:
 
 Describing your Work
@@ -1742,7 +1741,7 @@ The Harel formalism was consumed by the UML standard.
 
 The UML standards were not properly curated and became overly-complicated and
 full of contradictions.  As a result, they are largely disregarded by the
-software community at large, so most of the open source drawing tool projects
+software community, so most of the open source drawing tool projects
 have been abandoned.  
 
 A lot of the commercial drawing tools have tried to keep up with the overly
