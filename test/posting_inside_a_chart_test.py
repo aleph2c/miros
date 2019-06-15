@@ -202,7 +202,6 @@ def armed(ao, e):
     status, ao.temp.fun = state.SUPER, arming
   return status
 
-@pytest.mark.aaa
 @pytest.mark.postings
 def test_interior_postings_example(fabric_fixture):
   ao = ActiveObject()
