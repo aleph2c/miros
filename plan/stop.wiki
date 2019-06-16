@@ -1,0 +1,82 @@
+*The stop features are under-developed*
+= Observe =
+  
+  *What defines Success?*
+  * An individual activeobject can be destroyed:
+    * its thread stops running
+    * its queues are destroyed 
+    * its memory can be garbage collected
+    * a new version can be recreated later from main
+  * The fabric can be destroyed:
+    * all attached active objects are destroyed
+    * all attached queue are destroyed
+    * its memory can be garbage collected
+    * a new version can be recreated later from main
+
+  *What is the problem?*
+ 
+  The active object module is complex, if you add bugs while adding this
+  feature, you will harm many people's code bases.  Ensure all test pass before
+  release.
+  
+  It doesn't look like this feature was prioritized before, but if you want to
+  construct workers without making memory leaks, you will need this feature.
+  
+  The pytest module has added warnings, which mean you have to add a ini file in
+  the top level directory.  This is annoying, but it could offer some added
+  visibility into what was previously tested.
+  
+  I am not sure how to confirm if something is garbage collected in Python.
+  
+  The active fabric and the active objects seem to share the same threading
+  Event.  This means to stop one active object is to stop all of them.  We do
+  not want this behavior.
+  
+  *Evidence that contradicts Assumptions:*
+  
+= Orient =
+  *Symptoms:*
+  
+  This feature wasn't priorized before.
+  
+  *Questions for 'The stop features are under-developed':*
+    * Is there a way for the active fabric to see all of it's attached active objects? 
+    * Is there a way to kill a task, and confirm it is done? (active fabric
+      kill an active object task, waiting till it is dead, then kill the next
+      one)
+    * Is there a way to kill a queue?  Does this event make sense?
+    
+
+  *Assumptions:*
+  We need to kill the active fabric (maybe we don't, this would simplify the design)
+
+= Decide =
+  *Idea/Hypotheses for The stop features are under-developed: >=5*
+  * [X] Check the tests for stop features
+  * [X] Get the tests passing
+  * [X] Write the test marks into the pytest.ini file
+  * [X] Read the code and see how the thread events are set up
+  * [ ] Research how to determine if something is garbage collected
+  * [ ] Create a plan for stopping an active object without harming the
+        activefabric
+  * [ ] Adjust the code
+  * [ ] Add tests to confirm the activeobject stop feature is working
+  * [ ] Add tests to confirm that the activefabric was unharmed
+  * [ ] Add tests to confirm that the activeobject has been garbage collected
+  * [ ] Add sensible docstrings under the stop feature
+  * [ ] Write a recipe
+  * [ ] Create a plan for stopping the active fabric and all attached activeobjects
+  * [ ] Adjust the code
+  * [ ] Add tests to confirm the activefabric stop feature is working
+  * [ ] Add tests to confirm that the activefabric has been garbage collected
+  * [ ] Add tests to confirm that all attached active objects have been garbage collected
+  * [ ] Add sensible docstrings under the stop feature
+  * [ ] Write a recipe
+  *Chosen Idea/Hypothesis*
+    
+    Research how to determine if something is garbage collected
+    
+  *Plan to Expand-on-Idea/Disprove-Hypothesis*
+
+= Act =
+

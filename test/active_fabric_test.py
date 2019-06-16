@@ -138,3 +138,4 @@ def test_subscribe_lilo(fabric_fixture):
   popped_event = input_queue_1.pop()
   assert(popped_event.signal_name == 'A')
   assert(len(input_queue_1) == 0)
+
