@@ -1473,40 +1473,52 @@ call as saying, “I would like to subscribe to this type of event”.</p>
 </div>
 <div class="section" id="publishing-events-to-other-active-objects">
 <span id="recipes-publishing-event-to-other-active-objects"></span><h3>Publishing events to other Active Objects<a class="headerlink" href="#publishing-events-to-other-active-objects" title="Permalink to this headline">¶</a></h3>
-<p>Your active object can communicate to other active objects in the system by
-publishing events.  There are two different threads in the active fabric
-object that manage this communication and they each have a priority queue.  A
-priority queue lets you post items into a queue with different priorities.  If
-one posted thing is higher than another, it will be pushed closer to the front of
-the queue.  The <code class="docutils literal notranslate"><span class="pre">publish</span></code> method has access to the same prioritization.  If
-you call it with a priority number it will pass this number in with the message
-that it is transmitting out to all of its subscribers.  The task will
-automatically arrange this message relative to all of the other
-events that are waiting in the queue.</p>
-<p>For an active object to publish an event to another active object (which has
-subscribed to the event):</p>
+<p>Your active object can send data to other active objects in the system by
+publishing events.</p>
+<p>But your active object can only control <em>how it talks to others</em>, not <em>who
+listens to it</em>; so, if another active object wants to receive a published event
+it must subscribe to it first.</p>
+<p>If you would like to publish data that will be used by another ActiveObject,
+copy your data into some sort of immutable object before you publish it:
+namedtuple objects are perfect for these situations:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="c1"># draw these payloads on your statechart diagram</span>
+<span class="n">MyPayload</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;MyPayload&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;name_of_item_1&#39;</span><span class="p">,</span> <span class="s1">&#39;name_of_item2&#39;</span><span class="p">])</span>
+
+<span class="n">publishing_ao</span> <span class="o">=</span> <span class="n">ActiveObect</span><span class="p">()</span>
+
+<span class="c1"># This is how you can send an &#39;THING_SUBSCRIBING_AO_CARES_ABOUT&#39; event</span>
+<span class="c1"># to anything that has subscribed to it</span>
+<span class="n">publishing_ao</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">MyPayload</span><span class="p">(</span>
+      <span class="n">name_of_item_1</span><span class="o">=</span><span class="s1">&#39;something&#39;</span><span class="p">,</span>
+      <span class="n">name_of_item_2</span><span class="o">=</span><span class="s1">&#39;something_else&#39;</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Here is how to publish an event with a specific priority:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">publishing_ao</span> <span class="o">=</span> <span class="n">ActiveObect</span><span class="p">()</span>
-<span class="n">publishing_ao</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">)</span>
+<span class="n">publishing_ao</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">))</span>
 
 <span class="c1"># or you can set the priority (1 is the highest priority see note):</span>
 <span class="n">publishing_ao</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
-  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">),</span>
   <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">NOTE:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
-<p>The highest event priority corresponds to the number 1 and all higher numbers
-have lower priority.  If a number is higher than another it will have lower
-priority than the number it is greater than.  By default all published events
-are given a priority of 1000.  If two events have the same priority the queue
-will behave like a first in first out queue.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The priority numbering scheme is counter-intuitive: low numbers mean high
+priority while high numbers mean low priority.  The highest published event
+priority is 1.  By default all published events are given a priority of 1000.
+If two events have the same priority the queue will behave like a first in
+first out queue.</p>
+</div>
 </div>
 </div>
 <div class="section" id="seeing-what-is-going-on">

@@ -1497,37 +1497,57 @@ call as saying, "I would like to subscribe to this type of event".
 
 Publishing events to other Active Objects
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Your active object can communicate to other active objects in the system by
-publishing events.  There are two different threads in the active fabric
-object that manage this communication and they each have a priority queue.  A
-priority queue lets you post items into a queue with different priorities.  If
-one posted thing is higher than another, it will be pushed closer to the front of
-the queue.  The ``publish`` method has access to the same prioritization.  If
-you call it with a priority number it will pass this number in with the message
-that it is transmitting out to all of its subscribers.  The task will
-automatically arrange this message relative to all of the other
-events that are waiting in the queue.
+Your active object can send data to other active objects in the system by
+publishing events.  
 
-For an active object to publish an event to another active object (which has
-subscribed to the event):
+But your active object can only control *how it talks to others*, not *who
+listens to it*; so, if another active object wants to receive a published event
+it must subscribe to it first.
+
+If you would like to publish data that will be used by another ActiveObject,
+copy your data into some sort of immutable object before you publish it:
+namedtuple objects are perfect for these situations:
+
+.. code-block:: python
+
+  from collections import namedtuple
+
+  # draw these payloads on your statechart diagram
+  MyPayload = namedtuple('MyPayload', ['name_of_item_1', 'name_of_item2'])
+
+  publishing_ao = ActiveObect()
+
+  # This is how you can send an 'THING_SUBSCRIBING_AO_CARES_ABOUT' event
+  # to anything that has subscribed to it
+  publishing_ao.publish(
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT,
+      payload=MyPayload(
+        name_of_item_1='something',
+        name_of_item_2='something_else'
+      )
+    )
+  )
+
+Here is how to publish an event with a specific priority:
 
 .. code-block:: python
 
   publishing_ao = ActiveObect()
-  publishing_ao.publish(Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT)
+  publishing_ao.publish(
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT))
 
   # or you can set the priority (1 is the highest priority see note):
   publishing_ao.publish(
-    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT),
     priority=1)
 
-
-:NOTE:
-The highest event priority corresponds to the number 1 and all higher numbers
-have lower priority.  If a number is higher than another it will have lower
-priority than the number it is greater than.  By default all published events
-are given a priority of 1000.  If two events have the same priority the queue
-will behave like a first in first out queue.
+.. note::
+  
+   The priority numbering scheme is counter-intuitive: low numbers mean high
+   priority while high numbers mean low priority.  The highest published event
+   priority is 1.  By default all published events are given a priority of 1000.
+   If two events have the same priority the queue will behave like a first in
+   first out queue.
 
 
 .. _recipes-seeing-what-is-:
