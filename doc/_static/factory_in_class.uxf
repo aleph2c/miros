@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>315</x>
+      <y>126</y>
+      <w>828</w>
+      <h>522</h>
+    </coordinates>
+    <panel_attributes>*ClassWithStatechartInIt*
+--
+attribute1
+attribute2
+name
+--
+
+
+  
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>432</x>
+      <y>675</y>
+      <w>405</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>if "__name__" == "__main__":
+  chart1 = ClassWithStatechartInit('chart1', live_trace=True)
+  chart2 = ClassWithStatechartInit('chart2', live_trace=True)
+  chart3 = ClassWithStatechartInit('chart3', live_trace=True)
+  time.sleep(3)
+  
+
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>315</x>
+      <y>72</y>
+      <w>243</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Asynchronous Statechart Thread parts
+in blue
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>396</x>
+      <y>99</y>
+      <w>243</w>
+      <h>162</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>250.0;160.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>954</x>
+      <y>693</y>
+      <w>171</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Synchronous Main Thread
+parts in black
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>342</x>
+      <y>243</y>
+      <w>774</w>
+      <h>369</h>
+    </coordinates>
+    <panel_attributes>*common_behaviors*
+--
+entry /
+  chart.subscribe(Event(signal=signals.OTHER_INNER_MOST))
+hook_1 / 
+ chart.worker1()
+hoot_2 /
+ chart.worker2()
+
+  
+  
+
+  
+
+valign=top
+layer=1
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>981</x>
+      <y>207</y>
+      <w>27</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>936</x>
+      <y>531</y>
+      <w>162</w>
+      <h>135</h>
+    </coordinates>
+    <panel_attributes>OTHER_INNER_MOST
+lt=-&gt;
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;130.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1017</x>
+      <y>72</y>
+      <w>90</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Factory</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1053</x>
+      <y>90</y>
+      <w>27</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>774</x>
+      <y>693</y>
+      <w>198</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;20.0;200.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>468</x>
+      <y>360</y>
+      <w>198</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>*a1*
+--
+entry /
+  if random.randint(1, 5) &lt;= 2:
+    chart.post_fifo(
+      Event(signal=signals.to_b1)
+      )
+
+valign=top
+layer=2
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>720</x>
+      <y>288</y>
+      <w>369</w>
+      <h>270</h>
+    </coordinates>
+    <panel_attributes>*b1*
+--
+entry /
+  chart.post_fifo(Event(signal=signals.hook_1))
+exit / 
+  chart.post_fifo(Event(signal=signals.hook_2))
+valign=top
+layer=1
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>774</x>
+      <y>378</y>
+      <w>288</w>
+      <h>162</h>
+    </coordinates>
+    <panel_attributes>*b11*
+--
+entry /
+  chart.post_fifo(
+    Event(signal=signals.inner_most))
+    
+inner_most / 
+  chart.publish(
+    Event(signal=signals.OTHER_INNER_MOST))
+    
+OTHER_INNER_MOST / {}
+    
+valign=top
+layer=2
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>423</x>
+      <y>414</y>
+      <w>18</w>
+      <h>18</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>423</x>
+      <y>414</y>
+      <w>63</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>729</x>
+      <y>414</y>
+      <w>63</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=1
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>756</x>
+      <y>468</y>
+      <w>18</w>
+      <h>18</h>
+    </coordinates>
+    <panel_attributes>
+bg=red
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>945</x>
+      <y>630</y>
+      <w>18</w>
+      <h>18</h>
+    </coordinates>
+    <panel_attributes>
+bg=green
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>738</x>
+      <y>414</y>
+      <w>18</w>
+      <h>18</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=1
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>522</x>
+      <y>477</y>
+      <w>387</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>to_b1
+lt=-&gt;
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;120.0;410.0;120.0;410.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1035</x>
+      <y>639</y>
+      <w>63</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;60.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>315</x>
+      <y>198</y>
+      <w>72</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>worker1()
+worker2()
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>441</x>
+      <y>603</y>
+      <w>207</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>reset
+lt=-&gt;
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0;210.0;30.0;210.0;10.0</additional_attributes>
+  </element>
+</diagram>

@@ -5,16 +5,11 @@
   * An individual activeobject can be destroyed:
     * its thread stops running
     * its queues are destroyed 
-    * its memory can be garbage collected
-    * a new version can be recreated later from main
   * The fabric can be destroyed:
     * all attached active objects are destroyed
     * all attached queue are destroyed
-    * its memory can be garbage collected
-    * a new version can be recreated later from main
 
   *What is the problem?*
- 
   The active object module is complex, if you add bugs while adding this
   feature, you will harm many people's code bases.  Ensure all test pass before
   release.
@@ -56,7 +51,6 @@
   
 = Orient =
   *Symptoms:*
-  
   This feature wasn't priorized before.
   
   *Questions for 'The stop features are under-developed':*
@@ -65,13 +59,14 @@
       kill an active object task, waiting till it is dead, then kill the next
       one)
     * Is there a way to kill a queue?  Does this event make sense?
-    
 
   *Assumptions:*
   We need to kill the active fabric (maybe we don't, this would simplify the design)
 
 = Decide =
+  
   *Idea/Hypotheses for The stop features are under-developed: >=5*
+
   * [X] Check the tests for stop features
   * [X] Get the tests passing
   * [X] Write the test marks into the pytest.ini file
@@ -81,20 +76,14 @@
         distraction)
   * [X] Create a plan for stopping an active object without harming the
         activefabric
-  * [ ] Adjust the code
-  * [ ] 
-  * [ ] Add tests to confirm the activeobject stop feature is working
-  * [ ] Add tests to confirm that the activefabric was unharmed
-  * [ ] Add tests to confirm that the activeobject has been garbage collected
-  * [ ] Add sensible docstrings under the stop feature
+  * [X] Adjust the code
+  * [X] Add tests to confirm the activeobject stop feature is working
+  * [X] Add tests to confirm that the activefabric was unharmed
+  * [X] Add sensible docstrings under the stop feature
+  * [X] Stopping the active fabric should stop the active object (upon receiving
+        its next event)
   * [ ] Write a recipe
-  * [ ] Create a plan for stopping the active fabric and all attached activeobjects
-  * [ ] Adjust the code
-  * [ ] Add tests to confirm the activefabric stop feature is working
-  * [ ] Add tests to confirm that the activefabric has been garbage collected
-  * [ ] Add tests to confirm that all attached active objects have been garbage collected
-  * [ ] Add sensible docstrings under the stop feature
-  * [ ] Write a recipe
+  
   *Chosen Idea/Hypothesis*
     
     Adjust the code
@@ -117,20 +106,24 @@
     Does the activefabric know about all of the threads that are running with
     it? No
     
-    1. activeobject: stop should set the task specific event to clear
-    2. activeobject: task should check if singleton event is cleared, if so, it
+    * [X] activeobject: stop should set the task specific event to clear
+    * [X] activeobject: task should check if singleton event is cleared, if so, it
                   should clear its own task specific event as well
-    3. activeobject: upon ending its task, it should set its queue to None, so that
+    * [X] activeobject: upon ending its task, it should set its queue to None, so that
                   the fabric doesn't post it it anymore, then del
-    4. activeobject: start, create a new queue with the correct size
-    5. activeobject: stop should not be able to effect fabric, there is not need
+    * [X] activeobject: start, create a new queue with the correct size
+    * [X] activeobject: stop should not be able to effect fabric, there is not need
                   for this feature
     
-    6. fabric: only post to a queue it if exists (test this once you have
-            refactored the work)... see lines 203 and 230
+    * [X] fabric: only post to a queue it if exists (test this once you have
+          refactored the work)... see lines 203 and 230
             
-    7. everything you touch: add new docstrings.
-    8. rerun tests
+    * [X] rerun previous tests
+    * [X] write new tests
+    * [X] activeobjects should subscribe to a stop_active_object event within the
+          framework.  This way the fabric can kill all threads when it is dying.
+    * [X] activeobject: upon stopping, all events should be cancelled.
+    * [ ] create a release
     
 = Act =
 

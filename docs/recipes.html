@@ -60,9 +60,9 @@ language supported by the Quantum Leaps framework for embedded systems (It uses
 the same event processing algorithm).  This style is pretty much self
 documenting.</p>
 <p>If you have no intention of porting your work and would like to avoid sissy
-if-elif-else structures and use some Macho Python data object instead, go for it.
-Just ensure that your state methods react the way the are expected to, so
-that the event processor can discover your design while it’s parsing the events.</p>
+if-elif-else structures and use some <a class="reference internal" href="#recipes-creating-a-statechart-inside-of-a-class"><span class="std std-ref">Macho Python data object</span></a> instead, go for it.  Just
+ensure that your state methods react the way the are expected to, so that the
+event processor can discover your design while it’s parsing the events.</p>
 <p>If you would like to metaprogram your statecharts, UML be damned, you can.
 Miros provides several ways that you can synthesize statecharts on the fly.</p>
 <p>There are different ways to create states with miros:</p>
@@ -99,6 +99,7 @@ turned back into a statechart of method 1 using the <code class="docutils litera
 <li><a class="reference internal" href="#recipes-what-a-state-does-and-how-to-structure-it"><span class="std std-ref">A Deeper look at state methods</span></a></li>
 <li><a class="reference internal" href="#recipes-creating-a-state-method-from-a-template"><span class="std std-ref">Creating a statechart from a template</span></a></li>
 <li><a class="reference internal" href="#recipes-creating-a-state-method-from-a-factory"><span class="std std-ref">Creating a statechart from a factory</span></a></li>
+<li><a class="reference internal" href="#recipes-creating-a-statechart-inside-of-a-class"><span class="std std-ref">Creating a statechart inside of a class</span></a></li>
 </ul>
 <div class="section" id="what-a-state-does-and-how-to-structure-it">
 <span id="recipes-what-a-state-does-and-how-to-structure-it"></span><h3>What a State Does and How to Structure it<a class="headerlink" href="#what-a-state-does-and-how-to-structure-it" title="Permalink to this headline">¶</a></h3>
@@ -947,6 +948,444 @@ signals.  Then turn it it into a method.</p>
 <p id="recipes-factory-7">If you need to debug or unwind your factor generated state methods, reference
 <a class="reference internal" href="#recipes-flatting-a-state-method"><span class="std std-ref">this</span></a>.</p>
 </div>
+<div class="section" id="creating-a-statechart-inside-of-a-class">
+<span id="recipes-creating-a-statechart-inside-of-a-class"></span><h3>Creating a Statechart Inside of a Class<a class="headerlink" href="#creating-a-statechart-inside-of-a-class" title="Permalink to this headline">¶</a></h3>
+<p>You can create a class that has a statechart within it.  Here are some of the benefits
+of programming this way:</p>
+<blockquote>
+<div><ul class="simple">
+<li>it is easy to draw using a mixture of class and statechart UML</li>
+<li>state names can be re-used in the same file</li>
+<li>provides a clear synchronous interface (methods)</li>
+<li>provides a clear asynchronous interface (post_fifo/post_lifo/publish/subscribe)</li>
+<li>packages all of your states, transitions and starting code within a single
+location in your file, within its class.</li>
+<li>the start_at code is held within the class’s <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method</li>
+<li>hides the state complexity from the rest of your code base</li>
+<li>effortlessly provides multi-threading without its dangers</li>
+<li>complicated <code class="docutils literal notranslate"><span class="pre">else</span></code> clauses in state callback handlers are avoided</li>
+<li>it is trivial for main to inject asynchronous information</li>
+<li>it is not hard for main to <a class="reference internal" href="#recipes-getting-information-from-your-statecchart"><span class="std std-ref">extract asynchronous information</span></a></li>
+<li>it is easy to build lots of these different kinds of objects and have them work as a
+federation. (systems programming)</li>
+<li>it is easy to document federations (systems design)</li>
+<li>it is not hard to network your federations with other federations across
+the internet (<a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/index.html">systems of systems: miros-rabbitmq</a>)</li>
+</ul>
+</div></blockquote>
+<p>To program this way we use the Factory class from miros.</p>
+<p>Here is a simple example of a statechart within an object:</p>
+<a class="reference external image-reference" href="_static/factory_in_class_simple.pdf"><div align="center" class="align-center"><img alt="_images/factory_in_class_simple.svg" src="_images/factory_in_class_simple.svg" /></div>
+</a>
+<p>Familiar stuff first:  The <code class="docutils literal notranslate"><span class="pre">ClassWithStatechartInIt</span></code> inherits from
+<code class="docutils literal notranslate"><span class="pre">Factory</span></code>, it has three attributes and two methods.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ClassWithStatechartInIt</span></code> also has an asynchronous statechart (blue),
+which is attached to an event processor, and it starts in the
+<code class="docutils literal notranslate"><span class="pre">common_behaviors</span></code> state.</p>
+<p>Let’s bring this design to life with some code (we will highlight the
+asynchronous aspects of the program):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+<span class="k">class</span> <span class="nc">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+  <span class="n">Default_Name</span> <span class="o">=</span> <span class="s1">&#39;default_name&#39;</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="c1"># call the Factory ctor</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+      <span class="n">ClassWithStatechartInIt</span><span class="o">.</span><span class="n">Default_Name</span> <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">name</span>
+    <span class="p">)</span>
+    <span class="c1"># determine how this object will be instrumented</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+
+    <span class="c1"># define our states and their statehandlers</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;common_behaviors&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors_init</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">hook_1</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors_hook_1</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">hook_2</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors_hook_2</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">reset</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors_reset</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">a1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;a1&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">a1_entry</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_b1</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">a1_to_b1</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">b1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;b1&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b1_init</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b1_entry</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b1_exit</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">b11</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;b11&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="c1"># nest our states within other states</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b11</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b1</span><span class="p">)</span>
+
+    <span class="c1"># start our statechart, which will start its thread</span>
+<span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span>
+</span>
+    <span class="c1"># let the internal statechart initialize before you give back control</span>
+    <span class="c1"># to the synchronous part of your program</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">common_behaviors_init</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">a1</span><span class="p">)</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">common_behaviors_hook_1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="c1"># call the ClassWithStatechartInIt work2 method</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">worker1</span><span class="p">()</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">common_behaviors_hook_2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="c1"># call the ClassWithStatechartInIt work2 method</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">worker2</span><span class="p">()</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">common_behaviors_reset</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">a1_entry</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="c1"># post an event to ourselves</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_b1</span><span class="p">))</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">a1_to_b1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">b1</span><span class="p">)</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">b1_init</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">b1_entry</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="c1"># post an event to ourselves</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">hook_1</span><span class="p">))</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">b1_exit</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="c1"># post an event to ourselves</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">hook_2</span><span class="p">))</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="k">def</span> <span class="nf">worker1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;worker1 called&#39;</span><span class="p">)</span>
+</span>
+<span class="hll">  <span class="k">def</span> <span class="nf">worker2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;worker2 called&#39;</span><span class="p">)</span>
+</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+  <span class="n">chart</span> <span class="o">=</span> <span class="n">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;chart&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">reset</span><span class="p">))</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will result in the following output:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">19</span> <span class="mo">06</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mf">02.662672</span><span class="p">]</span> <span class="p">[</span><span class="n">chart</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">a1</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">19</span> <span class="mo">06</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mf">02.662869</span><span class="p">]</span> <span class="p">[</span><span class="n">chart</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">to_b1</span><span class="p">()</span> <span class="n">a1</span><span class="o">-&gt;</span><span class="n">b1</span>
+<span class="n">worker1</span> <span class="n">called</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">19</span> <span class="mo">06</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mf">02.664588</span><span class="p">]</span> <span class="p">[</span><span class="n">chart</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">reset</span><span class="p">()</span> <span class="n">b1</span><span class="o">-&gt;</span><span class="n">a1</span>
+<span class="n">worker2</span> <span class="n">called</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">19</span> <span class="mo">06</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mf">02.665011</span><span class="p">]</span> <span class="p">[</span><span class="n">chart</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">to_b1</span><span class="p">()</span> <span class="n">a1</span><span class="o">-&gt;</span><span class="n">b1</span>
+<span class="n">worker1</span> <span class="n">called</span>
+</pre></div>
+</div>
+<p>Here is something a bit weirder, a concurrent statechart:</p>
+<a class="reference external image-reference" href="_static/factory_in_class.pdf"><div align="center" class="align-center"><img alt="_images/factory_in_class.svg" src="_images/factory_in_class.svg" /></div>
+</a>
+<p>Above we define a class that contains a statechart that subscribes to, and
+publishes events to other statecharts.  The class will be used to create three
+objects which will message each other.</p>
+<p>Upon starting, there is a 2/5 chance the statechart within
+<code class="docutils literal notranslate"><span class="pre">ClassWithStatechartInIt</span></code> will end up within <code class="docutils literal notranslate"><span class="pre">b11</span></code> state.  If a chart ends
+up in this state, it will publish the <code class="docutils literal notranslate"><span class="pre">OTHER_INNER_MOST</span></code> signal to any chart
+that has subscribed to the signal_name.</p>
+<p>The chart sending the <code class="docutils literal notranslate"><span class="pre">OTHER_INNER_MOST</span></code> event ignores it, and all other
+charts will respond by re-entering their <code class="docutils literal notranslate"><span class="pre">common_behaviors</span></code> state if they are
+not in the <code class="docutils literal notranslate"><span class="pre">b11</span></code> state.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The red and green dots are not UML.  They are markers that act to highlight
+the important parts of a concurrent statechart design.</p>
+<p>I put the red dot on the part of the chart that is publishing an
+event.  It is red because once an item is published, it is put in a queue and the
+message flows stops momentarily.</p>
+<p class="last">I put the green dot beside events that have been subscribed to and have been
+posted to the chart.  They are green, because they have been extracted from a
+queue by a thread and are being posted to the event processor attached to the
+chart.</p>
+</div>
+<p>We will make three of these charts, turn on some instrumentation, run them in
+parallel and see what happens.</p>
+<p>Here is the code (asynchronous parts highlighted):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+<span class="k">class</span> <span class="nc">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+    <span class="c1"># call the Factory ctor</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="c1"># determine how this object will be instrumented</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+
+    <span class="c1"># define our states and their statehandlers</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;common_behaviors&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors_init</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors_entry</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">hook_1</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors_hook_1</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">hook_2</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors_hook_2</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">reset</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors_reset</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">OTHER_INNER_MOST</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors_other_inner_most</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">a1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;a1&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">a1_entry</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_b1</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">a1_to_b1</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">b1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;b1&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b1_init</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b1_entry</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b1_exit</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">b11</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;b11&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b11_entry</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">inner_most</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b11_inner_most</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">OTHER_INNER_MOST</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b11_other_inner_most</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="c1"># nest our states within other states</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b11</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b1</span><span class="p">)</span>
+
+    <span class="c1"># start our statechart, which will start its thread</span>
+<span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span>
+</span>
+    <span class="c1"># let the internal statechart initialize before you give back control</span>
+    <span class="c1"># to the synchronous part of your program</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">common_behaviors_init</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">a1</span><span class="p">)</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">common_behaviors_entry</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">OTHER_INNER_MOST</span><span class="p">))</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">common_behaviors_hook_1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="c1"># call the ClassWithStatechartInIt work2 method</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">worker1</span><span class="p">()</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">common_behaviors_hook_2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="c1"># call the ClassWithStatechartInIt work2 method</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">worker2</span><span class="p">()</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">common_behaviors_reset</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">common_behaviors_other_inner_most</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">b11</span><span class="p">)</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">a1_entry</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="c1"># post an event to ourselves 2/5 of the time</span>
+</span><span class="hll">    <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">:</span>
+</span><span class="hll">      <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_b1</span><span class="p">))</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">a1_to_b1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">b1</span><span class="p">)</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">b1_init</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">b11</span><span class="p">)</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">b1_entry</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="c1"># post an event to ourselves</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">hook_1</span><span class="p">))</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">b1_exit</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="c1"># post an event to ourselves</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">hook_2</span><span class="p">))</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">b11_entry</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">inner_most</span><span class="p">))</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">b11_inner_most</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">OTHER_INNER_MOST</span><span class="p">))</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="nd">@staticmethod</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">b11_other_inner_most</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll">  <span class="k">def</span> <span class="nf">worker1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;{} worker1 called&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+</span>
+<span class="hll">  <span class="k">def</span> <span class="nf">worker2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;{} worker2 called&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+  <span class="n">chart1</span> <span class="o">=</span> <span class="n">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;chart1&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">chart2</span> <span class="o">=</span> <span class="n">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;chart2&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">chart3</span> <span class="o">=</span> <span class="n">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;chart3&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="c1"># send a reset event to chart1</span>
+  <span class="n">chart1</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">reset</span><span class="p">))</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>There is a probabilistic aspect to this program, so it could behave differently
+every time you run it.  Here is what I saw when I ran it for the first time:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">19</span> <span class="mi">12</span><span class="p">:</span><span class="mo">03</span><span class="p">:</span><span class="mf">17.949042</span><span class="p">]</span> <span class="p">[</span><span class="n">chart1</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">a1</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">19</span> <span class="mi">12</span><span class="p">:</span><span class="mo">03</span><span class="p">:</span><span class="mf">17.949227</span><span class="p">]</span> <span class="p">[</span><span class="n">chart1</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">to_b1</span><span class="p">()</span> <span class="n">a1</span><span class="o">-&gt;</span><span class="n">b11</span>
+<span class="n">chart1</span> <span class="n">worker1</span> <span class="n">called</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">19</span> <span class="mi">12</span><span class="p">:</span><span class="mo">03</span><span class="p">:</span><span class="mf">17.962356</span><span class="p">]</span> <span class="p">[</span><span class="n">chart2</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">a1</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">19</span> <span class="mi">12</span><span class="p">:</span><span class="mo">03</span><span class="p">:</span><span class="mf">17.962482</span><span class="p">]</span> <span class="p">[</span><span class="n">chart2</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">to_b1</span><span class="p">()</span> <span class="n">a1</span><span class="o">-&gt;</span><span class="n">b11</span>
+<span class="n">chart2</span> <span class="n">worker1</span> <span class="n">called</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">19</span> <span class="mi">12</span><span class="p">:</span><span class="mo">03</span><span class="p">:</span><span class="mf">17.975225</span><span class="p">]</span> <span class="p">[</span><span class="n">chart3</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">a1</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">19</span> <span class="mi">12</span><span class="p">:</span><span class="mo">03</span><span class="p">:</span><span class="mf">17.985577</span><span class="p">]</span> <span class="p">[</span><span class="n">chart1</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">reset</span><span class="p">()</span> <span class="n">b11</span><span class="o">-&gt;</span><span class="n">a1</span>
+<span class="n">chart1</span> <span class="n">worker2</span> <span class="n">called</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">19</span> <span class="mi">12</span><span class="p">:</span><span class="mo">03</span><span class="p">:</span><span class="mf">17.986041</span><span class="p">]</span> <span class="p">[</span><span class="n">chart1</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">to_b1</span><span class="p">()</span> <span class="n">a1</span><span class="o">-&gt;</span><span class="n">b11</span>
+<span class="n">chart1</span> <span class="n">worker1</span> <span class="n">called</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">19</span> <span class="mi">12</span><span class="p">:</span><span class="mo">03</span><span class="p">:</span><span class="mf">17.986845</span><span class="p">]</span> <span class="p">[</span><span class="n">chart3</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">OTHER_INNER_MOST</span><span class="p">()</span> <span class="n">a1</span><span class="o">-&gt;</span><span class="n">b11</span>
+<span class="n">chart3</span> <span class="n">worker1</span> <span class="n">called</span>
+</pre></div>
+</div>
+<p>The diagram describing this concurrent statechart is very compact and detailed,
+but we may want an even smaller version which hides the specifics of how the
+statechart behaves.</p>
+<p>Typically class diagrams are suppose to describe the attributes and the
+<code class="docutils literal notranslate"><span class="pre">messages</span></code> (methods) which can be received by an object instantiated from the
+class.  When you pack a statechart into a class, the idea of a message brakes
+into two things:</p>
+<blockquote>
+<div><ul class="simple">
+<li>synchronous messages (methods), and</li>
+<li>asynchronous messages (events)</li>
+</ul>
+</div></blockquote>
+<p>The asynchronous messages should be more nuanced: broken into events intended
+only for one statechart (using post_fifo/post_lifo) and events that are intended
+to be published into other statecharts which have subscribed to their signal
+names.</p>
+<p>As far as I know there is no standard way of describing how to do this, so I’ll
+show you how I do it:</p>
+<a class="reference external image-reference" href="_static/factory_in_class_compact.pdf"><div align="center" class="align-center"><img alt="_images/factory_in_class_compact.svg" src="_images/factory_in_class_compact.svg" /></div>
+</a>
+<p>We see that the <code class="docutils literal notranslate"><span class="pre">ClassWithStatechartInIt</span></code> state inherits from the <code class="docutils literal notranslate"><span class="pre">Factory</span></code>
+and that it has three attributes: <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">live_spy</span></code> and <code class="docutils literal notranslate"><span class="pre">live_trace</span></code>.  It
+has two methods, <code class="docutils literal notranslate"><span class="pre">worker1</span></code> and <code class="docutils literal notranslate"><span class="pre">worker2</span></code>.</p>
+<p>The rest of the diagram is non-standard:  I put an <code class="docutils literal notranslate"><span class="pre">e</span></code> in front of the
+internal (e)vents from the chart, the <code class="docutils literal notranslate"><span class="pre">to_b1</span></code> and the <code class="docutils literal notranslate"><span class="pre">reset</span></code> then I mark the
+asynchronous interface, by placing red and green dots on the compact form of a
+state icon.  Then place the signal names beside arrows showing how they publish or
+subscribe to these signal names.</p>
+<p>UML isn’t descriptive enough to actually capture a design’s intention, so I
+never hesitate to mark up a diagram with code.  In this case, my code is
+saying, let’s make three of these things and run them together.</p>
+<p>As you become more experienced building statecharts that work in concert, you
+will notice that you stop paying any attention to what attributes or methods a
+specific class has.  You don’t care about it’s internal events and you don’t
+care about from what it was inherited.  You only care about what published
+events it consumes and what events it publishes:</p>
+<a class="reference external image-reference" href="_static/factory_in_class_compact_2.pdf"><div align="center" class="align-center"><img alt="_images/factory_in_class_compact_2.svg" src="_images/factory_in_class_compact_2.svg" /></div>
+</a>
+<p>Then to draw a federation:</p>
+<a class="reference external image-reference" href="_static/federation_drawing.pdf"><div align="center" class="align-center"><img alt="_images/federation_drawing.svg" src="_images/federation_drawing.svg" /></div>
+</a>
+<p>There is probably a much better way to do this, since it looks like three
+classes are working together rather than three instantiated objects from the
+same class.  UML really falls-over in describing object interactions.</p>
+<p>If you have any suggestions about how to draw this better, email me.</p>
+</div>
 </div>
 <div class="section" id="events-and-signals">
 <span id="recipes-events-and-signals"></span><h2>Events And Signals<a class="headerlink" href="#events-and-signals" title="Permalink to this headline">¶</a></h2>
@@ -1292,7 +1731,7 @@ reaction to it.</p>
 </div>
 </div>
 <div class="section" id="getting-information-from-your-statechart">
-<h2>Getting Information from your Statechart<a class="headerlink" href="#getting-information-from-your-statechart" title="Permalink to this headline">¶</a></h2>
+<span id="recipes-getting-information-from-your-statecchart"></span><h2>Getting Information from your Statechart<a class="headerlink" href="#getting-information-from-your-statechart" title="Permalink to this headline">¶</a></h2>
 <p>You will find yourself in situations where you would like to read information
 that has asynchronously been gathered by your statechart from your main program.
 This may happen if you have built a statechart to monitor an external device, or
@@ -1305,9 +1744,9 @@ global variable, and one thread writes to it while the other thread reads from
 the variable, or they both partially write to the same variable at the same
 time, you have created an extremely pernicious bug called a ‘race condition’.</p>
 <p>These kinds of bugs do not behave deterministicly, because the timing between
-your threads is managed by the OS in a layer of the system you have no
-visibility into.  Worse yet, they can happen very infrequently and leave very
-little evidence for why your program failed.</p>
+your threads is managed by the OS in a layer of the system in which you have no
+visibility.  Worse yet, they can happen very infrequently and leave very little
+evidence for why your program failed.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">If you would like to share information between statecharts, you have the same
@@ -2226,6 +2665,7 @@ specification.</p>
 <li><a class="reference internal" href="#create-a-guard">Create a Guard</a></li>
 <li><a class="reference internal" href="#creating-a-statechart-from-a-template">Creating a Statechart From a Template</a></li>
 <li><a class="reference internal" href="#creating-a-statechart-from-a-factory">Creating a Statechart From a Factory</a></li>
+<li><a class="reference internal" href="#creating-a-statechart-inside-of-a-class">Creating a Statechart Inside of a Class</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#events-and-signals">Events And Signals</a><ul>

@@ -158,7 +158,6 @@ def test_start_stop_c(fabric_fixture):
 
 
 @pytest.mark.aos
-@pytest.mark.here
 def test_publish_subscribe(fabric_fixture):
   c1 = ActiveObject("c1")
   c2 = ActiveObject("c2")

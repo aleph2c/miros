@@ -6,7 +6,7 @@ from collections import deque, namedtuple
 from pprint      import pprint
 from threading   import Thread
 from queue       import PriorityQueue, Queue
-from threading   import Event as ThreadEventLib
+from threading   import Event as ThreadEvent
 from miros.hsm   import state_method_template
 from functools   import wraps
 
@@ -25,12 +25,14 @@ def pp(item):
 Signal().append("stop_fabric")
 Signal().append("stop_active_object")
 
-
-class SourceThreadEvent(ThreadEventLib):
+class SourceThreadEvent(ThreadEvent):
   pass
 
 
-ThreadEvent = SingletonDecorator(SourceThreadEvent)
+# The FiberThreadEvent is a singleton.  We want to be able to call
+# `FiberThreadEvent()` and get the same ThreadEvent (threading.Event) object in
+# many different places in this file.
+FiberThreadEvent = SingletonDecorator(SourceThreadEvent)
 
 
 class FabricEvent():
@@ -89,7 +91,7 @@ class ActiveFabricSource():
     super().__init__()
 
     # This is used to end the tasks forever loops
-    self.task_event = ThreadEvent()
+    self.fabric_task_event = FiberThreadEvent()
 
     # Set up two priority queues one for the fifo and one for the lifo
     self.fifo_fabric_queue = PriorityQueue()
@@ -109,14 +111,14 @@ class ActiveFabricSource():
 
     # Get the ThreadEvent (singleton), set it so that the threads will try and
     # run forever
-    self.task_event = ThreadEvent()
-    self.task_event.set()
+    self.fabric_task_event = FiberThreadEvent()
+    self.fabric_task_event.set()
 
     # Initiate a thread and return it so that this object can reference it later
     def initiate_thread(thread_obj, name, thread_runner, queue, subscriptions):
       if thread_obj is None or thread_obj.is_alive() is not True:
         thread_obj = Thread(target = thread_runner,
-                                     args=(self.task_event,
+                                     args=(self.fabric_task_event,
                                            queue,
                                            subscriptions))
         thread_obj.name   = name
@@ -156,8 +158,8 @@ class ActiveFabricSource():
 
     # Get the ThreadEvent (singleton), clear it so that the threads will try to
     # exit once they wake up.
-    task_event = ThreadEvent()
-    task_event.clear()
+    fabric_task_event = FiberThreadEvent()
+    fabric_task_event.clear()
 
     # Post an item to the queue to wake up the thread then join on it until it
     # completes its last run and exits
@@ -167,7 +169,7 @@ class ActiveFabricSource():
           stop_fe = FabricEvent(HsmEvent(signal=signals.stop_fabric), priority=1)
           # The tasks are pending on items in their queue, wake them up with a
           # queue item, so that they can see that they need to stop running by
-          # looking at their task_event thread-event
+          # looking at their fabric_task_event thread-event
           queue.put(stop_fe)
           thread_obj.join()
 
@@ -180,7 +182,7 @@ class ActiveFabricSource():
       assert(self.lifo_thread.is_alive() is False)
 
   def thread_runner_fifo(self,
-                     task_event,
+                     fabric_task_event,
                      fifo_queue,
                      fifo_subscriptions):
     '''If this was a Thread class this function would be called "run"
@@ -190,7 +192,7 @@ class ActiveFabricSource():
 
     '''
     fifo_item = None
-    while task_event.is_set():
+    while fabric_task_event.is_set():
 
       # this locks the task, it will only run if something is in the queue
       fifo_item = fifo_queue.get()
@@ -206,7 +208,7 @@ class ActiveFabricSource():
       fifo_queue.task_done()  # so that join can work
 
   def thread_runner_lifo(self,
-                     task_event,
+                     fabric_task_event,
                      lifo_queue,
                      lifo_subscriptions):
     '''If this was a Thread class this function would be called "run"
@@ -216,7 +218,7 @@ class ActiveFabricSource():
 
     '''
     lifo_item = None
-    while task_event.is_set():
+    while fabric_task_event.is_set():
 
       # this locks the task, it will only run if something is in the queue
       lifo_item = lifo_queue.get()
@@ -440,6 +442,7 @@ class ActiveObject(HsmWithQueues):
 
     super().__init__(instrumented)
     self.locking_deque = LockingDeque()
+    self.activeobject_task_event = ThreadEvent()
     # Over-write the deque in the Hsm with Queues with the one managed by the
     # LockingDeque object. This is the 'magic' in this object.  Any time a
     # post_fifo or post_lifo method within the Hsm is touched, it unknowingly uses
@@ -619,23 +622,35 @@ class ActiveObject(HsmWithQueues):
 
   def __start(self):
     '''Starts an active object thread, and the active fabric if it is not running'''
-    # Get the ThreadEvent (singleton), set it so that the threads will try and
-    # run forever
-    task_event = ThreadEvent()
-    task_event.set()
+    # if the self.post_event_queue variable is not defined, create it
+    try:
+      self.posted_events_queue
+    except:
+      self.posted_events_queue = deque(maxlen=self.__class__.QUEUE_SIZE)
 
-    # If the active fabric is not running, turn it on so that all of our active
-    # objects can talk to each other.
-    if self.fabric.is_alive() is False:
-      self.fabric.start()
+    # if the self.locking_deque variable is not defined, create it
+    try:
+      self.locking_deque
+    except:
+      self.locking_deque = LockingDeque()
+
 
     def start_thread(self):
       '''Starts an active object -- called within __start
 
       This will start an active object and the task fabric
       '''
-      thread        = Thread(target = self.run_event, args=(task_event, self.queue))
-      thread.name   = self.name
+      self.activeobject_task_event.set()
+
+      # objects can talk to each other.
+      if self.fabric.is_alive() is False:
+        self.fabric.start()
+
+      self.fabric_task_event = FiberThreadEvent()
+
+      thread = Thread(target=self.run_event,
+                args=(self.activeobject_task_event, self.fabric_task_event, self.queue))
+      thread.name = self.name
       thread.daemon = True
       thread.start()
       return thread
@@ -643,37 +658,44 @@ class ActiveObject(HsmWithQueues):
     if self.__thread_running() is False:
       self.thread = start_thread(self)
 
-  def stop(self, stop_fabric=None):
-    '''Stops the active object
+  def stop(self):
+    '''Stops the active object, can cancels all of its pending events'''
+    self.activeobject_task_event.clear()
 
-    Calling this method will stop all active objects.
-    '''
-    if stop_fabric is None:
-      stop_fabric = False
-
-    task_event = ThreadEvent()
-    task_event.clear()
+    # post an item to wake up the task so it can see it's event has been cleared
+    # this will cause it to exit its forever-loop and exit
     self.queue.append(HsmEvent(signal=signals.stop_active_object))
     self.thread.join()
-    if stop_fabric:
-      self.fabric.stop()
 
-  def run_event(self, task_event, queue):
-    '''The active object task function
+    # kill threads which were started by post_fifo or post_lifo single-shots or
+    # multi-shots
+    events_with_their_own_threads = [event for event in self.posted_events_queue]
+    for event in events_with_their_own_threads:
+      self.cancel_events(event)
 
-    This task method waits on the locking-deque.  If the signal is not a
+  def run_event(self, task_event, fabric_task_event, queue):
+    '''The active object threading function.
+
+    If this statechart has not been stopped and the active fabric hasn't been
+    stopped the threading function will run.  If the active fabric has been
+    stopped, it will stop this thread as well by clearing the task_event
+    HsmEvent (threading.Event) object.
+
+    This threading method waits on the locking-deque.  If the signal is not a
     stop_active_object signal it calls the hsm next_rtc method, which will pop
     the leftmost item out of the deque part of the locking-deque and dispatch it
     into the hsm.
     '''
     while task_event.is_set():
-      queue.wait()  # wait for an event we have subscribed to
-      if len(self.queue) >= 1:
-        try:
-          if self.queue.deque[0].signal_name != signals.stop_active_object:
+      queue.wait()  # wait for an event
+      if fabric_task_event.is_set():
+        if len(self.queue) >= 1:
+          if self.queue.deque[0].signal != signals.stop_active_object:
             self.next_rtc()
-        except:
-          pass
+          else:
+            task_event.clear()
+      else:
+        task_event.clear()
       queue.task_done()  # write this so that 'join' will work
 
   def trace(self):
@@ -699,7 +721,7 @@ class ActiveObject(HsmWithQueues):
     The post_event method is used to post one-shots or periodic events to the
     active object.
 
-    It constructs a task_event and a task, then starts the task.  The task will
+    It constructs a fabric_task_event and a task, then starts the task.  The task will
     run periodically posting events into either the fifo or the lifo of the
     active object.
 
@@ -793,7 +815,7 @@ class ActiveObject(HsmWithQueues):
       # create an exit event for the task, it will be shared with the
       # cancel_event/cancel_events methods, so that the task can be stopped by
       # someone using the ActiveObject api
-      task_run_event = ThreadEventLib()
+      task_run_event = ThreadEvent()
       task_run_event.set()
 
       # set up the specification for this task
@@ -819,7 +841,6 @@ class ActiveObject(HsmWithQueues):
             # this way we can access the time.sleep on every pass through from
             # now on.
             deferred = True
-
           # we might have been cancelled while we were sleeping
           if spec.task_run_event.is_set() is not True:
             break

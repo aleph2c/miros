@@ -196,7 +196,6 @@ def test_graffiti_spy():
   ao = ActiveObject(name="scribbled_on")
   ao.start_at(g1_s22_active_objects_graph)
   time.sleep(0.2)
-  ao.stop()
   pp(ao.spy())
 
 

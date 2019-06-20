@@ -108,9 +108,6 @@ def test1_trans_topology_a():
   pp(ao.spy_rtc())
   print(ao.trace())
 
-  # stop the threads
-  ao.stop()
-
   # clear the spy and the trace
   ao.clear_spy()
   ao.clear_trace()

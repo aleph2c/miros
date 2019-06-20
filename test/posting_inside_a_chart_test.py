@@ -20,8 +20,8 @@ assert(pp)  # to make an irritating pep8 error go away
 #   |      | entry/ multishot_id = \                             |  |  |
 #   |      |          chart.post_fifo(Event(signal=signals.A,    |  |  |
 #   |      |                          times=3,                   |  |  |
-#   |      |                          period=1.0,                |  |  |
-#   |      |                          deffered=True)             |  |  B (print("flash B!"))
+#   |      |                          period=0.1,                |  |  |
+#   |      |                          deferred=True)             |  |  B (print("flash B!"))
 #   |      |          chart.augment(other=multishot_id,          |  |  |
 #   |      |                        name='multishot_id')         |  |  |
 #   |      | exit/ chart.cancel_event(chart.multishot_id)        |  |  |
@@ -203,12 +203,12 @@ def armed(ao, e):
   return status
 
 @pytest.mark.postings
-def test_interior_postings_example(fabric_fixture):
+def test_interior_postings_example():
   ao = ActiveObject()
   ao.start_at(middle)
   time.sleep(0.4)
   ao.post_fifo(Event(signal=signals.D))
-  time.sleep(0.1)  # if you don't wait it won't look like it is working
+  time.sleep(0.5)  # if you don't wait it won't look like it is working
   pp(ao.spy)
   assert(ao.spy_full() ==
     ['START',
@@ -273,7 +273,7 @@ def test_interior_postings_example(fabric_fixture):
 
 @pytest.mark.tazor
 @pytest.mark.postings
-def test_tazor_example(fabric_fixture):
+def test_tazor_example():
   tazor = ActiveObject()
   tazor.start_at(arming)
   time.sleep(0.4)
@@ -347,7 +347,7 @@ def test_tazor_example(fabric_fixture):
 @pytest.mark.live_spy
 @pytest.mark.live_trace
 @pytest.mark.tazor
-def test_live_spys(fabric_fixture):
+def test_live_spys():
   tazor = ActiveObject()
   tazor.live_spy = True
   tazor.live_trace = True
@@ -360,7 +360,7 @@ def test_live_spys(fabric_fixture):
 
 
 @pytest.mark.tazor
-def test_trace_testing(fabric_fixture):
+def test_trace_testing():
   tazor = ActiveObject()
   tazor.start_at(arming)
   time.sleep(0.4)

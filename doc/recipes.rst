@@ -34,9 +34,10 @@ the same event processing algorithm).  This style is pretty much self
 documenting.
 
 If you have no intention of porting your work and would like to avoid sissy
-if-elif-else structures and use some Macho Python data object instead, go for it.
-Just ensure that your state methods react the way the are expected to, so
-that the event processor can discover your design while it's parsing the events.
+if-elif-else structures and use some :ref:`Macho Python data object
+<recipes-creating-a-statechart-inside-of-a-class>` instead, go for it.  Just
+ensure that your state methods react the way the are expected to, so that the
+event processor can discover your design while it's parsing the events.
 
 If you would like to metaprogram your statecharts, UML be damned, you can.
 Miros provides several ways that you can synthesize statecharts on the fly.
@@ -79,6 +80,7 @@ There are different ways to create states with miros:
 * :ref:`A Deeper look at state methods<recipes-what-a-state-does-and-how-to-structure-it>`
 * :ref:`Creating a statechart from a template<recipes-creating-a-state-method-from-a-template>`
 * :ref:`Creating a statechart from a factory<recipes-creating-a-state-method-from-a-factory>`
+* :ref:`Creating a statechart inside of a class<recipes-creating-a-statechart-inside-of-a-class>`
 
 .. _recipes-what-a-state-does-and-how-to-structure-it:
 
@@ -1001,8 +1003,483 @@ Start your statechart in the desired state.
 If you need to debug or unwind your factor generated state methods, reference
 :ref:`this<recipes-flatting-a-state-method>`.
 
-.. _recipes-events-and-signals:
+.. _recipes-creating-a-statechart-inside-of-a-class:
 
+Creating a Statechart Inside of a Class
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+You can create a class that has a statechart within it.  Here are some of the benefits
+of programming this way:
+
+   * it is easy to draw using a mixture of class and statechart UML
+   * state names can be re-used in the same file
+   * provides a clear synchronous interface (methods)
+   * provides a clear asynchronous interface (post_fifo/post_lifo/publish/subscribe)
+   * packages all of your states, transitions and starting code within a single
+     location in your file, within its class.
+   * the start_at code is held within the class's ``__init__`` method
+   * hides the state complexity from the rest of your code base
+   * effortlessly provides multi-threading without its dangers
+   * complicated ``else`` clauses in state callback handlers are avoided
+   * it is trivial for main to inject asynchronous information
+   * it is not hard for main to :ref:`extract asynchronous information<recipes-getting-information-from-your-statecchart>`
+   * it is easy to build lots of these different kinds of objects and have them work as a
+     federation. (systems programming)
+   * it is easy to document federations (systems design)
+   * it is not hard to network your federations with other federations across
+     the internet (`systems of systems: miros-rabbitmq <https://aleph2c.github.io/miros-rabbitmq/index.html>`_)
+
+To program this way we use the Factory class from miros.
+
+Here is a simple example of a statechart within an object:
+
+.. image:: _static/factory_in_class_simple.svg
+    :target: _static/factory_in_class_simple.pdf
+    :align: center
+
+Familiar stuff first:  The ``ClassWithStatechartInIt`` inherits from
+``Factory``, it has three attributes and two methods.
+
+The ``ClassWithStatechartInIt`` also has an asynchronous statechart (blue),
+which is attached to an event processor, and it starts in the
+``common_behaviors`` state.
+
+Let's bring this design to life with some code (we will highlight the
+asynchronous aspects of the program):
+
+.. code-block:: python
+  :emphasize-lines: 57, 63-66, 68-73, 75-80, 82-85, 87-92, 94-97, 99-102, 104-109, 111-116, 118-119, 121-122
+
+  import time
+
+  from miros import Event
+  from miros import signals
+  from miros import Factory
+  from miros import return_status
+
+  class ClassWithStatechartInIt(Factory):
+    Default_Name = 'default_name'
+    def __init__(self, name=None, live_trace=None, live_spy=None):
+      # call the Factory ctor
+      super().__init__(
+        ClassWithStatechartInIt.Default_Name if name == None else name
+      )
+      # determine how this object will be instrumented
+      self.live_spy = False if live_spy == None else live_spy
+      self.live_trace = False if live_trace == None else live_trace
+      
+      # define our states and their statehandlers
+      self.common_behaviors = self.create(state="common_behaviors"). \
+        catch(signal=signals.INIT_SIGNAL,
+          handler=self.common_behaviors_init). \
+        catch(signal=signals.hook_1,
+          handler=self.common_behaviors_hook_1). \
+        catch(signal=signals.hook_2,
+          handler=self.common_behaviors_hook_2). \
+        catch(signal=signals.reset,
+          handler=self.common_behaviors_reset). \
+        to_method()
+
+      self.a1 = self.create(state="a1"). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.a1_entry). \
+        catch(signal=signals.to_b1,
+          handler=self.a1_to_b1). \
+        to_method()
+
+      self.b1 = self.create(state="b1"). \
+        catch(signal=signals.INIT_SIGNAL,
+          handler=self.b1_init). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.b1_entry). \
+        catch(signal=signals.EXIT_SIGNAL,
+          handler=self.b1_exit). \
+        to_method()
+
+      self.b11 = self.create(state="b11"). \
+        to_method()
+
+      # nest our states within other states
+      self.nest(self.common_behaviors, parent=None). \
+          nest(self.a1, parent=self.common_behaviors). \
+          nest(self.b1, parent=self.common_behaviors). \
+          nest(self.b11, parent=self.b1)
+
+      # start our statechart, which will start its thread
+      self.start_at(self.common_behaviors)
+
+      # let the internal statechart initialize before you give back control
+      # to the synchronous part of your program
+      time.sleep(0.001)
+
+    @staticmethod
+    def common_behaviors_init(chart, e):
+      status = chart.trans(chart.a1)
+      return status
+
+    @staticmethod
+    def common_behaviors_hook_1(chart, e):
+      status = return_status.HANDLED
+      # call the ClassWithStatechartInIt work2 method
+      chart.worker1()
+      return status
+
+    @staticmethod
+    def common_behaviors_hook_2(chart, e):
+      status = return_status.HANDLED
+      # call the ClassWithStatechartInIt work2 method
+      chart.worker2()
+      return status
+
+    @staticmethod
+    def common_behaviors_reset(chart, e):
+      status = chart.trans(chart.common_behaviors)
+      return status
+
+    @staticmethod
+    def a1_entry(chart, e):
+      status = return_status.HANDLED
+      # post an event to ourselves
+      chart.post_fifo(Event(signal=signals.to_b1))
+      return status
+
+    @staticmethod
+    def a1_to_b1(chart, e):
+      status = chart.trans(chart.b1)
+      return status
+
+    @staticmethod
+    def b1_init(chart, e):
+      status = return_status.HANDLED
+      return status
+
+    @staticmethod
+    def b1_entry(chart, e):
+      status = return_status.HANDLED
+      # post an event to ourselves
+      chart.post_fifo(Event(signal=signals.hook_1))
+      return status
+
+    @staticmethod
+    def b1_exit(chart, e):
+      status = return_status.HANDLED
+      # post an event to ourselves
+      chart.post_fifo(Event(signal=signals.hook_2))
+      return status
+
+    def worker1(self):
+      print('worker1 called')
+
+    def worker2(self):
+      print('worker2 called')
+
+  if __name__ == '__main__':
+    chart = ClassWithStatechartInIt(name='chart', live_trace=True)
+    chart.post_fifo(Event(signal=signals.reset))
+    time.sleep(1)
+
+This will result in the following output:
+
+.. code-block:: python
+
+   [2019-06-19 06:16:02.662672] [chart] e->start_at() top->a1
+   [2019-06-19 06:16:02.662869] [chart] e->to_b1() a1->b1
+   worker1 called
+   [2019-06-19 06:16:02.664588] [chart] e->reset() b1->a1
+   worker2 called
+   [2019-06-19 06:16:02.665011] [chart] e->to_b1() a1->b1
+   worker1 called
+
+Here is something a bit weirder, a concurrent statechart:
+
+.. image:: _static/factory_in_class.svg
+    :target: _static/factory_in_class.pdf
+    :align: center
+
+Above we define a class that contains a statechart that subscribes to, and
+publishes events to other statecharts.  The class will be used to create three
+objects which will message each other.
+
+Upon starting, there is a 2/5 chance the statechart within
+``ClassWithStatechartInIt`` will end up within ``b11`` state.  If a chart ends
+up in this state, it will publish the ``OTHER_INNER_MOST`` signal to any chart
+that has subscribed to the signal_name.
+
+The chart sending the ``OTHER_INNER_MOST`` event ignores it, and all other
+charts will respond by re-entering their ``common_behaviors`` state if they are
+not in the ``b11`` state.
+
+.. note::
+
+  The red and green dots are not UML.  They are markers that act to highlight
+  the important parts of a concurrent statechart design.
+  
+  I put the red dot on the part of the chart that is publishing an
+  event.  It is red because once an item is published, it is put in a queue and the
+  message flows stops momentarily.
+
+  I put the green dot beside events that have been subscribed to and have been
+  posted to the chart.  They are green, because they have been extracted from a
+  queue by a thread and are being posted to the event processor attached to the
+  chart.
+
+We will make three of these charts, turn on some instrumentation, run them in
+parallel and see what happens.
+
+Here is the code (asynchronous parts highlighted):
+
+.. code-block:: python
+  :emphasize-lines: 67, 73-76, 78-82, 84-89, 91-96, 98-101, 103-106, 108-114, 116-119, 121-124, 126-131, 133-138, 140-144, 146-150, 152-155, 157-158, 160-161
+
+  import time
+  import random
+
+  from miros import Event
+  from miros import signals
+  from miros import Factory
+  from miros import return_status
+
+  class ClassWithStatechartInIt(Factory):
+    def __init__(self, name, live_trace=None, live_spy=None):
+
+      # call the Factory ctor
+      super().__init__(name)
+
+      # determine how this object will be instrumented
+      self.live_spy = False if live_spy == None else live_spy
+      self.live_trace = False if live_trace == None else live_trace
+      
+      # define our states and their statehandlers
+      self.common_behaviors = self.create(state="common_behaviors"). \
+        catch(signal=signals.INIT_SIGNAL,
+          handler=self.common_behaviors_init). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.common_behaviors_entry). \
+        catch(signal=signals.hook_1,
+          handler=self.common_behaviors_hook_1). \
+        catch(signal=signals.hook_2,
+          handler=self.common_behaviors_hook_2). \
+        catch(signal=signals.reset,
+          handler=self.common_behaviors_reset). \
+        catch(signal=signals.OTHER_INNER_MOST,
+          handler=self.common_behaviors_other_inner_most). \
+        to_method()
+
+      self.a1 = self.create(state="a1"). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.a1_entry). \
+        catch(signal=signals.to_b1,
+          handler=self.a1_to_b1). \
+        to_method()
+
+      self.b1 = self.create(state="b1"). \
+        catch(signal=signals.INIT_SIGNAL,
+          handler=self.b1_init). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.b1_entry). \
+        catch(signal=signals.EXIT_SIGNAL,
+          handler=self.b1_exit). \
+        to_method()
+
+      self.b11 = self.create(state="b11"). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.b11_entry). \
+        catch(signal=signals.inner_most,
+          handler=self.b11_inner_most). \
+        catch(signal=signals.OTHER_INNER_MOST,
+          handler=self.b11_other_inner_most). \
+        to_method()
+
+      # nest our states within other states
+      self.nest(self.common_behaviors, parent=None). \
+          nest(self.a1, parent=self.common_behaviors). \
+          nest(self.b1, parent=self.common_behaviors). \
+          nest(self.b11, parent=self.b1)
+
+      # start our statechart, which will start its thread
+      self.start_at(self.common_behaviors)
+
+      # let the internal statechart initialize before you give back control
+      # to the synchronous part of your program
+      time.sleep(0.01)
+
+    @staticmethod
+    def common_behaviors_init(chart, e):
+      status = chart.trans(chart.a1)
+      return status
+
+    @staticmethod
+    def common_behaviors_entry(chart, e):
+      status = return_status.HANDLED
+      chart.subscribe(Event(signal=signals.OTHER_INNER_MOST))
+      return status
+
+    @staticmethod
+    def common_behaviors_hook_1(chart, e):
+      status = return_status.HANDLED
+      # call the ClassWithStatechartInIt work2 method
+      chart.worker1()
+      return status
+
+    @staticmethod
+    def common_behaviors_hook_2(chart, e):
+      status = return_status.HANDLED
+      # call the ClassWithStatechartInIt work2 method
+      chart.worker2()
+      return status
+
+    @staticmethod
+    def common_behaviors_reset(chart, e):
+      status = chart.trans(chart.common_behaviors)
+      return status
+
+    @staticmethod
+    def common_behaviors_other_inner_most(chart, e):
+      status = chart.trans(chart.b11)
+      return status
+
+    @staticmethod
+    def a1_entry(chart, e):
+      status = return_status.HANDLED
+      # post an event to ourselves 2/5 of the time
+      if random.randint(1, 5) <= 3:
+        chart.post_fifo(Event(signal=signals.to_b1))
+      return status
+
+    @staticmethod
+    def a1_to_b1(chart, e):
+      status = chart.trans(chart.b1)
+      return status
+
+    @staticmethod
+    def b1_init(chart, e):
+      status = chart.trans(chart.b11)
+      return status
+
+    @staticmethod
+    def b1_entry(chart, e):
+      status = return_status.HANDLED
+      # post an event to ourselves
+      chart.post_fifo(Event(signal=signals.hook_1))
+      return status
+
+    @staticmethod
+    def b1_exit(chart, e):
+      status = return_status.HANDLED
+      # post an event to ourselves
+      chart.post_fifo(Event(signal=signals.hook_2))
+      return status
+
+    @staticmethod
+    def b11_entry(chart, e):
+      status = return_status.HANDLED
+      chart.post_fifo(Event(signal=signals.inner_most))
+      return status
+
+    @staticmethod
+    def b11_inner_most(chart, e):
+      status = return_status.HANDLED
+      chart.publish(Event(signal=signals.OTHER_INNER_MOST))
+      return status
+
+    @staticmethod
+    def b11_other_inner_most(chart, e):
+      status = return_status.HANDLED
+      return status
+
+    def worker1(self):
+      print('{} worker1 called'.format(self.name))
+
+    def worker2(self):
+      print('{} worker2 called'.format(self.name))
+
+  if __name__ == '__main__':
+    chart1 = ClassWithStatechartInIt(name='chart1', live_trace=True)
+    chart2 = ClassWithStatechartInIt(name='chart2', live_trace=True)
+    chart3 = ClassWithStatechartInIt(name='chart3', live_trace=True)
+    # send a reset event to chart1
+    chart1.post_fifo(Event(signal=signals.reset))
+    time.sleep(0.2)
+
+There is a probabilistic aspect to this program, so it could behave differently
+every time you run it.  Here is what I saw when I ran it for the first time:
+
+.. code-block:: python
+  
+  [2019-06-19 12:03:17.949042] [chart1] e->start_at() top->a1
+  [2019-06-19 12:03:17.949227] [chart1] e->to_b1() a1->b11
+  chart1 worker1 called
+  [2019-06-19 12:03:17.962356] [chart2] e->start_at() top->a1
+  [2019-06-19 12:03:17.962482] [chart2] e->to_b1() a1->b11
+  chart2 worker1 called
+  [2019-06-19 12:03:17.975225] [chart3] e->start_at() top->a1
+  [2019-06-19 12:03:17.985577] [chart1] e->reset() b11->a1
+  chart1 worker2 called
+  [2019-06-19 12:03:17.986041] [chart1] e->to_b1() a1->b11
+  chart1 worker1 called
+  [2019-06-19 12:03:17.986845] [chart3] e->OTHER_INNER_MOST() a1->b11
+  chart3 worker1 called
+
+The diagram describing this concurrent statechart is very compact and detailed,
+but we may want an even smaller version which hides the specifics of how the
+statechart behaves.
+
+Typically class diagrams are suppose to describe the attributes and the
+``messages`` (methods) which can be received by an object instantiated from the
+class.  When you pack a statechart into a class, the idea of a message brakes
+into two things: 
+
+   * synchronous messages (methods), and
+   * asynchronous messages (events)
+
+The asynchronous messages should be more nuanced: broken into events intended
+only for one statechart (using post_fifo/post_lifo) and events that are intended
+to be published into other statecharts which have subscribed to their signal
+names.
+
+As far as I know there is no standard way of describing how to do this, so I'll
+show you how I do it:
+
+.. image:: _static/factory_in_class_compact.svg
+    :target: _static/factory_in_class_compact.pdf
+    :align: center
+
+We see that the ``ClassWithStatechartInIt`` state inherits from the ``Factory``
+and that it has three attributes: ``name``, ``live_spy`` and ``live_trace``.  It
+has two methods, ``worker1`` and ``worker2``.
+
+The rest of the diagram is non-standard:  I put an ``e`` in front of the
+internal (e)vents from the chart, the ``to_b1`` and the ``reset`` then I mark the
+asynchronous interface, by placing red and green dots on the compact form of a
+state icon.  Then place the signal names beside arrows showing how they publish or
+subscribe to these signal names.
+
+UML isn't descriptive enough to actually capture a design's intention, so I
+never hesitate to mark up a diagram with code.  In this case, my code is
+saying, let's make three of these things and run them together.
+
+As you become more experienced building statecharts that work in concert, you
+will notice that you stop paying any attention to what attributes or methods a
+specific class has.  You don't care about it's internal events and you don't
+care about from what it was inherited.  You only care about what published
+events it consumes and what events it publishes:
+
+.. image:: _static/factory_in_class_compact_2.svg
+    :target: _static/factory_in_class_compact_2.pdf
+    :align: center
+
+Then to draw a federation:
+
+.. image:: _static/federation_drawing.svg
+    :target: _static/federation_drawing.pdf
+    :align: center
+
+There is probably a much better way to do this, since it looks like three
+classes are working together rather than three instantiated objects from the
+same class.  UML really falls-over in describing object interactions.
+
+If you have any suggestions about how to draw this better, email me.
+
+.. _recipes-events-and-signals:
 
 Events And Signals
 ------------------
@@ -1286,7 +1763,7 @@ To determine if an event has a payload:
   assert(e2.has_payload() == False)
 
 
-.. _recipes-getting-information-from-your-statecchart
+.. _recipes-getting-information-from-your-statecchart:
 
 Getting Information from your Statechart
 ----------------------------------------
@@ -1304,9 +1781,9 @@ the variable, or they both partially write to the same variable at the same
 time, you have created an extremely pernicious bug called a 'race condition'.
 
 These kinds of bugs do not behave deterministicly, because the timing between
-your threads is managed by the OS in a layer of the system you have no
-visibility into.  Worse yet, they can happen very infrequently and leave very
-little evidence for why your program failed.
+your threads is managed by the OS in a layer of the system in which you have no
+visibility.  Worse yet, they can happen very infrequently and leave very little
+evidence for why your program failed.
 
 .. note::
 
