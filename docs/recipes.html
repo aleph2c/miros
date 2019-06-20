@@ -89,7 +89,6 @@ turned back into a statechart of method 1 using the <code class="docutils litera
 <li><a class="reference internal" href="#recipes-do-something-when-the-state-is-entered"><span class="std std-ref">Do something when the state is entered</span></a></li>
 <li><a class="reference internal" href="#recipes-do-something-when-the-state-is-initialized"><span class="std std-ref">Do something when the state is initialized</span></a></li>
 <li><a class="reference internal" href="#recipes-do-something-when-the-state-is-exited"><span class="std std-ref">Do something when the state is exited</span></a></li>
-<li><a class="reference internal" href="#recipes-markup-your-event-processor"><span class="std std-ref">Augment your active object</span></a></li>
 <li><a class="reference internal" href="#recipes-create-a-hook"><span class="std std-ref">Create a hook</span></a></li>
 <li><a class="reference internal" href="#recipes-catch-and-release"><span class="std std-ref">Catch and release</span></a></li>
 <li><a class="reference internal" href="#recipes-create-a-one-shot-state"><span class="std std-ref">Create a one-shot</span></a></li>
@@ -526,16 +525,6 @@ outside of of your state method’s boundary.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="augment-your-active-object">
-<span id="recipes-markup-your-event-processor"></span><h3>Augment Your Active Object<a class="headerlink" href="#augment-your-active-object" title="Permalink to this headline">¶</a></h3>
-<p>It is a bad idea to add variables to the state methods, instead augment your
-active objects using the <code class="docutils literal notranslate"><span class="pre">augment</span></code> command.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">chart</span> <span class="o">=</span> <span class="n">ActiveObect</span><span class="p">()</span>
-<span class="n">chart</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;counter&#39;</span><span class="p">)</span>
-<span class="k">assert</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">counter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
 <div class="section" id="create-a-hook">
 <span id="recipes-create-a-hook"></span><h3>Create a Hook<a class="headerlink" href="#create-a-hook" title="Permalink to this headline">¶</a></h3>
 <p>A hook is some application code that is shared between your state method and
@@ -761,8 +750,8 @@ creating these types of repeating events.  You would use the <code class="docuti
 when you would need your heart beat event signal to barge ahead of all other
 events waiting to be processed by the active object.</p>
 </div>
-<div class="section" id="cancelling-events">
-<span id="recipes-cancelling-events-state"></span><span id="recipes-cancelling-a-specific-event-source"></span><h3>Cancelling Events<a class="headerlink" href="#cancelling-events" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="canceling-events">
+<span id="recipes-cancelling-events-state"></span><span id="recipes-cancelling-a-specific-event-source"></span><h3>Canceling Events<a class="headerlink" href="#canceling-events" title="Permalink to this headline">¶</a></h3>
 <p>To kill a cancel a specific event, see <a class="reference internal" href="i_create_a_multishot.html#recipes-cancelling-a-specific-event-source"><span class="std std-ref">this.</span></a></p>
 <p>To kill all events sharing a signal name, see <a class="reference internal" href="#recipes-cancelling-event-source-by-signal-name"><span class="std std-ref">this.</span></a></p>
 </div>
@@ -808,6 +797,374 @@ if statement:</p>
 <p>The highlighted code is the guard.</p>
 <p>To learn more about guards read the
 <a class="reference internal" href="scribbleexample.html#scribbleexample-hacking-to-learn-the-deeper-dynamics"><span class="std std-ref">hacking to learn example.</span></a></p>
+</div>
+</div>
+<div class="section" id="events-and-signals">
+<h2>Events And Signals<a class="headerlink" href="#events-and-signals" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="creating-an-event">
+<span id="recipes-creating-an-event"></span><h3>Creating an Event<a class="headerlink" href="#creating-an-event" title="Permalink to this headline">¶</a></h3>
+<p>An event is something that will be passed into your statechart, it will be
+reacted to, then removed from memory.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+
+<span class="n">event_1</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="s2">&quot;name_of_signal&quot;</span><span class="p">)</span>
+<span class="c1"># or</span>
+<span class="n">event_2</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">name_of_signal</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-a-signal">
+<span id="recipes-creating-a-signal"></span><h3>Creating a Signal<a class="headerlink" href="#creating-a-signal" title="Permalink to this headline">¶</a></h3>
+<p>A signal is the name of an event.  Many different events can have the same
+name, or signal.  When a signal is created, it is given a number which is one
+higher than the oldest signal that was within your program.  You shouldn’t have
+to worry about what a signal number is, they are only used to speed up the
+event processor. (it is faster to compare two numbers than two strings)</p>
+<p>When you create a signal it will not be removed from memory until your program
+finishes.  They are created at the moment they are referenced, so you don’t
+have to explicitly define them.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+
+<span class="c1"># signal named &quot;name_of_signaL&quot; invented</span>
+<span class="c1"># here and given a unique number</span>
+<span class="hll"><span class="n">event_1</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="s2">&quot;name_of_signal&quot;</span><span class="p">)</span>
+</span><span class="c1"># the signal number of this event will have</span>
+<span class="c1"># the same number as in line 6</span>
+<span class="n">event_2</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">name_of_signal</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Notice that the signal was invented on line <strong>6</strong> then re-used on line <strong>9</strong>.</p>
+<p>The signals are shared across your whole program.  To see reflect upon your
+signals read <a class="reference internal" href="#recipes-seeing-your-signals"><span class="std std-ref">this</span></a>.</p>
+</div>
+<div class="section" id="posting-events">
+<span id="id2"></span><h3>Posting Events<a class="headerlink" href="#posting-events" title="Permalink to this headline">¶</a></h3>
+<p>The Active Object <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code>, <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code>, <code class="docutils literal notranslate"><span class="pre">defer</span></code> and <code class="docutils literal notranslate"><span class="pre">recall</span></code>
+methods are use to feed events to the statechart.  An Event can be thought of
+as a kind of named marble that is placed onto a topological map.  If a
+particular elevation doesn’t know what to do with the marble, it rolls the
+marble to the next lower elevation, or state.  If the lowest elevation is
+reached and the program doesn’t know what to do, it just ignores the event, or
+lets the marble fall out of play.</p>
+<p>The name of the marble is the signal name. An event can have a payload, but it
+doesn’t have to.  An event can only be posted to a chart after the chart has
+started.  Otherwise the behavior of the active object is undefined.</p>
+<p>The state methods typically react to the names of a event, or the signal names.
+This means that the if-else structures that you write will use the signal names
+in their logic.</p>
+<p>If you use the chart’s post event methods within the chart, the chart will not
+concern itself with <em>where</em> you initiated that event.  It will post its events
+into its queue as if they were provided by the outside world.  In this way
+these events are called <em>artificial</em>; instead of the world creating the event,
+the chart does.  There are a number of situations where it makes sense to do
+this, they will be described in the patterns section.</p>
+</div>
+<div class="section" id="posting-an-event-to-the-fifo">
+<span id="recipes-posting-an-event-to-the-fifo"></span><h3>Posting an Event to the Fifo<a class="headerlink" href="#posting-an-event-to-the-fifo" title="Permalink to this headline">¶</a></h3>
+<p>To post an event to the active object first-in-first-out (fifo) buffer, you
+must have first started your statechart.  Here is a simple example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="c1"># start at &#39;outer&#39; for the sake of our example</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
+
+<span class="c1"># Send an event with the signal name &#39;mary&#39;</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">mary</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The signal names used by the events are common across the entire system.  You
+do not need to declare them.  If the system had not seen the <code class="docutils literal notranslate"><span class="pre">signals.mary</span></code>
+signal code before in our above example, this name would be added and assigned
+a unique number automatically.</p>
+</div>
+<div class="section" id="posting-an-event-to-the-lifo">
+<span id="recipes-posting-an-event-to-the-lifo"></span><h3>Posting an Event to the LIFO<a class="headerlink" href="#posting-an-event-to-the-lifo" title="Permalink to this headline">¶</a></h3>
+<p>To post an event to the active object last-in-first-out (lifo) buffer, you
+must have first started your statechart.  Here is a simple example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="c1"># start at &#39;outer&#39; for the sake of our example</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
+
+<span class="c1"># Now say we want to send an event with</span>
+<span class="c1"># th the signal name of &#39;mary&#39; to the chart</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_lifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">mary</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>You would post to the ‘lifo’ buffer if you needed your event to be moved to the
+front of the active object’s collection of unprocessed events.  You might want
+to do this with a timing heart beat or for any event that needs to be processed
+with a greater priority than other events.</p>
+</div>
+<div class="section" id="creating-a-one-shot-event">
+<span id="recipes-creating-a-one-shot-event"></span><h3>Creating a One-Shot Event<a class="headerlink" href="#creating-a-one-shot-event" title="Permalink to this headline">¶</a></h3>
+<p>A one-shot event can be used to add some delay between state transitions.  You
+can think of them as delayed <strong>init</strong> signals.  You might want to use a one-shot if
+you need a system to settle down a bit before transitioning into an inner
+state.</p>
+<p>Generally speaking, you should cancel your one-shot events as your chart passes
+control to outer states.  You don’t need to do this, but if you don’t your
+outer states will be hit with one-shot messages that they don’t care about
+and your chart will needlessly search as it reacts to these events.</p>
+<p>It is important to know that if your chart changes state, the event posted to
+it will look like it came from outside of your statechart, even though it was
+originally generated within a given state.  The construction of any event with
+the <code class="docutils literal notranslate"><span class="pre">fifo</span></code> or <code class="docutils literal notranslate"><span class="pre">lifo</span></code> api behaves like this.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here define a middle state the creates a one-shot event called</span>
+<span class="c1"># delayed_one_second.  The same delayed_one_second signal is captured</span>
+<span class="c1"># by the middle state and used to transition into the inner state</span>
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
+
+  <span class="c1"># we have entered the state and we would like to delay one</span>
+  <span class="c1"># second prior to entering the inner state</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+      <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+        <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">delay_one_second</span><span class="p">),</span>
+        <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span>
+      <span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># we are leaving this state for an outer state</span>
+    <span class="c1"># so we cancel our one-shot in case it hasn&#39;t gone off yet</span>
+    <span class="n">ao</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">delay_one_second</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="c1"># ignore our init</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="c1"># our one-shot has fired, one second has passed since</span>
+  <span class="c1"># we transitioned into this state, now transition</span>
+  <span class="c1"># to our desired target; &#39;inner&#39;</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">delay_one_second</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
+
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">outer</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-a-multishot-event">
+<span id="recipes-creating-a-multishot-event"></span><h3>Creating a Multishot Event<a class="headerlink" href="#creating-a-multishot-event" title="Permalink to this headline">¶</a></h3>
+<p>A multi-shot event is just an extension of the one-shot idea.  Instead of only
+being fired once on entry, it can be fired between 2 and an infinite number of
+times.  You would use a multi-shot event if you would like to provide an inner
+part of your chart with a heart beat that the outer part of your chart doesn’t
+need to know about.  In this way you could save cycles by avoiding unnecessary
+event processing in the parts of the chart that don’t need these heart beats.
+This will also be useful while debugging your chart, your logs won’t be filled
+with unnecessary events.</p>
+<p>You should cancel your multi-shot events in the exit handler of the state that
+created them.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here define a middle state the creates a multi-shot event called</span>
+<span class="c1"># three_pulse.  The same three_pulse signal is captured</span>
+<span class="c1"># by the middle state and used to transition into the inner state</span>
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">multi_shot_thread</span> <span class="o">=</span> \
+      <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">),</span>
+                      <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                      <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c1"># We mark up the ao with this id, so that</span>
+    <span class="c1"># state function can be used by many different aos</span>
+    <span class="n">ao</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="n">multi_shot_thread</span><span class="p">,</span>
+                  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;multi_shot_thread&#39;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">ao</span><span class="o">.</span><span class="n">cancel_event</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">multi_shot_thread</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">outer</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>By setting the <code class="docutils literal notranslate"><span class="pre">times</span></code> argument of the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> to 0, you can create an
+infinite multi-shot event.  This is how you could make an inner heart beat.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> api can be used the same as the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> api for
+creating these types of repeating events.  You would use the <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> api
+when you would need your heart beat event signal to barge ahead of all other
+events waiting to be processed by the active object.</p>
+</div>
+<div class="section" id="cancelling-a-specific-event-source">
+<span id="id3"></span><h3>Cancelling a Specific Event Source<a class="headerlink" href="#cancelling-a-specific-event-source" title="Permalink to this headline">¶</a></h3>
+<p>The requests to the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> and <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> methods, where <code class="docutils literal notranslate"><span class="pre">times</span></code> are
+specified, can be thought of as event sources.  This is because they create
+background threads which track time and periodically post events to the active
+object.</p>
+<p>There are two different ways to cancel event sources.  You can cancel a
+specific event source, or you can cancel all event sources that create a
+specific signal name (easier).  Read the
+<a class="reference internal" href="#recipes-cancelling-event-source-by-signal-name"><span class="std std-ref">Cancelling Event Source By Signal Name</span></a> recipe to see how to do
+this.</p>
+<p>To cancel a specific signal source, you need to track the thread id which was
+created when it was made, then use that id to cancel the event.  Since a state
+method can be used by many different active objects, you don’t want to store
+this id on the method itself, or in its variable name space.  Instead, you can
+markup the name of the chart that is using the method, this <code class="docutils literal notranslate"><span class="pre">chart</span></code> object is
+passed to the state method as the first argument.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here define a middle state the creates a multi-shot event called</span>
+<span class="c1"># three_pulse.  The same three_pulse signal is captured</span>
+<span class="c1"># by the middle state and used to transition into the inner state</span>
+<span class="c1">#</span>
+<span class="c1"># We want to cancel this specific event source when we are exiting this</span>
+<span class="c1"># state</span>
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">multi_shot_thread</span> <span class="o">=</span> \
+      <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">),</span>
+                      <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                      <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c1"># We graffiti the provided chart object with this id</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="n">multi_shot_thread</span><span class="p">,</span>
+                  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;multi_shot_thread&#39;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">cancel_event</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">multi_shot_thread</span><span class="p">)</span>
+
+    <span class="c1"># remove our graffiti</span>
+    <span class="k">del</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">multi_shot_thread</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">outer</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">augment</span></code> api is used to graffiti our chart upon entering the state.
+We write the event-source id onto the <code class="docutils literal notranslate"><span class="pre">multi_shot_thread</span></code> chart attribute,
+so that we can use it later.  By marking this specific <code class="docutils literal notranslate"><span class="pre">chart</span></code> object, the
+middle state method handler can be shared by other active objects.</p>
+<p>You would use this method of canceling an event source if you need the
+three_pulse signal name elsewhere in your statechart.  If you do not intend on
+re-using this signal name you can just cancel event sources using a much
+simpler api: the <code class="docutils literal notranslate"><span class="pre">cancel_event</span></code>.</p>
+</div>
+<div class="section" id="cancelling-event-source-by-signal-name">
+<span id="recipes-cancelling-event-source-by-signal-name"></span><h3>Cancelling Event Source By Signal Name<a class="headerlink" href="#cancelling-event-source-by-signal-name" title="Permalink to this headline">¶</a></h3>
+<p>If you would like to re-use your event source signal names through your chart,
+then you can use the <span class="xref std std-ref">recipes-cancelling-a-specific-event-source</span> recipe
+to cancel a specific source and leave your other event sources running.
+Otherwise, you can use the simpler <code class="docutils literal notranslate"><span class="pre">cancel_sources</span></code> api provided by the
+Active Object:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here we define a middle state the creates a multi-shot event called</span>
+<span class="c1"># three_pulse.  The same three_pulse signal is captured</span>
+<span class="c1"># by the middle state and used to transition into the inner state</span>
+<span class="c1">#</span>
+<span class="c1"># We want to cancel this specific event source when we are exiting this</span>
+<span class="c1"># state</span>
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">),</span>
+                    <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                    <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                    <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># cancel all event sources with the signal named three_pulses</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">))</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">outer</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>There is no need to keep a thread id for the event source, since the Active
+Object can just look at all of the event source threads and kill any of them
+that have this signal name provided to the <code class="docutils literal notranslate"><span class="pre">cancel_events</span></code> call.</p>
+</div>
+<div class="section" id="recipes-deferring-an-event">
+<span id="id4"></span><h3>Deferring and Recalling an Event<a class="headerlink" href="#recipes-deferring-an-event" title="Permalink to this headline">¶</a></h3>
+<p>There will be situations where you want to post a kind of artificial event into
+a queue which won’t immediately be acted upon by your startchart.  It is an
+<cite>artificial</cite> event, because your chart is making it up, it isn’t being given to
+it by the outside world.  It is a way for your chart to build up a kind of
+processing pressure that can be relieved when you have the cycles to work on
+things.</p>
+<p>This is a two stage process, one, deferring the event, and two, recalling the
+event.  It is called a deferment of an event because we are holding off our
+reaction to it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># code to place in the state that is deferring the event:</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">signal_that_is_deferred</span><span class="p">)</span>
+
+<span class="c1"># code to place in the state where you would like the event reposted into</span>
+<span class="c1"># the chart&#39;s first in first out queue</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span> <span class="c1"># posts our deferred event to the chart.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-a-payload-to-an-event">
+<span id="recipes-adding-a-payload-to-an-event"></span><h3>Adding a Payload to an Event<a class="headerlink" href="#adding-a-payload-to-an-event" title="Permalink to this headline">¶</a></h3>
+<p>To add a payload to your event:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">e</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">YOUR_SIGNAL_NAME</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s2">&quot;My Payload&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="determining-if-an-event-has-a-payload">
+<span id="recipes-determining-if-an-event-has-a-payload"></span><h3>Determining if an Event Has a Payload<a class="headerlink" href="#determining-if-an-event-has-a-payload" title="Permalink to this headline">¶</a></h3>
+<p>To determine if an event has a payload:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">e1</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">YOUR_SIGNAL_NAME</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="s2">&quot;My Payload&quot;</span><span class="p">)</span>
+<span class="n">e2</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">YOUR_SIGNAL_NAME</span><span class="p">)</span>
+
+<span class="k">assert</span><span class="p">(</span><span class="n">e1</span><span class="o">.</span><span class="n">has_payload</span><span class="p">()</span> <span class="o">==</span> <span class="bp">True</span><span class="p">)</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">e2</span><span class="o">.</span><span class="n">has_payload</span><span class="p">()</span> <span class="o">==</span> <span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="activeobjects-and-factories">
+<span id="recipes-activeobjects-and-factories"></span><h2>Activeobjects and Factories<a class="headerlink" href="#activeobjects-and-factories" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="#recipes-markup-your-event-processor"><span class="std std-ref">Augment your active object</span></a></li>
+<li><a class="reference internal" href="#recipes-creating-a-state-method-from-a-template"><span class="std std-ref">Create a statechart from a template</span></a></li>
+<li><a class="reference internal" href="#recipes-creating-a-state-method-from-a-factory"><span class="std std-ref">Create a statechart from a Factory</span></a></li>
+<li><a class="reference internal" href="#recipes-subscribing-to-an-event-posted-by-another-active-object"><span class="std std-ref">Subscribing to an event posted by another Activeobject and Factories</span></a></li>
+<li><a class="reference internal" href="#recipes-publishing-event-to-other-active-objects"><span class="std std-ref">Publishing events to other Activeobjects and Factories</span></a></li>
+<li><a class="reference internal" href="#recipes-creating-a-statechart-inside-of-a-class"><span class="std std-ref">Create a statechart inside of a Class</span></a></li>
+<li><a class="reference internal" href="#recipes-creating-a-statechart-inside-of-a-class"><span class="std std-ref">Getting information out of of your Statechart</span></a></li>
+<li><a class="reference internal" href="#recipes-multiple-statecharts"><span class="std std-ref">Working with Multiple statecharts</span></a></li>
+</ul>
+<div class="section" id="augment-your-activeobject">
+<span id="recipes-markup-your-event-processor"></span><h3>Augment Your Activeobject<a class="headerlink" href="#augment-your-activeobject" title="Permalink to this headline">¶</a></h3>
+<p>It is a bad idea to add variables to the state methods, instead augment your
+active objects using the <code class="docutils literal notranslate"><span class="pre">augment</span></code> command.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">chart</span> <span class="o">=</span> <span class="n">ActiveObect</span><span class="p">()</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;counter&#39;</span><span class="p">)</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">counter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>An even better idea would be to include the attributes in a subclass of an
+Activeobject or Factory.</p>
 </div>
 <div class="section" id="creating-a-statechart-from-a-template">
 <span id="recipes-creating-a-state-method-from-a-template"></span><h3>Creating a Statechart From a Template<a class="headerlink" href="#creating-a-statechart-from-a-template" title="Permalink to this headline">¶</a></h3>
@@ -973,7 +1330,7 @@ federation. (systems programming)</li>
 the internet (<a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/index.html">systems of systems: miros-rabbitmq</a>)</li>
 </ul>
 </div></blockquote>
-<p>To program this way we use the Factory class from miros.</p>
+<p>To program this way we use the <a class="reference internal" href="#recipes-creating-a-state-method-from-a-factory"><span class="std std-ref">Factory</span></a> class from miros.</p>
 <p>Here is a simple example of a statechart within an object:</p>
 <a class="reference external image-reference" href="_static/factory_in_class_simple.pdf"><div align="center" class="align-center"><img alt="_images/factory_in_class_simple.svg" src="_images/factory_in_class_simple.svg" /></div>
 </a>
@@ -1386,352 +1743,8 @@ classes are working together rather than three instantiated objects from the
 same class.  UML really falls-over in describing object interactions.</p>
 <p>If you have any suggestions about how to draw this better, email me.</p>
 </div>
-</div>
-<div class="section" id="events-and-signals">
-<span id="recipes-events-and-signals"></span><h2>Events And Signals<a class="headerlink" href="#events-and-signals" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="creating-an-event">
-<span id="recipes-creating-an-event"></span><h3>Creating an Event<a class="headerlink" href="#creating-an-event" title="Permalink to this headline">¶</a></h3>
-<p>An event is something that will be passed into your statechart, it will be
-reacted to, then removed from memory.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
-
-<span class="n">event_1</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="s2">&quot;name_of_signal&quot;</span><span class="p">)</span>
-<span class="c1"># or</span>
-<span class="n">event_2</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">name_of_signal</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="creating-a-signal">
-<span id="recipes-creating-a-signal"></span><h3>Creating a Signal<a class="headerlink" href="#creating-a-signal" title="Permalink to this headline">¶</a></h3>
-<p>A signal is the name of an event.  Many different events can have the same
-name, or signal.  When a signal is created, it is given a number which is one
-higher than the oldest signal that was within your program.  You shouldn’t have
-to worry about what a signal number is, they are only used to speed up the
-event processor. (it is faster to compare two numbers than two strings)</p>
-<p>When you create a signal it will not be removed from memory until your program
-finishes.  They are created at the moment they are referenced, so you don’t
-have to explicitly define them.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
-
-<span class="c1"># signal named &quot;name_of_signaL&quot; invented</span>
-<span class="c1"># here and given a unique number</span>
-<span class="hll"><span class="n">event_1</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="s2">&quot;name_of_signal&quot;</span><span class="p">)</span>
-</span><span class="c1"># the signal number of this event will have</span>
-<span class="c1"># the same number as in line 6</span>
-<span class="n">event_2</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">name_of_signal</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Notice that the signal was invented on line <strong>6</strong> then re-used on line <strong>9</strong>.</p>
-<p>The signals are shared across your whole program.  To see reflect upon your
-signals read <a class="reference internal" href="#recipes-seeing-your-signals"><span class="std std-ref">this</span></a>.</p>
-</div>
-<div class="section" id="posting-events">
-<span id="id2"></span><h3>Posting Events<a class="headerlink" href="#posting-events" title="Permalink to this headline">¶</a></h3>
-<p>The Active Object <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code>, <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code>, <code class="docutils literal notranslate"><span class="pre">defer</span></code> and <code class="docutils literal notranslate"><span class="pre">recall</span></code>
-methods are use to feed events to the statechart.  An Event can be thought of
-as a kind of named marble that is placed onto a topological map.  If a
-particular elevation doesn’t know what to do with the marble, it rolls the
-marble to the next lower elevation, or state.  If the lowest elevation is
-reached and the program doesn’t know what to do, it just ignores the event, or
-lets the marble fall out of play.</p>
-<p>The name of the marble is the signal name. An event can have a payload, but it
-doesn’t have to.  An event can only be posted to a chart after the chart has
-started.  Otherwise the behavior of the active object is undefined.</p>
-<p>The state methods typically react to the names of a event, or the signal names.
-This means that the if-else structures that you write will use the signal names
-in their logic.</p>
-<p>If you use the chart’s post event methods within the chart, the chart will not
-concern itself with <em>where</em> you initiated that event.  It will post its events
-into its queue as if they were provided by the outside world.  In this way
-these events are called <em>artificial</em>; instead of the world creating the event,
-the chart does.  There are a number of situations where it makes sense to do
-this, they will be described in the patterns section.</p>
-</div>
-<div class="section" id="posting-an-event-to-the-fifo">
-<span id="recipes-posting-an-event-to-the-fifo"></span><h3>Posting an Event to the Fifo<a class="headerlink" href="#posting-an-event-to-the-fifo" title="Permalink to this headline">¶</a></h3>
-<p>To post an event to the active object first-in-first-out (fifo) buffer, you
-must have first started your statechart.  Here is a simple example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
-<span class="c1"># start at &#39;outer&#39; for the sake of our example</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
-
-<span class="c1"># Send an event with the signal name &#39;mary&#39;</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">mary</span><span class="p">))</span>
-</pre></div>
-</div>
-<p>The signal names used by the events are common across the entire system.  You
-do not need to declare them.  If the system had not seen the <code class="docutils literal notranslate"><span class="pre">signals.mary</span></code>
-signal code before in our above example, this name would be added and assigned
-a unique number automatically.</p>
-</div>
-<div class="section" id="posting-an-event-to-the-lifo">
-<span id="recipes-posting-an-event-to-the-lifo"></span><h3>Posting an Event to the LIFO<a class="headerlink" href="#posting-an-event-to-the-lifo" title="Permalink to this headline">¶</a></h3>
-<p>To post an event to the active object last-in-first-out (lifo) buffer, you
-must have first started your statechart.  Here is a simple example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
-<span class="c1"># start at &#39;outer&#39; for the sake of our example</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
-
-<span class="c1"># Now say we want to send an event with</span>
-<span class="c1"># th the signal name of &#39;mary&#39; to the chart</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">post_lifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">mary</span><span class="p">))</span>
-</pre></div>
-</div>
-<p>You would post to the ‘lifo’ buffer if you needed your event to be moved to the
-front of the active object’s collection of unprocessed events.  You might want
-to do this with a timing heart beat or for any event that needs to be processed
-with a greater priority than other events.</p>
-</div>
-<div class="section" id="creating-a-one-shot-event">
-<span id="recipes-creating-a-one-shot-event"></span><h3>Creating a One-Shot Event<a class="headerlink" href="#creating-a-one-shot-event" title="Permalink to this headline">¶</a></h3>
-<p>A one-shot event can be used to add some delay between state transitions.  You
-can think of them as delayed <strong>init</strong> signals.  You might want to use a one-shot if
-you need a system to settle down a bit before transitioning into an inner
-state.</p>
-<p>Generally speaking, you should cancel your one-shot events as your chart passes
-control to outer states.  You don’t need to do this, but if you don’t your
-outer states will be hit with one-shot messages that they don’t care about
-and your chart will needlessly search as it reacts to these events.</p>
-<p>It is important to know that if your chart changes state, the event posted to
-it will look like it came from outside of your statechart, even though it was
-originally generated within a given state.  The construction of any event with
-the <code class="docutils literal notranslate"><span class="pre">fifo</span></code> or <code class="docutils literal notranslate"><span class="pre">lifo</span></code> api behaves like this.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here define a middle state the creates a one-shot event called</span>
-<span class="c1"># delayed_one_second.  The same delayed_one_second signal is captured</span>
-<span class="c1"># by the middle state and used to transition into the inner state</span>
-<span class="nd">@spy_on</span>
-<span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
-
-  <span class="c1"># we have entered the state and we would like to delay one</span>
-  <span class="c1"># second prior to entering the inner state</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-      <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
-        <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">delay_one_second</span><span class="p">),</span>
-        <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-        <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span>
-      <span class="p">)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-    <span class="c1"># we are leaving this state for an outer state</span>
-    <span class="c1"># so we cancel our one-shot in case it hasn&#39;t gone off yet</span>
-    <span class="n">ao</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">delay_one_second</span><span class="p">)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-
-  <span class="c1"># ignore our init</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-
-  <span class="c1"># our one-shot has fired, one second has passed since</span>
-  <span class="c1"># we transitioned into this state, now transition</span>
-  <span class="c1"># to our desired target; &#39;inner&#39;</span>
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">delay_one_second</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
-
-  <span class="k">else</span><span class="p">:</span>
-    <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">outer</span>
-  <span class="k">return</span> <span class="n">status</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="creating-a-multishot-event">
-<span id="recipes-creating-a-multishot-event"></span><h3>Creating a Multishot Event<a class="headerlink" href="#creating-a-multishot-event" title="Permalink to this headline">¶</a></h3>
-<p>A multi-shot event is just an extension of the one-shot idea.  Instead of only
-being fired once on entry, it can be fired between 2 and an infinite number of
-times.  You would use a multi-shot event if you would like to provide an inner
-part of your chart with a heart beat that the outer part of your chart doesn’t
-need to know about.  In this way you could save cycles by avoiding unnecessary
-event processing in the parts of the chart that don’t need these heart beats.
-This will also be useful while debugging your chart, your logs won’t be filled
-with unnecessary events.</p>
-<p>You should cancel your multi-shot events in the exit handler of the state that
-created them.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here define a middle state the creates a multi-shot event called</span>
-<span class="c1"># three_pulse.  The same three_pulse signal is captured</span>
-<span class="c1"># by the middle state and used to transition into the inner state</span>
-<span class="nd">@spy_on</span>
-<span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="n">multi_shot_thread</span> <span class="o">=</span> \
-      <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">),</span>
-                      <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                      <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-                      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="c1"># We mark up the ao with this id, so that</span>
-    <span class="c1"># state function can be used by many different aos</span>
-    <span class="n">ao</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="n">multi_shot_thread</span><span class="p">,</span>
-                  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;multi_shot_thread&#39;</span><span class="p">)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">ao</span><span class="o">.</span><span class="n">cancel_event</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">multi_shot_thread</span><span class="p">)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">outer</span>
-  <span class="k">return</span> <span class="n">status</span>
-</pre></div>
-</div>
-<p>By setting the <code class="docutils literal notranslate"><span class="pre">times</span></code> argument of the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> to 0, you can create an
-infinite multi-shot event.  This is how you could make an inner heart beat.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> api can be used the same as the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> api for
-creating these types of repeating events.  You would use the <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> api
-when you would need your heart beat event signal to barge ahead of all other
-events waiting to be processed by the active object.</p>
-</div>
-<div class="section" id="cancelling-a-specific-event-source">
-<span id="id3"></span><h3>Cancelling a Specific Event Source<a class="headerlink" href="#cancelling-a-specific-event-source" title="Permalink to this headline">¶</a></h3>
-<p>The requests to the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> and <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> methods, where <code class="docutils literal notranslate"><span class="pre">times</span></code> are
-specified, can be thought of as event sources.  This is because they create
-background threads which track time and periodically post events to the active
-object.</p>
-<p>There are two different ways to cancel event sources.  You can cancel a
-specific event source, or you can cancel all event sources that create a
-specific signal name (easier).  Read the
-<a class="reference internal" href="#recipes-cancelling-event-source-by-signal-name"><span class="std std-ref">Cancelling Event Source By Signal Name</span></a> recipe to see how to do
-this.</p>
-<p>To cancel a specific signal source, you need to track the thread id which was
-created when it was made, then use that id to cancel the event.  Since a state
-method can be used by many different active objects, you don’t want to store
-this id on the method itself, or in its variable name space.  Instead, you can
-markup the name of the chart that is using the method, this <code class="docutils literal notranslate"><span class="pre">chart</span></code> object is
-passed to the state method as the first argument.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here define a middle state the creates a multi-shot event called</span>
-<span class="c1"># three_pulse.  The same three_pulse signal is captured</span>
-<span class="c1"># by the middle state and used to transition into the inner state</span>
-<span class="c1">#</span>
-<span class="c1"># We want to cancel this specific event source when we are exiting this</span>
-<span class="c1"># state</span>
-<span class="nd">@spy_on</span>
-<span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="n">multi_shot_thread</span> <span class="o">=</span> \
-      <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">),</span>
-                      <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                      <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-                      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="c1"># We graffiti the provided chart object with this id</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="n">multi_shot_thread</span><span class="p">,</span>
-                  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;multi_shot_thread&#39;</span><span class="p">)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">cancel_event</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">multi_shot_thread</span><span class="p">)</span>
-
-    <span class="c1"># remove our graffiti</span>
-    <span class="k">del</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">multi_shot_thread</span><span class="p">)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">outer</span>
-  <span class="k">return</span> <span class="n">status</span>
-</pre></div>
-</div>
-<p>The <code class="docutils literal notranslate"><span class="pre">augment</span></code> api is used to graffiti our chart upon entering the state.
-We write the event-source id onto the <code class="docutils literal notranslate"><span class="pre">multi_shot_thread</span></code> chart attribute,
-so that we can use it later.  By marking this specific <code class="docutils literal notranslate"><span class="pre">chart</span></code> object, the
-middle state method handler can be shared by other active objects.</p>
-<p>You would use this method of canceling an event source if you need the
-three_pulse signal name elsewhere in your statechart.  If you do not intend on
-re-using this signal name you can just cancel event sources using a much
-simpler api: the <code class="docutils literal notranslate"><span class="pre">cancel_event</span></code>.</p>
-</div>
-<div class="section" id="cancelling-event-source-by-signal-name">
-<span id="recipes-cancelling-event-source-by-signal-name"></span><h3>Cancelling Event Source By Signal Name<a class="headerlink" href="#cancelling-event-source-by-signal-name" title="Permalink to this headline">¶</a></h3>
-<p>If you would like to re-use your event source signal names through your chart,
-then you can use the <span class="xref std std-ref">recipes-cancelling-a-specific-event-source</span> recipe
-to cancel a specific source and leave your other event sources running.
-Otherwise, you can use the simpler <code class="docutils literal notranslate"><span class="pre">cancel_sources</span></code> api provided by the
-Active Object:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here we define a middle state the creates a multi-shot event called</span>
-<span class="c1"># three_pulse.  The same three_pulse signal is captured</span>
-<span class="c1"># by the middle state and used to transition into the inner state</span>
-<span class="c1">#</span>
-<span class="c1"># We want to cancel this specific event source when we are exiting this</span>
-<span class="c1"># state</span>
-<span class="nd">@spy_on</span>
-<span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">),</span>
-                    <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                    <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-                    <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-    <span class="c1"># cancel all event sources with the signal named three_pulses</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">))</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">outer</span>
-  <span class="k">return</span> <span class="n">status</span>
-</pre></div>
-</div>
-<p>There is no need to keep a thread id for the event source, since the Active
-Object can just look at all of the event source threads and kill any of them
-that have this signal name provided to the <code class="docutils literal notranslate"><span class="pre">cancel_events</span></code> call.</p>
-</div>
-<div class="section" id="recipes-deferring-an-event">
-<span id="id4"></span><h3>Deferring and Recalling an Event<a class="headerlink" href="#recipes-deferring-an-event" title="Permalink to this headline">¶</a></h3>
-<p>There will be situations where you want to post a kind of artificial event into
-a queue which won’t immediately be acted upon by your startchart.  It is an
-<cite>artificial</cite> event, because your chart is making it up, it isn’t being given to
-it by the outside world.  It is a way for your chart to build up a kind of
-processing pressure that can be relieved when you have the cycles to work on
-things.</p>
-<p>This is a two stage process, one, deferring the event, and two, recalling the
-event.  It is called a deferment of an event because we are holding off our
-reaction to it.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># code to place in the state that is deferring the event:</span>
-<span class="n">chart</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">signal_that_is_deferred</span><span class="p">)</span>
-
-<span class="c1"># code to place in the state where you would like the event reposted into</span>
-<span class="c1"># the chart&#39;s first in first out queue</span>
-<span class="n">chart</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span> <span class="c1"># posts our deferred event to the chart.</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="adding-a-payload-to-an-event">
-<span id="recipes-adding-a-payload-to-an-event"></span><h3>Adding a Payload to an Event<a class="headerlink" href="#adding-a-payload-to-an-event" title="Permalink to this headline">¶</a></h3>
-<p>To add a payload to your event:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">e</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">YOUR_SIGNAL_NAME</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s2">&quot;My Payload&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="determining-if-an-event-has-a-payload">
-<span id="recipes-determining-if-an-event-has-a-payload"></span><h3>Determining if an Event Has a Payload<a class="headerlink" href="#determining-if-an-event-has-a-payload" title="Permalink to this headline">¶</a></h3>
-<p>To determine if an event has a payload:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">e1</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">YOUR_SIGNAL_NAME</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="s2">&quot;My Payload&quot;</span><span class="p">)</span>
-<span class="n">e2</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">YOUR_SIGNAL_NAME</span><span class="p">)</span>
-
-<span class="k">assert</span><span class="p">(</span><span class="n">e1</span><span class="o">.</span><span class="n">has_payload</span><span class="p">()</span> <span class="o">==</span> <span class="bp">True</span><span class="p">)</span>
-<span class="k">assert</span><span class="p">(</span><span class="n">e2</span><span class="o">.</span><span class="n">has_payload</span><span class="p">()</span> <span class="o">==</span> <span class="bp">False</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
 <div class="section" id="getting-information-from-your-statechart">
-<span id="recipes-getting-information-from-your-statecchart"></span><h2>Getting Information from your Statechart<a class="headerlink" href="#getting-information-from-your-statechart" title="Permalink to this headline">¶</a></h2>
+<span id="recipes-getting-information-from-your-statecchart"></span><h3>Getting Information from your Statechart<a class="headerlink" href="#getting-information-from-your-statechart" title="Permalink to this headline">¶</a></h3>
 <p>You will find yourself in situations where you would like to read information
 that has asynchronously been gathered by your statechart from your main program.
 This may happen if you have built a statechart to monitor an external device, or
@@ -1852,28 +1865,6 @@ synchronous <code class="docutils literal notranslate"><span class="pre">get_wea
 </pre></div>
 </div>
 </div>
-<div class="section" id="multiple-statecharts">
-<span id="recipes-multiple-statecharts"></span><h2>Multiple Statecharts<a class="headerlink" href="#multiple-statecharts" title="Permalink to this headline">¶</a></h2>
-<p>Break your design down into different interacting charts by using the
-ActiveFabric.</p>
-<p>The active fabric is a set of background tasks which act together to dispatch
-events between the active objects in your system.</p>
-<p>As a user of the software you wouldn’t touch the active fabric directly, but
-instead would use your active object’s <code class="docutils literal notranslate"><span class="pre">publish</span></code> and <code class="docutils literal notranslate"><span class="pre">subscribe</span></code> methods.  The
-active fabric has two different priority queues and two different tasks which
-pend upon them.  One is for managing subscriptions in a first in first (fifo)
-out manner, the other is for managing messages in a last in first out (lifo)
-manner.  By having two different queues and two different tasks an active
-object is given the option to subscribe to another active object’s published
-events, using one of two different strategies:</p>
-<ol class="arabic simple">
-<li>If it subscribes to an event using the <code class="docutils literal notranslate"><span class="pre">fifo</span></code> strategy, the active fabric
-will post events to it using its <a class="reference internal" href="#recipes-posting-an-event-to-the-fifo"><span class="std std-ref">post_fifo</span></a> method.</li>
-<li>If it subscribes in a <code class="docutils literal notranslate"><span class="pre">lifo</span></code> way it will post using the <a class="reference internal" href="#recipes-posting-an-event-to-the-lifo"><span class="std std-ref">post_lifo</span></a> method.</li>
-</ol>
-<p>You can also set the priority of the event while it is in transit within the
-active fabric.  This would only be useful if you are expecting contention
-between various events being dispatched across your system.</p>
 <div class="section" id="subscribing-to-an-event-posted-by-another-active-object">
 <span id="recipes-subscribing-to-an-event-posted-by-another-active-object"></span><h3>Subscribing to an Event Posted by Another Active Object<a class="headerlink" href="#subscribing-to-an-event-posted-by-another-active-object" title="Permalink to this headline">¶</a></h3>
 <p>Your active object can subscribe to the events published by other active objects.</p>
@@ -1958,6 +1949,29 @@ priority is 1.  By default all published events are given a priority of 1000.
 If two events have the same priority the queue will behave like a first in
 first out queue.</p>
 </div>
+</div>
+<div class="section" id="multiple-statecharts">
+<span id="recipes-multiple-statecharts"></span><h3>Multiple Statecharts<a class="headerlink" href="#multiple-statecharts" title="Permalink to this headline">¶</a></h3>
+<p>Break your design down into different interacting charts by using the
+ActiveFabric.</p>
+<p>The active fabric is a set of background tasks which act together to dispatch
+events between the active objects in your system.</p>
+<p>As a user of the software you wouldn’t touch the active fabric directly, but
+instead would use your active object’s <code class="docutils literal notranslate"><span class="pre">publish</span></code> and <code class="docutils literal notranslate"><span class="pre">subscribe</span></code> methods.  The
+active fabric has two different priority queues and two different tasks which
+pend upon them.  One is for managing subscriptions in a first in first (fifo)
+out manner, the other is for managing messages in a last in first out (lifo)
+manner.  By having two different queues and two different tasks an active
+object is given the option to subscribe to another active object’s published
+events, using one of two different strategies:</p>
+<ol class="arabic simple">
+<li>If it subscribes to an event using the <code class="docutils literal notranslate"><span class="pre">fifo</span></code> strategy, the active fabric
+will post events to it using its <a class="reference internal" href="#recipes-posting-an-event-to-the-fifo"><span class="std std-ref">post_fifo</span></a> method.</li>
+<li>If it subscribes in a <code class="docutils literal notranslate"><span class="pre">lifo</span></code> way it will post using the <a class="reference internal" href="#recipes-posting-an-event-to-the-lifo"><span class="std std-ref">post_lifo</span></a> method.</li>
+</ol>
+<p>You can also set the priority of the event while it is in transit within the
+active fabric.  This would only be useful if you are expecting contention
+between various events being dispatched across your system.</p>
 </div>
 </div>
 <div class="section" id="seeing-what-is-going-on">
@@ -2655,17 +2669,13 @@ specification.</p>
 <li><a class="reference internal" href="#do-something-when-the-state-is-entered">Do Something when the State is Entered</a></li>
 <li><a class="reference internal" href="#do-something-when-the-state-is-initialized">Do Something when the State is Initialized</a></li>
 <li><a class="reference internal" href="#do-something-when-the-state-is-exited">Do Something when the State is Exited</a></li>
-<li><a class="reference internal" href="#augment-your-active-object">Augment Your Active Object</a></li>
 <li><a class="reference internal" href="#create-a-hook">Create a Hook</a></li>
 <li><a class="reference internal" href="#catch-and-release">Catch and Release</a></li>
 <li><a class="reference internal" href="#create-a-one-shot">Create a One-Shot</a></li>
 <li><a class="reference internal" href="#create-a-multi-shot">Create a Multi-Shot</a></li>
-<li><a class="reference internal" href="#cancelling-events">Cancelling Events</a></li>
+<li><a class="reference internal" href="#canceling-events">Canceling Events</a></li>
 <li><a class="reference internal" href="#deferring-and-recalling-an-event">Deferring and Recalling an Event</a></li>
 <li><a class="reference internal" href="#create-a-guard">Create a Guard</a></li>
-<li><a class="reference internal" href="#creating-a-statechart-from-a-template">Creating a Statechart From a Template</a></li>
-<li><a class="reference internal" href="#creating-a-statechart-from-a-factory">Creating a Statechart From a Factory</a></li>
-<li><a class="reference internal" href="#creating-a-statechart-inside-of-a-class">Creating a Statechart Inside of a Class</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#events-and-signals">Events And Signals</a><ul>
@@ -2683,10 +2693,15 @@ specification.</p>
 <li><a class="reference internal" href="#determining-if-an-event-has-a-payload">Determining if an Event Has a Payload</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#activeobjects-and-factories">Activeobjects and Factories</a><ul>
+<li><a class="reference internal" href="#augment-your-activeobject">Augment Your Activeobject</a></li>
+<li><a class="reference internal" href="#creating-a-statechart-from-a-template">Creating a Statechart From a Template</a></li>
+<li><a class="reference internal" href="#creating-a-statechart-from-a-factory">Creating a Statechart From a Factory</a></li>
+<li><a class="reference internal" href="#creating-a-statechart-inside-of-a-class">Creating a Statechart Inside of a Class</a></li>
 <li><a class="reference internal" href="#getting-information-from-your-statechart">Getting Information from your Statechart</a></li>
-<li><a class="reference internal" href="#multiple-statecharts">Multiple Statecharts</a><ul>
 <li><a class="reference internal" href="#subscribing-to-an-event-posted-by-another-active-object">Subscribing to an Event Posted by Another Active Object</a></li>
 <li><a class="reference internal" href="#publishing-events-to-other-active-objects">Publishing events to other Active Objects</a></li>
+<li><a class="reference internal" href="#multiple-statecharts">Multiple Statecharts</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#seeing-what-is-going-on">Seeing What is Going On</a><ul>

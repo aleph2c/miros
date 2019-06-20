@@ -70,7 +70,6 @@ There are different ways to create states with miros:
 * :ref:`Do something when the state is entered<recipes-do-something-when-the-state-is-entered>`
 * :ref:`Do something when the state is initialized<recipes-do-something-when-the-state-is-initialized>`
 * :ref:`Do something when the state is exited<recipes-do-something-when-the-state-is-exited>`
-* :ref:`Augment your active object<recipes-markup-your-event-processor>`
 * :ref:`Create a hook<recipes-create-a-hook>`
 * :ref:`Catch and release<recipes-catch-and-release>`
 * :ref:`Create a one-shot<recipes-create-a-one-shot-state>`
@@ -572,18 +571,6 @@ outside of of your state method's boundary.
       self.temp.fun = self.c
     return status
 
-.. _recipes-markup-your-event-processor:
-
-Augment Your Active Object
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-It is a bad idea to add variables to the state methods, instead augment your
-active objects using the ``augment`` command.
-
-.. code-block:: python
-  
-  chart = ActiveObect()
-  chart.augment(other=0, name='counter')
-  assert(chart.counter == 0)
 
 
 .. _recipes-create-a-hook:
@@ -746,7 +733,7 @@ Create a Multi-Shot
 
 .. _recipes-cancelling-events-state:
 
-Cancelling Events
+Canceling Events
 ^^^^^^^^^^^^^^^^^
 To kill a cancel a specific event, see :ref:`this.<recipes-cancelling-a-specific-event-source>`
 
@@ -793,6 +780,320 @@ The highlighted code is the guard.
 
 To learn more about guards read the
 :ref:`hacking to learn example.<scribbleexample-hacking-to-learn-the-deeper-dynamics>`
+
+.. _recipes-events-and-signals:
+Events And Signals
+------------------
+
+.. _recipes-creating-an-event:
+
+Creating an Event
+^^^^^^^^^^^^^^^^^
+An event is something that will be passed into your statechart, it will be
+reacted to, then removed from memory.
+
+.. code-block:: python
+
+  from miros import Event
+  from miros import signals
+
+  event_1 = Event(signal="name_of_signal")
+  # or 
+  event_2 = Event(signal=signals.name_of_signal)
+
+.. _recipes-creating-a-signal:
+
+Creating a Signal
+^^^^^^^^^^^^^^^^^
+A signal is the name of an event.  Many different events can have the same
+name, or signal.  When a signal is created, it is given a number which is one
+higher than the oldest signal that was within your program.  You shouldn't have
+to worry about what a signal number is, they are only used to speed up the
+event processor. (it is faster to compare two numbers than two strings)
+
+When you create a signal it will not be removed from memory until your program
+finishes.  They are created at the moment they are referenced, so you don't
+have to explicitly define them.
+
+.. code-block:: python
+  :emphasize-lines: 6
+
+  from miros import Event
+  from miros import signals
+  
+  # signal named "name_of_signaL" invented
+  # here and given a unique number
+  event_1 = Event(signal="name_of_signal")
+  # the signal number of this event will have
+  # the same number as in line 6
+  event_2 = Event(signal=signals.name_of_signal)
+
+Notice that the signal was invented on line **6** then re-used on line **9**.
+
+The signals are shared across your whole program.  To see reflect upon your
+signals read :ref:`this<recipes_seeing_your_signals>`.
+
+
+.. _posting_events:
+
+Posting Events
+^^^^^^^^^^^^^^
+The Active Object ``post_fifo``, ``post_lifo``, ``defer`` and ``recall``
+methods are use to feed events to the statechart.  An Event can be thought of
+as a kind of named marble that is placed onto a topological map.  If a
+particular elevation doesn't know what to do with the marble, it rolls the
+marble to the next lower elevation, or state.  If the lowest elevation is
+reached and the program doesn't know what to do, it just ignores the event, or
+lets the marble fall out of play.
+
+The name of the marble is the signal name. An event can have a payload, but it
+doesn't have to.  An event can only be posted to a chart after the chart has
+started.  Otherwise the behavior of the active object is undefined.
+
+The state methods typically react to the names of a event, or the signal names.
+This means that the if-else structures that you write will use the signal names
+in their logic.
+
+If you use the chart's post event methods within the chart, the chart will not
+concern itself with *where* you initiated that event.  It will post its events
+into its queue as if they were provided by the outside world.  In this way
+these events are called *artificial*; instead of the world creating the event,
+the chart does.  There are a number of situations where it makes sense to do
+this, they will be described in the patterns section.
+
+.. _recipes-posting-an-event-to-the-fifo:
+
+Posting an Event to the Fifo
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To post an event to the active object first-in-first-out (fifo) buffer, you
+must have first started your statechart.  Here is a simple example:
+
+.. code-block:: python
+
+  ao = ActiveObject()
+  # start at 'outer' for the sake of our example
+  ao.start_at(outer)
+
+  # Send an event with the signal name 'mary'
+  ao.post_fifo(Event(signal=signals.mary))
+
+The signal names used by the events are common across the entire system.  You
+do not need to declare them.  If the system had not seen the ``signals.mary``
+signal code before in our above example, this name would be added and assigned
+a unique number automatically.
+
+.. _recipes-posting-an-event-to-the-lifo:
+
+Posting an Event to the LIFO
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To post an event to the active object last-in-first-out (lifo) buffer, you
+must have first started your statechart.  Here is a simple example:
+
+.. code-block:: python
+
+  ao = ActiveObject()
+  # start at 'outer' for the sake of our example
+  ao.start_at(outer)
+
+  # Now say we want to send an event with
+  # th the signal name of 'mary' to the chart
+  ao.post_lifo(Event(signal=signals.mary))
+
+You would post to the 'lifo' buffer if you needed your event to be moved to the
+front of the active object's collection of unprocessed events.  You might want
+to do this with a timing heart beat or for any event that needs to be processed
+with a greater priority than other events.
+
+
+.. _recipes-creating-a-one-shot-event:
+
+Creating a One-Shot Event
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: i_create_a_one_shot.rst 
+
+.. _recipes-creating-a-multishot-event:
+
+Creating a Multishot Event
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. include:: i_create_a_multishot.rst
+
+Cancelling a Specific Event Source
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The requests to the ``post_fifo`` and ``post_lifo`` methods, where ``times`` are
+specified, can be thought of as event sources.  This is because they create
+background threads which track time and periodically post events to the active
+object.
+
+There are two different ways to cancel event sources.  You can cancel a
+specific event source, or you can cancel all event sources that create a
+specific signal name (easier).  Read the
+:ref:`recipes-cancelling-event-source-by-signal-name` recipe to see how to do
+this.
+
+To cancel a specific signal source, you need to track the thread id which was
+created when it was made, then use that id to cancel the event.  Since a state
+method can be used by many different active objects, you don't want to store
+this id on the method itself, or in its variable name space.  Instead, you can
+markup the name of the chart that is using the method, this ``chart`` object is
+passed to the state method as the first argument.
+
+
+.. code-block:: python
+
+    # Here define a middle state the creates a multi-shot event called
+    # three_pulse.  The same three_pulse signal is captured
+    # by the middle state and used to transition into the inner state
+    #
+    # We want to cancel this specific event source when we are exiting this
+    # state
+    @spy_on
+    def middle(chart, e):
+      status = state.UNHANDLED
+      if(e.signal == signals.ENTRY_SIGNAL):
+        multi_shot_thread = \
+          chart.post_fifo(Event(signal=signals.three_pulse),
+                          times=3,
+                          period=1.0,
+                          deferred=True)
+        # We graffiti the provided chart object with this id
+        chart.augment(other=multi_shot_thread,
+                      name='multi_shot_thread')
+        status = state.HANDLED
+
+      elif(e.signal == signals.EXIT_SIGNAL):
+        chart.cancel_event(chart.multi_shot_thread)
+
+        # remove our graffiti
+        del(chart.multi_shot_thread)
+        status = state.HANDLED
+
+      if(e.signal == signals.INIT_SIGNAL):
+        status = state.HANDLED
+      elif(e.signal == signals.three_pulse):
+        status = chart.trans(inner)
+      else:
+        status, chart.temp.fun = state.SUPER, outer
+      return status
+
+The ``augment`` api is used to graffiti our chart upon entering the state.
+We write the event-source id onto the ``multi_shot_thread`` chart attribute,
+so that we can use it later.  By marking this specific ``chart`` object, the
+middle state method handler can be shared by other active objects.
+
+You would use this method of canceling an event source if you need the
+three_pulse signal name elsewhere in your statechart.  If you do not intend on
+re-using this signal name you can just cancel event sources using a much
+simpler api: the ``cancel_event``.
+
+.. _recipes-cancelling-event-source-by-signal-name:
+
+Cancelling Event Source By Signal Name
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If you would like to re-use your event source signal names through your chart,
+then you can use the :ref:`recipes-cancelling-a-specific-event-source` recipe
+to cancel a specific source and leave your other event sources running.
+Otherwise, you can use the simpler ``cancel_sources`` api provided by the
+Active Object:
+
+.. code-block:: python
+
+    # Here we define a middle state the creates a multi-shot event called
+    # three_pulse.  The same three_pulse signal is captured
+    # by the middle state and used to transition into the inner state
+    #
+    # We want to cancel this specific event source when we are exiting this
+    # state
+    @spy_on
+    def middle(chart, e):
+      status = state.UNHANDLED
+      if(e.signal == signals.ENTRY_SIGNAL):
+        chart.post_fifo(Event(signal=signals.three_pulse),
+                        times=3,
+                        period=1.0,
+                        deferred=True)
+        status = state.HANDLED
+
+      elif(e.signal == signals.EXIT_SIGNAL):
+        # cancel all event sources with the signal named three_pulses
+        chart.cancel_events(Event(signal=signals.three_pulse))
+        status = state.HANDLED
+
+      if(e.signal == signals.INIT_SIGNAL):
+        status = state.HANDLED
+      elif(e.signal == signals.three_pulse):
+        status = chart.trans(inner)
+      else:
+        status, chart.temp.fun = state.SUPER, outer
+      return status
+
+There is no need to keep a thread id for the event source, since the Active
+Object can just look at all of the event source threads and kill any of them
+that have this signal name provided to the ``cancel_events`` call.
+
+.. _recipes-deferring-an-event:
+
+Deferring and Recalling an Event
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: i_defer_and_recall.rst 
+
+.. _recipes-adding-a-payload-to-an-event:
+
+Adding a Payload to an Event
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To add a payload to your event:
+
+.. code-block:: python
+
+  e = Event(signal=signals.YOUR_SIGNAL_NAME, payload="My Payload")
+
+.. _recipes-determining-if-an-event-has-a-payload:
+
+Determining if an Event Has a Payload
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To determine if an event has a payload:
+
+.. code-block:: python
+
+  e1 = Event(signal=signals.YOUR_SIGNAL_NAME, event="My Payload")
+  e2 = Event(signal=signals.YOUR_SIGNAL_NAME)
+
+  assert(e1.has_payload() == True)
+  assert(e2.has_payload() == False)
+
+
+.. _recipes-activeobjects-and-factories:
+
+Activeobjects and Factories
+---------------------------
+
+* :ref:`Augment your active object<recipes-markup-your-event-processor>`
+* :ref:`Create a statechart from a template<recipes-creating-a-state-method-from-a-template>`
+* :ref:`Create a statechart from a Factory<recipes-creating-a-state-method-from-a-factory>`
+* :ref:`Subscribing to an event posted by another Activeobject and Factories<recipes-subscribing-to-an-event-posted-by-another-active-object>`
+* :ref:`Publishing events to other Activeobjects and Factories<recipes-publishing-event-to-other-active-objects>`
+* :ref:`Create a statechart inside of a Class<recipes-creating-a-statechart-inside-of-a-class>`
+* :ref:`Getting information out of of your Statechart<recipes-creating-a-statechart-inside-of-a-class>`
+* :ref:`Working with Multiple statecharts<recipes-multiple-statecharts>`
+
+.. _recipes-markup-your-event-processor:
+
+Augment Your Activeobject
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+It is a bad idea to add variables to the state methods, instead augment your
+active objects using the ``augment`` command.
+
+.. code-block:: python
+  
+  chart = ActiveObect()
+  chart.augment(other=0, name='counter')
+  assert(chart.counter == 0)
+
+An even better idea would be to include the attributes in a subclass of an
+Activeobject or Factory.
+
 
 .. _recipes-creating-a-state-method-from-a-template:
 
@@ -1028,7 +1329,7 @@ of programming this way:
    * it is not hard to network your federations with other federations across
      the internet (`systems of systems: miros-rabbitmq <https://aleph2c.github.io/miros-rabbitmq/index.html>`_)
 
-To program this way we use the Factory class from miros.
+To program this way we use the :ref:`Factory <recipes-creating-a-state-method-from-a-factory>` class from miros.
 
 Here is a simple example of a statechart within an object:
 
@@ -1479,294 +1780,11 @@ same class.  UML really falls-over in describing object interactions.
 
 If you have any suggestions about how to draw this better, email me.
 
-.. _recipes-events-and-signals:
-
-Events And Signals
-------------------
-
-.. _recipes-creating-an-event:
-
-Creating an Event
-^^^^^^^^^^^^^^^^^
-An event is something that will be passed into your statechart, it will be
-reacted to, then removed from memory.
-
-.. code-block:: python
-
-  from miros import Event
-  from miros import signals
-
-  event_1 = Event(signal="name_of_signal")
-  # or 
-  event_2 = Event(signal=signals.name_of_signal)
-
-.. _recipes-creating-a-signal:
-
-Creating a Signal
-^^^^^^^^^^^^^^^^^
-A signal is the name of an event.  Many different events can have the same
-name, or signal.  When a signal is created, it is given a number which is one
-higher than the oldest signal that was within your program.  You shouldn't have
-to worry about what a signal number is, they are only used to speed up the
-event processor. (it is faster to compare two numbers than two strings)
-
-When you create a signal it will not be removed from memory until your program
-finishes.  They are created at the moment they are referenced, so you don't
-have to explicitly define them.
-
-.. code-block:: python
-  :emphasize-lines: 6
-
-  from miros import Event
-  from miros import signals
-  
-  # signal named "name_of_signaL" invented
-  # here and given a unique number
-  event_1 = Event(signal="name_of_signal")
-  # the signal number of this event will have
-  # the same number as in line 6
-  event_2 = Event(signal=signals.name_of_signal)
-
-Notice that the signal was invented on line **6** then re-used on line **9**.
-
-The signals are shared across your whole program.  To see reflect upon your
-signals read :ref:`this<recipes_seeing_your_signals>`.
-
-
-.. _posting_events:
-
-Posting Events
-^^^^^^^^^^^^^^
-The Active Object ``post_fifo``, ``post_lifo``, ``defer`` and ``recall``
-methods are use to feed events to the statechart.  An Event can be thought of
-as a kind of named marble that is placed onto a topological map.  If a
-particular elevation doesn't know what to do with the marble, it rolls the
-marble to the next lower elevation, or state.  If the lowest elevation is
-reached and the program doesn't know what to do, it just ignores the event, or
-lets the marble fall out of play.
-
-The name of the marble is the signal name. An event can have a payload, but it
-doesn't have to.  An event can only be posted to a chart after the chart has
-started.  Otherwise the behavior of the active object is undefined.
-
-The state methods typically react to the names of a event, or the signal names.
-This means that the if-else structures that you write will use the signal names
-in their logic.
-
-If you use the chart's post event methods within the chart, the chart will not
-concern itself with *where* you initiated that event.  It will post its events
-into its queue as if they were provided by the outside world.  In this way
-these events are called *artificial*; instead of the world creating the event,
-the chart does.  There are a number of situations where it makes sense to do
-this, they will be described in the patterns section.
-
-.. _recipes-posting-an-event-to-the-fifo:
-
-Posting an Event to the Fifo
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-To post an event to the active object first-in-first-out (fifo) buffer, you
-must have first started your statechart.  Here is a simple example:
-
-.. code-block:: python
-
-  ao = ActiveObject()
-  # start at 'outer' for the sake of our example
-  ao.start_at(outer)
-
-  # Send an event with the signal name 'mary'
-  ao.post_fifo(Event(signal=signals.mary))
-
-The signal names used by the events are common across the entire system.  You
-do not need to declare them.  If the system had not seen the ``signals.mary``
-signal code before in our above example, this name would be added and assigned
-a unique number automatically.
-
-.. _recipes-posting-an-event-to-the-lifo:
-
-Posting an Event to the LIFO
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-To post an event to the active object last-in-first-out (lifo) buffer, you
-must have first started your statechart.  Here is a simple example:
-
-.. code-block:: python
-
-  ao = ActiveObject()
-  # start at 'outer' for the sake of our example
-  ao.start_at(outer)
-
-  # Now say we want to send an event with
-  # th the signal name of 'mary' to the chart
-  ao.post_lifo(Event(signal=signals.mary))
-
-You would post to the 'lifo' buffer if you needed your event to be moved to the
-front of the active object's collection of unprocessed events.  You might want
-to do this with a timing heart beat or for any event that needs to be processed
-with a greater priority than other events.
-
-
-.. _recipes-creating-a-one-shot-event:
-
-Creating a One-Shot Event
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. include:: i_create_a_one_shot.rst 
-
-.. _recipes-creating-a-multishot-event:
-
-Creating a Multishot Event
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. include:: i_create_a_multishot.rst
-
-Cancelling a Specific Event Source
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The requests to the ``post_fifo`` and ``post_lifo`` methods, where ``times`` are
-specified, can be thought of as event sources.  This is because they create
-background threads which track time and periodically post events to the active
-object.
-
-There are two different ways to cancel event sources.  You can cancel a
-specific event source, or you can cancel all event sources that create a
-specific signal name (easier).  Read the
-:ref:`recipes-cancelling-event-source-by-signal-name` recipe to see how to do
-this.
-
-To cancel a specific signal source, you need to track the thread id which was
-created when it was made, then use that id to cancel the event.  Since a state
-method can be used by many different active objects, you don't want to store
-this id on the method itself, or in its variable name space.  Instead, you can
-markup the name of the chart that is using the method, this ``chart`` object is
-passed to the state method as the first argument.
-
-
-.. code-block:: python
-
-    # Here define a middle state the creates a multi-shot event called
-    # three_pulse.  The same three_pulse signal is captured
-    # by the middle state and used to transition into the inner state
-    #
-    # We want to cancel this specific event source when we are exiting this
-    # state
-    @spy_on
-    def middle(chart, e):
-      status = state.UNHANDLED
-      if(e.signal == signals.ENTRY_SIGNAL):
-        multi_shot_thread = \
-          chart.post_fifo(Event(signal=signals.three_pulse),
-                          times=3,
-                          period=1.0,
-                          deferred=True)
-        # We graffiti the provided chart object with this id
-        chart.augment(other=multi_shot_thread,
-                      name='multi_shot_thread')
-        status = state.HANDLED
-
-      elif(e.signal == signals.EXIT_SIGNAL):
-        chart.cancel_event(chart.multi_shot_thread)
-
-        # remove our graffiti
-        del(chart.multi_shot_thread)
-        status = state.HANDLED
-
-      if(e.signal == signals.INIT_SIGNAL):
-        status = state.HANDLED
-      elif(e.signal == signals.three_pulse):
-        status = chart.trans(inner)
-      else:
-        status, chart.temp.fun = state.SUPER, outer
-      return status
-
-The ``augment`` api is used to graffiti our chart upon entering the state.
-We write the event-source id onto the ``multi_shot_thread`` chart attribute,
-so that we can use it later.  By marking this specific ``chart`` object, the
-middle state method handler can be shared by other active objects.
-
-You would use this method of canceling an event source if you need the
-three_pulse signal name elsewhere in your statechart.  If you do not intend on
-re-using this signal name you can just cancel event sources using a much
-simpler api: the ``cancel_event``.
-
-.. _recipes-cancelling-event-source-by-signal-name:
-
-Cancelling Event Source By Signal Name
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-If you would like to re-use your event source signal names through your chart,
-then you can use the :ref:`recipes-cancelling-a-specific-event-source` recipe
-to cancel a specific source and leave your other event sources running.
-Otherwise, you can use the simpler ``cancel_sources`` api provided by the
-Active Object:
-
-.. code-block:: python
-
-    # Here we define a middle state the creates a multi-shot event called
-    # three_pulse.  The same three_pulse signal is captured
-    # by the middle state and used to transition into the inner state
-    #
-    # We want to cancel this specific event source when we are exiting this
-    # state
-    @spy_on
-    def middle(chart, e):
-      status = state.UNHANDLED
-      if(e.signal == signals.ENTRY_SIGNAL):
-        chart.post_fifo(Event(signal=signals.three_pulse),
-                        times=3,
-                        period=1.0,
-                        deferred=True)
-        status = state.HANDLED
-
-      elif(e.signal == signals.EXIT_SIGNAL):
-        # cancel all event sources with the signal named three_pulses
-        chart.cancel_events(Event(signal=signals.three_pulse))
-        status = state.HANDLED
-
-      if(e.signal == signals.INIT_SIGNAL):
-        status = state.HANDLED
-      elif(e.signal == signals.three_pulse):
-        status = chart.trans(inner)
-      else:
-        status, chart.temp.fun = state.SUPER, outer
-      return status
-
-There is no need to keep a thread id for the event source, since the Active
-Object can just look at all of the event source threads and kill any of them
-that have this signal name provided to the ``cancel_events`` call.
-
-.. _recipes-deferring-an-event:
-
-Deferring and Recalling an Event
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. include:: i_defer_and_recall.rst 
-
-.. _recipes-adding-a-payload-to-an-event:
-
-Adding a Payload to an Event
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-To add a payload to your event:
-
-.. code-block:: python
-
-  e = Event(signal=signals.YOUR_SIGNAL_NAME, payload="My Payload")
-
-.. _recipes-determining-if-an-event-has-a-payload:
-
-Determining if an Event Has a Payload
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-To determine if an event has a payload:
-
-.. code-block:: python
-
-  e1 = Event(signal=signals.YOUR_SIGNAL_NAME, event="My Payload")
-  e2 = Event(signal=signals.YOUR_SIGNAL_NAME)
-
-  assert(e1.has_payload() == True)
-  assert(e2.has_payload() == False)
-
-
 .. _recipes-getting-information-from-your-statecchart:
 
 Getting Information from your Statechart
-----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 You will find yourself in situations where you would like to read information
 that has asynchronously been gathered by your statechart from your main program.
 This may happen if you have built a statechart to monitor an external device, or
@@ -1896,32 +1914,6 @@ Here is the code (asynchronous parts highlighted):
     # have the synchronous part of our program get information from the
     # asynchronous part of our program
     print(tracker.get_weather())  #=> sunny
-.. _recipes-multiple-statecharts:
-
-Multiple Statecharts
---------------------
-Break your design down into different interacting charts by using the
-ActiveFabric.
-
-The active fabric is a set of background tasks which act together to dispatch
-events between the active objects in your system.
-
-As a user of the software you wouldn't touch the active fabric directly, but
-instead would use your active object's ``publish`` and ``subscribe`` methods.  The
-active fabric has two different priority queues and two different tasks which
-pend upon them.  One is for managing subscriptions in a first in first (fifo)
-out manner, the other is for managing messages in a last in first out (lifo)
-manner.  By having two different queues and two different tasks an active
-object is given the option to subscribe to another active object's published
-events, using one of two different strategies:
-
-1.  If it subscribes to an event using the ``fifo`` strategy, the active fabric
-    will post events to it using its :ref:`post_fifo<recipes-posting-an-event-to-the-fifo\>` method.
-2.  If it subscribes in a ``lifo`` way it will post using the :ref:`post_lifo<recipes-posting-an-event-to-the-lifo>` method.
-
-You can also set the priority of the event while it is in transit within the
-active fabric.  This would only be useful if you are expecting contention
-between various events being dispatched across your system.
 
 .. _recipes-subscribing-to-an-event-posted-by-another-active-object:
 
@@ -1968,7 +1960,6 @@ call as saying, "I would like to subscribe to this type of event".
   subscribing_ao.subscribe(
     Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT),
     queue_type='fifo')
-
 
 .. _recipes-publishing-event-to-other-active-objects:
 
@@ -2026,6 +2017,32 @@ Here is how to publish an event with a specific priority:
    If two events have the same priority the queue will behave like a first in
    first out queue.
 
+.. _recipes-multiple-statecharts:
+
+Multiple Statecharts
+^^^^^^^^^^^^^^^^^^^^
+Break your design down into different interacting charts by using the
+ActiveFabric.
+
+The active fabric is a set of background tasks which act together to dispatch
+events between the active objects in your system.
+
+As a user of the software you wouldn't touch the active fabric directly, but
+instead would use your active object's ``publish`` and ``subscribe`` methods.  The
+active fabric has two different priority queues and two different tasks which
+pend upon them.  One is for managing subscriptions in a first in first (fifo)
+out manner, the other is for managing messages in a last in first out (lifo)
+manner.  By having two different queues and two different tasks an active
+object is given the option to subscribe to another active object's published
+events, using one of two different strategies:
+
+1.  If it subscribes to an event using the ``fifo`` strategy, the active fabric
+    will post events to it using its :ref:`post_fifo<recipes-posting-an-event-to-the-fifo\>` method.
+2.  If it subscribes in a ``lifo`` way it will post using the :ref:`post_lifo<recipes-posting-an-event-to-the-lifo>` method.
+
+You can also set the priority of the event while it is in transit within the
+active fabric.  This would only be useful if you are expecting contention
+between various events being dispatched across your system.
 
 .. _recipes-seeing-what-is-:
 
