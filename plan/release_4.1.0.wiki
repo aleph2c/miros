@@ -1,0 +1,48 @@
+*Release of 4.1.0*
+
+= Observe =
+  *What defines Success?*
+  
+  Following the github release process
+  Decent release notes
+  A pip upgrade (small image), removal of doc/docs/examples/experiment/venv/plan
+
+  *What is the problem?*
+  I release so infrequently I can't remember how to do everything.
+
+  *Evidence that contradicts Assumptions:*
+  
+= Orient =
+  *Symptoms:*
+  quick description of symptoms that lead your belief
+  
+  *Questions for Release of 4.1.0:*
+    Can you simplify your test?
+    Do you have enough information?
+    What recently changed?
+
+  *Assumptions:*
+
+= Decide =
+  *Idea/Hypotheses for Release of 4.1.0: >=5*
+  * [ ] Remove doc/docs/test/experiment/examples/ven in setup.py file
+  * [ ] Re-run all tests
+  * [ ] Change release name in setup.py file
+  * [ ] 
+  * [ ] 
+  *Chosen Idea/Hypothesis*
+  * removed unnecessary files from pip package (doc/test...)
+  * removed code which hides exceptions within your statechart (this might
+    unmask bugs in your design)
+  * changed how miros stops active objects.
+    * a call to the ActiveObject stop method will not stop the active fabric
+    * a call to the ActiveObject stop method will kill all slave threads posting
+      events into that ActiveObject.
+    * After the stop method is called on an ActiveObject, the ActiveFabric will
+      not post events into that ActiveObject's input queue, since it won't exist
+      anymore.
+
+  *Plan to Expand-on-Idea/Disprove-Hypothesis*
+
+= Act =
+

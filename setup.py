@@ -24,7 +24,7 @@ setup(
     py_modules=['miros'],
 
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='4.0.00',
+    version='4.1.00',
 
     description='A statechart library for Python',
     long_description=long_description,
@@ -59,12 +59,14 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
     # What does your project relate to?
     keywords='hsm HSM statechart hierarchical state machine statemachine miros',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=find_packages(exclude=['docs', 'test', 'experiment', 'prot', 'wsl', 'plan']),
+    packages=find_packages(exclude=['doc', 'docs', 'test', 'experiment', 'examples', 'venv', 'plan']),
 
 )
