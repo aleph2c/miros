@@ -1,29 +1,29 @@
-*Release of 4.1.0*
+*Instructions for Releasing Miros*
 
 = Observe =
   *What defines Success?*
-  
-  Follow the github release process
-  Decent release notes
-  A pip upgrade successful
+
+    * Follow the github release process
+    * Decent release notes
+    * pip upgrade successful
 
   *What is the problem?*
 
-  I release so infrequently I can't remember how to do everything.
-
-  *Evidence that contradicts Assumptions:*
+    * I release so infrequently I can't remember how to do everything.
+    * I do not entirely understand the setup.py/pip infrastructure and their
+      documents are illegible. (fake it till you make it)
   
 = Orient =
 
-  *Symptoms:*
-  quick description of symptoms that lead your belief
-  
-  *Questions for Release of 4.1.0:*
-    Can you simplify your test?
-    Do you have enough information?
-    What recently changed?
+  *Questions regarding your release process:*
+
+    Has the pip infrastructure changed?
+    Are you including too much in the pip package?
+    After you released, can you upgrade miros to its latest number?
 
   *Assumptions:*
+    
+    twine still works
 
 = Decide =
   *Idea/Hypotheses for Release of 4.1.0: >=5*
@@ -39,7 +39,9 @@
   * [ ] > python setup.py sdist
   * [ ] > twine upload dist/*
   * [ ] create a new directory, and venv
+  * [ ] turn off security so pip will work (and you won't scare yourself)
   * [ ] pip install miros and confirm it is getting the new release
+  * [ ] turn on security
 
   *Chosen Idea/Hypothesis*
 
