@@ -1,6 +1,5 @@
 .. _recipes:
 
-
 Recipes
 =======
 
@@ -571,8 +570,6 @@ outside of of your state method's boundary.
       self.temp.fun = self.c
     return status
 
-
-
 .. _recipes-create-a-hook:
 
 Create a Hook
@@ -746,7 +743,6 @@ Deferring and Recalling an Event
 
 .. include:: i_defer_and_recall.rst 
 
-
 .. _recipes-create-a-guard:
 
 Create a Guard
@@ -784,6 +780,9 @@ To learn more about guards read the
 .. _recipes-events-and-signals:
 Events And Signals
 ------------------
+
+* :ref:`Subscribing to an event posted by another Activeobject and Factories<recipes-subscribing-to-an-event-posted-by-another-active-object>`
+* :ref:`Publishing events to other Activeobjects and Factories<recipes-publishing-event-to-other-active-objects>`
 
 .. _recipes-creating-an-event:
 
@@ -919,8 +918,8 @@ Creating a Multishot Event
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. include:: i_create_a_multishot.rst
 
-Cancelling a Specific Event Source
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Canceling a Specific Event Source
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The requests to the ``post_fifo`` and ``post_lifo`` methods, where ``times`` are
 specified, can be thought of as event sources.  This is because they create
 background threads which track time and periodically post events to the active
@@ -989,7 +988,7 @@ simpler api: the ``cancel_event``.
 
 .. _recipes-cancelling-event-source-by-signal-name:
 
-Cancelling Event Source By Signal Name
+Canceling Event Source By Signal Name
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 If you would like to re-use your event source signal names through your chart,
 then you can use the :ref:`recipes-cancelling-a-specific-event-source` recipe
@@ -1049,6 +1048,60 @@ To add a payload to your event:
 
   e = Event(signal=signals.YOUR_SIGNAL_NAME, payload="My Payload")
 
+If you are creating a payload that will be shared across statecharts put it
+within an immutable object like a namedtuple before you send it out.  Then draw
+the named tuple onto your diagrams, because the structure of the payload will
+become extremely important when you are trying to understand your design later.
+
+.. note::
+
+  We want to use an immutable object when sharing data between threads to avoid
+  nasty multi-threading bugs.  If you can't change the object in two different
+  locations at the same time, then you can't accidently create this kind of bug.
+
+Here is an example of a payload picture, taken from the miros-random project:
+
+.. image:: _static/named_tuple_payload.svg
+    :target: _static/named_tuple_payload.pdf
+    :align: center
+
+You can see, it's just the code used to make it, placed within a UML note.
+
+Here is the code to make this payload's class:
+
+.. code-block:: python
+ 
+  # collections are in the Python standard library
+  from collections import namedtuple
+
+  # create a structured immutable object that has useful names related
+  # to your problem
+  PioneerRequestSpec = namedtuple(
+    'PioneerRequestSpec', ['cells_per_generation', 'deque_depth')
+
+Here is how you would create an event with this payload class:
+
+.. code-block:: python
+  
+  # There is often a relationship between your signal names and your payload
+  # name
+  e = Event(signal=signals.PioneerRequest,
+        payload=PioneerRequestSpec(
+          cells_per_generation=45,
+          queue_depth=11)
+
+Here is how you would access the payload elsewhere in your design:
+
+.. code-block:: python
+  
+  # to get access to the payload information when you receive this event in one
+  # of your event handlers:
+  e.payload.cells_per_generation  # => 45
+  e.payload.queue_depth  # => 11
+
+I would recommend that you always place your payloads in immutable objects,
+even if you aren't intending to share them between statecharts.
+
 .. _recipes-determining-if-an-event-has-a-payload:
 
 Determining if an Event Has a Payload
@@ -1064,24 +1117,260 @@ To determine if an event has a payload:
   assert(e2.has_payload() == False)
 
 
+.. _recipes-subscribing-to-an-event-posted-by-another-active-object:
+
+Subscribing to an Event Posted by Another Active Object
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Your active object can subscribe to the events published by other active objects:
+
+.. code-block:: python
+  
+  subscribing_ao = ActiveObject()
+  subscribing_ao.subscribe(
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT))
+
+An active object can set how the ActiveFabric (the infrastructure connecting all
+of your statecharts together) posts events to it.  If it would like a message to
+take priority over all other events waiting to be managed, you would use the
+``lifo`` technique:
+
+.. code-block:: python
+
+  subscribing_ao = ActiveObject()
+  subscribing_ao.subscribe(
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT),
+    queue_type='lifo')
+
+This approach would make sense if you were subscribed to a timed heart beat
+being sent out by another active object, or if this event was some sort of
+safety related thing.
+
+In most situations you can use the subscription defaults:
+
+.. code-block:: python
+
+  subscribing_ao = ActiveObject()
+  subscribing_ao.subscribe(signals.THING_SUBSCRIBING_AO_CARES_ABOUT)
+  # which is the same as writing
+  subscribing_ao.subscribe(
+    signals.THING_SUBSCRIBING_AO_CARES_ABOUT, queue_type='fifo')
+
+It may seem a little bit strange to subscribe to an event, since an event is a
+specific thing, which contains a general thing; the signal.  But the ``subscribe``
+method supports subscribing to events so that it's method signature looks like
+the other method signatures in the library.  (Less things for you to remember)
+
+If you chose to subscribe to events and not directly to signals, think of your
+call as saying, "I would like to subscribe to this type of event".
+
+.. code-block:: python
+
+  # subscribing to a `type` of event
+  subscribing_ao.subscribe(
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT),
+    queue_type='fifo')
+
+.. _recipes-publishing-event-to-other-active-objects:
+
+Publishing events to other Active Objects
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Your active object can send data to other active objects in the system by
+publishing events.  
+
+But your active object can only control *how it talks to others*, not *who
+listens to it*; so, if another active object wants to receive a published event
+it must subscribe to it first.
+
+If you would like to publish data that will be used by another ActiveObject,
+copy your data into some sort of immutable object before you publish it:
+namedtuple objects are perfect for these situations:
+
+.. code-block:: python
+
+  from collections import namedtuple
+
+  # draw these payloads on your statechart diagram
+  MyPayload = namedtuple('MyPayload', ['name_of_item_1', 'name_of_item2'])
+
+  publishing_ao = ActiveObect()
+
+  # This is how you can send an 'THING_SUBSCRIBING_AO_CARES_ABOUT' event
+  # to anything that has subscribed to it
+  publishing_ao.publish(
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT,
+      payload=MyPayload(
+        name_of_item_1='something',
+        name_of_item_2='something_else'
+      )
+    )
+  )
+
+Here is how to publish an event with a specific priority:
+
+.. code-block:: python
+
+  publishing_ao = ActiveObect()
+  publishing_ao.publish(
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT))
+
+  # or you can set the priority (1 is the highest priority see note):
+  publishing_ao.publish(
+    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT),
+    priority=1)
+
+.. note::
+  
+   The priority numbering scheme is counter-intuitive: low numbers mean high
+   priority while high numbers mean low priority.  The highest published event
+   priority is 1.  By default all published events are given a priority of 1000.
+   If two events have the same priority the queue will behave like a first in
+   first out queue.
 .. _recipes-activeobjects-and-factories:
 
 Activeobjects and Factories
 ---------------------------
 
+* :ref:`Starting an ActiveObject or Factory<recipes-starting-an-activeojbect-or-factory>`
+* :ref:`Stopping an ActiveObject or Factory<recipes-stopping-an-activeobject-or-factory>`
 * :ref:`Augment your active object<recipes-markup-your-event-processor>`
 * :ref:`Create a statechart from a template<recipes-creating-a-state-method-from-a-template>`
 * :ref:`Create a statechart from a Factory<recipes-creating-a-state-method-from-a-factory>`
-* :ref:`Subscribing to an event posted by another Activeobject and Factories<recipes-subscribing-to-an-event-posted-by-another-active-object>`
-* :ref:`Publishing events to other Activeobjects and Factories<recipes-publishing-event-to-other-active-objects>`
 * :ref:`Create a statechart inside of a Class<recipes-creating-a-statechart-inside-of-a-class>`
 * :ref:`Getting information out of of your Statechart<recipes-creating-a-statechart-inside-of-a-class>`
 * :ref:`Working with Multiple statecharts<recipes-multiple-statecharts>`
 
+.. _recipes-starting-an-activeojbect-or-factory:
+
+Starting an Activeobject or Factory
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Once you have created an Activeobject or a
+:ref:`Factory<recipes-creating-a-state-method-from-a-factory>` you can start its
+statemachine and thread with its ``start_at`` method.
+
+There is a set of queues and threads which connect *all of your ActiveObjects
+together* (the ActiveFabric), if it hasn't been started yet, the ``start_at``
+method will turn on this infrastructure as well.
+
+Here is a simple example:
+
+.. image:: _static/start_at.svg
+    :target: _static/start_at.pdf
+    :align: center
+
+The ``start_at`` method can start the statechart in any of its states.
+
+.. note::
+  
+   The diagram needs a way to show where the miros framework starts it.  There
+   is no way to indicate this with standard UML, so I parsimoniously appropriate
+   the bottom part of the component icon; I connect it to where we want the
+   machine to start when it is first turned on.
+
+Here is the code:
+
+.. code-block:: python
+  :emphasize-lines: 47
+
+  import time
+  from miros import spy_on
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
+
+  @spy_on
+  def c(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      status = return_status.HANDLED
+      print("c1 entered")
+    elif(e.signal == signals.INIT_SIGNAL):
+      status = chart.trans(c1)
+    elif(e.signal == signals.B):
+      status = chart.trans(c)
+    else:
+      chart.temp.fun = chart.top
+      status = return_status.SUPER
+    return status
+
+  @spy_on
+  def c1(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.A):
+      status = chart.trans(c2)
+    else:
+      chart.temp.fun = c
+      status = return_status.SUPER
+    return status
+
+  @spy_on
+  def c2(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      print("c2 entered")
+      status = return_status.HANDLED
+    elif(e.signal == signals.A):
+      status = chart.trans(c1)
+    else:
+      chart.temp.fun = c
+      status = return_status.SUPER
+    return status
+
+  if __name__ == "__main__":
+    ao = ActiveObject('start_example')
+    print("calling: start_at(c2)")
+    ao.start_at(c2)
+
+    time.sleep(0.2)
+    print(ao.trace()) # print what happened from the start_at call
+    ao.clear_trace()  # clear our instrumentation
+
+    print("sending B, then A, then A:")
+    ao.post_fifo(Event(signal=signals.B))
+    ao.post_fifo(Event(signal=signals.A))
+    ao.post_fifo(Event(signal=signals.A))
+    time.sleep(0.2)
+    print(ao.trace()) # print what happened
+
+When we run this code we will see this result:
+
+.. code-block:: python
+ 
+   calling: start_at(c2)
+   c1 entered
+   c2 entered
+   [2019-06-21 06:05:36.234137] [start_example] e->start_at() top->c2
+
+   sending B, then A, then A
+   c1 entered
+   c2 entered
+   [2019-06-21 06:05:36.435853] [start_example] e->B() c2->c1
+   [2019-06-21 06:05:36.436074] [start_example] e->A() c1->c2
+   [2019-06-21 06:05:36.436228] [start_example] e->A() c2->c1
+
+
+.. _recipes-stopping-an-activeobject-or-factory:
+
+Stopping an ActiveObject or Factory
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If you would like to stop an Activeobject or a
+:ref:`Factory<recipes-creating-a-state-method-from-a-factory>` you can use its
+``stop`` method.
+
+This will stop its thread, and it will stop all of that Activeobject's slave
+threads (constructed by the post_fifo or post_lifo heartbeat constructors).  The
+stop method sets the Activeobject's ActiveFabric-facing queue to None, so that
+the ActiveFabric will not post items to it anymore.
+
+.. note::
+     
+   Calling the ``stop`` method will not stop the ActiveFabric.  But the
+   ActiveFabric, like all threads in miros, is a daemonic thread, so it will stop
+   running when your program has stopped running.
+
 .. _recipes-markup-your-event-processor:
 
-Augment Your Activeobject
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Augmentng your ActiveObject
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 It is a bad idea to add variables to the state methods, instead augment your
 active objects using the ``augment`` command.
 
@@ -1091,14 +1380,17 @@ active objects using the ``augment`` command.
   chart.augment(other=0, name='counter')
   assert(chart.counter == 0)
 
-An even better idea would be to include the attributes in a subclass of an
-Activeobject or Factory.
-
+.. note::
+    
+   An even better idea would be to include the attributes in a subclass of an
+   Activeobject or Factory.
 
 .. _recipes-creating-a-state-method-from-a-template:
 
 Creating a Statechart From a Template
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Don't do this, use the :ref:`Factory<recipes-creating-a-state-method-from-a-factory>` instead.
+
 To have the library create your state methods for you:
 
 1. :ref:`Import the correct items from the miros library<recipes-template-1>`
@@ -1109,7 +1401,6 @@ To have the library create your state methods for you:
 6. :ref:`Relate your states to one another by assigning them parents<recipes-template-6>`
 7. :ref:`Start up the active object in the desired state<recipes-template-7>`
 8. :ref:`Debugging a templated state method<recipes-template-8>`
-
 
 .. image:: _static/factory2.svg
     :target: _static/factory2.pdf
@@ -1191,7 +1482,6 @@ Relate your states to one another by assigning them to parents:
   ao.register_parent(tc2_s3, tc2_s1)
 
 .. _recipes-template-7:
-
 
 Start up the active object in the desired state:
 
@@ -1914,108 +2204,6 @@ Here is the code (asynchronous parts highlighted):
     # have the synchronous part of our program get information from the
     # asynchronous part of our program
     print(tracker.get_weather())  #=> sunny
-
-.. _recipes-subscribing-to-an-event-posted-by-another-active-object:
-
-Subscribing to an Event Posted by Another Active Object
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Your active object can subscribe to the events published by other active objects.
-
-An active object can set how the active fabric posts events to it.  If it would
-like a message to take priority over all other events waiting to be managed,
-you would use the ``lifo`` technique:
-
-.. code-block:: python
-
-  subscribing_ao = ActiveObject()
-  subscribing_ao.subscribe(
-    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT),
-    queue_type='lifo')
-
-This approach would make sense if you were subscribed to a timed heart beat
-being sent out by another active object, or if this event was some sort of
-safety related thing.
-
-In most situations you can use the subscription defaults:
-
-.. code-block:: python
-
-  subscribing_ao = ActiveObject()
-  subscribing_ao.subscribe(signals.THING_SUBSCRIBING_AO_CARES_ABOUT)
-  # which is the same as writing
-  subscribing_ao.subscribe(
-    signals.THING_SUBSCRIBING_AO_CARES_ABOUT, queue_type='fifo')
-
-It may seem a little bit strange to subscribe to an event, since an event is a
-specific thing, which contains a general thing; the signal.  But the ``subscribe``
-method supports subscribing to events so that it's method signature looks like
-the other method signatures in the library.  (Less things for you to remember)
-
-If you chose to subscribe to events and not directly to signals, think of your
-call as saying, "I would like to subscribe to this type of event".
-
-.. code-block:: python
-
-  # subscribing to a `type` of event
-  subscribing_ao.subscribe(
-    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT),
-    queue_type='fifo')
-
-.. _recipes-publishing-event-to-other-active-objects:
-
-Publishing events to other Active Objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Your active object can send data to other active objects in the system by
-publishing events.  
-
-But your active object can only control *how it talks to others*, not *who
-listens to it*; so, if another active object wants to receive a published event
-it must subscribe to it first.
-
-If you would like to publish data that will be used by another ActiveObject,
-copy your data into some sort of immutable object before you publish it:
-namedtuple objects are perfect for these situations:
-
-.. code-block:: python
-
-  from collections import namedtuple
-
-  # draw these payloads on your statechart diagram
-  MyPayload = namedtuple('MyPayload', ['name_of_item_1', 'name_of_item2'])
-
-  publishing_ao = ActiveObect()
-
-  # This is how you can send an 'THING_SUBSCRIBING_AO_CARES_ABOUT' event
-  # to anything that has subscribed to it
-  publishing_ao.publish(
-    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT,
-      payload=MyPayload(
-        name_of_item_1='something',
-        name_of_item_2='something_else'
-      )
-    )
-  )
-
-Here is how to publish an event with a specific priority:
-
-.. code-block:: python
-
-  publishing_ao = ActiveObect()
-  publishing_ao.publish(
-    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT))
-
-  # or you can set the priority (1 is the highest priority see note):
-  publishing_ao.publish(
-    Event(signal=signals.THING_SUBSCRIBING_AO_CARES_ABOUT),
-    priority=1)
-
-.. note::
-  
-   The priority numbering scheme is counter-intuitive: low numbers mean high
-   priority while high numbers mean low priority.  The highest published event
-   priority is 1.  By default all published events are given a priority of 1000.
-   If two events have the same priority the queue will behave like a first in
-   first out queue.
 
 .. _recipes-multiple-statecharts:
 

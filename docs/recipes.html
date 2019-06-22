@@ -801,6 +801,10 @@ if statement:</p>
 </div>
 <div class="section" id="events-and-signals">
 <h2>Events And Signals<a class="headerlink" href="#events-and-signals" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="#recipes-subscribing-to-an-event-posted-by-another-active-object"><span class="std std-ref">Subscribing to an event posted by another Activeobject and Factories</span></a></li>
+<li><a class="reference internal" href="#recipes-publishing-event-to-other-active-objects"><span class="std std-ref">Publishing events to other Activeobjects and Factories</span></a></li>
+</ul>
 <div class="section" id="creating-an-event">
 <span id="recipes-creating-an-event"></span><h3>Creating an Event<a class="headerlink" href="#creating-an-event" title="Permalink to this headline">¶</a></h3>
 <p>An event is something that will be passed into your statechart, it will be
@@ -1000,8 +1004,8 @@ creating these types of repeating events.  You would use the <code class="docuti
 when you would need your heart beat event signal to barge ahead of all other
 events waiting to be processed by the active object.</p>
 </div>
-<div class="section" id="cancelling-a-specific-event-source">
-<span id="id3"></span><h3>Cancelling a Specific Event Source<a class="headerlink" href="#cancelling-a-specific-event-source" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="canceling-a-specific-event-source">
+<span id="id3"></span><h3>Canceling a Specific Event Source<a class="headerlink" href="#canceling-a-specific-event-source" title="Permalink to this headline">¶</a></h3>
 <p>The requests to the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> and <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> methods, where <code class="docutils literal notranslate"><span class="pre">times</span></code> are
 specified, can be thought of as event sources.  This is because they create
 background threads which track time and periodically post events to the active
@@ -1009,7 +1013,7 @@ object.</p>
 <p>There are two different ways to cancel event sources.  You can cancel a
 specific event source, or you can cancel all event sources that create a
 specific signal name (easier).  Read the
-<a class="reference internal" href="#recipes-cancelling-event-source-by-signal-name"><span class="std std-ref">Cancelling Event Source By Signal Name</span></a> recipe to see how to do
+<a class="reference internal" href="#recipes-cancelling-event-source-by-signal-name"><span class="std std-ref">Canceling Event Source By Signal Name</span></a> recipe to see how to do
 this.</p>
 <p>To cancel a specific signal source, you need to track the thread id which was
 created when it was made, then use that id to cancel the event.  Since a state
@@ -1062,8 +1066,8 @@ three_pulse signal name elsewhere in your statechart.  If you do not intend on
 re-using this signal name you can just cancel event sources using a much
 simpler api: the <code class="docutils literal notranslate"><span class="pre">cancel_event</span></code>.</p>
 </div>
-<div class="section" id="cancelling-event-source-by-signal-name">
-<span id="recipes-cancelling-event-source-by-signal-name"></span><h3>Cancelling Event Source By Signal Name<a class="headerlink" href="#cancelling-event-source-by-signal-name" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="canceling-event-source-by-signal-name">
+<span id="recipes-cancelling-event-source-by-signal-name"></span><h3>Canceling Event Source By Signal Name<a class="headerlink" href="#canceling-event-source-by-signal-name" title="Permalink to this headline">¶</a></h3>
 <p>If you would like to re-use your event source signal names through your chart,
 then you can use the <span class="xref std std-ref">recipes-cancelling-a-specific-event-source</span> recipe
 to cancel a specific source and leave your other event sources running.
@@ -1129,6 +1133,48 @@ reaction to it.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">e</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">YOUR_SIGNAL_NAME</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s2">&quot;My Payload&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>If you are creating a payload that will be shared across statecharts put it
+within an immutable object like a namedtuple before you send it out.  Then draw
+the named tuple onto your diagrams, because the structure of the payload will
+become extremely important when you are trying to understand your design later.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We want to use an immutable object when sharing data between threads to avoid
+nasty multi-threading bugs.  If you can’t change the object in two different
+locations at the same time, then you can’t accidently create this kind of bug.</p>
+</div>
+<p>Here is an example of a payload picture, taken from the miros-random project:</p>
+<a class="reference external image-reference" href="_static/named_tuple_payload.pdf"><div align="center" class="align-center"><img alt="_images/named_tuple_payload.svg" src="_images/named_tuple_payload.svg" /></div>
+</a>
+<p>You can see, it’s just the code used to make it, placed within a UML note.</p>
+<p>Here is the code to make this payload’s class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># collections are in the Python standard library</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="c1"># create a structured immutable object that has useful names related</span>
+<span class="c1"># to your problem</span>
+<span class="n">PioneerRequestSpec</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
+  <span class="s1">&#39;PioneerRequestSpec&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;cells_per_generation&#39;</span><span class="p">,</span> <span class="s1">&#39;deque_depth&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here is how you would create an event with this payload class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># There is often a relationship between your signal names and your payload</span>
+<span class="c1"># name</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">PioneerRequest</span><span class="p">,</span>
+      <span class="n">payload</span><span class="o">=</span><span class="n">PioneerRequestSpec</span><span class="p">(</span>
+        <span class="n">cells_per_generation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+        <span class="n">queue_depth</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here is how you would access the payload elsewhere in your design:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># to get access to the payload information when you receive this event in one</span>
+<span class="c1"># of your event handlers:</span>
+<span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">cells_per_generation</span>  <span class="c1"># =&gt; 45</span>
+<span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">queue_depth</span>  <span class="c1"># =&gt; 11</span>
+</pre></div>
+</div>
+<p>I would recommend that you always place your payloads in immutable objects,
+even if you aren’t intending to share them between statecharts.</p>
 </div>
 <div class="section" id="determining-if-an-event-has-a-payload">
 <span id="recipes-determining-if-an-event-has-a-payload"></span><h3>Determining if an Event Has a Payload<a class="headerlink" href="#determining-if-an-event-has-a-payload" title="Permalink to this headline">¶</a></h3>
@@ -1141,21 +1187,223 @@ reaction to it.</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="subscribing-to-an-event-posted-by-another-active-object">
+<span id="recipes-subscribing-to-an-event-posted-by-another-active-object"></span><h3>Subscribing to an Event Posted by Another Active Object<a class="headerlink" href="#subscribing-to-an-event-posted-by-another-active-object" title="Permalink to this headline">¶</a></h3>
+<p>Your active object can subscribe to the events published by other active objects:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">subscribing_ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>An active object can set how the ActiveFabric (the infrastructure connecting all
+of your statecharts together) posts events to it.  If it would like a message to
+take priority over all other events waiting to be managed, you would use the
+<code class="docutils literal notranslate"><span class="pre">lifo</span></code> technique:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">subscribing_ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">),</span>
+  <span class="n">queue_type</span><span class="o">=</span><span class="s1">&#39;lifo&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This approach would make sense if you were subscribed to a timed heart beat
+being sent out by another active object, or if this event was some sort of
+safety related thing.</p>
+<p>In most situations you can use the subscription defaults:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">subscribing_ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">)</span>
+<span class="c1"># which is the same as writing</span>
+<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
+  <span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">,</span> <span class="n">queue_type</span><span class="o">=</span><span class="s1">&#39;fifo&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It may seem a little bit strange to subscribe to an event, since an event is a
+specific thing, which contains a general thing; the signal.  But the <code class="docutils literal notranslate"><span class="pre">subscribe</span></code>
+method supports subscribing to events so that it’s method signature looks like
+the other method signatures in the library.  (Less things for you to remember)</p>
+<p>If you chose to subscribe to events and not directly to signals, think of your
+call as saying, “I would like to subscribe to this type of event”.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># subscribing to a `type` of event</span>
+<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">),</span>
+  <span class="n">queue_type</span><span class="o">=</span><span class="s1">&#39;fifo&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="publishing-events-to-other-active-objects">
+<span id="recipes-publishing-event-to-other-active-objects"></span><h3>Publishing events to other Active Objects<a class="headerlink" href="#publishing-events-to-other-active-objects" title="Permalink to this headline">¶</a></h3>
+<p>Your active object can send data to other active objects in the system by
+publishing events.</p>
+<p>But your active object can only control <em>how it talks to others</em>, not <em>who
+listens to it</em>; so, if another active object wants to receive a published event
+it must subscribe to it first.</p>
+<p>If you would like to publish data that will be used by another ActiveObject,
+copy your data into some sort of immutable object before you publish it:
+namedtuple objects are perfect for these situations:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="c1"># draw these payloads on your statechart diagram</span>
+<span class="n">MyPayload</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;MyPayload&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;name_of_item_1&#39;</span><span class="p">,</span> <span class="s1">&#39;name_of_item2&#39;</span><span class="p">])</span>
+
+<span class="n">publishing_ao</span> <span class="o">=</span> <span class="n">ActiveObect</span><span class="p">()</span>
+
+<span class="c1"># This is how you can send an &#39;THING_SUBSCRIBING_AO_CARES_ABOUT&#39; event</span>
+<span class="c1"># to anything that has subscribed to it</span>
+<span class="n">publishing_ao</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">MyPayload</span><span class="p">(</span>
+      <span class="n">name_of_item_1</span><span class="o">=</span><span class="s1">&#39;something&#39;</span><span class="p">,</span>
+      <span class="n">name_of_item_2</span><span class="o">=</span><span class="s1">&#39;something_else&#39;</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Here is how to publish an event with a specific priority:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">publishing_ao</span> <span class="o">=</span> <span class="n">ActiveObect</span><span class="p">()</span>
+<span class="n">publishing_ao</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">))</span>
+
+<span class="c1"># or you can set the priority (1 is the highest priority see note):</span>
+<span class="n">publishing_ao</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">),</span>
+  <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The priority numbering scheme is counter-intuitive: low numbers mean high
+priority while high numbers mean low priority.  The highest published event
+priority is 1.  By default all published events are given a priority of 1000.
+If two events have the same priority the queue will behave like a first in
+first out queue.</p>
+</div>
+</div>
 </div>
 <div class="section" id="activeobjects-and-factories">
 <span id="recipes-activeobjects-and-factories"></span><h2>Activeobjects and Factories<a class="headerlink" href="#activeobjects-and-factories" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
+<li><a class="reference internal" href="#recipes-starting-an-activeojbect-or-factory"><span class="std std-ref">Starting an ActiveObject or Factory</span></a></li>
+<li><a class="reference internal" href="#recipes-stopping-an-activeobject-or-factory"><span class="std std-ref">Stopping an ActiveObject or Factory</span></a></li>
 <li><a class="reference internal" href="#recipes-markup-your-event-processor"><span class="std std-ref">Augment your active object</span></a></li>
 <li><a class="reference internal" href="#recipes-creating-a-state-method-from-a-template"><span class="std std-ref">Create a statechart from a template</span></a></li>
 <li><a class="reference internal" href="#recipes-creating-a-state-method-from-a-factory"><span class="std std-ref">Create a statechart from a Factory</span></a></li>
-<li><a class="reference internal" href="#recipes-subscribing-to-an-event-posted-by-another-active-object"><span class="std std-ref">Subscribing to an event posted by another Activeobject and Factories</span></a></li>
-<li><a class="reference internal" href="#recipes-publishing-event-to-other-active-objects"><span class="std std-ref">Publishing events to other Activeobjects and Factories</span></a></li>
 <li><a class="reference internal" href="#recipes-creating-a-statechart-inside-of-a-class"><span class="std std-ref">Create a statechart inside of a Class</span></a></li>
 <li><a class="reference internal" href="#recipes-creating-a-statechart-inside-of-a-class"><span class="std std-ref">Getting information out of of your Statechart</span></a></li>
 <li><a class="reference internal" href="#recipes-multiple-statecharts"><span class="std std-ref">Working with Multiple statecharts</span></a></li>
 </ul>
-<div class="section" id="augment-your-activeobject">
-<span id="recipes-markup-your-event-processor"></span><h3>Augment Your Activeobject<a class="headerlink" href="#augment-your-activeobject" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="starting-an-activeobject-or-factory">
+<span id="recipes-starting-an-activeojbect-or-factory"></span><h3>Starting an Activeobject or Factory<a class="headerlink" href="#starting-an-activeobject-or-factory" title="Permalink to this headline">¶</a></h3>
+<p>Once you have created an Activeobject or a
+<a class="reference internal" href="#recipes-creating-a-state-method-from-a-factory"><span class="std std-ref">Factory</span></a> you can start its
+statemachine and thread with its <code class="docutils literal notranslate"><span class="pre">start_at</span></code> method.</p>
+<p>There is a set of queues and threads which connect <em>all of your ActiveObjects
+together</em> (the ActiveFabric), if it hasn’t been started yet, the <code class="docutils literal notranslate"><span class="pre">start_at</span></code>
+method will turn on this infrastructure as well.</p>
+<p>Here is a simple example:</p>
+<a class="reference external image-reference" href="_static/start_at.pdf"><div align="center" class="align-center"><img alt="_images/start_at.svg" src="_images/start_at.svg" /></div>
+</a>
+<p>The <code class="docutils literal notranslate"><span class="pre">start_at</span></code> method can start the statechart in any of its states.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The diagram needs a way to show where the miros framework starts it.  There
+is no way to indicate this with standard UML, so I parsimoniously appropriate
+the bottom part of the component icon; I connect it to where we want the
+machine to start when it is first turned on.</p>
+</div>
+<p>Here is the code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">c</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;c1 entered&quot;</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">c1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">c</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">c2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;c2 entered&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">c</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s1">&#39;start_example&#39;</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;calling: start_at(c2)&quot;</span><span class="p">)</span>
+<span class="hll">  <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
+</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="c1"># print what happened from the start_at call</span>
+  <span class="n">ao</span><span class="o">.</span><span class="n">clear_trace</span><span class="p">()</span>  <span class="c1"># clear our instrumentation</span>
+
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;sending B, then A, then A:&quot;</span><span class="p">)</span>
+  <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">))</span>
+  <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+  <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="c1"># print what happened</span>
+</pre></div>
+</div>
+<p>When we run this code we will see this result:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">calling</span><span class="p">:</span> <span class="n">start_at</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
+<span class="n">c1</span> <span class="n">entered</span>
+<span class="n">c2</span> <span class="n">entered</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">21</span> <span class="mo">06</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mf">36.234137</span><span class="p">]</span> <span class="p">[</span><span class="n">start_example</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">c2</span>
+
+<span class="n">sending</span> <span class="n">B</span><span class="p">,</span> <span class="n">then</span> <span class="n">A</span><span class="p">,</span> <span class="n">then</span> <span class="n">A</span>
+<span class="n">c1</span> <span class="n">entered</span>
+<span class="n">c2</span> <span class="n">entered</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">21</span> <span class="mo">06</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mf">36.435853</span><span class="p">]</span> <span class="p">[</span><span class="n">start_example</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">B</span><span class="p">()</span> <span class="n">c2</span><span class="o">-&gt;</span><span class="n">c1</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">21</span> <span class="mo">06</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mf">36.436074</span><span class="p">]</span> <span class="p">[</span><span class="n">start_example</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">A</span><span class="p">()</span> <span class="n">c1</span><span class="o">-&gt;</span><span class="n">c2</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">21</span> <span class="mo">06</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mf">36.436228</span><span class="p">]</span> <span class="p">[</span><span class="n">start_example</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">A</span><span class="p">()</span> <span class="n">c2</span><span class="o">-&gt;</span><span class="n">c1</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="stopping-an-activeobject-or-factory">
+<span id="recipes-stopping-an-activeobject-or-factory"></span><h3>Stopping an ActiveObject or Factory<a class="headerlink" href="#stopping-an-activeobject-or-factory" title="Permalink to this headline">¶</a></h3>
+<p>If you would like to stop an Activeobject or a
+<a class="reference internal" href="#recipes-creating-a-state-method-from-a-factory"><span class="std std-ref">Factory</span></a> you can use its
+<code class="docutils literal notranslate"><span class="pre">stop</span></code> method.</p>
+<p>This will stop its thread, and it will stop all of that Activeobject’s slave
+threads (constructed by the post_fifo or post_lifo heartbeat constructors).  The
+stop method sets the Activeobject’s ActiveFabric-facing queue to None, so that
+the ActiveFabric will not post items to it anymore.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Calling the <code class="docutils literal notranslate"><span class="pre">stop</span></code> method will not stop the ActiveFabric.  But the
+ActiveFabric, like all threads in miros, is a daemonic thread, so it will stop
+running when your program has stopped running.</p>
+</div>
+</div>
+<div class="section" id="augmentng-your-activeobject">
+<span id="recipes-markup-your-event-processor"></span><h3>Augmentng your ActiveObject<a class="headerlink" href="#augmentng-your-activeobject" title="Permalink to this headline">¶</a></h3>
 <p>It is a bad idea to add variables to the state methods, instead augment your
 active objects using the <code class="docutils literal notranslate"><span class="pre">augment</span></code> command.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">chart</span> <span class="o">=</span> <span class="n">ActiveObect</span><span class="p">()</span>
@@ -1163,11 +1411,15 @@ active objects using the <code class="docutils literal notranslate"><span class=
 <span class="k">assert</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">counter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>An even better idea would be to include the attributes in a subclass of an
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">An even better idea would be to include the attributes in a subclass of an
 Activeobject or Factory.</p>
+</div>
 </div>
 <div class="section" id="creating-a-statechart-from-a-template">
 <span id="recipes-creating-a-state-method-from-a-template"></span><h3>Creating a Statechart From a Template<a class="headerlink" href="#creating-a-statechart-from-a-template" title="Permalink to this headline">¶</a></h3>
+<p>Don’t do this, use the <a class="reference internal" href="#recipes-creating-a-state-method-from-a-factory"><span class="std std-ref">Factory</span></a> instead.</p>
 <p>To have the library create your state methods for you:</p>
 <ol class="arabic simple">
 <li><a class="reference internal" href="#recipes-template-1"><span class="std std-ref">Import the correct items from the miros library</span></a></li>
@@ -1863,91 +2115,6 @@ synchronous <code class="docutils literal notranslate"><span class="pre">get_wea
   <span class="c1"># asynchronous part of our program</span>
   <span class="k">print</span><span class="p">(</span><span class="n">tracker</span><span class="o">.</span><span class="n">get_weather</span><span class="p">())</span>  <span class="c1">#=&gt; sunny</span>
 </pre></div>
-</div>
-</div>
-<div class="section" id="subscribing-to-an-event-posted-by-another-active-object">
-<span id="recipes-subscribing-to-an-event-posted-by-another-active-object"></span><h3>Subscribing to an Event Posted by Another Active Object<a class="headerlink" href="#subscribing-to-an-event-posted-by-another-active-object" title="Permalink to this headline">¶</a></h3>
-<p>Your active object can subscribe to the events published by other active objects.</p>
-<p>An active object can set how the active fabric posts events to it.  If it would
-like a message to take priority over all other events waiting to be managed,
-you would use the <code class="docutils literal notranslate"><span class="pre">lifo</span></code> technique:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">subscribing_ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
-<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
-  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">),</span>
-  <span class="n">queue_type</span><span class="o">=</span><span class="s1">&#39;lifo&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>This approach would make sense if you were subscribed to a timed heart beat
-being sent out by another active object, or if this event was some sort of
-safety related thing.</p>
-<p>In most situations you can use the subscription defaults:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">subscribing_ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
-<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">)</span>
-<span class="c1"># which is the same as writing</span>
-<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
-  <span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">,</span> <span class="n">queue_type</span><span class="o">=</span><span class="s1">&#39;fifo&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>It may seem a little bit strange to subscribe to an event, since an event is a
-specific thing, which contains a general thing; the signal.  But the <code class="docutils literal notranslate"><span class="pre">subscribe</span></code>
-method supports subscribing to events so that it’s method signature looks like
-the other method signatures in the library.  (Less things for you to remember)</p>
-<p>If you chose to subscribe to events and not directly to signals, think of your
-call as saying, “I would like to subscribe to this type of event”.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># subscribing to a `type` of event</span>
-<span class="n">subscribing_ao</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
-  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">),</span>
-  <span class="n">queue_type</span><span class="o">=</span><span class="s1">&#39;fifo&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="publishing-events-to-other-active-objects">
-<span id="recipes-publishing-event-to-other-active-objects"></span><h3>Publishing events to other Active Objects<a class="headerlink" href="#publishing-events-to-other-active-objects" title="Permalink to this headline">¶</a></h3>
-<p>Your active object can send data to other active objects in the system by
-publishing events.</p>
-<p>But your active object can only control <em>how it talks to others</em>, not <em>who
-listens to it</em>; so, if another active object wants to receive a published event
-it must subscribe to it first.</p>
-<p>If you would like to publish data that will be used by another ActiveObject,
-copy your data into some sort of immutable object before you publish it:
-namedtuple objects are perfect for these situations:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-
-<span class="c1"># draw these payloads on your statechart diagram</span>
-<span class="n">MyPayload</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;MyPayload&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;name_of_item_1&#39;</span><span class="p">,</span> <span class="s1">&#39;name_of_item2&#39;</span><span class="p">])</span>
-
-<span class="n">publishing_ao</span> <span class="o">=</span> <span class="n">ActiveObect</span><span class="p">()</span>
-
-<span class="c1"># This is how you can send an &#39;THING_SUBSCRIBING_AO_CARES_ABOUT&#39; event</span>
-<span class="c1"># to anything that has subscribed to it</span>
-<span class="n">publishing_ao</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
-  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">,</span>
-    <span class="n">payload</span><span class="o">=</span><span class="n">MyPayload</span><span class="p">(</span>
-      <span class="n">name_of_item_1</span><span class="o">=</span><span class="s1">&#39;something&#39;</span><span class="p">,</span>
-      <span class="n">name_of_item_2</span><span class="o">=</span><span class="s1">&#39;something_else&#39;</span>
-    <span class="p">)</span>
-  <span class="p">)</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>Here is how to publish an event with a specific priority:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">publishing_ao</span> <span class="o">=</span> <span class="n">ActiveObect</span><span class="p">()</span>
-<span class="n">publishing_ao</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
-  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">))</span>
-
-<span class="c1"># or you can set the priority (1 is the highest priority see note):</span>
-<span class="n">publishing_ao</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
-  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">THING_SUBSCRIBING_AO_CARES_ABOUT</span><span class="p">),</span>
-  <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The priority numbering scheme is counter-intuitive: low numbers mean high
-priority while high numbers mean low priority.  The highest published event
-priority is 1.  By default all published events are given a priority of 1000.
-If two events have the same priority the queue will behave like a first in
-first out queue.</p>
 </div>
 </div>
 <div class="section" id="multiple-statecharts">
@@ -2686,21 +2853,23 @@ specification.</p>
 <li><a class="reference internal" href="#posting-an-event-to-the-lifo">Posting an Event to the LIFO</a></li>
 <li><a class="reference internal" href="#creating-a-one-shot-event">Creating a One-Shot Event</a></li>
 <li><a class="reference internal" href="#creating-a-multishot-event">Creating a Multishot Event</a></li>
-<li><a class="reference internal" href="#cancelling-a-specific-event-source">Cancelling a Specific Event Source</a></li>
-<li><a class="reference internal" href="#cancelling-event-source-by-signal-name">Cancelling Event Source By Signal Name</a></li>
+<li><a class="reference internal" href="#canceling-a-specific-event-source">Canceling a Specific Event Source</a></li>
+<li><a class="reference internal" href="#canceling-event-source-by-signal-name">Canceling Event Source By Signal Name</a></li>
 <li><a class="reference internal" href="#recipes-deferring-an-event">Deferring and Recalling an Event</a></li>
 <li><a class="reference internal" href="#adding-a-payload-to-an-event">Adding a Payload to an Event</a></li>
 <li><a class="reference internal" href="#determining-if-an-event-has-a-payload">Determining if an Event Has a Payload</a></li>
+<li><a class="reference internal" href="#subscribing-to-an-event-posted-by-another-active-object">Subscribing to an Event Posted by Another Active Object</a></li>
+<li><a class="reference internal" href="#publishing-events-to-other-active-objects">Publishing events to other Active Objects</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#activeobjects-and-factories">Activeobjects and Factories</a><ul>
-<li><a class="reference internal" href="#augment-your-activeobject">Augment Your Activeobject</a></li>
+<li><a class="reference internal" href="#starting-an-activeobject-or-factory">Starting an Activeobject or Factory</a></li>
+<li><a class="reference internal" href="#stopping-an-activeobject-or-factory">Stopping an ActiveObject or Factory</a></li>
+<li><a class="reference internal" href="#augmentng-your-activeobject">Augmentng your ActiveObject</a></li>
 <li><a class="reference internal" href="#creating-a-statechart-from-a-template">Creating a Statechart From a Template</a></li>
 <li><a class="reference internal" href="#creating-a-statechart-from-a-factory">Creating a Statechart From a Factory</a></li>
 <li><a class="reference internal" href="#creating-a-statechart-inside-of-a-class">Creating a Statechart Inside of a Class</a></li>
 <li><a class="reference internal" href="#getting-information-from-your-statechart">Getting Information from your Statechart</a></li>
-<li><a class="reference internal" href="#subscribing-to-an-event-posted-by-another-active-object">Subscribing to an Event Posted by Another Active Object</a></li>
-<li><a class="reference internal" href="#publishing-events-to-other-active-objects">Publishing events to other Active Objects</a></li>
 <li><a class="reference internal" href="#multiple-statecharts">Multiple Statecharts</a></li>
 </ul>
 </li>
