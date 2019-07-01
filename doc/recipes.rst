@@ -2232,6 +2232,23 @@ You can also set the priority of the event while it is in transit within the
 active fabric.  This would only be useful if you are expecting contention
 between various events being dispatched across your system.
 
+.. _recipes-building-workers:
+
+Building and Destroying Workers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If you have a long running task that has to access blocking IO or connect to a
+slow API, you can wrap it up into a worker.  Unlike stateless architectures,
+with miros you can make your workers as complicated as you want, sending them
+events as they sit or pend; change their behaviors in response to unexpected
+things, or even have rich communications with them prior to having them destroy
+themselves.
+
+A worker can be thought of as some code sitting in a parallel thread, which will
+do work, then post the results of this work back to their federation before they
+prepare themselves for garbage collection.
+
+
+
 .. _recipes-seeing-what-is-:
 
 Seeing What is Going On

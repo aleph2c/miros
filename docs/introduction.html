@@ -39,87 +39,256 @@
 <div><p><em>Decisions without actions are pointless. Actions without decisions are reckless.</em></p>
 <p class="attribution">&mdash;John Boyd</p>
 </div></blockquote>
+<div class="section" id="introduction">
+<span id="introduction-introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <blockquote>
 <div><p><em>Point of view is worth 80 IQ points</em></p>
 <p class="attribution">&mdash;Alan Kay</p>
 </div></blockquote>
-<div class="section" id="introduction">
-<span id="introduction-introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>This package is only dependent upon the Python standard library.</p>
 <p>Miros is a statechart library written in Python.  A statechart is a
 <a class="reference external" href="https://en.wikipedia.org/wiki/UML_state_machine">hierarchical state machine (HSM)</a>, running within its own
-thread.  If you program using statecharts, you will have the ability to <a class="reference internal" href="quickstart.html#quick-start"><span class="std std-ref">quickly
-translate your design goals into robust, understandable, working code</span></a>.</p>
-<p>The problem with most software systems is that they are too complex to
-understand without a picture.  The lion’s share of a programmer’s time is spent
-troubleshooting the behavior of their software, instead of adding working features.  This
-is because it’s difficult to see how a specific portion of code interacts with
-the overall design.  Most developers are in the dark, armed only with a flashlight.</p>
-<p>Let’s turn the lights on.  We can start by drawing pictures in a way that we can
-see the full system at once while allowing other people to understand our
-thinking.  The pictures will guide how we write our code.</p>
-<p>But we tried this before in the 1990s with <a class="reference external" href="https://en.wikipedia.org/wiki/Unified_Modeling_Language">UML (Universal Modeling Language)</a>.  The group behind
-this movement promised systems understanding through pictures.  To do this they
-pulled together 14 different ways that people were drawing software systems
-into one standard.</p>
-<p>Then the movement lost momentum, because <em>they drew the wrong pictures</em>: they
+thread.  If you program using statecharts, you will have the ability to
+<a class="reference internal" href="quickstart.html#quick-start"><span class="std std-ref">quickly translate your design goals into robust, understandable, working
+code</span></a>.</p>
+<div class="section" id="history-and-context">
+<span id="introduction-history-and-context"></span><h2>History and Context<a class="headerlink" href="#history-and-context" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p><em>I made up the term object-oriented, and I can tell you I did not have C++ in
+mind.</em></p>
+<p class="attribution">&mdash;Alan Kay</p>
+</div></blockquote>
+<p>When Alan Kay invented object-oriented programming (circa 1966), he was inspired
+by biology. He saw plants and animals as extremely complicated systems of
+systems, made up of cells who’s inner states and clocks were hidden from one
+another. The only way that these cells could work together was by producing
+small chemical messages and exchanging them with their adjacent cells. He saw
+this as a great example of how to think about programming.</p>
+<p>Message passing was an essential and misunderstood part of his original vision.
+As modern OOP (C++) programming languages were developed, their designers
+parsimoniously moved functions into c data structures and called these
+data/function collections, classes. When you constructed one of these
+Frankenstein structures (a class), it was called instantiation of an object. But
+this term object was a redefinition of Alan Kay’s word because its way of
+message passing could halt and stutter the entire collective system. To pass a
+message using C++, was just to call a function in another object and if the
+function call had to wait for some IO to come in from a computer peripheral,
+then all of the other objects in the system would have to wait too. This meant
+that all of the C++ system cells were temporally coupled together since they
+shared the same synchronous clock. Nature doesn’t work like this, if your cells
+suddenly started to operate this way, you would keel over dead in seconds. Alan
+Kay’s original biological metaphor of an object was broken. He ended up having
+to call his objects, real objects, instead of objects, because the OOP language
+which he invented, was colonized by the C++ popular culture.</p>
+<p>But “statecharts” build from the miros library, each act as if they were running
+on their own computer, so they can pass messages like cells pass messages. When
+a message is passed this way, it is called an event. This means that we have to
+re-name our objects to something else to differentiate them from instantiated
+Frankenstein structures, very much like Alan Kay did. We will call our living
+objects, active objects.</p>
+<p>In fact, the miros library lets you pass messages in three ways:</p>
+<ul class="simple">
+<li>traditional method synchronous calls are supported, and</li>
+<li>active objects can subscribe to and publish asynchronous public events (messages outside of the cell), and</li>
+<li>active objects can send and consume private asynchronous events (messages inside of the cell).</li>
+</ul>
+<p>The events act like the simple chemical messages that are shared between cells.
+When an event is published, the active object that produced it goes back to its
+business, it is not blocked like it would be if it made a function call or a
+method call. It can do this because it has its own thread (it runs like it owns
+its own computer). This ability to process in parallel is called orthogonality
+in statechart theory.</p>
+<p>The statechart was invented by the Mathematician David Harel in 1983 as a
+conceptual tool to help the avionics industry manage their engineering
+complexity. Instead of working from a metaphor, David Harel’s innovations
+occurred while working shoulder to shoulder with Israeli software engineers,
+while he watched them build a jet fighter. He noticed that they could answer
+questions like, “What algorithm is used by the radar to measure the distance to
+a target?”, but they did not have answers to questions that seemed more basic,
+such as “What happens when you press this button on the stick under all possible
+circumstances?” After asking such questions, he would watch the engineers dive
+into a two-volume, 2000 page document; attempting to cross-reference different
+parts of the tome, written by different authors.</p>
+<p>Many large scale engineering disasters occur due to “interface failures,” not as
+a result of a single component, but of the integration between them. The
+interface failures are the direct result of teams not having answers to the
+simple-seeming questions that David Harel asked his avionics team.</p>
+<p>We are lucky that David Harel comes from a strong background in mathematical
+topology and not from a strong programming perspective. He watched the engineers
+like an anthropologist, and mapped how they talked about things into simple
+pictures; often on napkins. He didn’t try to imagine how to program their
+descriptions but specifically focused on how to draw a picture of what they said
+and then thought of a way to formalize the pictures into a set of rules. The
+rules were simple enough that anyone looking at the diagram could quickly
+understand what would have otherwise taken pages to write down. The pictures
+described different working parts of the systems as states, and often, these
+states of operation would also contain the behaviour of other states. From this,
+he formalized the notion of a hierarchical state machine (HSM). From this
+formalism, it was possible to build a software framework that could, take pages
+and pages of a complex specification, convert it into a compacted diagram, that
+could quickly be understood by a human or a team, and be compiled into working
+software. This was a massive contribution to computing.</p>
+<blockquote>
+<div><p><strong>I find the concept of statecharts to be quite interesting, but unfortunately
+only to a small segment of our readership. I find the information presented to
+be somewhat innovative but not wholly new. I feel that the use of the digital
+watch example to be useful, but somewhat simple in the light of what our
+readership would be looking for.”</strong></p>
+<p class="attribution">&mdash;<strong>REJECTION LETTER TO DR. DAVID HAREL FROM THE IEEE (1983)</strong>: REGARDING THIS PAPER</p>
+</div></blockquote>
+<p>Converting complex specifications into software and releasing software is just
+the start of things though. It has been empirically demonstrated that the
+majority of a software’s cost goes into its maintenance cycle. Even when we are
+building new software, the majority of our time goes into troubleshooting our
+creations. A difficult thing to do as a developer is to create a cognitive
+picture of the code which is in front of us. Even harder is to challenge our own
+assumptions as you try to see why our cognitive picture isn’t working as you
+expect it to.</p>
+<p>If we had a map or an easily understood picture of our design, then
+troubleshooting old code would be much more comfortable. We wouldn’t have to
+scan the code an build a mental diagram, the diagram would be given to us as a
+gift from the past, leaving our working memory available for solving problems.</p>
+<p>But we tried drawing pictures before in the 1990s with UML (Universal Modeling
+Language). The group behind this movement promised systems-understanding through
+pictures. To do this, they pulled together 14 different ways that people were
+drawing software systems into one standard.</p>
+<p>Then the movement lost momentum because they drew the wrong pictures: they
 emphasized class diagrams without statechart diagrams.</p>
-<p>A class diagram only shows how code is structured, but a statechart diagram
-tells you how code will <em>behave</em>.</p>
+<p>A class diagram only shows how the code is structured, but a statechart diagram
+tells you how the code will behave.</p>
 <a class="reference external image-reference" href="_static/intro_1.pdf"><div align="center" class="align-center"><img alt="_images/intro_1.svg" src="_images/intro_1.svg" /></div>
 </a>
-<p>It is easy to manifest a class diagram in Python, since Python is an object
-oriented programming language.  But how to you create the code that is described
-by a behavioral statechart diagram?  Well, that’s the point of this library: it
-provides you with the syntax, threading and queuing infrastructure needed to
-make it work.</p>
-<p>UML never really went away.  So, let’s use their theory, let’s use their tooling
-and let’s learn from their mistakes:  We won’t become enamored with our
-pictures, but keep them small, useful and easy to change.  We won’t separate the
-person who draws and understands the picture, from the person implementing it in
-code.</p>
-<p>To use this library is to program in Python, not pictures; so there is no
-picture-to-code compiler here.  This means you can use whatever picture drawing
-technology you want, from a napkin to <a class="reference external" href="http://www.umlet.com">UMLet</a>… it’s up to you.</p>
-<p>We will learn some simple, formal rules for drawing statecharts. These drawing
-rules will help us draw our ideas with a picture and then link that picture to
-our code.  The same rules will describe how our code is expected to interact
-with the world.  These statechart drawing and behavioral rules are called the
-<a class="reference external" href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">Harel formalism</a>,
-named after <a class="reference external" href="https://en.wikipedia.org/wiki/David_Harel">Dr. David Harel</a>, a mathematician who invented the statechart in
-1987.  The statechart picture is only 1 of the 14 UML drawing types.</p>
-<p>In the early 2000s <a class="reference external" href="https://www.linkedin.com/in/samek">Dr. Miro Samek</a> implemented a statechart framework in
-c/C++.  As a firmware developer Dr. Samek ran into the tight memory and
-processing constraints that confine a developer while they write code for small
-processors.  He refactored the Harel formalism to be more performant and then he
-published a core part of the algorithm that lets a statechart designer translate
-their picture into working code: the event processing algorithm.</p>
-<p>This library uses Miros Samek’s event processing algorithm and this is why it is
-called miros.</p>
+<p>It is easy to manifest a class diagram in Python since Python started as an
+object-oriented programming language of the C++ family. But how do you create
+the code that is described by a behavioural statechart diagram? Well, that’s the
+point of this library: it provides you with the syntax, concurrency and queuing
+infrastructure needed to make it work in Python.</p>
+<p>The UML movement contained two different philosophically opposed groups. The
+first wanted to construct a set of picture languages, whose semantics were
+powerful enough to compile down to working executables. The second group wanted
+the pictures as sketches of the software so that teams could quickly share
+complex ideas and use the images to determine what to program. (miros is in the
+second camp).</p>
+<p>To create machine code from a picture is called model-driven development.
+Model-driven software is typically proprietary, niched to a specific problem
+space and expensive. When statecharts first started to gain momentum in the late
+1990s, the only way to access their expressive power was to spend a lot of money
+on proprietary software.</p>
+<p>David Harel was involved in a few of these software companies, and as a result,
+he was placed in an economical conundrum. If he demonstrated how to implement
+his theory, he would be giving competing software firms his IP. If he didn’t
+describe how to apply his theory to actual practitioners, then it would lose
+momentum, and his idea wouldn’t spread the way he wanted it to. When asked to
+describe statechart semantics, his firm explained one way of doing it externally
+while using another way internally. The language and mechanisms of how to
+implement his vision became confused, and the UML standards that described
+statechart mechanisms ended up containing contradictions, which led to
+fragmentation.</p>
+<p>In the early 2000s Dr. Miro Samek liberated statechart theory from proprietary
+model-driven software by implementing a statechart framework in c/C++, and then
+showed how he did it. He wrote two different books and a series of articles.
+Miro Samek took a code-centric approach; showing how to build his framework
+using c/C++ in his code listings. If you were to became confused by a term or a
+diagram, you could just look at his working code and see what he meant.</p>
+<p>As a firmware developer, Dr. Samek ran into the tight memory and processing
+constraints that confine a developer while they write code for small processors.
+He refactored the Harel formalism to be more performant and practical. Then he
+published the code that solves the topological problems needed to make it easy
+for a statechart designer to translate their pictures into working solutions: he
+called this code the event processor.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">If you would like to translate your design into Miro Samek’s <a class="reference external" href="http://www.state-machine.com/">QP framework</a>
-(for a huge performance gain), it should be fairly straight forward to port
+<p>This library uses Miros Samek’s event processing algorithm, and his way of
+thinking about the problem space: this is why it is called miros.</p>
+<p class="last">If you would like to translate your design into Miro Samek’s QP framework (for a
+considerable performance gain), it should be reasonably straight forward to port
 your Python code to c/C++.</p>
 </div>
-<p>I can’t expect you to know UML.  So I will include instructions on how to draw
-enough of these pictures to help guide your thinking.</p>
-<p>I will explain how statecharts work, and what they are in detail, then I will
-show you how to use this library to program with them.</p>
-<p>This package is only dependent upon the Python standard library.</p>
-<p>From this documentation you can learn how to:</p>
-<ul class="simple">
-<li>understand the Harel-Miro statechart formalism (drawing rules and meaning)</li>
-<li>understand how to design systems with statechart diagrams</li>
-<li>understand how the event processor works</li>
-<li>quickly look up the specifics about how to do something</li>
-<li>find an example to work from</li>
-<li>reflect upon the behavior of your state machines</li>
-<li>test your code</li>
-<li>create concurrent statecharts that work together</li>
-</ul>
-<p>If you would like to link your statecharts across a computer network (for IOT
-applications), you can use the <a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq</a> plugin.</p>
+<p>Miro Samek provides his code for free but requires a small payment if you use it
+in your product. In return for this payment, you get access to a world-class
+developer, his supporting documentation, and you know that his project will
+continue to evolve and improve for your next product.</p>
+<p>Miro Samek then demonstrated how to get rid of the OS entirely, how to build a
+real-time, concurrent system using an event loop (circa 2000). His approach is
+similar to the event loops provided by twisted and asycio in Python.</p>
+<p>What he did was quite remarkable. He replaced model-driven tools which would
+create code, which would then have to be compiled into projects off of the
+target, by embedding the topological solver (event processor) directly into the
+embedded code base. He showed how to get rid of the pre-emptive real-time
+operating systems. His code was tiny, extremely fast, and its expressive power
+was immense. His documentation was clear and based on the excellent theory
+developed by David Harel.</p>
+<p>To draw the pictures, he provided Visio templates and recommended free tools
+like UMLet. He wasn’t trying to create his own language, he used existing
+languages so that a firm wouldn’t have to re-write all of their code. Miro Samek
+had turned c/C++ into something that was more in line with Alan Kay’s original
+vision of an object-oriented programming language and with the expressive power
+of statecharts.</p>
+<p>Meanwhile, the software community moved on. UML was used by less and less firms
+because the pictures of software structure provided by class diagrams just
+weren’t that useful to practitioners. Proprietary languages started to lose
+ground to open source languages. Model Driven tools were asymmetric, you could
+change the model to make code, but if you changed the code, the picture wouldn’t
+update.</p>
+<p>But UML never really went away, here are the google trends for the term “UML”
+from 2004 till June 2019:</p>
+<a class="reference external image-reference" href="_static/google_trends_UML_2004_to_2019.PNG"><img alt="_images/google_trends_UML_2004_to_2019.PNG" class="align-center" src="_images/google_trends_UML_2004_to_2019.PNG" /></a>
+<p>As a result, there are still open source UML drawing packages in circulation.
+These drawing packages overemphasize the class drawing aspects of UML, but UMLet
+for one has enough expressive power to describe statecharts too. You won’t want
+to use them to make marketing documentation, but they are good enough to keep
+your drawings small, expressive and easy to change.</p>
+<p>Many of the features asked for in David Harel’s original paper are missing from
+these drawing tools. UMLet has no way of “zooming in” or “zooming out of a
+diagram.” To make such documents work with the web would require a significant
+amount of money and time. But for now, they are good enough to proceed with.</p>
+<p>To use this library is to program in Python, not pictures; so there is no
+picture-to-code compiler here. This means you can use whatever picture drawing
+technology you want. I use UMLet, or if you find something better, email me
+about it.</p>
+<p>Python has advanced significantly since the 90s. UML cannot capture all of the
+expressive power of the language, but it doesn’t have to; if you don’t know how
+to draw your intention (list comprehensions, etc.), just write the code onto
+your diagram.</p>
+<div class="section" id="what-this-documentation-will-provide">
+<span id="introduction-what-this-documentation-will-provide"></span><h3>What this Documentation will Provide<a class="headerlink" href="#what-this-documentation-will-provide" title="Permalink to this headline">¶</a></h3>
+<p>This project ports the Miro Samek event processor to Python.  It provides the
+same concurrent statechart features, but instead of using a high-speed busing
+algorithm written in c, it uses the Python threading and queuing modules
+contained in the Python standard library.</p>
+<p>I can’t expect you to know UML, so part of the documentation explains enough UML
+to draw some pictures.</p>
+<p>A lot of people who have been training in the C++ tradition of UML still don’t
+understand statecharts, if they did UML would still be fashionable.  So part of
+this documentation will demonstrate how to read a statechart diagram and
+understand what it means.</p>
+<p>Statechart concepts are explained in <code class="docutils literal notranslate"><span class="pre">zero</span> <span class="pre">to</span> <span class="pre">one</span></code> which also contains an
+interactive, choose-your-own-adventure kind of tutorial.</p>
+<p>If you know statecharts, you can immediately jump to the quick start and look at
+how I implemented a networked, robotic sprinkler using the open weather API with
+miros in Python.  It demonstrates 3 different orthogonal statecharts working
+together.</p>
+<p>Miro Samek pulled a lot of the difficult parts of statechart specification out
+of his code to make it compact and fast.  Then he spent an entire chapter of his
+latest book showing how to regain these features by making simple adjustments to
+your code; he called this section patterns.  I have demonstrated how to
+implement his patterns and then show a few more.</p>
+<p>The Recipes section contains a list of things that you might want to do and a
+concise example of how to do it.</p>
+<p>The Examples sections contain some more extended examples which can be
+referenced and then extended for your own designs.</p>
+<p>The Reflection section goes into the details about how to use the
+instrumentation that has been build into the miros library.  Two different types
+of sensible logging have been added to this library, you can use the logging to
+see how your statechart is reacting to its environment in great detail or in
+more of a higher level way.</p>
+<p>The testing section will demonstrate a set of simple test patterns so that you
+can verify your designs.</p>
+<p>Finally, if you would like to link your statecharts across a computer network
+(for IOT applications), you can use the <a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq</a> plugin.</p>
 <a class="reference internal" href="installation.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="quickstart.html"><span class="std std-ref">next</span></a><div class="toctree-wrapper compound">
+</div>
+</div>
 </div>
 </div>
 
@@ -131,7 +300,18 @@ applications), you can use the <a class="reference external" href="https://aleph
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
   <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
-</a></p><div class="relations">
+</a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#history-and-context">History and Context</a><ul>
+<li><a class="reference internal" href="#what-this-documentation-will-provide">What this Documentation will Provide</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>

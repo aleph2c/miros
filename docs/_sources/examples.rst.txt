@@ -16,6 +16,7 @@ Examples
    scribbleexample
    towardsthefactoryexample
    interactingcharts
+   city_sprinkler
    i_mongol_example
 
 More examples can be found in the :ref:`patterns section<patterns>`.

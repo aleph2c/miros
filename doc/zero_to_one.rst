@@ -5359,7 +5359,7 @@ We account for this lateness in our test code by providing some tolerance:
 
 I am testing this documentation using Jupyter (running in a web browser) which
 is talking to a CPython, Python implementation, which is running within the
-Windows Linux Subsystem.  The Jupyter web interface communicates with the
+Windows Subsystem for Linux (wsl).  The Jupyter web interface communicates with the
 Cpython interpreter using Json over the ZeroMQ messaging protocol.
 
 The ``miros`` library uses Python threads, which is to say a single process on

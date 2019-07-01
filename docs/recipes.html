@@ -2140,6 +2140,18 @@ will post events to it using its <a class="reference internal" href="#recipes-po
 active fabric.  This would only be useful if you are expecting contention
 between various events being dispatched across your system.</p>
 </div>
+<div class="section" id="building-and-destroying-workers">
+<span id="recipes-building-workers"></span><h3>Building and Destroying Workers<a class="headerlink" href="#building-and-destroying-workers" title="Permalink to this headline">¶</a></h3>
+<p>If you have a long running task that has to access blocking IO or connect to a
+slow API, you can wrap it up into a worker.  Unlike stateless architectures,
+with miros you can make your workers as complicated as you want, sending them
+events as they sit or pend; change their behaviors in response to unexpected
+things, or even have rich communications with them prior to having them destroy
+themselves.</p>
+<p>A worker can be thought of as some code sitting in a parallel thread, which will
+do work, then post the results of this work back to their federation before they
+prepare themselves for garbage collection.</p>
+</div>
 </div>
 <div class="section" id="seeing-what-is-going-on">
 <span id="recipes-seeing-what-is"></span><h2>Seeing What is Going On<a class="headerlink" href="#seeing-what-is-going-on" title="Permalink to this headline">¶</a></h2>
@@ -2871,6 +2883,7 @@ specification.</p>
 <li><a class="reference internal" href="#creating-a-statechart-inside-of-a-class">Creating a Statechart Inside of a Class</a></li>
 <li><a class="reference internal" href="#getting-information-from-your-statechart">Getting Information from your Statechart</a></li>
 <li><a class="reference internal" href="#multiple-statecharts">Multiple Statecharts</a></li>
+<li><a class="reference internal" href="#building-and-destroying-workers">Building and Destroying Workers</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#seeing-what-is-going-on">Seeing What is Going On</a><ul>
