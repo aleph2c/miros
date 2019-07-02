@@ -574,8 +574,9 @@ the other two objects needed to build the robotic sprinkler:
 
 
 To run it, I make sure to delete the compressed file (so the code will be forced
-to download it again), then hammer the statechart with a bunch of requests while
-it is trying to download and decompress and make sense of the file:
+to download it again), then I hammer the statechart with a bunch of requests
+(see above) while it is trying to download and decompress and make sense of the
+file:
 
 .. code-block:: python
   
@@ -586,20 +587,21 @@ Let's look at what it did, we can see it because we turned on the
 
 .. code-block:: text
   
-  [11:12:25] [city_details] e->start_at() top->read_file
-  [11:12:25] [city_details] e->ready() read_file->idle
-  [11:12:25] [city_details] e->REQUEST_CITY_DETAILS() idle->conduct_query
-  [11:12:25] [city_details] e->ready() conduct_query->idle
-  Vancouver: 6173331
-  [11:12:25] [city_details] e->REQUEST_CITY_DETAILS() idle->conduct_query
-  [11:12:25] [city_details] e->ready() conduct_query->idle
-  [11:12:25] [city_details] e->REQUEST_CITY_DETAILS() idle->conduct_query
-  Toronto: 6167865
-  [11:12:25] [city_details] e->ready() conduct_query->idle
-  Burnaby: 5911606
-  [11:12:25] [city_details] e->REQUEST_CITY_DETAILS() idle->conduct_query
-  [11:12:25] [city_details] e->ready() conduct_query->idle
-  Saskatoon: 6141256         
+   [12:09:57] [city_details] e->start_at() top->get_id_file_from_network
+   [12:09:57] [city_details] e->read_file() get_id_file_from_network->read_file
+   [12:09:58] [city_details] e->ready() read_file->idle                                               
+   [12:09:58] [city_details] e->REQUEST_CITY_DETAILS() idle->conduct_query                            
+   [12:09:58] [city_details] e->ready() conduct_query->idle                                           
+   [12:09:58] [city_details] e->REQUEST_CITY_DETAILS() idle->conduct_query                            
+   Vancouver: 6173331
+   [12:09:58] [city_details] e->ready() conduct_query->idle                                           
+   [12:09:58] [city_details] e->REQUEST_CITY_DETAILS() idle->conduct_query                            
+   Toronto: 6167865                                                                                                     
+   [12:09:58] [city_details] e->ready() conduct_query->idle                                           
+   [12:09:58] [city_details] e->REQUEST_CITY_DETAILS() idle->conduct_query                            
+   Burnaby: 5911606                                                                                                     
+   [12:09:58] [city_details] e->ready() conduct_query->idle                                           
+   Saskatoon: 6141256  
 
 :ref:`Turning this into a sequence diagram <recipes-drawing-a-sequence-diagram>` looks
 like this:
@@ -607,30 +609,30 @@ like this:
 .. code-block:: python
   
    [Statechart: city_details]
-               top          read_file    idle                   conduct_query
-                +--start_at()-->|          |                          |
-                |     (1)       |          |                          |
-                |               +-ready()->|                          |
-                |               |  (2)     |                          |
-                |               |          +--REQUEST_CITY_DETAILS()->|
-                |               |          |           (3)            |
-                |               |          +<---------ready()---------|
-                |               |          |           (4)            |
-                |               |          +--REQUEST_CITY_DETAILS()->|
-                |               |          |           (5)            |
-                |               |          +<---------ready()---------|
-                |               |          |           (6)            |
-                |               |          +--REQUEST_CITY_DETAILS()->|
-                |               |          |           (7)            |
-                |               |          +<---------ready()---------|
-                |               |          |           (8)            |
-                |               |          +--REQUEST_CITY_DETAILS()->|
-                |               |          |           (9)            |
-                |               |          +<---------ready()---------|
-                |               |          |          (10)            |
+   top   get_id_file_from_network read_file   idle                  conduct_query
+    +---start_at()->|              |           |                          |
+    |      (1)      |              |           |                          |
+    |               +-read_file()->|           |                          |
+    |               |    (2)       |           |                          |
+    |               |              +-ready()-->|                          |
+    |               |              |  (3)      |                          |
+    |               |              |           +--REQUEST_CITY_DETAILS()->|
+    |               |              |           |           (4)            |
+    |               |              |           +<---------ready()---------|
+    |               |              |           |           (5)            |
+    |               |              |           +--REQUEST_CITY_DETAILS()->|
+    |               |              |           |           (6)            |
+    |               |              |           +--REQUEST_CITY_DETAILS()->|
+    |               |              |           |           (7)            |
+    |               |              |           +<---------ready()---------|
+    |               |              |           |           (8)            |
+    |               |              |           +--REQUEST_CITY_DETAILS()->|
+    |               |              |           |           (9)            |
+    |               |              |           +<---------ready()---------|
+    |               |              |           |          (10)            |
 
 We can see that the city_details statechart queued the REQUEST_CITY_DETAILS
-(3,5,7,9) events until after it had downloaded the ``city.list.json.qz`` (2).
+(4,6,l,9) events until after it had downloaded the ``city.list.json.qz`` (2).
 
 .. _quickstart-citydetails-specifications:
 

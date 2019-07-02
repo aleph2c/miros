@@ -545,57 +545,59 @@ the other two objects needed to build the robotic sprinkler:</p>
 </pre></div>
 </div>
 <p>To run it, I make sure to delete the compressed file (so the code will be forced
-to download it again), then hammer the statechart with a bunch of requests while
-it is trying to download and decompress and make sense of the file:</p>
+to download it again), then I hammer the statechart with a bunch of requests
+(see above) while it is trying to download and decompress and make sense of the
+file:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rm</span> <span class="o">*.</span><span class="n">gz</span> <span class="p">;</span> <span class="n">python</span> <span class="n">sprinkler</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 <p>Let’s look at what it did, we can see it because we turned on the
 <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code>’s live_trace feature:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[11:12:25] [city_details] e-&gt;start_at() top-&gt;read_file
-[11:12:25] [city_details] e-&gt;ready() read_file-&gt;idle
-[11:12:25] [city_details] e-&gt;REQUEST_CITY_DETAILS() idle-&gt;conduct_query
-[11:12:25] [city_details] e-&gt;ready() conduct_query-&gt;idle
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[12:09:57] [city_details] e-&gt;start_at() top-&gt;get_id_file_from_network
+[12:09:57] [city_details] e-&gt;read_file() get_id_file_from_network-&gt;read_file
+[12:09:58] [city_details] e-&gt;ready() read_file-&gt;idle
+[12:09:58] [city_details] e-&gt;REQUEST_CITY_DETAILS() idle-&gt;conduct_query
+[12:09:58] [city_details] e-&gt;ready() conduct_query-&gt;idle
+[12:09:58] [city_details] e-&gt;REQUEST_CITY_DETAILS() idle-&gt;conduct_query
 Vancouver: 6173331
-[11:12:25] [city_details] e-&gt;REQUEST_CITY_DETAILS() idle-&gt;conduct_query
-[11:12:25] [city_details] e-&gt;ready() conduct_query-&gt;idle
-[11:12:25] [city_details] e-&gt;REQUEST_CITY_DETAILS() idle-&gt;conduct_query
+[12:09:58] [city_details] e-&gt;ready() conduct_query-&gt;idle
+[12:09:58] [city_details] e-&gt;REQUEST_CITY_DETAILS() idle-&gt;conduct_query
 Toronto: 6167865
-[11:12:25] [city_details] e-&gt;ready() conduct_query-&gt;idle
+[12:09:58] [city_details] e-&gt;ready() conduct_query-&gt;idle
+[12:09:58] [city_details] e-&gt;REQUEST_CITY_DETAILS() idle-&gt;conduct_query
 Burnaby: 5911606
-[11:12:25] [city_details] e-&gt;REQUEST_CITY_DETAILS() idle-&gt;conduct_query
-[11:12:25] [city_details] e-&gt;ready() conduct_query-&gt;idle
+[12:09:58] [city_details] e-&gt;ready() conduct_query-&gt;idle
 Saskatoon: 6141256
 </pre></div>
 </div>
 <p><a class="reference internal" href="recipes.html#recipes-drawing-a-sequence-diagram"><span class="std std-ref">Turning this into a sequence diagram</span></a> looks
 like this:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Statechart</span><span class="p">:</span> <span class="n">city_details</span><span class="p">]</span>
-            <span class="n">top</span>          <span class="n">read_file</span>    <span class="n">idle</span>                   <span class="n">conduct_query</span>
-             <span class="o">+--</span><span class="n">start_at</span><span class="p">()</span><span class="o">--&gt;|</span>          <span class="o">|</span>                          <span class="o">|</span>
-             <span class="o">|</span>     <span class="p">(</span><span class="mi">1</span><span class="p">)</span>       <span class="o">|</span>          <span class="o">|</span>                          <span class="o">|</span>
-             <span class="o">|</span>               <span class="o">+-</span><span class="n">ready</span><span class="p">()</span><span class="o">-&gt;|</span>                          <span class="o">|</span>
-             <span class="o">|</span>               <span class="o">|</span>  <span class="p">(</span><span class="mi">2</span><span class="p">)</span>     <span class="o">|</span>                          <span class="o">|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>           <span class="p">(</span><span class="mi">3</span><span class="p">)</span>            <span class="o">|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>           <span class="p">(</span><span class="mi">4</span><span class="p">)</span>            <span class="o">|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>           <span class="p">(</span><span class="mi">5</span><span class="p">)</span>            <span class="o">|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>           <span class="p">(</span><span class="mi">6</span><span class="p">)</span>            <span class="o">|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>           <span class="p">(</span><span class="mi">7</span><span class="p">)</span>            <span class="o">|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>           <span class="p">(</span><span class="mi">8</span><span class="p">)</span>            <span class="o">|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>           <span class="p">(</span><span class="mi">9</span><span class="p">)</span>            <span class="o">|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
-             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>          <span class="p">(</span><span class="mi">10</span><span class="p">)</span>            <span class="o">|</span>
+<span class="n">top</span>   <span class="n">get_id_file_from_network</span> <span class="n">read_file</span>   <span class="n">idle</span>                  <span class="n">conduct_query</span>
+ <span class="o">+---</span><span class="n">start_at</span><span class="p">()</span><span class="o">-&gt;|</span>              <span class="o">|</span>           <span class="o">|</span>                          <span class="o">|</span>
+ <span class="o">|</span>      <span class="p">(</span><span class="mi">1</span><span class="p">)</span>      <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>                          <span class="o">|</span>
+ <span class="o">|</span>               <span class="o">+-</span><span class="n">read_file</span><span class="p">()</span><span class="o">-&gt;|</span>           <span class="o">|</span>                          <span class="o">|</span>
+ <span class="o">|</span>               <span class="o">|</span>    <span class="p">(</span><span class="mi">2</span><span class="p">)</span>       <span class="o">|</span>           <span class="o">|</span>                          <span class="o">|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">+-</span><span class="n">ready</span><span class="p">()</span><span class="o">--&gt;|</span>                          <span class="o">|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>  <span class="p">(</span><span class="mi">3</span><span class="p">)</span>      <span class="o">|</span>                          <span class="o">|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>           <span class="p">(</span><span class="mi">4</span><span class="p">)</span>            <span class="o">|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>           <span class="p">(</span><span class="mi">5</span><span class="p">)</span>            <span class="o">|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>           <span class="p">(</span><span class="mi">6</span><span class="p">)</span>            <span class="o">|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>           <span class="p">(</span><span class="mi">7</span><span class="p">)</span>            <span class="o">|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>           <span class="p">(</span><span class="mi">8</span><span class="p">)</span>            <span class="o">|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>           <span class="p">(</span><span class="mi">9</span><span class="p">)</span>            <span class="o">|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>          <span class="p">(</span><span class="mi">10</span><span class="p">)</span>            <span class="o">|</span>
 </pre></div>
 </div>
 <p>We can see that the city_details statechart queued the REQUEST_CITY_DETAILS
-(3,5,7,9) events until after it had downloaded the <code class="docutils literal notranslate"><span class="pre">city.list.json.qz</span></code> (2).</p>
+(4,6,l,9) events until after it had downloaded the <code class="docutils literal notranslate"><span class="pre">city.list.json.qz</span></code> (2).</p>
 </div>
 <div class="section" id="cityweather-specifications">
 <span id="quickstart-citydetails-specifications"></span><h3>CityWeather Specifications<a class="headerlink" href="#cityweather-specifications" title="Permalink to this headline">¶</a></h3>
