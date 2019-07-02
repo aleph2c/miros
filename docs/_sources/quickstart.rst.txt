@@ -343,7 +343,10 @@ From the design we can write our code (compacted to fit on the page):
       live_trace=None,
       live_spy=None,
       lookup_file_url=None):
-
+      '''
+      To see the design diagram:
+        https://aleph2c.github.io/miros/_static/open_weather_map_city_details.pdf
+      '''
       super().__init__(name, live_trace, live_spy)
 
       # setup attributes
