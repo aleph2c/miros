@@ -190,16 +190,409 @@ provide very nice syntax.</p>
 <span class="c1"># (green light)</span>
 </pre></div>
 </div>
+<p>To lock down how I want my payloads to look, I would place this in the top part
+of the robotic sprinkler Python file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="n">Coord</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
+  <span class="s1">&#39;Coord&#39;</span><span class="p">,</span>
+  <span class="p">[</span>
+    <span class="s1">&#39;lon&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;lat&#39;</span>
+  <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="c1"># uses Coord</span>
+<span class="n">CityDetailsPayload</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
+  <span class="s1">&#39;CityDetailsPayload&#39;</span><span class="p">,</span>
+  <span class="p">[</span>
+    <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;country&#39;</span><span class="p">,</span>  <span class="c1"># ISO 3166</span>
+    <span class="s1">&#39;city&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;coord&#39;</span>  <span class="c1"># Coord</span>
+  <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">RequestDetailsForCityPayload</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
+  <span class="s1">&#39;RequestDetailsForCityPayload&#39;</span><span class="p">,</span>
+  <span class="p">[</span>
+    <span class="s1">&#39;city&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;country&#39;</span>  <span class="c1"># ISO 3166</span>
+  <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">Weather</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
+  <span class="s1">&#39;Weather&#39;</span><span class="p">,</span>
+  <span class="p">[</span>
+    <span class="s1">&#39;icon&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;main&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;description&#39;</span>
+  <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="c1"># uses Weather, Coord</span>
+<span class="n">WeatherOpenApiResult</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
+  <span class="s1">&#39;WeatherOpenApiResult&#39;</span><span class="p">,</span>
+  <span class="p">[</span>
+    <span class="s1">&#39;city&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;country&#39;</span><span class="p">,</span>  <span class="c1"># ISO 3166</span>
+    <span class="s1">&#39;coord&#39;</span><span class="p">,</span>    <span class="c1"># Coord</span>
+    <span class="s1">&#39;wind&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;weather&#39;</span><span class="p">,</span>  <span class="c1"># Weather</span>
+    <span class="s1">&#39;sunrise&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sunset&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;temp_min&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;temp_max&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;temp&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;humidity&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dt&#39;</span>
+  <span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 <p>Now that we have a decent understanding about what information we want to flow
 in our system, let’s focus in on each part.</p>
 </div>
 <div class="section" id="openweathermapcitydetails-specifications">
 <span id="quickstart-openweathermapcitydetails-specifications"></span><h3>OpenWeatherMapCityDetails Specifications<a class="headerlink" href="#openweathermapcitydetails-specifications" title="Permalink to this headline">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> needs to provide a city ID given a city and a
-country.  This city ID will be used by the <code class="docutils literal notranslate"><span class="pre">CityDetails</span></code> object to make a call
-to the open web API.</p>
+country.  This city ID will be used by the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> object to make a call
+to the open web API.  The open-weather website contains a compressed file called
+<code class="docutils literal notranslate"><span class="pre">city.list.json.gz</span></code> at
+<a class="reference external" href="http://bulk.openweathermap.org/sample/city.list.json.gz">http://bulk.openweathermap.org/sample/city.list.json.gz</a>.  If you have a
+city name and a country code, you can use this file to look up the city’s id.</p>
+<p>I have long term plans to pull the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> object out of
+the networked sprinkler and place it on a server somewhere.  This is because the
+<code class="docutils literal notranslate"><span class="pre">city.list.json.gz</span></code> file is really big, and I would like to cost reduce my
+robotic sprinkler onto processors with very little memory.  This means that many
+many different <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> objects might be making requests for city-ids at
+the same time.</p>
+<p>I only want to download the <code class="docutils literal notranslate"><span class="pre">city.list.json.gz</span></code> file if I don’t have it
+already, and I would like the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> object to be
+resilient to network outages on the Open Weather website.  If it can’t download
+the file from the Open Weather server, it should wait ten seconds then try
+again.  While its waiting, it should place any request from <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code>
+objects for city-ids into a queue which will be answered once it gets the
+information it needs.  Once it gets the file, it should answer any of its queued
+requests in a first in first out kind of way.</p>
+<p>Here is the design, it uses the <a class="reference internal" href="patterns.html#patterns-deferred-event"><span class="std std-ref">deferred event</span></a>
+statechart pattern.</p>
 <a class="reference external image-reference" href="_static/open_weather_map_city_details.pdf"><div align="center" class="align-center"><img alt="_images/open_weather_map_city_details.svg" src="_images/open_weather_map_city_details.svg" /></div>
 </a>
+<p>From the design we can write our code (compacted to fit on the page):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gzip</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+<span class="c1"># ... named tuples defined above, see previous section (removed to make it</span>
+<span class="c1">#     easier to see the OpenWeatherMapCityDetails code</span>
+
+<span class="k">class</span> <span class="nc">InstrumentedFactory</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+
+<span class="k">class</span> <span class="nc">OpenWeatherMapCityDetails</span><span class="p">(</span><span class="n">InstrumentedFactory</span><span class="p">):</span>
+
+  <span class="n">DEFAULT_LOOKUP_FILE_URL</span> <span class="o">=</span> \
+    <span class="s1">&#39;http://bulk.openweathermap.org/sample/city.list.json.gz&#39;</span>
+
+  <span class="n">LOOKUP_FILE_PATH</span> <span class="o">=</span> \
+    <span class="s1">&#39;city_to_id_json.gz&#39;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">,</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">lookup_file_url</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="p">,</span> <span class="n">live_spy</span><span class="p">)</span>
+
+    <span class="c1"># setup attributes</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">city</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">country</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">lookup_file_url</span> <span class="o">=</span> \
+      <span class="n">OpenWeatherMapCityDetails</span><span class="o">.</span><span class="n">DEFAULT_LOOKUP_FILE_URL</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">lookup_file_name</span> <span class="o">=</span> \
+       <span class="n">OpenWeatherMapCityDetails</span><span class="o">.</span><span class="n">LOOKUP_FILE_PATH</span> \
+         <span class="k">if</span> <span class="n">lookup_file_url</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">lookup_file_url</span>
+
+    <span class="c1"># define the states, link signals to handlers</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">api_lookup_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;api_lookup_data&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_lookup_data_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_lookup_data_init_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_lookup_data_request_city_details</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">CITY_DETAILS</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_lookup_data_city_details</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">build_data_structure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;build_data_structure&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">build_data_structure_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">build_data_structure_init_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">read_file</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">build_data_structure_read_file</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ready</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_id_file_from_network_ready</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">retry_after_network_error</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_id_file_from_network_retry_after_network_error</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">get_id_file_from_network</span> <span class="o">=</span> \
+      <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;get_id_file_from_network&quot;</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_id_file_from_network_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">read_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;read_file&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">read_file_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">idle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">idle_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">idle_request_city_details</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">conduct_query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;conduct_query&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conduct_query_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ready</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conduct_query_ready</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="c1"># add the hierarchy</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_lookup_data</span><span class="p">,</span>
+           <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_data_structure</span><span class="p">,</span>
+           <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_lookup_data</span><span class="p">)</span><span class="o">.</span> \
+         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_id_file_from_network</span><span class="p">,</span>
+           <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">build_data_structure</span><span class="p">)</span><span class="o">.</span> \
+         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read_file</span><span class="p">,</span>
+           <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">build_data_structure</span><span class="p">)</span><span class="o">.</span> \
+         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idle</span><span class="p">,</span>
+           <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">build_data_structure</span><span class="p">)</span><span class="o">.</span> \
+         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conduct_query</span><span class="p">,</span>
+           <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">build_data_structure</span><span class="p">)</span>
+
+    <span class="c1"># start the statechart (fire up a separate thread)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_lookup_data</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">city_details_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Pull the city details out of the raw_weather_lookup_dict using the</span>
+<span class="sd">       country and city attributes to identify the required item from the</span>
+<span class="sd">       collection</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">       (CityDetailsPayload): namedtuple containing the city details needed for</span>
+<span class="sd">       the open weather API call</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">for</span> <span class="n">_id</span><span class="p">,</span> <span class="n">_dict</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_weather_lookup_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">city</span> <span class="o">==</span> <span class="n">_dict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">country</span> <span class="o">==</span> <span class="n">_dict</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">]:</span>
+        <span class="n">coord</span> <span class="o">=</span> <span class="n">Coord</span><span class="p">(</span><span class="n">lon</span><span class="o">=</span><span class="n">_dict</span><span class="p">[</span><span class="s1">&#39;coord&#39;</span><span class="p">][</span><span class="s1">&#39;lon&#39;</span><span class="p">],</span> <span class="n">lat</span><span class="o">=</span><span class="n">_dict</span><span class="p">[</span><span class="s1">&#39;coord&#39;</span><span class="p">][</span><span class="s1">&#39;lon&#39;</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">CityDetailsPayload</span><span class="p">(</span>
+          <span class="nb">id</span><span class="o">=</span><span class="n">_dict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
+          <span class="n">city</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city</span><span class="p">,</span>
+          <span class="n">country</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">country</span><span class="p">,</span>
+          <span class="n">coord</span><span class="o">=</span><span class="n">coord</span><span class="p">)</span>
+        <span class="k">break</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">api_lookup_data_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">))</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">CITY_DETAILS</span><span class="p">))</span>  <span class="c1"># debugging</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">api_lookup_data_init_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">build_data_structure</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">api_lookup_data_request_city_details</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">api_lookup_data_city_details</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{}: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">city</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">build_data_structure_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">this_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">lookup_file_path</span> <span class="o">=</span> <span class="n">this_dir</span> <span class="o">/</span> <span class="n">chart</span><span class="o">.</span><span class="n">lookup_file_name</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">build_data_structure_init_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">chart</span><span class="o">.</span><span class="n">lookup_file_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">get_id_file_from_network</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">read_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">build_data_structure_read_file</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">read_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">get_id_file_from_network_ready</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">idle</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">get_id_file_from_network_retry_after_network_error</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">build_data_structure</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">get_id_file_from_network_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">lookup_file_url</span><span class="p">)</span>
+      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">lookup_file_path</span><span class="p">),</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">read_file</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+        <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">retry_after_network_error</span><span class="p">),</span>
+        <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">period</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+        <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">read_file_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">raw_weather_lookup_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">lookup_file_path</span><span class="p">),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+      <span class="n">raw_weather_lookup_list</span> <span class="o">=</span> \
+        <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">raw_weather_lookup_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">raw_weather_lookup_dict</span> <span class="o">=</span> \
+      <span class="p">{</span><span class="n">node</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="p">:</span> <span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">raw_weather_lookup_list</span><span class="p">}</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ready</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">idle_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">idle_request_city_details</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">city</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">city</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">country</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">country</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">conduct_query</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">conduct_query_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">CITY_DETAILS</span><span class="p">,</span>
+      <span class="n">payload</span><span class="o">=</span><span class="n">chart</span><span class="o">.</span><span class="n">city_details_payload</span><span class="p">()))</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ready</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">conduct_query_ready</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">idle</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>Now that I have a design and its code, I would like to run it independently of
+the other two objects needed to build the robotic sprinkler:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">owm</span> <span class="o">=</span> <span class="n">OpenWeatherMapCityDetails</span><span class="p">(</span><span class="s1">&#39;city_details&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">owm</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">RequestDetailsForCityPayload</span><span class="p">(</span><span class="n">city</span><span class="o">=</span><span class="s2">&quot;Vancouver&quot;</span><span class="p">,</span> <span class="n">country</span><span class="o">=</span><span class="s2">&quot;CA&quot;</span><span class="p">)))</span>
+  <span class="n">owm</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">RequestDetailsForCityPayload</span><span class="p">(</span><span class="n">city</span><span class="o">=</span><span class="s2">&quot;Burnaby&quot;</span><span class="p">,</span> <span class="n">country</span><span class="o">=</span><span class="s2">&quot;CA&quot;</span><span class="p">)))</span>
+  <span class="n">owm</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">RequestDetailsForCityPayload</span><span class="p">(</span><span class="n">city</span><span class="o">=</span><span class="s2">&quot;Toronto&quot;</span><span class="p">,</span> <span class="n">country</span><span class="o">=</span><span class="s2">&quot;CA&quot;</span><span class="p">)))</span>
+  <span class="n">owm</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">RequestDetailsForCityPayload</span><span class="p">(</span><span class="n">city</span><span class="o">=</span><span class="s2">&quot;Saskatoon&quot;</span><span class="p">,</span> <span class="n">country</span><span class="o">=</span><span class="s2">&quot;CA&quot;</span><span class="p">)))</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To run it, I make sure to delete the compressed file (so the code will be forced
+to download it again), then hammer the statechart with a bunch of requests while
+it is trying to download and decompress and make sense of the file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rm</span> <span class="o">*.</span><span class="n">gz</span> <span class="p">;</span> <span class="n">python</span> <span class="n">sprinkler</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>Let’s look at what it did, we can see it because we turned on the
+<code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code>’s live_trace feature:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[11:12:25] [city_details] e-&gt;start_at() top-&gt;read_file
+[11:12:25] [city_details] e-&gt;ready() read_file-&gt;idle
+[11:12:25] [city_details] e-&gt;REQUEST_CITY_DETAILS() idle-&gt;conduct_query
+[11:12:25] [city_details] e-&gt;ready() conduct_query-&gt;idle
+Vancouver: 6173331
+[11:12:25] [city_details] e-&gt;REQUEST_CITY_DETAILS() idle-&gt;conduct_query
+[11:12:25] [city_details] e-&gt;ready() conduct_query-&gt;idle
+[11:12:25] [city_details] e-&gt;REQUEST_CITY_DETAILS() idle-&gt;conduct_query
+Toronto: 6167865
+[11:12:25] [city_details] e-&gt;ready() conduct_query-&gt;idle
+Burnaby: 5911606
+[11:12:25] [city_details] e-&gt;REQUEST_CITY_DETAILS() idle-&gt;conduct_query
+[11:12:25] [city_details] e-&gt;ready() conduct_query-&gt;idle
+Saskatoon: 6141256
+</pre></div>
+</div>
+<p><a class="reference internal" href="recipes.html#recipes-drawing-a-sequence-diagram"><span class="std std-ref">Turning this into a sequence diagram</span></a> looks
+like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Statechart</span><span class="p">:</span> <span class="n">city_details</span><span class="p">]</span>
+            <span class="n">top</span>          <span class="n">read_file</span>    <span class="n">idle</span>                   <span class="n">conduct_query</span>
+             <span class="o">+--</span><span class="n">start_at</span><span class="p">()</span><span class="o">--&gt;|</span>          <span class="o">|</span>                          <span class="o">|</span>
+             <span class="o">|</span>     <span class="p">(</span><span class="mi">1</span><span class="p">)</span>       <span class="o">|</span>          <span class="o">|</span>                          <span class="o">|</span>
+             <span class="o">|</span>               <span class="o">+-</span><span class="n">ready</span><span class="p">()</span><span class="o">-&gt;|</span>                          <span class="o">|</span>
+             <span class="o">|</span>               <span class="o">|</span>  <span class="p">(</span><span class="mi">2</span><span class="p">)</span>     <span class="o">|</span>                          <span class="o">|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>           <span class="p">(</span><span class="mi">3</span><span class="p">)</span>            <span class="o">|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>           <span class="p">(</span><span class="mi">4</span><span class="p">)</span>            <span class="o">|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>           <span class="p">(</span><span class="mi">5</span><span class="p">)</span>            <span class="o">|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>           <span class="p">(</span><span class="mi">6</span><span class="p">)</span>            <span class="o">|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>           <span class="p">(</span><span class="mi">7</span><span class="p">)</span>            <span class="o">|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>           <span class="p">(</span><span class="mi">8</span><span class="p">)</span>            <span class="o">|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>           <span class="p">(</span><span class="mi">9</span><span class="p">)</span>            <span class="o">|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>          <span class="p">(</span><span class="mi">10</span><span class="p">)</span>            <span class="o">|</span>
+</pre></div>
+</div>
+<p>We can see that the city_details statechart queued the REQUEST_CITY_DETAILS
+(3,5,7,9) events until after it had downloaded the <code class="docutils literal notranslate"><span class="pre">city.list.json.qz</span></code> (2).</p>
 </div>
 <div class="section" id="cityweather-specifications">
 <span id="quickstart-citydetails-specifications"></span><h3>CityWeather Specifications<a class="headerlink" href="#cityweather-specifications" title="Permalink to this headline">¶</a></h3>

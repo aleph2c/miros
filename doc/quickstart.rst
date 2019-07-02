@@ -204,6 +204,69 @@ Here is how you would use the miros library to publish (public send) a
   # was subscribed to on the diagram, it will have a green dot beside it.
   # (green light)
 
+To lock down how I want my payloads to look, I would place this in the top part
+of the robotic sprinkler Python file:
+
+.. code-block:: python
+  
+   from collections import namedtuple
+
+   Coord = namedtuple(
+     'Coord',
+     [
+       'lon',
+       'lat'
+     ]
+   )
+
+   # uses Coord
+   CityDetailsPayload = namedtuple(
+     'CityDetailsPayload',
+     [
+       'id', 
+       'country',  # ISO 3166
+       'city',
+       'coord'  # Coord
+     ]
+   )
+
+   RequestDetailsForCityPayload = namedtuple(
+     'RequestDetailsForCityPayload',
+     [
+       'city',
+       'country'  # ISO 3166
+     ]
+   )
+
+   Weather = namedtuple(
+     'Weather',
+     [
+       'icon',
+       'main',
+       'id',
+       'description'
+     ]
+   )
+
+   # uses Weather, Coord
+   WeatherOpenApiResult = namedtuple(
+     'WeatherOpenApiResult', 
+     [
+       'city',
+       'country',  # ISO 3166
+       'coord',    # Coord
+       'wind',
+       'weather',  # Weather
+       'sunrise',
+       'sunset',
+       'temp_min',
+       'temp_max',
+       'temp',
+       'humidity',
+       'dt'
+     ]
+   )
+
 Now that we have a decent understanding about what information we want to flow
 in our system, let's focus in on each part.
 
@@ -212,12 +275,359 @@ in our system, let's focus in on each part.
 OpenWeatherMapCityDetails Specifications
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The ``OpenWeatherMapCityDetails`` needs to provide a city ID given a city and a
-country.  This city ID will be used by the ``CityDetails`` object to make a call
-to the open web API.
+country.  This city ID will be used by the ``CityWeather`` object to make a call
+to the open web API.  The open-weather website contains a compressed file called
+``city.list.json.gz`` at
+`http://bulk.openweathermap.org/sample/city.list.json.gz <http://bulk.openweathermap.org/sample/city.list.json.gz>`_.  If you have a
+city name and a country code, you can use this file to look up the city's id.
+
+I have long term plans to pull the ``OpenWeatherMapCityDetails`` object out of
+the networked sprinkler and place it on a server somewhere.  This is because the
+``city.list.json.gz`` file is really big, and I would like to cost reduce my
+robotic sprinkler onto processors with very little memory.  This means that many
+many different ``CityWeather`` objects might be making requests for city-ids at
+the same time.
+
+I only want to download the ``city.list.json.gz`` file if I don't have it
+already, and I would like the ``OpenWeatherMapCityDetails`` object to be
+resilient to network outages on the Open Weather website.  If it can't download
+the file from the Open Weather server, it should wait ten seconds then try
+again.  While its waiting, it should place any request from ``CityWeather``
+objects for city-ids into a queue which will be answered once it gets the
+information it needs.  Once it gets the file, it should answer any of its queued
+requests in a first in first out kind of way.
+
+Here is the design, it uses the :ref:`deferred event <patterns-deferred-event>`
+statechart pattern.
 
 .. image:: _static/open_weather_map_city_details.svg
     :target: _static/open_weather_map_city_details.pdf
     :align: center
+
+From the design we can write our code (compacted to fit on the page):
+
+.. code-block:: python
+
+  import gzip
+  import json
+  import time
+  import random
+  from pathlib import Path
+  from collections import namedtuple
+
+  import requests
+  from miros import Event
+  from miros import signals
+  from miros import Factory
+  from miros import return_status
+
+  # ... named tuples defined above, see previous section (removed to make it
+  #     easier to see the OpenWeatherMapCityDetails code
+  
+  class InstrumentedFactory(Factory):
+    def __init__(self, name, live_trace=None, live_spy=None):
+      super().__init__(name)
+      self.live_trace = False if live_trace == None else live_trace
+      self.live_spy = False if live_spy == None else live_spy
+
+  class OpenWeatherMapCityDetails(InstrumentedFactory):
+
+    DEFAULT_LOOKUP_FILE_URL = \
+      'http://bulk.openweathermap.org/sample/city.list.json.gz'
+
+    LOOKUP_FILE_PATH = \
+      'city_to_id_json.gz'
+
+    def __init__(self, 
+      name, 
+      live_trace=None,
+      live_spy=None,
+      lookup_file_url=None):
+
+      super().__init__(name, live_trace, live_spy)
+
+      # setup attributes
+      self.city = None
+      self.country = None
+      self.lookup_file_url = \
+        OpenWeatherMapCityDetails.DEFAULT_LOOKUP_FILE_URL
+      self.lookup_file_name = \
+         OpenWeatherMapCityDetails.LOOKUP_FILE_PATH \
+           if lookup_file_url == None else lookup_file_url
+
+      # define the states, link signals to handlers
+      self.api_lookup_data = self.create(state="api_lookup_data"). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.api_lookup_data_entry_signal). \
+        catch(signal=signals.INIT_SIGNAL,
+          handler=self.api_lookup_data_init_signal). \
+        catch(signal=signals.REQUEST_CITY_DETAILS,
+          handler=self.api_lookup_data_request_city_details). \
+        catch(signal=signals.CITY_DETAILS,
+          handler=self.api_lookup_data_city_details). \
+        to_method()
+
+      self.build_data_structure = self.create(state="build_data_structure"). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.build_data_structure_entry_signal). \
+        catch(signal=signals.INIT_SIGNAL,
+          handler=self.build_data_structure_init_signal). \
+        catch(signal=signals.read_file,
+          handler=self.build_data_structure_read_file). \
+        catch(signal=signals.ready,
+          handler=self.get_id_file_from_network_ready). \
+        catch(signal=signals.retry_after_network_error,
+          handler=self.get_id_file_from_network_retry_after_network_error). \
+        to_method()
+
+      self.get_id_file_from_network = \
+        self.create(state="get_id_file_from_network"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.get_id_file_from_network_entry_signal). \
+         to_method()
+
+      self.read_file = self.create(state="read_file"). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.read_file_entry_signal). \
+        to_method()
+
+      self.idle = self.create(state="idle"). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.idle_entry_signal). \
+        catch(signal=signals.REQUEST_CITY_DETAILS,
+          handler=self.idle_request_city_details). \
+        to_method()
+
+      self.conduct_query = self.create(state="conduct_query"). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.conduct_query_entry_signal). \
+        catch(signal=signals.ready,
+          handler=self.conduct_query_ready). \
+        to_method()
+
+      # add the hierarchy
+      self.nest(self.api_lookup_data, 
+             parent=None). \
+           nest(self.build_data_structure,
+             parent=self.api_lookup_data). \
+           nest(self.get_id_file_from_network,
+             parent=self.build_data_structure). \
+           nest(self.read_file, 
+             parent=self.build_data_structure). \
+           nest(self.idle, 
+             parent=self.build_data_structure). \
+           nest(self.conduct_query, 
+             parent=self.build_data_structure)
+
+      # start the statechart (fire up a separate thread)
+      self.start_at(self.api_lookup_data)
+
+    def city_details_payload(self):
+      '''Pull the city details out of the raw_weather_lookup_dict using the
+         country and city attributes to identify the required item from the
+         collection
+
+      **Returns**:
+         (CityDetailsPayload): namedtuple containing the city details needed for
+         the open weather API call
+      '''
+      result = None
+      for _id, _dict in self.raw_weather_lookup_dict.items():
+        if self.city == _dict['name'] and self.country == _dict['country']:
+          coord = Coord(lon=_dict['coord']['lon'], lat=_dict['coord']['lon'])
+          result = CityDetailsPayload(
+            id=_dict['id'],
+            city=self.city,
+            country=self.country,
+            coord=coord)
+          break
+      return result
+
+    @staticmethod
+    def api_lookup_data_entry_signal(chart, e):
+      status = return_status.HANDLED
+      chart.subscribe(Event(signal=signals.REQUEST_CITY_DETAILS))
+      chart.subscribe(Event(signal=signals.CITY_DETAILS))  # debugging
+      return status
+
+    @staticmethod
+    def api_lookup_data_init_signal(chart, e):
+      status = chart.trans(chart.build_data_structure)
+      return status
+
+    @staticmethod
+    def api_lookup_data_request_city_details(chart, e):
+      status = return_status.HANDLED
+      chart.defer(e)
+      return status
+
+    @staticmethod
+    def api_lookup_data_city_details(chart, e):
+      status = return_status.HANDLED
+      print("{}: {}".format(e.payload.city, e.payload.id))
+      return status
+
+    @staticmethod
+    def build_data_structure_entry_signal(chart, e):
+      status = return_status.HANDLED
+      this_dir = Path('.').resolve()
+      chart.lookup_file_path = this_dir / chart.lookup_file_name
+      return status
+
+    @staticmethod
+    def build_data_structure_init_signal(chart, e):
+      if not chart.lookup_file_path.exists():
+        status = chart.trans(chart.get_id_file_from_network)
+      else:
+        status = chart.trans(chart.read_file)
+      return status
+
+    @staticmethod
+    def build_data_structure_read_file(chart, e):
+      status = chart.trans(chart.read_file)
+      return status
+
+    @staticmethod
+    def get_id_file_from_network_ready(chart, e):
+      status = chart.trans(chart.idle)
+      return status
+
+    @staticmethod
+    def get_id_file_from_network_retry_after_network_error(chart, e):
+      status = chart.trans(chart.build_data_structure)
+      return status
+
+    @staticmethod
+    def get_id_file_from_network_entry_signal(chart, e):
+      status = return_status.HANDLED
+      try:
+        r = requests.get(chart.lookup_file_url)
+        with open(str(chart.lookup_file_path), 'wb') as f:
+          f.write(r.content)
+        chart.post_fifo(Event(signal=signals.read_file))
+      except:
+        chart.post_fifo(
+          Event(signal=signals.retry_after_network_error),
+          times=1,
+          period=10.0,
+          deferred=True)
+      return status
+
+    @staticmethod
+    def read_file_entry_signal(chart, e):
+      status = return_status.HANDLED
+      raw_weather_lookup_list = []
+      with gzip.open(str(chart.lookup_file_path), 'rb') as f:
+        raw_weather_lookup_list = \
+          json.loads(f.read().decode('utf-8'))
+      chart.raw_weather_lookup_dict = {}
+      chart.raw_weather_lookup_dict = \
+        {node["id"] : node for node in raw_weather_lookup_list}
+      chart.post_fifo(Event(signal=signals.ready))
+      return status
+
+    @staticmethod
+    def idle_entry_signal(chart, e):
+      status = return_status.HANDLED
+      chart.recall()
+      return status
+
+    @staticmethod
+    def idle_request_city_details(chart, e):
+      chart.city = e.payload.city
+      chart.country = e.payload.country
+      status = chart.trans(chart.conduct_query)
+      return status
+
+    @staticmethod
+    def conduct_query_entry_signal(chart, e):
+      status = return_status.HANDLED
+      chart.publish(Event(signal=signals.CITY_DETAILS,
+        payload=chart.city_details_payload()))
+      chart.post_fifo(Event(signal=signals.ready))
+      return status
+
+    @staticmethod
+    def conduct_query_ready(chart, e):
+      status = chart.trans(chart.idle)
+      return status
+
+Now that I have a design and its code, I would like to run it independently of
+the other two objects needed to build the robotic sprinkler:
+
+.. code-block:: python
+  
+  if __name__ == "__main__":
+    owm = OpenWeatherMapCityDetails('city_details', live_trace=True)
+    owm.publish(Event(signal=signals.REQUEST_CITY_DETAILS,
+      payload=RequestDetailsForCityPayload(city="Vancouver", country="CA")))
+    owm.publish(Event(signal=signals.REQUEST_CITY_DETAILS,
+      payload=RequestDetailsForCityPayload(city="Burnaby", country="CA")))
+    owm.publish(Event(signal=signals.REQUEST_CITY_DETAILS,
+      payload=RequestDetailsForCityPayload(city="Toronto", country="CA")))
+    owm.publish(Event(signal=signals.REQUEST_CITY_DETAILS,
+      payload=RequestDetailsForCityPayload(city="Saskatoon", country="CA")))
+    time.sleep(5)
+
+
+To run it, I make sure to delete the compressed file (so the code will be forced
+to download it again), then hammer the statechart with a bunch of requests while
+it is trying to download and decompress and make sense of the file:
+
+.. code-block:: python
+  
+  rm *.gz ; python sprinkler.py
+
+Let's look at what it did, we can see it because we turned on the
+``OpenWeatherMapCityDetails``'s live_trace feature:
+
+.. code-block:: text
+  
+  [11:12:25] [city_details] e->start_at() top->read_file
+  [11:12:25] [city_details] e->ready() read_file->idle
+  [11:12:25] [city_details] e->REQUEST_CITY_DETAILS() idle->conduct_query
+  [11:12:25] [city_details] e->ready() conduct_query->idle
+  Vancouver: 6173331
+  [11:12:25] [city_details] e->REQUEST_CITY_DETAILS() idle->conduct_query
+  [11:12:25] [city_details] e->ready() conduct_query->idle
+  [11:12:25] [city_details] e->REQUEST_CITY_DETAILS() idle->conduct_query
+  Toronto: 6167865
+  [11:12:25] [city_details] e->ready() conduct_query->idle
+  Burnaby: 5911606
+  [11:12:25] [city_details] e->REQUEST_CITY_DETAILS() idle->conduct_query
+  [11:12:25] [city_details] e->ready() conduct_query->idle
+  Saskatoon: 6141256         
+
+:ref:`Turning this into a sequence diagram <recipes-drawing-a-sequence-diagram>` looks
+like this:
+
+.. code-block:: python
+  
+   [Statechart: city_details]
+               top          read_file    idle                   conduct_query
+                +--start_at()-->|          |                          |
+                |     (1)       |          |                          |
+                |               +-ready()->|                          |
+                |               |  (2)     |                          |
+                |               |          +--REQUEST_CITY_DETAILS()->|
+                |               |          |           (3)            |
+                |               |          +<---------ready()---------|
+                |               |          |           (4)            |
+                |               |          +--REQUEST_CITY_DETAILS()->|
+                |               |          |           (5)            |
+                |               |          +<---------ready()---------|
+                |               |          |           (6)            |
+                |               |          +--REQUEST_CITY_DETAILS()->|
+                |               |          |           (7)            |
+                |               |          +<---------ready()---------|
+                |               |          |           (8)            |
+                |               |          +--REQUEST_CITY_DETAILS()->|
+                |               |          |           (9)            |
+                |               |          +<---------ready()---------|
+                |               |          |          (10)            |
+
+We can see that the city_details statechart queued the REQUEST_CITY_DETAILS
+(3,5,7,9) events until after it had downloaded the ``city.list.json.qz`` (2).
 
 .. _quickstart-citydetails-specifications:
 
