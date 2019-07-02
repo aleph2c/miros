@@ -221,7 +221,7 @@ similar to the event loops provided by twisted and asycio in Python.
 There was still a need to draw pictures, so Miro Samek gave away his programmed
 `stencils <http://www.state-machine.com/downloads/visio2003.zip>`_ for the
 Microsoft Visio drawing package, and he recommended free drawing tools like
-`UMLel`_.
+`UMLet`_.
 
 What he didn't do was to create his own language, he used existing languages so
 that a firm wouldn't have to re-write all of their code. Miro Samek had turned
