@@ -586,18 +586,20 @@ like this:</p>
  <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>           <span class="p">(</span><span class="mi">5</span><span class="p">)</span>            <span class="o">|</span>
  <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
  <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>           <span class="p">(</span><span class="mi">6</span><span class="p">)</span>            <span class="o">|</span>
- <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
  <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>           <span class="p">(</span><span class="mi">7</span><span class="p">)</span>            <span class="o">|</span>
- <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
- <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>           <span class="p">(</span><span class="mi">8</span><span class="p">)</span>            <span class="o">|</span>
  <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
- <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>           <span class="p">(</span><span class="mi">9</span><span class="p">)</span>            <span class="o">|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>           <span class="p">(</span><span class="mi">8</span><span class="p">)</span>            <span class="o">|</span>
  <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>           <span class="p">(</span><span class="mi">9</span><span class="p">)</span>            <span class="o">|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+--</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">()</span><span class="o">-&gt;|</span>
  <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>          <span class="p">(</span><span class="mi">10</span><span class="p">)</span>            <span class="o">|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">+&lt;---------</span><span class="n">ready</span><span class="p">()</span><span class="o">---------|</span>
+ <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>           <span class="o">|</span>          <span class="p">(</span><span class="mi">11</span><span class="p">)</span>            <span class="o">|</span>
 </pre></div>
 </div>
 <p>We can see that the city_details statechart queued the REQUEST_CITY_DETAILS
-(4,6,l,9) events until after it had downloaded the <code class="docutils literal notranslate"><span class="pre">city.list.json.qz</span></code> (2).</p>
+(4,6,8,10) events until after it had downloaded the <code class="docutils literal notranslate"><span class="pre">city.list.json.qz</span></code> (1).</p>
 </div>
 <div class="section" id="cityweather-specifications">
 <span id="quickstart-citydetails-specifications"></span><h3>CityWeather Specifications<a class="headerlink" href="#cityweather-specifications" title="Permalink to this headline">¶</a></h3>

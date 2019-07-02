@@ -622,17 +622,19 @@ like this:
     |               |              |           |           (5)            |
     |               |              |           +--REQUEST_CITY_DETAILS()->|
     |               |              |           |           (6)            |
-    |               |              |           +--REQUEST_CITY_DETAILS()->|
+    |               |              |           +<---------ready()---------|
     |               |              |           |           (7)            |
-    |               |              |           +<---------ready()---------|
-    |               |              |           |           (8)            |
     |               |              |           +--REQUEST_CITY_DETAILS()->|
-    |               |              |           |           (9)            |
+    |               |              |           |           (8)            |
     |               |              |           +<---------ready()---------|
+    |               |              |           |           (9)            |
+    |               |              |           +--REQUEST_CITY_DETAILS()->|
     |               |              |           |          (10)            |
+    |               |              |           +<---------ready()---------|
+    |               |              |           |          (11)            |
 
 We can see that the city_details statechart queued the REQUEST_CITY_DETAILS
-(4,6,l,9) events until after it had downloaded the ``city.list.json.qz`` (2).
+(4,6,8,10) events until after it had downloaded the ``city.list.json.qz`` (1).
 
 .. _quickstart-citydetails-specifications:
 
