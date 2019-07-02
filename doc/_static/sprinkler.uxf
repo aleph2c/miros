@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>420</x>
+      <y>870</y>
+      <w>370</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>*sprinker_on*
+--
+entry /
+   chart.turn_on_sprinker()
+	chart.post_fifo(
+	  Event(signal=signals.done_watering,
+	    period=chart.water_time_sec,
+	    times=1,
+	    deferred=True))
+exit /
+  chart.turn_off_sprinker()
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>470</x>
+      <y>1070</y>
+      <w>200</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>*sprinker_off*
+--
+
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>260</x>
+      <y>840</y>
+      <w>570</w>
+      <h>320</h>
+    </coordinates>
+    <panel_attributes>*not_raining*
+--
+
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>200</x>
+      <y>890</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>900</x>
+      <y>780</y>
+      <w>130</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>to_summer
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>110.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>510</x>
+      <y>1010</y>
+      <w>110</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>done_watering
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>200</x>
+      <y>890</y>
+      <w>80</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>80</x>
+      <y>880</y>
+      <w>120</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>to_night
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;20.0;100.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>80</x>
+      <y>840</y>
+      <w>120</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>to_day
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>100.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>900</x>
+      <y>740</y>
+      <w>130</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>to_winter
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;20.0;110.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>300</x>
+      <y>1050</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>300</x>
+      <y>940</y>
+      <w>140</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;110.0;10.0;10.0;120.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>260</x>
+      <y>920</y>
+      <w>170</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>[chart.not_raining]
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>40</x>
+      <y>400</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>
+bg=green
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>40</x>
+      <y>370</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>
+bg=red
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>20</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*Factory*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>60</x>
+      <y>40</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>260</x>
+      <y>20</y>
+      <w>230</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*OpenWeatherMapCityDetails*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>140</x>
+      <y>20</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*CityWeather*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>180</x>
+      <y>40</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>350</x>
+      <y>40</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>180</x>
+      <y>790</y>
+      <w>690</w>
+      <h>390</h>
+    </coordinates>
+    <panel_attributes>*night*
+--
+to_night / {}
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>90</x>
+      <y>720</y>
+      <w>820</w>
+      <h>480</h>
+    </coordinates>
+    <panel_attributes>*summer*
+--
+entry /
+to_summer / {}
+to_day / {}
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>60</x>
+      <y>220</y>
+      <w>950</w>
+      <h>1000</h>
+    </coordinates>
+    <panel_attributes>*robotic_gardener_common_features*
+--
+entry /
+  chart.turn_off_sprinkler()
+  chart.post_fifo(Event(signal=signals.heart_beat),
+    times=0,
+    period=5,
+    deferred=True)
+  chart.owmd = OpenWeatherMapCityDetails(list_trace=chart.live_trace)
+  chart.weather = CityWeather(city='Vancouver', country='CA', live_trace=chart.live_trace)
+
+heart_beat /
+  chart.publish(Event(signal=signals.GET_WEATHER))
+
+WEATHER as e /
+  # https://openweathermap.org/weather-conditions
+  if 500 &lt;= e.payload.weather.id &lt;= 531:
+    chart.not_raining = False
+  else:
+    chart.not_raining = True
+
+  is_winter = False
+  is_winter |= 600 &lt;= e.payload.weather.id &lt;= 622
+  is_winter |= 511
+  is_winter |= e.payload.temp_min &lt; 0.0
+  if is_winter:
+    post_fifo(Event(signal=signals.to_winter))
+  else:
+    post_fifo(Event(signal=signals.to_summer))
+
+  if e.payload.dt &gt; e.payload.sunset:
+    post_fifo(Event(signal=signals.to_night))
+  else:
+    post_fifo(Event(signal=signals.to_day))
+  
+exit /
+  chart.owmd.stop()
+  chart.weather.stop()
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>80</y>
+      <w>1020</w>
+      <h>1160</h>
+    </coordinates>
+    <panel_attributes>*Sprinkler*
+--
+city
+country
+is_raining
+api_key
+--
+turn_sprinkler_on()
+turn_sprinkler_off()
+stop()
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

@@ -54,6 +54,7 @@ Statecharts in C/C++, 2nd Edition</a>.</p>
 <p>Let’s use the Python miros library to build a sprinkler. This
 sprinkler will water our plants in the summer, after dark, and only when it is
 not raining.  To do this we will call out to the <a class="reference external" href="https://openweathermap.org/api">open weather api</a>.</p>
+<a class="reference external image-reference" href="https://www.ijcaonline.org/archives/volume172/number6/28254-2017915160"><img alt="_images/sprinkler.jpg" class="align-center" src="_images/sprinkler.jpg" /></a>
 <p>Once the networked sprinkler knows which city its working in it should just turn
 on and operate as if it could measure the weather conditions with local instruments.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">open</span> <span class="pre">weather</span></code> documentation recommends that we request city information
@@ -83,31 +84,24 @@ OpenWeatherMapCityDetails object (black diamond arrows).  The CityWeather
 object will interact with the Sprinkler and OpenWeatherMapCityDetails objects.
 (dashed lines)</p>
 </div>
-<p>Each of the objects will be a type of miros ActiveObject, so they will:</p>
-<blockquote>
-<div><ul class="simple">
-<li>be able to subscribe and post events.</li>
-<li>run in their own thread</li>
-<li>be pre-instrumented with sensible logging (for trouble shooting and
-documentation)</li>
-</ul>
-</div></blockquote>
+<p>We will use three different statecharts, one per object in the above diagram.
+Having independent objects interface in a statechart is called orthogonality in
+statechart theory.</p>
 <div class="section" id="figuring-out-what-information-will-be-passed-around">
 <span id="quickstart-figuring-out-what-information-will-be-passed-around"></span><h3>Figuring out what Information will be Passed Around<a class="headerlink" href="#figuring-out-what-information-will-be-passed-around" title="Permalink to this headline">¶</a></h3>
-<p>So let’s look at our high level design again and think about them as cells.
-They manage their own clocks and their own internal states, but they need to
-pass simple messages to one another in the form of <code class="docutils literal notranslate"><span class="pre">miros.Events</span></code>.</p>
-<p>Lets wave our hands and assume the inner parts of the cells are working, but we
-want to see how the cells communicate with one another.</p>
+<p>Let’s wave our hands an assume that the three active objects used in this
+designed have been built already and are working, but we want to figure out how
+they will communicate with one another.</p>
+<p>David Harel called such a thing, a <code class="docutils literal notranslate"><span class="pre">statocol</span></code> (state protocol):  what
+information will the statecharts need to share, so as a group, they will
+achieve our design goal; and give us our networked sprinkler:</p>
 <a class="reference external image-reference" href="_static/sprinkler_high_level.pdf"><div align="center" class="align-center"><img alt="_images/sprinkler_high_level.svg" src="_images/sprinkler_high_level.svg" /></div>
 </a>
-<p>What information should they share?  Let’s drill in a bit.</p>
 <p>We need to figure out how to call the open weather api, with a city id, before it
 will return weather information for its location. This is the problem the
 <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> object solves: it will provide the city id when we
 give it the city and country names of where we have placed the sprinkler.</p>
-<p>The high level event interface of the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> object will look
-like this:</p>
+<p>A rough sketch of the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> object will look like this:</p>
 <a class="reference external image-reference" href="_static/open_weather_map_city_details_medium.pdf"><div align="center" class="align-center"><img alt="_images/open_weather_map_city_details_medium.svg" src="_images/open_weather_map_city_details_medium.svg" /></div>
 </a>
 <p>This diagram shows us the input and output goals; for a city and a country
@@ -155,6 +149,47 @@ look like.</p>
 </a>
 <p>This diagram shows us the <code class="docutils literal notranslate"><span class="pre">Sprinkler</span></code> input and output goals: Ask for the
 weather and get the weather.</p>
+<p>There can be many events which all share the same name; an event’s name is
+called a signal.  An event of a particular signal, can also carry a python
+object with it.  As this event is passed through the system, the object that it
+is carrying stays linked to it.  A linked object is called a payload.  The miros
+library lets you link any python object to an event, or in other words, your
+Event can have any Python object as a payload.  However, we are limiting
+ourselves to only send namedtuples as payloads, because they are immutable and
+provide very nice syntax.</p>
+<p>Here is how you would use the miros library to publish (public send) a
+<code class="docutils literal notranslate"><span class="pre">REQUEST_DETAILS_FOR_CITY</span></code> event:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="c1"># define the REQUEST_DETAILS_FOR_CITY payload type</span>
+<span class="n">RequestDetailsForCityPayload</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;RequestDetailsForCityPayload&#39;</span><span class="p">,</span>
+  <span class="p">[</span><span class="s1">&#39;city&#39;</span><span class="p">,</span> <span class="s1">&#39;country&#39;</span><span class="p">])</span>
+
+<span class="c1"># Assume the CityWeather ActiveObject has been defined elsewhere and is</span>
+<span class="c1"># working.</span>
+<span class="n">city_weather</span> <span class="o">=</span> <span class="n">CityWeather</span><span class="p">()</span>
+
+<span class="c1"># Published an event will have a red dot beside it on the diagram, it</span>
+<span class="c1"># publishes and the event has to wait somewhere before it is processed (red</span>
+<span class="c1"># light).</span>
+<span class="c1">#</span>
+<span class="c1"># If the &#39;REQUEST_DETAILS_FOR_CITY&#39; signal name has not been defined before</span>
+<span class="c1"># miros will define it now.  Its signal will be given a signal_number</span>
+<span class="c1"># attribute and a signal_name attribute equal to &#39;REQUEST_DETAILS_FOR_CITY&#39;</span>
+<span class="c1"># (signal name construction happens automatically in miros)</span>
+<span class="n">city_weather</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+  <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">REQUEST_DETAILS_FOR_CITY</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">RequestDetailsForCityPayload</span><span class="p">(</span><span class="n">city</span><span class="o">=</span><span class="s1">&#39;Vancouver&#39;</span><span class="p">,</span> <span class="n">country</span><span class="o">=</span><span class="s1">&#39;CA&#39;</span><span class="p">)</span>
+  <span class="p">)</span>
+<span class="p">)</span>
+<span class="c1"># any ActiveObject that has subscribed to REQUEST_DETAILS_FOR_CITY will</span>
+<span class="c1"># receive the event and react to it.  When an event is received which</span>
+<span class="c1"># was subscribed to on the diagram, it will have a green dot beside it.</span>
+<span class="c1"># (green light)</span>
+</pre></div>
+</div>
 <p>Now that we have a decent understanding about what information we want to flow
 in our system, let’s focus in on each part.</p>
 </div>
@@ -166,11 +201,15 @@ to the open web API.</p>
 <a class="reference external image-reference" href="_static/open_weather_map_city_details.pdf"><div align="center" class="align-center"><img alt="_images/open_weather_map_city_details.svg" src="_images/open_weather_map_city_details.svg" /></div>
 </a>
 </div>
-<div class="section" id="citydetails-specifications">
-<span id="quickstart-citydetails-specifications"></span><h3>CityDetails Specifications<a class="headerlink" href="#citydetails-specifications" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="cityweather-specifications">
+<span id="quickstart-citydetails-specifications"></span><h3>CityWeather Specifications<a class="headerlink" href="#cityweather-specifications" title="Permalink to this headline">¶</a></h3>
+<a class="reference external image-reference" href="_static/city_weather.pdf"><div align="center" class="align-center"><img alt="_images/city_weather.svg" src="_images/city_weather.svg" /></div>
+</a>
 </div>
 <div class="section" id="sprinkler-specifications">
 <span id="quickstart-sprinkler-specifications"></span><h3>Sprinkler Specifications<a class="headerlink" href="#sprinkler-specifications" title="Permalink to this headline">¶</a></h3>
+<a class="reference external image-reference" href="_static/sprinkler.pdf"><div align="center" class="align-center"><img alt="_images/sprinkler.svg" src="_images/sprinkler.svg" /></div>
+</a>
 <a class="reference internal" href="introduction.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="zero_to_one.html"><span class="std std-ref">next</span></a><div class="toctree-wrapper compound">
 </div>
 </div>
@@ -192,7 +231,7 @@ to the open web API.</p>
 <li><a class="reference internal" href="#a-networked-sprinkler">A Networked Sprinkler</a><ul>
 <li><a class="reference internal" href="#figuring-out-what-information-will-be-passed-around">Figuring out what Information will be Passed Around</a></li>
 <li><a class="reference internal" href="#openweathermapcitydetails-specifications">OpenWeatherMapCityDetails Specifications</a></li>
-<li><a class="reference internal" href="#citydetails-specifications">CityDetails Specifications</a></li>
+<li><a class="reference internal" href="#cityweather-specifications">CityWeather Specifications</a></li>
 <li><a class="reference internal" href="#sprinkler-specifications">Sprinkler Specifications</a></li>
 </ul>
 </li>

@@ -56,7 +56,7 @@ suddenly started to operate this way, you would keel over dead in seconds. Alan
 Kay's original biological metaphor of an object was broken. He ended up having
 to call his objects, real objects, instead of objects, because the OOP language
 which he invented, was `colonized by the C++ popular culture
-<https://www.quora.com/What-did-Alan-Kay-mean-by-I-made-up-the-term-object-oriented-and-I-can-tell-you-I-did-not-have-C++-in-mind>`.
+<https://www.quora.com/What-did-Alan-Kay-mean-by-I-made-up-the-term-object-oriented-and-I-can-tell-you-I-did-not-have-C++-in-mind>`_.
 
 But “statecharts” build from the miros library, each act as if they were running
 on their own computer, so they can pass messages like cells pass messages. When
