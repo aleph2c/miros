@@ -248,6 +248,14 @@ of the robotic sprinkler Python file:
      ]
    )
 
+   Wind = namedtuple(
+     'Wind',
+     [
+       'speed',
+       'deg',
+     ]
+   )
+
    # uses Weather, Coord
    WeatherOpenApiResult = namedtuple(
      'WeatherOpenApiResult', 
@@ -255,7 +263,7 @@ of the robotic sprinkler Python file:
        'city',
        'country',  # ISO 3166
        'coord',    # Coord
-       'wind',
+       'wind',     # Wind
        'weather',  # Weather
        'sunrise',
        'sunset',
@@ -263,7 +271,10 @@ of the robotic sprinkler Python file:
        'temp_max',
        'temp',
        'humidity',
-       'dt'
+       'pressure'
+       'dt',
+       'visibility',
+       'timezone',
      ]
    )
 
@@ -640,10 +651,343 @@ We can see that the city_details statechart queued the REQUEST_CITY_DETAILS
 
 CityWeather Specifications
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+The ``CityWeather`` goals are: 
+
+* for a city and a country get a city id so the open weather api can be called for information about this city
+* return weather information when it is asked for it.
+
+``CityWeather`` will be built like this:
+
+.. code-block:: python
+  :emphasize-lines: 5
+  
+  cw = CityWeather(
+    name='city_weather', # for trace outputs (logs)
+    city='Vancouver',
+    country='CA',
+    api_key='b35975e18dc93725acb092f7272cc6b8',
+    live_trace=True)  # if you want to see the live trace
+
+You will have to get your own API key (highlighted) from `here
+<https://openweathermap.org/appid>`_.  
+
+Before ``CityWeather`` can get the weather, it needs to ask for the CITY_DETAILS so
+it can call the open weather server with the correct city ID.  While
+it's waiting around to get this information, it might start receiving
+GET_WEATHER events.  If this happens it should just queue up these requests and
+answer them in the right order when it can.
+
+There is a chance that while its trying to contact the open weather API, there
+could be an issue with the network.  If this happens wait 5 seconds and post the
+GET_WEATHER event back at itself as if someone from outside of the active object
+made the request.  However, if a real GET_WEATHER event comes into the object
+while it's waiting for this network-error-timer to time out, just cancel the timer.
+If we don't do this, we could end up sending way too many WEATHER events once the
+network issue clears.
+
+The open weather API asks us not to make more than 1 weather request every 10
+seconds.  If we send too many requests per minute, the open api server will send
+us an error message.  To avoid such a situation we ``CityWeather`` will only
+make one real call to the open weather servers every 10 seconds, otherwise it
+just returns its most recently discovered weather data.  This provide a kind of
+time buffer between it in the server.
 
 .. image:: _static/city_weather.svg
     :target: _static/city_weather.pdf
     :align: center
+
+Here is the CityWeather code based on the above design:
+
+.. code-block:: python
+
+  class CityWeather(InstrumentedFactory):
+  
+    API_HOLD_OFF_TIME_IN_SEC = 10.0
+    NETWORK_ERROR_RETRY_TIME_IN_SEC = 5.0
+  
+    def __init__(self,
+      name,
+      city,
+      country,
+      api_key,
+      live_trace=None,
+      live_spy=None):
+      '''
+      To see diagram of the CityWeather statechart:
+        https://aleph2c.github.io/miros/_static/city_weather.pdf
+      '''
+      super().__init__(name, live_trace, live_spy)
+  
+      self.city = city
+      self.country = country  # ISO 3166
+      self.city_id = None
+      self.api_key = api_key
+      self.cached_payload = None
+  
+      self.weather_worker = self.create(state="weather_worker"). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.weather_worker_entry_signal). \
+        catch(signal=signals.GET_WEATHER,
+          handler=self.weather_worker_get_weather). \
+        catch(signal=signals.CITY_DETAILS,
+          handler=self.weather_worker_city_details). \
+        catch(signal=signals.WEATHER,
+          handler=self.weather_worker_weather). \
+        to_method()
+  
+      self.query_weather = self.create(state="query_weather"). \
+        catch(signal=signals.INIT_SIGNAL,
+          handler=self.query_weather_init_signal). \
+        to_method()
+  
+      self.idle = self.create(state="idle"). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.idle_entry_signal). \
+        catch(signal=signals.GET_WEATHER,
+          handler=self.idle_get_weather). \
+        to_method()
+  
+      self.api_live = self.create(state="api_live"). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.api_live_entry_signal). \
+        catch(signal=signals.INIT_SIGNAL,
+          handler=self.api_live_init_signal). \
+        catch(signal=signals.fresh_api_call,
+          handler=self.api_live_fresh_api_call). \
+        catch(signal=signals.network_error,
+          handler=self.api_live_network_error). \
+        to_method()
+  
+      self.api_paused = self.create(state="api_paused"). \
+        catch(signal=signals.ENTRY_SIGNAL,
+          handler=self.api_paused_entry). \
+        catch(signal=signals.GET_WEATHER,
+          handler=self.api_paused_get_weather). \
+        to_method()
+  
+      self.nest(self.weather_worker, parent=None). \
+        nest(self.query_weather, parent=self.weather_worker). \
+        nest(self.idle, parent=self.query_weather). \
+        nest(self.api_live, parent=self.query_weather). \
+        nest(self.api_paused, parent=self.api_live)
+  
+      self.start_at(self.weather_worker)
+  
+    def query_api(self):
+      api_query_url=self.make_url()
+      result = requests.get(api_query_url)
+      return result.json()
+  
+    def make_url(self):
+      '''Make an Open Weather URL to request weather data this object's city and
+         country
+  
+      **Note**:
+         The URL request should look something like this:
+  
+         http://api.openweathermap.org/data/2.5/
+           weather?id=6173331&APPID=
+           b35975e18dc93725acb092f7272cc6b8&units=metric
+  
+      **Returns**:
+         (str): the url which you can use with the requests library
+      
+      '''
+      query = 'id='+str(self.city_id)
+  
+      url = 'http://api.openweathermap.org/data/2.5/weather?'
+      url += query
+      url += '&APPID='
+      url += self.api_key
+      url += '&units=metric'
+  
+      return url
+  
+    def to_weather_payload(self, weather_dict):
+      '''Convert the open web api (as a dict) to the WeatherOpenApiResult.
+  
+      **Args**:
+         | ``weather_dict`` (dict): dictionary version of the json structure
+         |                          returned from the Open Weather Api service
+  
+      **Returns**:
+         (WeatherOpenApiResult): immutable namedtuple of the data
+      '''
+      api = weather_dict
+      api_weather_dict = api['weather'][0]
+  
+      coord = Coord(lon=api['coord']['lon'], lat=api['coord']['lat'])
+  
+      weather = Weather(
+        icon=api_weather_dict['icon'],
+        main=api_weather_dict['main'],
+        id=api_weather_dict['id'],
+        description=api_weather_dict['description']
+      )
+  
+      wind = Wind(
+        speed=api['wind']['speed'],
+        deg=api['wind']['deg']
+      )
+  
+      payload = WeatherOpenApiResult(
+        city=self.city,
+        country=self.country,
+        coord=coord,
+        wind=wind,
+        weather=weather,
+        sunrise=api['sys']['sunrise'],
+        sunset=api['sys']['sunset'],
+        temp_min=api['main']['temp_min'],
+        temp_max=api['main']['temp_max'],
+        temp=api['main']['temp'],
+        humidity=api['main']['humidity'],
+        pressure=api['main']['pressure'],
+        dt=api['dt'],
+        visibility=api['visibility'],
+        timezone=api['timezone'],
+      ) 
+  
+      return payload
+  
+    @staticmethod
+    def weather_worker_entry_signal(chart, e):
+      status = return_status.HANDLED
+      chart.subscribe(Event(signal=signals.GET_WEATHER))
+      chart.subscribe(Event(signal=signals.CITY_DETAILS))
+      chart.subscribe(Event(signal=signals.WEATHER))
+      chart.publish(Event(signal=signals.REQUEST_CITY_DETAILS,
+        payload=RequestDetailsForCityPayload(
+          city=chart.city,
+          country=chart.country)))
+      return status
+  
+    @staticmethod
+    def weather_worker_get_weather(chart, e):
+      status = return_status.HANDLED 
+      chart.defer(e)
+      return status
+  
+    @staticmethod
+    def weather_worker_city_details(chart, e):
+      status = return_status.HANDLED 
+      if e.payload.city == chart.city and \
+         e.payload.country == e.payload.country:
+        chart.city_id = e.payload.id
+        status = chart.trans(chart.query_weather)
+      return status
+  
+    @staticmethod
+    def weather_worker_weather(chart, e):
+      status = return_status.HANDLED 
+      if e.payload.city == chart.city and \
+         e.payload.country == chart.country:
+        print(e.payload)
+      return status
+  
+    @staticmethod
+    def query_weather_init_signal(chart, e):
+      status = chart.trans(chart.idle)
+      return status
+  
+    @staticmethod
+    def idle_entry_signal(chart, e):
+      status = return_status.HANDLED
+      chart.recall()
+      return status
+  
+    @staticmethod
+    def idle_get_weather(chart, e):
+      chart.cancel_events(
+        Event(signal=signals.network_error)
+      )
+      status = chart.trans(chart.api_live)
+      return status
+  
+    @staticmethod
+    def api_live_entry_signal(chart, e):
+      status = return_status.HANDLED
+      try:
+        weather_results_dict = chart.query_api()
+        chart.cached_payload = \
+          chart.to_weather_payload(weather_results_dict)
+        chart.publish(
+          Event(
+            signal=signals.WEATHER,
+            payload=chart.cached_payload
+          )
+        )
+      except:
+        chart.post_lifo(Event(signal=signals.network_error))
+        chart.post_fifo(
+          Event(signal=signals.GET_WEATHER),
+          times=1,
+          period=CityWeather.NETWORK_ERROR_RETRY_TIME_IN_SEC,
+          deferred=True)
+      return status
+  
+    @staticmethod
+    def api_live_init_signal(chart, e):
+      status = chart.trans(chart.api_paused)
+      return status
+  
+    @staticmethod
+    def api_live_fresh_api_call(chart, e):
+      status = chart.trans(chart.idle)
+      return status
+  
+    @staticmethod
+    def api_live_network_error(chart, e):
+      status = chart.trans(chart.idle)
+      return status
+  
+    @staticmethod
+    def api_paused_entry(chart, e):
+      status = return_status.HANDLED
+      chart.post_fifo(
+        Event(signal=signals.fresh_api_call),
+        times=1,
+        period=CityWeather.API_HOLD_OFF_TIME_IN_SEC,
+        deferred=True
+      )
+      return status
+  
+    @staticmethod
+    def api_paused_get_weather(chart, e):
+      status = return_status.HANDLED
+      chart.publish(
+        Event(signal=signals.WEATHER, 
+          payload=chart.cached_payload
+        )
+      )
+      return status
+
+I already built the ``OpenWeatherMapCityDetails`` object which can return city
+ID objects when it's asked to by ``CityWeather``.  
+
+So, to see if the ``CityWeather`` object is working, I'll make both objects and
+publish some ``GET_WEATHER`` events to both the them.
+
+.. code-block:: python
+  
+  owm = OpenWeatherMapCityDetails('city_details', live_trace=True)
+  cw  = CityWeather(
+    name='city_weather',
+    city='Vancouver',
+    country='CA',
+    api_key='b35975e18dc93725acb092f7272cc6b8',
+    live_trace=True)
+
+  for i in range(10):
+    cw.publish(Event(signal=signals.GET_WEATHER))
+    time.sleep(5)
+
+This produces the following output, which convinced me that the code was
+working:
+
+.. code-block:: python
+
+
 
 .. _quickstart-sprinkler-specifications:
 

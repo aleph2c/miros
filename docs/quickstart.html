@@ -231,6 +231,14 @@ of the robotic sprinkler Python file:</p>
   <span class="p">]</span>
 <span class="p">)</span>
 
+<span class="n">Wind</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
+  <span class="s1">&#39;Wind&#39;</span><span class="p">,</span>
+  <span class="p">[</span>
+    <span class="s1">&#39;speed&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;deg&#39;</span><span class="p">,</span>
+  <span class="p">]</span>
+<span class="p">)</span>
+
 <span class="c1"># uses Weather, Coord</span>
 <span class="n">WeatherOpenApiResult</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
   <span class="s1">&#39;WeatherOpenApiResult&#39;</span><span class="p">,</span>
@@ -238,7 +246,7 @@ of the robotic sprinkler Python file:</p>
     <span class="s1">&#39;city&#39;</span><span class="p">,</span>
     <span class="s1">&#39;country&#39;</span><span class="p">,</span>  <span class="c1"># ISO 3166</span>
     <span class="s1">&#39;coord&#39;</span><span class="p">,</span>    <span class="c1"># Coord</span>
-    <span class="s1">&#39;wind&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;wind&#39;</span><span class="p">,</span>     <span class="c1"># Wind</span>
     <span class="s1">&#39;weather&#39;</span><span class="p">,</span>  <span class="c1"># Weather</span>
     <span class="s1">&#39;sunrise&#39;</span><span class="p">,</span>
     <span class="s1">&#39;sunset&#39;</span><span class="p">,</span>
@@ -246,7 +254,10 @@ of the robotic sprinkler Python file:</p>
     <span class="s1">&#39;temp_max&#39;</span><span class="p">,</span>
     <span class="s1">&#39;temp&#39;</span><span class="p">,</span>
     <span class="s1">&#39;humidity&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;dt&#39;</span>
+    <span class="s1">&#39;pressure&#39;</span>
+    <span class="s1">&#39;dt&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;visibility&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;timezone&#39;</span><span class="p">,</span>
   <span class="p">]</span>
 <span class="p">)</span>
 </pre></div>
@@ -603,8 +614,327 @@ like this:</p>
 </div>
 <div class="section" id="cityweather-specifications">
 <span id="quickstart-citydetails-specifications"></span><h3>CityWeather Specifications<a class="headerlink" href="#cityweather-specifications" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> goals are:</p>
+<ul class="simple">
+<li>for a city and a country get a city id so the open weather api can be called for information about this city</li>
+<li>return weather information when it is asked for it.</li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> will be built like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cw</span> <span class="o">=</span> <span class="n">CityWeather</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;city_weather&#39;</span><span class="p">,</span> <span class="c1"># for trace outputs (logs)</span>
+  <span class="n">city</span><span class="o">=</span><span class="s1">&#39;Vancouver&#39;</span><span class="p">,</span>
+  <span class="n">country</span><span class="o">=</span><span class="s1">&#39;CA&#39;</span><span class="p">,</span>
+<span class="hll">  <span class="n">api_key</span><span class="o">=</span><span class="s1">&#39;b35975e18dc93725acb092f7272cc6b8&#39;</span><span class="p">,</span>
+</span>  <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>  <span class="c1"># if you want to see the live trace</span>
+</pre></div>
+</div>
+<p>You will have to get your own API key (highlighted) from <a class="reference external" href="https://openweathermap.org/appid">here</a>.</p>
+<p>Before <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> can get the weather, it needs to ask for the CITY_DETAILS so
+it can call the open weather server with the correct city ID.  While
+it’s waiting around to get this information, it might start receiving
+GET_WEATHER events.  If this happens it should just queue up these requests and
+answer them in the right order when it can.</p>
+<p>There is a chance that while its trying to contact the open weather API, there
+could be an issue with the network.  If this happens wait 5 seconds and post the
+GET_WEATHER event back at itself as if someone from outside of the active object
+made the request.  However, if a real GET_WEATHER event comes into the object
+while it’s waiting for this network-error-timer to time out, just cancel the timer.
+If we don’t do this, we could end up sending way too many WEATHER events once the
+network issue clears.</p>
+<p>The open weather API asks us not to make more than 1 weather request every 10
+seconds.  If we send too many requests per minute, the open api server will send
+us an error message.  To avoid such a situation we <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> will only
+make one real call to the open weather servers every 10 seconds, otherwise it
+just returns its most recently discovered weather data.  This provide a kind of
+time buffer between it in the server.</p>
 <a class="reference external image-reference" href="_static/city_weather.pdf"><div align="center" class="align-center"><img alt="_images/city_weather.svg" src="_images/city_weather.svg" /></div>
 </a>
+<p>Here is the CityWeather code based on the above design:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CityWeather</span><span class="p">(</span><span class="n">InstrumentedFactory</span><span class="p">):</span>
+
+  <span class="n">API_HOLD_OFF_TIME_IN_SEC</span> <span class="o">=</span> <span class="mf">10.0</span>
+  <span class="n">NETWORK_ERROR_RETRY_TIME_IN_SEC</span> <span class="o">=</span> <span class="mf">5.0</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">,</span>
+    <span class="n">city</span><span class="p">,</span>
+    <span class="n">country</span><span class="p">,</span>
+    <span class="n">api_key</span><span class="p">,</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    To see diagram of the CityWeather statechart:</span>
+<span class="sd">      https://aleph2c.github.io/miros/_static/city_weather.pdf</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="p">,</span> <span class="n">live_spy</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">city</span> <span class="o">=</span> <span class="n">city</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">country</span> <span class="o">=</span> <span class="n">country</span>  <span class="c1"># ISO 3166</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">city_id</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">api_key</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cached_payload</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">weather_worker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;weather_worker&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weather_worker_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">GET_WEATHER</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weather_worker_get_weather</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">CITY_DETAILS</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weather_worker_city_details</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">WEATHER</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weather_worker_weather</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">query_weather</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;query_weather&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_weather_init_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">idle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;idle&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">idle_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">GET_WEATHER</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">idle_get_weather</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">api_live</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;api_live&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_live_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_live_init_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">fresh_api_call</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_live_fresh_api_call</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">network_error</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_live_network_error</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">api_paused</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;api_paused&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_paused_entry</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">GET_WEATHER</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_paused_get_weather</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weather_worker</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query_weather</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weather_worker</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idle</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_weather</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_live</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_weather</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_paused</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_live</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weather_worker</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">query_api</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">api_query_url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">make_url</span><span class="p">()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">api_query_url</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="nf">make_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Make an Open Weather URL to request weather data this object&#39;s city and</span>
+<span class="sd">       country</span>
+
+<span class="sd">    **Note**:</span>
+<span class="sd">       The URL request should look something like this:</span>
+
+<span class="sd">       http://api.openweathermap.org/data/2.5/</span>
+<span class="sd">         weather?id=6173331&amp;APPID=</span>
+<span class="sd">         b35975e18dc93725acb092f7272cc6b8&amp;units=metric</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">       (str): the url which you can use with the requests library</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;id=&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">city_id</span><span class="p">)</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://api.openweathermap.org/data/2.5/weather?&#39;</span>
+    <span class="n">url</span> <span class="o">+=</span> <span class="n">query</span>
+    <span class="n">url</span> <span class="o">+=</span> <span class="s1">&#39;&amp;APPID=&#39;</span>
+    <span class="n">url</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span>
+    <span class="n">url</span> <span class="o">+=</span> <span class="s1">&#39;&amp;units=metric&#39;</span>
+
+    <span class="k">return</span> <span class="n">url</span>
+
+  <span class="k">def</span> <span class="nf">to_weather_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weather_dict</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Convert the open web api (as a dict) to the WeatherOpenApiResult.</span>
+
+<span class="sd">    **Args**:</span>
+<span class="sd">       | ``weather_dict`` (dict): dictionary version of the json structure</span>
+<span class="sd">       |                          returned from the Open Weather Api service</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">       (WeatherOpenApiResult): immutable namedtuple of the data</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">api</span> <span class="o">=</span> <span class="n">weather_dict</span>
+    <span class="n">api_weather_dict</span> <span class="o">=</span> <span class="n">api</span><span class="p">[</span><span class="s1">&#39;weather&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">coord</span> <span class="o">=</span> <span class="n">Coord</span><span class="p">(</span><span class="n">lon</span><span class="o">=</span><span class="n">api</span><span class="p">[</span><span class="s1">&#39;coord&#39;</span><span class="p">][</span><span class="s1">&#39;lon&#39;</span><span class="p">],</span> <span class="n">lat</span><span class="o">=</span><span class="n">api</span><span class="p">[</span><span class="s1">&#39;coord&#39;</span><span class="p">][</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span>
+
+    <span class="n">weather</span> <span class="o">=</span> <span class="n">Weather</span><span class="p">(</span>
+      <span class="n">icon</span><span class="o">=</span><span class="n">api_weather_dict</span><span class="p">[</span><span class="s1">&#39;icon&#39;</span><span class="p">],</span>
+      <span class="n">main</span><span class="o">=</span><span class="n">api_weather_dict</span><span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">],</span>
+      <span class="nb">id</span><span class="o">=</span><span class="n">api_weather_dict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
+      <span class="n">description</span><span class="o">=</span><span class="n">api_weather_dict</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">wind</span> <span class="o">=</span> <span class="n">Wind</span><span class="p">(</span>
+      <span class="n">speed</span><span class="o">=</span><span class="n">api</span><span class="p">[</span><span class="s1">&#39;wind&#39;</span><span class="p">][</span><span class="s1">&#39;speed&#39;</span><span class="p">],</span>
+      <span class="n">deg</span><span class="o">=</span><span class="n">api</span><span class="p">[</span><span class="s1">&#39;wind&#39;</span><span class="p">][</span><span class="s1">&#39;deg&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">payload</span> <span class="o">=</span> <span class="n">WeatherOpenApiResult</span><span class="p">(</span>
+      <span class="n">city</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city</span><span class="p">,</span>
+      <span class="n">country</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">country</span><span class="p">,</span>
+      <span class="n">coord</span><span class="o">=</span><span class="n">coord</span><span class="p">,</span>
+      <span class="n">wind</span><span class="o">=</span><span class="n">wind</span><span class="p">,</span>
+      <span class="n">weather</span><span class="o">=</span><span class="n">weather</span><span class="p">,</span>
+      <span class="n">sunrise</span><span class="o">=</span><span class="n">api</span><span class="p">[</span><span class="s1">&#39;sys&#39;</span><span class="p">][</span><span class="s1">&#39;sunrise&#39;</span><span class="p">],</span>
+      <span class="n">sunset</span><span class="o">=</span><span class="n">api</span><span class="p">[</span><span class="s1">&#39;sys&#39;</span><span class="p">][</span><span class="s1">&#39;sunset&#39;</span><span class="p">],</span>
+      <span class="n">temp_min</span><span class="o">=</span><span class="n">api</span><span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">][</span><span class="s1">&#39;temp_min&#39;</span><span class="p">],</span>
+      <span class="n">temp_max</span><span class="o">=</span><span class="n">api</span><span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">][</span><span class="s1">&#39;temp_max&#39;</span><span class="p">],</span>
+      <span class="n">temp</span><span class="o">=</span><span class="n">api</span><span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">][</span><span class="s1">&#39;temp&#39;</span><span class="p">],</span>
+      <span class="n">humidity</span><span class="o">=</span><span class="n">api</span><span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">][</span><span class="s1">&#39;humidity&#39;</span><span class="p">],</span>
+      <span class="n">pressure</span><span class="o">=</span><span class="n">api</span><span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">][</span><span class="s1">&#39;pressure&#39;</span><span class="p">],</span>
+      <span class="n">dt</span><span class="o">=</span><span class="n">api</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">],</span>
+      <span class="n">visibility</span><span class="o">=</span><span class="n">api</span><span class="p">[</span><span class="s1">&#39;visibility&#39;</span><span class="p">],</span>
+      <span class="n">timezone</span><span class="o">=</span><span class="n">api</span><span class="p">[</span><span class="s1">&#39;timezone&#39;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">payload</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">weather_worker_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">GET_WEATHER</span><span class="p">))</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">CITY_DETAILS</span><span class="p">))</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">WEATHER</span><span class="p">))</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">REQUEST_CITY_DETAILS</span><span class="p">,</span>
+      <span class="n">payload</span><span class="o">=</span><span class="n">RequestDetailsForCityPayload</span><span class="p">(</span>
+        <span class="n">city</span><span class="o">=</span><span class="n">chart</span><span class="o">.</span><span class="n">city</span><span class="p">,</span>
+        <span class="n">country</span><span class="o">=</span><span class="n">chart</span><span class="o">.</span><span class="n">country</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">weather_worker_get_weather</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">weather_worker_city_details</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">city</span> <span class="o">==</span> <span class="n">chart</span><span class="o">.</span><span class="n">city</span> <span class="ow">and</span> \
+       <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">country</span> <span class="o">==</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">country</span><span class="p">:</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">city_id</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">id</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">query_weather</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">weather_worker_weather</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">city</span> <span class="o">==</span> <span class="n">chart</span><span class="o">.</span><span class="n">city</span> <span class="ow">and</span> \
+       <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">country</span> <span class="o">==</span> <span class="n">chart</span><span class="o">.</span><span class="n">country</span><span class="p">:</span>
+      <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">query_weather_init_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">idle</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">idle_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">idle_get_weather</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span>
+      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">network_error</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">api_live</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">api_live_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">weather_results_dict</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">query_api</span><span class="p">()</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">cached_payload</span> <span class="o">=</span> \
+        <span class="n">chart</span><span class="o">.</span><span class="n">to_weather_payload</span><span class="p">(</span><span class="n">weather_results_dict</span><span class="p">)</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+        <span class="n">Event</span><span class="p">(</span>
+          <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">WEATHER</span><span class="p">,</span>
+          <span class="n">payload</span><span class="o">=</span><span class="n">chart</span><span class="o">.</span><span class="n">cached_payload</span>
+        <span class="p">)</span>
+      <span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">post_lifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">network_error</span><span class="p">))</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+        <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">GET_WEATHER</span><span class="p">),</span>
+        <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">period</span><span class="o">=</span><span class="n">CityWeather</span><span class="o">.</span><span class="n">NETWORK_ERROR_RETRY_TIME_IN_SEC</span><span class="p">,</span>
+        <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">api_live_init_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">api_paused</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">api_live_fresh_api_call</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">idle</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">api_live_network_error</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">idle</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">api_paused_entry</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">fresh_api_call</span><span class="p">),</span>
+      <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">period</span><span class="o">=</span><span class="n">CityWeather</span><span class="o">.</span><span class="n">API_HOLD_OFF_TIME_IN_SEC</span><span class="p">,</span>
+      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">api_paused_get_weather</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">WEATHER</span><span class="p">,</span>
+        <span class="n">payload</span><span class="o">=</span><span class="n">chart</span><span class="o">.</span><span class="n">cached_payload</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>I already built the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> object which can return city
+ID objects when it’s asked to by <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code>.</p>
+<p>So, to see if the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> object is working, I’ll make both objects and
+publish some <code class="docutils literal notranslate"><span class="pre">GET_WEATHER</span></code> events to both the them.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">owm</span> <span class="o">=</span> <span class="n">OpenWeatherMapCityDetails</span><span class="p">(</span><span class="s1">&#39;city_details&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">cw</span>  <span class="o">=</span> <span class="n">CityWeather</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;city_weather&#39;</span><span class="p">,</span>
+  <span class="n">city</span><span class="o">=</span><span class="s1">&#39;Vancouver&#39;</span><span class="p">,</span>
+  <span class="n">country</span><span class="o">=</span><span class="s1">&#39;CA&#39;</span><span class="p">,</span>
+  <span class="n">api_key</span><span class="o">=</span><span class="s1">&#39;b35975e18dc93725acb092f7272cc6b8&#39;</span><span class="p">,</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+  <span class="n">cw</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">GET_WEATHER</span><span class="p">))</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This produces the following output, which convinced me that the code was
+working:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="sprinkler-specifications">
 <span id="quickstart-sprinkler-specifications"></span><h3>Sprinkler Specifications<a class="headerlink" href="#sprinkler-specifications" title="Permalink to this headline">¶</a></h3>
