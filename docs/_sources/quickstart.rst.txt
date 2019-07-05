@@ -1463,7 +1463,7 @@ Expressed as a sequence diagram:
     |             |              |             |       (4)        |
 
 1. The sprinkler active object started.  It created a five second ``heart_beat``
-   mulishot, which will run until the program is stopped, to request weather
+   multishot, which will run until the program is stopped, to request weather
    information every time it is triggered.
 2. After the first heart beat event was fired, a ``GET_WEATHER`` event was sent out.
    Upon receiving the resulting ``WEATHER`` event, it's payload was examined and
@@ -1472,7 +1472,8 @@ Expressed as a sequence diagram:
 3. The ``to_summer`` event was reacted to causing a transition into the summer
    state.
 4. The ``to_night`` event was reacted to causing transition into the
-   ``sprinkler_on`` state.
+   ``sprinkler_on`` state. (it wasn't at the time of the last ``WEATHER``
+   event).
 5. Ten seconds elapses and the sprinkler turns off.
 
 We can see that our sprinkler worked after dark.  I ran the code the next

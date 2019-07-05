@@ -1378,7 +1378,7 @@ contains the entire example if you want to look at it):</p>
 </div>
 <ol class="arabic simple">
 <li>The sprinkler active object started.  It created a five second <code class="docutils literal notranslate"><span class="pre">heart_beat</span></code>
-mulishot, which will run until the program is stopped, to request weather
+multishot, which will run until the program is stopped, to request weather
 information every time it is triggered.</li>
 <li>After the first heart beat event was fired, a <code class="docutils literal notranslate"><span class="pre">GET_WEATHER</span></code> event was sent out.
 Upon receiving the resulting <code class="docutils literal notranslate"><span class="pre">WEATHER</span></code> event, it’s payload was examined and
@@ -1387,7 +1387,8 @@ output buffer of the sprinkler’s statechart (<a class="reference internal" hre
 <li>The <code class="docutils literal notranslate"><span class="pre">to_summer</span></code> event was reacted to causing a transition into the summer
 state.</li>
 <li>The <code class="docutils literal notranslate"><span class="pre">to_night</span></code> event was reacted to causing transition into the
-<code class="docutils literal notranslate"><span class="pre">sprinkler_on</span></code> state.</li>
+<code class="docutils literal notranslate"><span class="pre">sprinkler_on</span></code> state. (it wasn’t at the time of the last <code class="docutils literal notranslate"><span class="pre">WEATHER</span></code>
+event).</li>
 <li>Ten seconds elapses and the sprinkler turns off.</li>
 </ol>
 <p>We can see that our sprinkler worked after dark.  I ran the code the next
