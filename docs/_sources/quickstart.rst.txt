@@ -285,8 +285,29 @@ in our system, let's focus in on each part.
 
 OpenWeatherMapCityDetails Specifications
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Let's start by looking at the rough sketch of the ``OpenWeatherMapCityDetails``
+object again:
+
+.. image:: _static/open_weather_map_city_details_medium.svg
+    :target: _static/open_weather_map_city_details_medium.pdf
+    :align: center
+
+We can see that for a city and a country the object should return the city id,
+and some other city details.
+
+This is how we would like to build the object:
+
+.. code-block:: python
+  
+  owm = OpenWeatherMapCityDetails(
+    name='city_details',  # used by the trace
+    live_trace=True       # if you want to see the live trace
+  )
+
 The ``OpenWeatherMapCityDetails`` needs to provide a city ID given a city and a
-country.  This city ID will be used by the ``CityWeather`` object to make a call
+country.
+
+This city ID will be used by the ``CityWeather`` object to make a call
 to the open web API.  The open-weather website contains a compressed file called
 ``city.list.json.gz`` at
 `http://bulk.openweathermap.org/sample/city.list.json.gz <http://bulk.openweathermap.org/sample/city.list.json.gz>`_.  If you have a
@@ -614,6 +635,9 @@ Let's look at what it did, we can see it because we turned on the
    [12:09:58] [city_details] e->ready() conduct_query->idle                                           
    Saskatoon: 6141256  
 
+We can see that it returned the city codes, but did the chart behave the way wanted it
+to?
+
 :ref:`Turning this into a sequence diagram <recipes-drawing-a-sequence-diagram>` looks
 like this:
 
@@ -646,17 +670,25 @@ like this:
 
 We can see that the city_details statechart queued the REQUEST_CITY_DETAILS
 (4,6,8,10) events until after it had downloaded the ``city.list.json.qz`` (1).
+So it works as designed.
 
 .. _quickstart-citydetails-specifications:
 
 CityWeather Specifications
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Let's start by looking at the rough sketch of the ``CityWeather`` active object
+again:
+
+.. image:: _static/city_weather_details_medium.svg
+    :target: _static/city_weather_details_medium.pdf
+    :align: center
+
 The ``CityWeather`` goals are: 
 
-* for a city and a country get a city id so the open weather api can be called for information about this city
-* return weather information when it is asked for it.
+* for a city and a country get a city id (from the `OpenWeatherMapCityDetails`) so the open-weather-api can be called for information about this city
+* to return weather information when it is asked for it.
 
-``CityWeather`` will be built like this:
+A ``CityWeather`` active object will be built like this:
 
 .. code-block:: python
   :emphasize-lines: 5
@@ -668,29 +700,52 @@ The ``CityWeather`` goals are:
     api_key='b35975e18dc93725acb092f7272cc6b8',
     live_trace=True)  # if you want to see the live trace
 
-You will have to get your own API key (highlighted) from `here
-<https://openweathermap.org/appid>`_.  
+`You will have to get your own API key <https://openweathermap.org/appid>`_
+(highlighted above) from the Open Weather map website.
 
-Before ``CityWeather`` can get the weather, it needs to ask for the CITY_DETAILS so
-it can call the open weather server with the correct city ID.  While
-it's waiting around to get this information, it might start receiving
-GET_WEATHER events.  If this happens it should just queue up these requests and
-answer them in the right order when it can.
+Before a ``CityWeather`` active object can get the weather, it needs to get the
+correct city ID.  While it's waiting around to get this information, it might
+start receiving GET_WEATHER events.  If this happens it should just queue up
+these requests and answer them in the right order when it can. (:ref:`deferred
+event pattern <patterns-deferred-event>`)
 
 There is a chance that while its trying to contact the open weather API, there
-could be an issue with the network.  If this happens wait 5 seconds and post the
-GET_WEATHER event back at itself as if someone from outside of the active object
-made the request.  However, if a real GET_WEATHER event comes into the object
-while it's waiting for this network-error-timer to time out, just cancel the timer.
-If we don't do this, we could end up sending way too many WEATHER events once the
-network issue clears.
+could be an issue with the network.  If this happens it should just wait 5
+seconds and re-post the GET_WEATHER event back at itself as if someone from
+outside of the active object made the request (:ref:`reminder pattern
+<patterns-reminder>`).  However, if a real GET_WEATHER event comes into the
+object while it's waiting for this network-error-timer to time out, just cancel
+this 5-second timer.  If we don't do this, we could end up sending way too many
+WEATHER events once the network issue clears.
 
 The open weather API asks us not to make more than 1 weather request every 10
 seconds.  If we send too many requests per minute, the open api server will send
-us an error message.  To avoid such a situation we ``CityWeather`` will only
-make one real call to the open weather servers every 10 seconds, otherwise it
-just returns its most recently discovered weather data.  This provide a kind of
-time buffer between it in the server.
+us an error message:
+
+.. code-block:: python
+  
+  { 
+    "cod": 429,
+    "message": "Your account is temporary blocked due to exceeding of requests
+    limitation of your subscription type.  Please choose the proper subscription
+    http://openweathermap.org/price"
+  }
+
+To avoid getting error messages the ``CityWeather`` active
+object will only make one real call to the open weather servers every 10
+seconds, otherwise it just returns its most recently cached weather data.
+This provides a kind of time buffer between it in the server.
+
+.. note::
+
+  If this example becomes popular the Open Weather API will issue the above
+  message a lot.  You will need to get and get your own API key to make this
+  issue go away.
+
+In the case that a cod 429 error does occur, the ``CityWeather`` active object
+should behave exactly the same as it would if a network error occurred.
+
+Here is the design:
 
 .. image:: _static/city_weather.svg
     :target: _static/city_weather.pdf
@@ -966,37 +1021,471 @@ I already built the ``OpenWeatherMapCityDetails`` object which can return city
 ID objects when it's asked to by ``CityWeather``.  
 
 So, to see if the ``CityWeather`` object is working, I'll make both objects and
-publish some ``GET_WEATHER`` events to both the them.
+publish some ``GET_WEATHER`` events.
 
 .. code-block:: python
   
-  owm = OpenWeatherMapCityDetails('city_details', live_trace=True)
-  cw  = CityWeather(
-    name='city_weather',
-    city='Vancouver',
-    country='CA',
-    api_key='b35975e18dc93725acb092f7272cc6b8',
-    live_trace=True)
+   if __name__ == "__main__":
+     owm = OpenWeatherMapCityDetails('city_details', live_trace=True)
+     cw  = CityWeather(
+       name='city_weather',
+       city='Vancouver',
+       country='CA',
+       api_key='b35975e18dc93725acb092f7272cc6b8',
+       live_trace=True)
 
-  for i in range(10):
-    cw.publish(Event(signal=signals.GET_WEATHER))
-    time.sleep(5)
+     for i in range(10):
+       cw.publish(Event(signal=signals.GET_WEATHER))
+       time.sleep(5)
 
-This produces the following output, which convinced me that the code was
-working:
+This produces the following output (edit to fit on this page):
 
-.. code-block:: python
+.. code-block:: text
 
+   [08:03:49] [city_details] e->start_at() top->read_file
+   [08:03:49] [city_details] e->ready() read_file->idle
+   [08:03:49] [city_weather] e->start_at() top->weather_worker
+   [08:03:49] [city_details] e->REQUEST_CITY_DETAILS() idle->conduct_query
+   [08:03:49] [city_details] e->ready() conduct_query->idle
+   [08:03:49] [city_weather] e->CITY_DETAILS() weather_worker->idle
+   Vancouver: 6173331
+   [2019-07-04 08:03:49.097032] [city_weather] e->GET_WEATHER() idle->api_paused
+   WeatherOpenApiResult(
+      city='Vancouver',
+      country='CA',
+      coord=Coord(lon=-123.12, lat=49.25),
+      wind=Wind(speed=5.7, deg=170),
+      weather=Weather(
+         icon='04d', 
+         main='Clouds',
+         id=803, 
+         description='broken clouds'),
+      sunrise=1562242385,
+      sunset=1562300420,
+      temp_min=13.33,
+      temp_max=16.11,
+      temp=14.64,
+      humidity=82,
+      pressure=1017,
+      dt=1562252610,
+      visibility=16093,
+      timezone=-25200)
+   WeatherOpenApiResult ...
+   WeatherOpenApiResult ...
+   [08:03:59] [city_weather] e->fresh_api_call() api_paused->idle
+   [08:04:04] [city_weather] e->GET_WEATHER() idle->api_paused
+   WeatherOpenApiResult ...
+   WeatherOpenApiResult ...
+   WeatherOpenApiResult ...
+   [08:04:14] [city_weather] e->fresh_api_call() api_paused->idle
+   [08:04:19] [city_weather] e->GET_WEATHER() idle->api_paused
+   WeatherOpenApiResult ...
+   WeatherOpenApiResult ...
+   WeatherOpenApiResult ...
+   [08:04:29] [city_weather] e->fresh_api_call() api_paused->idle
+   [08:04:34] [city_weather] e->GET_WEATHER() idle->api_paused
+   WeatherOpenApiResult ...
 
+I can see that there is some interaction between the
+``OpenWeatherMapCityDetails`` and the ``CityWeather`` active objects, and the
+``CityWeather``` is returning the detailed weather information that I'm looking
+for, but are the statechart behaving the way I want them too?
+
+It can be difficult to explain how two or more charts are working together
+directly from a trace.
+
+To make it easier to see and explain I'll :ref:`turn the trace output into a set of
+sequence diagrams <recipes-drawing-a-sequence-diagram>`:
+
+.. code-block:: text
+
+   [Statechart: city_details] (A)
+     top        read_file    idle                   conduct_query
+      +-start_at()->|          |                          |
+      |    (1)      |          |                          |
+      |             +-ready()->|                          |
+      |             |  (3)     |                          |
+      |             |          +--REQUEST_CITY_DETAILS()->|
+      |             |          |           (4)            |
+      |             |          +<---------ready()---------|
+      |             |          |           (6)            |
+
+   [Statechart: city_weather] (B)
+    top      weather_worker         idle              api_paused
+     +-start_at()->|                 |                    |
+     |    (2)      |                 |                    |
+     |             +-CITY_DETAILS()->|                    |
+     |             |      (5)        |                    |
+     |             |                 +----GET_WEATHER()-->|
+     |             |                 |        (7)         |
+     |             |                 +<-fresh_api_call()--|
+     |             |                 |        (8)         |
+     |             |                 +----GET_WEATHER()-->|
+     |             |                 |        (9)         |
+     |             |                 +<-fresh_api_call()--|
+     |             |                 |       (10)         |
+     |             |                 +----GET_WEATHER()-->|
+     |             |                 |       (11)         |
+     |             |                 +<-fresh_api_call()--|
+     |             |                 |       (12)         |
+     |             |                 +----GET_WEATHER()-->|
+     |             |                 |       (13)         |
+
+Here is a description of the interaction:
+
+1. (A) ``OpenWeatherMapCityDetails`` is instantiated and started as city_details in the trace output.
+2. (B) ``CityWeather`` is instantiated and started as city_weather in the trace output.  The main thread sends a ``GET_WEATHER`` event to the city_weather object, which is queued because it doesn't have a city id yet, so it can't request weather information from the Open Weather server.
+3. (A) city_details sees that it has a file, so it reads it and transitions to idle.  Meanwhile, city_weather publishes the ``REQUEST_CITY_DETAILS`` event
+4. (B) city_weather receives the ``REQUEST_CITY_DETAILS`` event and conducts a query, then publishes the ``CITY_DETAILS`` event.
+5. (B) city_weather receives ``CITY_DETAILS``, extracts the city id, then issues a ``recall`` on any queue ``GET_WEATHER`` events that were sent to it before it was ready.
+7. (B) city_details receives the ``GET_WEATHER`` event it just posted to itself.  This causes it to call the open weather api and it prints the results to the screen (I added code that will do this in this object).  While in the api_paused state, it receives 2 more requests for the weather, and it just posts the old weather information instead of calling the server again.
+8. (B) city_details 10 second server delay timer times out.  It transitions from api_paused to idle.  It is ready to call the server for new weather information when it receives its next ``GET_WEATHER`` event.
+9-13. (B) The pattern described from 7 to 8 is repeated.
+
+We haven't tested the network error handling part of our system, but I would
+say the nominal behavior is working as designed.
 
 .. _quickstart-sprinkler-specifications:
 
 Sprinkler Specifications
 ^^^^^^^^^^^^^^^^^^^^^^^^
+Let's start by looking at the rough sketch of the ``Sprinkler`` active object again:
+
+.. image:: _static/sprinkler_details_medium.svg
+    :target: _static/sprinker_details_medium.pdf
+    :align: center
+
+The diagram shows us how the sprinkler gets its weather information but it
+doesn't tell us what the sprinkler does with this data.
+
+If we ran our code on a `raspberry pi
+<https://www.raspberrypi.org/products/raspberry-pi-4-model-b/>`_, we could
+connect a wire from one of its break-out pins `(GPIO)
+<https://thepihut.com/blogs/raspberry-pi-tutorials/27968772-turning-on-an-led-with-your-raspberry-pis-gpio-pins>`_,
+to a relay.  This relay could turn an `electrically controlled water valve
+<https://www.hunterindustries.com/product-line/valves>`_ on/off.
+
+What is cool about this design is that we have imbued an inexpensive
+`electrically controlled water valve
+<https://www.hunterindustries.com/product-line/valves>`_ with knowledge about
+the weather, the local time, when the sunrises and when it will set.  It knows
+about the barometric pressure, the local humidity and it has a rough estimate of
+the GPS coordinates of the sprinkler if you need to turn it off from `above
+<https://en.wikipedia.org/wiki/Northrop_Grumman_RQ-4_Global_Hawk>`_.
+
+We will feed the sprinkler some data, so it will know how long to keep the water
+on, what its API key is, what city and country it is in.  The construction
+of its active object will look like this:
+
+.. code-block:: python
+  
+  sprinkler = Sprinkler(
+    name='sprinkler',
+    city='Vancouver',
+    country='CA',
+    api_key='b35975e18dc93725acb092f7272cc6b8',
+    water_time_sec = 60*60,
+    live_trace=True)
+
+There is so much we can do, but for now we will keep it simple.  The sprinkler
+will turn on and run for water_time_sec if:
+
+   * it is sunset, so that our water doesn't immediately evaporate
+   * if it's not raining are snowing
+   * if the daily expected minimum temperature is above 0 degrees Celsius.
+
+The weather details will be provided by the ``Weather`` event's payload,
+``e.payload.weather.id`` which are described `here
+<https://openweathermap.org/weather-conditions>`_.
 
 .. image:: _static/sprinkler.svg
     :target: _static/sprinkler.pdf
     :align: center
+
+Here is the sprinkler code:
+
+.. code-block:: python
+  
+   class Sprinkler(InstrumentedFactory):
+
+     SPRINKLER_HEART_BEAT_SEC = 5.0
+
+     def __init__(self,
+       name,
+       city,
+       country,
+       api_key,
+       water_time_sec,
+       live_trace=None,
+       live_spy=None):
+
+       super().__init__(name, live_trace, live_spy)
+       self.city_details = OpenWeatherMapCityDetails('city_details')
+       self.city_weather = CityWeather('city_weather', city, country, api_key)
+
+       self.city = city
+       self.country = country
+       self.not_raining = None
+       self.water_time_sec = water_time_sec
+
+       self.common_behaviors = self.create(state="common_behaviors"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.common_behaviors_entry_signal). \
+         catch(signal=signals.heart_beat,
+           handler=self.common_behaviors_heart_beat). \
+         catch(signal=signals.WEATHER,
+           handler=self.common_behaviors_weather). \
+         catch(signal=signals.to_summer,
+           handler=self.common_behaviors_to_summer). \
+         to_method()
+
+       self.summer = self.create(state="summer"). \
+         catch(signal=signals.to_winter,
+           handler=self.summer_to_winter). \
+         catch(signal=signals.to_summer,
+           handler=self.summer_to_summer). \
+         catch(signal=signals.to_day,
+           handler=self.summer_to_day). \
+         catch(signal=signals.to_night,
+           handler=self.summer_to_night). \
+         to_method()
+
+       self.night = self.create(state="night"). \
+         catch(signal=signals.to_night,
+           handler=self.night_to_night). \
+         catch(signal=signals.to_day,
+           handler=self.night_to_day). \
+         catch(signal=signals.INIT_SIGNAL,
+           handler=self.sprinkler_off_init_signal). \
+         to_method()
+
+       self.not_raining_state = self.create(state="not_raining_state"). \
+         catch(signal=signals.INIT_SIGNAL,
+           handler=self.not_raining_init_signal). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.not_raining_exit_signal). \
+         to_method()
+
+       self.sprinkler_on = self.create(state="sprinkler_on"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.sprinkler_on_entry_signal). \
+         catch(signal=signals.done_watering,
+           handler=self.sprinkler_on_done_watering). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.sprinkler_on_exit_signal). \
+         to_method()
+
+       self.sprinkler_off = self.create(state="sprinkler_off"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.sprinkler_off_entry_signal). \
+         to_method()
+
+       self.nest(self.common_behaviors, parent=None). \
+            nest(self.summer, parent=self.common_behaviors). \
+            nest(self.night, parent=self.summer). \
+            nest(self.not_raining_state, parent=self.night). \
+            nest(self.sprinkler_on, parent=self.not_raining_state). \
+            nest(self.sprinkler_off, parent=self.not_raining_state)
+
+       self.start_at(self.common_behaviors)
+
+     @staticmethod
+     def common_behaviors_entry_signal(chart, e):
+       status = return_status.HANDLED
+       chart.subscribe(Event(signal=signals.WEATHER))
+       chart.turn_off_sprinkler()
+       chart.post_fifo(
+         Event(signal=signals.heart_beat),
+         times=0,
+         period=Sprinkler.SPRINKLER_HEART_BEAT_SEC,
+         deferred=True)
+       return status
+
+     @staticmethod
+     def common_behaviors_heart_beat(chart, e):
+       status = return_status.HANDLED
+       chart.publish(Event(signal=signals.GET_WEATHER))
+       return status
+
+     @staticmethod
+     def common_behaviors_weather(chart, e):
+       status = return_status.HANDLED
+
+       # https://openweathermap.org/weather-conditions
+       if 500 <= e.payload.weather.id <= 531:
+         chart.not_raining = False
+       else:
+         chart.not_raining = True
+
+       is_winter = False
+       is_winter |= 600 <= e.payload.weather.id <= 622
+       is_winter |= e.payload.weather.id == 511
+       is_winter |= e.payload.temp_min < 0.0
+       if is_winter:
+         chart.post_fifo(Event(signal=signals.to_winter))
+       else:
+         chart.post_fifo(Event(signal=signals.to_summer))
+
+       if e.payload.dt > e.payload.sunset:
+         chart.post_fifo(Event(signal=signals.to_night))
+       else:
+         chart.post_fifo(Event(signal=signals.to_day))
+       return status
+
+     @staticmethod
+     def common_behaviors_to_summer(chart, e):
+       status = chart.trans(chart.summer)
+       return status
+
+     @staticmethod
+     def summer_to_winter(chart, e):
+       status = chart.trans(chart.common_behaviors)
+       return status
+
+     @staticmethod
+     def summer_to_summer(chart, e):
+       status = return_status.HANDLED
+       return status
+
+     @staticmethod
+     def summer_to_day(chart, e):
+       status = return_status.HANDLED
+       return status
+
+     @staticmethod
+     def summer_to_night(chart, e):
+       status = chart.trans(chart.night)
+       return status
+
+     @staticmethod
+     def night_to_night(chart, e):
+       status = return_status.HANDLED
+       return status
+
+     @staticmethod
+     def night_to_day(chart, e):
+       status = chart.trans(chart.summer)
+       return status
+
+     @staticmethod
+     def sprinkler_off_init_signal(chart, e):
+       status = return_status.HANDLED
+       if chart.not_raining:
+         status = chart.trans(chart.not_raining_state)
+       return status
+
+     @staticmethod
+     def not_raining_init_signal(chart, e):
+       status = chart.trans(chart.sprinkler_on)
+       return status
+
+     def not_raining_exit_signal(chart, e):
+       status = return_status.HANDLED
+       chart.cancel_events(Event(signal=signals.done_watering))
+       return status
+
+     @staticmethod
+     def sprinkler_on_entry_signal(chart, e):
+       status = return_status.HANDLED
+       chart.turn_on_sprinkler()
+       chart.post_fifo(
+         Event(signal=signals.done_watering),
+         times=1,
+         period=chart.water_time_sec,
+         deferred=True)
+       return status
+
+     @staticmethod
+     def sprinkler_on_done_watering(chart, e):
+       status = chart.trans(chart.sprinkler_off)
+       return status
+
+     @staticmethod
+     def sprinkler_on_exit_signal(chart, e):
+       status = return_status.HANDLED
+       chart.turn_off_sprinkler()
+       return status
+
+     @staticmethod
+     def sprinkler_off_entry_signal(chart, e):
+       status = return_status.HANDLED
+       chart.turn_off_sprinkler()
+       return status
+
+     def turn_on_sprinkler(self):
+       '''turn our sprinkler on'''
+       print('turn the sprinkler on')
+
+     def turn_off_sprinkler(self):
+       '''turn our sprinkler off'''
+       print('turn the sprinkler off')
+
+To test the code I wrote this at the bottom of the sprinkler.py file (which
+contains the entire example if you want to look at it):
+
+.. code-block:: python
+  
+  sprinkler  = Sprinkler(
+    name='sprinkler',
+    city='Vancouver',
+    country='CA',
+    api_key='b35975e18dc93725acb092f7272cc6b8',
+    water_time_sec = 10,
+    live_trace=True)
+
+I ran this code at night, after dark, when it was not raining and in the summer I saw this output:
+
+.. code-block:: python
+  
+   turn the sprinkler off
+   [22:12:14] [sprinkler] e->start_at() top->common_behaviors
+   Vancouver: 6173331
+   [22:12:20] [sprinkler] e->to_summer() common_behaviors->summer
+   turn the sprinkler on
+   [22:12:20] [sprinkler] e->to_night() summer->sprinkler_on
+   turn the sprinkler off
+   turn the sprinkler off
+   [22:12:30] [sprinkler] e->done_watering() sprinkler_on->sprinkler_off
+
+Expressed as a sequence diagram:
+
+.. code-block:: python
+  
+   [Statechart: sprinkler]
+   top     common_behaviors    summer     sprinkler_on       sprinkler_off
+    +-start_at()->|              |             |                  |
+    |    (1)      |              |             |                  |
+    |             +-to_summer()->|             |                  |
+    |             |    (2)       |             |                  |
+    |             |              +-to_night()->|                  |
+    |             |              |    (3)      |                  |
+    |             |              |             +--done_watering()>|
+    |             |              |             |       (4)        |
+
+1. The sprinkler active object started.  It created a five second ``heart_beat``
+   mulishot, which will run until the program is stopped, to request weather
+   information every time it is triggered.
+2. After the first heart beat event was fired, a ``GET_WEATHER`` event was sent out.
+   Upon receiving the resulting ``WEATHER`` event, it's payload was examined and
+   a ``to_summer`` and ``to_night`` events were placed in the first in first
+   output buffer of the sprinkler's statechart (:ref:`reminder pattern <patterns-reminder>`).
+3. The ``to_summer`` event was reacted to causing a transition into the summer
+   state.
+4. The ``to_night`` event was reacted to causing transition into the
+   ``sprinkler_on`` state.
+5. Ten seconds elapses and the sprinkler turns off.
+
+We can see that our sprinkler worked after dark.  I ran the code the next
+morning to see what would happen:
+
+.. code-block:: python
+  
+  turn the sprinkler off
+  [2019-07-05 06:03:56.865036] [sprinkler] e->start_at() top->common_behaviors
+  Vancouver: 6173331
+  [2019-07-05 06:04:02.056800] [sprinkler] e->to_summer() common_behaviors->summer
+
+It didn't turn on the sprinkler and that's what we wanted.
 
 .. raw:: html
 

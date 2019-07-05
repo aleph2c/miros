@@ -267,8 +267,22 @@ in our system, let’s focus in on each part.</p>
 </div>
 <div class="section" id="openweathermapcitydetails-specifications">
 <span id="quickstart-openweathermapcitydetails-specifications"></span><h3>OpenWeatherMapCityDetails Specifications<a class="headerlink" href="#openweathermapcitydetails-specifications" title="Permalink to this headline">¶</a></h3>
+<p>Let’s start by looking at the rough sketch of the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code>
+object again:</p>
+<a class="reference external image-reference" href="_static/open_weather_map_city_details_medium.pdf"><div align="center" class="align-center"><img alt="_images/open_weather_map_city_details_medium.svg" src="_images/open_weather_map_city_details_medium.svg" /></div>
+</a>
+<p>We can see that for a city and a country the object should return the city id,
+and some other city details.</p>
+<p>This is how we would like to build the object:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">owm</span> <span class="o">=</span> <span class="n">OpenWeatherMapCityDetails</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;city_details&#39;</span><span class="p">,</span>  <span class="c1"># used by the trace</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span>       <span class="c1"># if you want to see the live trace</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 <p>The <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> needs to provide a city ID given a city and a
-country.  This city ID will be used by the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> object to make a call
+country.</p>
+<p>This city ID will be used by the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> object to make a call
 to the open web API.  The open-weather website contains a compressed file called
 <code class="docutils literal notranslate"><span class="pre">city.list.json.gz</span></code> at
 <a class="reference external" href="http://bulk.openweathermap.org/sample/city.list.json.gz">http://bulk.openweathermap.org/sample/city.list.json.gz</a>.  If you have a
@@ -581,6 +595,8 @@ Burnaby: 5911606
 Saskatoon: 6141256
 </pre></div>
 </div>
+<p>We can see that it returned the city codes, but did the chart behave the way wanted it
+to?</p>
 <p><a class="reference internal" href="recipes.html#recipes-drawing-a-sequence-diagram"><span class="std std-ref">Turning this into a sequence diagram</span></a> looks
 like this:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Statechart</span><span class="p">:</span> <span class="n">city_details</span><span class="p">]</span>
@@ -610,16 +626,21 @@ like this:</p>
 </pre></div>
 </div>
 <p>We can see that the city_details statechart queued the REQUEST_CITY_DETAILS
-(4,6,8,10) events until after it had downloaded the <code class="docutils literal notranslate"><span class="pre">city.list.json.qz</span></code> (1).</p>
+(4,6,8,10) events until after it had downloaded the <code class="docutils literal notranslate"><span class="pre">city.list.json.qz</span></code> (1).
+So it works as designed.</p>
 </div>
 <div class="section" id="cityweather-specifications">
 <span id="quickstart-citydetails-specifications"></span><h3>CityWeather Specifications<a class="headerlink" href="#cityweather-specifications" title="Permalink to this headline">¶</a></h3>
+<p>Let’s start by looking at the rough sketch of the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> active object
+again:</p>
+<a class="reference external image-reference" href="_static/city_weather_details_medium.pdf"><div align="center" class="align-center"><img alt="_images/city_weather_details_medium.svg" src="_images/city_weather_details_medium.svg" /></div>
+</a>
 <p>The <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> goals are:</p>
 <ul class="simple">
-<li>for a city and a country get a city id so the open weather api can be called for information about this city</li>
-<li>return weather information when it is asked for it.</li>
+<li>for a city and a country get a city id (from the <cite>OpenWeatherMapCityDetails</cite>) so the open-weather-api can be called for information about this city</li>
+<li>to return weather information when it is asked for it.</li>
 </ul>
-<p><code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> will be built like this:</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> active object will be built like this:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cw</span> <span class="o">=</span> <span class="n">CityWeather</span><span class="p">(</span>
   <span class="n">name</span><span class="o">=</span><span class="s1">&#39;city_weather&#39;</span><span class="p">,</span> <span class="c1"># for trace outputs (logs)</span>
   <span class="n">city</span><span class="o">=</span><span class="s1">&#39;Vancouver&#39;</span><span class="p">,</span>
@@ -628,25 +649,44 @@ like this:</p>
 </span>  <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>  <span class="c1"># if you want to see the live trace</span>
 </pre></div>
 </div>
-<p>You will have to get your own API key (highlighted) from <a class="reference external" href="https://openweathermap.org/appid">here</a>.</p>
-<p>Before <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> can get the weather, it needs to ask for the CITY_DETAILS so
-it can call the open weather server with the correct city ID.  While
-it’s waiting around to get this information, it might start receiving
-GET_WEATHER events.  If this happens it should just queue up these requests and
-answer them in the right order when it can.</p>
+<p><a class="reference external" href="https://openweathermap.org/appid">You will have to get your own API key</a>
+(highlighted above) from the Open Weather map website.</p>
+<p>Before a <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> active object can get the weather, it needs to get the
+correct city ID.  While it’s waiting around to get this information, it might
+start receiving GET_WEATHER events.  If this happens it should just queue up
+these requests and answer them in the right order when it can. (<a class="reference internal" href="patterns.html#patterns-deferred-event"><span class="std std-ref">deferred
+event pattern</span></a>)</p>
 <p>There is a chance that while its trying to contact the open weather API, there
-could be an issue with the network.  If this happens wait 5 seconds and post the
-GET_WEATHER event back at itself as if someone from outside of the active object
-made the request.  However, if a real GET_WEATHER event comes into the object
-while it’s waiting for this network-error-timer to time out, just cancel the timer.
-If we don’t do this, we could end up sending way too many WEATHER events once the
-network issue clears.</p>
+could be an issue with the network.  If this happens it should just wait 5
+seconds and re-post the GET_WEATHER event back at itself as if someone from
+outside of the active object made the request (<a class="reference internal" href="patterns.html#patterns-reminder"><span class="std std-ref">reminder pattern</span></a>).  However, if a real GET_WEATHER event comes into the
+object while it’s waiting for this network-error-timer to time out, just cancel
+this 5-second timer.  If we don’t do this, we could end up sending way too many
+WEATHER events once the network issue clears.</p>
 <p>The open weather API asks us not to make more than 1 weather request every 10
 seconds.  If we send too many requests per minute, the open api server will send
-us an error message.  To avoid such a situation we <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> will only
-make one real call to the open weather servers every 10 seconds, otherwise it
-just returns its most recently discovered weather data.  This provide a kind of
-time buffer between it in the server.</p>
+us an error message:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;cod&quot;</span><span class="p">:</span> <span class="mi">429</span><span class="p">,</span>
+  <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Your account is temporary blocked due to exceeding of requests</span>
+  <span class="n">limitation</span> <span class="n">of</span> <span class="n">your</span> <span class="n">subscription</span> <span class="nb">type</span><span class="o">.</span>  <span class="n">Please</span> <span class="n">choose</span> <span class="n">the</span> <span class="n">proper</span> <span class="n">subscription</span>
+  <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">openweathermap</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">price</span><span class="s2">&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>To avoid getting error messages the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> active
+object will only make one real call to the open weather servers every 10
+seconds, otherwise it just returns its most recently cached weather data.
+This provides a kind of time buffer between it in the server.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If this example becomes popular the Open Weather API will issue the above
+message a lot.  You will need to get and get your own API key to make this
+issue go away.</p>
+</div>
+<p>In the case that a cod 429 error does occur, the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> active object
+should behave exactly the same as it would if a network error occurred.</p>
+<p>Here is the design:</p>
 <a class="reference external image-reference" href="_static/city_weather.pdf"><div align="center" class="align-center"><img alt="_images/city_weather.svg" src="_images/city_weather.svg" /></div>
 </a>
 <p>Here is the CityWeather code based on the above design:</p>
@@ -916,30 +956,449 @@ time buffer between it in the server.</p>
 <p>I already built the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> object which can return city
 ID objects when it’s asked to by <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code>.</p>
 <p>So, to see if the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> object is working, I’ll make both objects and
-publish some <code class="docutils literal notranslate"><span class="pre">GET_WEATHER</span></code> events to both the them.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">owm</span> <span class="o">=</span> <span class="n">OpenWeatherMapCityDetails</span><span class="p">(</span><span class="s1">&#39;city_details&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">cw</span>  <span class="o">=</span> <span class="n">CityWeather</span><span class="p">(</span>
-  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;city_weather&#39;</span><span class="p">,</span>
-  <span class="n">city</span><span class="o">=</span><span class="s1">&#39;Vancouver&#39;</span><span class="p">,</span>
-  <span class="n">country</span><span class="o">=</span><span class="s1">&#39;CA&#39;</span><span class="p">,</span>
-  <span class="n">api_key</span><span class="o">=</span><span class="s1">&#39;b35975e18dc93725acb092f7272cc6b8&#39;</span><span class="p">,</span>
-  <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+publish some <code class="docutils literal notranslate"><span class="pre">GET_WEATHER</span></code> events.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">owm</span> <span class="o">=</span> <span class="n">OpenWeatherMapCityDetails</span><span class="p">(</span><span class="s1">&#39;city_details&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">cw</span>  <span class="o">=</span> <span class="n">CityWeather</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;city_weather&#39;</span><span class="p">,</span>
+    <span class="n">city</span><span class="o">=</span><span class="s1">&#39;Vancouver&#39;</span><span class="p">,</span>
+    <span class="n">country</span><span class="o">=</span><span class="s1">&#39;CA&#39;</span><span class="p">,</span>
+    <span class="n">api_key</span><span class="o">=</span><span class="s1">&#39;b35975e18dc93725acb092f7272cc6b8&#39;</span><span class="p">,</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-  <span class="n">cw</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">GET_WEATHER</span><span class="p">))</span>
-  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">cw</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">GET_WEATHER</span><span class="p">))</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This produces the following output, which convinced me that the code was
-working:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<p>This produces the following output (edit to fit on this page):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[08:03:49] [city_details] e-&gt;start_at() top-&gt;read_file
+[08:03:49] [city_details] e-&gt;ready() read_file-&gt;idle
+[08:03:49] [city_weather] e-&gt;start_at() top-&gt;weather_worker
+[08:03:49] [city_details] e-&gt;REQUEST_CITY_DETAILS() idle-&gt;conduct_query
+[08:03:49] [city_details] e-&gt;ready() conduct_query-&gt;idle
+[08:03:49] [city_weather] e-&gt;CITY_DETAILS() weather_worker-&gt;idle
+Vancouver: 6173331
+[2019-07-04 08:03:49.097032] [city_weather] e-&gt;GET_WEATHER() idle-&gt;api_paused
+WeatherOpenApiResult(
+   city=&#39;Vancouver&#39;,
+   country=&#39;CA&#39;,
+   coord=Coord(lon=-123.12, lat=49.25),
+   wind=Wind(speed=5.7, deg=170),
+   weather=Weather(
+      icon=&#39;04d&#39;,
+      main=&#39;Clouds&#39;,
+      id=803,
+      description=&#39;broken clouds&#39;),
+   sunrise=1562242385,
+   sunset=1562300420,
+   temp_min=13.33,
+   temp_max=16.11,
+   temp=14.64,
+   humidity=82,
+   pressure=1017,
+   dt=1562252610,
+   visibility=16093,
+   timezone=-25200)
+WeatherOpenApiResult ...
+WeatherOpenApiResult ...
+[08:03:59] [city_weather] e-&gt;fresh_api_call() api_paused-&gt;idle
+[08:04:04] [city_weather] e-&gt;GET_WEATHER() idle-&gt;api_paused
+WeatherOpenApiResult ...
+WeatherOpenApiResult ...
+WeatherOpenApiResult ...
+[08:04:14] [city_weather] e-&gt;fresh_api_call() api_paused-&gt;idle
+[08:04:19] [city_weather] e-&gt;GET_WEATHER() idle-&gt;api_paused
+WeatherOpenApiResult ...
+WeatherOpenApiResult ...
+WeatherOpenApiResult ...
+[08:04:29] [city_weather] e-&gt;fresh_api_call() api_paused-&gt;idle
+[08:04:34] [city_weather] e-&gt;GET_WEATHER() idle-&gt;api_paused
+WeatherOpenApiResult ...
 </pre></div>
 </div>
+<p>I can see that there is some interaction between the
+<code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> and the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> active objects, and the
+<code class="docutils literal notranslate"><span class="pre">CityWeather`</span></code> is returning the detailed weather information that I’m looking
+for, but are the statechart behaving the way I want them too?</p>
+<p>It can be difficult to explain how two or more charts are working together
+directly from a trace.</p>
+<p>To make it easier to see and explain I’ll <a class="reference internal" href="recipes.html#recipes-drawing-a-sequence-diagram"><span class="std std-ref">turn the trace output into a set of
+sequence diagrams</span></a>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[Statechart: city_details] (A)
+  top        read_file    idle                   conduct_query
+   +-start_at()-&gt;|          |                          |
+   |    (1)      |          |                          |
+   |             +-ready()-&gt;|                          |
+   |             |  (3)     |                          |
+   |             |          +--REQUEST_CITY_DETAILS()-&gt;|
+   |             |          |           (4)            |
+   |             |          +&lt;---------ready()---------|
+   |             |          |           (6)            |
+
+[Statechart: city_weather] (B)
+ top      weather_worker         idle              api_paused
+  +-start_at()-&gt;|                 |                    |
+  |    (2)      |                 |                    |
+  |             +-CITY_DETAILS()-&gt;|                    |
+  |             |      (5)        |                    |
+  |             |                 +----GET_WEATHER()--&gt;|
+  |             |                 |        (7)         |
+  |             |                 +&lt;-fresh_api_call()--|
+  |             |                 |        (8)         |
+  |             |                 +----GET_WEATHER()--&gt;|
+  |             |                 |        (9)         |
+  |             |                 +&lt;-fresh_api_call()--|
+  |             |                 |       (10)         |
+  |             |                 +----GET_WEATHER()--&gt;|
+  |             |                 |       (11)         |
+  |             |                 +&lt;-fresh_api_call()--|
+  |             |                 |       (12)         |
+  |             |                 +----GET_WEATHER()--&gt;|
+  |             |                 |       (13)         |
+</pre></div>
+</div>
+<p>Here is a description of the interaction:</p>
+<ol class="arabic simple">
+<li><ol class="first upperalpha">
+<li><code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> is instantiated and started as city_details in the trace output.</li>
+</ol>
+</li>
+<li><ol class="first upperalpha" start="2">
+<li><code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> is instantiated and started as city_weather in the trace output.  The main thread sends a <code class="docutils literal notranslate"><span class="pre">GET_WEATHER</span></code> event to the city_weather object, which is queued because it doesn’t have a city id yet, so it can’t request weather information from the Open Weather server.</li>
+</ol>
+</li>
+<li><ol class="first upperalpha">
+<li>city_details sees that it has a file, so it reads it and transitions to idle.  Meanwhile, city_weather publishes the <code class="docutils literal notranslate"><span class="pre">REQUEST_CITY_DETAILS</span></code> event</li>
+</ol>
+</li>
+<li><ol class="first upperalpha" start="2">
+<li>city_weather receives the <code class="docutils literal notranslate"><span class="pre">REQUEST_CITY_DETAILS</span></code> event and conducts a query, then publishes the <code class="docutils literal notranslate"><span class="pre">CITY_DETAILS</span></code> event.</li>
+</ol>
+</li>
+</ol>
+<p>5. (B) city_weather receives <code class="docutils literal notranslate"><span class="pre">CITY_DETAILS</span></code>, extracts the city id, then issues a <code class="docutils literal notranslate"><span class="pre">recall</span></code> on any queue <code class="docutils literal notranslate"><span class="pre">GET_WEATHER</span></code> events that were sent to it before it was ready.
+7. (B) city_details receives the <code class="docutils literal notranslate"><span class="pre">GET_WEATHER</span></code> event it just posted to itself.  This causes it to call the open weather api and it prints the results to the screen (I added code that will do this in this object).  While in the api_paused state, it receives 2 more requests for the weather, and it just posts the old weather information instead of calling the server again.
+8. (B) city_details 10 second server delay timer times out.  It transitions from api_paused to idle.  It is ready to call the server for new weather information when it receives its next <code class="docutils literal notranslate"><span class="pre">GET_WEATHER</span></code> event.
+9-13. (B) The pattern described from 7 to 8 is repeated.</p>
+<p>We haven’t tested the network error handling part of our system, but I would
+say the nominal behavior is working as designed.</p>
 </div>
 <div class="section" id="sprinkler-specifications">
 <span id="quickstart-sprinkler-specifications"></span><h3>Sprinkler Specifications<a class="headerlink" href="#sprinkler-specifications" title="Permalink to this headline">¶</a></h3>
+<p>Let’s start by looking at the rough sketch of the <code class="docutils literal notranslate"><span class="pre">Sprinkler</span></code> active object again:</p>
+<a class="reference external image-reference" href="_static/sprinker_details_medium.pdf"><div align="center" class="align-center"><img alt="_images/sprinkler_details_medium.svg" src="_images/sprinkler_details_medium.svg" /></div>
+</a>
+<p>The diagram shows us how the sprinkler gets its weather information but it
+doesn’t tell us what the sprinkler does with this data.</p>
+<p>If we ran our code on a <a class="reference external" href="https://www.raspberrypi.org/products/raspberry-pi-4-model-b/">raspberry pi</a>, we could
+connect a wire from one of its break-out pins <a class="reference external" href="https://thepihut.com/blogs/raspberry-pi-tutorials/27968772-turning-on-an-led-with-your-raspberry-pis-gpio-pins">(GPIO)</a>,
+to a relay.  This relay could turn an <a class="reference external" href="https://www.hunterindustries.com/product-line/valves">electrically controlled water valve</a> on/off.</p>
+<p>What is cool about this design is that we have imbued an inexpensive
+<a class="reference external" href="https://www.hunterindustries.com/product-line/valves">electrically controlled water valve</a> with knowledge about
+the weather, the local time, when the sunrises and when it will set.  It knows
+about the barometric pressure, the local humidity and it has a rough estimate of
+the GPS coordinates of the sprinkler if you need to turn it off from <a class="reference external" href="https://en.wikipedia.org/wiki/Northrop_Grumman_RQ-4_Global_Hawk">above</a>.</p>
+<p>We will feed the sprinkler some data, so it will know how long to keep the water
+on, what its API key is, what city and country it is in.  The construction
+of its active object will look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sprinkler</span> <span class="o">=</span> <span class="n">Sprinkler</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;sprinkler&#39;</span><span class="p">,</span>
+  <span class="n">city</span><span class="o">=</span><span class="s1">&#39;Vancouver&#39;</span><span class="p">,</span>
+  <span class="n">country</span><span class="o">=</span><span class="s1">&#39;CA&#39;</span><span class="p">,</span>
+  <span class="n">api_key</span><span class="o">=</span><span class="s1">&#39;b35975e18dc93725acb092f7272cc6b8&#39;</span><span class="p">,</span>
+  <span class="n">water_time_sec</span> <span class="o">=</span> <span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>There is so much we can do, but for now we will keep it simple.  The sprinkler
+will turn on and run for water_time_sec if:</p>
+<blockquote>
+<div><ul class="simple">
+<li>it is sunset, so that our water doesn’t immediately evaporate</li>
+<li>if it’s not raining are snowing</li>
+<li>if the daily expected minimum temperature is above 0 degrees Celsius.</li>
+</ul>
+</div></blockquote>
+<p>The weather details will be provided by the <code class="docutils literal notranslate"><span class="pre">Weather</span></code> event’s payload,
+<code class="docutils literal notranslate"><span class="pre">e.payload.weather.id</span></code> which are described <a class="reference external" href="https://openweathermap.org/weather-conditions">here</a>.</p>
 <a class="reference external image-reference" href="_static/sprinkler.pdf"><div align="center" class="align-center"><img alt="_images/sprinkler.svg" src="_images/sprinkler.svg" /></div>
 </a>
+<p>Here is the sprinkler code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Sprinkler</span><span class="p">(</span><span class="n">InstrumentedFactory</span><span class="p">):</span>
+
+  <span class="n">SPRINKLER_HEART_BEAT_SEC</span> <span class="o">=</span> <span class="mf">5.0</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">,</span>
+    <span class="n">city</span><span class="p">,</span>
+    <span class="n">country</span><span class="p">,</span>
+    <span class="n">api_key</span><span class="p">,</span>
+    <span class="n">water_time_sec</span><span class="p">,</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="p">,</span> <span class="n">live_spy</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">city_details</span> <span class="o">=</span> <span class="n">OpenWeatherMapCityDetails</span><span class="p">(</span><span class="s1">&#39;city_details&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">city_weather</span> <span class="o">=</span> <span class="n">CityWeather</span><span class="p">(</span><span class="s1">&#39;city_weather&#39;</span><span class="p">,</span> <span class="n">city</span><span class="p">,</span> <span class="n">country</span><span class="p">,</span> <span class="n">api_key</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">city</span> <span class="o">=</span> <span class="n">city</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">country</span> <span class="o">=</span> <span class="n">country</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">not_raining</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">water_time_sec</span> <span class="o">=</span> <span class="n">water_time_sec</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;common_behaviors&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">heart_beat</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors_heart_beat</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">WEATHER</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors_weather</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_summer</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors_to_summer</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">summer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;summer&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_winter</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">summer_to_winter</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_summer</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">summer_to_summer</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_day</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">summer_to_day</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_night</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">summer_to_night</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">night</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;night&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_night</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">night_to_night</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_day</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">night_to_day</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sprinkler_off_init_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">not_raining_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;not_raining_state&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">not_raining_init_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">not_raining_exit_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sprinkler_on</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;sprinkler_on&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sprinkler_on_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">done_watering</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sprinkler_on_done_watering</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sprinkler_on_exit_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sprinkler_off</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;sprinkler_off&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sprinkler_off_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">summer</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span><span class="o">.</span> \
+         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">night</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">summer</span><span class="p">)</span><span class="o">.</span> \
+         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">not_raining_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">night</span><span class="p">)</span><span class="o">.</span> \
+         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sprinkler_on</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">not_raining_state</span><span class="p">)</span><span class="o">.</span> \
+         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sprinkler_off</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">not_raining_state</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">common_behaviors_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">WEATHER</span><span class="p">))</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">turn_off_sprinkler</span><span class="p">()</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">heart_beat</span><span class="p">),</span>
+      <span class="n">times</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+      <span class="n">period</span><span class="o">=</span><span class="n">Sprinkler</span><span class="o">.</span><span class="n">SPRINKLER_HEART_BEAT_SEC</span><span class="p">,</span>
+      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">common_behaviors_heart_beat</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">GET_WEATHER</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">common_behaviors_weather</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+    <span class="c1"># https://openweathermap.org/weather-conditions</span>
+    <span class="k">if</span> <span class="mi">500</span> <span class="o">&lt;=</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">id</span> <span class="o">&lt;=</span> <span class="mi">531</span><span class="p">:</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">not_raining</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">not_raining</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="n">is_winter</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">is_winter</span> <span class="o">|=</span> <span class="mi">600</span> <span class="o">&lt;=</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">id</span> <span class="o">&lt;=</span> <span class="mi">622</span>
+    <span class="n">is_winter</span> <span class="o">|=</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="mi">511</span>
+    <span class="n">is_winter</span> <span class="o">|=</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">temp_min</span> <span class="o">&lt;</span> <span class="mf">0.0</span>
+    <span class="k">if</span> <span class="n">is_winter</span><span class="p">:</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_winter</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_summer</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">dt</span> <span class="o">&gt;</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">sunset</span><span class="p">:</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_night</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_day</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">common_behaviors_to_summer</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">summer</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">summer_to_winter</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">summer_to_summer</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">summer_to_day</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">summer_to_night</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">night</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">night_to_night</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">night_to_day</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">summer</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">sprinkler_off_init_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">not_raining</span><span class="p">:</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">not_raining_state</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">not_raining_init_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">sprinkler_on</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">not_raining_exit_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">done_watering</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">sprinkler_on_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">turn_on_sprinkler</span><span class="p">()</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">done_watering</span><span class="p">),</span>
+      <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">period</span><span class="o">=</span><span class="n">chart</span><span class="o">.</span><span class="n">water_time_sec</span><span class="p">,</span>
+      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">sprinkler_on_done_watering</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">sprinkler_off</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">sprinkler_on_exit_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">turn_off_sprinkler</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">sprinkler_off_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">turn_off_sprinkler</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">turn_on_sprinkler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;turn our sprinkler on&#39;&#39;&#39;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;turn the sprinkler on&#39;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">turn_off_sprinkler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;turn our sprinkler off&#39;&#39;&#39;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;turn the sprinkler off&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To test the code I wrote this at the bottom of the sprinkler.py file (which
+contains the entire example if you want to look at it):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sprinkler</span>  <span class="o">=</span> <span class="n">Sprinkler</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;sprinkler&#39;</span><span class="p">,</span>
+  <span class="n">city</span><span class="o">=</span><span class="s1">&#39;Vancouver&#39;</span><span class="p">,</span>
+  <span class="n">country</span><span class="o">=</span><span class="s1">&#39;CA&#39;</span><span class="p">,</span>
+  <span class="n">api_key</span><span class="o">=</span><span class="s1">&#39;b35975e18dc93725acb092f7272cc6b8&#39;</span><span class="p">,</span>
+  <span class="n">water_time_sec</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>I ran this code at night, after dark, when it was not raining and in the summer I saw this output:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">turn</span> <span class="n">the</span> <span class="n">sprinkler</span> <span class="n">off</span>
+<span class="p">[</span><span class="mi">22</span><span class="p">:</span><span class="mi">12</span><span class="p">:</span><span class="mi">14</span><span class="p">]</span> <span class="p">[</span><span class="n">sprinkler</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">common_behaviors</span>
+<span class="n">Vancouver</span><span class="p">:</span> <span class="mi">6173331</span>
+<span class="p">[</span><span class="mi">22</span><span class="p">:</span><span class="mi">12</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">sprinkler</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">to_summer</span><span class="p">()</span> <span class="n">common_behaviors</span><span class="o">-&gt;</span><span class="n">summer</span>
+<span class="n">turn</span> <span class="n">the</span> <span class="n">sprinkler</span> <span class="n">on</span>
+<span class="p">[</span><span class="mi">22</span><span class="p">:</span><span class="mi">12</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span> <span class="p">[</span><span class="n">sprinkler</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">to_night</span><span class="p">()</span> <span class="n">summer</span><span class="o">-&gt;</span><span class="n">sprinkler_on</span>
+<span class="n">turn</span> <span class="n">the</span> <span class="n">sprinkler</span> <span class="n">off</span>
+<span class="n">turn</span> <span class="n">the</span> <span class="n">sprinkler</span> <span class="n">off</span>
+<span class="p">[</span><span class="mi">22</span><span class="p">:</span><span class="mi">12</span><span class="p">:</span><span class="mi">30</span><span class="p">]</span> <span class="p">[</span><span class="n">sprinkler</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">done_watering</span><span class="p">()</span> <span class="n">sprinkler_on</span><span class="o">-&gt;</span><span class="n">sprinkler_off</span>
+</pre></div>
+</div>
+<p>Expressed as a sequence diagram:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Statechart</span><span class="p">:</span> <span class="n">sprinkler</span><span class="p">]</span>
+<span class="n">top</span>     <span class="n">common_behaviors</span>    <span class="n">summer</span>     <span class="n">sprinkler_on</span>       <span class="n">sprinkler_off</span>
+ <span class="o">+-</span><span class="n">start_at</span><span class="p">()</span><span class="o">-&gt;|</span>              <span class="o">|</span>             <span class="o">|</span>                  <span class="o">|</span>
+ <span class="o">|</span>    <span class="p">(</span><span class="mi">1</span><span class="p">)</span>      <span class="o">|</span>              <span class="o">|</span>             <span class="o">|</span>                  <span class="o">|</span>
+ <span class="o">|</span>             <span class="o">+-</span><span class="n">to_summer</span><span class="p">()</span><span class="o">-&gt;|</span>             <span class="o">|</span>                  <span class="o">|</span>
+ <span class="o">|</span>             <span class="o">|</span>    <span class="p">(</span><span class="mi">2</span><span class="p">)</span>       <span class="o">|</span>             <span class="o">|</span>                  <span class="o">|</span>
+ <span class="o">|</span>             <span class="o">|</span>              <span class="o">+-</span><span class="n">to_night</span><span class="p">()</span><span class="o">-&gt;|</span>                  <span class="o">|</span>
+ <span class="o">|</span>             <span class="o">|</span>              <span class="o">|</span>    <span class="p">(</span><span class="mi">3</span><span class="p">)</span>      <span class="o">|</span>                  <span class="o">|</span>
+ <span class="o">|</span>             <span class="o">|</span>              <span class="o">|</span>             <span class="o">+--</span><span class="n">done_watering</span><span class="p">()</span><span class="o">&gt;|</span>
+ <span class="o">|</span>             <span class="o">|</span>              <span class="o">|</span>             <span class="o">|</span>       <span class="p">(</span><span class="mi">4</span><span class="p">)</span>        <span class="o">|</span>
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li>The sprinkler active object started.  It created a five second <code class="docutils literal notranslate"><span class="pre">heart_beat</span></code>
+mulishot, which will run until the program is stopped, to request weather
+information every time it is triggered.</li>
+<li>After the first heart beat event was fired, a <code class="docutils literal notranslate"><span class="pre">GET_WEATHER</span></code> event was sent out.
+Upon receiving the resulting <code class="docutils literal notranslate"><span class="pre">WEATHER</span></code> event, it’s payload was examined and
+a <code class="docutils literal notranslate"><span class="pre">to_summer</span></code> and <code class="docutils literal notranslate"><span class="pre">to_night</span></code> events were placed in the first in first
+output buffer of the sprinkler’s statechart (<a class="reference internal" href="patterns.html#patterns-reminder"><span class="std std-ref">reminder pattern</span></a>).</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">to_summer</span></code> event was reacted to causing a transition into the summer
+state.</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">to_night</span></code> event was reacted to causing transition into the
+<code class="docutils literal notranslate"><span class="pre">sprinkler_on</span></code> state.</li>
+<li>Ten seconds elapses and the sprinkler turns off.</li>
+</ol>
+<p>We can see that our sprinkler worked after dark.  I ran the code the next
+morning to see what would happen:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">turn</span> <span class="n">the</span> <span class="n">sprinkler</span> <span class="n">off</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mo">05</span> <span class="mo">06</span><span class="p">:</span><span class="mo">03</span><span class="p">:</span><span class="mf">56.865036</span><span class="p">]</span> <span class="p">[</span><span class="n">sprinkler</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">common_behaviors</span>
+<span class="n">Vancouver</span><span class="p">:</span> <span class="mi">6173331</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mo">05</span> <span class="mo">06</span><span class="p">:</span><span class="mo">04</span><span class="p">:</span><span class="mf">02.056800</span><span class="p">]</span> <span class="p">[</span><span class="n">sprinkler</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">to_summer</span><span class="p">()</span> <span class="n">common_behaviors</span><span class="o">-&gt;</span><span class="n">summer</span>
+</pre></div>
+</div>
+<p>It didn’t turn on the sprinkler and that’s what we wanted.</p>
 <a class="reference internal" href="introduction.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="zero_to_one.html"><span class="std std-ref">next</span></a><div class="toctree-wrapper compound">
 </div>
 </div>

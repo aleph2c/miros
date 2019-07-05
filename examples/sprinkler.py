@@ -279,8 +279,9 @@ class OpenWeatherMapCityDetails(InstrumentedFactory):
   @staticmethod
   def conduct_query_entry_signal(chart, e):
     status = return_status.HANDLED
+    payload = chart.city_details_payload()
     chart.publish(Event(signal=signals.CITY_DETAILS,
-      payload=chart.city_details_payload()))
+                  payload=payload))
     chart.post_fifo(Event(signal=signals.ready))
     return status
 
@@ -471,7 +472,8 @@ class CityWeather(InstrumentedFactory):
     status = return_status.HANDLED 
     if e.payload.city == chart.city and \
        e.payload.country == chart.country:
-      print(e.payload)
+      pass
+      #print(e.payload)
     return status
 
   @staticmethod
@@ -551,18 +553,230 @@ class CityWeather(InstrumentedFactory):
     )
     return status
 
+class Sprinkler(InstrumentedFactory):
+
+  SPRINKLER_HEART_BEAT_SEC = 5.0
+
+  def __init__(self,
+    name,
+    city,
+    country,
+    api_key,
+    water_time_sec,
+    live_trace=None,
+    live_spy=None):
+
+    super().__init__(name, live_trace, live_spy)
+    self.city_details = OpenWeatherMapCityDetails('city_details')
+    self.city_weather = CityWeather('city_weather', city, country, api_key)
+
+    self.city = city
+    self.country = country
+    self.not_raining = None
+    self.water_time_sec = water_time_sec
+
+    self.common_behaviors = self.create(state="common_behaviors"). \
+      catch(signal=signals.ENTRY_SIGNAL,
+        handler=self.common_behaviors_entry_signal). \
+      catch(signal=signals.heart_beat,
+        handler=self.common_behaviors_heart_beat). \
+      catch(signal=signals.WEATHER,
+        handler=self.common_behaviors_weather). \
+      catch(signal=signals.to_summer,
+        handler=self.common_behaviors_to_summer). \
+      to_method()
+
+    self.summer = self.create(state="summer"). \
+      catch(signal=signals.to_winter,
+        handler=self.summer_to_winter). \
+      catch(signal=signals.to_summer,
+        handler=self.summer_to_summer). \
+      catch(signal=signals.to_day,
+        handler=self.summer_to_day). \
+      catch(signal=signals.to_night,
+        handler=self.summer_to_night). \
+      to_method()
+
+    self.night = self.create(state="night"). \
+      catch(signal=signals.to_night,
+        handler=self.night_to_night). \
+      catch(signal=signals.to_day,
+        handler=self.night_to_day). \
+      catch(signal=signals.INIT_SIGNAL,
+        handler=self.sprinkler_off_init_signal). \
+      to_method()
+
+    self.not_raining_state = self.create(state="not_raining_state"). \
+      catch(signal=signals.INIT_SIGNAL,
+        handler=self.not_raining_init_signal). \
+      catch(signal=signals.EXIT_SIGNAL,
+        handler=self.not_raining_exit_signal). \
+      to_method()
+
+    self.sprinkler_on = self.create(state="sprinkler_on"). \
+      catch(signal=signals.ENTRY_SIGNAL,
+        handler=self.sprinkler_on_entry_signal). \
+      catch(signal=signals.done_watering,
+        handler=self.sprinkler_on_done_watering). \
+      catch(signal=signals.EXIT_SIGNAL,
+        handler=self.sprinkler_on_exit_signal). \
+      to_method()
+
+    self.sprinkler_off = self.create(state="sprinkler_off"). \
+      catch(signal=signals.ENTRY_SIGNAL,
+        handler=self.sprinkler_off_entry_signal). \
+      to_method()
+
+    self.nest(self.common_behaviors, parent=None). \
+         nest(self.summer, parent=self.common_behaviors). \
+         nest(self.night, parent=self.summer). \
+         nest(self.not_raining_state, parent=self.night). \
+         nest(self.sprinkler_on, parent=self.not_raining_state). \
+         nest(self.sprinkler_off, parent=self.not_raining_state)
+
+    self.start_at(self.common_behaviors)
+
+  @staticmethod
+  def common_behaviors_entry_signal(chart, e):
+    status = return_status.HANDLED
+    chart.subscribe(Event(signal=signals.WEATHER))
+    chart.turn_off_sprinkler()
+    chart.post_fifo(
+      Event(signal=signals.heart_beat),
+      times=0,
+      period=Sprinkler.SPRINKLER_HEART_BEAT_SEC,
+      deferred=True)
+    return status
+
+  @staticmethod
+  def common_behaviors_heart_beat(chart, e):
+    status = return_status.HANDLED
+    chart.publish(Event(signal=signals.GET_WEATHER))
+    return status
+
+  @staticmethod
+  def common_behaviors_weather(chart, e):
+    status = return_status.HANDLED
+
+    # https://openweathermap.org/weather-conditions
+    if 500 <= e.payload.weather.id <= 531:
+      chart.not_raining = False
+    else:
+      chart.not_raining = True
+
+    is_winter = False
+    is_winter |= 600 <= e.payload.weather.id <= 622
+    is_winter |= e.payload.weather.id == 511
+    is_winter |= e.payload.temp_min < 0.0
+    if is_winter:
+      chart.post_fifo(Event(signal=signals.to_winter))
+    else:
+      chart.post_fifo(Event(signal=signals.to_summer))
+
+    if e.payload.dt > e.payload.sunset:
+      chart.post_fifo(Event(signal=signals.to_night))
+    else:
+      chart.post_fifo(Event(signal=signals.to_day))
+
+    return status
+
+  @staticmethod
+  def common_behaviors_to_summer(chart, e):
+    status = chart.trans(chart.summer)
+    return status
+
+  @staticmethod
+  def summer_to_winter(chart, e):
+    status = chart.trans(chart.common_behaviors)
+    return status
+
+  @staticmethod
+  def summer_to_summer(chart, e):
+    status = return_status.HANDLED
+    return status
+
+  @staticmethod
+  def summer_to_day(chart, e):
+    status = return_status.HANDLED
+    return status
+
+  @staticmethod
+  def summer_to_night(chart, e):
+    status = chart.trans(chart.night)
+    return status
+
+  @staticmethod
+  def night_to_night(chart, e):
+    status = return_status.HANDLED
+    return status
+
+  @staticmethod
+  def night_to_day(chart, e):
+    status = chart.trans(chart.summer)
+    return status
+
+  @staticmethod
+  def sprinkler_off_init_signal(chart, e):
+    status = return_status.HANDLED
+    if chart.not_raining:
+      status = chart.trans(chart.not_raining_state)
+    return status
+
+  @staticmethod
+  def not_raining_init_signal(chart, e):
+    status = chart.trans(chart.sprinkler_on)
+    return status
+
+  def not_raining_exit_signal(chart, e):
+    status = return_status.HANDLED
+    chart.cancel_events(Event(signal=signals.done_watering))
+    return status
+
+  @staticmethod
+  def sprinkler_on_entry_signal(chart, e):
+    status = return_status.HANDLED
+    chart.turn_on_sprinkler()
+    chart.post_fifo(
+      Event(signal=signals.done_watering),
+      times=1,
+      period=chart.water_time_sec,
+      deferred=True)
+    return status
+
+  @staticmethod
+  def sprinkler_on_done_watering(chart, e):
+    status = chart.trans(chart.sprinkler_off)
+    return status
+
+  @staticmethod
+  def sprinkler_on_exit_signal(chart, e):
+    status = return_status.HANDLED
+    chart.turn_off_sprinkler()
+    return status
+
+  @staticmethod
+  def sprinkler_off_entry_signal(chart, e):
+    status = return_status.HANDLED
+    chart.turn_off_sprinkler()
+    return status
+
+  def turn_on_sprinkler(self):
+    '''turn our sprinkler on'''
+    print('turn the sprinkler on')
+
+  def turn_off_sprinkler(self):
+    '''turn our sprinkler off'''
+    print('turn the sprinkler off')
+
+
 if __name__ == "__main__":
-  owm = OpenWeatherMapCityDetails('city_details', live_trace=True)
-  cw  = CityWeather(
-    name='city_weather',
+  sprinkler  = Sprinkler(
+    name='sprinkler',
     city='Vancouver',
     country='CA',
     api_key='b35975e18dc93725acb092f7272cc6b8',
+    water_time_sec = 10,
     live_trace=True)
 
-  for i in range(10):
-    cw.publish(Event(signal=signals.GET_WEATHER))
-    time.sleep(5)
-
-
+  time.sleep(300)
 

@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="14.3.0">
-  <zoom_level>10</zoom_level>
+  <zoom_level>8</zoom_level>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>420</x>
-      <y>870</y>
-      <w>370</w>
-      <h>150</h>
+      <x>728</x>
+      <y>480</y>
+      <w>192</w>
+      <h>160</h>
     </coordinates>
     <panel_attributes>*sprinker_on*
 --
 entry /
-   chart.turn_on_sprinker()
-	chart.post_fifo(
-	  Event(signal=signals.done_watering,
-	    period=chart.water_time_sec,
-	    times=1,
-	    deferred=True))
+  chart.turn_on_sprinker()
+  chart.post_fifo(
+    Event(signal=signals.done_watering,
+      period=chart.water_time_sec,
+      times=1,
+      deferred=True))
+      
 exit /
-  chart.turn_off_sprinker()
+  chart.turn_off_sprinkler()
+  
 valign=top
 layer=2
 </panel_attributes>
@@ -28,30 +30,16 @@ layer=2
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>470</x>
-      <y>1070</y>
-      <w>200</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>*sprinker_off*
---
-
-valign=top
-layer=2
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLState</id>
-    <coordinates>
-      <x>260</x>
-      <y>840</y>
-      <w>570</w>
-      <h>320</h>
+      <x>680</x>
+      <y>416</y>
+      <w>288</w>
+      <h>344</h>
     </coordinates>
     <panel_attributes>*not_raining*
 --
-
+exit /
+  chart.cancel_events(Event(signal=signals.done_watering))
+  
 valign=top
 layer=2
 </panel_attributes>
@@ -60,10 +48,10 @@ layer=2
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>200</x>
-      <y>890</y>
-      <w>20</w>
-      <h>20</h>
+      <x>600</x>
+      <y>632</y>
+      <w>16</w>
+      <h>16</h>
     </coordinates>
     <panel_attributes>type=initial
 layer=3</panel_attributes>
@@ -72,87 +60,87 @@ layer=3</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>900</x>
-      <y>780</y>
-      <w>130</w>
-      <h>40</h>
-    </coordinates>
-    <panel_attributes>to_summer
-lt=-&gt;
-layer=3</panel_attributes>
-    <additional_attributes>110.0;20.0;10.0;20.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>510</x>
-      <y>1010</y>
-      <w>110</w>
-      <h>80</h>
-    </coordinates>
-    <panel_attributes>done_watering
-lt=-&gt;
-layer=3</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>200</x>
-      <y>890</y>
-      <w>80</w>
-      <h>30</h>
-    </coordinates>
-    <panel_attributes>lt=-&gt;
-layer=3</panel_attributes>
-    <additional_attributes>10.0;10.0;60.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>80</x>
-      <y>880</y>
-      <w>120</w>
-      <h>40</h>
-    </coordinates>
-    <panel_attributes>to_night
-lt=-&gt;
-layer=3</panel_attributes>
-    <additional_attributes>10.0;20.0;100.0;20.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>80</x>
-      <y>840</y>
-      <w>120</w>
-      <h>40</h>
-    </coordinates>
-    <panel_attributes>to_day
-lt=-&gt;
-layer=3</panel_attributes>
-    <additional_attributes>100.0;20.0;10.0;20.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>900</x>
-      <y>740</y>
-      <w>130</w>
-      <h>40</h>
+      <x>264</x>
+      <y>744</y>
+      <w>288</w>
+      <h>32</h>
     </coordinates>
     <panel_attributes>to_winter
 lt=-&gt;
 layer=3</panel_attributes>
-    <additional_attributes>10.0;20.0;110.0;20.0</additional_attributes>
+    <additional_attributes>340.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>808</x>
+      <y>632</y>
+      <w>88</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>done_watering
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>600</x>
+      <y>632</y>
+      <w>96</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;100.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>528</x>
+      <y>544</y>
+      <w>80</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>to_night
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;20.0;80.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>528</x>
+      <y>512</y>
+      <w>80</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>to_day
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>80.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>264</x>
+      <y>696</y>
+      <w>288</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>to_summer
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;20.0;340.0;20.0</additional_attributes>
   </element>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>300</x>
-      <y>1050</y>
-      <w>20</w>
-      <h>20</h>
+      <x>696</x>
+      <y>592</y>
+      <w>16</w>
+      <h>16</h>
     </coordinates>
     <panel_attributes>type=initial
 layer=3</panel_attributes>
@@ -161,22 +149,22 @@ layer=3</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>300</x>
-      <y>940</y>
-      <w>140</w>
-      <h>130</h>
+      <x>696</x>
+      <y>592</y>
+      <w>48</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 layer=3</panel_attributes>
-    <additional_attributes>10.0;110.0;10.0;10.0;120.0;10.0</additional_attributes>
+    <additional_attributes>10.0;10.0;40.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>260</x>
-      <y>920</y>
-      <w>170</w>
-      <h>30</h>
+      <x>592</x>
+      <y>608</y>
+      <w>104</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>[chart.not_raining]
 style=wordwrap
@@ -186,10 +174,10 @@ layer=3</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>40</x>
-      <y>400</y>
-      <w>20</w>
-      <h>20</h>
+      <x>256</x>
+      <y>376</y>
+      <w>16</w>
+      <h>16</h>
     </coordinates>
     <panel_attributes>
 bg=green
@@ -199,10 +187,10 @@ layer=3</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>40</x>
-      <y>370</y>
-      <w>20</w>
-      <h>20</h>
+      <x>256</x>
+      <y>344</y>
+      <w>16</w>
+      <h>16</h>
     </coordinates>
     <panel_attributes>
 bg=red
@@ -212,10 +200,10 @@ layer=3</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>20</x>
-      <y>20</y>
-      <w>100</w>
-      <h>30</h>
+      <x>240</x>
+      <y>120</y>
+      <w>80</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>*Factory*</panel_attributes>
     <additional_attributes/>
@@ -223,10 +211,10 @@ layer=3</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>60</x>
-      <y>40</y>
-      <w>30</w>
-      <h>60</h>
+      <x>272</x>
+      <y>136</y>
+      <w>24</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-
 layer=3</panel_attributes>
@@ -235,10 +223,10 @@ layer=3</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>260</x>
-      <y>20</y>
-      <w>230</w>
-      <h>30</h>
+      <x>432</x>
+      <y>120</y>
+      <w>184</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>*OpenWeatherMapCityDetails*</panel_attributes>
     <additional_attributes/>
@@ -246,10 +234,10 @@ layer=3</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>140</x>
-      <y>20</y>
-      <w>100</w>
-      <h>30</h>
+      <x>336</x>
+      <y>120</y>
+      <w>80</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>*CityWeather*</panel_attributes>
     <additional_attributes/>
@@ -257,10 +245,10 @@ layer=3</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>180</x>
-      <y>40</y>
-      <w>30</w>
-      <h>60</h>
+      <x>368</x>
+      <y>136</y>
+      <w>24</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
     <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
@@ -268,10 +256,10 @@ layer=3</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>350</x>
-      <y>40</y>
-      <w>30</w>
-      <h>60</h>
+      <x>504</x>
+      <y>136</y>
+      <w>24</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
     <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
@@ -279,10 +267,10 @@ layer=3</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>180</x>
-      <y>790</y>
-      <w>690</w>
-      <h>390</h>
+      <x>592</x>
+      <y>384</y>
+      <w>392</w>
+      <h>392</h>
     </coordinates>
     <panel_attributes>*night*
 --
@@ -295,14 +283,13 @@ layer=2
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>90</x>
-      <y>720</y>
-      <w>820</w>
-      <h>480</h>
+      <x>536</x>
+      <y>344</y>
+      <w>464</w>
+      <h>456</h>
     </coordinates>
     <panel_attributes>*summer*
 --
-entry /
 to_summer / {}
 to_day / {}
 valign=top
@@ -313,21 +300,17 @@ layer=2
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>60</x>
-      <y>220</y>
-      <w>950</w>
-      <h>1000</h>
+      <x>272</x>
+      <y>264</y>
+      <w>744</w>
+      <h>560</h>
     </coordinates>
-    <panel_attributes>*robotic_gardener_common_features*
+    <panel_attributes>*common_behaviors*
 --
 entry /
+  chart.post_fifo(Event(signal=signals.heart_beat), times=0, period=5, deferred=True)
   chart.turn_off_sprinkler()
-  chart.post_fifo(Event(signal=signals.heart_beat),
-    times=0,
-    period=5,
-    deferred=True)
-  chart.owmd = OpenWeatherMapCityDetails(list_trace=chart.live_trace)
-  chart.weather = CityWeather(city='Vancouver', country='CA', live_trace=chart.live_trace)
+  chart.subscribe(Event(signal=signals.WEATHER))
 
 heart_beat /
   chart.publish(Event(signal=signals.GET_WEATHER))
@@ -344,18 +327,16 @@ WEATHER as e /
   is_winter |= 511
   is_winter |= e.payload.temp_min &lt; 0.0
   if is_winter:
-    post_fifo(Event(signal=signals.to_winter))
+    chart.post_fifo(Event(signal=signals.to_winter))
   else:
-    post_fifo(Event(signal=signals.to_summer))
+    chart.post_fifo(Event(signal=signals.to_summer))
 
   if e.payload.dt &gt; e.payload.sunset:
-    post_fifo(Event(signal=signals.to_night))
+    chart.post_fifo(Event(signal=signals.to_night))
   else:
-    post_fifo(Event(signal=signals.to_day))
+    chart.post_fifo(Event(signal=signals.to_day))
   
-exit /
-  chart.owmd.stop()
-  chart.weather.stop()
+
 valign=top
 layer=2
 </panel_attributes>
@@ -364,22 +345,49 @@ layer=2
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>20</x>
-      <y>80</y>
-      <w>1020</w>
-      <h>1160</h>
+      <x>240</x>
+      <y>168</y>
+      <w>792</w>
+      <h>680</h>
     </coordinates>
     <panel_attributes>*Sprinkler*
 --
 city
 country
-is_raining
-api_key
+not_raining
 --
 turn_sprinkler_on()
 turn_sprinkler_off()
-stop()
 layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>984</x>
+      <y>232</y>
+      <w>24</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>736</x>
+      <y>688</y>
+      <w>176</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>*sprinker_off*
+--
+entry / 
+  chart.turn_off_sprinkler()
+valign=top
+layer=2
+</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>
