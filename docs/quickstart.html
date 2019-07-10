@@ -41,21 +41,26 @@
 </div></blockquote>
 <div class="section" id="quick-start">
 <span id="id1"></span><h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
-<p>If you know nothing about statecharts I suggest you start here: <a class="reference internal" href="zero_to_one.html#zero-to-one-zero-to-one"><span class="std std-ref">zero to
+<p>If you know nothing about statecharts, I suggest you start here: <a class="reference internal" href="zero_to_one.html#zero-to-one-zero-to-one"><span class="std std-ref">zero to
 one</span></a></p>
 <p>If you haven’t seen UML diagrams before, scan the <a class="reference internal" href="reading_diagrams.html#reading-diagrams-reading-diagrams"><span class="std std-ref">understanding diagrams</span></a> part of this guide to make sense of the
 pictures.</p>
-<p>If you are an embedded developer and want to port your working miros Python code to
-C/C++ for a considerable performance gain.  Check out this project: <a class="reference external" href="https://github.com/QuantumLeaps/qpc">qp codebase</a>.  It is documented here: <a class="reference external" href="https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download">Practical UML
-Statecharts in C/C++, 2nd Edition</a>.</p>
-<p>In the next section we will show how to tackle a problem using UML statecharts.</p>
+<p>If you are an embedded developer and want to port your working miros Python code
+to C/C++ for a considerable performance gain.  Check out this project: <a class="reference external" href="https://github.com/QuantumLeaps/qpc">qp
+codebase</a>.  It is documented here:
+<a class="reference external" href="https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download">Practical UML Statecharts in C/C++, 2nd Edition</a>.</p>
+<p>In the next section, we will show how to tackle a problem using UML statecharts.</p>
 <div class="section" id="a-networked-sprinkler">
 <span id="quickstart-a-quick-example"></span><h2>A Networked Sprinkler<a class="headerlink" href="#a-networked-sprinkler" title="Permalink to this headline">¶</a></h2>
-<p>Let’s use the Python miros library to build a sprinkler. This
-sprinkler will water our plants in the summer, after dark, and only when it is
-not raining.  To do this we will call out to the <a class="reference external" href="https://openweathermap.org/api">open weather api</a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You can look at this example’s code <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/sprinkler.py">here</a>.</p>
+</div>
+<p>Let’s use the Python miros library to build a sprinkler. This sprinkler will
+water our plants in the summer, after dark, and only when it is not raining.  To
+do this, we will call out to the <a class="reference external" href="https://openweathermap.org/api">open weather API</a>.</p>
 <a class="reference external image-reference" href="https://www.ijcaonline.org/archives/volume172/number6/28254-2017915160"><img alt="_images/sprinkler.jpg" class="align-center" src="_images/sprinkler.jpg" /></a>
-<p>Once the networked sprinkler knows which city its working in it should just turn
+<p>Once the networked sprinkler knows which city it’s working in it should just turn
 on and operate as if it could measure the weather conditions with local instruments.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">open</span> <span class="pre">weather</span></code> documentation recommends that we request city information
 using a city ID, so our software should extract this id from a file the <code class="docutils literal notranslate"><span class="pre">open</span>
@@ -73,7 +78,7 @@ extract the correct city ID for a given city and country
 by making calls to the open weather API (CityWeather).</li>
 </ul>
 </div></blockquote>
-<p>Here is a high level diagram of how these parts fit together and what they do:</p>
+<p>Here is a high-level diagram of how these parts fit together and what they do:</p>
 <a class="reference external image-reference" href="_static/sprinkler_high_level.pdf"><div align="center" class="align-center"><img alt="_images/sprinkler_high_level.svg" src="_images/sprinkler_high_level.svg" /></div>
 </a>
 <div class="admonition note">
@@ -89,35 +94,35 @@ Having independent objects interface in a statechart is called orthogonality in
 statechart theory.</p>
 <div class="section" id="figuring-out-what-information-will-be-passed-around">
 <span id="quickstart-figuring-out-what-information-will-be-passed-around"></span><h3>Figuring out what Information will be Passed Around<a class="headerlink" href="#figuring-out-what-information-will-be-passed-around" title="Permalink to this headline">¶</a></h3>
-<p>Let’s wave our hands an assume that the three active objects used in this
+<p>Let’s wave our hands and assume that the three active objects used in this
 designed have been built already and are working, but we want to figure out how
 they will communicate with one another.</p>
 <p>David Harel called such a thing, a <code class="docutils literal notranslate"><span class="pre">statocol</span></code> (state protocol):  what
 information will the statecharts need to share, so as a group, they will
-achieve our design goal; and give us our networked sprinkler:</p>
+achieve our design goal, and give us our networked sprinkler:</p>
 <a class="reference external image-reference" href="_static/sprinkler_high_level.pdf"><div align="center" class="align-center"><img alt="_images/sprinkler_high_level.svg" src="_images/sprinkler_high_level.svg" /></div>
 </a>
-<p>We need to figure out how to call the open weather api, with a city id, before it
-will return weather information for its location. This is the problem the
+<p>We need to figure out how to call the open weather API, with a city-id, before it
+returns weather information for its location. This is the problem the
 <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> object solves: it will provide the city id when we
 give it the city and country names of where we have placed the sprinkler.</p>
 <p>A rough sketch of the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> object will look like this:</p>
 <a class="reference external image-reference" href="_static/open_weather_map_city_details_medium.pdf"><div align="center" class="align-center"><img alt="_images/open_weather_map_city_details_medium.svg" src="_images/open_weather_map_city_details_medium.svg" /></div>
 </a>
 <p>This diagram shows us the input and output goals; for a city and a country
-return the open weather api’s city id.</p>
+return the open weather API’s city id.</p>
 <p><code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> will subscribe to and receive events called
 <code class="docutils literal notranslate"><span class="pre">REQUEST_DETAILS_FOR_CITY</span></code>.  Below this event is the namedtuple,
 <code class="docutils literal notranslate"><span class="pre">RequestDetailsForCityPayload</span></code>.  This is the immutable payload that will ride
-inside of the event.  Likewise the namedtuple called <code class="docutils literal notranslate"><span class="pre">CityDetailsPayload</span></code> will
+inside of the event.  Likewise, the namedtuple called <code class="docutils literal notranslate"><span class="pre">CityDetailsPayload</span></code> will
 ride inside of the <code class="docutils literal notranslate"><span class="pre">CITY_DETAILS</span></code> event.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>On interpreting the diagram:</p>
-<p class="last">All of the high level event interfaces will look like this one.  Arrows going
+<p class="last">All of the high-level event interfaces will look like this one.  Arrows going
 into the rounded rectangle beside the green dots are the published events
-that the object will consume.  Arrows leaving the object, beside the red
-dots, will be the events it publishes.  The namedtuples near the event’s name
+that the object will consume.  Arrows leaving the object, beside each red
+dot, will be the events it publishes.  The namedtuples near the event’s name
 will describe the payload data structure.</p>
 </div>
 <div class="admonition note">
@@ -129,7 +134,7 @@ want one thread to change this object while another thread is trying to read
 it, so as a rule use immutable objects as payloads when programming with miros
 (to avoid nasty multithreading bugs).</p>
 </div>
-<p>The high level event interface of the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> object looks like this:</p>
+<p>The high-level event interface of the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> object looks like this:</p>
 <a class="reference external image-reference" href="_static/city_weather_details_medium.pdf"><div align="center" class="align-center"><img alt="_images/city_weather_details_medium.svg" src="_images/city_weather_details_medium.svg" /></div>
 </a>
 <p>This diagram shows us the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> input and output goals: For a city and
@@ -137,26 +142,23 @@ a country get its city id, and when asked, return the weather information for
 that city.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p>On implimentation (and sausage making):</p>
-<p class="last">I wrote some prototype code, to poke at the open weather city api prior to
+<p>On implementation (and sausage making):</p>
+<p class="last">I wrote some prototype code, to poke at the open weather city API prior to
 designing this system.  I used the python debugger to break right after
 receiving a message from their service.  I compared what I was seeing with
 their documentation, then decided on what the payload data structures should
 look like.</p>
 </div>
-<p>Here is the high level interface diagram of the <code class="docutils literal notranslate"><span class="pre">Sprinkler</span></code>:</p>
+<p>Here is the high-level interface diagram of the <code class="docutils literal notranslate"><span class="pre">Sprinkler</span></code>:</p>
 <a class="reference external image-reference" href="_static/sprinkler_details_medium.pdf"><div align="center" class="align-center"><img alt="_images/sprinkler_details_medium.svg" src="_images/sprinkler_details_medium.svg" /></div>
 </a>
 <p>This diagram shows us the <code class="docutils literal notranslate"><span class="pre">Sprinkler</span></code> input and output goals: Ask for the
 weather and get the weather.</p>
 <p>There can be many events which all share the same name; an event’s name is
-called a signal.  An event of a particular signal, can also carry a python
-object with it.  As this event is passed through the system, the object that it
-is carrying stays linked to it.  A linked object is called a payload.  The miros
-library lets you link any python object to an event, or in other words, your
-Event can have any Python object as a payload.  However, we are limiting
-ourselves to only send namedtuples as payloads, because they are immutable and
-provide very nice syntax.</p>
+called a signal.  An event can also carry a python object
+with it as a payload.  In this design we are limiting ourselves only to send
+namedtuples as payloads, because they are immutable and provide very nice
+syntax.</p>
 <p>Here is how you would use the miros library to publish (public send) a
 <code class="docutils literal notranslate"><span class="pre">REQUEST_DETAILS_FOR_CITY</span></code> event:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">event</span>
@@ -262,11 +264,10 @@ of the robotic sprinkler Python file:</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>Now that we have a decent understanding about what information we want to flow
-in our system, let’s focus in on each part.</p>
+<p>Now that we have a decent understanding about what information we want to flow in our system let’s focus in on each part.</p>
 </div>
-<div class="section" id="openweathermapcitydetails-specifications">
-<span id="quickstart-openweathermapcitydetails-specifications"></span><h3>OpenWeatherMapCityDetails Specifications<a class="headerlink" href="#openweathermapcitydetails-specifications" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="openweathermapcitydetails">
+<span id="quickstart-openweathermapcitydetails-specifications"></span><h3>OpenWeatherMapCityDetails<a class="headerlink" href="#openweathermapcitydetails" title="Permalink to this headline">¶</a></h3>
 <p>Let’s start by looking at the rough sketch of the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code>
 object again:</p>
 <a class="reference external image-reference" href="_static/open_weather_map_city_details_medium.pdf"><div align="center" class="align-center"><img alt="_images/open_weather_map_city_details_medium.svg" src="_images/open_weather_map_city_details_medium.svg" /></div>
@@ -282,11 +283,11 @@ and some other city details.</p>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> needs to provide a city ID given a city and a
 country.</p>
-<p>This city ID will be used by the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> object to make a call
-to the open web API.  The open-weather website contains a compressed file called
+<p>This city ID will be used by the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> object to make a call to the
+open web API.  The open-weather website contains a compressed file called
 <code class="docutils literal notranslate"><span class="pre">city.list.json.gz</span></code> at
-<a class="reference external" href="http://bulk.openweathermap.org/sample/city.list.json.gz">http://bulk.openweathermap.org/sample/city.list.json.gz</a>.  If you have a
-city name and a country code, you can use this file to look up the city’s id.</p>
+<a class="reference external" href="http://bulk.openweathermap.org/sample/city.list.json.gz">http://bulk.openweathermap.org/sample/city.list.json.gz</a>.  If you have a city
+name and a country code, you can use this file to look up the city’s id.</p>
 <p>I have long term plans to pull the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> object out of
 the networked sprinkler and place it on a server somewhere.  This is because the
 <code class="docutils literal notranslate"><span class="pre">city.list.json.gz</span></code> file is really big, and I would like to cost reduce my
@@ -297,10 +298,10 @@ the same time.</p>
 already, and I would like the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> object to be
 resilient to network outages on the Open Weather website.  If it can’t download
 the file from the Open Weather server, it should wait ten seconds then try
-again.  While its waiting, it should place any request from <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code>
+again.  While it’s waiting, it should place any request from <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code>
 objects for city-ids into a queue which will be answered once it gets the
-information it needs.  Once it gets the file, it should answer any of its queued
-requests in a first in first out kind of way.</p>
+information it needs.  Once it receives the file, it should answer any of its
+queued requests in a first in first out kind of way.</p>
 <p>Here is the design, it uses the <a class="reference internal" href="patterns.html#patterns-deferred-event"><span class="std std-ref">deferred event</span></a>
 statechart pattern.</p>
 <a class="reference external image-reference" href="_static/open_weather_map_city_details.pdf"><div align="center" class="align-center"><img alt="_images/open_weather_map_city_details.svg" src="_images/open_weather_map_city_details.svg" /></div>
@@ -429,8 +430,8 @@ statechart pattern.</p>
 <span class="sd">       collection</span>
 
 <span class="sd">    **Returns**:</span>
-<span class="sd">       (CityDetailsPayload): namedtuple containing the city details needed for</span>
-<span class="sd">       the open weather API call</span>
+<span class="sd">       (CityDetailsPayload): namedtuple containing the city details</span>
+<span class="sd">       needed for the open weather API call</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">result</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="k">for</span> <span class="n">_id</span><span class="p">,</span> <span class="n">_dict</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_weather_lookup_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -629,8 +630,8 @@ like this:</p>
 (4,6,8,10) events until after it had downloaded the <code class="docutils literal notranslate"><span class="pre">city.list.json.qz</span></code> (1).
 So it works as designed.</p>
 </div>
-<div class="section" id="cityweather-specifications">
-<span id="quickstart-citydetails-specifications"></span><h3>CityWeather Specifications<a class="headerlink" href="#cityweather-specifications" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="cityweather">
+<span id="quickstart-citydetails-specifications"></span><h3>CityWeather<a class="headerlink" href="#cityweather" title="Permalink to this headline">¶</a></h3>
 <p>Let’s start by looking at the rough sketch of the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> active object
 again:</p>
 <a class="reference external image-reference" href="_static/city_weather_details_medium.pdf"><div align="center" class="align-center"><img alt="_images/city_weather_details_medium.svg" src="_images/city_weather_details_medium.svg" /></div>
@@ -1084,8 +1085,8 @@ sequence diagrams</span></a>:</p>
 <p>We haven’t tested the network error handling part of our system, but I would
 say the nominal behavior is working as designed.</p>
 </div>
-<div class="section" id="sprinkler-specifications">
-<span id="quickstart-sprinkler-specifications"></span><h3>Sprinkler Specifications<a class="headerlink" href="#sprinkler-specifications" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="sprinkler">
+<span id="quickstart-sprinkler-specifications"></span><h3>Sprinkler<a class="headerlink" href="#sprinkler" title="Permalink to this headline">¶</a></h3>
 <p>Let’s start by looking at the rough sketch of the <code class="docutils literal notranslate"><span class="pre">Sprinkler</span></code> active object again:</p>
 <a class="reference external image-reference" href="_static/sprinker_details_medium.pdf"><div align="center" class="align-center"><img alt="_images/sprinkler_details_medium.svg" src="_images/sprinkler_details_medium.svg" /></div>
 </a>
@@ -1379,11 +1380,11 @@ contains the entire example if you want to look at it):</p>
 <ol class="arabic simple">
 <li>The sprinkler active object started.  It created a five second <code class="docutils literal notranslate"><span class="pre">heart_beat</span></code>
 multishot, which will run until the program is stopped, to request weather
-information every time it is triggered.</li>
-<li>After the first heart beat event was fired, a <code class="docutils literal notranslate"><span class="pre">GET_WEATHER</span></code> event was sent out.
-Upon receiving the resulting <code class="docutils literal notranslate"><span class="pre">WEATHER</span></code> event, it’s payload was examined and
-a <code class="docutils literal notranslate"><span class="pre">to_summer</span></code> and <code class="docutils literal notranslate"><span class="pre">to_night</span></code> events were placed in the first in first
-output buffer of the sprinkler’s statechart (<a class="reference internal" href="patterns.html#patterns-reminder"><span class="std std-ref">reminder pattern</span></a>).</li>
+information every time it is triggered.  After the first heart beat event was
+fired, a <code class="docutils literal notranslate"><span class="pre">GET_WEATHER</span></code> event was sent out.  Upon receiving the resulting
+<code class="docutils literal notranslate"><span class="pre">WEATHER</span></code> event, it’s payload was examined and a <code class="docutils literal notranslate"><span class="pre">to_summer</span></code> and
+<code class="docutils literal notranslate"><span class="pre">to_night</span></code> events were placed in the first in first output buffer of the
+sprinkler’s statechart (<a class="reference internal" href="patterns.html#patterns-reminder"><span class="std std-ref">reminder pattern</span></a>).</li>
 <li>The <code class="docutils literal notranslate"><span class="pre">to_summer</span></code> event was reacted to causing a transition into the summer
 state.</li>
 <li>The <code class="docutils literal notranslate"><span class="pre">to_night</span></code> event was reacted to causing transition into the
@@ -1394,12 +1395,44 @@ event).</li>
 <p>We can see that our sprinkler worked after dark.  I ran the code the next
 morning to see what would happen:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">turn</span> <span class="n">the</span> <span class="n">sprinkler</span> <span class="n">off</span>
-<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mo">05</span> <span class="mo">06</span><span class="p">:</span><span class="mo">03</span><span class="p">:</span><span class="mf">56.865036</span><span class="p">]</span> <span class="p">[</span><span class="n">sprinkler</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">common_behaviors</span>
+<span class="p">[</span><span class="mo">06</span><span class="p">:</span><span class="mo">03</span><span class="p">:</span><span class="mf">56.86</span><span class="p">]</span> <span class="p">[</span><span class="n">sprinkler</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">common_behaviors</span>
 <span class="n">Vancouver</span><span class="p">:</span> <span class="mi">6173331</span>
-<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mo">05</span> <span class="mo">06</span><span class="p">:</span><span class="mo">04</span><span class="p">:</span><span class="mf">02.056800</span><span class="p">]</span> <span class="p">[</span><span class="n">sprinkler</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">to_summer</span><span class="p">()</span> <span class="n">common_behaviors</span><span class="o">-&gt;</span><span class="n">summer</span>
+<span class="p">[</span><span class="mo">06</span><span class="p">:</span><span class="mo">04</span><span class="p">:</span><span class="mf">02.056</span><span class="p">]</span> <span class="p">[</span><span class="n">sprinkler</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">to_summer</span><span class="p">()</span> <span class="n">common_behaviors</span><span class="o">-&gt;</span><span class="n">summer</span>
 </pre></div>
 </div>
 <p>It didn’t turn on the sprinkler and that’s what we wanted.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Refactoring ideas:</p>
+<p>Now that we have finished the example let’s look at ways to improve it:</p>
+<p>You could simplify this design by getting rid of the
+<code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code>, it is not needed:  When I was halfway through
+building the example, I noticed that you can call the open weather API with a
+city and a country at the same time.  This means you don’t need a city id to
+make a query, so you don’t need the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> active object.</p>
+<p>But, I left the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> active object in the example to
+show how to build, then gate-keep, resource-access inside of an active object.
+In this case the resource was a file that had to be downloaded and decompressed.
+But a resource could be a database, or a peripheral, or anything that could only
+be handled by one thread at a time.</p>
+<p>Then I came up with a contrived reason (future plans) about why this resource
+would be needed by many different client active-objects, and how you could serve
+these different clients while only letting one of them manipulate the resource
+at a time.  But the feature wasn’t needed, so you could simplify the
+<code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> active object to make a better product.</p>
+<p>The decision to allow multiple clients to access the
+<code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> at the same time made the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> more
+complicated than it needed to be.  When it received some <code class="docutils literal notranslate"><span class="pre">CITY_DETAILS</span></code> event,
+it needed to check to see if it was one that had the same city and country
+details that were stored in it’s attributes.  This kind of check wouldn’t be
+needed if the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> only served the one <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code>
+active object, or better yet, get rid of the need to get the details entirely
+and just call the Open Weather API with the country and city instead of using
+the city-id.</p>
+<p class="last">If we got rid of the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code> active object we would reduce
+the <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/sprinkler.py">sprinkler.py</a> file size
+by at least 126 lines (16 percent).</p>
+</div>
 <a class="reference internal" href="introduction.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="zero_to_one.html"><span class="std std-ref">next</span></a><div class="toctree-wrapper compound">
 </div>
 </div>
@@ -1420,9 +1453,9 @@ morning to see what would happen:</p>
 <li><a class="reference internal" href="#">Quick Start</a><ul>
 <li><a class="reference internal" href="#a-networked-sprinkler">A Networked Sprinkler</a><ul>
 <li><a class="reference internal" href="#figuring-out-what-information-will-be-passed-around">Figuring out what Information will be Passed Around</a></li>
-<li><a class="reference internal" href="#openweathermapcitydetails-specifications">OpenWeatherMapCityDetails Specifications</a></li>
-<li><a class="reference internal" href="#cityweather-specifications">CityWeather Specifications</a></li>
-<li><a class="reference internal" href="#sprinkler-specifications">Sprinkler Specifications</a></li>
+<li><a class="reference internal" href="#openweathermapcitydetails">OpenWeatherMapCityDetails</a></li>
+<li><a class="reference internal" href="#cityweather">CityWeather</a></li>
+<li><a class="reference internal" href="#sprinkler">Sprinkler</a></li>
 </ul>
 </li>
 </ul>

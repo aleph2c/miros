@@ -8,36 +8,40 @@
 
 Quick Start
 ===========
-If you know nothing about statecharts I suggest you start here: :ref:`zero to
+If you know nothing about statecharts, I suggest you start here: :ref:`zero to
 one <zero_to_one-zero-to-one>`
 
 If you haven't seen UML diagrams before, scan the :ref:`understanding diagrams
 <reading_diagrams-reading-diagrams>` part of this guide to make sense of the
 pictures.
 
-If you are an embedded developer and want to port your working miros Python code to
-C/C++ for a considerable performance gain.  Check out this project: `qp codebase
-<https://github.com/QuantumLeaps/qpc>`_.  It is documented here: `Practical UML
-Statecharts in C/C++, 2nd Edition
+If you are an embedded developer and want to port your working miros Python code
+to C/C++ for a considerable performance gain.  Check out this project: `qp
+codebase <https://github.com/QuantumLeaps/qpc>`_.  It is documented here:
+`Practical UML Statecharts in C/C++, 2nd Edition
 <https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download>`_.
 
-In the next section we will show how to tackle a problem using UML statecharts.
+In the next section, we will show how to tackle a problem using UML statecharts.
 
 .. _quickstart-a-quick-example:
 
 A Networked Sprinkler
 ---------------------
+.. note::
 
-Let's use the Python miros library to build a sprinkler. This
-sprinkler will water our plants in the summer, after dark, and only when it is
-not raining.  To do this we will call out to the `open weather api
+   You can look at this example's code `here
+   <https://github.com/aleph2c/miros/blob/master/examples/sprinkler.py>`_.
+
+Let's use the Python miros library to build a sprinkler. This sprinkler will
+water our plants in the summer, after dark, and only when it is not raining.  To
+do this, we will call out to the `open weather API
 <https://openweathermap.org/api>`_.
 
 .. image:: _static/sprinkler.jpg
     :target: https://www.ijcaonline.org/archives/volume172/number6/28254-2017915160
     :align: center
 
-Once the networked sprinkler knows which city its working in it should just turn
+Once the networked sprinkler knows which city it's working in it should just turn
 on and operate as if it could measure the weather conditions with local instruments.
 
 The ``open weather`` documentation recommends that we request city information
@@ -55,7 +59,7 @@ together:
    * something that will act like a weather station attached to the sprinkler,
      by making calls to the open weather API (CityWeather).
 
-Here is a high level diagram of how these parts fit together and what they do:
+Here is a high-level diagram of how these parts fit together and what they do:
 
 .. image:: _static/sprinkler_high_level.svg
     :target: _static/sprinkler_high_level.pdf
@@ -78,20 +82,20 @@ statechart theory.
 
 Figuring out what Information will be Passed Around
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Let's wave our hands an assume that the three active objects used in this
+Let's wave our hands and assume that the three active objects used in this
 designed have been built already and are working, but we want to figure out how
 they will communicate with one another.
 
 David Harel called such a thing, a ``statocol`` (state protocol):  what
 information will the statecharts need to share, so as a group, they will
-achieve our design goal; and give us our networked sprinkler:
+achieve our design goal, and give us our networked sprinkler:
 
 .. image:: _static/sprinkler_high_level.svg
     :target: _static/sprinkler_high_level.pdf
     :align: center
 
-We need to figure out how to call the open weather api, with a city id, before it
-will return weather information for its location. This is the problem the
+We need to figure out how to call the open weather API, with a city-id, before it
+returns weather information for its location. This is the problem the
 ``OpenWeatherMapCityDetails`` object solves: it will provide the city id when we
 give it the city and country names of where we have placed the sprinkler.
 
@@ -102,22 +106,22 @@ A rough sketch of the ``OpenWeatherMapCityDetails`` object will look like this:
     :align: center
 
 This diagram shows us the input and output goals; for a city and a country
-return the open weather api's city id.  
+return the open weather API's city id.  
 
 ``OpenWeatherMapCityDetails`` will subscribe to and receive events called
 ``REQUEST_DETAILS_FOR_CITY``.  Below this event is the namedtuple,
 ``RequestDetailsForCityPayload``.  This is the immutable payload that will ride
-inside of the event.  Likewise the namedtuple called ``CityDetailsPayload`` will
+inside of the event.  Likewise, the namedtuple called ``CityDetailsPayload`` will
 ride inside of the ``CITY_DETAILS`` event.
 
 .. note::
 
    On interpreting the diagram:
 
-   All of the high level event interfaces will look like this one.  Arrows going
+   All of the high-level event interfaces will look like this one.  Arrows going
    into the rounded rectangle beside the green dots are the published events
-   that the object will consume.  Arrows leaving the object, beside the red
-   dots, will be the events it publishes.  The namedtuples near the event's name
+   that the object will consume.  Arrows leaving the object, beside each red
+   dot, will be the events it publishes.  The namedtuples near the event's name
    will describe the payload data structure.
 
 .. note::
@@ -131,7 +135,7 @@ ride inside of the ``CITY_DETAILS`` event.
    (to avoid nasty multithreading bugs).
 
 
-The high level event interface of the ``CityWeather`` object looks like this:
+The high-level event interface of the ``CityWeather`` object looks like this:
 
 .. image:: _static/city_weather_details_medium.svg
     :target: _static/city_weather_details_medium.pdf
@@ -143,15 +147,15 @@ that city.
 
 .. note::
 
-  On implimentation (and sausage making):
+  On implementation (and sausage making):
 
-  I wrote some prototype code, to poke at the open weather city api prior to
+  I wrote some prototype code, to poke at the open weather city API prior to
   designing this system.  I used the python debugger to break right after
   receiving a message from their service.  I compared what I was seeing with
   their documentation, then decided on what the payload data structures should
   look like.
 
-Here is the high level interface diagram of the ``Sprinkler``:
+Here is the high-level interface diagram of the ``Sprinkler``:
 
 .. image:: _static/sprinkler_details_medium.svg
     :target: _static/sprinkler_details_medium.pdf
@@ -161,13 +165,10 @@ This diagram shows us the ``Sprinkler`` input and output goals: Ask for the
 weather and get the weather.
 
 There can be many events which all share the same name; an event's name is
-called a signal.  An event of a particular signal, can also carry a python
-object with it.  As this event is passed through the system, the object that it
-is carrying stays linked to it.  A linked object is called a payload.  The miros
-library lets you link any python object to an event, or in other words, your
-Event can have any Python object as a payload.  However, we are limiting
-ourselves to only send namedtuples as payloads, because they are immutable and
-provide very nice syntax.
+called a signal.  An event can also carry a python object
+with it as a payload.  In this design we are limiting ourselves only to send
+namedtuples as payloads, because they are immutable and provide very nice
+syntax.
 
 Here is how you would use the miros library to publish (public send) a
 ``REQUEST_DETAILS_FOR_CITY`` event:
@@ -278,13 +279,12 @@ of the robotic sprinkler Python file:
      ]
    )
 
-Now that we have a decent understanding about what information we want to flow
-in our system, let's focus in on each part.
+Now that we have a decent understanding about what information we want to flow in our system let's focus in on each part.
 
 .. _quickstart-openweathermapcitydetails-specifications:
 
-OpenWeatherMapCityDetails Specifications
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OpenWeatherMapCityDetails
+^^^^^^^^^^^^^^^^^^^^^^^^^
 Let's start by looking at the rough sketch of the ``OpenWeatherMapCityDetails``
 object again:
 
@@ -307,11 +307,12 @@ This is how we would like to build the object:
 The ``OpenWeatherMapCityDetails`` needs to provide a city ID given a city and a
 country.
 
-This city ID will be used by the ``CityWeather`` object to make a call
-to the open web API.  The open-weather website contains a compressed file called
+This city ID will be used by the ``CityWeather`` object to make a call to the
+open web API.  The open-weather website contains a compressed file called
 ``city.list.json.gz`` at
-`http://bulk.openweathermap.org/sample/city.list.json.gz <http://bulk.openweathermap.org/sample/city.list.json.gz>`_.  If you have a
-city name and a country code, you can use this file to look up the city's id.
+`http://bulk.openweathermap.org/sample/city.list.json.gz
+<http://bulk.openweathermap.org/sample/city.list.json.gz>`_.  If you have a city
+name and a country code, you can use this file to look up the city's id.
 
 I have long term plans to pull the ``OpenWeatherMapCityDetails`` object out of
 the networked sprinkler and place it on a server somewhere.  This is because the
@@ -324,10 +325,10 @@ I only want to download the ``city.list.json.gz`` file if I don't have it
 already, and I would like the ``OpenWeatherMapCityDetails`` object to be
 resilient to network outages on the Open Weather website.  If it can't download
 the file from the Open Weather server, it should wait ten seconds then try
-again.  While its waiting, it should place any request from ``CityWeather``
+again.  While it's waiting, it should place any request from ``CityWeather``
 objects for city-ids into a queue which will be answered once it gets the
-information it needs.  Once it gets the file, it should answer any of its queued
-requests in a first in first out kind of way.
+information it needs.  Once it receives the file, it should answer any of its
+queued requests in a first in first out kind of way.
 
 Here is the design, it uses the :ref:`deferred event <patterns-deferred-event>`
 statechart pattern.
@@ -463,8 +464,8 @@ From the design we can write our code (compacted to fit on the page):
          collection
 
       **Returns**:
-         (CityDetailsPayload): namedtuple containing the city details needed for
-         the open weather API call
+         (CityDetailsPayload): namedtuple containing the city details 
+         needed for the open weather API call
       '''
       result = None
       for _id, _dict in self.raw_weather_lookup_dict.items():
@@ -674,8 +675,8 @@ So it works as designed.
 
 .. _quickstart-citydetails-specifications:
 
-CityWeather Specifications
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+CityWeather
+^^^^^^^^^^^
 Let's start by looking at the rough sketch of the ``CityWeather`` active object
 again:
 
@@ -1147,8 +1148,8 @@ say the nominal behavior is working as designed.
 
 .. _quickstart-sprinkler-specifications:
 
-Sprinkler Specifications
-^^^^^^^^^^^^^^^^^^^^^^^^
+Sprinkler
+^^^^^^^^^
 Let's start by looking at the rough sketch of the ``Sprinkler`` active object again:
 
 .. image:: _static/sprinkler_details_medium.svg
@@ -1464,17 +1465,17 @@ Expressed as a sequence diagram:
 
 1. The sprinkler active object started.  It created a five second ``heart_beat``
    multishot, which will run until the program is stopped, to request weather
-   information every time it is triggered.
-2. After the first heart beat event was fired, a ``GET_WEATHER`` event was sent out.
-   Upon receiving the resulting ``WEATHER`` event, it's payload was examined and
-   a ``to_summer`` and ``to_night`` events were placed in the first in first
-   output buffer of the sprinkler's statechart (:ref:`reminder pattern <patterns-reminder>`).
-3. The ``to_summer`` event was reacted to causing a transition into the summer
+   information every time it is triggered.  After the first heart beat event was
+   fired, a ``GET_WEATHER`` event was sent out.  Upon receiving the resulting
+   ``WEATHER`` event, it's payload was examined and a ``to_summer`` and
+   ``to_night`` events were placed in the first in first output buffer of the
+   sprinkler's statechart (:ref:`reminder pattern <patterns-reminder>`).
+2. The ``to_summer`` event was reacted to causing a transition into the summer
    state.
-4. The ``to_night`` event was reacted to causing transition into the
+3. The ``to_night`` event was reacted to causing transition into the
    ``sprinkler_on`` state. (it wasn't at the time of the last ``WEATHER``
    event).
-5. Ten seconds elapses and the sprinkler turns off.
+4. Ten seconds elapses and the sprinkler turns off.
 
 We can see that our sprinkler worked after dark.  I ran the code the next
 morning to see what would happen:
@@ -1482,11 +1483,51 @@ morning to see what would happen:
 .. code-block:: python
   
   turn the sprinkler off
-  [2019-07-05 06:03:56.865036] [sprinkler] e->start_at() top->common_behaviors
+  [06:03:56.86] [sprinkler] e->start_at() top->common_behaviors
   Vancouver: 6173331
-  [2019-07-05 06:04:02.056800] [sprinkler] e->to_summer() common_behaviors->summer
+  [06:04:02.056] [sprinkler] e->to_summer() common_behaviors->summer
 
 It didn't turn on the sprinkler and that's what we wanted.
+
+.. note::
+
+  Refactoring ideas:
+
+  Now that we have finished the example let's look at ways to improve it:
+
+  You could simplify this design by getting rid of the
+  ``OpenWeatherMapCityDetails``, it is not needed:  When I was halfway through
+  building the example, I noticed that you can call the open weather API with a
+  city and a country at the same time.  This means you don't need a city id to
+  make a query, so you don't need the ``OpenWeatherMapCityDetails`` active object.
+
+  But, I left the ``OpenWeatherMapCityDetails`` active object in the example to
+  show how to build, then gate-keep, resource-access inside of an active object.
+  In this case the resource was a file that had to be downloaded and decompressed.
+  But a resource could be a database, or a peripheral, or anything that could only
+  be handled by one thread at a time.
+
+  Then I came up with a contrived reason (future plans) about why this resource
+  would be needed by many different client active-objects, and how you could serve
+  these different clients while only letting one of them manipulate the resource
+  at a time.  But the feature wasn't needed, so you could simplify the
+  ``OpenWeatherMapCityDetails`` active object to make a better product.
+
+  The decision to allow multiple clients to access the
+  ``OpenWeatherMapCityDetails`` at the same time made the ``CityWeather`` more
+  complicated than it needed to be.  When it received some ``CITY_DETAILS`` event,
+  it needed to check to see if it was one that had the same city and country
+  details that were stored in it's attributes.  This kind of check wouldn't be
+  needed if the ``OpenWeatherMapCityDetails`` only served the one ``CityWeather``
+  active object, or better yet, get rid of the need to get the details entirely
+  and just call the Open Weather API with the country and city instead of using
+  the city-id.
+
+  If we got rid of the ``OpenWeatherMapCityDetails`` active object we would reduce
+  the `sprinkler.py
+  <https://github.com/aleph2c/miros/blob/master/examples/sprinkler.py>`_ file size
+  by at least 126 lines (16 percent).
+
 
 .. raw:: html
 

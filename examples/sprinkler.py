@@ -98,7 +98,7 @@ class OpenWeatherMapCityDetails(InstrumentedFactory):
 
     self.city = None
     self.country = None
-    self.city_id = 6173331
+    self.city_id = None
     self.lookup_file_url = OpenWeatherMapCityDetails.DEFAULT_LOOKUP_FILE_URL
     self.lookup_file_name = OpenWeatherMapCityDetails.LOOKUP_FILE_PATH if lookup_file_url == None else lookup_file_url
 

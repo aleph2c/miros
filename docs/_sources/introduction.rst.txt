@@ -62,8 +62,8 @@ But “statecharts” build from the miros library, each act as if they were run
 on their own computer, so they can pass messages like cells pass messages. When
 a message is passed this way, it is called an event. This means that we have to
 re-name our objects to something else to differentiate them from instantiated
-Frankenstein structures, very much like Alan Kay did. We will call our living
-objects, active objects.
+Frankenstein structures, very much like Alan Kay did. An object that runs in
+it's own thread is called an active object.
 
 .. note::
 
@@ -187,7 +187,7 @@ statecharts ended up containing contradictions, which led to fragmentation.
 
 In the early 2000s Dr. Miro Samek liberated statechart theory from proprietary
 model-driven software by implementing a statechart framework in c/C++, and then
-he show everyone how he did it. He wrote two different books and a series of articles.
+he showed everyone how he did it. He wrote two different books and a series of articles.
 Miro Samek took a `code-centric` approach; showing how to build his framework
 using c/C++ in his code listings. If you were to become confused by a term or a
 diagram, you could just look at his working code and see what he meant.
@@ -197,7 +197,7 @@ constraints that confine a developer while they write code for small processors.
 He refactored the Harel formalism to be more performant and practical. Then he
 published the code that solves the topological problems needed to make it easy
 for a statechart designer to translate their pictures into working solutions,
-without having to solve these problem themselves; he called this code the event
+without having to solve these problems themselves; he called this code the event
 processor.
 
 .. note::
@@ -256,7 +256,7 @@ about it.
 
 Python has advanced significantly since the 90s. UML cannot capture all of the
 expressive power of the language, but it doesn't have to; if you don't know how
-to draw your intention (list comprehensions, etc.), your can just write the code onto
+to draw your intention (list comprehensions, etc.), you can just write the code onto
 your diagram.
 
 .. _introduction-what-this-documentation-will-provide:
