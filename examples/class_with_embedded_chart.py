@@ -1,3 +1,4 @@
+# class_with_embedded_chart.py
 import time
 from collections import namedtuple
 

@@ -96,7 +96,7 @@ pictures.</p>
 <p>Be aware that as you draw your pictures, you will lock-in your thinking.</p>
 <p>You and everyone on your team will be effected by the Sunk Cost Fallacy:  “Your
 decisions are tainted by the emotional investments you accumulate, and the more
-you invest in something the harder it becomes to abandon”. <a class="footnote-reference" href="#id3" id="id1">[1]</a></p>
+you invest in something the harder it becomes to abandon”. <a class="footnote-reference" href="#id7" id="id1">[1]</a></p>
 <p>If you build beautiful drawings with a graphic design application; you will need
 to put time and effort into them and you will probably become emotionally
 attached to them.  Remember, your diagrams are just mistakes in the right
@@ -256,8 +256,9 @@ the source state, then add the EVT_A event to my fifo queue so that it can be
 run during my next RTC process, then transition to the target_state, but, if my
 guard code returns False, do not transition, but let the SIGNAL_NAME, propagate
 outward.”</p>
-<p>The above diagram written as code, could look like this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1"># name of file</span>
+<p>The above diagram written as <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/guard_example.py">code</a>,
+could look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1"># guard_example.py</span>
  <span class="kn">import</span> <span class="nn">time</span>
  <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
@@ -328,7 +329,10 @@ named “SIGNAL_NAME” while I am in source_state, or any of its inner states, 
 the guard, if it returns True, run the action().  When I have finished running
 the action, do not perform a state transition.  If the guard returned false,
 ignore this event and let it percolate outward to my super state”</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="kn">import</span> <span class="nn">time</span>
+<p>The above diagram expressed in <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/hook_example_1.py">code</a>
+could look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1"># hook_example_1.py</span>
+ <span class="kn">import</span> <span class="nn">time</span>
  <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
  <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
@@ -380,6 +384,7 @@ ignore this event and let it percolate outward to my super state”</p>
 <span class="n">a1</span>
 </pre></div>
 </div>
+<hr class="docutils" />
 <p>If I would like my hook to stop the event from being handled outside of the
 state, I would handle it with the hook, but I would show that I’m doing nothing
 with it by drawing <code class="docutils literal notranslate"><span class="pre">{}</span></code> in the action part of the hook.</p>
@@ -389,7 +394,10 @@ with it by drawing <code class="docutils literal notranslate"><span class="pre">
 named ‘SIGNAL_NAME’ while I am in a1, or any of its inner states (a11), do
 not let this event proceed past the a1 boundary, and do not cause a
 state transition.”</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="kn">import</span> <span class="nn">time</span>
+<p>The above diagram expressed in <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/hook_example_2.py">code</a>
+could look like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1"># hook_example_2.py</span>
+ <span class="kn">import</span> <span class="nn">time</span>
  <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
  <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
@@ -459,8 +467,10 @@ follows the hook drawing rules.</p>
 settled into.  On the diagram it is a <strong>large black dot</strong> with an arrow on it.</p>
 <a class="reference external image-reference" href="_static/internal_signals_1.pdf"><div align="center" class="align-center"><img alt="_images/internal_signals_1.svg" src="_images/internal_signals_1.svg" /></div>
 </a>
-<p>Here is some code that would map to the above diagram:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="kn">import</span> <span class="nn">time</span>
+<p>Here is some <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/internal_signals_1.py">code</a>
+that would map to the above diagram:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1"># internal_signals_1.py</span>
+ <span class="kn">import</span> <span class="nn">time</span>
 
  <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
  <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
@@ -564,8 +574,10 @@ the state chart dynamics and it shows were the state machine is started.</p>
 <p class="last">I’m not sure if I’m using UML properly according to the standard, and I don’t
 really care.  What I care about is if you understand what I mean.</p>
 </div>
-<p>The above diagram could be written this way in Python:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="kn">import</span> <span class="nn">time</span>
+<p>The above diagram could be <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/attachment_point_1.py">written this way</a>
+in Python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1"># attachment_point_1.py</span>
+ <span class="kn">import</span> <span class="nn">time</span>
 
  <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
  <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
@@ -674,11 +686,14 @@ different event processor can also be attach to the same statemachine.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The statemachine and its functions do not keep track of variables or the
-current state; they simply act as a behavioral specification.  The variable
-changes are always on the first arguement of the state function.</p>
+current state; they simply act as a behavioral specification.  The attribute
+changes are always performed on the first arguement of the state function,
+the state function itself has no memory or notion of the program’s state.</p>
 </div>
-<p>You could manifest the above diagram in code like this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<p>You could manifest the above diagram in <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/attachment_point_2.py">code like
+this</a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># attachment_point_2.py</span>
+<span class="kn">import</span> <span class="nn">time</span>
 
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
@@ -820,14 +835,14 @@ embedded state chart might look like this:</p>
 <a class="reference external image-reference" href="_static/attachment_point_4.pdf"><div align="center" class="align-center"><img alt="_images/attachment_point_4.svg" src="_images/attachment_point_4.svg" /></div>
 </a>
 <p>The <code class="docutils literal notranslate"><span class="pre">Event</span> <span class="pre">Processor</span></code> component in the <code class="docutils literal notranslate"><span class="pre">ClassWithEmbeddedChart</span></code> is taking up
-a lot of room on the diagram.  So, why not just keep the bulbus part of it as a
-shorthand for the attachment.  It still shows where we want the statechart to
-start:</p>
+a lot of room on the diagram.  So, why not just keep the bulbus part of its
+glyph as a shorthand for the attachment point.  It still shows where we want the
+statechart to start:</p>
 <a class="reference external image-reference" href="_static/attachment_point_5.pdf"><div align="center" class="align-center"><img alt="_images/attachment_point_5.svg" src="_images/attachment_point_5.svg" /></div>
 </a>
-<p>Here is the code that could manifest the above diagram, notice that the
-<code class="docutils literal notranslate"><span class="pre">start_at</span></code> call is made within the <code class="docutils literal notranslate"><span class="pre">ClassWithEmbeddedChart</span></code> <code class="docutils literal notranslate"><span class="pre">__init__</span></code>
-method:</p>
+<p>Here is the <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/class_with_embedded_chart.py">code</a>
+that could manifest the above diagram, notice that the <code class="docutils literal notranslate"><span class="pre">start_at</span></code> call is made
+within the <code class="docutils literal notranslate"><span class="pre">ClassWithEmbeddedChart</span></code> <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
@@ -967,7 +982,7 @@ arrows and hooks on the statechart diagram.  The state function will contain
 information about what state wraps it in the diagram (it’s super state), this is
 typically expressed in the else clause of it’s if-elif-else structure.  The
 state function needs to return predefined information to tell the event
-processor how it has reacted to someone, like if it is transitioning, or if the
+processor how it has reacted to an event; like if it is transitioning, or if the
 event was unhandled and needs to be passed to the super state, or if it has been
 handled so that the event processor can stop processing the event.</p>
 <p>An important thing to remember is that a state function will be called many
@@ -979,14 +994,18 @@ graph and a behavioral specification.</p>
 functions.</p>
 <a class="reference external image-reference" href="_static/attachment_point_1.pdf"><div align="center" class="align-center"><img alt="_images/attachment_point_1.svg" src="_images/attachment_point_1.svg" /></div>
 </a>
+<p>You can see the code that could implement this design <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/attachment_point_1.py">here</a>.</p>
 <p>The outer_state code could look like this:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
 
 <span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+
   <span class="c1"># return_status contain information about how this state</span>
-  <span class="c1"># has reacted to the event, we initialize it to UNHANDLED if an event guard fails</span>
-  <span class="c1"># this event can percolate outward to its superstate (parent state)</span>
+  <span class="c1"># has reacted to the event,</span>
+  <span class="c1"># we initialize our return status it to UNHANDLED,</span>
+  <span class="c1"># so that if an event guard fails the event can percolate outward</span>
+  <span class="c1"># to its superstate (parent state)</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 
   <span class="c1"># e, is the event that is being sent to this state function by the event</span>
@@ -998,12 +1017,13 @@ functions.</p>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
     <span class="c1"># we are reacting to the entry event on the diagram</span>
     <span class="c1"># we only change variables on the first argument of our function, like</span>
-    <span class="c1"># we would if it was named &#39;self&#39; in a typical python method</span>
+    <span class="c1"># we would if it was named &#39;self&#39; in a typical Python method</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">False</span>
 
     <span class="c1"># this state wants to tell the event processor this event was handled</span>
-    <span class="c1"># do not percolate outward in the graph</span>
+    <span class="c1"># do not percolate outward in the graph (it wouldn&#39;t anyway for internal</span>
+    <span class="c1"># signals)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 
   <span class="c1"># The INIT_SIGNAL is the big black dot on the diagram.  It is the &quot;now</span>
@@ -1014,8 +1034,9 @@ functions.</p>
 
      <span class="c1"># Here we tell the event processor that we want it to transition to a</span>
      <span class="c1"># different state by feeding the state function of our target as an</span>
-     <span class="c1"># argument to the trans method, this method will determine what we want</span>
-     <span class="c1"># to return from this function.</span>
+     <span class="c1"># argument to the trans method.</span>
+     <span class="c1"># The trans method will determine what we want  to return from</span>
+     <span class="c1"># this function.</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner_state_1</span><span class="p">)</span>
 
   <span class="c1"># The Hook signal name is an external signal name, something that is</span>
@@ -1030,16 +1051,15 @@ functions.</p>
     <span class="c1"># inner_state_2</span>
     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hook&quot;</span><span class="p">)</span>
     <span class="c1"># This is the code that makes the handing of this event a hook,</span>
-    <span class="c1"># or an event which causes</span>
-    <span class="c1"># code to run without causing a state transition.  Here we tell the</span>
-    <span class="c1"># event processor to stop searching.</span>
+    <span class="c1"># or an event which causes  code to run without causing a</span>
+    <span class="c1"># state transition.  Here we tell the event processor to stop searching.</span>
+
     <span class="c1"># So imagine that we were in the inner_state_2 and a &#39;Hook&#39; event was</span>
     <span class="c1"># sent to the chart, the above code would run and the chart would remain</span>
-    <span class="c1"># in the inner_state_2 state.  This is possible because of the code in our else</span>
-    <span class="c1"># clauses.</span>
+    <span class="c1"># in the inner_state_2 state.</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
-    <span class="c1"># we specifically write what our outer state function is, since there</span>
+    <span class="c1"># We specifically write what our outer state function is, since there</span>
     <span class="c1"># isn&#39;t one for outer_state, we use the special `top` attribute of the</span>
     <span class="c1"># active object to indicate to the event processor that we are at the</span>
     <span class="c1"># outermost state of our design.</span>
@@ -1053,17 +1073,40 @@ functions.</p>
   <span class="k">return</span> <span class="n">status</span>
 </pre></div>
 </div>
-<p>As a developer, you don’t have to solve the problems that the event processor
-solves, instead you just learn some simple rules, then write your code into
-your statechart functions.  But you don’t do this directly in one step, first
-you learn how to draw simple pictures that are easy to think about.  Model these
-pictures so that they map to your problem then write your code after you have a
-decent idea about your design.  These pictures are called state machines, and
-they come in many different UML flavors.</p>
-<p>The Miro Samek algorithm doesn’t really care about the specifics of these
-drawing conventions, since it supports finite state machines (with simple
-states: <a class="reference external" href="https://www.mathworks.com/videos/understanding-state-machines-what-are-they-1-of-4-90488.html">Mealy or Moore</a>)
-and hierarchical state machines (composite states) in exactly the same way.</p>
+<p>The inner_state_1 and inner_state_2 state functions would look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">inner_state_1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">method_1</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner_state_2</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">method_2</span><span class="p">()</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer_state</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">def</span> <span class="nf">inner_state_2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner_state_1</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer_state</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
 <p>Here is a simple state, you would use it when drawing a finite state machine:</p>
 <a class="reference external image-reference" href="_static/simple_state_1.pdf"><div align="center" class="align-center"><img alt="_images/simple_state_1.svg" src="_images/simple_state_1.svg" /></div>
 </a>
@@ -1276,7 +1319,7 @@ different threads.  You can draw your payloads into your statecharts like this:<
 <p>Pepper these payload descriptions all over your drawings, you might be repeating
 yourself, but the quick understanding that you will be getting from a glance
 will pay for this trade-off.  The <a class="reference external" href="https://docs.python.org/3.5/library/collections.html#collections.namedtuple">namedtuple is nice to work with</a>.</p>
-<a class="reference internal" href="zero_to_one.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="examples.html"><span class="std std-ref">next</span></a><table class="docutils footnote" frame="void" id="id3" rules="none">
+<a class="reference internal" href="zero_to_one.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="examples.html"><span class="std std-ref">next</span></a><table class="docutils footnote" frame="void" id="id7" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="https://youarenotsosmart.com/2011/03/25/the-sunk-cost-fallacy/">The Sunk Cost Fallacy</a></td></tr>

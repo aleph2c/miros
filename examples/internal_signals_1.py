@@ -1,3 +1,4 @@
+# internal_signals_1.py
 import time
 
 from miros import spy_on

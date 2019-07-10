@@ -300,13 +300,14 @@ run during my next RTC process, then transition to the target_state, but, if my
 guard code returns False, do not transition, but let the SIGNAL_NAME, propagate
 outward."
 
-The above diagram written as code, could look like this:
-
+The above diagram written as `code
+<https://github.com/aleph2c/miros/blob/master/examples/guard_example.py>`_,
+could look like this:
 
 .. code-block:: python
   :emphasize-lines: 24-33
  
-   # name of file
+   # guard_example.py
    import time
    from collections import namedtuple
 
@@ -383,9 +384,14 @@ the guard, if it returns True, run the action().  When I have finished running
 the action, do not perform a state transition.  If the guard returned false,
 ignore this event and let it percolate outward to my super state"
 
+The above diagram expressed in `code
+<https://github.com/aleph2c/miros/blob/master/examples/hook_example_1.py>`_
+could look like this:
+
 .. code-block:: python
-  :emphasize-lines: 21-24
-  
+  :emphasize-lines: 22-25
+ 
+   # hook_example_1.py
    import time
    from collections import namedtuple
 
@@ -439,6 +445,8 @@ This will produce the following trace:
    hook code was run 2
    a1
 
+----
+
 If I would like my hook to stop the event from being handled outside of the
 state, I would handle it with the hook, but I would show that I'm doing nothing
 with it by drawing ``{}`` in the action part of the hook.
@@ -452,9 +460,14 @@ named 'SIGNAL_NAME' while I am in a1, or any of its inner states (a11), do
 not let this event proceed past the a1 boundary, and do not cause a
 state transition."
 
+The above diagram expressed in `code
+<https://github.com/aleph2c/miros/blob/master/examples/hook_example_2.py>`_
+could look like:
+
 .. code-block:: python
-  :emphasize-lines: 25-26
-  
+  :emphasize-lines: 26-27
+ 
+   # hook_example_2.py
    import time
    from collections import namedtuple
 
@@ -534,11 +547,14 @@ settled into.  On the diagram it is a **large black dot** with an arrow on it.
     :target: _static/internal_signals_1.pdf
     :align: center
 
-Here is some code that would map to the above diagram:
+Here is some `code
+<https://github.com/aleph2c/miros/blob/master/examples/internal_signals_1.py>`_
+that would map to the above diagram:
 
 .. code-block:: python
-  :emphasize-lines: 12-19, 22-28, 36-41
-  
+  :emphasize-lines: 13-20, 23-29, 37-42
+ 
+   # internal_signals_1.py
    import time
 
    from miros import spy_on
@@ -652,11 +668,14 @@ the state chart dynamics and it shows were the state machine is started.
    I'm not sure if I'm using UML properly according to the standard, and I don't
    really care.  What I care about is if you understand what I mean.
 
-The above diagram could be written this way in Python:
+The above diagram could be `written this way
+<https://github.com/aleph2c/miros/blob/master/examples/attachment_point_1.py>`_
+in Python:
 
 .. code-block:: python
-  :emphasize-lines: 81-84
-  
+  :emphasize-lines: 82-85
+ 
+   # attachment_point_1.py
    import time
 
    from miros import spy_on
@@ -771,14 +790,17 @@ different event processor can also be attach to the same statemachine.
 .. note::
 
    The statemachine and its functions do not keep track of variables or the
-   current state; they simply act as a behavioral specification.  The variable
-   changes are always on the first arguement of the state function.
+   current state; they simply act as a behavioral specification.  The attribute
+   changes are always performed on the first arguement of the state function,
+   the state function itself has no memory or notion of the program's state.
 
-You could manifest the above diagram in code like this:
+You could manifest the above diagram in `code like
+this <https://github.com/aleph2c/miros/blob/master/examples/attachment_point_2.py>`_:
 
 .. code-block:: python
-  :emphasize-lines: 98-99, 109-111
-   
+  :emphasize-lines: 99-100, 110-112
+  
+  # attachment_point_2.py
   import time
 
   from miros import spy_on
@@ -926,17 +948,18 @@ embedded state chart might look like this:
     :align: center
 
 The ``Event Processor`` component in the ``ClassWithEmbeddedChart`` is taking up
-a lot of room on the diagram.  So, why not just keep the bulbus part of it as a
-shorthand for the attachment.  It still shows where we want the statechart to
-start:
+a lot of room on the diagram.  So, why not just keep the bulbus part of its
+glyph as a shorthand for the attachment point.  It still shows where we want the
+statechart to start:
 
 .. image:: _static/attachment_point_5.svg
     :target: _static/attachment_point_5.pdf
     :align: center
 
-Here is the code that could manifest the above diagram, notice that the
-``start_at`` call is made within the ``ClassWithEmbeddedChart`` ``__init__``
-method:
+Here is the `code
+<https://github.com/aleph2c/miros/blob/master/examples/class_with_embedded_chart.py>`_
+that could manifest the above diagram, notice that the ``start_at`` call is made
+within the ``ClassWithEmbeddedChart`` ``__init__`` method:
 
 .. code-block:: python
   :emphasize-lines: 51,52
@@ -1082,7 +1105,7 @@ arrows and hooks on the statechart diagram.  The state function will contain
 information about what state wraps it in the diagram (it's super state), this is
 typically expressed in the else clause of it's if-elif-else structure.  The
 state function needs to return predefined information to tell the event
-processor how it has reacted to someone, like if it is transitioning, or if the
+processor how it has reacted to an event; like if it is transitioning, or if the
 event was unhandled and needs to be passed to the super state, or if it has been
 handled so that the event processor can stop processing the event.
 
@@ -1099,6 +1122,9 @@ functions.
     :target: _static/attachment_point_1.pdf
     :align: center
 
+You can see the code that could implement this design `here
+<https://github.com/aleph2c/miros/blob/master/examples/attachment_point_1.py>`_.
+
 The outer_state code could look like this:
 
 .. code-block:: python
@@ -1107,9 +1133,12 @@ The outer_state code could look like this:
     from miros import return_status
     
     def outer_state(chart, e):
+
       # return_status contain information about how this state
-      # has reacted to the event, we initialize it to UNHANDLED if an event guard fails
-      # this event can percolate outward to its superstate (parent state)
+      # has reacted to the event,
+      # we initialize our return status it to UNHANDLED,
+      # so that if an event guard fails the event can percolate outward
+      # to its superstate (parent state)
       status = return_status.UNHANDLED 
     
       # e, is the event that is being sent to this state function by the event
@@ -1121,12 +1150,13 @@ The outer_state code could look like this:
       if(e.signal == signals.ENTRY_SIGNAL):
         # we are reacting to the entry event on the diagram
         # we only change variables on the first argument of our function, like
-        # we would if it was named 'self' in a typical python method
+        # we would if it was named 'self' in a typical Python method
         chart.attribute_1 = False  
         chart.attribute_2 = False  
 
         # this state wants to tell the event processor this event was handled
-        # do not percolate outward in the graph
+        # do not percolate outward in the graph (it wouldn't anyway for internal
+        # signals)
         status = return_status.HANDLED
 
       # The INIT_SIGNAL is the big black dot on the diagram.  It is the "now
@@ -1137,8 +1167,9 @@ The outer_state code could look like this:
 
          # Here we tell the event processor that we want it to transition to a
          # different state by feeding the state function of our target as an
-         # argument to the trans method, this method will determine what we want
-         # to return from this function.
+         # argument to the trans method.
+         # The trans method will determine what we want  to return from
+         # this function.
          status = chart.trans(inner_state_1)
 
       # The Hook signal name is an external signal name, something that is
@@ -1153,16 +1184,15 @@ The outer_state code could look like this:
         # inner_state_2
         print("hook")
         # This is the code that makes the handing of this event a hook,
-        # or an event which causes
-        # code to run without causing a state transition.  Here we tell the 
-        # event processor to stop searching.
+        # or an event which causes  code to run without causing a
+        # state transition.  Here we tell the event processor to stop searching.
+
         # So imagine that we were in the inner_state_2 and a 'Hook' event was 
         # sent to the chart, the above code would run and the chart would remain
-        # in the inner_state_2 state.  This is possible because of the code in our else
-        # clauses.
+        # in the inner_state_2 state.
         status = return_status.HANDLED
       else:
-        # we specifically write what our outer state function is, since there
+        # We specifically write what our outer state function is, since there
         # isn't one for outer_state, we use the special `top` attribute of the
         # active object to indicate to the event processor that we are at the
         # outermost state of our design.
@@ -1175,21 +1205,41 @@ The outer_state code could look like this:
       # tell the event processor how we dealt with the event
       return status
 
+The inner_state_1 and inner_state_2 state functions would look like this:
 
-
-
-As a developer, you don't have to solve the problems that the event processor
-solves, instead you just learn some simple rules, then write your code into
-your statechart functions.  But you don't do this directly in one step, first
-you learn how to draw simple pictures that are easy to think about.  Model these
-pictures so that they map to your problem then write your code after you have a
-decent idea about your design.  These pictures are called state machines, and
-they come in many different UML flavors.
-
-The Miro Samek algorithm doesn't really care about the specifics of these
-drawing conventions, since it supports finite state machines (with simple
-states: `Mealy or Moore <https://www.mathworks.com/videos/understanding-state-machines-what-are-they-1-of-4-90488.html>`_)
-and hierarchical state machines (composite states) in exactly the same way.
+.. code-block:: python
+  
+   def inner_state_1(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       chart.method_1()
+       status = return_status.HANDLED
+     elif(e.signal == signals.B):
+       status = chart.trans(inner_state_2)
+     elif(e.signal == signals.EXIT_SIGNAL):
+       chart.method_2()
+       status = return_status.HANDLED
+     else:
+       chart.temp.fun = outer_state
+       status = return_status.SUPER
+     return status
+  
+   def inner_state_2(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       chart.attribute_1 = True
+       chart.attribute_2 = True
+       status = return_status.HANDLED
+     elif(e.signal == signals.A):
+       status = chart.trans(inner_state_1)
+     elif(e.signal == signals.EXIT_SIGNAL):
+       chart.attribute_1 = False
+       chart.attribute_2 = False
+       status = return_status.HANDLED
+     else:
+       chart.temp.fun = outer_state
+       status = return_status.SUPER
+     return status
 
 Here is a simple state, you would use it when drawing a finite state machine:
 

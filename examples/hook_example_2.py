@@ -1,3 +1,4 @@
+# hook_example_2.py
 import time
 from collections import namedtuple
 
