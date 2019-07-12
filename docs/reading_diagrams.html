@@ -91,55 +91,20 @@ going to treat UML as a formal language, but rather something to sketch with.
 The formal language we will use is Python.</p>
 <p>This section should give you enough information so that you can make your own
 pictures.</p>
-<div class="section" id="a-warning-about-diagramming">
-<span id="reading-diagrams-a-warning-about-diagramming"></span><h3>A Warning about Diagramming<a class="headerlink" href="#a-warning-about-diagramming" title="Permalink to this headline">¶</a></h3>
-<p>Be aware that as you draw your pictures, you will lock-in your thinking.</p>
-<p>You and everyone on your team will be effected by the Sunk Cost Fallacy:  “Your
-decisions are tainted by the emotional investments you accumulate, and the more
-you invest in something the harder it becomes to abandon”. <a class="footnote-reference" href="#id7" id="id1">[1]</a></p>
-<p>If you build beautiful drawings with a graphic design application; you will need
-to put time and effort into them and you will probably become emotionally
-attached to them.  Remember, your diagrams are just mistakes in the right
-direction.  You need to be able to destroy these pictures, just as casually as
-you would refactor your code.</p>
-<p>So use a simple and customizable tool.  To draw the pictures in this
-documentation I used UMLet.  With UMLet you can build custom templates, <a class="reference external" href="https://github.com/aleph2c/umlet-statechart-template">here is
-mine</a>.  And it is hard
-to fall in love with a picture made by UMLet.</p>
-<p>You don’t have to use this tool or this template, there <a class="reference external" href="https://en.wikipedia.org/wiki/List_of_Unified_Modeling_Language_tools">a lot of other UML
-drawing tools available</a>.</p>
-<p>Another way to make your pictures easy to change is to limit the amount of
-detail on them.  You don’t have to draw every class and you can shrink a
-complicated statechart into a kind of short hand.</p>
-<p>There are some diagrams that are extremely expressive and extremely fragile.  I
-can explain how a sequence diagram works to someone in 10 seconds.  But any
-sequence diagram used to describe your statechart behavior, will be extremely
-fragile to change.  A 1 second edit of your statechart picture might turn pages
-and pages of sequence diagrams into lies.  For this reason I only render
-sequence diagrams as ASCII from the miros trace listings using the sequence
-tool.</p>
-<p>You might feel reluctant to change your design, not because you are attached to
-your picture, but because you don’t want to re-write all of the boiler plate
-code to describe your statechart in Python.  To avoid what used to take me hours
-of work (mostly to debug) I have written some Ultisnips snippets for vim, that
-mostly write the statechart code for me.  You can <a class="reference external" href="https://github.com/aleph2c/vim_tmux/blob/master/snippets/python.snippets">find these snippets here</a>.</p>
-<p>UML can’t begin to describe everything you can create with your Python code.
-So, if you need to express a code’s idea on the diagram, just write the code
-directly onto the picture.</p>
-<p>You may decide to extend or change how UML diagrams are drawn to match your way
-of programming.  I have done this in this documentation.  There are a lot of
-features that would make it very nice to view a statechart, like being able to
-click on a diagram and drill in to see the specifics of that part of the
-picture.  UMLet doesn’t support this, and to get such a thing to show up in HTML
-(this doc) you would need some sort of SVG library working with javascript.
-Well, I don’t have time to write that, and I’m not funded, so we will do the
-best we have with the tools we got.</p>
-<p>When you customize the way you draw a picture, just make sure the other
-people on your team understand what you mean.</p>
-</div>
 <div class="section" id="the-most-important-rule-in-uml">
 <span id="reading-diagrams-the-most-important-rule-in-uml"></span><h3>The Most Important Rule in UML<a class="headerlink" href="#the-most-important-rule-in-uml" title="Permalink to this headline">¶</a></h3>
-<p>You don’t have to draw everything on your picture.</p>
+<blockquote>
+<div><p><em>Software modelers depend on and use engineering analogies but often fail to
+understand them.  Engineers realize that the models aren’t the product; they’re
+abstractions of the product.  In fact, in most cases, the models are only
+partial abstractions of the product, used to hightlight aspects that the
+engineer should know about the product.  The term *executable specification</em>
+is an oxymoron – if the specification were truly executable, it would
+actually be “the thing”.  Otherwise, it would merely model “the thing,” which
+by definition is partial and incomplete.*</p>
+<p class="attribution">&mdash;Dave Thomas</p>
+</div></blockquote>
+<p><strong>You don’t have to draw everything on your picture.</strong></p>
 </div>
 <div class="section" id="classes">
 <span id="reading-diagrams-classes"></span><h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
@@ -250,12 +215,11 @@ over it.  This is how these grooves can be drawn with UML:</p>
 <a class="reference external image-reference" href="_static/Transition_Triggers.pdf"><div align="center" class="align-center"><img alt="_images/Transition_Triggers.svg" src="_images/Transition_Triggers.svg" /></div>
 </a>
 <p>In English, the above diagram would say, “If I receive an event with a signal
-name SIGNAL_NAME while I am in source_state, run
-the guard, if it returns True, run the action() function within the context of
-the source state, then add the EVT_A event to my fifo queue so that it can be
-run during my next RTC process, then transition to the target_state, but, if my
-guard code returns False, do not transition, but let the SIGNAL_NAME, propagate
-outward.”</p>
+name SIGNAL_NAME while I am in source_state, run the guard, if it returns True,
+run the action() function within the context of the source state, then add the
+EVT_A event to my fifo queue so that it can be run during my next RTC process,
+then transition to the target_state, but, if my guard code returns False, do not
+transition, but let the SIGNAL_NAME event propagate outward.”</p>
 <p>The above diagram written as <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/guard_example.py">code</a>,
 could look like this:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1"># guard_example.py</span>
@@ -968,9 +932,9 @@ within the <code class="docutils literal notranslate"><span class="pre">ClassWit
 <p class="first admonition-title">Note</p>
 <p class="last">Object Oriented statecharts were first implemented and written about in 1996</p>
 </div>
-<p>As your team gets used to looking at these kinds of diagrams, you might create
-a short hand for the attachment point, or leave it off of your diagram all
-together.</p>
+<p>As your team gets used to looking at these kinds of diagrams, you might create a
+different short hand for the attachment point, or leave it off of your diagram
+all together.</p>
 </div>
 <div class="section" id="states">
 <span id="reading-diagrams-states"></span><h3>States<a class="headerlink" href="#states" title="Permalink to this headline">¶</a></h3>
@@ -1107,29 +1071,116 @@ functions.</p>
   <span class="k">return</span> <span class="n">status</span>
 </pre></div>
 </div>
+<hr class="docutils" />
+<dl class="docutils">
+<dt>There are two different ways to draw a state on a diagram:</dt>
+<dd><ul class="first last simple">
+<li>simple states</li>
+<li>composite states</li>
+</ul>
+</dd>
+</dl>
 <p>Here is a simple state, you would use it when drawing a finite state machine:</p>
 <a class="reference external image-reference" href="_static/simple_state_1.pdf"><div align="center" class="align-center"><img alt="_images/simple_state_1.svg" src="_images/simple_state_1.svg" /></div>
 </a>
 <p>Here is an example of a finite state machine (FSM) – An oven.</p>
 <a class="reference external image-reference" href="_static/simple_state_2.pdf"><div align="center" class="align-center"><img alt="_images/simple_state_2.svg" src="_images/simple_state_2.svg" /></div>
 </a>
-<p>Here is a composite state (a state that can have states within it):</p>
+<p>To make such a finite statemachine with miros is very straight forward, you just
+set your state function super states to the <code class="docutils literal notranslate"><span class="pre">top</span></code> attribute of the
+ActiveObject.  Here is some code that the above diagram could model:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">bake_pressed</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">heating</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">heating</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">off_pressed</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">too_hot</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">idling</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">idling</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">too_cold</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">heating</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>Notice that the <strong>init</strong> signal is not written into the code, instead we use the
+<code class="docutils literal notranslate"><span class="pre">start_at</span></code> method to attach our ActiveObject to the off state:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+   <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s1">&#39;simple_fsm_2&#39;</span><span class="p">)</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="hll">   <span class="c1"># attach the ActiveObject&#39;s event processor to the state machine</span>
+</span>   <span class="c1"># and start its thread</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">bake_pressed</span><span class="p">))</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">off_pressed</span><span class="p">))</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">bake_pressed</span><span class="p">))</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">too_hot</span><span class="p">))</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">too_cold</span><span class="p">))</span>
+   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If we run it we see that it works:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mi">12</span> <span class="mo">07</span><span class="p">:</span><span class="mo">02</span><span class="p">:</span><span class="mf">10.304293</span><span class="p">]</span> <span class="p">[</span><span class="n">simple_fsm_2</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">off</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mi">12</span> <span class="mo">07</span><span class="p">:</span><span class="mo">02</span><span class="p">:</span><span class="mf">10.305574</span><span class="p">]</span> <span class="p">[</span><span class="n">simple_fsm_2</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">bake_pressed</span><span class="p">()</span> <span class="n">off</span><span class="o">-&gt;</span><span class="n">heating</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mi">12</span> <span class="mo">07</span><span class="p">:</span><span class="mo">02</span><span class="p">:</span><span class="mf">10.306446</span><span class="p">]</span> <span class="p">[</span><span class="n">simple_fsm_2</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">off_pressed</span><span class="p">()</span> <span class="n">heating</span><span class="o">-&gt;</span><span class="n">off</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mi">12</span> <span class="mo">07</span><span class="p">:</span><span class="mo">02</span><span class="p">:</span><span class="mf">10.307243</span><span class="p">]</span> <span class="p">[</span><span class="n">simple_fsm_2</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">bake_pressed</span><span class="p">()</span> <span class="n">off</span><span class="o">-&gt;</span><span class="n">heating</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mi">12</span> <span class="mo">07</span><span class="p">:</span><span class="mo">02</span><span class="p">:</span><span class="mf">10.308006</span><span class="p">]</span> <span class="p">[</span><span class="n">simple_fsm_2</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">too_hot</span><span class="p">()</span> <span class="n">heating</span><span class="o">-&gt;</span><span class="n">idling</span>
+<span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mi">12</span> <span class="mo">07</span><span class="p">:</span><span class="mo">02</span><span class="p">:</span><span class="mf">10.308924</span><span class="p">]</span> <span class="p">[</span><span class="n">simple_fsm_2</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">too_cold</span><span class="p">()</span> <span class="n">idling</span><span class="o">-&gt;</span><span class="n">heating</span>
+</pre></div>
+</div>
+<p>So, to get a finite state machine working with miros, we must know that the
+<strong>init</strong> glyph is just a synonym for the attachment point:</p>
+<a class="reference external image-reference" href="_static/simple_state_3.pdf"><div align="center" class="align-center"><img alt="_images/simple_state_3.svg" src="_images/simple_state_3.svg" /></div>
+</a>
+<hr class="docutils" />
+<p>The UML term for a state which can have other states inside of it, is called a
+“composite state”.  Here is what it looks like:</p>
 <a class="reference external image-reference" href="_static/composite_state_1.pdf"><div align="center" class="align-center"><img alt="_images/composite_state_1.svg" src="_images/composite_state_1.svg" /></div>
 </a>
+<p>It shares the same rounded rectangular look of the simple state icon, but it
+also has a bar across the top, above which, you type the state’s name.  The
+name of the state is placed at the top like this to separate it away from the
+rest of the rounded rectangle’s inner area, because this area serves as a canvas onto
+which you will draw your inner states, hooks, event arrows… etc.</p>
 <p>Here is a simple hierarchical state machine (HSM) – A slightly better oven:</p>
 <a class="reference external image-reference" href="_static/composite_state_2.pdf"><div align="center" class="align-center"><img alt="_images/composite_state_2.svg" src="_images/composite_state_2.svg" /></div>
 </a>
-<p>I think a lot of the terminology that was invented for UML came from exhausted
-committees working on Friday afternoons, minutes before the weekend:  Any
-state-looking-widget on your diagram that actually isn’t a state, is called a
-pseudostate.  For instance, on our diagram, the black initialization dot and the
-H with a star beside it (deep history) are both called pseudostates.</p>
+<p>Any state-looking-widget on your diagram that actually isn’t a state, is called
+a <strong>pseudostate</strong>.  For instance, on our diagram, the black initialization dot
+and the H with a star beside it (deep history) are both called pseudostates.</p>
 <p>If you had to draw your statechart into a diagram that didn’t have enough room
 for it, you might want to simplify it into a compacted representation.  This
 would let the person reading your diagram know that there is more to it, but
 that it was simplified on the picture so that everything would fit on the page.
-For some reason this is called “decomposition hiding”.  I’ll demonstrate this by
-hiding some of the details of our HSM oven:</p>
+For some reason this is called <strong>decomposition hiding</strong>.  I’ll demonstrate this
+by hiding some of the details of our HSM oven:</p>
 <a class="reference external image-reference" href="_static/composite_state_3.pdf"><div align="center" class="align-center"><img alt="_images/composite_state_3.svg" src="_images/composite_state_3.svg" /></div>
 </a>
 <p>The states aren’t useful without the assortment of arrows, internal events and
@@ -1319,10 +1370,56 @@ different threads.  You can draw your payloads into your statecharts like this:<
 <p>Pepper these payload descriptions all over your drawings, you might be repeating
 yourself, but the quick understanding that you will be getting from a glance
 will pay for this trade-off.  The <a class="reference external" href="https://docs.python.org/3.5/library/collections.html#collections.namedtuple">namedtuple is nice to work with</a>.</p>
+</div>
+<div class="section" id="a-warning-about-diagramming">
+<span id="reading-diagrams-a-warning-about-diagramming"></span><h3>A Warning about Diagramming<a class="headerlink" href="#a-warning-about-diagramming" title="Permalink to this headline">¶</a></h3>
+<p>Be aware that as you draw your pictures, you will lock-in your thinking.</p>
+<p>You and everyone on your team will be effected by the Sunk Cost Fallacy:  “Your
+decisions are tainted by the emotional investments you accumulate, and the more
+you invest in something the harder it becomes to abandon”. <a class="footnote-reference" href="#id7" id="id6">[1]</a></p>
+<p>If you build beautiful drawings with a graphic design application; you will need
+to put time and effort into them and you will probably become emotionally
+attached to them.  Remember, your diagrams are just mistakes in the right
+direction.  You need to be able to destroy these pictures, just as casually as
+you would refactor your code.</p>
+<p>So use a simple and customizable tool.  To draw the pictures in this
+documentation I used UMLet.  With UMLet you can build custom templates, <a class="reference external" href="https://github.com/aleph2c/umlet-statechart-template">here is
+mine</a>.  And it is hard
+to fall in love with a picture made by UMLet.</p>
+<p>You don’t have to use this tool or this template, there <a class="reference external" href="https://en.wikipedia.org/wiki/List_of_Unified_Modeling_Language_tools">a lot of other UML
+drawing tools available</a>.</p>
+<p>Another way to make your pictures easy to change is to limit the amount of
+detail on them.  You don’t have to draw every class and you can shrink a
+complicated statechart into a kind of short hand.</p>
+<p>There are some diagrams that are extremely expressive and extremely fragile.  I
+can explain how a sequence diagram works to someone in 10 seconds.  But any
+sequence diagram used to describe your statechart behavior, will be extremely
+fragile to change.  A 1 second edit of your statechart picture might turn pages
+and pages of sequence diagrams into lies.  For this reason I only render
+sequence diagrams as ASCII from the miros trace listings using the sequence
+tool.</p>
+<p>You might feel reluctant to change your design, not because you are attached to
+your picture, but because you don’t want to re-write all of the boiler plate
+code to describe your statechart in Python.  To avoid what used to take me hours
+of work (mostly to debug) I have written some Ultisnips snippets for vim, that
+mostly write the statechart code for me.  You can <a class="reference external" href="https://github.com/aleph2c/vim_tmux/blob/master/snippets/python.snippets">find these snippets here</a>.</p>
+<p>UML can’t begin to describe everything you can create with your Python code.
+So, if you need to express a code’s idea on the diagram, just write the code
+directly onto the picture.</p>
+<p>You may decide to extend or change how UML diagrams are drawn to match your way
+of programming.  I have done this in this documentation.  There are a lot of
+features that would make it very nice to view a statechart, like being able to
+click on a diagram and drill in to see the specifics of that part of the
+picture.  UMLet doesn’t support this, and to get such a thing to show up in HTML
+(this doc) you would need some sort of SVG library working with javascript.
+Well, I don’t have time to write that, and I’m not funded, so we will do the
+best we have with the tools we got.</p>
+<p>When you customize the way you draw a picture, just make sure the other
+people on your team understand what you mean.</p>
 <a class="reference internal" href="zero_to_one.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="examples.html"><span class="std std-ref">next</span></a><table class="docutils footnote" frame="void" id="id7" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="https://youarenotsosmart.com/2011/03/25/the-sunk-cost-fallacy/">The Sunk Cost Fallacy</a></td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id6">[1]</a></td><td><a class="reference external" href="https://youarenotsosmart.com/2011/03/25/the-sunk-cost-fallacy/">The Sunk Cost Fallacy</a></td></tr>
 </tbody>
 </table>
 </div>
@@ -1342,7 +1439,6 @@ will pay for this trade-off.  The <a class="reference external" href="https://do
   <ul>
 <li><a class="reference internal" href="#">Diagrams</a><ul>
 <li><a class="reference internal" href="#history-and-context">History and Context</a><ul>
-<li><a class="reference internal" href="#a-warning-about-diagramming">A Warning about Diagramming</a></li>
 <li><a class="reference internal" href="#the-most-important-rule-in-uml">The Most Important Rule in UML</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#inheritance-and-miros">Inheritance and miros</a></li>
@@ -1361,6 +1457,7 @@ will pay for this trade-off.  The <a class="reference external" href="https://do
 <li><a class="reference internal" href="#detailed-statechart-diagrams">Detailed Statechart Diagrams</a></li>
 <li><a class="reference internal" href="#sequence-diagrams">Sequence Diagrams</a></li>
 <li><a class="reference internal" href="#payloads">Payloads</a></li>
+<li><a class="reference internal" href="#a-warning-about-diagramming">A Warning about Diagramming</a></li>
 </ul>
 </li>
 </ul>

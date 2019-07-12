@@ -4,6 +4,7 @@
   
   -- Albert Einstein
 
+
 Diagrams
 ========
 
@@ -71,71 +72,23 @@ The formal language we will use is Python.
 This section should give you enough information so that you can make your own
 pictures.
 
-.. _reading_diagrams-a-warning-about-diagramming:
-
-A Warning about Diagramming
----------------------------
-Be aware that as you draw your pictures, you will lock-in your thinking.
-
-You and everyone on your team will be effected by the Sunk Cost Fallacy:  "Your
-decisions are tainted by the emotional investments you accumulate, and the more
-you invest in something the harder it becomes to abandon". [#]_  
-
-If you build beautiful drawings with a graphic design application; you will need
-to put time and effort into them and you will probably become emotionally
-attached to them.  Remember, your diagrams are just mistakes in the right
-direction.  You need to be able to destroy these pictures, just as casually as
-you would refactor your code.
-
-So use a simple and customizable tool.  To draw the pictures in this
-documentation I used UMLet.  With UMLet you can build custom templates, `here is
-mine <https://github.com/aleph2c/umlet-statechart-template>`_.  And it is hard
-to fall in love with a picture made by UMLet.
-
-You don't have to use this tool or this template, there `a lot of other UML
-drawing tools available
-<https://en.wikipedia.org/wiki/List_of_Unified_Modeling_Language_tools>`_.
-
-Another way to make your pictures easy to change is to limit the amount of
-detail on them.  You don't have to draw every class and you can shrink a
-complicated statechart into a kind of short hand.
-
-There are some diagrams that are extremely expressive and extremely fragile.  I
-can explain how a sequence diagram works to someone in 10 seconds.  But any
-sequence diagram used to describe your statechart behavior, will be extremely
-fragile to change.  A 1 second edit of your statechart picture might turn pages
-and pages of sequence diagrams into lies.  For this reason I only render
-sequence diagrams as ASCII from the miros trace listings using the sequence
-tool.
-
-You might feel reluctant to change your design, not because you are attached to
-your picture, but because you don't want to re-write all of the boiler plate
-code to describe your statechart in Python.  To avoid what used to take me hours
-of work (mostly to debug) I have written some Ultisnips snippets for vim, that
-mostly write the statechart code for me.  You can `find these snippets here
-<https://github.com/aleph2c/vim_tmux/blob/master/snippets/python.snippets>`_.
-
-UML can't begin to describe everything you can create with your Python code.
-So, if you need to express a code's idea on the diagram, just write the code
-directly onto the picture.
-
-You may decide to extend or change how UML diagrams are drawn to match your way
-of programming.  I have done this in this documentation.  There are a lot of
-features that would make it very nice to view a statechart, like being able to
-click on a diagram and drill in to see the specifics of that part of the
-picture.  UMLet doesn't support this, and to get such a thing to show up in HTML
-(this doc) you would need some sort of SVG library working with javascript.
-Well, I don't have time to write that, and I'm not funded, so we will do the
-best we have with the tools we got.
-
-When you customize the way you draw a picture, just make sure the other
-people on your team understand what you mean.
-
 .. _reading_diagrams-the-most-important-rule-in-uml:
 
 The Most Important Rule in UML
 ------------------------------
-You don't have to draw everything on your picture.
+
+  *Software modelers depend on and use engineering analogies but often fail to
+  understand them.  Engineers realize that the models aren't the product; they're
+  abstractions of the product.  In fact, in most cases, the models are only
+  partial abstractions of the product, used to hightlight aspects that the
+  engineer should know about the product.  The term *executable specification*
+  is an oxymoron -- if the specification were truly executable, it would
+  actually be "the thing".  Otherwise, it would merely model "the thing," which
+  by definition is partial and incomplete.*
+
+  -- Dave Thomas
+
+**You don't have to draw everything on your picture.**
 
 .. _reading_diagrams-classes:
 
@@ -293,12 +246,11 @@ over it.  This is how these grooves can be drawn with UML:
     :align: center
 
 In English, the above diagram would say, "If I receive an event with a signal
-name SIGNAL_NAME while I am in source_state, run
-the guard, if it returns True, run the action() function within the context of
-the source state, then add the EVT_A event to my fifo queue so that it can be
-run during my next RTC process, then transition to the target_state, but, if my
-guard code returns False, do not transition, but let the SIGNAL_NAME, propagate
-outward."
+name SIGNAL_NAME while I am in source_state, run the guard, if it returns True,
+run the action() function within the context of the source state, then add the
+EVT_A event to my fifo queue so that it can be run during my next RTC process,
+then transition to the target_state, but, if my guard code returns False, do not
+transition, but let the SIGNAL_NAME event propagate outward."
 
 The above diagram written as `code
 <https://github.com/aleph2c/miros/blob/master/examples/guard_example.py>`_,
@@ -1088,9 +1040,9 @@ within the ``ClassWithEmbeddedChart`` ``__init__`` method:
 
   Object Oriented statecharts were first implemented and written about in 1996
 
-As your team gets used to looking at these kinds of diagrams, you might create
-a short hand for the attachment point, or leave it off of your diagram all
-together.
+As your team gets used to looking at these kinds of diagrams, you might create a
+different short hand for the attachment point, or leave it off of your diagram
+all together.
 
 .. _reading_diagrams-states:
 
@@ -1241,6 +1193,12 @@ The inner_state_1 and inner_state_2 state functions would look like this:
        status = return_status.SUPER
      return status
 
+----
+
+There are two different ways to draw a state on a diagram:
+   * simple states
+   * composite states
+
 Here is a simple state, you would use it when drawing a finite state machine:
 
 .. image:: _static/simple_state_1.svg
@@ -1253,11 +1211,103 @@ Here is an example of a finite state machine (FSM) -- An oven.
     :target: _static/simple_state_2.pdf
     :align: center
 
-Here is a composite state (a state that can have states within it):
+To make such a finite statemachine with miros is very straight forward, you just
+set your state function super states to the ``top`` attribute of the
+ActiveObject.  Here is some code that the above diagram could model:
+
+.. code-block:: python
+  
+   import time
+
+   from miros import Event
+   from miros import spy_on
+   from miros import signals
+   from miros import ActiveObject
+   from miros import return_status
+
+   @spy_on
+   def off(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.bake_pressed):
+       status = chart.trans(heating)
+     else:
+       chart.temp.fun = chart.top
+       status = return_status.SUPER
+     return status
+
+   @spy_on
+   def heating(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.off_pressed):
+       status = chart.trans(off)
+     elif(e.signal == signals.too_hot):
+       status = chart.trans(idling)
+     else:
+       chart.temp.fun = chart.top
+       status = return_status.SUPER
+     return status
+
+   @spy_on
+   def idling(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.too_cold):
+       status = chart.trans(heating)
+     else:
+       chart.temp.fun = chart.top
+       status = return_status.SUPER
+     return status
+
+Notice that the **init** signal is not written into the code, instead we use the
+``start_at`` method to attach our ActiveObject to the off state:
+
+.. code-block:: python
+  :emphasize-lines: 4
+  
+  if __name__ == "__main__":
+     ao = ActiveObject('simple_fsm_2')
+     ao.live_trace = True
+     # attach the ActiveObject's event processor to the state machine 
+     # and start its thread
+     ao.start_at(off)  
+     ao.post_fifo(Event(signal=signals.bake_pressed))
+     ao.post_fifo(Event(signal=signals.off_pressed))
+     ao.post_fifo(Event(signal=signals.bake_pressed))
+     ao.post_fifo(Event(signal=signals.too_hot))
+     ao.post_fifo(Event(signal=signals.too_cold))
+     time.sleep(0.01)
+
+If we run it we see that it works:
+
+.. code-block:: python
+ 
+  [2019-07-12 07:02:10.304293] [simple_fsm_2] e->start_at() top->off
+  [2019-07-12 07:02:10.305574] [simple_fsm_2] e->bake_pressed() off->heating
+  [2019-07-12 07:02:10.306446] [simple_fsm_2] e->off_pressed() heating->off
+  [2019-07-12 07:02:10.307243] [simple_fsm_2] e->bake_pressed() off->heating
+  [2019-07-12 07:02:10.308006] [simple_fsm_2] e->too_hot() heating->idling
+  [2019-07-12 07:02:10.308924] [simple_fsm_2] e->too_cold() idling->heating
+
+So, to get a finite state machine working with miros, we must know that the
+**init** glyph is just a synonym for the attachment point:
+
+.. image:: _static/simple_state_3.svg
+    :target: _static/simple_state_3.pdf
+    :align: center
+
+----
+
+The UML term for a state which can have other states inside of it, is called a
+"composite state".  Here is what it looks like:
 
 .. image:: _static/composite_state_1.svg
     :target: _static/composite_state_1.pdf
     :align: center
+
+It shares the same rounded rectangular look of the simple state icon, but it
+also has a bar across the top, above which, you type the state's name.  The
+name of the state is placed at the top like this to separate it away from the
+rest of the rounded rectangle's inner area, because this area serves as a canvas onto
+which you will draw your inner states, hooks, event arrows... etc.
 
 Here is a simple hierarchical state machine (HSM) -- A slightly better oven:
 
@@ -1265,18 +1315,16 @@ Here is a simple hierarchical state machine (HSM) -- A slightly better oven:
     :target: _static/composite_state_2.pdf
     :align: center
 
-I think a lot of the terminology that was invented for UML came from exhausted
-committees working on Friday afternoons, minutes before the weekend:  Any
-state-looking-widget on your diagram that actually isn't a state, is called a
-pseudostate.  For instance, on our diagram, the black initialization dot and the
-H with a star beside it (deep history) are both called pseudostates.
+Any state-looking-widget on your diagram that actually isn't a state, is called
+a **pseudostate**.  For instance, on our diagram, the black initialization dot
+and the H with a star beside it (deep history) are both called pseudostates.
 
 If you had to draw your statechart into a diagram that didn't have enough room
 for it, you might want to simplify it into a compacted representation.  This
 would let the person reading your diagram know that there is more to it, but
 that it was simplified on the picture so that everything would fit on the page.
-For some reason this is called "decomposition hiding".  I'll demonstrate this by
-hiding some of the details of our HSM oven:
+For some reason this is called **decomposition hiding**.  I'll demonstrate this
+by hiding some of the details of our HSM oven:
 
 .. image:: _static/composite_state_3.svg
     :target: _static/composite_state_3.pdf
@@ -1539,6 +1587,67 @@ Pepper these payload descriptions all over your drawings, you might be repeating
 yourself, but the quick understanding that you will be getting from a glance
 will pay for this trade-off.  The `namedtuple is nice to work with
 <https://docs.python.org/3.5/library/collections.html#collections.namedtuple>`_.
+
+.. _reading_diagrams-a-warning-about-diagramming:
+
+A Warning about Diagramming
+---------------------------
+Be aware that as you draw your pictures, you will lock-in your thinking.
+
+You and everyone on your team will be effected by the Sunk Cost Fallacy:  "Your
+decisions are tainted by the emotional investments you accumulate, and the more
+you invest in something the harder it becomes to abandon". [#]_  
+
+If you build beautiful drawings with a graphic design application; you will need
+to put time and effort into them and you will probably become emotionally
+attached to them.  Remember, your diagrams are just mistakes in the right
+direction.  You need to be able to destroy these pictures, just as casually as
+you would refactor your code.
+
+So use a simple and customizable tool.  To draw the pictures in this
+documentation I used UMLet.  With UMLet you can build custom templates, `here is
+mine <https://github.com/aleph2c/umlet-statechart-template>`_.  And it is hard
+to fall in love with a picture made by UMLet.
+
+You don't have to use this tool or this template, there `a lot of other UML
+drawing tools available
+<https://en.wikipedia.org/wiki/List_of_Unified_Modeling_Language_tools>`_.
+
+Another way to make your pictures easy to change is to limit the amount of
+detail on them.  You don't have to draw every class and you can shrink a
+complicated statechart into a kind of short hand.
+
+There are some diagrams that are extremely expressive and extremely fragile.  I
+can explain how a sequence diagram works to someone in 10 seconds.  But any
+sequence diagram used to describe your statechart behavior, will be extremely
+fragile to change.  A 1 second edit of your statechart picture might turn pages
+and pages of sequence diagrams into lies.  For this reason I only render
+sequence diagrams as ASCII from the miros trace listings using the sequence
+tool.
+
+You might feel reluctant to change your design, not because you are attached to
+your picture, but because you don't want to re-write all of the boiler plate
+code to describe your statechart in Python.  To avoid what used to take me hours
+of work (mostly to debug) I have written some Ultisnips snippets for vim, that
+mostly write the statechart code for me.  You can `find these snippets here
+<https://github.com/aleph2c/vim_tmux/blob/master/snippets/python.snippets>`_.
+
+UML can't begin to describe everything you can create with your Python code.
+So, if you need to express a code's idea on the diagram, just write the code
+directly onto the picture.
+
+You may decide to extend or change how UML diagrams are drawn to match your way
+of programming.  I have done this in this documentation.  There are a lot of
+features that would make it very nice to view a statechart, like being able to
+click on a diagram and drill in to see the specifics of that part of the
+picture.  UMLet doesn't support this, and to get such a thing to show up in HTML
+(this doc) you would need some sort of SVG library working with javascript.
+Well, I don't have time to write that, and I'm not funded, so we will do the
+best we have with the tools we got.
+
+When you customize the way you draw a picture, just make sure the other
+people on your team understand what you mean.
+
 
 .. raw:: html
 
