@@ -12,66 +12,54 @@
 .. role:: new_spec
   :class: new_spec
 
-Zero To One
-===========
+Tutorial: Zero To One
+=====================
 
 This is not a 5-minute blog read.  But, if you want to learn how statecharts
-work, this is your one-stop shop, it will take you from 0 to 1.
+work, this is your one-stop shop, it will take you from 0 to 1.  If you already
+understand statecharts, and would like to just see how to use the syntax of this
+library, reference the :ref:`quick start <quick-start>`.
 
-First, I'll try to explain the statechart concepts, pictures and mechanics using
-a :ref:`story <zero_to_one_story>`.  At the end of the story I'll describe how the story's stage,
-characters and theme map back onto the things you need to know to be a
-statechart designer.  Don't worry if you are a little bit confused after reading
-the story; if a few things stick, great, proceed into the example, then re-read
-the story once you have written your first couple of statecharts.
-
-Secondly, we will work through an :ref:`example <zero-to-one-a-simple-example>`
-together.  The example will be broken up into a set of iterations and each
-iteration will be broken into 4 parts:
-
-* `spec`, what are we trying to build and how do we know when we are done.
-* `design`, a picture, as a formal description of the thing we are trying to build
-* `code`, the code required to manifest the design
-* `proof`, proof that our code is actually matching our design
-* `questions`, a list of questions and answers
-
-The questions section will provide you with a choose-your-own-adventure style of
-reading the documentation.
-
-Each iteration is heavily linked so that you can quickly bounce around between
-its various parts.
-
-.. admonition:: Scott Volk: 2018-09-09
-
-  I will also pepper the story with boxes, like this one, containing **hints**
-  about how the story relates to the technical aspects of statecharts.
-  
-  I challenge you *not to read* these boxes in your first look at the story,
-  especially if you are new to this type of technical language.  Read the hints
-  after you have programmed your first working statechart.
-
-  On your first pass just read the story and look over the pictures.
-
-  After you have completed the example, read the story again if your
-  understanding of the dynamics aren't clear, the hint boxes will serve as a
-  bridge between the story and your technical work.
-
-.. _zero_to_one_story:
-
-Story
-^^^^^ 
 If you are like me, learning something entirely new can be very exhausting.  You
 need to learn new words, new ideas and you have to juggle them in your head
 until you finally see how they interrelate.  This can be hard work.
 
 But stories about people moving around on a small stage are much easier to
-remember.  If it's a good story, it doesn't feel like work at all.
+remember.  If it's a good story, it doesn't feel like work to remember its
+details.
 
-So why don't we try to explain something that is hard to remember using
-something that is easier to remember?
+So lets use a :ref:`story <zero_to_one_story>` to explain the statechart
+concepts, pictures and mechanics.  At the end of the story I'll describe how its
+stage, characters and objects map back onto the technical things you need to
+know.  Don't worry if you are a little bit confused after reading the story; if
+a few things stick, great, push on.
 
-I will do this now, I will use a story as a mental-scaffolding around the
-statechart ideas you need to know.
+Once we understand some basic statechart concepts, we will work through an
+:ref:`example <zero-to-one-a-simple-example>`.  The example will be broken up
+into a set of iterations and each iteration will be broken into 4 parts:
+
+* `spec`: what are we trying to build and how do we know when we are done?
+* `design`: a picture, as a formal description of the thing we are trying to
+  build 
+* `code`: the code required to manifest the design 
+* `proof`: proof that our code is actually matching our design 
+* `questions`: a list of questions and answers
+
+The questions section will provide you with a dialogue driven style of
+reading the documentation.  Each iteration is heavily linked so that you can
+quickly bounce around between its various parts.
+
+.. note::
+
+  I will also pepper the story with boxes, like this one, translating a story
+  part to the technical aspects of statecharts.  If the contents of these boxes
+  don't make sense, don't worry.  Things will become clearer once you work
+  through the examples.
+
+.. _zero_to_one_story:
+
+Story
+^^^^^ 
 
 .. raw:: html
 
@@ -79,9 +67,9 @@ statechart ideas you need to know.
    
    <p><span class="story-intro">Our story will be placed in a little universe.</span>  This little universe will
    consist of a heaven, an earth and an underworld.   The earth in the story
-   isn't round like ours.  It's a very small flat-earth, acting as a platform,
-   floating above the underworld.  On top of the earth are a set of pubs,
-   arranged on different terraces.
+   isn't round like ours.  It's a very small flat platform, floating above the
+   underworld.  On top of the earth are a set of pubs, arranged on different
+   terraces.  Each terrace has one pub.
    </p>
 
    <p>
@@ -90,10 +78,6 @@ statechart ideas you need to know.
    less space have a more specialized aesthetic. 
    </p>
    
-   <p>
-   Now let's add some characters and a bit more detail to the story.
-   </p>
-
    <p>
    On every terrace, there will be two bouncers, a greeter and zero or more
    bartenders.  There will only be one set of stairs that can be used to enter or
@@ -113,7 +97,7 @@ statechart ideas you need to know.
     :target: _static/md_terraced_pubs.pdf
     :align: center
 
-.. admonition:: hint
+.. admonition:: translation
 
   Each pub is a state in a statemachine.  You would program these states as
   functions that take two arguments, a reference to an active object and an event.
@@ -133,12 +117,12 @@ statechart ideas you need to know.
    <div class="story">
 
    <p>
-   Now let's add some supernatural beings: three gods and a spirit.
+   Now let's add some supernatural beings: three "gods" and a "spirit".
    </p>
 
    <p>
-   The heaven will have one goddess Eve, "the goddess of law and order" and
-   the underworld will be ruled by Theo, <a href="https://en.wikipedia.org/wiki/Solipsism">the solipsist.</a> The earth
+   The heaven will have one goddess, Eve, "the goddess of law and order" and the
+   underworld will be ruled by Theo, "<a href="https://en.wikipedia.org/wiki/Solipsism">the solipsist.</a>" The earth
    will have a lazy god named Spike, "the source" who happens to be the only guy
    who can drink in the whole universe.  Spike will have a companion spirit,
    named Tara "the explorer."
@@ -155,7 +139,7 @@ statechart ideas you need to know.
     :target: _static/md_terraced_gods.pdf
     :align: center
 
-.. admonition:: hint
+.. admonition:: translation
 
   Eve represents the "event processor", or the algorithm that sends the state
   functions different events.
@@ -179,9 +163,10 @@ statechart ideas you need to know.
    <div class="story">
 
    <p>
-   Let's put our little universe into a small multiverse. Each universe will have
-   it's own heaven and underworld, gods, people and explorer spirit, but its
-   terraced architecture of pubs, can be shared across all connected universes.
+   Let's put our little universe into a small multiverse. Each universe will
+   have it's own heaven and underworld, gods and explorer spirit, but its
+   terraced architecture of pubs, and people (bartenders, greeters) can be
+   shared across all connected universes.
    </p>
 
    <p>
@@ -194,16 +179,17 @@ statechart ideas you need to know.
     :target: _static/md_multiverse.pdf
     :align: center
 
-.. admonition:: hint
+.. admonition:: translation
 
-  Anytime a statechart references a callback, that callback will change the
-  internal variable state of the active object in its first argument -- the
-  state callback functions do not have their own memory.
+  Anytime a statechart references a callback (a pub), that callback will change
+  the internal variable state of the ActiveObject that is passed in as its first
+  argument -- the state callback functions themselves, do not have their own
+  memory.
 
   Since the callback functions don't keep any information, they can be called by
-  many different active objects, in that active object's thread, and behave as
-  expected; there are no side effects.  In this way, many different active
-  objects can use the same set of state callback functions.
+  many different ActiveObjects (in that ActiveObjects's thread) and behave as
+  expected; there are no side effects.  In this way, many different ActiveObject
+  can use the same set of state callback functions.
 
 .. raw:: html
 
@@ -223,19 +209,18 @@ statechart ideas you need to know.
     :target: _static/md_eve.pdf
     :align: center
 
-.. admonition:: hint
+.. admonition:: translation
 
-  Eve is the "event processor".  The if-elif clauses, represented by the people
-  in the story, exist within each of the state functions.  These if-elif clauses
-  only become active when the event processor calls its function with an
-  internal event, represented by one of the people in the story.
+  The if-elif clauses, represented by the people in the story, exist within each
+  of the state functions.  These if-elif clauses only become active when the
+  event processor (Eve) calls its function with an internal event, represented
+  by one of the people in the story.
 
   Tara, the "target state" is used by the event processor when it is searching a
-  statemachine to see which state handles an external event.
-
-  Since the event processor calls the function and change's its target state
-  while it is searching through a statemachine, we say that Eve rules over the
-  people and Tara the "explorer spirit".
+  statemachine to see which state handles an external event.  Since the event
+  processor calls the function and change's its target state while it is
+  searching through a statemachine, we say that Eve rules over the people and
+  Tara the "explorer spirit".
 
 .. raw:: html
 
@@ -262,9 +247,9 @@ statechart ideas you need to know.
     :target: _static/md_theo.pdf
     :align: center
 
-.. admonition:: hint
+.. admonition:: translation
 
-  Theo represents a "thread" pending on a queue.  The activeobject's ``post_fifo``
+  Theo represents a "thread" pending on a queue.  The ActiveObject's ``post_fifo``
   and ``post_lifo`` methods allow an application developer to put events into
   this queue.  When the thread sees that a queue has an item, it will wake up,
   and drive the event processor, which in turn, will call the functions
@@ -286,39 +271,37 @@ statechart ideas you need to know.
     :target: _static/md_events.pdf
     :align: center
 
-.. admonition:: hint
+.. admonition:: translation
   
   An event has a name, called a signal, which can be a user defined name or it
-  can be a predefined name.  An event with a user defined signal name is called
-  an external event.  An event with a predefined name is called an internal
-  event.
+  can be a predefined name (ENTRY_SIGNAL, EXIT_SIGNAL, INIT_SIGNAL, etc...).  An
+  event with a user defined signal name is called an external event.  An event
+  with a predefined name is called an internal event.
 
   The whole point of naming an event with a signal is so that a state function
   can use an if-elif clause to "catch" the event when it is given to that
   function.  When such an event is caught, your code is run.
-
-  An event can have an optional payload.
 
 .. raw:: html
 
    <div class="story">
 
    <p>
-   When an "event" comes through the portal, Theo will pick it up, marvel at it
+   When an "event" comes through the portal, Theo will pick it up, marvel at it,
    then in a reverent gesture, pass it to Eve.  They both become excited, maybe
-   even a little nervous, because they know there universe is going to change; it
+   even a little nervous, because they know their universe is going to change; it
    will react to the event.
    </p>
 
    <p>
-   Theo encourages Eve to fly back up into the sky and to "follow the laws." Then
-   he will watch as she gives her minions their marching orders.  Only after all of
-   the activity stops, will he focus his attention back on the portal.
+   Theo encourages Eve to "follow the laws." Then he will watch as she gives her
+   minions their marching orders.  Only after all of the activity stops, will he
+   focus his attention back on the portal.
    </p>
 
    <p>
    Feeling oddly refreshed and encouraged by Theo, Eve looks around the map until
-   she see's Spike from her high vantage point.  Spike being the god of the earth,
+   she sees Spike from her high vantage point.  Spike being the god of the earth,
    is easy to see and Eve knows that her underling-spirit Tara, "the explorer",  is
    always near him.
    </p>
@@ -353,19 +336,22 @@ statechart ideas you need to know.
    <div class="story">
 
    <p>
-   If there is no bartender to talk to on her terrace, she will go to it's exit
-   staircase and descend to the next terrace.  Being a spirit, she is hard to see
-   and the bouncers and greeters leave her alone when she is by herself.
+   If there is no bartender to talk to on her terrace, she will go to its exit
+   staircase and <strong>descends</strong> to the next terrace (Tara only ascends when given
+   instructions to do so).  Being a spirit, she is hard to see and the bouncers
+   and greeters leave her alone when she is by herself.
    </p>
 
    </div>
 
-.. admonition:: hint
+.. admonition:: translation
 
-  The terraces are just callback functions containing if-elif-else clauses.  The
-  else clause of each callback function provides information about what other
-  callback function should be called if it doesn't know what to do with a given
-  event.  This other function, can be thought of as a lower terrace.
+  The terraces are just callback functions containing if-elif-else clauses (pub
+  == terrace == state == callback).
+  
+  The else clause of each callback function provides information about what
+  other callback function should be called if it doesn't know what to do with a
+  given event.  This other function, can be thought of as a lower terrace.
 
   The bartenders are named arrows on the HSM diagram.
 
@@ -388,7 +374,7 @@ statechart ideas you need to know.
     :target: _static/md_bartenders_on_the_hsm_oblivion.pdf
     :align: center
 
-.. admonition:: hint
+.. admonition:: translation
 
   Here we are starting to explore a statechart's dynamics.  If your statemachine
   doesn't handle an event in any of it's callback functions, the event will be
@@ -415,7 +401,7 @@ statechart ideas you need to know.
     :target: _static/md_bartenders_on_the_hsm_hook.pdf
     :align: center
 
-.. admonition:: hint
+.. admonition:: translation
 
   Tara, the "target state" is used by the event processor to find which state
   callback function knows how to handle a given event.  In the above picture we
@@ -456,7 +442,7 @@ statechart ideas you need to know.
    where Tara has gotten her next clue.  He knows that she will want to talk to him
    about it.  As he approaches the exit, the exit bouncer puts up a hand, then
    looks at a clip board to see if Spike is on the guest list, which he always is,
-   and then let's Spike pass to the next lower terrace.  You really can't stop the
+   and then let's Spike pass to the next terrace.  You really can't stop the
    god of the earth.  For every terrace that Spike needs to leave so that he can
    rejoin with Tara, this futile ritual is repeated.
    </p>
@@ -466,7 +452,7 @@ statechart ideas you need to know.
     :target: _static/md_bartenders_on_the_hsm_reaction_2.pdf
     :align: center
 
-.. admonition:: hint
+.. admonition:: translation
 
   Tara, the "target state" is used by the event processor to recurse outward
   from C1 to find a state that knows what to do with the Event, who's signal
@@ -558,7 +544,7 @@ statechart ideas you need to know.
    </p>
    </div>
 
-.. admonition:: hint
+.. admonition:: translation
 
   The run to completion, RTC, concept is very important to understand.  Your
   statechart will only react to one event at a time.  The thread will only
@@ -636,6 +622,8 @@ statechart ideas you need to know.
 |                                     | method), each callback takes two        |
 |                                     | arguments, a reference to a statechart  |
 |                                     | and an event to send to it              |
++-------------------------------------+-----------------------------------------+
+| A pub                               | a state within a state machine          |
 +-------------------------------------+-----------------------------------------+
 | Eve, "the goddess of law and order",| the event processor                     |
 | goddess of heaven                   |                                         |

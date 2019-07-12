@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Zero To One &#8212; miros 2.0 documentation</title>
+    <title>Tutorial: Zero To One &#8212; miros 2.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -41,70 +41,59 @@ before that you must think hard about whether it will be valuable in the
 future.</em></p>
 <p class="attribution">&mdash;Peter Thiel, Zero to One: Notes on Startups, or How to build the Future</p>
 </div></blockquote>
-<div class="section" id="zero-to-one">
-<h1>Zero To One<a class="headerlink" href="#zero-to-one" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="tutorial-zero-to-one">
+<h1>Tutorial: Zero To One<a class="headerlink" href="#tutorial-zero-to-one" title="Permalink to this headline">¶</a></h1>
 <p>This is not a 5-minute blog read.  But, if you want to learn how statecharts
-work, this is your one-stop shop, it will take you from 0 to 1.</p>
-<p>First, I’ll try to explain the statechart concepts, pictures and mechanics using
-a <a class="reference internal" href="#zero-to-one-story"><span class="std std-ref">story</span></a>.  At the end of the story I’ll describe how the story’s stage,
-characters and theme map back onto the things you need to know to be a
-statechart designer.  Don’t worry if you are a little bit confused after reading
-the story; if a few things stick, great, proceed into the example, then re-read
-the story once you have written your first couple of statecharts.</p>
-<p>Secondly, we will work through an <a class="reference internal" href="#zero-to-one-a-simple-example"><span class="std std-ref">example</span></a>
-together.  The example will be broken up into a set of iterations and each
-iteration will be broken into 4 parts:</p>
-<ul class="simple">
-<li><cite>spec</cite>, what are we trying to build and how do we know when we are done.</li>
-<li><cite>design</cite>, a picture, as a formal description of the thing we are trying to build</li>
-<li><cite>code</cite>, the code required to manifest the design</li>
-<li><cite>proof</cite>, proof that our code is actually matching our design</li>
-<li><cite>questions</cite>, a list of questions and answers</li>
-</ul>
-<p>The questions section will provide you with a choose-your-own-adventure style of
-reading the documentation.</p>
-<p>Each iteration is heavily linked so that you can quickly bounce around between
-its various parts.</p>
-<div class="admonition-scott-volk-2018-09-09 admonition">
-<p class="first admonition-title">Scott Volk: 2018-09-09</p>
-<p>I will also pepper the story with boxes, like this one, containing <strong>hints</strong>
-about how the story relates to the technical aspects of statecharts.</p>
-<p>I challenge you <em>not to read</em> these boxes in your first look at the story,
-especially if you are new to this type of technical language.  Read the hints
-after you have programmed your first working statechart.</p>
-<p>On your first pass just read the story and look over the pictures.</p>
-<p class="last">After you have completed the example, read the story again if your
-understanding of the dynamics aren’t clear, the hint boxes will serve as a
-bridge between the story and your technical work.</p>
-</div>
-<div class="section" id="story">
-<span id="zero-to-one-story"></span><h2>Story<a class="headerlink" href="#story" title="Permalink to this headline">¶</a></h2>
+work, this is your one-stop shop, it will take you from 0 to 1.  If you already
+understand statecharts, and would like to just see how to use the syntax of this
+library, reference the <a class="reference internal" href="quickstart.html#quick-start"><span class="std std-ref">quick start</span></a>.</p>
 <p>If you are like me, learning something entirely new can be very exhausting.  You
 need to learn new words, new ideas and you have to juggle them in your head
 until you finally see how they interrelate.  This can be hard work.</p>
 <p>But stories about people moving around on a small stage are much easier to
-remember.  If it’s a good story, it doesn’t feel like work at all.</p>
-<p>So why don’t we try to explain something that is hard to remember using
-something that is easier to remember?</p>
-<p>I will do this now, I will use a story as a mental-scaffolding around the
-statechart ideas you need to know.</p>
+remember.  If it’s a good story, it doesn’t feel like work to remember its
+details.</p>
+<p>So lets use a <a class="reference internal" href="#zero-to-one-story"><span class="std std-ref">story</span></a> to explain the statechart
+concepts, pictures and mechanics.  At the end of the story I’ll describe how its
+stage, characters and objects map back onto the technical things you need to
+know.  Don’t worry if you are a little bit confused after reading the story; if
+a few things stick, great, push on.</p>
+<p>Once we understand some basic statechart concepts, we will work through an
+<a class="reference internal" href="#zero-to-one-a-simple-example"><span class="std std-ref">example</span></a>.  The example will be broken up
+into a set of iterations and each iteration will be broken into 4 parts:</p>
+<ul class="simple">
+<li><cite>spec</cite>: what are we trying to build and how do we know when we are done?</li>
+<li><cite>design</cite>: a picture, as a formal description of the thing we are trying to
+build</li>
+<li><cite>code</cite>: the code required to manifest the design</li>
+<li><cite>proof</cite>: proof that our code is actually matching our design</li>
+<li><cite>questions</cite>: a list of questions and answers</li>
+</ul>
+<p>The questions section will provide you with a dialogue driven style of
+reading the documentation.  Each iteration is heavily linked so that you can
+quickly bounce around between its various parts.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">I will also pepper the story with boxes, like this one, translating a story
+part to the technical aspects of statecharts.  If the contents of these boxes
+don’t make sense, don’t worry.  Things will become clearer once you work
+through the examples.</p>
+</div>
+<div class="section" id="story">
+<span id="zero-to-one-story"></span><h2>Story<a class="headerlink" href="#story" title="Permalink to this headline">¶</a></h2>
 <div class="story">
 
 <p><span class="story-intro">Our story will be placed in a little universe.</span>  This little universe will
 consist of a heaven, an earth and an underworld.   The earth in the story
-isn't round like ours.  It's a very small flat-earth, acting as a platform,
-floating above the underworld.  On top of the earth are a set of pubs,
-arranged on different terraces.
+isn't round like ours.  It's a very small flat platform, floating above the
+underworld.  On top of the earth are a set of pubs, arranged on different
+terraces.  Each terrace has one pub.
 </p>
 
 <p>
 To get to a higher pub, you would first have to walk through a lower pub.  The
 lower pubs are for a more general audience, while the higher pubs, though having
 less space have a more specialized aesthetic.
-</p>
-
-<p>
-Now let's add some characters and a bit more detail to the story.
 </p>
 
 <p>
@@ -122,8 +111,8 @@ secrets.
 </p>
 </div><a class="reference external image-reference" href="_static/md_terraced_pubs.pdf"><div align="center" class="align-center"><img alt="_images/md_terraced_pubs.svg" src="_images/md_terraced_pubs.svg" /></div>
 </a>
-<div class="admonition-hint admonition">
-<p class="first admonition-title">hint</p>
+<div class="admonition-translation admonition">
+<p class="first admonition-title">translation</p>
 <p>Each pub is a state in a statemachine.  You would program these states as
 functions that take two arguments, a reference to an active object and an event.</p>
 <p>These state functions will contain an if-elif structure which will have
@@ -137,12 +126,12 @@ event name.</p>
 <div class="story">
 
 <p>
-Now let's add some supernatural beings: three gods and a spirit.
+Now let's add some supernatural beings: three "gods" and a "spirit".
 </p>
 
 <p>
-The heaven will have one goddess Eve, "the goddess of law and order" and
-the underworld will be ruled by Theo, <a href="https://en.wikipedia.org/wiki/Solipsism">the solipsist.</a> The earth
+The heaven will have one goddess, Eve, "the goddess of law and order" and the
+underworld will be ruled by Theo, "<a href="https://en.wikipedia.org/wiki/Solipsism">the solipsist.</a>" The earth
 will have a lazy god named Spike, "the source" who happens to be the only guy
 who can drink in the whole universe.  Spike will have a companion spirit,
 named Tara "the explorer."
@@ -155,8 +144,8 @@ bartenders, three gods and one spirit.
 
 </div><a class="reference external image-reference" href="_static/md_terraced_gods.pdf"><div align="center" class="align-center"><img alt="_images/md_terraced_gods.svg" src="_images/md_terraced_gods.svg" /></div>
 </a>
-<div class="admonition-hint admonition">
-<p class="first admonition-title">hint</p>
+<div class="admonition-translation admonition">
+<p class="first admonition-title">translation</p>
 <p>Eve represents the “event processor”, or the algorithm that sends the state
 functions different events.</p>
 <p>Spike, represents the “Source” state while the event processor is searching
@@ -173,9 +162,10 @@ why these characters are supernatural in the story; it’s a mnemonic.</p>
 <div class="story">
 
 <p>
-Let's put our little universe into a small multiverse. Each universe will have
-it's own heaven and underworld, gods, people and explorer spirit, but its
-terraced architecture of pubs, can be shared across all connected universes.
+Let's put our little universe into a small multiverse. Each universe will
+have it's own heaven and underworld, gods and explorer spirit, but its
+terraced architecture of pubs, and people (bartenders, greeters) can be
+shared across all connected universes.
 </p>
 
 <p>
@@ -184,15 +174,16 @@ If this doesn't make any sense, don't worry about it.  Let's move on.
 
 </div><a class="reference external image-reference" href="_static/md_multiverse.pdf"><div align="center" class="align-center"><img alt="_images/md_multiverse.svg" src="_images/md_multiverse.svg" /></div>
 </a>
-<div class="admonition-hint admonition">
-<p class="first admonition-title">hint</p>
-<p>Anytime a statechart references a callback, that callback will change the
-internal variable state of the active object in its first argument – the
-state callback functions do not have their own memory.</p>
+<div class="admonition-translation admonition">
+<p class="first admonition-title">translation</p>
+<p>Anytime a statechart references a callback (a pub), that callback will change
+the internal variable state of the ActiveObject that is passed in as its first
+argument – the state callback functions themselves, do not have their own
+memory.</p>
 <p class="last">Since the callback functions don’t keep any information, they can be called by
-many different active objects, in that active object’s thread, and behave as
-expected; there are no side effects.  In this way, many different active
-objects can use the same set of state callback functions.</p>
+many different ActiveObjects (in that ActiveObjects’s thread) and behave as
+expected; there are no side effects.  In this way, many different ActiveObject
+can use the same set of state callback functions.</p>
 </div>
 <div class="story">
 
@@ -206,17 +197,17 @@ everyone on earth, except Spike, who she can't control.
 
 </div><a class="reference external image-reference" href="_static/md_eve.pdf"><div align="center" class="align-center"><img alt="_images/md_eve.svg" src="_images/md_eve.svg" /></div>
 </a>
-<div class="admonition-hint admonition">
-<p class="first admonition-title">hint</p>
-<p>Eve is the “event processor”.  The if-elif clauses, represented by the people
-in the story, exist within each of the state functions.  These if-elif clauses
-only become active when the event processor calls its function with an
-internal event, represented by one of the people in the story.</p>
-<p>Tara, the “target state” is used by the event processor when it is searching a
-statemachine to see which state handles an external event.</p>
-<p class="last">Since the event processor calls the function and change’s its target state
-while it is searching through a statemachine, we say that Eve rules over the
-people and Tara the “explorer spirit”.</p>
+<div class="admonition-translation admonition">
+<p class="first admonition-title">translation</p>
+<p>The if-elif clauses, represented by the people in the story, exist within each
+of the state functions.  These if-elif clauses only become active when the
+event processor (Eve) calls its function with an internal event, represented
+by one of the people in the story.</p>
+<p class="last">Tara, the “target state” is used by the event processor when it is searching a
+statemachine to see which state handles an external event.  Since the event
+processor calls the function and change’s its target state while it is
+searching through a statemachine, we say that Eve rules over the people and
+Tara the “explorer spirit”.</p>
 </div>
 <div class="story">
 
@@ -237,9 +228,9 @@ fact, this is his supernatural ability.
 
 </div><a class="reference external image-reference" href="_static/md_theo.pdf"><div align="center" class="align-center"><img alt="_images/md_theo.svg" src="_images/md_theo.svg" /></div>
 </a>
-<div class="admonition-hint admonition">
-<p class="first admonition-title">hint</p>
-<p class="last">Theo represents a “thread” pending on a queue.  The activeobject’s <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code>
+<div class="admonition-translation admonition">
+<p class="first admonition-title">translation</p>
+<p class="last">Theo represents a “thread” pending on a queue.  The ActiveObject’s <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code>
 and <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> methods allow an application developer to put events into
 this queue.  When the thread sees that a queue has an item, it will wake up,
 and drive the event processor, which in turn, will call the functions
@@ -254,35 +245,34 @@ have a scroll within them, he calls that scroll a "payload".
 </p>
 </div><a class="reference external image-reference" href="_static/md_events.pdf"><div align="center" class="align-center"><img alt="_images/md_events.svg" src="_images/md_events.svg" /></div>
 </a>
-<div class="admonition-hint admonition">
-<p class="first admonition-title">hint</p>
+<div class="admonition-translation admonition">
+<p class="first admonition-title">translation</p>
 <p>An event has a name, called a signal, which can be a user defined name or it
-can be a predefined name.  An event with a user defined signal name is called
-an external event.  An event with a predefined name is called an internal
-event.</p>
-<p>The whole point of naming an event with a signal is so that a state function
+can be a predefined name (ENTRY_SIGNAL, EXIT_SIGNAL, INIT_SIGNAL, etc…).  An
+event with a user defined signal name is called an external event.  An event
+with a predefined name is called an internal event.</p>
+<p class="last">The whole point of naming an event with a signal is so that a state function
 can use an if-elif clause to “catch” the event when it is given to that
 function.  When such an event is caught, your code is run.</p>
-<p class="last">An event can have an optional payload.</p>
 </div>
 <div class="story">
 
 <p>
-When an "event" comes through the portal, Theo will pick it up, marvel at it
+When an "event" comes through the portal, Theo will pick it up, marvel at it,
 then in a reverent gesture, pass it to Eve.  They both become excited, maybe
-even a little nervous, because they know there universe is going to change; it
+even a little nervous, because they know their universe is going to change; it
 will react to the event.
 </p>
 
 <p>
-Theo encourages Eve to fly back up into the sky and to "follow the laws." Then
-he will watch as she gives her minions their marching orders.  Only after all of
-the activity stops, will he focus his attention back on the portal.
+Theo encourages Eve to "follow the laws." Then he will watch as she gives her
+minions their marching orders.  Only after all of the activity stops, will he
+focus his attention back on the portal.
 </p>
 
 <p>
 Feeling oddly refreshed and encouraged by Theo, Eve looks around the map until
-she see's Spike from her high vantage point.  Spike being the god of the earth,
+she sees Spike from her high vantage point.  Spike being the god of the earth,
 is easy to see and Eve knows that her underling-spirit Tara, "the explorer",  is
 always near him.
 </p>
@@ -311,17 +301,19 @@ the event, she will approach that bartender and talk to him.
 <div class="story">
 
 <p>
-If there is no bartender to talk to on her terrace, she will go to it's exit
-staircase and descend to the next terrace.  Being a spirit, she is hard to see
-and the bouncers and greeters leave her alone when she is by herself.
+If there is no bartender to talk to on her terrace, she will go to its exit
+staircase and <strong>descends</strong> to the next terrace (Tara only ascends when given
+instructions to do so).  Being a spirit, she is hard to see and the bouncers
+and greeters leave her alone when she is by herself.
 </p>
 
-</div><div class="admonition-hint admonition">
-<p class="first admonition-title">hint</p>
-<p>The terraces are just callback functions containing if-elif-else clauses.  The
-else clause of each callback function provides information about what other
-callback function should be called if it doesn’t know what to do with a given
-event.  This other function, can be thought of as a lower terrace.</p>
+</div><div class="admonition-translation admonition">
+<p class="first admonition-title">translation</p>
+<p>The terraces are just callback functions containing if-elif-else clauses (pub
+== terrace == state == callback).</p>
+<p>The else clause of each callback function provides information about what
+other callback function should be called if it doesn’t know what to do with a
+given event.  This other function, can be thought of as a lower terrace.</p>
 <p>The bartenders are named arrows on the HSM diagram.</p>
 <p class="last">The bartender also represents an if-elif clause that matches the name of the
 event given to that function.</p>
@@ -336,8 +328,8 @@ event.
 </p>
 </div><a class="reference external image-reference" href="_static/md_bartenders_on_the_hsm_oblivion.pdf"><div align="center" class="align-center"><img alt="_images/md_bartenders_on_the_hsm_oblivion.svg" src="_images/md_bartenders_on_the_hsm_oblivion.svg" /></div>
 </a>
-<div class="admonition-hint admonition">
-<p class="first admonition-title">hint</p>
+<div class="admonition-translation admonition">
+<p class="first admonition-title">translation</p>
 <p class="last">Here we are starting to explore a statechart’s dynamics.  If your statemachine
 doesn’t handle an event in any of it’s callback functions, the event will be
 ignored.</p>
@@ -357,8 +349,8 @@ Spike calls this a "hook".
 </p>
 </div><a class="reference external image-reference" href="_static/md_bartenders_on_the_hsm_hook.pdf"><div align="center" class="align-center"><img alt="_images/md_bartenders_on_the_hsm_hook.svg" src="_images/md_bartenders_on_the_hsm_hook.svg" /></div>
 </a>
-<div class="admonition-hint admonition">
-<p class="first admonition-title">hint</p>
+<div class="admonition-translation admonition">
+<p class="first admonition-title">translation</p>
 <p>Tara, the “target state” is used by the event processor to find which state
 callback function knows how to handle a given event.  In the above picture we
 see that T started in “C pub”, then the event processor recursed outward to “A
@@ -388,14 +380,14 @@ loves about him.  Having nothing else to do, he makes his way to the terrace
 where Tara has gotten her next clue.  He knows that she will want to talk to him
 about it.  As he approaches the exit, the exit bouncer puts up a hand, then
 looks at a clip board to see if Spike is on the guest list, which he always is,
-and then let's Spike pass to the next lower terrace.  You really can't stop the
+and then let's Spike pass to the next terrace.  You really can't stop the
 god of the earth.  For every terrace that Spike needs to leave so that he can
 rejoin with Tara, this futile ritual is repeated.
 </p>
 </div><a class="reference external image-reference" href="_static/md_bartenders_on_the_hsm_reaction_2.pdf"><div align="center" class="align-center"><img alt="_images/md_bartenders_on_the_hsm_reaction_2.svg" src="_images/md_bartenders_on_the_hsm_reaction_2.svg" /></div>
 </a>
-<div class="admonition-hint admonition">
-<p class="first admonition-title">hint</p>
+<div class="admonition-translation admonition">
+<p class="first admonition-title">translation</p>
 <p>Tara, the “target state” is used by the event processor to recurse outward
 from C1 to find a state that knows what to do with the Event, who’s signal
 name is Mary.</p>
@@ -468,8 +460,8 @@ and its "run to completion".  Knowing there is nothing left to do in the
 universe, he turns his gaze back to the portal.  He waits patiently for an event
 to pass through the little universe's loading dock.  All is well.
 </p>
-</div><div class="admonition-hint admonition">
-<p class="first admonition-title">hint</p>
+</div><div class="admonition-translation admonition">
+<p class="first admonition-title">translation</p>
 <p>The run to completion, RTC, concept is very important to understand.  Your
 statechart will only react to one event at a time.  The thread will only
 process the next event when the event processor has run out of things to do
@@ -543,25 +535,28 @@ method), each callback takes two
 arguments, a reference to a statechart
 and an event to send to it</td>
 </tr>
-<tr class="row-even"><td>Eve, “the goddess of law and order”,
+<tr class="row-even"><td>A pub</td>
+<td>a state within a state machine</td>
+</tr>
+<tr class="row-odd"><td>Eve, “the goddess of law and order”,
 goddess of heaven</td>
 <td>the event processor</td>
 </tr>
-<tr class="row-odd"><td>Spike, “the source”,
+<tr class="row-even"><td>Spike, “the source”,
 god of the earth</td>
 <td>the source state, <strong>S</strong> of a statechart
 (the current state of the HSM)</td>
 </tr>
-<tr class="row-even"><td>Theo, “the solipsist”
+<tr class="row-odd"><td>Theo, “the solipsist”
 god of the underworld</td>
 <td>the thread that drives the
 statechart</td>
 </tr>
-<tr class="row-odd"><td>Tara, “the explorer”, spirit</td>
+<tr class="row-even"><td>Tara, “the explorer”, spirit</td>
 <td>a search aspect, <strong>T</strong> (target), of the
 event processor</td>
 </tr>
-<tr class="row-even"><td>bartender</td>
+<tr class="row-odd"><td>bartender</td>
 <td>arrow or hook on the HSM diagram,
 represented as a conditional statement
 for a user defined event,
@@ -569,22 +564,22 @@ any code associated with this
 conditional statement it run when
 touched by <strong>T</strong></td>
 </tr>
-<tr class="row-odd"><td>greeter</td>
+<tr class="row-even"><td>greeter</td>
 <td><code class="docutils literal notranslate"><span class="pre">INIT_SIGNAL</span></code> event given to callback
 by the event processor when <strong>S</strong>
 stabilizes in the state it represents</td>
 </tr>
-<tr class="row-even"><td>exit bouncer</td>
+<tr class="row-odd"><td>exit bouncer</td>
 <td><code class="docutils literal notranslate"><span class="pre">EXIT_SIGNAL</span></code> event given to callback
 by the event processor when <strong>S</strong> exits
 the state it represents</td>
 </tr>
-<tr class="row-odd"><td>exit bouncer</td>
+<tr class="row-even"><td>exit bouncer</td>
 <td><code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code> event given to callback
 by the event processor when <strong>S</strong> enters
 the state it represents</td>
 </tr>
-<tr class="row-even"><td><strong>run to completion, RTC</strong>:
+<tr class="row-odd"><td><strong>run to completion, RTC</strong>:
 Theo keeps his attention on the
 universe’s activities until the
 action stops</td>
@@ -595,7 +590,7 @@ can no longer cause state transitions
 and the statechart settles on a new
 state.</td>
 </tr>
-<tr class="row-odd"><td>Top level view of terraced bar
+<tr class="row-even"><td>Top level view of terraced bar
 universe</td>
 <td>Make these drawings with a 90’s drawing
 technology called UML</td>
@@ -7378,7 +7373,7 @@ immediately after being started.</p>
 </a></p>
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Zero To One</a><ul>
+<li><a class="reference internal" href="#">Tutorial: Zero To One</a><ul>
 <li><a class="reference internal" href="#story">Story</a></li>
 <li><a class="reference internal" href="#a-simple-example-toaster-oven">A Simple Example: Toaster Oven</a><ul>
 <li><a class="reference internal" href="#iteration-1-setup">Iteration 1: setup</a><ul>
