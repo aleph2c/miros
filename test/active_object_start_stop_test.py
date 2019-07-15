@@ -1,9 +1,11 @@
 import time
 import pytest
 from miros import Event
+from miros import spy_on
 from miros import signals
 from miros import Factory
 from collections import deque
+from miros import ActiveObject
 from miros import return_status
 from collections import namedtuple
 
@@ -120,6 +122,27 @@ def test_that_stopping_the_fabric_stops_the_tasks():
   ssc.post_fifo(Event(signal=signals.do_some_useful_work, payload=Payload(item=1)))
   time.sleep(0.1)
   assert(ssc.thread.is_alive() == False)
+
+@spy_on
+def some_state(chart, e):
+  status = return_status.UNHANDLED
+  if(e.signal == signals.Destroy_This_Chart):
+    chart.stop()
+    status = return_status.HANDLED
+  else:
+    chart.temp.fun = chart.top
+    status = return_status.SUPER
+  return status
+
+@pytest.mark.stop
+def test_that_stop_works_within_an_active_object():
+  ao = ActiveObject('some_state')
+  ao.start_at(some_state)
+  time.sleep(0.1)
+  assert(ao.thread.is_alive() == True)
+  ao.post_fifo(Event(signal=signals.Destroy_This_Chart))
+  time.sleep(0.1)
+  assert(ao.thread.is_alive() == False)
 
 if __name__ == "__main__":
   print("hey")

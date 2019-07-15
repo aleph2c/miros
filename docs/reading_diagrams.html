@@ -1187,17 +1187,21 @@ This is called <strong>decomposition hiding</strong>.  I’ll demonstrate this b
 of the details of our HSM oven:</p>
 <a class="reference external image-reference" href="_static/composite_state_3.pdf"><div align="center" class="align-center"><img alt="_images/composite_state_3.svg" src="_images/composite_state_3.svg" /></div>
 </a>
-<p>There is a good chance that I am breaking the UML standard by drawing the above
-diagram the way I did.  I’m hiding the door_closed state, yet I’m showing part
-of it’s design.  I’m showing an arrow going into the door_closed state, and
-showing it land on a deep history icon.  So, am I hiding the state or not?
-Well, I’m doing both.  I’m trying to explain the gist of the hidden part of the
-design: to go back to the previous sub-state of the door_closed part of the
-statechart, when the door is opened after the over was in a door_open state.
-I’m trying to show this history-behavior is happening without going into the
-details of what substates exist within the door_closed state.</p>
-<p>When you sketch your diagrams without adhering to a ridged set of drawing rules,
-you can make decisions like this.</p>
+<p>I have hidden the majority of the door_closed state in the decomposition hiding
+state icon.  When you see this icon, you know that some details have been hidden
+to make the diagram fit on a page.  But there is a good chance that I am
+breaking the UML standard by drawing the above diagram the way I did.  I’m
+hiding the door_closed state, yet I’m showing part of it’s design.  I’m showing
+an arrow going into the door_closed state, and showing it land on a deep history
+icon.  So, am I hiding the state or not?  Well, I’m doing both.  I’m trying to
+explain the gist of the hidden part of the design: to go back to the previous
+sub-state of the door_closed part of the statechart, when the door is opened
+after the over was in a door_open state.  I’m trying to show this
+history-behavior is happening without going into the details of what substates
+exist within the door_closed state.</p>
+<p>When you sketch your diagrams without adhering to a rigid set of drawing rules,
+you can make decisions like this.  The diagrams act as sketches rather than a
+programming language.</p>
 </div>
 <div class="section" id="deep-history-icon">
 <span id="reading-diagrams-deep-history-dot"></span><h3>Deep History Icon<a class="headerlink" href="#deep-history-icon" title="Permalink to this headline">¶</a></h3>
@@ -1206,6 +1210,8 @@ but you would like to transition back to that state after the interruption, you
 can use the deep history pseudostate, it’s a circle enclosing a H*:</p>
 <a class="reference external image-reference" href="_static/TransitionToHistoryStatePattern.pdf"><div align="center" class="align-center"><img alt="_images/TransitionToHistoryStatePattern.svg" src="_images/TransitionToHistoryStatePattern.svg" /></div>
 </a>
+<p>The <a class="reference internal" href="patterns.html#patterns-transition-to-history"><span class="std std-ref">transition to history</span></a> section of the
+patterns part of this document goes into the details about how to implement this in code.</p>
 </div>
 <div class="section" id="if-else-structures">
 <span id="reading-diagrams-if-structures"></span><h3>If-Else Structures<a class="headerlink" href="#if-else-structures" title="Permalink to this headline">¶</a></h3>

@@ -1337,18 +1337,22 @@ of the details of our HSM oven:
     :target: _static/composite_state_3.pdf
     :align: center
 
-There is a good chance that I am breaking the UML standard by drawing the above
-diagram the way I did.  I'm hiding the door_closed state, yet I'm showing part
-of it's design.  I'm showing an arrow going into the door_closed state, and
-showing it land on a deep history icon.  So, am I hiding the state or not?
-Well, I'm doing both.  I'm trying to explain the gist of the hidden part of the
-design: to go back to the previous sub-state of the door_closed part of the
-statechart, when the door is opened after the over was in a door_open state.
-I'm trying to show this history-behavior is happening without going into the
-details of what substates exist within the door_closed state.
+I have hidden the majority of the door_closed state in the decomposition hiding
+state icon.  When you see this icon, you know that some details have been hidden
+to make the diagram fit on a page.  But there is a good chance that I am
+breaking the UML standard by drawing the above diagram the way I did.  I'm
+hiding the door_closed state, yet I'm showing part of it's design.  I'm showing
+an arrow going into the door_closed state, and showing it land on a deep history
+icon.  So, am I hiding the state or not?  Well, I'm doing both.  I'm trying to
+explain the gist of the hidden part of the design: to go back to the previous
+sub-state of the door_closed part of the statechart, when the door is opened
+after the over was in a door_open state.  I'm trying to show this
+history-behavior is happening without going into the details of what substates
+exist within the door_closed state.
 
-When you sketch your diagrams without adhering to a ridged set of drawing rules,
-you can make decisions like this.
+When you sketch your diagrams without adhering to a rigid set of drawing rules,
+you can make decisions like this.  The diagrams act as sketches rather than a
+programming language.
 
 .. _reading_diagrams-deep-history-dot:
 
@@ -1361,6 +1365,9 @@ can use the deep history pseudostate, it's a circle enclosing a H*:
 .. image:: _static/TransitionToHistoryStatePattern.svg
     :target: _static/TransitionToHistoryStatePattern.pdf
     :align: center
+
+The :ref:`transition to history <patterns-transition-to-history>` section of the
+patterns part of this document goes into the details about how to implement this in code.
 
 .. _reading_diagrams-if-structures:
 

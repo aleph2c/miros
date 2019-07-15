@@ -665,7 +665,14 @@ class ActiveObject(HsmWithQueues):
     # post an item to wake up the task so it can see it's event has been cleared
     # this will cause it to exit its forever-loop and exit
     self.queue.append(HsmEvent(signal=signals.stop_active_object))
-    self.thread.join()
+    try:
+      # If stop is being called outside of this active object, wait for this
+      # thread to stop
+      self.thread.join()
+    except RuntimeError:
+      # If stop is being called from within the active object thread, we can not
+      # join our own thread, so proceed with the next steps
+      pass
 
     # kill threads which were started by post_fifo or post_lifo single-shots or
     # multi-shots
