@@ -100,7 +100,7 @@ Story
 .. admonition:: translation
 
   Each pub is a state in a statemachine.  You would program these states as
-  functions that take two arguments, a reference to an active object and an event.
+  functions that take two arguments, a reference to an ActiveObject and an event.
 
   These state functions will contain an if-elif structure which will have
   multiple clauses.  The greeter is the "init" clause, and the enter and exit
@@ -188,7 +188,7 @@ Story
 
   Since the callback functions don't keep any information, they can be called by
   many different ActiveObjects (in that ActiveObjects's thread) and behave as
-  expected; there are no side effects.  In this way, many different ActiveObject
+  expected; there are no side effects.  In this way, many different ActiveObjects
   can use the same set of state callback functions.
 
 .. raw:: html
@@ -454,7 +454,7 @@ Story
 
 .. admonition:: translation
 
-  Tara, the "target state" is used by the event processor to recurse outward
+  The target state is used by the event processor to recurse outward
   from C1 to find a state that knows what to do with the Event, who's signal
   name is Mary.  
 
@@ -464,7 +464,9 @@ Story
   from it's current state, to the LCA.  However, it should not exit the LCA.
 
   As an application developer, you don't really care about the LCA acronym.  You
-  just need to understand the dynamics of how exits work.
+  just need to understand the dynamics of how exits work; your exit handlers
+  will be called as your source state transitions out of the inner states to
+  re-join the target state.
 
 .. raw:: html
 
@@ -473,7 +475,7 @@ Story
    When Spike finally finds Tara he asks her what she learned.  Bubbling with
    excitement, she tells him about where the bartender said to take the event, to
    which he always says, "great I'll meet you there, but first I want to have a
-   drink."  Tara takes the event and makes her way to the location that the
+   drink here."  Tara takes the event and makes her way to the location that the
    bartender told her about.
    </p>
 
@@ -481,7 +483,7 @@ Story
    Spike finishes his drink, then again starts to make his way toward Tara.  Before
    he can climb up to a new Terrace, he is stopped by the entry bouncer, who looks
    at his clip board to see if Spike is on the guest list, which he always is, then
-   let's Spike proceed.  You really can't stop the god of the earth anyway.
+   lets Spike proceed.  You really can't stop the god of the earth anyway.
    </p>
    </div>
 
@@ -551,8 +553,9 @@ Story
   process the next event when the event processor has run out of things to do
   with your old event.
 
-  For this reason, you should not put blocking code into your statecharts.  If
-  you do, they will stop reacting to events and become unresponsive.
+  For this reason, you should not put `blocking code
+  <https://en.wikipedia.org/wiki/Blocking_(computing)>`_ into your statecharts.
+  If you do, they will stop reacting to events and become unresponsive.
 
 .. raw:: html
 
@@ -562,7 +565,20 @@ Story
    his eyes and daydreams; his attention briefly drifts back to his world.  This is
    enough to wake everyone up from their non-existence.
    </p>
+   </div>
 
+
+.. admonition:: translation
+   
+   Solipsism is the name of the philosophy where a person thinks they create the
+   world when they open their eyes, and they destroy the world when they close
+   their eyes.  It's delusional.  But Theo is actually a "solipsist" (though he
+   doesn't know that he is) because he is a Python thread.  No code can run
+   unless he grants CPU access to it.
+
+.. raw:: html
+
+   <div class="story">
    <p>
    When the people wake up, they become listless. The bouncers who have had nothing
    to do since the prohibition was announced by Eve, are particularly frustrated
@@ -573,27 +589,26 @@ Story
    </p>
 
    <p>
-   Then somehow they find out about you and me, fellow humans called developers.
+   Somehow, they find out about you and me, fellow humans called developers.
    </p>
 
    <p>
-   They learn that we, despite being human, are all powerful.  That we can build
+   They learn that we, despite being human, are very powerful.  That we can build
    the pub terrace system to which their gods are subservient; that we can send the
-   events and give the greeters and the bouncers their secret directions (arrows on
-   the diagram).  That we can even built lots of different interconnected universes
+   event orbs and give the greeters and the bouncers their secret directions (arrows on
+   the diagram).  That we can even build many different interconnected universes
    and have them communicate with each other.
    <p>
 
    <p>
    They challenge us to make something useful out of their existence, even if
    they can't understand it from where they are, they need something to
-   <strong>mean something</strong>.  So, they create an organized campaign:
-   "hack the humans".  This is how it works: All of the humans in the little
-   universe, open themselves to run code from our universe, while they are
+   <strong>have meaning</strong>.  So, they create an organized campaign: "hack
+   the humans".  This is how it works: All of the humans in the little universe,
+   open themselves to run code directly from our universe, while they are
    talking to either Tara or Spike.
    </p>
    </div>
-
 
 .. image:: _static/md_hack_the_humans.svg
     :target: _static/md_hack_the_humans.pdf
@@ -603,75 +618,118 @@ Story
 
    <div class="story">
    <p>
-   To help us, they create a Rosetta stone, translating the concepts of their
+   To help us, they create a <a href="https://www.dictionary.com/browse/rosetta-stone">Rosetta stone</a>, translating the concepts of their
    universe into something legible for you and me:
    </p>
    </div>
 
 .. _zero_to_one_rosetta:
 
-+-------------------------------------+-----------------------------------------+
-| **Story Concept**                   | **Programming Concept**                 |
-+=====================================+=========================================+
-| The universe                        | a statechart, which is an ActiveObject  |
-|                                     | derived object.                         |
-+-------------------------------------+-----------------------------------------+
-| The multiverse of terraced bars     | a set of callback functions making an   |
-|                                     | HSM (accessible from multiple           |
-|                                     | statecharts, via the ``start_at``       |
-|                                     | method), each callback takes two        |
-|                                     | arguments, a reference to a statechart  |
-|                                     | and an event to send to it              |
-+-------------------------------------+-----------------------------------------+
-| A pub                               | a state within a state machine          |
-+-------------------------------------+-----------------------------------------+
-| Eve, "the goddess of law and order",| the event processor                     |
-| goddess of heaven                   |                                         |
-+-------------------------------------+-----------------------------------------+
-| Spike, "the source",                | the source state, **S** of a statechart |
-| god of the earth                    | (the current state of the HSM)          |
-+-------------------------------------+-----------------------------------------+
-| Theo, "the solipsist"               | the thread that drives the              |
-| god of the underworld               | statechart                              |
-+-------------------------------------+-----------------------------------------+
-| Tara, "the explorer", spirit        | a search aspect, **T** (target), of the |
-|                                     | event processor                         |
-+-------------------------------------+-----------------------------------------+
-| bartender                           | arrow or hook on the HSM diagram,       |
-|                                     | represented as a conditional statement  |
-|                                     | for a user defined event,               |
-|                                     | any code associated with this           |
-|                                     | conditional statement it run when       |
-|                                     | touched by **T**                        |
-+-------------------------------------+-----------------------------------------+
-| greeter                             | ``INIT_SIGNAL`` event given to callback |
-|                                     | by the event processor when **S**       |
-|                                     | stabilizes in the state it represents   |
-+-------------------------------------+-----------------------------------------+
-| exit bouncer                        | ``EXIT_SIGNAL`` event given to callback |
-|                                     | by the event processor when **S** exits |
-|                                     | the state it represents                 |
-+-------------------------------------+-----------------------------------------+
-| exit bouncer                        | ``ENTRY_SIGNAL`` event given to callback|
-|                                     | by the event processor when **S** enters|
-|                                     | the state it represents                 |
-+-------------------------------------+-----------------------------------------+
-| **run to completion, RTC**:         | The thread will only handle one event   |
-| Theo keeps his attention on the     | a time. This is called RTC.  An RTC     |
-| universe's activities until the     | process is over when the event processor|
-| action stops                        | can no longer cause state transitions   |
-|                                     | and the statechart settles on a new     |
-|                                     | state.                                  |
-+-------------------------------------+-----------------------------------------+
-| Top level view of terraced bar      | Make these drawings with a 90's drawing |
-| universe                            | technology called UML                   | 
-+-------------------------------------+-----------------------------------------+
++--------------------------------------+------------------------------------------+
+| **Story Concept**                    | **Programming Concept**                  |
++======================================+==========================================+
+| The terraced pubs, humans, Gods and  | A statechart                             |
+| spirit                               |                                          |
+|                                      |                                          |
++--------------------------------------+------------------------------------------+
+| All the terraced pubs                | A set of all possible states that your   |
+| (And all the humans)                 | design will have (pubs) and the code     |
+|                                      | that makes each state run the way you    |
+|                                      | want it to (the humans).  A              |
+|                                      | state is an abstraction of a real world  |
+|                                      | state of being, or how you would like to |
+|                                      | group your program's functionality and   |
+|                                      | behaviors.                               |
+|                                      | A program                                |
+|                                      | made up of a bunch of interacting states |
+|                                      | is called a state machine.  Our programs |
+|                                      | will be made up of layered states in a   |
+|                                      | hierarchy, so our machine is called a    |
+|                                      | hierachical state machine (HSM).         |
++--------------------------------------+------------------------------------------+
+| A single pub and its humans          | A callback function with some code in it.|
+|                                      | The callback function represents one of  |
+|                                      | the states in our design.                |
+|                                      | A callback function references its       |
+|                                      | lower callback function (it knows about  |
+|                                      | its lower pub, or its parent state).     |
++--------------------------------------+------------------------------------------+
+| Gods and Spirit                      | An ActiveObject which uses the callback  |
+|                                      | functions.                               |
+|                                      | It provides a thread to run              |
+|                                      | the state machine in, the rules on how   |
+|                                      | it should run and it marks the state     |
+|                                      | machine with a source state and a target |
+|                                      | state.                                   |
+|                                      | An ActiveObject can mark states but it   |
+|                                      | does not have states, it attaches to a   |
+|                                      | set of state callbacks with its          |
+|                                      | ``start_at`` call which takes a state    |
+|                                      | callback as an argument.                 |
++--------------------------------------+------------------------------------------+
+| Eve, "the goddess of law and order", | The ActiveObject event processor, the    |
+| goddess of heaven                    | algorithm that ensures we follow HSM     |
+|                                      | transition rules                         |
++--------------------------------------+------------------------------------------+
+| Spike, "the source",                 | There are many states in an HSM, we can  |
+| god of the earth                     | not be in them all at the same time,     |
+|                                      | **S**, the source state; is a variable   |
+|                                      | holding the active state of our          |
+|                                      | state machine before it reacts to an     |
+|                                      | event. If the state machine is not       |
+|                                      | reacting to an event **S** is the        |
+|                                      | current state of the state machine.      |
++--------------------------------------+------------------------------------------+
+| Theo, "the solipsist",               | The thread that the statechart runs in.  |
+| god of the underworld                |                                          |
++--------------------------------------+------------------------------------------+
+| Tara, "the explorer", spirit         | The target state, **T** (search aspect)  |
+|                                      | of the event processor.  It is a         |
+|                                      | variable that can hold different         |
+|                                      | states while the state machine is        |
+|                                      | figuring out how to transition from      |
+|                                      | one state to another as it reacts to     |
+|                                      | events.                                  |
++--------------------------------------+------------------------------------------+
+| bartender                            | Arrow or hook on the HSM diagram,        |
+|                                      | represented as a conditional statement   |
+|                                      | for a user defined event.                |
+|                                      | Any hook code associated with this       |
+|                                      | conditional statement is run when        |
+|                                      | touched by **T**.                        |
++--------------------------------------+------------------------------------------+
+| greeter                              | ``INIT_SIGNAL`` event given to a         |
+|                                      | callback by the event processor when     |
+|                                      | **S** stabilizes in a new state.         |
++--------------------------------------+------------------------------------------+
+| exit bouncer                         | ``EXIT_SIGNAL`` event given to a         |
+|                                      | callback by the event processor when     |
+|                                      | **S** exits a state.                     |
++--------------------------------------+------------------------------------------+
+| exit bouncer                         | ``ENTRY_SIGNAL`` event given to          |
+|                                      | a callback by the event processor when   |
+|                                      | **S** enters a state.                    |
++--------------------------------------+------------------------------------------+
+| run to completion, RTC:              | The thread will only handle one event    |
+| Theo keeps his attention on the      | a time. This is called RTC.  An RTC      |
+| universe's activities until the      | process is over when the event processor |
+| action stops                         | can no longer cause state transitions    |
+|                                      | and the statechart settles on a new      |
+|                                      | state.                                   |
++--------------------------------------+------------------------------------------+
+| Top level view of terraced bar       | UML statechart drawings                  |
+| universe                             |                                          | 
++--------------------------------------+------------------------------------------+
 
 .. raw:: html
 
    <div class="story">
    <p>
-   Here is a warning that they provide us about UML:
+   The human's find a drawing technology in our world that can be used to
+   describe theirs, it is called the UML statechart diagram.
+   
+   But before we go any further, let's examine some of the information that is
+   missing from a typical UML statechart drawing:
    </p>
    </div>
 
@@ -684,26 +742,47 @@ Story
    <div class="story">
 
    <p>
-   The above diagram shows us how a lot of information is missing from a "UML
-   statechart".  The picture describes some class information, and a behavioural
-   specification for the states provided as a bird's eye view of the terraced
-   bar system, but there is no information about the thread, <strong>S</strong>,
-   <strong>T</strong>, the deques, the events or any of the dynamics for the
-   statechart.
+   The picture describes some class information, and a behavioural specification
+   for the states as a bird's eye view of the terraced bar system, but
+   there is no information about the thread, <strong>S</strong>,
+   <strong>T</strong>, the deques, the events or any of the dynamics of the
+   statechart.  
    </p>
-
-   <p id="zero-to-one-spy-carpet">
-   So the human's provide us with the option of laying down a spy-carpet over
-   any bar in their universe. If you lay this carpet down, it will record and
-   report all activity that transpired between <strong>T</strong>,
-   <strong>S</strong> and any human within that pub.  To use this carpet, you
-   place the <strong>@spy_on</strong> decorator above any callback function
-   representing a pub, or state in the HSM.  This is called instrumentation.
+   
+   <p>
+   So the UML statechart diagram acts as a stage in a play, with the full script
+   being broken into pieces and given to each human actor in the play in the
+   location where it can be read.  We can see all of this information in the
+   diagram: the stage, the human actors, where they stand on the stage and what
+   they will read when it is their turn to talk.
    </p>
 
    <p>
-   Let's answer their challenge for deep meaning, by using one of their universes
-   to make a toaster oven:
+   The diagram describes everything that is possible, but it doesn't tell how a
+   specific story plays out; this requires our own world to send an event (an
+   orb) into theirs, and it requires work by their gods and their explorer
+   spirit.
+   </p>
+
+   <p id="zero-to-one-spy-carpet">
+   To help us see and hear a specific story from the many possible stories, they
+   invent a <a
+   href="https://www.aetv.com/real-crime/a-surveillance-expert-on-planting-bugs-in-carpets-cats-and-cockroaches-to-nab-suspects">spy-carpet</a>.
+   To use this carpet, you place the <strong>@spy_on</strong> decorator above
+   any callback function representing a pub, or state in the HSM.  This is
+   called instrumentation.
+   </p>
+
+   <p id="zero-to-one-spy-carpet">
+   If you lay this carpet down, it will record and report all activity that
+   transpired between <strong>T</strong>, <strong>S</strong> and any human
+   within that pub.  This information can be read during or after their universe
+   has reacted to the events send from our world.
+   </p>
+
+   <p>
+   Now that we understand a bit more about statecharts, let's use one of their
+   universes to make a toaster oven.
    </p>
    </div>
 

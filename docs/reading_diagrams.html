@@ -87,8 +87,9 @@ understanding about Harel formalism as it relates to UML, go to the source and
 read <a class="reference external" href="https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download">Practical UML Statecharts in C/C++, 2nd Edition</a> by Miro
 Samek.</p>
 <p>But do you need to read these books before you use UML? No, because we are not
-going to treat UML as a formal language, but rather something to sketch with.
-The formal language we will use is Python.</p>
+going to treat UML as a formal computer language with mathematical semantics. We
+will use UML as something to sketch with.  The formal language we will use is
+Python.</p>
 <p>This section should give you enough information so that you can make your own
 pictures.</p>
 <div class="section" id="the-most-important-rule-in-uml">
@@ -1160,33 +1161,51 @@ ActiveObject.  Here is some code that the above diagram could model:</p>
 <a class="reference external image-reference" href="_static/simple_state_3.pdf"><div align="center" class="align-center"><img alt="_images/simple_state_3.svg" src="_images/simple_state_3.svg" /></div>
 </a>
 <hr class="docutils" />
-<p>The UML term for a state which can have other states inside of it, is called a
+<p>The UML term for a state, which can have other states inside of it, is called a
 “composite state”.  Here is what it looks like:</p>
 <a class="reference external image-reference" href="_static/composite_state_1.pdf"><div align="center" class="align-center"><img alt="_images/composite_state_1.svg" src="_images/composite_state_1.svg" /></div>
 </a>
 <p>It shares the same rounded rectangular look of the simple state icon, but it
-also has a bar across the top, above which, you type the state’s name.  The
-name of the state is placed at the top like this to separate it away from the
-rest of the rounded rectangle’s inner area, because this area serves as a canvas onto
-which you will draw your inner states, hooks, event arrows… etc.</p>
+also has a bar across the top, above which, you type the state’s name.  The name
+of the state is placed at the top like this to separate it away from the rest of
+the rounded rectangle’s inner area.  The majority of the compound state’s inner
+area serves as a canvas where you will draw your inner states, hooks, event
+arrows…  etc.</p>
+<p>In miros, all states are composite states.</p>
 <p>Here is a simple hierarchical state machine (HSM) – A slightly better oven:</p>
 <a class="reference external image-reference" href="_static/composite_state_2.pdf"><div align="center" class="align-center"><img alt="_images/composite_state_2.svg" src="_images/composite_state_2.svg" /></div>
 </a>
 <p>Any state-looking-widget on your diagram that actually isn’t a state, is called
 a <strong>pseudostate</strong>.  For instance, on our diagram, the black initialization dot
 and the H with a star beside it (deep history) are both called pseudostates.</p>
+<p>We will talk about these shortly.</p>
 <p>If you had to draw your statechart into a diagram that didn’t have enough room
 for it, you might want to simplify it into a compacted representation.  This
 would let the person reading your diagram know that there is more to it, but
-that it was simplified on the picture so that everything would fit on the page.
-For some reason this is called <strong>decomposition hiding</strong>.  I’ll demonstrate this
-by hiding some of the details of our HSM oven:</p>
+that it was simplified on your picture so that everything would fit on the page.
+This is called <strong>decomposition hiding</strong>.  I’ll demonstrate this by hiding some
+of the details of our HSM oven:</p>
 <a class="reference external image-reference" href="_static/composite_state_3.pdf"><div align="center" class="align-center"><img alt="_images/composite_state_3.svg" src="_images/composite_state_3.svg" /></div>
 </a>
-<p>The states aren’t useful without the assortment of arrows, internal events and
-hooks that you will pepper all over your drawing.  In addition to this, there are
-UML ways to solve some of the common problems that you will have when you try to
-draw how your code works on a diagram.  Read on for the details.</p>
+<p>There is a good chance that I am breaking the UML standard by drawing the above
+diagram the way I did.  I’m hiding the door_closed state, yet I’m showing part
+of it’s design.  I’m showing an arrow going into the door_closed state, and
+showing it land on a deep history icon.  So, am I hiding the state or not?
+Well, I’m doing both.  I’m trying to explain the gist of the hidden part of the
+design: to go back to the previous sub-state of the door_closed part of the
+statechart, when the door is opened after the over was in a door_open state.
+I’m trying to show this history-behavior is happening without going into the
+details of what substates exist within the door_closed state.</p>
+<p>When you sketch your diagrams without adhering to a ridged set of drawing rules,
+you can make decisions like this.</p>
+</div>
+<div class="section" id="deep-history-icon">
+<span id="reading-diagrams-deep-history-dot"></span><h3>Deep History Icon<a class="headerlink" href="#deep-history-icon" title="Permalink to this headline">¶</a></h3>
+<p>If an event has caused you to leave a state deeply embedded in your statechart,
+but you would like to transition back to that state after the interruption, you
+can use the deep history pseudostate, it’s a circle enclosing a H*:</p>
+<a class="reference external image-reference" href="_static/TransitionToHistoryStatePattern.pdf"><div align="center" class="align-center"><img alt="_images/TransitionToHistoryStatePattern.svg" src="_images/TransitionToHistoryStatePattern.svg" /></div>
+</a>
 </div>
 <div class="section" id="if-else-structures">
 <span id="reading-diagrams-if-structures"></span><h3>If-Else Structures<a class="headerlink" href="#if-else-structures" title="Permalink to this headline">¶</a></h3>
@@ -1245,14 +1264,6 @@ provide some useful features.</p>
 <p class="first admonition-title">Note</p>
 <p class="last">This is not in the UML standard</p>
 </div>
-</div>
-<div class="section" id="deep-history-icon">
-<span id="reading-diagrams-deep-history-dot"></span><h3>Deep History Icon<a class="headerlink" href="#deep-history-icon" title="Permalink to this headline">¶</a></h3>
-<p>If an event has caused you to leave a state deeply embedded in your statechart,
-but you would like to transition back to that state after the interruption, you
-can use the deep history pseudostate, it’s a circle enclosing a H*:</p>
-<a class="reference external image-reference" href="_static/TransitionToHistoryStatePattern.pdf"><div align="center" class="align-center"><img alt="_images/TransitionToHistoryStatePattern.svg" src="_images/TransitionToHistoryStatePattern.svg" /></div>
-</a>
 </div>
 <div class="section" id="subscription-and-publishing-icons">
 <span id="reading-diagrams-publishing-to-other-charts"></span><h3>Subscription and Publishing Icons<a class="headerlink" href="#subscription-and-publishing-icons" title="Permalink to this headline">¶</a></h3>
@@ -1445,12 +1456,12 @@ people on your team understand what you mean.</p>
 <li><a class="reference internal" href="#events">Events</a></li>
 <li><a class="reference internal" href="#event-processor-attachment-points">Event Processor Attachment Points</a></li>
 <li><a class="reference internal" href="#states">States</a></li>
+<li><a class="reference internal" href="#deep-history-icon">Deep History Icon</a></li>
 <li><a class="reference internal" href="#if-else-structures">If-Else Structures</a></li>
 <li><a class="reference internal" href="#extending-arrows">Extending Arrows</a></li>
 <li><a class="reference internal" href="#terminate-icon">Terminate Icon</a></li>
 <li><a class="reference internal" href="#final-icon">Final Icon</a></li>
 <li><a class="reference internal" href="#fall-through">Fall Through</a></li>
-<li><a class="reference internal" href="#deep-history-icon">Deep History Icon</a></li>
 <li><a class="reference internal" href="#subscription-and-publishing-icons">Subscription and Publishing Icons</a></li>
 <li><a class="reference internal" href="#high-level-federation-diagrams">High Level Federation Diagrams</a></li>
 <li><a class="reference internal" href="#medium-level-construction-and-pub-sub-diagrams">Medium Level Construction and Pub/Sub Diagrams</a></li>

@@ -114,7 +114,7 @@ secrets.
 <div class="admonition-translation admonition">
 <p class="first admonition-title">translation</p>
 <p>Each pub is a state in a statemachine.  You would program these states as
-functions that take two arguments, a reference to an active object and an event.</p>
+functions that take two arguments, a reference to an ActiveObject and an event.</p>
 <p>These state functions will contain an if-elif structure which will have
 multiple clauses.  The greeter is the “init” clause, and the enter and exit
 bouncers are the “entry” and “exit” clauses.</p>
@@ -182,7 +182,7 @@ argument – the state callback functions themselves, do not have their own
 memory.</p>
 <p class="last">Since the callback functions don’t keep any information, they can be called by
 many different ActiveObjects (in that ActiveObjects’s thread) and behave as
-expected; there are no side effects.  In this way, many different ActiveObject
+expected; there are no side effects.  In this way, many different ActiveObjects
 can use the same set of state callback functions.</p>
 </div>
 <div class="story">
@@ -388,7 +388,7 @@ rejoin with Tara, this futile ritual is repeated.
 </a>
 <div class="admonition-translation admonition">
 <p class="first admonition-title">translation</p>
-<p>Tara, the “target state” is used by the event processor to recurse outward
+<p>The target state is used by the event processor to recurse outward
 from C1 to find a state that knows what to do with the Event, who’s signal
 name is Mary.</p>
 <p>The A state has an if-elif clause which handles Mary, and within the clause
@@ -396,14 +396,16 @@ there is a transition to the B2 state.  In this scenario, the A state is
 called the Least Common Ancestor, LCA of S and T.  S needs to exit all states,
 from it’s current state, to the LCA.  However, it should not exit the LCA.</p>
 <p class="last">As an application developer, you don’t really care about the LCA acronym.  You
-just need to understand the dynamics of how exits work.</p>
+just need to understand the dynamics of how exits work; your exit handlers
+will be called as your source state transitions out of the inner states to
+re-join the target state.</p>
 </div>
 <div class="story">
 <p>
 When Spike finally finds Tara he asks her what she learned.  Bubbling with
 excitement, she tells him about where the bartender said to take the event, to
 which he always says, "great I'll meet you there, but first I want to have a
-drink."  Tara takes the event and makes her way to the location that the
+drink here."  Tara takes the event and makes her way to the location that the
 bartender told her about.
 </p>
 
@@ -411,7 +413,7 @@ bartender told her about.
 Spike finishes his drink, then again starts to make his way toward Tara.  Before
 he can climb up to a new Terrace, he is stopped by the entry bouncer, who looks
 at his clip board to see if Spike is on the guest list, which he always is, then
-let's Spike proceed.  You really can't stop the god of the earth anyway.
+lets Spike proceed.  You really can't stop the god of the earth anyway.
 </p>
 </div><a class="reference external image-reference" href="_static/md_bartenders_on_the_hsm_reaction_3.pdf"><div align="center" class="align-center"><img alt="_images/md_bartenders_on_the_hsm_reaction_3.svg" src="_images/md_bartenders_on_the_hsm_reaction_3.svg" /></div>
 </a>
@@ -466,8 +468,8 @@ to pass through the little universe's loading dock.  All is well.
 statechart will only react to one event at a time.  The thread will only
 process the next event when the event processor has run out of things to do
 with your old event.</p>
-<p class="last">For this reason, you should not put blocking code into your statecharts.  If
-you do, they will stop reacting to events and become unresponsive.</p>
+<p class="last">For this reason, you should not put <a class="reference external" href="https://en.wikipedia.org/wiki/Blocking_(computing)">blocking code</a> into your statecharts.
+If you do, they will stop reacting to events and become unresponsive.</p>
 </div>
 <div class="story">
 <p>
@@ -475,7 +477,15 @@ But is it?  Sometimes when Theo, "the solipsist", god of the underworld, closes
 his eyes and daydreams; his attention briefly drifts back to his world.  This is
 enough to wake everyone up from their non-existence.
 </p>
-
+</div><div class="admonition-translation admonition">
+<p class="first admonition-title">translation</p>
+<p class="last">Solipsism is the name of the philosophy where a person thinks they create the
+world when they open their eyes, and they destroy the world when they close
+their eyes.  It’s delusional.  But Theo is actually a “solipsist” (though he
+doesn’t know that he is) because he is a Python thread.  No code can run
+unless he grants CPU access to it.</p>
+</div>
+<div class="story">
 <p>
 When the people wake up, they become listless. The bouncers who have had nothing
 to do since the prohibition was announced by Eve, are particularly frustrated
@@ -486,35 +496,35 @@ It seems so pointless.  It's lame.
 </p>
 
 <p>
-Then somehow they find out about you and me, fellow humans called developers.
+Somehow, they find out about you and me, fellow humans called developers.
 </p>
 
 <p>
-They learn that we, despite being human, are all powerful.  That we can build
+They learn that we, despite being human, are very powerful.  That we can build
 the pub terrace system to which their gods are subservient; that we can send the
-events and give the greeters and the bouncers their secret directions (arrows on
-the diagram).  That we can even built lots of different interconnected universes
+event orbs and give the greeters and the bouncers their secret directions (arrows on
+the diagram).  That we can even build many different interconnected universes
 and have them communicate with each other.
 <p>
 
 <p>
 They challenge us to make something useful out of their existence, even if
 they can't understand it from where they are, they need something to
-<strong>mean something</strong>.  So, they create an organized campaign:
-"hack the humans".  This is how it works: All of the humans in the little
-universe, open themselves to run code from our universe, while they are
+<strong>have meaning</strong>.  So, they create an organized campaign: "hack
+the humans".  This is how it works: All of the humans in the little universe,
+open themselves to run code directly from our universe, while they are
 talking to either Tara or Spike.
 </p>
 </div><a class="reference external image-reference" href="_static/md_hack_the_humans.pdf"><div align="center" class="align-center"><img alt="_images/md_hack_the_humans.svg" src="_images/md_hack_the_humans.svg" /></div>
 </a>
 <div class="story">
 <p>
-To help us, they create a Rosetta stone, translating the concepts of their
+To help us, they create a <a href="https://www.dictionary.com/browse/rosetta-stone">Rosetta stone</a>, translating the concepts of their
 universe into something legible for you and me:
 </p>
 </div><table border="1" class="docutils" id="zero-to-one-rosetta">
 <colgroup>
-<col width="47%" />
+<col width="48%" />
 <col width="53%" />
 </colgroup>
 <thead valign="bottom">
@@ -523,63 +533,103 @@ universe into something legible for you and me:
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>The universe</td>
-<td>a statechart, which is an ActiveObject
-derived object.</td>
+<tr class="row-even"><td>The terraced pubs, humans, Gods and
+spirit</td>
+<td>A statechart</td>
 </tr>
-<tr class="row-odd"><td>The multiverse of terraced bars</td>
-<td>a set of callback functions making an
-HSM (accessible from multiple
-statecharts, via the <code class="docutils literal notranslate"><span class="pre">start_at</span></code>
-method), each callback takes two
-arguments, a reference to a statechart
-and an event to send to it</td>
+<tr class="row-odd"><td>All the terraced pubs
+(And all the humans)</td>
+<td>A set of all possible states that your
+design will have (pubs) and the code
+that makes each state run the way you
+want it to (the humans).  A
+state is an abstraction of a real world
+state of being, or how you would like to
+group your program’s functionality and
+behaviors.
+A program
+made up of a bunch of interacting states
+is called a state machine.  Our programs
+will be made up of layered states in a
+hierarchy, so our machine is called a
+hierachical state machine (HSM).</td>
 </tr>
-<tr class="row-even"><td>A pub</td>
-<td>a state within a state machine</td>
+<tr class="row-even"><td>A single pub and its humans</td>
+<td>A callback function with some code in it.
+The callback function represents one of
+the states in our design.
+A callback function references its
+lower callback function (it knows about
+its lower pub, or its parent state).</td>
 </tr>
-<tr class="row-odd"><td>Eve, “the goddess of law and order”,
+<tr class="row-odd"><td>Gods and Spirit</td>
+<td>An ActiveObject which uses the callback
+functions.
+It provides a thread to run
+the state machine in, the rules on how
+it should run and it marks the state
+machine with a source state and a target
+state.
+An ActiveObject can mark states but it
+does not have states, it attaches to a
+set of state callbacks with its
+<code class="docutils literal notranslate"><span class="pre">start_at</span></code> call which takes a state
+callback as an argument.</td>
+</tr>
+<tr class="row-even"><td>Eve, “the goddess of law and order”,
 goddess of heaven</td>
-<td>the event processor</td>
+<td>The ActiveObject event processor, the
+algorithm that ensures we follow HSM
+transition rules</td>
 </tr>
-<tr class="row-even"><td>Spike, “the source”,
+<tr class="row-odd"><td>Spike, “the source”,
 god of the earth</td>
-<td>the source state, <strong>S</strong> of a statechart
-(the current state of the HSM)</td>
+<td>There are many states in an HSM, we can
+not be in them all at the same time,
+<strong>S</strong>, the source state; is a variable
+holding the active state of our
+state machine before it reacts to an
+event. If the state machine is not
+reacting to an event <strong>S</strong> is the
+current state of the state machine.</td>
 </tr>
-<tr class="row-odd"><td>Theo, “the solipsist”
+<tr class="row-even"><td>Theo, “the solipsist”,
 god of the underworld</td>
-<td>the thread that drives the
-statechart</td>
+<td>The thread that the statechart runs in.</td>
 </tr>
-<tr class="row-even"><td>Tara, “the explorer”, spirit</td>
-<td>a search aspect, <strong>T</strong> (target), of the
-event processor</td>
+<tr class="row-odd"><td>Tara, “the explorer”, spirit</td>
+<td>The target state, <strong>T</strong> (search aspect)
+of the event processor.  It is a
+variable that can hold different
+states while the state machine is
+figuring out how to transition from
+one state to another as it reacts to
+events.</td>
 </tr>
-<tr class="row-odd"><td>bartender</td>
-<td>arrow or hook on the HSM diagram,
+<tr class="row-even"><td>bartender</td>
+<td>Arrow or hook on the HSM diagram,
 represented as a conditional statement
-for a user defined event,
-any code associated with this
-conditional statement it run when
-touched by <strong>T</strong></td>
+for a user defined event.
+Any hook code associated with this
+conditional statement is run when
+touched by <strong>T</strong>.</td>
 </tr>
-<tr class="row-even"><td>greeter</td>
-<td><code class="docutils literal notranslate"><span class="pre">INIT_SIGNAL</span></code> event given to callback
-by the event processor when <strong>S</strong>
-stabilizes in the state it represents</td>
-</tr>
-<tr class="row-odd"><td>exit bouncer</td>
-<td><code class="docutils literal notranslate"><span class="pre">EXIT_SIGNAL</span></code> event given to callback
-by the event processor when <strong>S</strong> exits
-the state it represents</td>
+<tr class="row-odd"><td>greeter</td>
+<td><code class="docutils literal notranslate"><span class="pre">INIT_SIGNAL</span></code> event given to a
+callback by the event processor when
+<strong>S</strong> stabilizes in a new state.</td>
 </tr>
 <tr class="row-even"><td>exit bouncer</td>
-<td><code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code> event given to callback
-by the event processor when <strong>S</strong> enters
-the state it represents</td>
+<td><code class="docutils literal notranslate"><span class="pre">EXIT_SIGNAL</span></code> event given to a
+callback by the event processor when
+<strong>S</strong> exits a state.</td>
 </tr>
-<tr class="row-odd"><td><strong>run to completion, RTC</strong>:
+<tr class="row-odd"><td>exit bouncer</td>
+<td><code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code> event given to
+a callback by the event processor when
+<strong>S</strong> enters a state.</td>
+</tr>
+<tr class="row-even"><td>run to completion, RTC:
 Theo keeps his attention on the
 universe’s activities until the
 action stops</td>
@@ -590,42 +640,66 @@ can no longer cause state transitions
 and the statechart settles on a new
 state.</td>
 </tr>
-<tr class="row-even"><td>Top level view of terraced bar
+<tr class="row-odd"><td>Top level view of terraced bar
 universe</td>
-<td>Make these drawings with a 90’s drawing
-technology called UML</td>
+<td>UML statechart drawings</td>
 </tr>
 </tbody>
 </table>
 <div class="story">
 <p>
-Here is a warning that they provide us about UML:
+The human's find a drawing technology in our world that can be used to
+describe theirs, it is called the UML statechart diagram.
+
+But before we go any further, let's examine some of the information that is
+missing from a typical UML statechart drawing:
 </p>
 </div><a class="reference external image-reference" href="_static/md_translation_with_notes.pdf"><div align="center" class="align-center"><img alt="_images/md_translation_with_notes.svg" src="_images/md_translation_with_notes.svg" /></div>
 </a>
 <div class="story">
 
 <p>
-The above diagram shows us how a lot of information is missing from a "UML
-statechart".  The picture describes some class information, and a behavioural
-specification for the states provided as a bird's eye view of the terraced
-bar system, but there is no information about the thread, <strong>S</strong>,
-<strong>T</strong>, the deques, the events or any of the dynamics for the
+The picture describes some class information, and a behavioural specification
+for the states as a bird's eye view of the terraced bar system, but
+there is no information about the thread, <strong>S</strong>,
+<strong>T</strong>, the deques, the events or any of the dynamics of the
 statechart.
 </p>
 
-<p id="zero-to-one-spy-carpet">
-So the human's provide us with the option of laying down a spy-carpet over
-any bar in their universe. If you lay this carpet down, it will record and
-report all activity that transpired between <strong>T</strong>,
-<strong>S</strong> and any human within that pub.  To use this carpet, you
-place the <strong>@spy_on</strong> decorator above any callback function
-representing a pub, or state in the HSM.  This is called instrumentation.
+<p>
+So the UML statechart diagram acts as a stage in a play, with the full script
+being broken into pieces and given to each human actor in the play in the
+location where it can be read.  We can see all of this information in the
+diagram: the stage, the human actors, where they stand on the stage and what
+they will read when it is their turn to talk.
 </p>
 
 <p>
-Let's answer their challenge for deep meaning, by using one of their universes
-to make a toaster oven:
+The diagram describes everything that is possible, but it doesn't tell how a
+specific story plays out; this requires our own world to send an event (an
+orb) into theirs, and it requires work by their gods and their explorer
+spirit.
+</p>
+
+<p id="zero-to-one-spy-carpet">
+To help us see and hear a specific story from the many possible stories, they
+invent a <a
+href="https://www.aetv.com/real-crime/a-surveillance-expert-on-planting-bugs-in-carpets-cats-and-cockroaches-to-nab-suspects">spy-carpet</a>.
+To use this carpet, you place the <strong>@spy_on</strong> decorator above
+any callback function representing a pub, or state in the HSM.  This is
+called instrumentation.
+</p>
+
+<p id="zero-to-one-spy-carpet">
+If you lay this carpet down, it will record and report all activity that
+transpired between <strong>T</strong>, <strong>S</strong> and any human
+within that pub.  This information can be read during or after their universe
+has reacted to the events send from our world.
+</p>
+
+<p>
+Now that we understand a bit more about statecharts, let's use one of their
+universes to make a toaster oven.
 </p>
 </div></div>
 <div class="section" id="a-simple-example-toaster-oven">

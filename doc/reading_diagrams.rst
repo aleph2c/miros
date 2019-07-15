@@ -66,8 +66,9 @@ read `Practical UML Statecharts in C/C++, 2nd Edition
 Samek.
 
 But do you need to read these books before you use UML? No, because we are not
-going to treat UML as a formal language, but rather something to sketch with.
-The formal language we will use is Python.
+going to treat UML as a formal computer language with mathematical semantics. We
+will use UML as something to sketch with.  The formal language we will use is
+Python.
 
 This section should give you enough information so that you can make your own
 pictures.
@@ -1296,18 +1297,22 @@ So, to get a finite state machine working with miros, we must know that the
 
 ----
 
-The UML term for a state which can have other states inside of it, is called a
+The UML term for a state, which can have other states inside of it, is called a
 "composite state".  Here is what it looks like:
 
 .. image:: _static/composite_state_1.svg
     :target: _static/composite_state_1.pdf
     :align: center
 
+
 It shares the same rounded rectangular look of the simple state icon, but it
-also has a bar across the top, above which, you type the state's name.  The
-name of the state is placed at the top like this to separate it away from the
-rest of the rounded rectangle's inner area, because this area serves as a canvas onto
-which you will draw your inner states, hooks, event arrows... etc.
+also has a bar across the top, above which, you type the state's name.  The name
+of the state is placed at the top like this to separate it away from the rest of
+the rounded rectangle's inner area.  The majority of the compound state's inner
+area serves as a canvas where you will draw your inner states, hooks, event
+arrows...  etc.
+
+In miros, all states are composite states.
 
 Here is a simple hierarchical state machine (HSM) -- A slightly better oven:
 
@@ -1317,23 +1322,45 @@ Here is a simple hierarchical state machine (HSM) -- A slightly better oven:
 
 Any state-looking-widget on your diagram that actually isn't a state, is called
 a **pseudostate**.  For instance, on our diagram, the black initialization dot
-and the H with a star beside it (deep history) are both called pseudostates.
+and the H with a star beside it (deep history) are both called pseudostates.  
+
+We will talk about these shortly.
 
 If you had to draw your statechart into a diagram that didn't have enough room
 for it, you might want to simplify it into a compacted representation.  This
 would let the person reading your diagram know that there is more to it, but
-that it was simplified on the picture so that everything would fit on the page.
-For some reason this is called **decomposition hiding**.  I'll demonstrate this
-by hiding some of the details of our HSM oven:
+that it was simplified on your picture so that everything would fit on the page.
+This is called **decomposition hiding**.  I'll demonstrate this by hiding some
+of the details of our HSM oven:
 
 .. image:: _static/composite_state_3.svg
     :target: _static/composite_state_3.pdf
     :align: center
 
-The states aren't useful without the assortment of arrows, internal events and
-hooks that you will pepper all over your drawing.  In addition to this, there are
-UML ways to solve some of the common problems that you will have when you try to
-draw how your code works on a diagram.  Read on for the details.
+There is a good chance that I am breaking the UML standard by drawing the above
+diagram the way I did.  I'm hiding the door_closed state, yet I'm showing part
+of it's design.  I'm showing an arrow going into the door_closed state, and
+showing it land on a deep history icon.  So, am I hiding the state or not?
+Well, I'm doing both.  I'm trying to explain the gist of the hidden part of the
+design: to go back to the previous sub-state of the door_closed part of the
+statechart, when the door is opened after the over was in a door_open state.
+I'm trying to show this history-behavior is happening without going into the
+details of what substates exist within the door_closed state.
+
+When you sketch your diagrams without adhering to a ridged set of drawing rules,
+you can make decisions like this.
+
+.. _reading_diagrams-deep-history-dot:
+
+Deep History Icon
+-----------------
+If an event has caused you to leave a state deeply embedded in your statechart,
+but you would like to transition back to that state after the interruption, you
+can use the deep history pseudostate, it's a circle enclosing a H*:
+
+.. image:: _static/TransitionToHistoryStatePattern.svg
+    :target: _static/TransitionToHistoryStatePattern.pdf
+    :align: center
 
 .. _reading_diagrams-if-structures:
 
@@ -1420,17 +1447,6 @@ provide some useful features.
 
   This is not in the UML standard
 
-.. _reading_diagrams-deep-history-dot:
-
-Deep History Icon
------------------
-If an event has caused you to leave a state deeply embedded in your statechart,
-but you would like to transition back to that state after the interruption, you
-can use the deep history pseudostate, it's a circle enclosing a H*:
-
-.. image:: _static/TransitionToHistoryStatePattern.svg
-    :target: _static/TransitionToHistoryStatePattern.pdf
-    :align: center
 
 .. _reading_diagrams-publishing-to-other-charts:
 
