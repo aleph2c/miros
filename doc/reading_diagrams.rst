@@ -253,6 +253,20 @@ EVT_A event to my fifo queue so that it can be run during my next RTC process,
 then transition to the target_state, but, if my guard code returns False, do not
 transition, but let the SIGNAL_NAME event propagate outward."
 
+.. note::
+
+  On the ``^EVT_A`` shorthand.
+
+  In miros there are many different ways to post events.  You can post to a
+  fifo; ``post_fifo`` and you can post to a lifo, ``post_lifo``.  You can even
+  publish an event, so that another concurrent statechart will receive the
+  message.  So, to use the ``^EVT_A`` in UML isn't descriptive capture miro's
+  capabilities.
+
+  As a rule, if I see ``^EVT_A`` I will assume that it is using the
+  ``post_fifo`` API, and if I need to be specific, I will write the code that
+  performs the post directly on the diagram.
+
 The above diagram written as `code
 <https://github.com/aleph2c/miros/blob/master/examples/guard_example.py>`_,
 could look like this:
@@ -1404,11 +1418,66 @@ You can also "fork" them using a bar too:
 Terminate Icon
 -------------
 If you want to destroy your statechart upon reacting to an event, you can use
-the terminate pseudostate (icon):
+the terminate pseudostate (icon).  
 
 .. image:: _static/terminate_1.svg
     :target: _static/terminate_1.pdf
     :align: center
+
+Here is some code that shows a trivial statechart being terminated with the
+ActiveObject's ``stop`` method.
+
+.. note::
+
+  In this picture's code example we will turn on
+  the :ref:`spy <recipes-using-the-spy>`, and :ref:`scribble
+  <recipes-scribble-on-the-spy>` onto its output.
+
+.. code-block:: python
+  :emphasize-lines: 11, 25
+  
+  import time
+
+  from miros import spy_on
+  from miros import ActiveObject
+  from miros import signals, Event, return_status
+
+  @spy_on
+  def some_state(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.Destroy_This_Chart):
+      chart.stop()
+      chart.scribble("Terminating Thread")
+      status = return_status.HANDLED
+    else:
+      chart.temp.fun = chart.top
+      status = return_status.SUPER
+    return status
+
+  if __name__ == "__main__":
+    ao = ActiveObject('some_state')
+    ao.live_spy = True
+    ao.start_at(some_state)
+    time.sleep(0.1)
+    assert(ao.thread.is_alive() == True)
+    ao.post_fifo(Event(signal=signals.Destroy_This_Chart))
+    time.sleep(0.1)
+    assert(ao.thread.is_alive() == False)
+
+If we were to run this code we would see:
+
+.. code-block:: python
+
+  START
+  SEARCH_FOR_SUPER_SIGNAL:some_state
+  ENTRY_SIGNAL:some_state
+  INIT_SIGNAL:some_state
+  <- Queued:(0) Deferred:(0)
+  Destroy_This_Chart:some_state
+  Terminating Thread
+  Destroy_This_Chart:some_state:HOOK
+  <- Queued:(1) Deferred:(0)
+
 
 .. _reading_diagrams-final-state:
 
@@ -1429,31 +1498,300 @@ state machine:
     :target: _static/final_2.pdf
     :align: center
 
+Here is some code that would answer this design:
+
+.. code-block:: python
+  :emphasize-lines: 20, 21
+  
+   # final_icon_example_1.py
+   import time
+
+   from miros import spy_on
+   from miros import Event
+   from miros import signals
+   from miros import ActiveObject
+   from miros import return_status
+
+   @spy_on
+   def outer_state(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       chart.condition = False if chart.condition == None else chart.condition
+       status = return_status.HANDLED
+     elif(e.signal == signals.INIT_SIGNAL):
+       if chart.condition:
+         status = chart.trans(inner_state)
+       else:
+         chart.scribble("run code, but don't transition out of outer_state")
+         status = return_status.HANDLED
+     elif(e.signal == signals.Retry):
+       chart.condition = False if chart.condition else True
+       status = chart.trans(outer_state)
+     else:
+       chart.temp.fun = chart.top
+       status = return_status.SUPER
+     return status
+
+   @spy_on
+   def inner_state(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       status = return_status.HANDLED
+     else:
+       chart.temp.fun = outer_state
+       status = return_status.SUPER
+     return status
+
+We are writing our debug code onto the :ref:`spy instrumentation
+<recipes-using-the-spy>` using its :ref:`scribble <recipes-scribble-on-the-spy>`
+feature, so we have to turn on the spy instrumentation to see it:
+
+.. code-block:: python
+  :emphasize-lines: 4
+  
+   if __name__ == "__main__":
+     ao = ActiveObject('final_icon')
+     ao.augment( name='condition', other=None)
+     ao.live_spy = True
+     ao.start_at(outer_state)
+     ao.post_fifo(Event(signal=signals.Retry))
+     ao.post_fifo(Event(signal=signals.Retry))
+     time.sleep(0.01)
+
+If you run this code you will see the following:
+
+.. code-block:: python
+  :emphasize-lines: 5, 21
+  
+  START
+  SEARCH_FOR_SUPER_SIGNAL:outer_state
+  ENTRY_SIGNAL:outer_state
+  INIT_SIGNAL:outer_state
+  run code, but don't transition out of outer_state
+  <- Queued:(0) Deferred:(0)
+  Retry:outer_state
+  EXIT_SIGNAL:outer_state
+  ENTRY_SIGNAL:outer_state
+  INIT_SIGNAL:outer_state
+  SEARCH_FOR_SUPER_SIGNAL:inner_state
+  ENTRY_SIGNAL:inner_state
+  INIT_SIGNAL:inner_state
+  <- Queued:(1) Deferred:(0)
+  Retry:inner_state
+  Retry:outer_state
+  EXIT_SIGNAL:inner_state
+  EXIT_SIGNAL:outer_state
+  ENTRY_SIGNAL:outer_state
+  INIT_SIGNAL:outer_state
+  run code, but don't transition out of outer_state
+  <- Queued:(0) Deferred:(0)
+
+The above final pseudostate example could have been made with a statechart
+wrapped within a class:
+
+.. image:: _static/final_3.svg
+    :target: _static/final_3.pdf
+    :align: center
+
+Here is some code which interlocks with the above design diagram:
+
+.. code-block:: python
+  :emphasize-lines: 62, 63
+  
+   import time
+
+   from miros import Event
+   from miros import signals
+   from miros import Factory
+   from miros import return_status
+
+   class InstrumentedFactory(Factory):
+     def __init__(self, name, live_trace=None, live_spy=None):
+       super().__init__(name)
+       self.live_trace = False if live_trace == None else live_trace
+       self.live_spy = False if live_spy == None else live_spy
+
+   class FinalIconExample(InstrumentedFactory):
+     def __init__(self, name, condition, live_trace=None, live_spy=None):
+       '''statechart demonstration the final icon
+
+       **Args**:
+          | ``name`` (str): name of the statechart
+          | ``condition`` (bool): do we want to transition into the inner state?
+          | ``live_trace=None``: enable live_trace feature?
+          | ``live_spy=None``: enable live_spy feature?
+
+       **Example(s)**:
+         
+       .. code-block:: python
+          
+          FinalIconExample(name='final_icon', condition=True)
+
+       '''
+       super().__init__(name, live_trace, live_spy)
+       self.condition = condition
+
+       self.outer_state = self.create(state="outer_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.outer_state_entry_signal). \
+         catch(signal=signals.INIT_SIGNAL,
+           handler=self.outer_state_init_signal). \
+         catch(signal=signals.Retry,
+           handler=self.outer_state_retry). \
+         to_method()
+
+       self.inner_state = self.create(state="inner_state"). \
+         to_method()
+
+       self.nest(self.outer_state, parent=None). \
+            nest(self.inner_state, parent=self.outer_state)
+
+       self.start_at(self.outer_state)
+
+     @staticmethod
+     def outer_state_entry_signal(chart, e):
+       chart.condition = False if chart.condition == None else chart.condition
+       status = return_status.HANDLED
+       return status
+
+     @staticmethod
+     def outer_state_init_signal(chart, e):
+       if chart.condition:
+         status = chart.trans(chart.inner_state)
+       else:
+         chart.scribble("run code, but don't transition out of outer_state")
+         status = return_status.HANDLED
+       return status
+
+     @staticmethod
+     def outer_state_retry(chart, e):
+       chart.condition = False if chart.condition else True
+       status = chart.trans(chart.outer_state)
+       return status
+
+   if __name__ == "__main__":
+     ao = FinalIconExample(name='final_icon', condition=True, live_spy=True)
+     ao.post_fifo(Event(signal=signals.Retry))
+     ao.post_fifo(Event(signal=signals.Retry))
+     time.sleep(0.01)
+
+If you were to run this code you would see a spy output very similar to the
+first example:
+
+.. code-block:: python
+  :emphasize-lines: 15
+  
+  START
+  SEARCH_FOR_SUPER_SIGNAL:outer_state
+  ENTRY_SIGNAL:outer_state
+  INIT_SIGNAL:outer_state
+  SEARCH_FOR_SUPER_SIGNAL:inner_state
+  ENTRY_SIGNAL:inner_state
+  INIT_SIGNAL:inner_state
+  <- Queued:(0) Deferred:(0)
+  Retry:inner_state
+  Retry:outer_state
+  EXIT_SIGNAL:inner_state
+  EXIT_SIGNAL:outer_state
+  ENTRY_SIGNAL:outer_state
+  INIT_SIGNAL:outer_state
+  run code, but don't transition out of outer_state
+  <- Queued:(1) Deferred:(0)
+  Retry:outer_state
+  EXIT_SIGNAL:outer_state
+  ENTRY_SIGNAL:outer_state
+  INIT_SIGNAL:outer_state
+  SEARCH_FOR_SUPER_SIGNAL:inner_state
+  ENTRY_SIGNAL:inner_state
+  INIT_SIGNAL:inner_state
+  <- Queued:(0) Deferred:(0)
+
+
 Fall Through
 ------------
 The miros event handler can do something that I haven't seen specified anywhere,
-it can do a kind of catch and release, where an event can be processed by a
-state, then released outward into the statechart to be processed by an outer
-state.
+it can do a kind of `catch-and-release
+<https://en.wikipedia.org/wiki/Catch_and_release>`_, where an event can be
+processed by a state, then released outward into the statechart to be processed
+by another, outer, state.  This event bubbling continues until the event falls
+off the edge of the chart or is handled by a hook.
+
+.. note::
+  
+   This is not in the UML standard
 
 .. image:: _static/fall_through_1.svg
     :target: _static/fall_through_1.pdf
     :align: center
 
-I draw this with an un-attached arrow.  The arrow has code marked on it, but it
-does not connect to anything, to express that it is not locally handled, so that
-the event processor will recurse outward in it's search to find where it is
-handled.  The action on the unhandled arrow is a kind of side effect that can
-provide some useful features.
+I draw this with an un-attached, or an unhandled, arrow.  The arrow has code
+marked on it, but it does not connect to anything, to express that it is not
+handled within the current state region; the event processor will recurse
+outward in it's search to find where it is handled.  
 
-.. image:: _static/catchandrelease1.svg
-    :target: _static/catchandrelease1.pdf
-    :align: center
+The action on the "unhandled" arrow is a search side effect that can provide
+some useful features.
 
-.. note::
+.. code-block:: python
+   
+  import time
 
-  This is not in the UML standard
+  from miros import Event
+  from miros import spy_on
+  from miros import signals
+  from miros import ActiveObject
+  from miros import return_status
 
+  @spy_on
+  def a0(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.INIT_SIGNAL):
+      status = chart.trans(a2)
+    elif(e.signal == signals.Bubbling):
+      print(
+        "finally hooked by a0, but state remains as {}".
+        format(chart.state_name))
+      status = return_status.HANDLED
+    else:
+      chart.temp.fun = chart.top
+      status = return_status.SUPER
+    return status
+
+  @spy_on
+  def a1(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.Bubbling):
+      print("caught and released by a1")
+    else:
+      chart.temp.fun = a0
+      status = return_status.SUPER
+    return status
+
+  @spy_on
+  def a2(chart, e):
+    status = return_status.UNHANDLED
+    if(e.signal == signals.Bubbling):
+      print("caught and released by a2")
+    else:
+      chart.temp.fun = a1
+      status = return_status.SUPER
+    return status
+
+  if __name__ == "__main__":
+    ao = ActiveObject('fall_through')
+    ao.live_trace = True
+    ao.start_at(a0)
+    ao.post_fifo(Event(signal=signals.Bubbling))
+    time.sleep(0.1)
+
+Running the above would result in this output:
+
+.. code-block:: text
+  
+   [2019-07-16 09:02:04.725787] [fall_through] e->start_at() top->a2
+   caught and released by a2
+   caught and released by a1
+   finally hooked by a0, but state remains as a0
 
 .. _reading_diagrams-publishing-to-other-charts:
 
@@ -1469,13 +1807,13 @@ often very useful to have your eyes fall immediately on where it is being acted
 upon.  It is an input.  I use a green dot, to show that this signal is going, or
 being acted upon by the statechart which has subscribed to it
 
-.. image:: _static/pub_sub_icons.svg
-    :target: _static/pub_sub_icons.pdf
-    :align: center
-
 .. note::
 
   This is not in the UML standard
+
+.. image:: _static/pub_sub_icons.svg
+    :target: _static/pub_sub_icons.pdf
+    :align: center
 
 
 .. _reading_diagrams-high-level-dependency-diagrams:

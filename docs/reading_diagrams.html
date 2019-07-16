@@ -221,6 +221,18 @@ run the action() function within the context of the source state, then add the
 EVT_A event to my fifo queue so that it can be run during my next RTC process,
 then transition to the target_state, but, if my guard code returns False, do not
 transition, but let the SIGNAL_NAME event propagate outward.”</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>On the <code class="docutils literal notranslate"><span class="pre">^EVT_A</span></code> shorthand.</p>
+<p>In miros there are many different ways to post events.  You can post to a
+fifo; <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> and you can post to a lifo, <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code>.  You can even
+publish an event, so that another concurrent statechart will receive the
+message.  So, to use the <code class="docutils literal notranslate"><span class="pre">^EVT_A</span></code> in UML isn’t descriptive capture miro’s
+capabilities.</p>
+<p class="last">As a rule, if I see <code class="docutils literal notranslate"><span class="pre">^EVT_A</span></code> I will assume that it is using the
+<code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> API, and if I need to be specific, I will write the code that
+performs the post directly on the diagram.</p>
+</div>
 <p>The above diagram written as <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/guard_example.py">code</a>,
 could look like this:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1"># guard_example.py</span>
@@ -1235,9 +1247,57 @@ bar:</p>
 <div class="section" id="terminate-icon">
 <span id="reading-diagrams-terminate-pseudostate"></span><h3>Terminate Icon<a class="headerlink" href="#terminate-icon" title="Permalink to this headline">¶</a></h3>
 <p>If you want to destroy your statechart upon reacting to an event, you can use
-the terminate pseudostate (icon):</p>
+the terminate pseudostate (icon).</p>
 <a class="reference external image-reference" href="_static/terminate_1.pdf"><div align="center" class="align-center"><img alt="_images/terminate_1.svg" src="_images/terminate_1.svg" /></div>
 </a>
+<p>Here is some code that shows a trivial statechart being terminated with the
+ActiveObject’s <code class="docutils literal notranslate"><span class="pre">stop</span></code> method.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In this picture’s code example we will turn on
+the <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a>, and <a class="reference internal" href="recipes.html#recipes-scribble-on-the-spy"><span class="std std-ref">scribble</span></a> onto its output.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">some_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Destroy_This_Chart</span><span class="p">):</span>
+<span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+</span>    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;Terminating Thread&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s1">&#39;some_state&#39;</span><span class="p">)</span>
+  <span class="n">ao</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">some_state</span><span class="p">)</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+  <span class="k">assert</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span> <span class="o">==</span> <span class="bp">True</span><span class="p">)</span>
+<span class="hll">  <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Destroy_This_Chart</span><span class="p">))</span>
+</span>  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+  <span class="k">assert</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span> <span class="o">==</span> <span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If we were to run this code we would see:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">START</span>
+<span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">some_state</span>
+<span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">some_state</span>
+<span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">some_state</span>
+<span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">Destroy_This_Chart</span><span class="p">:</span><span class="n">some_state</span>
+<span class="n">Terminating</span> <span class="n">Thread</span>
+<span class="n">Destroy_This_Chart</span><span class="p">:</span><span class="n">some_state</span><span class="p">:</span><span class="n">HOOK</span>
+<span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">1</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="final-icon">
 <span id="reading-diagrams-final-state"></span><h3>Final Icon<a class="headerlink" href="#final-icon" title="Permalink to this headline">¶</a></h3>
@@ -1250,25 +1310,272 @@ initialization of the state, but you do not want to transition deeper into the
 state machine:</p>
 <a class="reference external image-reference" href="_static/final_2.pdf"><div align="center" class="align-center"><img alt="_images/final_2.svg" src="_images/final_2.svg" /></div>
 </a>
+<p>Here is some code that would answer this design:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1"># final_icon_example_1.py</span>
+ <span class="kn">import</span> <span class="nn">time</span>
+
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+ <span class="nd">@spy_on</span>
+ <span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+     <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span><span class="p">:</span>
+       <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner_state</span><span class="p">)</span>
+     <span class="k">else</span><span class="p">:</span>
+<span class="hll">       <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;run code, but don&#39;t transition out of outer_state&quot;</span><span class="p">)</span>
+</span><span class="hll">       <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span>   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Retry</span><span class="p">):</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="k">else</span> <span class="bp">True</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
+   <span class="k">else</span><span class="p">:</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+   <span class="k">return</span> <span class="n">status</span>
+
+ <span class="nd">@spy_on</span>
+ <span class="k">def</span> <span class="nf">inner_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+   <span class="k">else</span><span class="p">:</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer_state</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+   <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>We are writing our debug code onto the <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy instrumentation</span></a> using its <a class="reference internal" href="recipes.html#recipes-scribble-on-the-spy"><span class="std std-ref">scribble</span></a>
+feature, so we have to turn on the spy instrumentation to see it:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+   <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s1">&#39;final_icon&#39;</span><span class="p">)</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;condition&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="hll">   <span class="n">ao</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
+</span>   <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retry</span><span class="p">))</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retry</span><span class="p">))</span>
+   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you run this code you will see the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">START</span>
+<span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="hll"><span class="n">run</span> <span class="n">code</span><span class="p">,</span> <span class="n">but</span> <span class="n">don</span><span class="s1">&#39;t transition out of outer_state</span>
+</span><span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">Retry</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">inner_state</span>
+<span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">inner_state</span>
+<span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">inner_state</span>
+<span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">1</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">Retry</span><span class="p">:</span><span class="n">inner_state</span>
+<span class="n">Retry</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">inner_state</span>
+<span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="hll"><span class="n">run</span> <span class="n">code</span><span class="p">,</span> <span class="n">but</span> <span class="n">don</span><span class="s1">&#39;t transition out of outer_state</span>
+</span><span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The above final pseudostate example could have been made with a statechart
+wrapped within a class:</p>
+<a class="reference external image-reference" href="_static/final_3.pdf"><div align="center" class="align-center"><img alt="_images/final_3.svg" src="_images/final_3.svg" /></div>
+</a>
+<p>Here is some code which interlocks with the above design diagram:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="kn">import</span> <span class="nn">time</span>
+
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+ <span class="k">class</span> <span class="nc">InstrumentedFactory</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+
+ <span class="k">class</span> <span class="nc">FinalIconExample</span><span class="p">(</span><span class="n">InstrumentedFactory</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+     <span class="sd">&#39;&#39;&#39;statechart demonstration the final icon</span>
+
+<span class="sd">     **Args**:</span>
+<span class="sd">        | ``name`` (str): name of the statechart</span>
+<span class="sd">        | ``condition`` (bool): do we want to transition into the inner state?</span>
+<span class="sd">        | ``live_trace=None``: enable live_trace feature?</span>
+<span class="sd">        | ``live_spy=None``: enable live_spy feature?</span>
+
+<span class="sd">     **Example(s)**:</span>
+
+<span class="sd">     .. code-block:: python</span>
+
+<span class="sd">        FinalIconExample(name=&#39;final_icon&#39;, condition=True)</span>
+
+<span class="sd">     &#39;&#39;&#39;</span>
+     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="p">,</span> <span class="n">live_spy</span><span class="p">)</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">condition</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;outer_state&quot;</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_init_signal</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retry</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_retry</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">to_method</span><span class="p">()</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;inner_state&quot;</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">to_method</span><span class="p">()</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+          <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+
+   <span class="nd">@staticmethod</span>
+   <span class="k">def</span> <span class="nf">outer_state_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="nd">@staticmethod</span>
+   <span class="k">def</span> <span class="nf">outer_state_init_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span><span class="p">:</span>
+       <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">inner_state</span><span class="p">)</span>
+     <span class="k">else</span><span class="p">:</span>
+<span class="hll">       <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;run code, but don&#39;t transition out of outer_state&quot;</span><span class="p">)</span>
+</span><span class="hll">       <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span>     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="nd">@staticmethod</span>
+   <span class="k">def</span> <span class="nf">outer_state_retry</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="k">else</span> <span class="bp">True</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+ <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+   <span class="n">ao</span> <span class="o">=</span> <span class="n">FinalIconExample</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;final_icon&#39;</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retry</span><span class="p">))</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retry</span><span class="p">))</span>
+   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you were to run this code you would see a spy output very similar to the
+first example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">START</span>
+<span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">inner_state</span>
+<span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">inner_state</span>
+<span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">inner_state</span>
+<span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">Retry</span><span class="p">:</span><span class="n">inner_state</span>
+<span class="n">Retry</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">inner_state</span>
+<span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="hll"><span class="n">run</span> <span class="n">code</span><span class="p">,</span> <span class="n">but</span> <span class="n">don</span><span class="s1">&#39;t transition out of outer_state</span>
+</span><span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">1</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">Retry</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+<span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">inner_state</span>
+<span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">inner_state</span>
+<span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">inner_state</span>
+<span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="fall-through">
 <h3>Fall Through<a class="headerlink" href="#fall-through" title="Permalink to this headline">¶</a></h3>
 <p>The miros event handler can do something that I haven’t seen specified anywhere,
-it can do a kind of catch and release, where an event can be processed by a
-state, then released outward into the statechart to be processed by an outer
-state.</p>
-<a class="reference external image-reference" href="_static/fall_through_1.pdf"><div align="center" class="align-center"><img alt="_images/fall_through_1.svg" src="_images/fall_through_1.svg" /></div>
-</a>
-<p>I draw this with an un-attached arrow.  The arrow has code marked on it, but it
-does not connect to anything, to express that it is not locally handled, so that
-the event processor will recurse outward in it’s search to find where it is
-handled.  The action on the unhandled arrow is a kind of side effect that can
-provide some useful features.</p>
-<a class="reference external image-reference" href="_static/catchandrelease1.pdf"><div align="center" class="align-center"><img alt="_images/catchandrelease1.svg" src="_images/catchandrelease1.svg" /></div>
-</a>
+it can do a kind of <a class="reference external" href="https://en.wikipedia.org/wiki/Catch_and_release">catch-and-release</a>, where an event can be
+processed by a state, then released outward into the statechart to be processed
+by another, outer, state.  This event bubbling continues until the event falls
+off the edge of the chart or is handled by a hook.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This is not in the UML standard</p>
+</div>
+<a class="reference external image-reference" href="_static/fall_through_1.pdf"><div align="center" class="align-center"><img alt="_images/fall_through_1.svg" src="_images/fall_through_1.svg" /></div>
+</a>
+<p>I draw this with an un-attached, or an unhandled, arrow.  The arrow has code
+marked on it, but it does not connect to anything, to express that it is not
+handled within the current state region; the event processor will recurse
+outward in it’s search to find where it is handled.</p>
+<p>The action on the “unhandled” arrow is a search side effect that can provide
+some useful features.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">a0</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">a2</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Bubbling</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span>
+      <span class="s2">&quot;finally hooked by a0, but state remains as {}&quot;</span><span class="o">.</span>
+      <span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">state_name</span><span class="p">))</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">a1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Bubbling</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;caught and released by a1&quot;</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">a0</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">a2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Bubbling</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;caught and released by a2&quot;</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">a1</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s1">&#39;fall_through&#39;</span><span class="p">)</span>
+  <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+  <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Bubbling</span><span class="p">))</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Running the above would result in this output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[2019-07-16 09:02:04.725787] [fall_through] e-&gt;start_at() top-&gt;a2
+caught and released by a2
+caught and released by a1
+finally hooked by a0, but state remains as a0
+</pre></div>
 </div>
 </div>
 <div class="section" id="subscription-and-publishing-icons">
@@ -1281,12 +1588,12 @@ stopped, as it is waiting for processing in a queue.</p>
 often very useful to have your eyes fall immediately on where it is being acted
 upon.  It is an input.  I use a green dot, to show that this signal is going, or
 being acted upon by the statechart which has subscribed to it</p>
-<a class="reference external image-reference" href="_static/pub_sub_icons.pdf"><div align="center" class="align-center"><img alt="_images/pub_sub_icons.svg" src="_images/pub_sub_icons.svg" /></div>
-</a>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This is not in the UML standard</p>
 </div>
+<a class="reference external image-reference" href="_static/pub_sub_icons.pdf"><div align="center" class="align-center"><img alt="_images/pub_sub_icons.svg" src="_images/pub_sub_icons.svg" /></div>
+</a>
 </div>
 <div class="section" id="high-level-federation-diagrams">
 <span id="reading-diagrams-high-level-dependency-diagrams"></span><h3>High Level Federation Diagrams<a class="headerlink" href="#high-level-federation-diagrams" title="Permalink to this headline">¶</a></h3>

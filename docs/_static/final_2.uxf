@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<diagram program="umlet" version="14.2">
+<diagram program="umlet" version="14.3.0">
   <zoom_level>10</zoom_level>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>970</x>
-      <y>270</y>
+      <x>910</x>
+      <y>520</y>
       <w>20</w>
       <h>20</h>
     </coordinates>
@@ -15,15 +15,16 @@
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>470</x>
-      <y>200</y>
+      <x>410</x>
+      <y>430</y>
       <w>590</w>
-      <h>230</h>
+      <h>260</h>
     </coordinates>
     <panel_attributes>*outer_state*
 --
 entry /
-exit / 
+  chart.condition = False if chart.condition == None else chart.condtion
+
 valign=top
 </panel_attributes>
     <additional_attributes/>
@@ -31,39 +32,38 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>570</x>
-      <y>260</y>
+      <x>510</x>
+      <y>510</y>
       <w>420</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>print("run code, but don't transition out of outer_state")
+    <panel_attributes>chart.scribble("run code, but don't transition out of outer_state")
 lt=-&gt;</panel_attributes>
     <additional_attributes>10.0;20.0;400.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>550</x>
-      <y>290</y>
+      <x>490</x>
+      <y>540</y>
       <w>190</w>
       <h>70</h>
     </coordinates>
-    <panel_attributes>[self.condition == True]
+    <panel_attributes>[chart.condition == True]
 lt=-&gt;</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;50.0;170.0;50.0</additional_attributes>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>720</x>
-      <y>300</y>
+      <x>660</x>
+      <y>550</y>
       <w>300</w>
-      <h>100</h>
+      <h>110</h>
     </coordinates>
     <panel_attributes>*inner_state*
 --
-entry /
-exit / 
+
 valign=top
 </panel_attributes>
     <additional_attributes/>
@@ -71,8 +71,8 @@ valign=top
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>540</x>
-      <y>260</y>
+      <x>480</x>
+      <y>510</y>
       <w>40</w>
       <h>40</h>
     </coordinates>
@@ -80,15 +80,105 @@ valign=top
     <additional_attributes/>
   </element>
   <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>440</x>
+      <y>520</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
     <id>Relation</id>
     <coordinates>
-      <x>460</x>
-      <y>260</y>
-      <w>100</w>
-      <h>40</h>
+      <x>440</x>
+      <y>520</y>
+      <w>60</w>
+      <h>30</h>
     </coordinates>
-    <panel_attributes>A
-lt=-&gt;</panel_attributes>
-    <additional_attributes>10.0;20.0;80.0;20.0</additional_attributes>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;40.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>870</x>
+      <y>380</y>
+      <w>30</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>860</x>
+      <y>320</y>
+      <w>50</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=[^]-(
+layer=3</panel_attributes>
+    <additional_attributes>20.0;10.0;20.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>780</x>
+      <y>250</y>
+      <w>220</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>*ActiveObject*
+--
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>790</x>
+      <y>290</y>
+      <w>200</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+Event Processor
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>670</x>
+      <y>370</y>
+      <w>210</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>ao = ActiveObject('final_icon')
+ao.augment('condition', None)
+ao.start_at(outer_state)
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>470</x>
+      <y>680</y>
+      <w>450</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>Retry / chart.condition = False if chart.condition else True
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0;430.0;40.0;430.0;10.0</additional_attributes>
   </element>
 </diagram>

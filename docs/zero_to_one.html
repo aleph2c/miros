@@ -714,12 +714,12 @@ documentation.</p>
 <div class="section" id="iteration-1-setup">
 <span id="iter1"></span><h3>Iteration 1: setup<a class="headerlink" href="#iteration-1-setup" title="Permalink to this headline">¶</a></h3>
 <p>In this iteration I will talk about setting up our development environment.  We
-will built a very simple statechart example and confirm that it is working.</p>
+will build a very simple statechart and confirm that it is working.</p>
 <div class="section" id="iteration-1-specification">
 <span id="iter1-spec"></span><h4>Iteration 1 specification<a class="headerlink" href="#iteration-1-specification" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li>Ensure our Python version is 3.5 or greater (miros needs this to work)</li>
-<li>Install miros</li>
+<li>Ensure our Python version is 3.5 or greater</li>
+<li><a class="reference internal" href="installation.html#installation"><span class="std std-ref">Install miros</span></a></li>
 <li>Import the required statechart components</li>
 <li>Build a ToasterOven class which inherits from an ActiveObject</li>
 <li>Make a single state, and start the statechart in that state</li>
@@ -737,9 +737,9 @@ will built a very simple statechart example and confirm that it is working.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 --version
 </pre></div>
 </div>
-<p>To install miros, use pip (included in Python 3.5 or greater), in your terminal
-type:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 -m venv
+<p>To install miros, use pip (included in Python 3.5 or greater).  For this example
+I will install it in a virtual environment.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 -m venv venv
 . ./venv/bin/activate
 pip install miros
 </pre></div>
@@ -792,13 +792,15 @@ pip install miros
 26
 27
 28
-29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># file named toaster_oven_1.py</span>
+29
+30</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># file named toaster_oven_1.py</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
-<span class="kn">import</span> <span class="nn">time</span>
 
 <span class="k">class</span> <span class="nc">ToasterOven</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
@@ -807,7 +809,7 @@ pip install miros
 <span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">some_state_to_prove_this_works</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+  <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span>
     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
@@ -834,7 +836,7 @@ pip install miros
 <div class="section" id="iteration-1-proof">
 <span id="iter1-proof"></span><h4>Iteration 1 proof<a class="headerlink" href="#iteration-1-proof" title="Permalink to this headline">¶</a></h4>
 <p>Now to prove that the code works, in your terminal, run the program:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 toaster_oven_1.py
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python toaster_oven_1.py
 hello world
 <span class="o">[</span><span class="m">2018</span>-09-11 <span class="m">09</span>:35:10.011526<span class="o">]</span> <span class="o">[</span>oven<span class="o">]</span> <span class="se">\</span>
   e-&gt;start_at<span class="o">()</span> top-&gt;some_state_to_prove_this_works
@@ -926,12 +928,13 @@ an accidental limitation.</p>
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="why-bother-making"><strong>Why bother making a ToasterOven that inherits from the ActiveObect, why not just use the ActiveObject?</strong></p>
-<p>We will put toaster oven attributes and worker functions into the toaster oven
-class later.  For instance, we could put a <code class="docutils literal notranslate"><span class="pre">light_on</span></code> method in the
-ToasterOven class.  The first argument given to any state callback function by
-the event processor will be a reference to a ToasterOven object. Now suppose
-this first argument was called <code class="docutils literal notranslate"><span class="pre">oven</span></code>, any state callback function could turn
-on the light with: <code class="docutils literal notranslate"><span class="pre">oven.light_on()</span></code></p>
+<p>The ActiveObject doesn’t know anything about being a toaster oven.  It knows
+about queues and threads and it knows how to drive a state machine using a set
+of callback functions.  If you wanted to give an instantiated ActiveObject, a
+method or an attribute, you could use the <a href="#id1"><span class="problematic" id="id2">:ref:`augment
+&lt;recipes-markup-your-event-processor&gt;`_</span></a> method; but a more traditional way of
+giving it toaster-like features, is to sub-class it, then add these features to
+that subclass.</p>
 <a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,

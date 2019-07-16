@@ -805,15 +805,15 @@ documentation.
 Iteration 1: setup
 ------------------
 In this iteration I will talk about setting up our development environment.  We
-will built a very simple statechart example and confirm that it is working.
+will build a very simple statechart and confirm that it is working.
 
 .. _iter1_spec:
 
 Iteration 1 specification
 """""""""""""""""""""""""
 
-* Ensure our Python version is 3.5 or greater (miros needs this to work)
-* Install miros
+* Ensure our Python version is 3.5 or greater
+* :ref:`Install miros <installation>`
 * Import the required statechart components
 * Build a ToasterOven class which inherits from an ActiveObject
 * Make a single state, and start the statechart in that state
@@ -828,12 +828,12 @@ To confirm that Python is version 3.5 or greater, in your terminal type:
 
   python3 --version
 
-To install miros, use pip (included in Python 3.5 or greater), in your terminal
-type:
+To install miros, use pip (included in Python 3.5 or greater).  For this example
+I will install it in a virtual environment.
 
 .. code-block:: bash
 
-  python3 -m venv
+  python3 -m venv venv
   . ./venv/bin/activate
   pip install miros
 
@@ -862,12 +862,13 @@ Iteration 1 code
   :linenos:
 
   # file named toaster_oven_1.py
+  import time
+
+  from miros import Event
+  from miros import spy_on
+  from miros import signals
   from miros import ActiveObject
   from miros import return_status
-  from miros import Event
-  from miros import signals
-  from miros import spy_on
-  import time
 
   class ToasterOven(ActiveObject):
     def __init__(self, name):
@@ -876,7 +877,7 @@ Iteration 1 code
   @spy_on
   def some_state_to_prove_this_works(oven, e):
     status = return_status.UNHANDLED
-    if(e.signal == signals.ENTRY_SIGNAL):
+    if e.signal == signals.ENTRY_SIGNAL:
       print("hello world")
       status = return_status.HANDLED
     else:
@@ -902,7 +903,7 @@ Now to prove that the code works, in your terminal, run the program:
 
 .. code-block:: bash
 
-  python3 toaster_oven_1.py
+  python toaster_oven_1.py
   hello world
   [2018-09-11 09:35:10.011526] [oven] \
     e->start_at() top->some_state_to_prove_this_works
@@ -987,12 +988,13 @@ I'll answer this question by putting a lot of comments into the code:
 
 **Why bother making a ToasterOven that inherits from the ActiveObect, why not just use the ActiveObject?**
 
-We will put toaster oven attributes and worker functions into the toaster oven
-class later.  For instance, we could put a ``light_on`` method in the
-ToasterOven class.  The first argument given to any state callback function by
-the event processor will be a reference to a ToasterOven object. Now suppose
-this first argument was called ``oven``, any state callback function could turn
-on the light with: ``oven.light_on()``
+The ActiveObject doesn't know anything about being a toaster oven.  It knows
+about queues and threads and it knows how to drive a state machine using a set
+of callback functions.  If you wanted to give an instantiated ActiveObject, a
+method or an attribute, you could use the :ref:`augment
+<recipes-markup-your-event-processor>`_ method; but a more traditional way of
+giving it toaster-like features, is to sub-class it, then add these features to
+that subclass.
 
 .. include:: i_navigation_1.rst
 

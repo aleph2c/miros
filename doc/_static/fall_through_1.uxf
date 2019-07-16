@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<diagram program="umlet" version="14.2">
+<diagram program="umlet" version="14.3.0">
   <zoom_level>10</zoom_level>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>440</x>
-      <y>70</y>
-      <w>530</w>
-      <h>240</h>
+      <x>640</x>
+      <y>380</y>
+      <w>550</w>
+      <h>220</h>
     </coordinates>
-    <panel_attributes>*A*
+    <panel_attributes>*a0*
 --
-Bubbling / print("finally hooked")
+Bubbling / print("finally hooked by A0, but state remains as {}".format(state.name))
 
 valign=top
 </panel_attributes>
@@ -20,15 +20,14 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>470</x>
-      <y>130</y>
+      <x>690</x>
+      <y>430</y>
       <w>430</w>
-      <h>160</h>
+      <h>120</h>
     </coordinates>
-    <panel_attributes>*A1*
+    <panel_attributes>*a1*
 --
-entry /
-exit / 
+
 valign=top
 </panel_attributes>
     <additional_attributes/>
@@ -36,15 +35,14 @@ valign=top
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>490</x>
-      <y>200</y>
+      <x>710</x>
+      <y>470</y>
       <w>90</w>
       <h>60</h>
     </coordinates>
-    <panel_attributes>*A2*
+    <panel_attributes>*a2*
 --
-entry /
-exit / 
+ 
 valign=top
 </panel_attributes>
     <additional_attributes/>
@@ -52,8 +50,8 @@ valign=top
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>570</x>
-      <y>230</y>
+      <x>790</x>
+      <y>500</y>
       <w>280</w>
       <h>30</h>
     </coordinates>
@@ -63,35 +61,113 @@ valign=top
   <element>
     <id>Text</id>
     <coordinates>
-      <x>590</x>
-      <y>210</y>
-      <w>260</w>
-      <h>70</h>
+      <x>810</x>
+      <y>480</y>
+      <w>280</w>
+      <h>40</h>
     </coordinates>
-    <panel_attributes>Bubbling / print("caught and released")
+    <panel_attributes>Bubbling / print("caught and released by A2")
 style=wordwrap</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
-    <id>UMLSpecialState</id>
+    <id>UMLClass</id>
     <coordinates>
-      <x>410</x>
-      <y>220</y>
-      <w>20</w>
-      <h>20</h>
+      <x>970</x>
+      <y>200</y>
+      <w>220</w>
+      <h>110</h>
     </coordinates>
-    <panel_attributes>type=initial</panel_attributes>
+    <panel_attributes>*ActiveObject*
+--
+
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>980</x>
+      <y>240</y>
+      <w>200</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+Event Processor
+layer=2</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>410</x>
-      <y>220</y>
-      <w>100</w>
+      <x>1060</x>
+      <y>280</y>
+      <w>50</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=[^]-(
+layer=3</panel_attributes>
+    <additional_attributes>20.0;10.0;20.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1070</x>
+      <y>340</y>
+      <w>30</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>650</x>
+      <y>490</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>650</x>
+      <y>490</y>
+      <w>80</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;</panel_attributes>
-    <additional_attributes>10.0;10.0;80.0;10.0</additional_attributes>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>720</x>
+      <y>540</y>
+      <w>350</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0;330.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>730</x>
+      <y>560</y>
+      <w>280</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>Bubbling / print("caught and released by A1")
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
   </element>
 </diagram>
