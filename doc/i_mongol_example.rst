@@ -2622,39 +2622,6 @@ discover new voodoo tricks.
   testing the team of horse archers.
 
 
-System Programming your Organization
-====================================
-Let's imagine two armies competing as businesses in a free market.  One army is
-organized as an engineering hierarchy and the second based on our mongol horde
-example.
-
-Our first army's basic unit: Every engineering step requires the involvement of
-three groups of people: a manager, and architect and a set of developers.  The
-manager asks the same question over and over, "When is it going to be done?" The
-architect, wrestles with the problem then draws some pictures and makes plans to
-build an entire solution.  Having high social status they do not have to lower
-themselves to actually look at the feedback from their programmed experiments.
-The developers would not bother to really think about the problem because they
-were getting their thinking from someone else.  They would instead focus on the
-specific "deliverables" given to them by their manager.  But their manager
-doesn't actually understand the problem or what they do.
-
-.. note::
-
-  This is not a straw man, since I have seen this many times in my
-  career.  Such a structure creates a deadened environment; an organization
-  absent of personal victories; slow, plodding and stupid.  I have seen it done
-  within an "Agile" development framework.  Each member is smart and capable,
-  but the structure of the organization was envisioned by someone who doesn't
-  understand how to program systems. (MBA/HR?)
-
-Now we imagine a second organization, one where the developers are the
-architects and the managers all wrapped into one person.  There are still
-ranking officers, who will kill/fire the team if there is a lack of cohesion.
-How can you fire an entire team?  Well if that team was a set of contractors,
-easy, cancel the contract.  If the team were employees, there is probably
-something else that can be done.
-
 .. _mesh_network: https://github.com/aleph2c/miros/blob/master/examples/mesh_network.py
 .. _party_line: https://en.wikipedia.org/wiki/Party_line_(telephony)
 

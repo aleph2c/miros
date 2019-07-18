@@ -2208,8 +2208,8 @@ you invest in something the harder it becomes to abandon". [#]_
 If you build beautiful drawings with a graphic design application; you will need
 to put time and effort into them and you will probably become emotionally
 attached to them.  Remember, your diagrams are just mistakes in the right
-direction.  You need to be able to destroy these pictures, just as casually as
-you would refactor your code.
+direction.  You need to be able to destroy and reform these pictures, just as
+casually as you would refactor your code.
 
 So use a simple and customizable tool.  To draw the pictures in this
 documentation I used UMLet.  With UMLet you can build custom templates, `here is
@@ -2227,10 +2227,7 @@ complicated statechart into a kind of short hand.
 There are some diagrams that are extremely expressive and extremely fragile.  I
 can explain how a sequence diagram works to someone in 10 seconds.  But any
 sequence diagram used to describe your statechart behavior, will be extremely
-fragile to change.  A 1 second edit of your statechart picture might turn pages
-and pages of sequence diagrams into lies.  For this reason I only render
-sequence diagrams as ASCII from the miros trace listings using the sequence
-tool.
+fragile to change.
 
 You might feel reluctant to change your design, not because you are attached to
 your picture, but because you don't want to re-write all of the boiler plate
@@ -2254,7 +2251,6 @@ best we have with the tools we got.
 
 When you customize the way you draw a picture, just make sure the other
 people on your team understand what you mean.
-
 
 .. raw:: html
 
