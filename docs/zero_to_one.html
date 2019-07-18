@@ -931,8 +931,7 @@ an accidental limitation.</p>
 <p>The ActiveObject doesn’t know anything about being a toaster oven.  It knows
 about queues and threads and it knows how to drive a state machine using a set
 of callback functions.  If you wanted to give an instantiated ActiveObject, a
-method or an attribute, you could use the <a href="#id1"><span class="problematic" id="id2">:ref:`augment
-&lt;recipes-markup-your-event-processor&gt;`_</span></a> method; but a more traditional way of
+method or an attribute, you could use the <a class="reference internal" href="recipes.html#recipes-markup-your-event-processor"><span class="std std-ref">augment</span></a> method; but a more traditional way of
 giving it toaster-like features, is to sub-class it, then add these features to
 that subclass.</p>
 <a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
@@ -960,7 +959,8 @@ that it can be called later:</p>
 </pre></div>
 </div>
 <p>The states in our diagram are constructed as callback functions with a given
-signature.  The event processor will call these functions when it needs to.</p>
+function signature (this is explained in the next question/answer).  The
+event processor will call these functions when it needs to.</p>
 <a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
@@ -972,18 +972,20 @@ signature.  The event processor will call these functions when it needs to.</p>
 <p>A function signature describes the arguments that a function can take and the
 type of items it can return.</p>
 <p>Our state callback functions will always have the same signature:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># The event processor will call this function when it needs to</span>
-<span class="c1"># because the  function isn&#39;t called right away,</span>
-<span class="c1"># it is called a callback function</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># needed from miros for this example</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+<span class="c1"># The event processor will call this function when it needs to.</span>
+<span class="c1"># Since the function isn&#39;t called right away,it is called a</span>
+<span class="c1"># callback function</span>
 
 <span class="c1"># 1st part of the function signature, it&#39;s arguments.</span>
 <span class="c1"># Our state callback functions will always take two arguments:</span>
-<span class="c1"># 1) a reference to a state_chart_object</span>
+<span class="c1"># 1) an ActiveObject</span>
 <span class="c1"># 2) an event</span>
-<span class="k">def</span> <span class="nf">some_state_function</span><span class="p">(</span><span class="n">state_chart_object</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">some_state_function</span><span class="p">(</span><span class="n">active_object</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="c1"># do useful work, then</span>
-
   <span class="c1"># set the status variable to an attribute of return_status</span>
   <span class="c1"># to tell the event processor how your function responded</span>
   <span class="c1"># to its call</span>
@@ -993,7 +995,7 @@ type of items it can return.</p>
   <span class="k">return</span> <span class="n">status</span>
 </pre></div>
 </div>
-<p>For a real state function, it’s signature would be expressed like this:</p>
+<p>For our example state callback function, it’s signature looks like this:</p>
 <div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
@@ -1014,17 +1016,17 @@ type of items it can return.</p>
 </span></pre></div>
 </td></tr></table></div>
 <p>To make our state callback function have the right signature, we ensure that it
-takes two arguments, a statechart object and an event, line 1.  Then, depending
-on how the function reacts, we either return:</p>
+takes two arguments, a reference to an ActiveObject and an event, (see line 1).
+Then, depending on how the function reacts, we either return:</p>
 <blockquote>
 <div><ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">return_status.UNHANDLED</span></code> if we want an event to bubble outward in the
 chart.  Typically this is the default value of the item you will return from
-a statechart callback.  See line 2.</li>
+a statechart callback (see line 2).</li>
 <li><code class="docutils literal notranslate"><span class="pre">return_status.HANDLED</span></code> when we want the event processor to stop searching
-for an event.  See line 3.</li>
+for an event (see line 3).</li>
 <li><code class="docutils literal notranslate"><span class="pre">return_status.SUPER</span></code> when we don’t know what to do to the event, so we
-return information that will tell the event processor to try our super state. See line 8.</li>
+return information that will tell the event processor to try our super state (see line 8).</li>
 </ul>
 </div></blockquote>
 <p>There are more things that can be returned, we will address them as the example continues.</p>
@@ -1039,18 +1041,22 @@ return information that will tell the event processor to try our super state. Se
 <p>The miros library is intended to serve two different audiences:</p>
 <ul class="simple">
 <li>Embedded programmers who need to quickly prototype their designs, then port
-the work to c/C++ using the QP framework.</li>
+the work to c/C++ using the <a class="reference external" href="https://github.com/QuantumLeaps/qpcpp">QP framework</a>.</li>
 <li>Python developers who want to use statecharts.</li>
 </ul>
 <p>This way of writing statecharts – by using callbacks with if-elif structures,
 working with an ActiveObject – will make code that is extremely easy to port
 back to the QP framework.</p>
 <p>If you would like to program in a more “Pythonic” way, you can inherit from the
-miros Factory class instead of the ActiveObject.  Under the hood, the Factory
+miros <code class="docutils literal notranslate"><span class="pre">Factory</span></code> class instead of the <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code>.  Under the hood, the <code class="docutils literal notranslate"><span class="pre">Factory</span></code>
 class is just making the kinds of callback functions we are talking about here.</p>
-<p>It is easier to explain this library using the traditional techniques of engaging
+<p>It is easier to explain how this library works using the traditional techniques of engaging
 with the Miros Samek event processing algorithm than by just jumping into the
-Factory class. (I only program the statecharts using the Factory class)</p>
+<code class="docutils literal notranslate"><span class="pre">Factory</span></code> class.</p>
+<p>Once you understand how the event processor works, you can choose between the
+two different ways of writing your own statecharts.  I have a preference to
+build statecharts with a <a class="reference internal" href="recipes.html#recipes-creating-a-statechart-inside-of-a-class"><span class="std std-ref">derived Factory classes</span></a>, because it gives me the full
+power of Python.</p>
 <a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
@@ -1063,7 +1069,7 @@ Factory class. (I only program the statecharts using the Factory class)</p>
 the <a class="reference internal" href="recipes.html#recipes-boiler-plate-state-method-code"><span class="std std-ref">boiler plate example</span></a>, and change it
 to match your design.</p>
 <p>Also, it is relatively easy to add this boiler plate code to whatever snippet
-technology you are using with your editor. I use Ultisnips in Vim.</p>
+technology you are using with your editor. <a class="reference external" href="https://github.com/aleph2c/vim_tmux/blob/master/snippets/python.snippets">I use Ultisnips in Vim</a>.</p>
 <a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
@@ -1072,17 +1078,12 @@ technology you are using with your editor. I use Ultisnips in Vim.</p>
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="where-is-the-thr"><strong>Where is the thread, event processor and queues in the diagram?</strong></p>
-<p>The thread is missing from the UML:</p>
+<p>The thread and the queues are missing from the UML diagram; but they are
+contained within the ActiveObject class.</p>
+<p>The event processor is shown on the picture, since I use its attachment point to
+serve double duty; to show we want state we want to start in, and that the
+statemachine uses an event processor provided by the toaster oven.</p>
 <a class="reference external image-reference" href="_static/ToastOven_0_1.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_0_1.svg" src="_images/ToasterOven_0_1.svg" /></div>
-</a>
-<p>Unlike the thread the, event processor is actually shown on the picture:</p>
-<a class="reference external image-reference" href="_static/ToastOven_0_2.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_0_2.svg" src="_images/ToasterOven_0_2.svg" /></div>
-</a>
-<p>I leave the event processor on my pictures so I can show the starting state of
-the active object.</p>
-<p>The queues are missing from the UML as well, but they are contained within the
-ActiveObject class:</p>
-<a class="reference external image-reference" href="_static/ToastOven_0_3.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_0_3.svg" src="_images/ToasterOven_0_3.svg" /></div>
 </a>
 <a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
@@ -1109,10 +1110,10 @@ and <strong>S</strong> move around the HSM.</p>
   <span class="k">return</span> <span class="n">status</span>
 </pre></div>
 </div>
-<p>By using the decorator you can debug, test and document the behavior of your
-statechart.</p>
+<p>With this decorator it will be easier for you to debug, test and document the
+behavior of your statechart.</p>
 <p>If you don’t include the decorator, the statechart will work a little bit
-faster, but it will be harder to debug.</p>
+faster, but it will be harder to see what is happening.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The spy_on decorator needs to be placed on every callback that you want to
@@ -1152,7 +1153,7 @@ the <code class="docutils literal notranslate"><span class="pre">some_state_to_p
 <a class="reference internal" href="zero_to_one.html#iter1-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="can-you-explain-where-the-init-and-exit-clauses-a"><strong>Can you explain where the init and exit clauses are?</strong></p>
-<p>We don’t need the init and exit clauses in the design, so we don’t include them
+<p>We don’t need the init and exit clauses in this design, so we don’t include them
 in the if-elif structure of the state’s callback function.  The event processor
 will still call the function with the event named <code class="docutils literal notranslate"><span class="pre">INIT_SIGNAL</span></code>, after it has
 entered the <code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code> state, but it will be ignored.</p>
@@ -1175,13 +1176,23 @@ it.</li>
 </ol>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">In the second case, <a class="reference internal" href="#zero-to-one-rosetta"><span class="std std-ref">T</span></a> has not found anything in the
-current state that can handle its event and it needs to know how to descent outward in the HSM.</p>
+<p class="last">In the second case, <a class="reference internal" href="#zero-to-one-rosetta"><span class="std std-ref">T</span></a> has not found anything in
+the current state that can handle its event and it needs to know how to
+descend outward in the HSM.</p>
 </div>
 <p>Thankfully, your callback function doesn’t have to care which of these two
-reasons were behind why it has landed in its <code class="docutils literal notranslate"><span class="pre">else</span></code> clause.  It just has set
-the <code class="docutils literal notranslate"><span class="pre">tem.fun</span></code> attribute of its first argument to the its parent callback
-function, and return <code class="docutils literal notranslate"><span class="pre">return_status.SUPER</span></code>.</p>
+reasons were behind why it has landed in its <code class="docutils literal notranslate"><span class="pre">else</span></code> clause.  It just has to
+set the <code class="docutils literal notranslate"><span class="pre">temp.fun</span></code> attribute its parent callback function, and return
+<code class="docutils literal notranslate"><span class="pre">return_status.SUPER</span></code>.  In the case that there is no parent function we set
+<code class="docutils literal notranslate"><span class="pre">temp.fun</span></code> to <code class="docutils literal notranslate"><span class="pre">oven.top</span></code> to indicate we are in the outermost state.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal notranslate"><span class="pre">temp.fun</span></code> stands for temporary function. It is a way for your callback
+function to store some graphical information; who is my parent state.  The
+<code class="docutils literal notranslate"><span class="pre">temp.fun</span></code> attribute actually belongs to the event processor, so you are
+reaching into it and setting the parent of state of this callback while it is
+working within this callback (if you care).</p>
+</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_state_to_prove_this_works</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
@@ -1193,25 +1204,20 @@ function, and return <code class="docutils literal notranslate"><span class="pre
 </span>  <span class="k">return</span> <span class="n">status</span>
 </pre></div>
 </div>
-<p>But in our example, the <code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code> state doesn’t have an outer
-state, so we set the <code class="docutils literal notranslate"><span class="pre">oven.temp.fun</span></code> attribute to <code class="docutils literal notranslate"><span class="pre">oven.top</span></code>, to let the event
-processor know it has reached the outermost state of the HSM.</p>
 <a class="reference external image-reference" href="_static/ToastOven_0_4.pdf"><div align="center" class="align-center"><img alt="_images/ToasterOven_0_4.svg" src="_images/ToasterOven_0_4.svg" /></div>
 </a>
 <p>The returned value of the state callback function is set to
 <code class="docutils literal notranslate"><span class="pre">return_status.SUPER</span></code> so that your function can notify the event processor
-that it set the <code class="docutils literal notranslate"><span class="pre">oven.temp.fun</span></code> to its superstate’s function.</p>
+that it set the <code class="docutils literal notranslate"><span class="pre">oven.temp.fun</span></code> to its parent’s state function.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>How the else clause is called doesn’t really matter to you as an application
 developer.  You just have to follow some rules:</p>
 <ul class="last simple">
-<li>set the <code class="docutils literal notranslate"><span class="pre">oven.temp.fun</span></code> to the callback function representing the
-superstate</li>
-<li>if there is no superstate, set it to the <code class="docutils literal notranslate"><span class="pre">top</span></code> attribute of the first
+<li>set the <code class="docutils literal notranslate"><span class="pre">oven.temp.fun</span></code> to the callback function representing the parent state.</li>
+<li>if there is no parent state, set it to the <code class="docutils literal notranslate"><span class="pre">top</span></code> attribute of the first
 argument given to the callback function</li>
-<li>ensure that the callback function returns, return_state.SUPER if the else
-clause is reached.</li>
+<li>ensure that the callback function returns, return_state.SUPER</li>
 </ul>
 </div>
 <span class="target" id="how-does-the-live-trace-call-wo"></span><a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
@@ -1223,7 +1229,7 @@ clause is reached.</li>
 <a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p><strong>How does the live_trace call work?</strong></p>
 <p>The <a class="reference internal" href="recipes.html#recipes-tracing-live"><span class="std std-ref">live_trace</span></a> attribute needs to be set before the
-statechart’s thread is started:</p>
+statechart’s thread is started with a <code class="docutils literal notranslate"><span class="pre">start_at</span></code> method call:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
@@ -1257,13 +1263,8 @@ that the starting state of <a class="reference internal" href="#zero-to-one-rose
 ending state of <a class="reference internal" href="#zero-to-one-rosetta"><span class="std std-ref">S</span></a> was <code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code>.</p>
 <p>There is no <code class="docutils literal notranslate"><span class="pre">start_at</span></code> event in miros.  But to keep the trace output useful, I
 write a fake <code class="docutils literal notranslate"><span class="pre">start_at</span></code> event as the cause of the initial transition into the
-HSM.  On the diagram, this will be where the event processor attachment point
-touches the HSM.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">I might remove some information from the timestamp in this documentation to make
-the text fit on the screen.</p>
-</div>
+HSM.  On the diagram, this will be <a class="reference internal" href="reading_diagrams.html#reading-diagrams-event-processor-connection"><span class="std std-ref">where the event processor attachment point
+touches the HSM</span></a>.</p>
 <a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter1-design"<span class="std-ref">design</span></a></span></a>,
@@ -1283,13 +1284,12 @@ event processor in that thread.</p>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Before a statechart is started, <a class="reference internal" href="#zero-to-one-rosetta"><span class="std std-ref">T</span></a> and <a class="reference internal" href="#zero-to-one-rosetta"><span class="std std-ref">S</span></a>
-exist outside of the outermost
-state.  The <code class="docutils literal notranslate"><span class="pre">start_at</span></code> call, places <a class="reference internal" href="#zero-to-one-rosetta"><span class="std std-ref">T</span></a> into the
-<code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code>.  <a class="reference internal" href="#zero-to-one-rosetta"><span class="std std-ref">S</span></a>
-marches towards <a class="reference internal" href="#zero-to-one-rosetta"><span class="std std-ref">T</span></a>, triggering as
-many needed entry events as required, then the init event in the state that
-<a class="reference internal" href="#zero-to-one-rosetta"><span class="std std-ref">T</span></a> is in.</p>
+<p>Before a statechart is started, <a class="reference internal" href="#zero-to-one-rosetta"><span class="std std-ref">T</span></a> and <a class="reference internal" href="#zero-to-one-rosetta"><span class="std std-ref">S</span></a> exist outside of the outermost state.  The <code class="docutils literal notranslate"><span class="pre">start_at</span></code>
+call, places <a class="reference internal" href="#zero-to-one-rosetta"><span class="std std-ref">T</span></a> into the
+<code class="docutils literal notranslate"><span class="pre">some_state_to_prove_this_works</span></code>.  <a class="reference internal" href="#zero-to-one-rosetta"><span class="std std-ref">S</span></a> marches
+towards <a class="reference internal" href="#zero-to-one-rosetta"><span class="std std-ref">T</span></a>, triggering as many needed entry events
+as are required.  Once <strong>S</strong> settles into a state, that state’s init event is
+called.</p>
 <p>In our example there isn’t much to talk about.  The entry clause of the
 <code class="docutils literal notranslate"><span class="pre">some_state_function</span></code> is called, printing “hello world”.</p>
 <a class="reference internal" href="zero_to_one.html#zero-to-one-a-simple-example"<span class="std-ref">prev</span></a>,
@@ -1350,7 +1350,7 @@ print “hello world” to the terminal.</p>
 <a class="reference internal" href="zero_to_one.html#iter2"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="why-are-you-using-threads"><strong>Why are you using threads and not asyncio?</strong></p>
 <p>Asyncio is cool, but it doesn’t work with everything yet.  It may be the future
-of Python, but to use it all of your libraries will have to be asyncio
+of Python, but to use it, all of your libraries would have be asyncio
 compliant.  I wrote miros so that it can use as much existing Python as possible.</p>
 <p>If you want to check out another implementation of the Miro Samek event
 processing algorithm in Python, written with asyncio, check out <a class="reference external" href="https://github.com/dwhall/pq">Dean Hall’s pq.</a></p>
@@ -1369,15 +1369,15 @@ processing algorithm in Python, written with asyncio, check out <a class="refere
 <div class="section" id="iteration-2-basic-oven">
 <span id="iter2"></span><h3>Iteration 2: basic oven<a class="headerlink" href="#iteration-2-basic-oven" title="Permalink to this headline">¶</a></h3>
 <p>Now that we know miros will run on our system, lets use it to build a very basic
-toaster oven with a working HSM.</p>
+toaster oven with a working HSM.  We will add some states and show how to
+transition between these states.</p>
 <div class="section" id="iteration-2-specification">
 <span id="iter2-spec"></span><h4>Iteration 2 specification<a class="headerlink" href="#iteration-2-specification" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><span class="new-spec">The toaster oven will have a door, it will always be closed (for now)</span></li>
+<li><span class="new-spec">The toaster oven will have a door (for now, it will always be closed)</span></li>
 <li><span class="new-spec">The toaster oven will have an oven light, which can be turned on and off</span></li>
 <li><span class="new-spec">The toaster oven will have a heater, which can be turned on and off</span></li>
-<li><span class="new-spec">It will have two different heating modes, baking which can bake a potato
-and toasting which can toast some bread</span></li>
+<li><span class="new-spec">It will have two different heating modes; baking and toasting</span></li>
 <li><span class="new-spec">The toaster oven should start in the off state</span></li>
 <li><span class="new-spec">The toaster can only heat when the door is closed</span></li>
 <li><span class="new-spec">The toaster’s light should be off when the door is closed</span></li>
@@ -2624,8 +2624,7 @@ there is no way to open and close the door.</p>
 <li><span class="dead-spec">The toaster oven will have a door, it will always be closed</span></li>
 <li>The toaster oven will have an oven light, which can be turned on and off</li>
 <li>The toaster oven will have a heater, which can be turned on and off</li>
-<li>It will have two different heating modes, baking which can bake a potato
-and toasting which can toast some bread</li>
+<li>It will have two different heating modes; baking and toasting</li>
 <li>The toaster oven should start in the off state</li>
 <li>The toaster can only heat when the door is closed</li>
 <li>The toaster’s light should be off when the door is closed</li>
@@ -3500,8 +3499,7 @@ location.</p>
 <ul class="simple">
 <li>The toaster oven will have an oven light, which can be turned on and off</li>
 <li>The toaster oven will have a heater, which can be turned off and on</li>
-<li>It will have two different heating modes, baking which can bake a potato
-and toasting which can toast some bread</li>
+<li>It will have two different heating modes; baking and toasting</li>
 <li>The toaster oven should start in the off state</li>
 <li>The toaster can only heat when the door is closed</li>
 <li>The toaster’s light should be off when the door is closed</li>

@@ -4,6 +4,9 @@
   
   -- Albert Einstein
 
+  *Obey, cooperate, diverge*
+
+  -- Chinese Proverb
 
 Diagrams
 ========
@@ -1733,6 +1736,7 @@ The action on the "unhandled" arrow is a search side effect that can provide
 some useful features.
 
 .. code-block:: python
+  :emphasize-lines: 26-28, 36-38
    
   import time
 
@@ -1795,25 +1799,250 @@ Running the above would result in this output:
 
 .. _reading_diagrams-publishing-to-other-charts:
 
-Subscription and Publishing Icons
----------------------------------
-If you are publishing an event to another chart, it is often very useful to have
-your eyes fall on this immediately while looking at your diagram.  It is an
-output.  I use a red dot to signify this, red, because the event is currently
-stopped, as it is waiting for processing in a queue.
+Publish and Subscribe Coloured Dots
+-----------------------------------------
+If you are publishing an event to another chart, it is often beneficial to have
+your eyes fall on this immediately while looking at your diagram. It is an
+output.  I use a red dot to signify this. Red because the event is currently
+stopped as it is waiting for processing in a queue.
 
-Likewise, if you have subscribed to an event being posted by another chart, it's
-often very useful to have your eyes fall immediately on where it is being acted
-upon.  It is an input.  I use a green dot, to show that this signal is going, or
-being acted upon by the statechart which has subscribed to it
+Eventually, this published event will pass through to the other chart.  To make
+it easy to see where this happens, I mark the location with a green dot.  Green
+for go; the event is being acted upon.
+
+The red and green dots are not part of the UML standard, so you will be fighting
+your UML drawing tools to place these dots in a way that is consistent on each
+diagram.  So don't worry about placement consistency, just get the dots close to
+where you want them; think of them as marks you might make with a highlighter to
+emphasize what you need to see.
 
 .. note::
 
-  This is not in the UML standard
+  Putting red and green dots on your statechart is not in the UML standard
 
-.. image:: _static/pub_sub_icons.svg
-    :target: _static/pub_sub_icons.pdf
+To make a point I will draw two statecharts, which work together, with too much
+UML:
+
+.. image:: _static/pub_sub_icons_2.svg
+    :target: _static/pub_sub_icons_2.pdf
     :align: center
+
+The diagram is very busy.
+
+The inheritance arrows at the top of the diagram describe the program's
+structure.  We see that I'm trying to get the attributes and methods of Chart1
+into Chart2.  Chart2 also pulls in the features of the Factory, so we can
+:ref:`create a statechart inside of a class
+<recipes-creating-a-statechart-inside-of-a-class>`.  
+
+These structural details might be helpful when we first
+write our code, but after that, they become clutter. The state machines are the vital part of the diagram;  this is where we pack the
+design's behavioral complexity.  We have two coupled state machines that work
+together, so when we need to come back to this drawing, we will want to see how
+this behavioral partnership works right away.  This is why we add the
+highlighter marks.
+
+Here is the code for the above picture with the event sharing code highlighted:
+
+.. code-block:: python
+  :emphasize-lines: 27, 29-32, 98-99
+  
+   # pub_sub_example.py
+   import time
+   from collections import namedtuple
+
+   from miros import Event
+   from miros import spy_on
+   from miros import signals
+   from miros import Factory
+   from miros import ActiveObject
+   from miros import return_status
+
+   Coordinate = \
+     namedtuple('Coordinate', ['x','y', 'z'])
+
+   class Chart1(ActiveObject):
+     def __init__(self, name):
+       super().__init__(name)
+       self.x, self.y, self.z = None, None, None
+
+     def print_payload(self):
+       print("x: {}, y: {}, z: {}".format(self.x, self.y, self.z))
+
+   @spy_on
+   def c_1_outer_state(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       chart.subscribe(Event(signal=signals.Chart_2_Started))
+       status = return_status.HANDLED
+     elif(e.signal == signals.Chart_2_Started):
+       chart.x = e.payload.x
+       chart.y = e.payload.y
+       chart.z = e.payload.z
+       status = chart.trans(c_1_inner_state)
+     else:
+       chart.temp.fun = chart.top
+       status = return_status.SUPER
+     return status
+
+   @spy_on
+   def c_1_inner_state(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       chart.print_payload()
+       chart.post_lifo(Event(signal=signals.Reset))
+       status = return_status.HANDLED
+     elif(e.signal == signals.Reset):
+       status = chart.trans(c_1_outer_state)
+     elif(e.signal == signals.INIT_SIGNAL):
+       status = return_status.HANDLED
+     else:
+       chart.temp.fun = c_1_outer_state
+       status = return_status.SUPER
+     return status
+
+
+   class Chart2(Chart1, Factory):
+
+     def __init__(self, name, live_trace=None, live_spy=None):
+       super().__init__(name)
+       self.x = 0
+       self.live_spy = False if live_spy == None else live_spy
+       self.live_trace = False if live_trace == None else live_trace
+
+       self.c_2_outer_state = self.create(state="c_2_outer_state"). \
+         catch(signal=signals.INIT_SIGNAL,
+           handler=self.c_2_outer_state_init_signal). \
+         catch(signal=signals.Reset,
+           handler=self.c_2_outer_state_reset). \
+         to_method()
+
+       self.c_2_inner_state = self.create(state="c_2_inner_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.c_2_outer_state_entry_signal). \
+         to_method()
+
+       self.nest(self.c_2_outer_state, parent=None). \
+            nest(self.c_2_inner_state, parent=self.c_2_outer_state)
+
+       self.start_at(self.c_2_inner_state)
+
+     def increment_x(self):
+       self.x += 1
+
+     @staticmethod
+     def c_2_outer_state_init_signal(chart, e):
+       status = chart.trans(chart.c_2_inner_state)
+       return status
+
+     @staticmethod
+     def c_2_outer_state_reset(chart, e):
+       chart.increment_x()
+       status = chart.trans(chart.c_2_outer_state)
+       return status
+
+     @staticmethod
+     def c_2_outer_state_entry_signal(chart, e):
+       status = return_status.HANDLED
+       chart.publish(Event(signal=signals.Chart_2_Started,
+         payload=Coordinate(x=chart.x, y=2, z=3)))
+       return status
+
+   if __name__ == '__main__':
+     # need to create an active object
+     # set it's live trace attribute
+     # then start it in the correct state
+     c_1 = Chart1('c_1')
+     c_1.live_trace = True
+     c_1.start_at(c_1_outer_state)
+
+     # Chart2 starts itself in the correct state
+     c_2 = Chart2(name='c_2', live_trace=True)
+     c_2.post_fifo(Event(signal=signals.Reset))
+     c_2.post_fifo(Event(signal=signals.Reset))
+     time.sleep(0.1)
+
+Running this code, we see:
+
+.. code-block:: python
+
+   [09:05:33] [c_1] e->start_at() top->c_1_outer_state
+   [09:05:33] [c_2] e->start_at() top->c_2_inner_state
+   x: 0, y: 2, z: 3
+   [09:05:33] [c_1] e->Chart_2_Started() c_1_outer_state->c_1_inner_state
+   [09:05:33] [c_1] e->Reset() c_1_inner_state->c_1_outer_state
+   [09:05:33] [c_2] e->Reset() c_2_inner_state->c_2_inner_state
+   x: 1, y: 2, z: 3
+   [09:05:33] [c_2] e->Reset() c_2_inner_state->c_2_inner_state
+   [09:05:33] [c_1] e->Chart_2_Started() c_1_outer_state->c_1_inner_state
+   [09:05:33] [c_1] e->Reset() c_1_inner_state->c_1_outer_state
+   x: 2, y: 2, z: 3
+   [09:05:33] [c_1] e->Chart_2_Started() c_1_outer_state->c_1_inner_state
+   [09:05:33] [c_1] e->Reset() c_1_inner_state->c_1_outer_state
+
+Let's run the above trace output through the `sequence tool
+<https://github.com/aleph2c/sequence>`_ and compare the resulting :ref:`sequence
+diagram <reading_diagrams-sequence-diagrams>` and UML statecharts:
+
+.. image:: _static/pub_sub_icons_2.svg
+    :target: _static/pub_sub_icons_2.pdf
+    :align: center
+  
+.. code-block:: python
+
+   [Statechart: c_1] (Chart1: ActiveObject)
+            top            c_1_outer_state      c_1_inner_state
+             +-----start_at()---->|                    |
+             |        (1)         |                    |
+             |                    +--Chart_2_Started()>|
+             |                    |        (3)         |
+             |                    +<------Reset()------|
+             |                    |        (4)         |
+             |                    +--Chart_2_Started()>|
+             |                    |        (7)         |
+             |                    +<------Reset()------|
+             |                    |        (8)         |
+             |                    +--Chart_2_Started()>|
+             |                    |        (9)         |
+             |                    +<------Reset()------|
+             |                    |       (10)         |
+
+   [Statechart: c_2] (Chart2: Factory)
+         top      c_2_inner_state
+          +--start_at()->| publishes Chart_2_Started
+          |     (2)      |
+          |              +
+          |               \ (5)
+          |               Reset() publishes Chart_2_Started
+          |               /
+          |              <
+          |              +
+          |               \ (6)
+          |               Reset() publishes Chart_2_Started
+          |               /
+          |              <
+
+Here is what happens when we run our code:
+
+1. c_1 (Chart1) starts and settles into the c_1_outer_state.
+#. c_2 (Chart2) starts and transitions into the c_2_inner_state, which publishes
+   Chart_2_Started.
+#. c_1 reacts to the Chart_2_Started event, transitions from c_1_outer_state to
+   c_1_inner_state, prints the contents of the Chart_2_started event's payload,
+   then posts a Reset event to itself using the post_lifo API.
+#. c_1 reacts to its Reset event, transitioning into c_1_outer_state.
+#. c_2 receives a Reset event from our main thread, it publishes a
+   Chart_2_Started event.
+#. c_2 receives another Reset event from our main thread, it publishes a
+   Chart_2_Started event.
+#. c_1 reacts to the Chart_2_Started event, transitions from c_1_outer_state to
+   c_1_inner_state, prints the contents of the Chart_2_started event's payload,
+   then posts a Reset event to itself using the post_lifo API.
+#. c_1 reacts to its Reset event, transitioning into c_1_outer_state.
+#. c_1 reacts to the Chart_2_Started event, transitions from c_1_outer_state to
+   c_1_inner_state, prints the contents of the Chart_2_started event's payload,
+   then posts a Reset event to itself using the post_lifo API.
+#. c_1 reacts to its Reset event, transitioning into c_1_outer_state.
 
 
 .. _reading_diagrams-high-level-dependency-diagrams:
@@ -1885,7 +2114,7 @@ think will be useful, place those on the diagram too:
 
 Sequence Diagrams
 -----------------
-Sequence diagrams are very useful and extremely fragile to design changes.  The
+Sequence diagrams are very useful and extremely fragile to design changes.  They
 `can be generated directly from the trace instrumentation of the state machine
 <https://github.com/aleph2c/sequence>`_ and quickly written up in plain text.
 You can drop this plain text into your code or use it directly in your docs.
@@ -1907,22 +2136,39 @@ To this sequence diagram:
    [ Chart: doc_process ] (?)
       spec       statechart        code             trace      sequence_diagram 
         +-begin()->|                |                |                |
-        |   (?)    |                |                |                |
+        |   (1)    |                |                |                |
         |          +--prototype()-->|                |                |
-        |          |      (?)       |                |                |
+        |          |      (2)       |                |                |
         |          |                +                |                |
-        |          |                 \ (?)           |                |
+        |          |                 \ (3)           |                |
         |          |                 debug()         |                |
         |          |                 /               |                |
         |          |                <                |                |
         |          |                +-communicate()->|                |
-        |          |                |      (?)       |                |
+        |          |                |      (4)       |                |
         |          |                |                +-sequence.rb()->|
-        |          |                |                |      (?)       |
+        |          |                |                |      (5)       |
 
-Avoid spending a lot of time on these diagrams, and avoid the more advanced
-diagramming features, since to put effort into hand drawing a sequence diagram
-while designing a reactive system will be a Sisyphean effort.
+
+The horizontal axis describes the states we want to show in an interaction.  The
+vertical axis represents time, time starts at the top of the page and moves into
+the program's future, lower down the page.
+
+Vertical bars descend from each state, as guides for your eyes.  These are
+called "lifelines," the lifelines are connected by asynchronous events.  An
+event can connect two different lifelines, or they can connect back on
+themselves (like the debug event on the code lifeline).  Such an event
+connection represents a state transition.
+
+The UML sequence diagram standard describes ways we can define loops,
+iterations, unexpected messages, lost messages, synchronous messages, actors and
+all sorts of other stuff that we don't care about.  We don't care about this
+stuff, because the engineering trade-off is not worth it.  The time spent to
+build these beautiful and descriptive diagrams is wasted because they are broken
+by the smallest change to your statechart.
+
+So avoid spending a lot of time or effort on these diagrams, use code to
+generate them, and avoid using their more advanced diagramming features.
 
 .. _reading_diagrams-payloads:
 

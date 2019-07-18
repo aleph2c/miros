@@ -271,20 +271,22 @@ For a flat state:
 
 .. code-block:: python
 
+  from miros import Event
   from miros import spy_on
-  from miros import signals, return_status, Event
+  from miros import signals
+  from miros import return_status
 
   @spy_on
-  def <your_state_method_name>(self, e):
-    # if you state method doesn't know what to do it should return this
+  def <your_state_method_name>(chart, e):
+    # if your state method doesn't know what to do, it should return this
     status = return_status.UNHANDLED
 
-    if(e.signal == signals.ENTRY_SIGNAL):
+    if e.signal == signals.ENTRY_SIGNAL:
       # call your entry application code
 
       # make sure you tell the event processor you handled this event
       status = return_status.HANDLED
-    elif(e.signal == signals.INIT_SIGNAL):
+    elif e.signal == signals.INIT_SIGNAL:
       # call your initialization (big black dot) application code
 
       # make sure you tell the event processor you handled this event
@@ -292,11 +294,11 @@ For a flat state:
 
     #
     # Write your custom
-    # event handlers in here as there own elif clauses
+    # event handlers in here as their own elif clauses
     #
 
-    elif(e.signal == signals.EXIT_SIGNAL):
-      # call your exit (big black dot) application code
+    elif e.signal == signals.EXIT_SIGNAL:
+      # call your exit application code
 
       # make sure you tell the event processor you handled this event
       status = return_status.HANDLED
@@ -305,7 +307,9 @@ For a flat state:
       # SEARCH_FOR_SUPER_SIGNAL name
 
       # 1) place your parent state method into the self.temp.fun
-      self.temp.fun = <your_parent_state_method>
+      # 1.1) if this is the top-most state, use ``chart.top`` as your
+      #      <your_parent_state_method>
+      chart.temp.fun = <your_parent_state_method>
 
       # 2) make sure you return this value
       status = return_status.SUPER

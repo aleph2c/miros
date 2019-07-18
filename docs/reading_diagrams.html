@@ -39,6 +39,10 @@
 <div><p><em>If I can’t picture it, I can’t understand it</em></p>
 <p class="attribution">&mdash;Albert Einstein</p>
 </div></blockquote>
+<blockquote>
+<div><p><em>Obey, cooperate, diverge</em></p>
+<p class="attribution">&mdash;Chinese Proverb</p>
+</div></blockquote>
 <div class="section" id="diagrams">
 <h1>Diagrams<a class="headerlink" href="#diagrams" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="history-and-context">
@@ -1544,20 +1548,20 @@ some useful features.</p>
 
 <span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">a1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Bubbling</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;caught and released by a1&quot;</span><span class="p">)</span>
-  <span class="k">else</span><span class="p">:</span>
+<span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Bubbling</span><span class="p">):</span>
+</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;caught and released by a1&quot;</span><span class="p">)</span>
+</span>  <span class="k">else</span><span class="p">:</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">a0</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
   <span class="k">return</span> <span class="n">status</span>
 
 <span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">a2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Bubbling</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;caught and released by a2&quot;</span><span class="p">)</span>
-  <span class="k">else</span><span class="p">:</span>
+<span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Bubbling</span><span class="p">):</span>
+</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;caught and released by a2&quot;</span><span class="p">)</span>
+</span>  <span class="k">else</span><span class="p">:</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">a1</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
   <span class="k">return</span> <span class="n">status</span>
@@ -1578,22 +1582,231 @@ finally hooked by a0, but state remains as a0
 </pre></div>
 </div>
 </div>
-<div class="section" id="subscription-and-publishing-icons">
-<span id="reading-diagrams-publishing-to-other-charts"></span><h3>Subscription and Publishing Icons<a class="headerlink" href="#subscription-and-publishing-icons" title="Permalink to this headline">¶</a></h3>
-<p>If you are publishing an event to another chart, it is often very useful to have
-your eyes fall on this immediately while looking at your diagram.  It is an
-output.  I use a red dot to signify this, red, because the event is currently
-stopped, as it is waiting for processing in a queue.</p>
-<p>Likewise, if you have subscribed to an event being posted by another chart, it’s
-often very useful to have your eyes fall immediately on where it is being acted
-upon.  It is an input.  I use a green dot, to show that this signal is going, or
-being acted upon by the statechart which has subscribed to it</p>
+<div class="section" id="publish-and-subscribe-coloured-dots">
+<span id="reading-diagrams-publishing-to-other-charts"></span><h3>Publish and Subscribe Coloured Dots<a class="headerlink" href="#publish-and-subscribe-coloured-dots" title="Permalink to this headline">¶</a></h3>
+<p>If you are publishing an event to another chart, it is often beneficial to have
+your eyes fall on this immediately while looking at your diagram. It is an
+output.  I use a red dot to signify this. Red because the event is currently
+stopped as it is waiting for processing in a queue.</p>
+<p>Eventually, this published event will pass through to the other chart.  To make
+it easy to see where this happens, I mark the location with a green dot.  Green
+for go; the event is being acted upon.</p>
+<p>The red and green dots are not part of the UML standard, so you will be fighting
+your UML drawing tools to place these dots in a way that is consistent on each
+diagram.  So don’t worry about placement consistency, just get the dots close to
+where you want them; think of them as marks you might make with a highlighter to
+emphasize what you need to see.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This is not in the UML standard</p>
+<p class="last">Putting red and green dots on your statechart is not in the UML standard</p>
 </div>
-<a class="reference external image-reference" href="_static/pub_sub_icons.pdf"><div align="center" class="align-center"><img alt="_images/pub_sub_icons.svg" src="_images/pub_sub_icons.svg" /></div>
+<p>To make a point I will draw two statecharts, which work together, with too much
+UML:</p>
+<a class="reference external image-reference" href="_static/pub_sub_icons_2.pdf"><div align="center" class="align-center"><img alt="_images/pub_sub_icons_2.svg" src="_images/pub_sub_icons_2.svg" /></div>
 </a>
+<p>The diagram is very busy.</p>
+<p>The inheritance arrows at the top of the diagram describe the program’s
+structure.  We see that I’m trying to get the attributes and methods of Chart1
+into Chart2.  Chart2 also pulls in the features of the Factory, so we can
+<a class="reference internal" href="recipes.html#recipes-creating-a-statechart-inside-of-a-class"><span class="std std-ref">create a statechart inside of a class</span></a>.</p>
+<p>These structural details might be helpful when we first
+write our code, but after that, they become clutter. The state machines are the vital part of the diagram;  this is where we pack the
+design’s behavioral complexity.  We have two coupled state machines that work
+together, so when we need to come back to this drawing, we will want to see how
+this behavioral partnership works right away.  This is why we add the
+highlighter marks.</p>
+<p>Here is the code for the above picture with the event sharing code highlighted:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1"># pub_sub_example.py</span>
+ <span class="kn">import</span> <span class="nn">time</span>
+ <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+ <span class="n">Coordinate</span> <span class="o">=</span> \
+   <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Coordinate&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">])</span>
+
+ <span class="k">class</span> <span class="nc">Chart1</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+
+   <span class="k">def</span> <span class="nf">print_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;x: {}, y: {}, z: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">))</span>
+
+ <span class="nd">@spy_on</span>
+ <span class="k">def</span> <span class="nf">c_1_outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+<span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Chart_2_Started</span><span class="p">))</span>
+</span>     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Chart_2_Started</span><span class="p">):</span>
+</span><span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">x</span>
+</span><span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">y</span>
+</span><span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">z</span>
+</span>     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c_1_inner_state</span><span class="p">)</span>
+   <span class="k">else</span><span class="p">:</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+   <span class="k">return</span> <span class="n">status</span>
+
+ <span class="nd">@spy_on</span>
+ <span class="k">def</span> <span class="nf">c_1_inner_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">print_payload</span><span class="p">()</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">post_lifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c_1_outer_state</span><span class="p">)</span>
+   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+   <span class="k">else</span><span class="p">:</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">c_1_outer_state</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+   <span class="k">return</span> <span class="n">status</span>
+
+
+ <span class="k">class</span> <span class="nc">Chart2</span><span class="p">(</span><span class="n">Chart1</span><span class="p">,</span> <span class="n">Factory</span><span class="p">):</span>
+
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">c_2_outer_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;c_2_outer_state&quot;</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">c_2_outer_state_init_signal</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">c_2_outer_state_reset</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">to_method</span><span class="p">()</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">c_2_inner_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;c_2_inner_state&quot;</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">c_2_outer_state_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">to_method</span><span class="p">()</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c_2_outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+          <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c_2_inner_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">c_2_outer_state</span><span class="p">)</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c_2_inner_state</span><span class="p">)</span>
+
+   <span class="k">def</span> <span class="nf">increment_x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+=</span> <span class="mi">1</span>
+
+   <span class="nd">@staticmethod</span>
+   <span class="k">def</span> <span class="nf">c_2_outer_state_init_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">c_2_inner_state</span><span class="p">)</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="nd">@staticmethod</span>
+   <span class="k">def</span> <span class="nf">c_2_outer_state_reset</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">increment_x</span><span class="p">()</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">c_2_outer_state</span><span class="p">)</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="nd">@staticmethod</span>
+   <span class="k">def</span> <span class="nf">c_2_outer_state_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Chart_2_Started</span><span class="p">,</span>
+</span><span class="hll">       <span class="n">payload</span><span class="o">=</span><span class="n">Coordinate</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">chart</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">3</span><span class="p">)))</span>
+</span>     <span class="k">return</span> <span class="n">status</span>
+
+ <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+   <span class="c1"># need to create an active object</span>
+   <span class="c1"># set it&#39;s live trace attribute</span>
+   <span class="c1"># then start it in the correct state</span>
+   <span class="n">c_1</span> <span class="o">=</span> <span class="n">Chart1</span><span class="p">(</span><span class="s1">&#39;c_1&#39;</span><span class="p">)</span>
+   <span class="n">c_1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+   <span class="n">c_1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">c_1_outer_state</span><span class="p">)</span>
+
+   <span class="c1"># Chart2 starts itself in the correct state</span>
+   <span class="n">c_2</span> <span class="o">=</span> <span class="n">Chart2</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;c_2&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+   <span class="n">c_2</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
+   <span class="n">c_2</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
+   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Running this code, we see:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">09</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">33</span><span class="p">]</span> <span class="p">[</span><span class="n">c_1</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">c_1_outer_state</span>
+<span class="p">[</span><span class="mi">09</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">33</span><span class="p">]</span> <span class="p">[</span><span class="n">c_2</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">c_2_inner_state</span>
+<span class="n">x</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="mi">3</span>
+<span class="p">[</span><span class="mi">09</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">33</span><span class="p">]</span> <span class="p">[</span><span class="n">c_1</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Chart_2_Started</span><span class="p">()</span> <span class="n">c_1_outer_state</span><span class="o">-&gt;</span><span class="n">c_1_inner_state</span>
+<span class="p">[</span><span class="mi">09</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">33</span><span class="p">]</span> <span class="p">[</span><span class="n">c_1</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Reset</span><span class="p">()</span> <span class="n">c_1_inner_state</span><span class="o">-&gt;</span><span class="n">c_1_outer_state</span>
+<span class="p">[</span><span class="mi">09</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">33</span><span class="p">]</span> <span class="p">[</span><span class="n">c_2</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Reset</span><span class="p">()</span> <span class="n">c_2_inner_state</span><span class="o">-&gt;</span><span class="n">c_2_inner_state</span>
+<span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="mi">3</span>
+<span class="p">[</span><span class="mi">09</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">33</span><span class="p">]</span> <span class="p">[</span><span class="n">c_2</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Reset</span><span class="p">()</span> <span class="n">c_2_inner_state</span><span class="o">-&gt;</span><span class="n">c_2_inner_state</span>
+<span class="p">[</span><span class="mi">09</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">33</span><span class="p">]</span> <span class="p">[</span><span class="n">c_1</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Chart_2_Started</span><span class="p">()</span> <span class="n">c_1_outer_state</span><span class="o">-&gt;</span><span class="n">c_1_inner_state</span>
+<span class="p">[</span><span class="mi">09</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">33</span><span class="p">]</span> <span class="p">[</span><span class="n">c_1</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Reset</span><span class="p">()</span> <span class="n">c_1_inner_state</span><span class="o">-&gt;</span><span class="n">c_1_outer_state</span>
+<span class="n">x</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="mi">3</span>
+<span class="p">[</span><span class="mi">09</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">33</span><span class="p">]</span> <span class="p">[</span><span class="n">c_1</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Chart_2_Started</span><span class="p">()</span> <span class="n">c_1_outer_state</span><span class="o">-&gt;</span><span class="n">c_1_inner_state</span>
+<span class="p">[</span><span class="mi">09</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">33</span><span class="p">]</span> <span class="p">[</span><span class="n">c_1</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Reset</span><span class="p">()</span> <span class="n">c_1_inner_state</span><span class="o">-&gt;</span><span class="n">c_1_outer_state</span>
+</pre></div>
+</div>
+<p>Let’s run the above trace output through the <a class="reference external" href="https://github.com/aleph2c/sequence">sequence tool</a> and compare the resulting <a class="reference internal" href="#reading-diagrams-sequence-diagrams"><span class="std std-ref">sequence
+diagram</span></a> and UML statecharts:</p>
+<a class="reference external image-reference" href="_static/pub_sub_icons_2.pdf"><div align="center" class="align-center"><img alt="_images/pub_sub_icons_2.svg" src="_images/pub_sub_icons_2.svg" /></div>
+</a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Statechart</span><span class="p">:</span> <span class="n">c_1</span><span class="p">]</span> <span class="p">(</span><span class="n">Chart1</span><span class="p">:</span> <span class="n">ActiveObject</span><span class="p">)</span>
+         <span class="n">top</span>            <span class="n">c_1_outer_state</span>      <span class="n">c_1_inner_state</span>
+          <span class="o">+-----</span><span class="n">start_at</span><span class="p">()</span><span class="o">----&gt;|</span>                    <span class="o">|</span>
+          <span class="o">|</span>        <span class="p">(</span><span class="mi">1</span><span class="p">)</span>         <span class="o">|</span>                    <span class="o">|</span>
+          <span class="o">|</span>                    <span class="o">+--</span><span class="n">Chart_2_Started</span><span class="p">()</span><span class="o">&gt;|</span>
+          <span class="o">|</span>                    <span class="o">|</span>        <span class="p">(</span><span class="mi">3</span><span class="p">)</span>         <span class="o">|</span>
+          <span class="o">|</span>                    <span class="o">+&lt;------</span><span class="n">Reset</span><span class="p">()</span><span class="o">------|</span>
+          <span class="o">|</span>                    <span class="o">|</span>        <span class="p">(</span><span class="mi">4</span><span class="p">)</span>         <span class="o">|</span>
+          <span class="o">|</span>                    <span class="o">+--</span><span class="n">Chart_2_Started</span><span class="p">()</span><span class="o">&gt;|</span>
+          <span class="o">|</span>                    <span class="o">|</span>        <span class="p">(</span><span class="mi">7</span><span class="p">)</span>         <span class="o">|</span>
+          <span class="o">|</span>                    <span class="o">+&lt;------</span><span class="n">Reset</span><span class="p">()</span><span class="o">------|</span>
+          <span class="o">|</span>                    <span class="o">|</span>        <span class="p">(</span><span class="mi">8</span><span class="p">)</span>         <span class="o">|</span>
+          <span class="o">|</span>                    <span class="o">+--</span><span class="n">Chart_2_Started</span><span class="p">()</span><span class="o">&gt;|</span>
+          <span class="o">|</span>                    <span class="o">|</span>        <span class="p">(</span><span class="mi">9</span><span class="p">)</span>         <span class="o">|</span>
+          <span class="o">|</span>                    <span class="o">+&lt;------</span><span class="n">Reset</span><span class="p">()</span><span class="o">------|</span>
+          <span class="o">|</span>                    <span class="o">|</span>       <span class="p">(</span><span class="mi">10</span><span class="p">)</span>         <span class="o">|</span>
+
+<span class="p">[</span><span class="n">Statechart</span><span class="p">:</span> <span class="n">c_2</span><span class="p">]</span> <span class="p">(</span><span class="n">Chart2</span><span class="p">:</span> <span class="n">Factory</span><span class="p">)</span>
+      <span class="n">top</span>      <span class="n">c_2_inner_state</span>
+       <span class="o">+--</span><span class="n">start_at</span><span class="p">()</span><span class="o">-&gt;|</span> <span class="n">publishes</span> <span class="n">Chart_2_Started</span>
+       <span class="o">|</span>     <span class="p">(</span><span class="mi">2</span><span class="p">)</span>      <span class="o">|</span>
+       <span class="o">|</span>              <span class="o">+</span>
+       <span class="o">|</span>               \ <span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+       <span class="o">|</span>               <span class="n">Reset</span><span class="p">()</span> <span class="n">publishes</span> <span class="n">Chart_2_Started</span>
+       <span class="o">|</span>               <span class="o">/</span>
+       <span class="o">|</span>              <span class="o">&lt;</span>
+       <span class="o">|</span>              <span class="o">+</span>
+       <span class="o">|</span>               \ <span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+       <span class="o">|</span>               <span class="n">Reset</span><span class="p">()</span> <span class="n">publishes</span> <span class="n">Chart_2_Started</span>
+       <span class="o">|</span>               <span class="o">/</span>
+       <span class="o">|</span>              <span class="o">&lt;</span>
+</pre></div>
+</div>
+<p>Here is what happens when we run our code:</p>
+<ol class="arabic simple">
+<li>c_1 (Chart1) starts and settles into the c_1_outer_state.</li>
+<li>c_2 (Chart2) starts and transitions into the c_2_inner_state, which publishes
+Chart_2_Started.</li>
+<li>c_1 reacts to the Chart_2_Started event, transitions from c_1_outer_state to
+c_1_inner_state, prints the contents of the Chart_2_started event’s payload,
+then posts a Reset event to itself using the post_lifo API.</li>
+<li>c_1 reacts to its Reset event, transitioning into c_1_outer_state.</li>
+<li>c_2 receives a Reset event from our main thread, it publishes a
+Chart_2_Started event.</li>
+<li>c_2 receives another Reset event from our main thread, it publishes a
+Chart_2_Started event.</li>
+<li>c_1 reacts to the Chart_2_Started event, transitions from c_1_outer_state to
+c_1_inner_state, prints the contents of the Chart_2_started event’s payload,
+then posts a Reset event to itself using the post_lifo API.</li>
+<li>c_1 reacts to its Reset event, transitioning into c_1_outer_state.</li>
+<li>c_1 reacts to the Chart_2_Started event, transitions from c_1_outer_state to
+c_1_inner_state, prints the contents of the Chart_2_started event’s payload,
+then posts a Reset event to itself using the post_lifo API.</li>
+<li>c_1 reacts to its Reset event, transitioning into c_1_outer_state.</li>
+</ol>
 </div>
 <div class="section" id="high-level-federation-diagrams">
 <span id="reading-diagrams-high-level-dependency-diagrams"></span><h3>High Level Federation Diagrams<a class="headerlink" href="#high-level-federation-diagrams" title="Permalink to this headline">¶</a></h3>
@@ -1644,7 +1857,7 @@ think will be useful, place those on the diagram too:</p>
 </div>
 <div class="section" id="sequence-diagrams">
 <span id="reading-diagrams-sequence-diagrams"></span><h3>Sequence Diagrams<a class="headerlink" href="#sequence-diagrams" title="Permalink to this headline">¶</a></h3>
-<p>Sequence diagrams are very useful and extremely fragile to design changes.  The
+<p>Sequence diagrams are very useful and extremely fragile to design changes.  They
 <a class="reference external" href="https://github.com/aleph2c/sequence">can be generated directly from the trace instrumentation of the state machine</a> and quickly written up in plain text.
 You can drop this plain text into your code or use it directly in your docs.</p>
 <p>From this instrumentation trace log:</p>
@@ -1659,23 +1872,36 @@ You can drop this plain text into your code or use it directly in your docs.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>[ Chart: doc_process ] (?)
    spec       statechart        code             trace      sequence_diagram
      +-begin()-&gt;|                |                |                |
-     |   (?)    |                |                |                |
+     |   (1)    |                |                |                |
      |          +--prototype()--&gt;|                |                |
-     |          |      (?)       |                |                |
+     |          |      (2)       |                |                |
      |          |                +                |                |
-     |          |                 \ (?)           |                |
+     |          |                 \ (3)           |                |
      |          |                 debug()         |                |
      |          |                 /               |                |
      |          |                &lt;                |                |
      |          |                +-communicate()-&gt;|                |
-     |          |                |      (?)       |                |
+     |          |                |      (4)       |                |
      |          |                |                +-sequence.rb()-&gt;|
-     |          |                |                |      (?)       |
+     |          |                |                |      (5)       |
 </pre></div>
 </div>
-<p>Avoid spending a lot of time on these diagrams, and avoid the more advanced
-diagramming features, since to put effort into hand drawing a sequence diagram
-while designing a reactive system will be a Sisyphean effort.</p>
+<p>The horizontal axis describes the states we want to show in an interaction.  The
+vertical axis represents time, time starts at the top of the page and moves into
+the program’s future, lower down the page.</p>
+<p>Vertical bars descend from each state, as guides for your eyes.  These are
+called “lifelines,” the lifelines are connected by asynchronous events.  An
+event can connect two different lifelines, or they can connect back on
+themselves (like the debug event on the code lifeline).  Such an event
+connection represents a state transition.</p>
+<p>The UML sequence diagram standard describes ways we can define loops,
+iterations, unexpected messages, lost messages, synchronous messages, actors and
+all sorts of other stuff that we don’t care about.  We don’t care about this
+stuff, because the engineering trade-off is not worth it.  The time spent to
+build these beautiful and descriptive diagrams is wasted because they are broken
+by the smallest change to your statechart.</p>
+<p>So avoid spending a lot of time or effort on these diagrams, use code to
+generate them, and avoid using their more advanced diagramming features.</p>
 </div>
 <div class="section" id="payloads">
 <span id="reading-diagrams-payloads"></span><h3>Payloads<a class="headerlink" href="#payloads" title="Permalink to this headline">¶</a></h3>
@@ -1775,7 +2001,7 @@ people on your team understand what you mean.</p>
 <li><a class="reference internal" href="#terminate-icon">Terminate Icon</a></li>
 <li><a class="reference internal" href="#final-icon">Final Icon</a></li>
 <li><a class="reference internal" href="#fall-through">Fall Through</a></li>
-<li><a class="reference internal" href="#subscription-and-publishing-icons">Subscription and Publishing Icons</a></li>
+<li><a class="reference internal" href="#publish-and-subscribe-coloured-dots">Publish and Subscribe Coloured Dots</a></li>
 <li><a class="reference internal" href="#high-level-federation-diagrams">High Level Federation Diagrams</a></li>
 <li><a class="reference internal" href="#medium-level-construction-and-pub-sub-diagrams">Medium Level Construction and Pub/Sub Diagrams</a></li>
 <li><a class="reference internal" href="#detailed-statechart-diagrams">Detailed Statechart Diagrams</a></li>

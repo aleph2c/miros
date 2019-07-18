@@ -992,7 +992,7 @@ The ActiveObject doesn't know anything about being a toaster oven.  It knows
 about queues and threads and it knows how to drive a state machine using a set
 of callback functions.  If you wanted to give an instantiated ActiveObject, a
 method or an attribute, you could use the :ref:`augment
-<recipes-markup-your-event-processor>`_ method; but a more traditional way of
+<recipes-markup-your-event-processor>` method; but a more traditional way of
 giving it toaster-like features, is to sub-class it, then add these features to
 that subclass.
 
@@ -1021,7 +1021,8 @@ that it can be called later:
   call_something_later(print_msg)
 
 The states in our diagram are constructed as callback functions with a given
-signature.  The event processor will call these functions when it needs to.
+function signature (this is explained in the next question/answer).  The
+event processor will call these functions when it needs to.
 
 .. include:: i_navigation_1.rst
 
@@ -1036,18 +1037,20 @@ Our state callback functions will always have the same signature:
 
 .. code-block:: python
 
-  # The event processor will call this function when it needs to 
-  # because the  function isn't called right away,
-  # it is called a callback function
+  # needed from miros for this example
+  from miros import return_status
+
+  # The event processor will call this function when it needs to.
+  # Since the function isn't called right away,it is called a 
+  # callback function
 
   # 1st part of the function signature, it's arguments.
   # Our state callback functions will always take two arguments:
-  # 1) a reference to a state_chart_object 
+  # 1) an ActiveObject
   # 2) an event
-  def some_state_function(state_chart_object, e):
+  def some_state_function(active_object, e):
     status = return_status.UNHANDLED
     # do useful work, then
-
     # set the status variable to an attribute of return_status
     # to tell the event processor how your function responded
     # to its call
@@ -1056,7 +1059,7 @@ Our state callback functions will always have the same signature:
     # an attribute of the return_status object
     return status
 
-For a real state function, it's signature would be expressed like this:
+For our example state callback function, it's signature looks like this:
 
 .. code-block:: python
   :emphasize-lines: 1, 2, 5, 8, 9
@@ -1073,16 +1076,16 @@ For a real state function, it's signature would be expressed like this:
     return status
 
 To make our state callback function have the right signature, we ensure that it
-takes two arguments, a statechart object and an event, line 1.  Then, depending
-on how the function reacts, we either return:
+takes two arguments, a reference to an ActiveObject and an event, (see line 1).
+Then, depending on how the function reacts, we either return:
 
   * ``return_status.UNHANDLED`` if we want an event to bubble outward in the
     chart.  Typically this is the default value of the item you will return from
-    a statechart callback.  See line 2.
+    a statechart callback (see line 2).
   * ``return_status.HANDLED`` when we want the event processor to stop searching
-    for an event.  See line 3.
+    for an event (see line 3).
   * ``return_status.SUPER`` when we don't know what to do to the event, so we
-    return information that will tell the event processor to try our super state. See line 8.
+    return information that will tell the event processor to try our super state (see line 8).
 
 There are more things that can be returned, we will address them as the example continues.
 
@@ -1095,7 +1098,7 @@ There are more things that can be returned, we will address them as the example 
 The miros library is intended to serve two different audiences:
 
 * Embedded programmers who need to quickly prototype their designs, then port
-  the work to c/C++ using the QP framework.  
+  the work to c/C++ using the `QP framework <https://github.com/QuantumLeaps/qpcpp>`_.  
 * Python developers who want to use statecharts.
 
 This way of writing statecharts -- by using callbacks with if-elif structures,
@@ -1103,12 +1106,18 @@ working with an ActiveObject -- will make code that is extremely easy to port
 back to the QP framework.
 
 If you would like to program in a more "Pythonic" way, you can inherit from the
-miros Factory class instead of the ActiveObject.  Under the hood, the Factory
+miros ``Factory`` class instead of the ``ActiveObject``.  Under the hood, the ``Factory``
 class is just making the kinds of callback functions we are talking about here.
 
-It is easier to explain this library using the traditional techniques of engaging
+It is easier to explain how this library works using the traditional techniques of engaging
 with the Miros Samek event processing algorithm than by just jumping into the
-Factory class. (I only program the statecharts using the Factory class)
+``Factory`` class.
+
+Once you understand how the event processor works, you can choose between the
+two different ways of writing your own statecharts.  I have a preference to
+build statecharts with a :ref:`derived Factory classes
+<recipes-creating-a-statechart-inside-of-a-class>`, because it gives me the full
+power of Python.
 
 .. include:: i_navigation_1.rst
 
@@ -1121,7 +1130,8 @@ the :ref:`boiler plate example <recipes-boiler-plate-state-method-code>`, and ch
 to match your design.
 
 Also, it is relatively easy to add this boiler plate code to whatever snippet
-technology you are using with your editor. I use Ultisnips in Vim.
+technology you are using with your editor. `I use Ultisnips in Vim
+<https://github.com/aleph2c/vim_tmux/blob/master/snippets/python.snippets>`_.
 
 .. include:: i_navigation_1.rst
 
@@ -1129,27 +1139,18 @@ technology you are using with your editor. I use Ultisnips in Vim.
 
 **Where is the thread, event processor and queues in the diagram?**
 
-The thread is missing from the UML:
+
+The thread and the queues are missing from the UML diagram; but they are
+contained within the ActiveObject class.
+
+The event processor is shown on the picture, since I use its attachment point to
+serve double duty; to show we want state we want to start in, and that the
+statemachine uses an event processor provided by the toaster oven.
 
 .. image:: _static/ToasterOven_0_1.svg
     :target: _static/ToastOven_0_1.pdf
     :align: center
 
-Unlike the thread the, event processor is actually shown on the picture:
-
-.. image:: _static/ToasterOven_0_2.svg
-    :target: _static/ToastOven_0_2.pdf
-    :align: center
-
-I leave the event processor on my pictures so I can show the starting state of
-the active object.
-
-The queues are missing from the UML as well, but they are contained within the
-ActiveObject class:
-
-.. image:: _static/ToasterOven_0_3.svg
-    :target: _static/ToastOven_0_3.pdf
-    :align: center
 
 .. include:: i_navigation_1.rst
 
@@ -1177,11 +1178,11 @@ and **S** move around the HSM.
       status = return_status.SUPER
     return status
 
-By using the decorator you can debug, test and document the behavior of your
-statechart.
+With this decorator it will be easier for you to debug, test and document the
+behavior of your statechart.
 
 If you don't include the decorator, the statechart will work a little bit
-faster, but it will be harder to debug.
+faster, but it will be harder to see what is happening.
 
 .. note::
 
@@ -1222,7 +1223,7 @@ the ``some_state_to_prove_this_works`` state.
 
 **Can you explain where the init and exit clauses are?**
 
-We don't need the init and exit clauses in the design, so we don't include them
+We don't need the init and exit clauses in this design, so we don't include them
 in the if-elif structure of the state's callback function.  The event processor
 will still call the function with the event named ``INIT_SIGNAL``, after it has
 entered the ``some_state_to_prove_this_works`` state, but it will be ignored.
@@ -1245,13 +1246,23 @@ A callback function can land in its `else` clause for one of two reasons:
 
 .. note::
   
-   In the second case, :ref:`T <zero_to_one_rosetta>` has not found anything in the
-   current state that can handle its event and it needs to know how to descent outward in the HSM.
+   In the second case, :ref:`T <zero_to_one_rosetta>` has not found anything in
+   the current state that can handle its event and it needs to know how to
+   descend outward in the HSM.
 
 Thankfully, your callback function doesn't have to care which of these two
-reasons were behind why it has landed in its ``else`` clause.  It just has set
-the ``tem.fun`` attribute of its first argument to the its parent callback
-function, and return ``return_status.SUPER``.
+reasons were behind why it has landed in its ``else`` clause.  It just has to
+set the ``temp.fun`` attribute its parent callback function, and return
+``return_status.SUPER``.  In the case that there is no parent function we set
+``temp.fun`` to ``oven.top`` to indicate we are in the outermost state.  
+
+.. note::
+
+  ``temp.fun`` stands for temporary function. It is a way for your callback
+  function to store some graphical information; who is my parent state.  The
+  ``temp.fun`` attribute actually belongs to the event processor, so you are
+  reaching into it and setting the parent of state of this callback while it is
+  working within this callback (if you care).
 
 .. code-block:: python
   :emphasize-lines: 6-8
@@ -1266,29 +1277,23 @@ function, and return ``return_status.SUPER``.
       status = return_status.SUPER
     return status
 
-But in our example, the ``some_state_to_prove_this_works`` state doesn't have an outer
-state, so we set the ``oven.temp.fun`` attribute to ``oven.top``, to let the event
-processor know it has reached the outermost state of the HSM.
-
 .. image:: _static/ToasterOven_0_4.svg
     :target: _static/ToastOven_0_4.pdf
     :align: center
 
 The returned value of the state callback function is set to
 ``return_status.SUPER`` so that your function can notify the event processor
-that it set the ``oven.temp.fun`` to its superstate's function.
+that it set the ``oven.temp.fun`` to its parent's state function.
 
 .. note::
 
   How the else clause is called doesn't really matter to you as an application
   developer.  You just have to follow some rules:
 
-  * set the ``oven.temp.fun`` to the callback function representing the
-    superstate
-  * if there is no superstate, set it to the ``top`` attribute of the first
+  * set the ``oven.temp.fun`` to the callback function representing the parent state.
+  * if there is no parent state, set it to the ``top`` attribute of the first
     argument given to the callback function
-  * ensure that the callback function returns, return_state.SUPER if the else
-    clause is reached.
+  * ensure that the callback function returns, return_state.SUPER
 
 .. _how_does_the_live_trace_call_wo:
 
@@ -1297,7 +1302,7 @@ that it set the ``oven.temp.fun`` to its superstate's function.
 **How does the live_trace call work?**
 
 The :ref:`live_trace <recipes-tracing-live>` attribute needs to be set before the
-statechart's thread is started:
+statechart's thread is started with a ``start_at`` method call:
 
 .. code-block:: python
 
@@ -1336,13 +1341,8 @@ ending state of :ref:`S <zero_to_one_rosetta>` was ``some_state_to_prove_this_wo
 
 There is no ``start_at`` event in miros.  But to keep the trace output useful, I
 write a fake ``start_at`` event as the cause of the initial transition into the
-HSM.  On the diagram, this will be where the event processor attachment point
-touches the HSM.
-
-.. note:: 
-
-  I might remove some information from the timestamp in this documentation to make
-  the text fit on the screen.
+HSM.  On the diagram, this will be :ref:`where the event processor attachment point
+touches the HSM <reading_diagrams-event-processor-connection>`.
 
 .. include:: i_navigation_1.rst
 
@@ -1363,13 +1363,13 @@ event processor in that thread.
 
     time.sleep(0.1)
 
-Before a statechart is started, :ref:`T <zero_to_one_rosetta>` and :ref:`S <zero_to_one_rosetta>`
-exist outside of the outermost
-state.  The ``start_at`` call, places :ref:`T <zero_to_one_rosetta>` into the
-``some_state_to_prove_this_works``.  :ref:`S <zero_to_one_rosetta>`
-marches towards :ref:`T <zero_to_one_rosetta>`, triggering as
-many needed entry events as required, then the init event in the state that
-:ref:`T <zero_to_one_rosetta>` is in.
+Before a statechart is started, :ref:`T <zero_to_one_rosetta>` and :ref:`S
+<zero_to_one_rosetta>` exist outside of the outermost state.  The ``start_at``
+call, places :ref:`T <zero_to_one_rosetta>` into the
+``some_state_to_prove_this_works``.  :ref:`S <zero_to_one_rosetta>` marches
+towards :ref:`T <zero_to_one_rosetta>`, triggering as many needed entry events
+as are required.  Once **S** settles into a state, that state's init event is
+called.
 
 In our example there isn't much to talk about.  The entry clause of the
 ``some_state_function`` is called, printing "hello world".
@@ -1431,7 +1431,7 @@ Which is exactly what were were expecting.
 **Why are you using threads and not asyncio?**
 
 Asyncio is cool, but it doesn't work with everything yet.  It may be the future
-of Python, but to use it all of your libraries will have to be asyncio
+of Python, but to use it, all of your libraries would have be asyncio
 compliant.  I wrote miros so that it can use as much existing Python as possible.
 
 If you want to check out another implementation of the Miro Samek event
@@ -1453,18 +1453,18 @@ I'm not answering this question
 Iteration 2: basic oven
 -----------------------
 Now that we know miros will run on our system, lets use it to build a very basic
-toaster oven with a working HSM.
+toaster oven with a working HSM.  We will add some states and show how to
+transition between these states.
 
 .. _iter2_spec:
 
 Iteration 2 specification
 """""""""""""""""""""""""
 
-* :new_spec:`The toaster oven will have a door, it will always be closed (for now)`
+* :new_spec:`The toaster oven will have a door (for now, it will always be closed)`
 * :new_spec:`The toaster oven will have an oven light, which can be turned on and off`
 * :new_spec:`The toaster oven will have a heater, which can be turned on and off`
-* :new_spec:`It will have two different heating modes, baking which can bake a potato
-  and toasting which can toast some bread`
+* :new_spec:`It will have two different heating modes; baking and toasting`
 * :new_spec:`The toaster oven should start in the off state`
 * :new_spec:`The toaster can only heat when the door is closed`
 * :new_spec:`The toaster's light should be off when the door is closed`
@@ -2915,8 +2915,7 @@ The toaster oven spec:
 * :dead_spec:`The toaster oven will have a door, it will always be closed`
 * The toaster oven will have an oven light, which can be turned on and off
 * The toaster oven will have a heater, which can be turned on and off
-* It will have two different heating modes, baking which can bake a potato
-  and toasting which can toast some bread
+* It will have two different heating modes; baking and toasting
 * The toaster oven should start in the off state
 * The toaster can only heat when the door is closed
 * The toaster's light should be off when the door is closed
@@ -3601,8 +3600,7 @@ The toaster oven spec:
 
 * The toaster oven will have an oven light, which can be turned on and off
 * The toaster oven will have a heater, which can be turned off and on
-* It will have two different heating modes, baking which can bake a potato
-  and toasting which can toast some bread
+* It will have two different heating modes; baking and toasting
 * The toaster oven should start in the off state
 * The toaster can only heat when the door is closed
 * The toaster's light should be off when the door is closed
