@@ -1812,16 +1812,24 @@ then posts a Reset event to itself using the post_lifo API.</li>
 <span id="reading-diagrams-high-level-dependency-diagrams"></span><h3>High Level Federation Diagrams<a class="headerlink" href="#high-level-federation-diagrams" title="Permalink to this headline">¶</a></h3>
 <p>If you have a number of statecharts that are all working together to perform
 some sort of collective action, it’s often very useful to see how they relate
-to one another from a very high point of view.  For this I draw high level
+to one another as a federation.  For this I draw high level
 dependency diagrams:</p>
 <a class="reference external image-reference" href="_static/context_diagram.pdf"><div align="center" class="align-center"><img alt="_images/context_diagram.svg" src="_images/context_diagram.svg" /></div>
 </a>
+<p>If two different statecharts share events then I place a dashed line between
+their named rectangles.</p>
 <p>When I need to write about a specific part of the system, I will change it’s
 colour to draw my audience’s attention.  In this example I am trying to draw
 your attention to the CacheFileChart used by the <a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/how_it_works.html">miros-rabbitmq plugin</a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This is not in the UML standard</p>
+<p>This is not in the UML standard</p>
+<p class="last">There is something very similar though, it is called a communication diagram.
+It looks very much like what I have drawn above but with numbered arrows; and
+they track both synchronous and asynchronous (what we care about) messages.
+They name and number the messages.  Numbering the messages tells a specific
+story of many possible stories, so to describe your system you would need to
+draw many almost identical drawings with different numberings.</p>
 </div>
 </div>
 <div class="section" id="medium-level-construction-and-pub-sub-diagrams">

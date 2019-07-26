@@ -10,10 +10,10 @@ Examples
    :caption: Single Chart Examples:
 
    comprehensive
-   cellular_automata
    scribbleexample
    interactingcharts
    towardsthefactoryexample
+   cellular_automata
    i_mongol_example
 
 More examples can be found in the :ref:`patterns section<patterns>`.

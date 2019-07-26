@@ -2051,12 +2051,15 @@ High Level Federation Diagrams
 ------------------------------
 If you have a number of statecharts that are all working together to perform
 some sort of collective action, it's often very useful to see how they relate
-to one another from a very high point of view.  For this I draw high level
+to one another as a federation.  For this I draw high level
 dependency diagrams:
 
 .. image:: _static/context_diagram.svg
     :target: _static/context_diagram.pdf
     :align: center
+
+If two different statecharts share events then I place a dashed line between
+their named rectangles.
 
 When I need to write about a specific part of the system, I will change it's
 colour to draw my audience's attention.  In this example I am trying to draw
@@ -2066,6 +2069,13 @@ your attention to the CacheFileChart used by the `miros-rabbitmq plugin
 .. note::
 
   This is not in the UML standard
+
+  There is something very similar though, it is called a communication diagram.
+  It looks very much like what I have drawn above but with numbered arrows; and
+  they track both synchronous and asynchronous (what we care about) messages.
+  They name and number the messages.  Numbering the messages tells a specific
+  story of many possible stories, so to describe your system you would need to
+  draw many almost identical drawings with different numberings.
 
 .. _reading_diagrams-medium-level-construction-and-pub/sub-diagrams:
 
