@@ -1,3 +1,5 @@
+.. _comprehensive-comprehensive:
+
 Comprehensive
 =============
 

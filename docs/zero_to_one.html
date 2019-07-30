@@ -1374,7 +1374,7 @@ transition between these states.</p>
 <div class="section" id="iteration-2-specification">
 <span id="iter2-spec"></span><h4>Iteration 2 specification<a class="headerlink" href="#iteration-2-specification" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><span class="new-spec">The toaster oven will have a door (for now, it will always be closed)</span></li>
+<li><span class="new-spec">The toaster oven will have a door (for now, to make things easy, it will always be closed)</span></li>
 <li><span class="new-spec">The toaster oven will have an oven light, which can be turned on and off</span></li>
 <li><span class="new-spec">The toaster oven will have a heater, which can be turned on and off</span></li>
 <li><span class="new-spec">It will have two different heating modes; baking and toasting</span></li>
@@ -1870,37 +1870,36 @@ thread finish its work before the main thread exits and kills the oven thread.</
 <a class="reference internal" href="zero_to_one.html#iter2-questions"<span class="std-ref">questions</span></a></span></a>,
 <a class="reference internal" href="zero_to_one.html#iter3"><span class="std std-ref">next</span></a><hr class="docutils" />
 <p id="where-are-the-signal-names-defined"><strong>Where are the event names defined?</strong></p>
-<p>The event names are called signals.  A signal has a name and a number.  The
-number needs to be unique for each signal.</p>
-<p>If you were making your statecharts in c/C++ your signal numbers would be
-defined as an enumeration.  But miros is written in Python, so the signals are
-objects just like everything else.</p>
-<p>The internal signal names, <code class="docutils literal notranslate"><span class="pre">EXIT_SIGNAL</span></code>, <code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code>, <code class="docutils literal notranslate"><span class="pre">INIT_SIGNAL</span></code>
-are defined within the miros.event package, but you can access them by importing
-<code class="docutils literal notranslate"><span class="pre">signals</span></code> into your program:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<p>An event has a name which is called a signal.</p>
+<p>The signals are either predefined or are defined at the moment they
+are used by your code.</p>
+<p>The internal signals (the names of events that the event processor
+posts to your state machine as it enters, initializes or exits a
+state) are predefined within the library.</p>
+<p>The external signals (<code class="docutils literal notranslate"><span class="pre">Toasting</span></code>, <code class="docutils literal notranslate"><span class="pre">Baking</span></code> and <code class="docutils literal notranslate"><span class="pre">Off</span></code> signals,
+in this example) are defined and constructed the moment they are
+first encountered by the miros library in your code.  So, you don’t
+have to worry about defining them somewhere, the <code class="docutils literal notranslate"><span class="pre">miros</span></code> library
+will define them the first time it sees them when you create an
+event:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span>
+
+<span class="c1"># if the Toasting signal hasn&#39;t been seen before, it will be</span>
+<span class="c1"># constructed and added to the signals object at the moment</span>
+<span class="c1"># the following code is run</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>To get access to the internal signal objects:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span>
-<span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span>
-<span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span>
-</pre></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A signal object, has a name and a unique number.  The miros library
+uses the number to distinguish it from other signals.  As a user of
+the miros library, you probably don’t need to care about this, if
+you want to make a new signal, you just write it down as if it was
+already defined elsewhere, and the miros library will automatically
+give it a unique number and a signal name based on your code and
+its highest signal number so far.</p>
 </div>
-<p>The external signals, or the events that you define in your program, are created
-at the moment they are used.   Specifically when you reference an attribute of
-the <code class="docutils literal notranslate"><span class="pre">signals</span></code> object that doesn’t exist within it.  This creation only happens
-once, so the signal’s name and number remain unique across the life of the
-program.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># signals object does not have a New signal</span>
-<span class="n">some_event_the_system_has_never_seen</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">New</span><span class="p">)</span>
-<span class="c1"># signals object now has a New signal, it has been assigned a unique number</span>
-<span class="c1"># and the name &quot;New&quot;</span>
-</pre></div>
-</div>
-<p>So do you need to care about this?  No, you just need to remember to type,
-<code class="docutils literal notranslate"><span class="pre">Event(signal=signals.&lt;whatever_name_you_want&gt;)</span></code> and not worry about defining
-things before you use them.</p>
 <a class="reference internal" href="zero_to_one.html#iter1"<span class="std-ref">prev</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-spec"<span class="std-ref">spec</span></a>,
 <a class="reference internal" href="zero_to_one.html#iter2-design"<span class="std-ref">design</span></a></span></a>,

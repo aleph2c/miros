@@ -45,7 +45,8 @@ A state in a statechart diagram is represented by a named rounded rectangle:
     :target: _static/state_recipe_1.pdf
     :align: center
 
-Here is the miros code for the above diagram.
+Every state function, must at least describe where it is situated in the HSM
+hierarchy. Here is the miros code for the above diagram:
 
 .. code-block:: python
   :emphasize-lines: 2, 7
@@ -330,7 +331,7 @@ to an ``ActiveObject``, start it, and then post events to it.
 
 .. note::
   
-   The code that is on init arrow in our diagram and the code that is listed
+   The code that is on the init arrow in our diagram and the code that is listed
    under entry and exit signals is run while the event processor is trying to
    figure out what to do next.  The event processor is not aware of this code,
    the code is run as a side-effect of its efforts to search the graph then act
@@ -851,8 +852,7 @@ Here is the code:
      time.sleep(0.01)
 
 
-If we look at the log file created by this program it would look something like
-this:
+The log file created by this program would look something like this:
 
 .. code-block:: text
 
@@ -924,7 +924,216 @@ this:
    2019-07-26 11:37:22,690 DEBUG:S: [ao2] hello from inner_state
    2019-07-26 11:37:22,690 DEBUG:S: [ao2] INIT_SIGNAL:inner_state
    2019-07-26 11:37:22,690 DEBUG:S: [ao2] <- Queued:(0) Deferred:(0)
+ 
+That's a lot of information. Suppose we just wanted to see the ``ao1`` trace:
+
+.. code-block:: bash
   
+  cat simple_state_9.log | grep T:*.a01
+
+This would result in the following output:
+
+.. code-block:: python
+  
+  2019-07-26 11:37:22,674 DEBUG:T: [ao1] e->start_at() top->inner_state
+  2019-07-26 11:37:22,682 DEBUG:T: [ao1] e->Reset() inner_state->inner_state
+
+If you wanted to see the spy of ``a02``, you could grep ``S:*.a02``... etc.
+
+So far we have seen how to create state functions, how to link them to an
+``Activeobject``, which collectively makes a statechart.  If you would like to
+see a comprehensive example of all of the signal pathways supported by the Miro
+Samek event processor, look at this :ref:`example <comprehensive-comprehensive>`.
+
+Is there a way to just make a statechart by instantiating a class?
+
+Of course there is, this is what the ``Factory`` class is for.  It links a set
+of signals to static methods; and assigns this linked collection to a state.
+You do this once per state, then you nest the states within one another; and the
+resulting object is a statechart.  To start it's thread, you call it's start_at
+method, just as you would with an ``ActiveObject``.
+
+Let's rebuild our previous example using the ``miros.Factory`` object.
+
+.. image:: _static/state_recipe_10.svg
+    :target: _static/state_recipe_10.pdf
+    :align: center
+
+.. note::
+
+   The above image is probably breaking the UML specification, since I'm packing an
+   HSM diagram into a class icon.  But I don't care, since I have found that this
+   is a compact way of drawing my design intentions.
+
+The diagram is saying that the ``FactoryInstrumentationToLog`` class has a
+logging object and is inherited from the ``Factory`` class, and the ``Factory``
+class is inherited from the ``ActiveObject`` class.  It has two attributes,
+``live_spy`` and ``live_trace`` and three methods, ``trace_callback``,
+``spy_callback`` and ``start_at``.
+
+I don't know how to draw UML to describe that I want this class to start it's
+statemachine in two different ways, so I write the ``start_at`` code onto the
+diagram to remind myself that I'm thinking this way.
+
+Within the class, we see the same state machine we described in the
+``simple_state_9.py`` code listing.
+
+Here is the above design in code:
+
+.. code-block:: python
+  
+   # simple_state_10.py
+   import re
+   import time
+   import logging
+   from functools import partial
+
+   from miros import Event
+   from miros import signals
+   from miros import Factory
+   from miros import return_status
+
+   class FactoryInstrumentationToLog(Factory):
+
+     def __init__(self, name, log_file_name=None,
+         live_trace=None, live_spy=None):
+
+       super().__init__(name)
+
+       self.live_trace = \
+         False if live_trace == None else live_trace
+       self.live_spy = \
+         False if live_spy == None else live_spy
+
+       self.log_file_name = \
+         'simple_state_10.log' if log_file_name == None else log_file_name
+
+       logging.basicConfig(
+         format='%(asctime)s %(levelname)s:%(message)s',
+         filename=self.log_file_name,
+         level=logging.DEBUG)
+     
+       self.register_live_spy_callback(partial(self.spy_callback))
+       self.register_live_trace_callback(partial(self.trace_callback))
+
+       self.outer_state = self.create(state="outer_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.outer_state_entry_signal). \
+         catch(signal=signals.INIT_SIGNAL,
+           handler=self.outer_state_init_signal). \
+         catch(signal=signals.Hook,
+           handler=self.outer_state_hook). \
+         catch(signal=signals.Reset,
+           handler=self.outer_state_reset). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.outer_state_exit_signal). \
+         to_method()
+
+       self.inner_state = self.create(state="inner_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.inner_state_entry_signal). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.inner_state_exit_signal). \
+         to_method()
+
+       self.nest(self.outer_state, parent=None). \
+         nest(self.inner_state, parent=self.outer_state)
+
+     def trace_callback(self, trace):
+       '''trace without datetime-stamp'''
+       trace_without_datetime = re.search(r'(\[.+\]) (\[.+\].+)', trace).group(2)
+       logging.debug("T: " + trace_without_datetime)
+
+     def spy_callback(self, spy):
+       '''spy with machine name pre-pended'''
+       logging.debug("S: [{}] {}".format(self.name, spy))
+     
+     @staticmethod
+     def outer_state_entry_signal(chart, e):
+       chart.scribble("hello from outer_state")
+       status = return_status.HANDLED
+       return status
+
+     @staticmethod
+     def outer_state_init_signal(chart, e):
+       chart.scribble("init")
+       status = chart.trans(chart.inner_state)
+       return status
+
+     @staticmethod
+     def outer_state_hook(chart, e):
+       status = return_status.HANDLED
+       chart.scribble("run some code, but don't transition")
+       return status
+
+     @staticmethod
+     def outer_state_reset(chart, e):
+       status = chart.trans(chart.outer_state)
+       return status
+
+     @staticmethod
+     def outer_state_exit_signal(chart, e):
+       status = return_status.HANDLED
+       chart.scribble("exiting the outer_state")
+       return status
+
+     @staticmethod
+     def inner_state_entry_signal(chart, e):
+       status = return_status.HANDLED
+       chart.scribble("hello from inner_state")
+       return status
+
+     @staticmethod
+     def inner_state_exit_signal(chart, e):
+       status = return_status.HANDLED
+       chart.scribble("exiting inner_state")
+       return status
+
+   if __name__ == '__main__':
+
+     f1 = FactoryInstrumentationToLog(
+       "f1",
+       live_trace=True,
+       live_spy=True
+     )
+
+     f2 = FactoryInstrumentationToLog(
+       "f2",
+       live_trace=True,
+       live_spy=True
+     )
+
+     f1.start_at(f1.outer_state)
+     f1.post_fifo(Event(signal=signals.Hook))
+     f1.post_fifo(Event(signal=signals.Reset))
+
+     f2.start_at(f2.inner_state)
+     f2.post_fifo(Event(signal=signals.Hook))
+     f2.post_fifo(Event(signal=signals.Reset))
+
+     # let the threads catch up before we exit main
+     time.sleep(0.01)
+
+The benefit of programming a statechart this way is in it's containment.  You
+don't have functions drifting in package's name space, they are nicely contained
+as static methods within your statechart's class.  In addition to this, you no
+longer have to manipulate the ``temp.fun`` attribute of the event processor,
+this complexity is hidden within the ``Factory`` objects state function
+manufacturing process.  It takes your static method and how you have nested a
+state and builds a state function inside of itself.  You don't need to place
+``@spy_on`` decorators above your state functions.
+
+The ``__init__`` function of your statechart can be read and compared to your
+diagram; 
+
+
+
+
+I would
+normally place an attachment point on the diagram, but this is used to
+instantiate two different objects and start their state machines in two
+different states.  So, I just write my intention on the picture.
+
 
 Here we see that we want to start two different ``ActiveObjects``
 

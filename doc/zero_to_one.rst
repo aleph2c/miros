@@ -1461,7 +1461,7 @@ transition between these states.
 Iteration 2 specification
 """""""""""""""""""""""""
 
-* :new_spec:`The toaster oven will have a door (for now, it will always be closed)`
+* :new_spec:`The toaster oven will have a door (for now, to make things easy, it will always be closed)`
 * :new_spec:`The toaster oven will have an oven light, which can be turned on and off`
 * :new_spec:`The toaster oven will have a heater, which can be turned on and off`
 * :new_spec:`It will have two different heating modes; baking and toasting`
@@ -2033,45 +2033,41 @@ thread finish its work before the main thread exits and kills the oven thread.
 
 **Where are the event names defined?**
 
-The event names are called signals.  A signal has a name and a number.  The
-number needs to be unique for each signal.
+An event has a name which is called a signal.
 
-If you were making your statecharts in c/C++ your signal numbers would be
-defined as an enumeration.  But miros is written in Python, so the signals are
-objects just like everything else.
+The signals are either predefined or are defined at the moment they
+are used by your code.  
 
-The internal signal names, ``EXIT_SIGNAL``, ``ENTRY_SIGNAL``, ``INIT_SIGNAL``
-are defined within the miros.event package, but you can access them by importing
-``signals`` into your program:
+The internal signals (the names of events that the event processor
+posts to your state machine as it enters, initializes or exits a
+state) are predefined within the library.
 
-.. code-block:: python
-
-  from miros import signals
-
-To get access to the internal signal objects:
-
-.. code-block:: python
-
-  signals.EXIT_SIGNAL
-  signals.ENTRY_SIGNAL
-  signals.INIT_SIGNAL
-
-The external signals, or the events that you define in your program, are created
-at the moment they are used.   Specifically when you reference an attribute of
-the ``signals`` object that doesn't exist within it.  This creation only happens
-once, so the signal's name and number remain unique across the life of the
-program.
+The external signals (``Toasting``, ``Baking`` and ``Off`` signals,
+in this example) are defined and constructed the moment they are
+first encountered by the miros library in your code.  So, you don't
+have to worry about defining them somewhere, the ``miros`` library
+will define them the first time it sees them when you create an
+event:
 
 .. code-block:: python
 
-  # signals object does not have a New signal
-  some_event_the_system_has_never_seen = Event(signal=signals.New)
-  # signals object now has a New signal, it has been assigned a unique number
-  # and the name "New"
+  from miros import signals, Event
+ 
+  # if the Toasting signal hasn't been seen before, it will be
+  # constructed and added to the signals object at the moment
+  # the following code is run
+  e = Event(signal=signals.Toasting)
 
-So do you need to care about this?  No, you just need to remember to type,
-``Event(signal=signals.<whatever_name_you_want>)`` and not worry about defining
-things before you use them.
+.. note::
+
+   A signal object, has a name and a unique number.  The miros library
+   uses the number to distinguish it from other signals.  As a user of
+   the miros library, you probably don't need to care about this, if
+   you want to make a new signal, you just write it down as if it was
+   already defined elsewhere, and the miros library will automatically
+   give it a unique number and a signal name based on your code and
+   its highest signal number so far.
+
 
 .. include:: i_navigation_2.rst
 

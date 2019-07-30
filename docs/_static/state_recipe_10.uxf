@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>290</x>
+      <y>500</y>
+      <w>650</w>
+      <h>260</h>
+    </coordinates>
+    <panel_attributes>*outer_state*
+--
+entry / 
+  chart.scribble("hello from outer_state")
+Hook / 
+  chart.scribble("run some code, but don't transition")
+exit /
+  chart.scribble("exiting the outer_state")
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>560</x>
+      <y>620</y>
+      <w>350</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>*inner_state*
+--
+entry / 
+  chart.scribble("hello from inner_state")
+
+exit /
+  chart.scribble("exiting inner_state")
+  
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>170</x>
+      <y>400</y>
+      <w>800</w>
+      <h>410</h>
+    </coordinates>
+    <panel_attributes>*FactoryInstrumentationToLog*
+--
+live_spy
+live_trace
+--
+trace_callback(self, trace)
+spy_callback(self, spy)
+start_at(self, ...)
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>320</x>
+      <y>690</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>330</x>
+      <y>680</y>
+      <w>250</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>chart.scribble('init')
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;20.0;230.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>350</x>
+      <y>750</y>
+      <w>540</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0;520.0;40.0;520.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>430</x>
+      <y>770</y>
+      <w>380</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>Reset / chart.scribble("resetting the chart")
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>170</x>
+      <y>280</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>ActiveObject</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>360</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>330</x>
+      <y>360</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>290</x>
+      <y>340</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>logging</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>170</x>
+      <y>340</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>Factory</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>300</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>410</x>
+      <y>320</y>
+      <w>270</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>f1 = FactoryInstrumentationToLog('f1')
+f1.start_at(f1.outer_state)
+f2 = FactoryInstrumentationToLog('f2')
+f2.start_at(f2.inner_state)
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

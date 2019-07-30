@@ -75,7 +75,8 @@ more sense as we progress through some simple examples.</p>
 <p>A state in a statechart diagram is represented by a named rounded rectangle:</p>
 <a class="reference external image-reference" href="_static/state_recipe_1.pdf"><div align="center" class="align-center"><img alt="_images/state_recipe_1.svg" src="_images/state_recipe_1.svg" /></div>
 </a>
-<p>Here is the miros code for the above diagram.</p>
+<p>Every state function, must at least describe where it is situated in the HSM
+hierarchy. Here is the miros code for the above diagram:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 <span class="hll">   <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>  <span class="c1"># describe how we fit in the hierarchy</span>
 </span>   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>  <span class="c1"># describe how we reacted to the event</span>
@@ -324,7 +325,7 @@ state functions, which act as a behavioral specification and then connect this
 to an <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code>, start it, and then post events to it.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The code that is on init arrow in our diagram and the code that is listed
+<p class="last">The code that is on the init arrow in our diagram and the code that is listed
 under entry and exit signals is run while the event processor is trying to
 figure out what to do next.  The event processor is not aware of this code,
 the code is run as a side-effect of its efforts to search the graph then act
@@ -806,8 +807,7 @@ the <code class="docutils literal notranslate"><span class="pre">outer_state</sp
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If we look at the log file created by this program it would look something like
-this:</p>
+<p>The log file created by this program would look something like this:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2019-07-26 11:37:22,674 DEBUG:T: [ao1] e-&gt;start_at() top-&gt;inner_state
 2019-07-26 11:37:22,675 DEBUG:S: [ao1] START
 2019-07-26 11:37:22,675 DEBUG:S: [ao1] SEARCH_FOR_SUPER_SIGNAL:outer_state
@@ -878,6 +878,193 @@ this:</p>
 2019-07-26 11:37:22,690 DEBUG:S: [ao2] &lt;- Queued:(0) Deferred:(0)
 </pre></div>
 </div>
+<p>That’s a lot of information. Suppose we just wanted to see the <code class="docutils literal notranslate"><span class="pre">ao1</span></code> trace:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cat simple_state_9.log <span class="p">|</span> grep T:*.a01
+</pre></div>
+</div>
+<p>This would result in the following output:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mi">26</span> <span class="mi">11</span><span class="p">:</span><span class="mi">37</span><span class="p">:</span><span class="mi">22</span><span class="p">,</span><span class="mi">674</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">T</span><span class="p">:</span> <span class="p">[</span><span class="n">ao1</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">inner_state</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mi">26</span> <span class="mi">11</span><span class="p">:</span><span class="mi">37</span><span class="p">:</span><span class="mi">22</span><span class="p">,</span><span class="mi">682</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">T</span><span class="p">:</span> <span class="p">[</span><span class="n">ao1</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">Reset</span><span class="p">()</span> <span class="n">inner_state</span><span class="o">-&gt;</span><span class="n">inner_state</span>
+</pre></div>
+</div>
+<p>If you wanted to see the spy of <code class="docutils literal notranslate"><span class="pre">a02</span></code>, you could grep <code class="docutils literal notranslate"><span class="pre">S:*.a02</span></code>… etc.</p>
+<p>So far we have seen how to create state functions, how to link them to an
+<code class="docutils literal notranslate"><span class="pre">Activeobject</span></code>, which collectively makes a statechart.  If you would like to
+see a comprehensive example of all of the signal pathways supported by the Miro
+Samek event processor, look at this <a class="reference internal" href="comprehensive.html#comprehensive-comprehensive"><span class="std std-ref">example</span></a>.</p>
+<p>Is there a way to just make a statechart by instantiating a class?</p>
+<p>Of course there is, this is what the <code class="docutils literal notranslate"><span class="pre">Factory</span></code> class is for.  It links a set
+of signals to static methods; and assigns this linked collection to a state.
+You do this once per state, then you nest the states within one another; and the
+resulting object is a statechart.  To start it’s thread, you call it’s start_at
+method, just as you would with an <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code>.</p>
+<p>Let’s rebuild our previous example using the <code class="docutils literal notranslate"><span class="pre">miros.Factory</span></code> object.</p>
+<a class="reference external image-reference" href="_static/state_recipe_10.pdf"><div align="center" class="align-center"><img alt="_images/state_recipe_10.svg" src="_images/state_recipe_10.svg" /></div>
+</a>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The above image is probably breaking the UML specification, since I’m packing an
+HSM diagram into a class icon.  But I don’t care, since I have found that this
+is a compact way of drawing my design intentions.</p>
+</div>
+<p>The diagram is saying that the <code class="docutils literal notranslate"><span class="pre">FactoryInstrumentationToLog</span></code> class has a
+logging object and is inherited from the <code class="docutils literal notranslate"><span class="pre">Factory</span></code> class, and the <code class="docutils literal notranslate"><span class="pre">Factory</span></code>
+class is inherited from the <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code> class.  It has two attributes,
+<code class="docutils literal notranslate"><span class="pre">live_spy</span></code> and <code class="docutils literal notranslate"><span class="pre">live_trace</span></code> and three methods, <code class="docutils literal notranslate"><span class="pre">trace_callback</span></code>,
+<code class="docutils literal notranslate"><span class="pre">spy_callback</span></code> and <code class="docutils literal notranslate"><span class="pre">start_at</span></code>.</p>
+<p>I don’t know how to draw UML to describe that I want this class to start it’s
+statemachine in two different ways, so I write the <code class="docutils literal notranslate"><span class="pre">start_at</span></code> code onto the
+diagram to remind myself that I’m thinking this way.</p>
+<p>Within the class, we see the same state machine we described in the
+<code class="docutils literal notranslate"><span class="pre">simple_state_9.py</span></code> code listing.</p>
+<p>Here is the above design in code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># simple_state_10.py</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+<span class="k">class</span> <span class="nc">FactoryInstrumentationToLog</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> \
+      <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> \
+      <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span> <span class="o">=</span> \
+      <span class="s1">&#39;simple_state_10.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+      <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+      <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span><span class="p">,</span>
+      <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">register_live_spy_callback</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spy_callback</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">register_live_trace_callback</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace_callback</span><span class="p">))</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;outer_state&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_init_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_hook</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_reset</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_exit_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;inner_state&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_exit_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">trace_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;trace without datetime-stamp&#39;&#39;&#39;</span>
+    <span class="n">trace_without_datetime</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\[.+\]) (\[.+\].+)&#39;</span><span class="p">,</span> <span class="n">trace</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;T: &quot;</span> <span class="o">+</span> <span class="n">trace_without_datetime</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spy</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;spy with machine name pre-pended&#39;&#39;&#39;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">outer_state_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;hello from outer_state&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">outer_state_init_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;init&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">inner_state</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">outer_state_hook</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;run some code, but don&#39;t transition&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">outer_state_reset</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">outer_state_exit_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;exiting the outer_state&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">inner_state_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;hello from inner_state&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">inner_state_exit_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;exiting inner_state&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+  <span class="n">f1</span> <span class="o">=</span> <span class="n">FactoryInstrumentationToLog</span><span class="p">(</span>
+    <span class="s2">&quot;f1&quot;</span><span class="p">,</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span>
+  <span class="p">)</span>
+
+  <span class="n">f2</span> <span class="o">=</span> <span class="n">FactoryInstrumentationToLog</span><span class="p">(</span>
+    <span class="s2">&quot;f2&quot;</span><span class="p">,</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span>
+  <span class="p">)</span>
+
+  <span class="n">f1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+  <span class="n">f1</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">))</span>
+  <span class="n">f1</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
+
+  <span class="n">f2</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">f2</span><span class="o">.</span><span class="n">inner_state</span><span class="p">)</span>
+  <span class="n">f2</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">))</span>
+  <span class="n">f2</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
+
+  <span class="c1"># let the threads catch up before we exit main</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The benefit of programming a statechart this way is in it’s containment.  You
+don’t have functions drifting in package’s name space, they are nicely contained
+as static methods within your statechart’s class.  In addition to this, you no
+longer have to manipulate the <code class="docutils literal notranslate"><span class="pre">temp.fun</span></code> attribute of the event processor,
+this complexity is hidden within the <code class="docutils literal notranslate"><span class="pre">Factory</span></code> objects state function
+manufacturing process.  It takes your static method and how you have nested a
+state and builds a state function inside of itself.  You don’t need to place
+<code class="docutils literal notranslate"><span class="pre">&#64;spy_on</span></code> decorators above your state functions.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">__init__</span></code> function of your statechart can be read and compared to your
+diagram;</p>
+<p>I would
+normally place an attachment point on the diagram, but this is used to
+instantiate two different objects and start their state machines in two
+different states.  So, I just write my intention on the picture.</p>
 <p>Here we see that we want to start two different <code class="docutils literal notranslate"><span class="pre">ActiveObjects</span></code></p>
 <p>The <code class="docutils literal notranslate"><span class="pre">print</span></code> function in Python
 is not thread safe.  The output from one print my overwrite the output from
