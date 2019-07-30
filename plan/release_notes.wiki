@@ -1,3 +1,10 @@
-Allowing stop to be called within ActiveObject or Factory
+Allow simple methods to be registered using the ``catch`` method in the Factory
+class.
 
-* the stop method can now be called within an ActiveObject or a Factory.
+The Factory class lets a miros user build state machines within a class.  Previous
+to this release only static methods could be registered to signals during the
+state construction process.
+
+* static methods are still permitted as catch handler inputs (backwards
+  compatible)
+* standard methods are now also permitted as catch handlers too.

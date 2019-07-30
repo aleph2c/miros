@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import re
+import sys
 import pprint
+import inspect
 import traceback  # try not use this if you can avoid it (it's fragile)
 from copy         import copy
 from functools    import wraps
@@ -213,7 +215,10 @@ def state_method_template(name):
 
   def base_state_method(chart, e):
     with chart.signal_callback(e, name) as fn:
-      status = fn(chart, e)
+      if not inspect.ismethod(fn):
+        status = fn(chart, e)
+      else:
+        status = fn(e)
 
     if(status == return_status.UNHANDLED):
       with chart.parent_callback(name) as parent:
