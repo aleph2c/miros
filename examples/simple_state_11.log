@@ -65,3 +65,69 @@
 2019-07-30 06:25:43,740 DEBUG:S: [f1] hello from inner_state
 2019-07-30 06:25:43,740 DEBUG:S: [f1] INIT_SIGNAL:inner_state
 2019-07-30 06:25:43,740 DEBUG:S: [f1] <- Queued:(0) Deferred:(0)
+2019-08-01 06:28:10,237 DEBUG:T: [f1] e->start_at() top->inner_state
+2019-08-01 06:28:10,238 DEBUG:S: [f1] START
+2019-08-01 06:28:10,238 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:outer_state
+2019-08-01 06:28:10,238 DEBUG:S: [f1] ENTRY_SIGNAL:outer_state
+2019-08-01 06:28:10,238 DEBUG:S: [f1] hello from outer_state
+2019-08-01 06:28:10,238 DEBUG:S: [f1] INIT_SIGNAL:outer_state
+2019-08-01 06:28:10,238 DEBUG:S: [f1] init
+2019-08-01 06:28:10,239 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-08-01 06:28:10,239 DEBUG:S: [f1] ENTRY_SIGNAL:inner_state
+2019-08-01 06:28:10,239 DEBUG:S: [f1] hello from inner_state
+2019-08-01 06:28:10,239 DEBUG:S: [f1] INIT_SIGNAL:inner_state
+2019-08-01 06:28:10,239 DEBUG:S: [f1] <- Queued:(0) Deferred:(0)
+2019-08-01 06:28:10,241 DEBUG:T: [f2] e->start_at() top->inner_state
+2019-08-01 06:28:10,241 DEBUG:S: [f1] Hook:inner_state
+2019-08-01 06:28:10,241 DEBUG:S: [f2] START
+2019-08-01 06:28:10,242 DEBUG:S: [f1] Hook:outer_state
+2019-08-01 06:28:10,242 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-08-01 06:28:10,242 DEBUG:S: [f1] run some code, but don't transition
+2019-08-01 06:28:10,242 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:outer_state
+2019-08-01 06:28:10,242 DEBUG:S: [f1] Hook:outer_state:HOOK
+2019-08-01 06:28:10,243 DEBUG:S: [f2] ENTRY_SIGNAL:outer_state
+2019-08-01 06:28:10,243 DEBUG:S: [f1] <- Queued:(1) Deferred:(0)
+2019-08-01 06:28:10,243 DEBUG:S: [f2] hello from outer_state
+2019-08-01 06:28:10,245 DEBUG:T: [f1] e->Reset() inner_state->inner_state
+2019-08-01 06:28:10,245 DEBUG:S: [f2] ENTRY_SIGNAL:inner_state
+2019-08-01 06:28:10,245 DEBUG:S: [f1] Reset:inner_state
+2019-08-01 06:28:10,245 DEBUG:S: [f2] hello from inner_state
+2019-08-01 06:28:10,245 DEBUG:S: [f1] Reset:outer_state
+2019-08-01 06:28:10,246 DEBUG:S: [f2] INIT_SIGNAL:inner_state
+2019-08-01 06:28:10,246 DEBUG:S: [f1] EXIT_SIGNAL:inner_state
+2019-08-01 06:28:10,246 DEBUG:S: [f2] <- Queued:(0) Deferred:(0)
+2019-08-01 06:28:10,246 DEBUG:S: [f1] exiting inner_state
+2019-08-01 06:28:10,247 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-08-01 06:28:10,247 DEBUG:S: [f1] EXIT_SIGNAL:outer_state
+2019-08-01 06:28:10,247 DEBUG:S: [f1] exiting the outer_state
+2019-08-01 06:28:10,247 DEBUG:S: [f1] ENTRY_SIGNAL:outer_state
+2019-08-01 06:28:10,247 DEBUG:S: [f1] hello from outer_state
+2019-08-01 06:28:10,247 DEBUG:S: [f1] INIT_SIGNAL:outer_state
+2019-08-01 06:28:10,248 DEBUG:S: [f1] init
+2019-08-01 06:28:10,248 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-08-01 06:28:10,248 DEBUG:S: [f1] ENTRY_SIGNAL:inner_state
+2019-08-01 06:28:10,248 DEBUG:S: [f1] hello from inner_state
+2019-08-01 06:28:10,248 DEBUG:S: [f1] INIT_SIGNAL:inner_state
+2019-08-01 06:28:10,248 DEBUG:S: [f1] <- Queued:(0) Deferred:(0)
+2019-08-01 06:28:10,249 DEBUG:S: [f2] Hook:inner_state
+2019-08-01 06:28:10,249 DEBUG:S: [f2] Hook:outer_state
+2019-08-01 06:28:10,249 DEBUG:S: [f2] run some code, but don't transition
+2019-08-01 06:28:10,249 DEBUG:S: [f2] Hook:outer_state:HOOK
+2019-08-01 06:28:10,250 DEBUG:S: [f2] <- Queued:(1) Deferred:(0)
+2019-08-01 06:28:10,251 DEBUG:T: [f2] e->Reset() inner_state->inner_state
+2019-08-01 06:28:10,251 DEBUG:S: [f2] Reset:inner_state
+2019-08-01 06:28:10,251 DEBUG:S: [f2] Reset:outer_state
+2019-08-01 06:28:10,251 DEBUG:S: [f2] EXIT_SIGNAL:inner_state
+2019-08-01 06:28:10,252 DEBUG:S: [f2] exiting inner_state
+2019-08-01 06:28:10,252 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-08-01 06:28:10,252 DEBUG:S: [f2] EXIT_SIGNAL:outer_state
+2019-08-01 06:28:10,252 DEBUG:S: [f2] exiting the outer_state
+2019-08-01 06:28:10,252 DEBUG:S: [f2] ENTRY_SIGNAL:outer_state
+2019-08-01 06:28:10,252 DEBUG:S: [f2] hello from outer_state
+2019-08-01 06:28:10,252 DEBUG:S: [f2] INIT_SIGNAL:outer_state
+2019-08-01 06:28:10,253 DEBUG:S: [f2] init
+2019-08-01 06:28:10,253 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-08-01 06:28:10,253 DEBUG:S: [f2] ENTRY_SIGNAL:inner_state
+2019-08-01 06:28:10,253 DEBUG:S: [f2] hello from inner_state
+2019-08-01 06:28:10,253 DEBUG:S: [f2] INIT_SIGNAL:inner_state
+2019-08-01 06:28:10,253 DEBUG:S: [f2] <- Queued:(0) Deferred:(0)

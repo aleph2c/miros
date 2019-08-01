@@ -12,11 +12,11 @@
     <panel_attributes>*outer_state*
 --
 entry / 
-  chart.scribble("hello from outer_state")
+  self.scribble("hello from outer_state")
 Hook / 
-  chart.scribble("run some code, but don't transition")
+  self.scribble("run some code, but don't transition")
 exit /
-  chart.scribble("exiting the outer_state")
+  self.scribble("exiting the outer_state")
 valign=top
 </panel_attributes>
     <additional_attributes/>
@@ -32,10 +32,10 @@ valign=top
     <panel_attributes>*inner_state*
 --
 entry / 
-  chart.scribble("hello from inner_state")
+  self.scribble("hello from inner_state")
 
 exit /
-  chart.scribble("exiting inner_state")
+  self.scribble("exiting inner_state")
   
 valign=top
 </panel_attributes>
@@ -57,7 +57,7 @@ live_trace
 trace_callback(self, trace)
 spy_callback(self, spy)
 start_at(self, ...)
-layer=1</panel_attributes>
+layer=0</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -105,7 +105,7 @@ layer=3</panel_attributes>
       <w>380</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>Reset / chart.scribble("resetting the chart")
+    <panel_attributes>Reset / self.scribble("resetting the chart")
 style=wordwrap
 layer=3</panel_attributes>
     <additional_attributes/>

@@ -23,8 +23,8 @@ In miros a state is a behavioral specification for an event processor.  A state
 is a function that does the following:
 
 * It accepts two arguments:
-   1. an object of type ``miros.ActiveObject``, which has an event processor.
-   2. an event of type ``miros.Event``
+   1. an object of type/subclass of ``miros.ActiveObject``, which has an event processor.
+   2. an event of type/subclass of  ``miros.Event``
 * It describes how it is situated in a hierarchy and how it is connected to
   other states, by changing the ``temp.fun`` attribute of it's first argument.
 * It returns an ``miros.return_status`` attribute, which tells the event processor 
@@ -36,8 +36,9 @@ again with different types of internal and external events.  The state functions
 do two different things, they describe how they are topologically related to
 other states and they contain code with will run as the event processor calls
 them over and over again.  What emerges from this interplay is a Hierachical
-State Machine (HSM) behavior which follows the Harel Formalism.  This will make
-more sense as we progress through some simple examples.
+State Machine (HSM) behavior which follows the Harel Formalism.
+
+This will make more sense as we progress through some simple examples.
 
 A state in a statechart diagram is represented by a named rounded rectangle:
 
@@ -75,18 +76,21 @@ details:
     :target: _static/state_recipe_2.pdf
     :align: center
 
-The above diagram is saying that there is a connection between an ``ActiveObject``
-and the ``outer_state``.  To create and run a state machine, we will instantiate the
-``ActiveObject``, then ``start_at`` the ``outer_state``.  We have added a new
-graphing element called the init pseudostate, the black dot.  The black dot has
-an arrow pointing to the ``inner_state``.  This means, after I have entered
-into the ``outer_state`` and I have settled, transition into the ``inner_state``.
+The above diagram is saying that there is a connection between an
+``ActiveObject`` and the ``outer_state``.  To create and run a state machine, we
+will instantiate the ``ActiveObject``, then ``start_at`` the ``outer_state``.
+We have added a new graphing element called the init pseudostate, the black dot.
+The black dot has an arrow pointing to the ``inner_state``.  This means, after I
+have entered into the ``outer_state`` and I have settled, transition into the
+``inner_state``.  I can describe the expected behavior from the drawing, because
+I understand the Harel Formalism: the rules for translating a diagram to a
+behavior, and the rules for mapping a behavior onto a diagram.
 
-To make our new design work, we will have to change our ``outer_state`` function.
-It will need to provide graphical information about an init event.  It will set
-the ``temp.fun`` to ``inner_state`` and it will have to tell the event processor it
-needs to perform a transition into another state.  This is all done within the
-``trans`` method:
+To make our new design work, we will have to change our ``outer_state``
+function.  It will need to provide graphical information about an init event.
+It will set the ``temp.fun`` to ``inner_state`` and it will have to tell the
+event processor it needs to perform a transition into another state.  This is
+all done within the ``trans`` method:
 
 .. code-block:: python
   :emphasize-lines: 12-15
@@ -131,7 +135,8 @@ needs to perform a transition into another state.  This is all done within the
 
 Our code includes some ``@spy_on`` decorators, which wrap our state functions.
 These were added so I can instrument (automatically add logging code) to the
-state machine.  So if I run the above code I will see something like this:
+state machine.  So if I run the above code I will see something like this in my
+terminal:
 
 .. code-block:: python
   
@@ -1115,25 +1120,295 @@ Here is the above design in code:
      time.sleep(0.01)
 
 The benefit of programming a statechart this way is in it's containment.  You
-don't have functions drifting in package's name space, they are nicely contained
-as static methods within your statechart's class.  In addition to this, you no
-longer have to manipulate the ``temp.fun`` attribute of the event processor,
-this complexity is hidden within the ``Factory`` objects state function
-manufacturing process.  It takes your static method and how you have nested a
-state and builds a state function inside of itself.  You don't need to place
-``@spy_on`` decorators above your state functions.
+don't have functions drifting in your package's name space, they are nicely
+contained as static methods within your statechart's class.  In addition to
+this, you no longer have to manipulate the ``temp.fun`` attribute of the event
+processor, this complexity is hidden within the ``Factory`` object's
+state-function-manufacturing process.  To move the state functions into a class,
+you can just add a ``@staticmethod`` decorator on top of them.  Any static
+method is just a function forced into a class.
 
-The ``__init__`` function of your statechart can be read and compared to your
-diagram; 
+If you like, you can point the ``handler`` of the Factory's ``create`` method to
+a method instead of a function (or staticmethod).  To write the code this way
+only slightly changes our diagram, we need to replace all ``chart`` variables
+with ``self``:
 
+.. image:: _static/state_recipe_11.svg
+    :target: _static/state_recipe_11.pdf
+    :align: center
 
+To write this design, our state functions are just state methods (this feature
+was added in miros 4.1.2):
 
+.. code-block:: python
+  
+   # simple_state_11.py
+   import re
+   import time
+   import logging
+   from functools import partial
 
-I would
-normally place an attachment point on the diagram, but this is used to
+   from miros import Event
+   from miros import signals
+   from miros import Factory
+   from miros import return_status
+
+   class FactoryInstrumentationToLog(Factory):
+
+     def __init__(self, name, log_file_name=None,
+         live_trace=None, live_spy=None):
+
+       super().__init__(name)
+
+       self.live_trace = \
+         False if live_trace == None else live_trace
+       self.live_spy = \
+         False if live_spy == None else live_spy
+
+       self.log_file_name = \
+         'simple_state_11.log' if log_file_name == None else log_file_name
+
+       logging.basicConfig(
+         format='%(asctime)s %(levelname)s:%(message)s',
+         filename=self.log_file_name,
+         level=logging.DEBUG)
+     
+       self.register_live_spy_callback(partial(self.spy_callback))
+       self.register_live_trace_callback(partial(self.trace_callback))
+
+       self.outer_state = self.create(state="outer_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.outer_state_entry_signal). \
+         catch(signal=signals.INIT_SIGNAL,
+           handler=self.outer_state_init_signal). \
+         catch(signal=signals.Hook,
+           handler=self.outer_state_hook). \
+         catch(signal=signals.Reset,
+           handler=self.outer_state_reset). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.outer_state_exit_signal). \
+         to_method()
+
+       self.inner_state = self.create(state="inner_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.inner_state_entry_signal). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.inner_state_exit_signal). \
+         to_method()
+
+       self.nest(self.outer_state, parent=None). \
+         nest(self.inner_state, parent=self.outer_state)
+
+     def trace_callback(self, trace):
+       '''trace without datetime-stamp'''
+       trace_without_datetime = re.search(r'(\[.+\]) (\[.+\].+)', trace).group(2)
+       logging.debug("T: " + trace_without_datetime)
+
+     def spy_callback(self, spy):
+       '''spy with machine name pre-pended'''
+       logging.debug("S: [{}] {}".format(self.name, spy))
+     
+     def outer_state_entry_signal(self, e):
+       self.scribble("hello from outer_state")
+       status = return_status.HANDLED
+       return status
+
+     def outer_state_init_signal(self, e):
+       self.scribble("init")
+       status = self.trans(self.inner_state)
+       return status
+
+     def outer_state_hook(self, e):
+       status = return_status.HANDLED
+       self.scribble("run some code, but don't transition")
+       return status
+
+     def outer_state_reset(self, e):
+       status = self.trans(self.outer_state)
+       return status
+
+     def outer_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting the outer_state")
+       return status
+
+     def inner_state_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("hello from inner_state")
+       return status
+
+     def inner_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting inner_state")
+       return status
+
+   if __name__ == '__main__':
+
+     f1 = FactoryInstrumentationToLog(
+       "f1",
+       live_trace=True,
+       live_spy=True
+     )
+
+     f2 = FactoryInstrumentationToLog(
+       "f2",
+       live_trace=True,
+       live_spy=True
+     )
+
+     f1.start_at(f1.outer_state)
+     f1.post_fifo(Event(signal=signals.Hook))
+     f1.post_fifo(Event(signal=signals.Reset))
+
+     f2.start_at(f2.inner_state)
+     f2.post_fifo(Event(signal=signals.Hook))
+     f2.post_fifo(Event(signal=signals.Reset))
+
+     # let the threads catch up before we exit main
+     time.sleep(0.01)
+
+If we ran the code and looked at it's log file we would see:
+
+.. code-block:: text
+  
+   2019-07-30 06:25:43,725 DEBUG:T: [f1] e->start_at() top->inner_state
+   2019-07-30 06:25:43,726 DEBUG:S: [f1] START
+   2019-07-30 06:25:43,726 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:outer_state
+   2019-07-30 06:25:43,726 DEBUG:S: [f1] ENTRY_SIGNAL:outer_state
+   2019-07-30 06:25:43,726 DEBUG:S: [f1] hello from outer_state
+   2019-07-30 06:25:43,726 DEBUG:S: [f1] INIT_SIGNAL:outer_state
+   2019-07-30 06:25:43,726 DEBUG:S: [f1] init
+   2019-07-30 06:25:43,726 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+   2019-07-30 06:25:43,727 DEBUG:S: [f1] ENTRY_SIGNAL:inner_state
+   2019-07-30 06:25:43,727 DEBUG:S: [f1] hello from inner_state
+   2019-07-30 06:25:43,727 DEBUG:S: [f1] INIT_SIGNAL:inner_state
+   2019-07-30 06:25:43,727 DEBUG:S: [f1] <- Queued:(0) Deferred:(0)
+   2019-07-30 06:25:43,729 DEBUG:T: [f2] e->start_at() top->inner_state
+   2019-07-30 06:25:43,729 DEBUG:S: [f2] START
+   2019-07-30 06:25:43,729 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+   2019-07-30 06:25:43,730 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:outer_state
+   2019-07-30 06:25:43,730 DEBUG:S: [f2] ENTRY_SIGNAL:outer_state
+   2019-07-30 06:25:43,730 DEBUG:S: [f2] hello from outer_state
+   2019-07-30 06:25:43,730 DEBUG:S: [f2] ENTRY_SIGNAL:inner_state
+   2019-07-30 06:25:43,730 DEBUG:S: [f2] hello from inner_state
+   2019-07-30 06:25:43,730 DEBUG:S: [f2] INIT_SIGNAL:inner_state
+   2019-07-30 06:25:43,730 DEBUG:S: [f2] <- Queued:(0) Deferred:(0)
+   2019-07-30 06:25:43,731 DEBUG:S: [f2] Hook:inner_state
+   2019-07-30 06:25:43,731 DEBUG:S: [f2] Hook:outer_state
+   2019-07-30 06:25:43,731 DEBUG:S: [f2] run some code, but don't transition
+   2019-07-30 06:25:43,732 DEBUG:S: [f2] Hook:outer_state:HOOK
+   2019-07-30 06:25:43,732 DEBUG:S: [f2] <- Queued:(1) Deferred:(0)
+   2019-07-30 06:25:43,733 DEBUG:T: [f2] e->Reset() inner_state->inner_state
+   2019-07-30 06:25:43,733 DEBUG:S: [f2] Reset:inner_state
+   2019-07-30 06:25:43,733 DEBUG:S: [f2] Reset:outer_state
+   2019-07-30 06:25:43,733 DEBUG:S: [f2] EXIT_SIGNAL:inner_state
+   2019-07-30 06:25:43,734 DEBUG:S: [f2] exiting inner_state
+   2019-07-30 06:25:43,734 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+   2019-07-30 06:25:43,734 DEBUG:S: [f2] EXIT_SIGNAL:outer_state
+   2019-07-30 06:25:43,734 DEBUG:S: [f2] exiting the outer_state
+   2019-07-30 06:25:43,734 DEBUG:S: [f2] ENTRY_SIGNAL:outer_state
+   2019-07-30 06:25:43,734 DEBUG:S: [f2] hello from outer_state
+   2019-07-30 06:25:43,734 DEBUG:S: [f2] INIT_SIGNAL:outer_state
+   2019-07-30 06:25:43,735 DEBUG:S: [f2] init
+   2019-07-30 06:25:43,735 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+   2019-07-30 06:25:43,735 DEBUG:S: [f2] ENTRY_SIGNAL:inner_state
+   2019-07-30 06:25:43,735 DEBUG:S: [f2] hello from inner_state
+   2019-07-30 06:25:43,735 DEBUG:S: [f2] INIT_SIGNAL:inner_state
+   2019-07-30 06:25:43,736 DEBUG:S: [f1] Hook:inner_state
+   2019-07-30 06:25:43,736 DEBUG:S: [f2] <- Queued:(0) Deferred:(0)
+   2019-07-30 06:25:43,736 DEBUG:S: [f1] Hook:outer_state
+   2019-07-30 06:25:43,736 DEBUG:S: [f1] run some code, but don't transition
+   2019-07-30 06:25:43,736 DEBUG:S: [f1] Hook:outer_state:HOOK
+   2019-07-30 06:25:43,737 DEBUG:S: [f1] <- Queued:(1) Deferred:(0)
+   2019-07-30 06:25:43,738 DEBUG:T: [f1] e->Reset() inner_state->inner_state
+   2019-07-30 06:25:43,738 DEBUG:S: [f1] Reset:inner_state
+   2019-07-30 06:25:43,738 DEBUG:S: [f1] Reset:outer_state
+   2019-07-30 06:25:43,738 DEBUG:S: [f1] EXIT_SIGNAL:inner_state
+   2019-07-30 06:25:43,739 DEBUG:S: [f1] exiting inner_state
+   2019-07-30 06:25:43,739 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+   2019-07-30 06:25:43,739 DEBUG:S: [f1] EXIT_SIGNAL:outer_state
+   2019-07-30 06:25:43,739 DEBUG:S: [f1] exiting the outer_state
+   2019-07-30 06:25:43,739 DEBUG:S: [f1] ENTRY_SIGNAL:outer_state
+   2019-07-30 06:25:43,739 DEBUG:S: [f1] hello from outer_state
+   2019-07-30 06:25:43,739 DEBUG:S: [f1] INIT_SIGNAL:outer_state
+   2019-07-30 06:25:43,739 DEBUG:S: [f1] init
+   2019-07-30 06:25:43,740 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+   2019-07-30 06:25:43,740 DEBUG:S: [f1] ENTRY_SIGNAL:inner_state
+   2019-07-30 06:25:43,740 DEBUG:S: [f1] hello from inner_state
+   2019-07-30 06:25:43,740 DEBUG:S: [f1] INIT_SIGNAL:inner_state
+   2019-07-30 06:25:43,740 DEBUG:S: [f1] <- Queued:(0) Deferred:(0)
+   2019-08-01 06:28:10,237 DEBUG:T: [f1] e->start_at() top->inner_state
+   2019-08-01 06:28:10,238 DEBUG:S: [f1] START
+   2019-08-01 06:28:10,238 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:outer_state
+   2019-08-01 06:28:10,238 DEBUG:S: [f1] ENTRY_SIGNAL:outer_state
+   2019-08-01 06:28:10,238 DEBUG:S: [f1] hello from outer_state
+   2019-08-01 06:28:10,238 DEBUG:S: [f1] INIT_SIGNAL:outer_state
+   2019-08-01 06:28:10,238 DEBUG:S: [f1] init
+   2019-08-01 06:28:10,239 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+   2019-08-01 06:28:10,239 DEBUG:S: [f1] ENTRY_SIGNAL:inner_state
+   2019-08-01 06:28:10,239 DEBUG:S: [f1] hello from inner_state
+   2019-08-01 06:28:10,239 DEBUG:S: [f1] INIT_SIGNAL:inner_state
+   2019-08-01 06:28:10,239 DEBUG:S: [f1] <- Queued:(0) Deferred:(0)
+   2019-08-01 06:28:10,241 DEBUG:T: [f2] e->start_at() top->inner_state
+   2019-08-01 06:28:10,241 DEBUG:S: [f1] Hook:inner_state
+   2019-08-01 06:28:10,241 DEBUG:S: [f2] START
+   2019-08-01 06:28:10,242 DEBUG:S: [f1] Hook:outer_state
+   2019-08-01 06:28:10,242 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+   2019-08-01 06:28:10,242 DEBUG:S: [f1] run some code, but don't transition
+   2019-08-01 06:28:10,242 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:outer_state
+   2019-08-01 06:28:10,242 DEBUG:S: [f1] Hook:outer_state:HOOK
+   2019-08-01 06:28:10,243 DEBUG:S: [f2] ENTRY_SIGNAL:outer_state
+   2019-08-01 06:28:10,243 DEBUG:S: [f1] <- Queued:(1) Deferred:(0)
+   2019-08-01 06:28:10,243 DEBUG:S: [f2] hello from outer_state
+   2019-08-01 06:28:10,245 DEBUG:T: [f1] e->Reset() inner_state->inner_state
+   2019-08-01 06:28:10,245 DEBUG:S: [f2] ENTRY_SIGNAL:inner_state
+   2019-08-01 06:28:10,245 DEBUG:S: [f1] Reset:inner_state
+   2019-08-01 06:28:10,245 DEBUG:S: [f2] hello from inner_state
+   2019-08-01 06:28:10,245 DEBUG:S: [f1] Reset:outer_state
+   2019-08-01 06:28:10,246 DEBUG:S: [f2] INIT_SIGNAL:inner_state
+   2019-08-01 06:28:10,246 DEBUG:S: [f1] EXIT_SIGNAL:inner_state
+   2019-08-01 06:28:10,246 DEBUG:S: [f2] <- Queued:(0) Deferred:(0)
+   2019-08-01 06:28:10,246 DEBUG:S: [f1] exiting inner_state
+   2019-08-01 06:28:10,247 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+   2019-08-01 06:28:10,247 DEBUG:S: [f1] EXIT_SIGNAL:outer_state
+   2019-08-01 06:28:10,247 DEBUG:S: [f1] exiting the outer_state
+   2019-08-01 06:28:10,247 DEBUG:S: [f1] ENTRY_SIGNAL:outer_state
+   2019-08-01 06:28:10,247 DEBUG:S: [f1] hello from outer_state
+   2019-08-01 06:28:10,247 DEBUG:S: [f1] INIT_SIGNAL:outer_state
+   2019-08-01 06:28:10,248 DEBUG:S: [f1] init
+   2019-08-01 06:28:10,248 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+   2019-08-01 06:28:10,248 DEBUG:S: [f1] ENTRY_SIGNAL:inner_state
+   2019-08-01 06:28:10,248 DEBUG:S: [f1] hello from inner_state
+   2019-08-01 06:28:10,248 DEBUG:S: [f1] INIT_SIGNAL:inner_state
+   2019-08-01 06:28:10,248 DEBUG:S: [f1] <- Queued:(0) Deferred:(0)
+   2019-08-01 06:28:10,249 DEBUG:S: [f2] Hook:inner_state
+   2019-08-01 06:28:10,249 DEBUG:S: [f2] Hook:outer_state
+   2019-08-01 06:28:10,249 DEBUG:S: [f2] run some code, but don't transition
+   2019-08-01 06:28:10,249 DEBUG:S: [f2] Hook:outer_state:HOOK
+   2019-08-01 06:28:10,250 DEBUG:S: [f2] <- Queued:(1) Deferred:(0)
+   2019-08-01 06:28:10,251 DEBUG:T: [f2] e->Reset() inner_state->inner_state
+   2019-08-01 06:28:10,251 DEBUG:S: [f2] Reset:inner_state
+   2019-08-01 06:28:10,251 DEBUG:S: [f2] Reset:outer_state
+   2019-08-01 06:28:10,251 DEBUG:S: [f2] EXIT_SIGNAL:inner_state
+   2019-08-01 06:28:10,252 DEBUG:S: [f2] exiting inner_state
+   2019-08-01 06:28:10,252 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+   2019-08-01 06:28:10,252 DEBUG:S: [f2] EXIT_SIGNAL:outer_state
+   2019-08-01 06:28:10,252 DEBUG:S: [f2] exiting the outer_state
+   2019-08-01 06:28:10,252 DEBUG:S: [f2] ENTRY_SIGNAL:outer_state
+   2019-08-01 06:28:10,252 DEBUG:S: [f2] hello from outer_state
+   2019-08-01 06:28:10,252 DEBUG:S: [f2] INIT_SIGNAL:outer_state
+   2019-08-01 06:28:10,253 DEBUG:S: [f2] init
+   2019-08-01 06:28:10,253 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+   2019-08-01 06:28:10,253 DEBUG:S: [f2] ENTRY_SIGNAL:inner_state
+   2019-08-01 06:28:10,253 DEBUG:S: [f2] hello from inner_state
+   2019-08-01 06:28:10,253 DEBUG:S: [f2] INIT_SIGNAL:inner_state
+   2019-08-01 06:28:10,253 DEBUG:S: [f2] <- Queued:(0) Deferred:(0)
+
+So, you can see as much information as you like about your statechart dynamics.
+
+I would normally place an attachment point on the diagram, but this is used to
 instantiate two different objects and start their state machines in two
 different states.  So, I just write my intention on the picture.
-
 
 Here we see that we want to start two different ``ActiveObjects``
 

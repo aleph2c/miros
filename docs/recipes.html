@@ -53,8 +53,8 @@ is a function that does the following:</p>
 <li><dl class="first docutils">
 <dt>It accepts two arguments:</dt>
 <dd><ol class="first last arabic">
-<li>an object of type <code class="docutils literal notranslate"><span class="pre">miros.ActiveObject</span></code>, which has an event processor.</li>
-<li>an event of type <code class="docutils literal notranslate"><span class="pre">miros.Event</span></code></li>
+<li>an object of type/subclass of <code class="docutils literal notranslate"><span class="pre">miros.ActiveObject</span></code>, which has an event processor.</li>
+<li>an event of type/subclass of  <code class="docutils literal notranslate"><span class="pre">miros.Event</span></code></li>
 </ol>
 </dd>
 </dl>
@@ -70,8 +70,8 @@ again with different types of internal and external events.  The state functions
 do two different things, they describe how they are topologically related to
 other states and they contain code with will run as the event processor calls
 them over and over again.  What emerges from this interplay is a Hierachical
-State Machine (HSM) behavior which follows the Harel Formalism.  This will make
-more sense as we progress through some simple examples.</p>
+State Machine (HSM) behavior which follows the Harel Formalism.</p>
+<p>This will make more sense as we progress through some simple examples.</p>
 <p>A state in a statechart diagram is represented by a named rounded rectangle:</p>
 <a class="reference external image-reference" href="_static/state_recipe_1.pdf"><div align="center" class="align-center"><img alt="_images/state_recipe_1.svg" src="_images/state_recipe_1.svg" /></div>
 </a>
@@ -98,17 +98,20 @@ event.  To make this point, I’ll redraw our simple state machine with some mor
 details:</p>
 <a class="reference external image-reference" href="_static/state_recipe_2.pdf"><div align="center" class="align-center"><img alt="_images/state_recipe_2.svg" src="_images/state_recipe_2.svg" /></div>
 </a>
-<p>The above diagram is saying that there is a connection between an <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code>
-and the <code class="docutils literal notranslate"><span class="pre">outer_state</span></code>.  To create and run a state machine, we will instantiate the
-<code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code>, then <code class="docutils literal notranslate"><span class="pre">start_at</span></code> the <code class="docutils literal notranslate"><span class="pre">outer_state</span></code>.  We have added a new
-graphing element called the init pseudostate, the black dot.  The black dot has
-an arrow pointing to the <code class="docutils literal notranslate"><span class="pre">inner_state</span></code>.  This means, after I have entered
-into the <code class="docutils literal notranslate"><span class="pre">outer_state</span></code> and I have settled, transition into the <code class="docutils literal notranslate"><span class="pre">inner_state</span></code>.</p>
-<p>To make our new design work, we will have to change our <code class="docutils literal notranslate"><span class="pre">outer_state</span></code> function.
-It will need to provide graphical information about an init event.  It will set
-the <code class="docutils literal notranslate"><span class="pre">temp.fun</span></code> to <code class="docutils literal notranslate"><span class="pre">inner_state</span></code> and it will have to tell the event processor it
-needs to perform a transition into another state.  This is all done within the
-<code class="docutils literal notranslate"><span class="pre">trans</span></code> method:</p>
+<p>The above diagram is saying that there is a connection between an
+<code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code> and the <code class="docutils literal notranslate"><span class="pre">outer_state</span></code>.  To create and run a state machine, we
+will instantiate the <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code>, then <code class="docutils literal notranslate"><span class="pre">start_at</span></code> the <code class="docutils literal notranslate"><span class="pre">outer_state</span></code>.
+We have added a new graphing element called the init pseudostate, the black dot.
+The black dot has an arrow pointing to the <code class="docutils literal notranslate"><span class="pre">inner_state</span></code>.  This means, after I
+have entered into the <code class="docutils literal notranslate"><span class="pre">outer_state</span></code> and I have settled, transition into the
+<code class="docutils literal notranslate"><span class="pre">inner_state</span></code>.  I can describe the expected behavior from the drawing, because
+I understand the Harel Formalism: the rules for translating a diagram to a
+behavior, and the rules for mapping a behavior onto a diagram.</p>
+<p>To make our new design work, we will have to change our <code class="docutils literal notranslate"><span class="pre">outer_state</span></code>
+function.  It will need to provide graphical information about an init event.
+It will set the <code class="docutils literal notranslate"><span class="pre">temp.fun</span></code> to <code class="docutils literal notranslate"><span class="pre">inner_state</span></code> and it will have to tell the
+event processor it needs to perform a transition into another state.  This is
+all done within the <code class="docutils literal notranslate"><span class="pre">trans</span></code> method:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="kn">import</span> <span class="nn">time</span>
 
  <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
@@ -150,7 +153,8 @@ needs to perform a transition into another state.  This is all done within the
 </div>
 <p>Our code includes some <code class="docutils literal notranslate"><span class="pre">&#64;spy_on</span></code> decorators, which wrap our state functions.
 These were added so I can instrument (automatically add logging code) to the
-state machine.  So if I run the above code I will see something like this:</p>
+state machine.  So if I run the above code I will see something like this in my
+terminal:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mi">22</span> <span class="mi">12</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mf">34.050461</span><span class="p">]</span> <span class="p">[</span><span class="n">ao</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">inner_state</span>
 </pre></div>
 </div>
@@ -1052,17 +1056,284 @@ diagram to remind myself that I’m thinking this way.</p>
 </pre></div>
 </div>
 <p>The benefit of programming a statechart this way is in it’s containment.  You
-don’t have functions drifting in package’s name space, they are nicely contained
-as static methods within your statechart’s class.  In addition to this, you no
-longer have to manipulate the <code class="docutils literal notranslate"><span class="pre">temp.fun</span></code> attribute of the event processor,
-this complexity is hidden within the <code class="docutils literal notranslate"><span class="pre">Factory</span></code> objects state function
-manufacturing process.  It takes your static method and how you have nested a
-state and builds a state function inside of itself.  You don’t need to place
-<code class="docutils literal notranslate"><span class="pre">&#64;spy_on</span></code> decorators above your state functions.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">__init__</span></code> function of your statechart can be read and compared to your
-diagram;</p>
-<p>I would
-normally place an attachment point on the diagram, but this is used to
+don’t have functions drifting in your package’s name space, they are nicely
+contained as static methods within your statechart’s class.  In addition to
+this, you no longer have to manipulate the <code class="docutils literal notranslate"><span class="pre">temp.fun</span></code> attribute of the event
+processor, this complexity is hidden within the <code class="docutils literal notranslate"><span class="pre">Factory</span></code> object’s
+state-function-manufacturing process.  To move the state functions into a class,
+you can just add a <code class="docutils literal notranslate"><span class="pre">&#64;staticmethod</span></code> decorator on top of them.  Any static
+method is just a function forced into a class.</p>
+<p>If you like, you can point the <code class="docutils literal notranslate"><span class="pre">handler</span></code> of the Factory’s <code class="docutils literal notranslate"><span class="pre">create</span></code> method to
+a method instead of a function (or staticmethod).  To write the code this way
+only slightly changes our diagram, we need to replace all <code class="docutils literal notranslate"><span class="pre">chart</span></code> variables
+with <code class="docutils literal notranslate"><span class="pre">self</span></code>:</p>
+<a class="reference external image-reference" href="_static/state_recipe_11.pdf"><div align="center" class="align-center"><img alt="_images/state_recipe_11.svg" src="_images/state_recipe_11.svg" /></div>
+</a>
+<p>To write this design, our state functions are just state methods (this feature
+was added in miros 4.1.2):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># simple_state_11.py</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+<span class="k">class</span> <span class="nc">FactoryInstrumentationToLog</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> \
+      <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> \
+      <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span> <span class="o">=</span> \
+      <span class="s1">&#39;simple_state_11.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+      <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+      <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span><span class="p">,</span>
+      <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">register_live_spy_callback</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spy_callback</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">register_live_trace_callback</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace_callback</span><span class="p">))</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;outer_state&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_init_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_hook</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_reset</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_exit_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;inner_state&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_exit_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">trace_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;trace without datetime-stamp&#39;&#39;&#39;</span>
+    <span class="n">trace_without_datetime</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\[.+\]) (\[.+\].+)&#39;</span><span class="p">,</span> <span class="n">trace</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;T: &quot;</span> <span class="o">+</span> <span class="n">trace_without_datetime</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spy</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;spy with machine name pre-pended&#39;&#39;&#39;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
+
+  <span class="k">def</span> <span class="nf">outer_state_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;hello from outer_state&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">outer_state_init_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;init&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">outer_state_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;run some code, but don&#39;t transition&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">outer_state_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">outer_state_exit_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;exiting the outer_state&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">inner_state_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;hello from inner_state&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">inner_state_exit_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;exiting inner_state&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+  <span class="n">f1</span> <span class="o">=</span> <span class="n">FactoryInstrumentationToLog</span><span class="p">(</span>
+    <span class="s2">&quot;f1&quot;</span><span class="p">,</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span>
+  <span class="p">)</span>
+
+  <span class="n">f2</span> <span class="o">=</span> <span class="n">FactoryInstrumentationToLog</span><span class="p">(</span>
+    <span class="s2">&quot;f2&quot;</span><span class="p">,</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span>
+  <span class="p">)</span>
+
+  <span class="n">f1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+  <span class="n">f1</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">))</span>
+  <span class="n">f1</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
+
+  <span class="n">f2</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">f2</span><span class="o">.</span><span class="n">inner_state</span><span class="p">)</span>
+  <span class="n">f2</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">))</span>
+  <span class="n">f2</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
+
+  <span class="c1"># let the threads catch up before we exit main</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If we ran the code and looked at it’s log file we would see:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2019-07-30 06:25:43,725 DEBUG:T: [f1] e-&gt;start_at() top-&gt;inner_state
+2019-07-30 06:25:43,726 DEBUG:S: [f1] START
+2019-07-30 06:25:43,726 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:outer_state
+2019-07-30 06:25:43,726 DEBUG:S: [f1] ENTRY_SIGNAL:outer_state
+2019-07-30 06:25:43,726 DEBUG:S: [f1] hello from outer_state
+2019-07-30 06:25:43,726 DEBUG:S: [f1] INIT_SIGNAL:outer_state
+2019-07-30 06:25:43,726 DEBUG:S: [f1] init
+2019-07-30 06:25:43,726 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-07-30 06:25:43,727 DEBUG:S: [f1] ENTRY_SIGNAL:inner_state
+2019-07-30 06:25:43,727 DEBUG:S: [f1] hello from inner_state
+2019-07-30 06:25:43,727 DEBUG:S: [f1] INIT_SIGNAL:inner_state
+2019-07-30 06:25:43,727 DEBUG:S: [f1] &lt;- Queued:(0) Deferred:(0)
+2019-07-30 06:25:43,729 DEBUG:T: [f2] e-&gt;start_at() top-&gt;inner_state
+2019-07-30 06:25:43,729 DEBUG:S: [f2] START
+2019-07-30 06:25:43,729 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-07-30 06:25:43,730 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:outer_state
+2019-07-30 06:25:43,730 DEBUG:S: [f2] ENTRY_SIGNAL:outer_state
+2019-07-30 06:25:43,730 DEBUG:S: [f2] hello from outer_state
+2019-07-30 06:25:43,730 DEBUG:S: [f2] ENTRY_SIGNAL:inner_state
+2019-07-30 06:25:43,730 DEBUG:S: [f2] hello from inner_state
+2019-07-30 06:25:43,730 DEBUG:S: [f2] INIT_SIGNAL:inner_state
+2019-07-30 06:25:43,730 DEBUG:S: [f2] &lt;- Queued:(0) Deferred:(0)
+2019-07-30 06:25:43,731 DEBUG:S: [f2] Hook:inner_state
+2019-07-30 06:25:43,731 DEBUG:S: [f2] Hook:outer_state
+2019-07-30 06:25:43,731 DEBUG:S: [f2] run some code, but don&#39;t transition
+2019-07-30 06:25:43,732 DEBUG:S: [f2] Hook:outer_state:HOOK
+2019-07-30 06:25:43,732 DEBUG:S: [f2] &lt;- Queued:(1) Deferred:(0)
+2019-07-30 06:25:43,733 DEBUG:T: [f2] e-&gt;Reset() inner_state-&gt;inner_state
+2019-07-30 06:25:43,733 DEBUG:S: [f2] Reset:inner_state
+2019-07-30 06:25:43,733 DEBUG:S: [f2] Reset:outer_state
+2019-07-30 06:25:43,733 DEBUG:S: [f2] EXIT_SIGNAL:inner_state
+2019-07-30 06:25:43,734 DEBUG:S: [f2] exiting inner_state
+2019-07-30 06:25:43,734 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-07-30 06:25:43,734 DEBUG:S: [f2] EXIT_SIGNAL:outer_state
+2019-07-30 06:25:43,734 DEBUG:S: [f2] exiting the outer_state
+2019-07-30 06:25:43,734 DEBUG:S: [f2] ENTRY_SIGNAL:outer_state
+2019-07-30 06:25:43,734 DEBUG:S: [f2] hello from outer_state
+2019-07-30 06:25:43,734 DEBUG:S: [f2] INIT_SIGNAL:outer_state
+2019-07-30 06:25:43,735 DEBUG:S: [f2] init
+2019-07-30 06:25:43,735 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-07-30 06:25:43,735 DEBUG:S: [f2] ENTRY_SIGNAL:inner_state
+2019-07-30 06:25:43,735 DEBUG:S: [f2] hello from inner_state
+2019-07-30 06:25:43,735 DEBUG:S: [f2] INIT_SIGNAL:inner_state
+2019-07-30 06:25:43,736 DEBUG:S: [f1] Hook:inner_state
+2019-07-30 06:25:43,736 DEBUG:S: [f2] &lt;- Queued:(0) Deferred:(0)
+2019-07-30 06:25:43,736 DEBUG:S: [f1] Hook:outer_state
+2019-07-30 06:25:43,736 DEBUG:S: [f1] run some code, but don&#39;t transition
+2019-07-30 06:25:43,736 DEBUG:S: [f1] Hook:outer_state:HOOK
+2019-07-30 06:25:43,737 DEBUG:S: [f1] &lt;- Queued:(1) Deferred:(0)
+2019-07-30 06:25:43,738 DEBUG:T: [f1] e-&gt;Reset() inner_state-&gt;inner_state
+2019-07-30 06:25:43,738 DEBUG:S: [f1] Reset:inner_state
+2019-07-30 06:25:43,738 DEBUG:S: [f1] Reset:outer_state
+2019-07-30 06:25:43,738 DEBUG:S: [f1] EXIT_SIGNAL:inner_state
+2019-07-30 06:25:43,739 DEBUG:S: [f1] exiting inner_state
+2019-07-30 06:25:43,739 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-07-30 06:25:43,739 DEBUG:S: [f1] EXIT_SIGNAL:outer_state
+2019-07-30 06:25:43,739 DEBUG:S: [f1] exiting the outer_state
+2019-07-30 06:25:43,739 DEBUG:S: [f1] ENTRY_SIGNAL:outer_state
+2019-07-30 06:25:43,739 DEBUG:S: [f1] hello from outer_state
+2019-07-30 06:25:43,739 DEBUG:S: [f1] INIT_SIGNAL:outer_state
+2019-07-30 06:25:43,739 DEBUG:S: [f1] init
+2019-07-30 06:25:43,740 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-07-30 06:25:43,740 DEBUG:S: [f1] ENTRY_SIGNAL:inner_state
+2019-07-30 06:25:43,740 DEBUG:S: [f1] hello from inner_state
+2019-07-30 06:25:43,740 DEBUG:S: [f1] INIT_SIGNAL:inner_state
+2019-07-30 06:25:43,740 DEBUG:S: [f1] &lt;- Queued:(0) Deferred:(0)
+2019-08-01 06:28:10,237 DEBUG:T: [f1] e-&gt;start_at() top-&gt;inner_state
+2019-08-01 06:28:10,238 DEBUG:S: [f1] START
+2019-08-01 06:28:10,238 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:outer_state
+2019-08-01 06:28:10,238 DEBUG:S: [f1] ENTRY_SIGNAL:outer_state
+2019-08-01 06:28:10,238 DEBUG:S: [f1] hello from outer_state
+2019-08-01 06:28:10,238 DEBUG:S: [f1] INIT_SIGNAL:outer_state
+2019-08-01 06:28:10,238 DEBUG:S: [f1] init
+2019-08-01 06:28:10,239 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-08-01 06:28:10,239 DEBUG:S: [f1] ENTRY_SIGNAL:inner_state
+2019-08-01 06:28:10,239 DEBUG:S: [f1] hello from inner_state
+2019-08-01 06:28:10,239 DEBUG:S: [f1] INIT_SIGNAL:inner_state
+2019-08-01 06:28:10,239 DEBUG:S: [f1] &lt;- Queued:(0) Deferred:(0)
+2019-08-01 06:28:10,241 DEBUG:T: [f2] e-&gt;start_at() top-&gt;inner_state
+2019-08-01 06:28:10,241 DEBUG:S: [f1] Hook:inner_state
+2019-08-01 06:28:10,241 DEBUG:S: [f2] START
+2019-08-01 06:28:10,242 DEBUG:S: [f1] Hook:outer_state
+2019-08-01 06:28:10,242 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-08-01 06:28:10,242 DEBUG:S: [f1] run some code, but don&#39;t transition
+2019-08-01 06:28:10,242 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:outer_state
+2019-08-01 06:28:10,242 DEBUG:S: [f1] Hook:outer_state:HOOK
+2019-08-01 06:28:10,243 DEBUG:S: [f2] ENTRY_SIGNAL:outer_state
+2019-08-01 06:28:10,243 DEBUG:S: [f1] &lt;- Queued:(1) Deferred:(0)
+2019-08-01 06:28:10,243 DEBUG:S: [f2] hello from outer_state
+2019-08-01 06:28:10,245 DEBUG:T: [f1] e-&gt;Reset() inner_state-&gt;inner_state
+2019-08-01 06:28:10,245 DEBUG:S: [f2] ENTRY_SIGNAL:inner_state
+2019-08-01 06:28:10,245 DEBUG:S: [f1] Reset:inner_state
+2019-08-01 06:28:10,245 DEBUG:S: [f2] hello from inner_state
+2019-08-01 06:28:10,245 DEBUG:S: [f1] Reset:outer_state
+2019-08-01 06:28:10,246 DEBUG:S: [f2] INIT_SIGNAL:inner_state
+2019-08-01 06:28:10,246 DEBUG:S: [f1] EXIT_SIGNAL:inner_state
+2019-08-01 06:28:10,246 DEBUG:S: [f2] &lt;- Queued:(0) Deferred:(0)
+2019-08-01 06:28:10,246 DEBUG:S: [f1] exiting inner_state
+2019-08-01 06:28:10,247 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-08-01 06:28:10,247 DEBUG:S: [f1] EXIT_SIGNAL:outer_state
+2019-08-01 06:28:10,247 DEBUG:S: [f1] exiting the outer_state
+2019-08-01 06:28:10,247 DEBUG:S: [f1] ENTRY_SIGNAL:outer_state
+2019-08-01 06:28:10,247 DEBUG:S: [f1] hello from outer_state
+2019-08-01 06:28:10,247 DEBUG:S: [f1] INIT_SIGNAL:outer_state
+2019-08-01 06:28:10,248 DEBUG:S: [f1] init
+2019-08-01 06:28:10,248 DEBUG:S: [f1] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-08-01 06:28:10,248 DEBUG:S: [f1] ENTRY_SIGNAL:inner_state
+2019-08-01 06:28:10,248 DEBUG:S: [f1] hello from inner_state
+2019-08-01 06:28:10,248 DEBUG:S: [f1] INIT_SIGNAL:inner_state
+2019-08-01 06:28:10,248 DEBUG:S: [f1] &lt;- Queued:(0) Deferred:(0)
+2019-08-01 06:28:10,249 DEBUG:S: [f2] Hook:inner_state
+2019-08-01 06:28:10,249 DEBUG:S: [f2] Hook:outer_state
+2019-08-01 06:28:10,249 DEBUG:S: [f2] run some code, but don&#39;t transition
+2019-08-01 06:28:10,249 DEBUG:S: [f2] Hook:outer_state:HOOK
+2019-08-01 06:28:10,250 DEBUG:S: [f2] &lt;- Queued:(1) Deferred:(0)
+2019-08-01 06:28:10,251 DEBUG:T: [f2] e-&gt;Reset() inner_state-&gt;inner_state
+2019-08-01 06:28:10,251 DEBUG:S: [f2] Reset:inner_state
+2019-08-01 06:28:10,251 DEBUG:S: [f2] Reset:outer_state
+2019-08-01 06:28:10,251 DEBUG:S: [f2] EXIT_SIGNAL:inner_state
+2019-08-01 06:28:10,252 DEBUG:S: [f2] exiting inner_state
+2019-08-01 06:28:10,252 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-08-01 06:28:10,252 DEBUG:S: [f2] EXIT_SIGNAL:outer_state
+2019-08-01 06:28:10,252 DEBUG:S: [f2] exiting the outer_state
+2019-08-01 06:28:10,252 DEBUG:S: [f2] ENTRY_SIGNAL:outer_state
+2019-08-01 06:28:10,252 DEBUG:S: [f2] hello from outer_state
+2019-08-01 06:28:10,252 DEBUG:S: [f2] INIT_SIGNAL:outer_state
+2019-08-01 06:28:10,253 DEBUG:S: [f2] init
+2019-08-01 06:28:10,253 DEBUG:S: [f2] SEARCH_FOR_SUPER_SIGNAL:inner_state
+2019-08-01 06:28:10,253 DEBUG:S: [f2] ENTRY_SIGNAL:inner_state
+2019-08-01 06:28:10,253 DEBUG:S: [f2] hello from inner_state
+2019-08-01 06:28:10,253 DEBUG:S: [f2] INIT_SIGNAL:inner_state
+2019-08-01 06:28:10,253 DEBUG:S: [f2] &lt;- Queued:(0) Deferred:(0)
+</pre></div>
+</div>
+<p>So, you can see as much information as you like about your statechart dynamics.</p>
+<p>I would normally place an attachment point on the diagram, but this is used to
 instantiate two different objects and start their state machines in two
 different states.  So, I just write my intention on the picture.</p>
 <p>Here we see that we want to start two different <code class="docutils literal notranslate"><span class="pre">ActiveObjects</span></code></p>
