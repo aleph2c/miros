@@ -4,13 +4,8 @@
   
   -- Albert Einstein
 
-  *Obey, cooperate, diverge*
-
-  -- Chinese Proverb
-
 Diagrams
 ========
-
 .. _reading_diagrams-history-and-context:
 
 History and Context
@@ -70,27 +65,51 @@ Samek.
 
 But do you need to read these books before you use UML? No, because we are not
 going to treat UML as a formal computer language with mathematical semantics. We
-will use UML as something to sketch with.  The formal language we will use is
-Python.
-
-This section should give you enough information so that you can make your own
-pictures.
-
-.. _reading_diagrams-the-most-important-rule-in-uml:
-
-The Most Important Rule in UML
-------------------------------
+will use UML as something to sketch with.
 
   *Software modelers depend on and use engineering analogies but often fail to
   understand them.  Engineers realize that the models aren't the product; they're
   abstractions of the product.  In fact, in most cases, the models are only
   partial abstractions of the product, used to hightlight aspects that the
-  engineer should know about the product.  The term *executable specification*
-  is an oxymoron -- if the specification were truly executable, it would
+  engineer should know about the product.  The term 
+  'executable specification' is an oxymoron -- if the specification were truly executable, it would
   actually be "the thing".  Otherwise, it would merely model "the thing," which
   by definition is partial and incomplete.*
 
   -- Dave Thomas
+
+
+The formal language we will use is Python.
+
+This section should give you enough information so that you can make your own
+pictures.
+
+.. _reading_diagrams-install-drawing-software:
+
+Install drawing software
+------------------------
+If you don't have a UML drawing package, go and get one.
+
+.. note::
+
+   I use `UMLet <https://www.umlet.com/>`_.
+
+   UMLet is dependent upon Java.  So, you will need that.
+
+   Install `UMLet <https://www.umlet.com/>`_.
+
+   If you would like to use my pallets, remove the ``palettes`` folder from the
+   ``UMLet`` directory, then naviage to that directory in your shell and type:
+
+   .. code-block:: bash
+     
+     git clone git@github.com:aleph2c/umlet-statechart-template.git palettes
+
+
+.. _reading_diagrams-the-most-important-rule-in-uml:
+
+The Most Important Rule in UML
+------------------------------
 
 **You don't have to draw everything on your picture.**
 

@@ -5,20 +5,31 @@
 
 .. _recipes:
 
+.. _recipes-recipes:
+
 Recipes
 =======
+
+This section contains some small programs used to explain different things that miros can do.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-Here is a collection of tiny programs that each demonstrate how to do something
-with miros.
+.. _recipes-demo:
+
+Demonstration of Capabilities
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In this section I'll show you how you can use the miros library to solve your
+problems, by layering on more and more of its features into a simple program.
+
 
 .. _recipes-states:
 
-States
-------
+State Abstraction in Miros
+--------------------------
+
 In miros a state is a behavioral specification for an event processor.  A state
 is a function that does the following:
 
@@ -32,15 +43,28 @@ is a function that does the following:
 
 The user starts and then posts events to the ActiveObject, and its event
 processor reacts to these events by calling your state functions over and over
-again with different types of internal and external events.  The state functions
-do two different things, they describe how they are topologically related to
-other states and they contain code with will run as the event processor calls
-them over and over again.  What emerges from this interplay is a Hierachical
-State Machine (HSM) behavior which follows the Harel Formalism.
+again with a set of internal and external events.  The internal events are used
+to search the hierarchical state machine, to run it's entry and exit conditions
+and to initialize the state once it has been settled into.  The external events
+are user defined (more will be said about this shortly).
 
-This will make more sense as we progress through some simple examples.
+The state functions do two different things, they describe how they are
+topologically related to other states and they contain code which will run as
+the event processor calls them over and over again.  What emerges from this
+interplay is a Hierarchical State Machine (HSM) behavior which follows the Harel
+Formalism (picture-to-behavior rules).
 
-A state in a statechart diagram is represented by a named rounded rectangle:
+Now that we understand a bit of theory and how the miros abstraction works,
+let's look at some examples.
+
+.. _recipes-minimal-viable-states:
+
+Minimal Viable States
+---------------------
+
+In a statechart diagram, a state is represented by a named rounded rectangle.
+In a hierarchical state machine a state can exist within a state.  Here we see
+an inner_state placed within an outer_state:
 
 .. image:: _static/state_recipe_1.svg
     :target: _static/state_recipe_1.pdf
@@ -62,47 +86,63 @@ hierarchy. Here is the miros code for the above diagram:
      status = return_status.SUPER  # describe how we reacted to the event
      return status
 
-Above we see two legal state methods, which react to every possible event the
-same way.  They set the ``temp.fun`` to their super state and return a status
-telling the event processor that they did this.
+Above we see two minimal-viable state functions, which react to every possible
+event the same way.  They set the ``temp.fun`` to their super state (it's outer
+state) and return a status telling the event processor that they did this.
 
-A state function is lazy about how it describes its graphical information.  To
-ask it a question about how it sits in the hierarchy, or how it is connected to
-another part of the state machine, the event processor needs to send it an
-event.  To make this point, I'll redraw our simple state machine with some more
-details:
+Now that we know how to make a minimal-viable state function, and how it relates to a
+hierarchical state machine, let's talk about how to connect it to a thread, how
+to start it and how to give it some behavior.
+
+.. _recipes-attachment-points-and-a-working-state-machine:
+
+Attachment Points and a Working State Machine
+---------------------------------------------
+
+A state function is lazy about how it describes its graphical relationship to
+the other states in its hierarchical state machine.  To ask it a question about
+how it sits in the hierarchy, or how it is connected to another part of the
+state machine, the event processor needs to send it an event.  The state
+function will respond by setting it's return status to something and it will
+change the ``temp.fun`` attribute of its first argument.
+
+But before it can do either of these things, an event processor needs to be
+connected to a state function.  This is done with the Active object's ``start_at``
+method.  On the diagram, this is called the attachment point.  It is where the
+ball and the socket meet.
+
+I'll redraw our simple state machine with some more details:
 
 .. image:: _static/state_recipe_2.svg
     :target: _static/state_recipe_2.pdf
     :align: center
 
-The above diagram is saying that there is a connection between an
+The above diagram is saying that there is an attachment point between an
 ``ActiveObject`` and the ``outer_state``.  To create and run a state machine, we
 will instantiate the ``ActiveObject``, then ``start_at`` the ``outer_state``.
-We have added a new graphing element called the init pseudostate, the black dot.
-The black dot has an arrow pointing to the ``inner_state``.  This means, after I
-have entered into the ``outer_state`` and I have settled, transition into the
-``inner_state``.  I can describe the expected behavior from the drawing, because
-I understand the Harel Formalism: the rules for translating a diagram to a
-behavior, and the rules for mapping a behavior onto a diagram.
+When we call this ``start_at`` method, the miros library will create a thread
+for this statechart and run it until the main program is stopped.
+
+We have also added a new graphing element called the init pseudostate, the black
+dot.  The black dot has an arrow pointing to the ``inner_state``.  This means,
+after I have entered into the ``outer_state`` and I have settled, transition
+into the ``inner_state``.
 
 To make our new design work, we will have to change our ``outer_state``
 function.  It will need to provide graphical information about an init event.
 It will set the ``temp.fun`` to ``inner_state`` and it will have to tell the
 event processor it needs to perform a transition into another state.  This is
 all done within the ``trans`` method:
-
+  
 .. code-block:: python
-  :emphasize-lines: 12-15
+  :emphasize-lines: 8, 10-13, 30
 
    import time
 
-   from miros import spy_on
    from miros import signals
    from miros import ActiveObject
    from miros import return_status
 
-   @spy_on  # enables the live_trace
    def outer_state(chart, e):
      status = return_status.UNHANDLED
      # the event processor is asking us about events called INIT_SIGNAL
@@ -116,7 +156,65 @@ all done within the ``trans`` method:
        status = return_status.SUPER
      return status
 
-   @spy_on  # enables the live_trace
+   def inner_state(chart, e):
+     # we do this for all events
+     chart.temp.fun = outer_state
+     status = return_status.SUPER
+     return status
+
+   if __name__ == '__main__':
+     ao = ActiveObject('ao')
+
+     # Create a thread and start our state machine
+     ao.start_at(outer_state)
+
+     # Run our main program so that the state machine's thread
+     # can do some stuff.
+     # The state machine's thread will be stopped when our main thread stops
+     time.sleep(0.01)
+
+I have highlighted the code that would cause the init transition and the
+attachment point (``start_at``).  If we run this code, the statechart will start
+in the ``outer_state``, then settle, then transition into the ``inner_state``.
+But you will have to trust me about this, since the code doesn't provide any
+user feedback.
+
+Now that we know how to build and start a small statechart.  Let's look at
+how to instrument it so it provides feedback about its behavior.
+
+.. _recipes-feedback-about-behavior-through-instrumentation:
+
+Feedback about Behavior through Instrumentation
+-----------------------------------------------
+
+We will include the ``spy_on`` decorator from the miros library, then we will
+use it to decorate our state functions:
+  
+.. code-block:: python
+  :emphasize-lines: 8, 22, 31
+
+   import time
+
+   from miros import spy_on
+   from miros import signals
+   from miros import ActiveObject
+   from miros import return_status
+
+   @spy_on  # enables the live_trace/live_spy capabilities
+   def outer_state(chart, e):
+     status = return_status.UNHANDLED
+     # the event processor is asking us about events called INIT_SIGNAL
+     if(e.signal == signals.INIT_SIGNAL):
+       # we are transitioning to inner_state
+       # we let the trans method, set temp.fun and our return status
+       status = chart.trans(inner_state)
+     # we do this for any other event
+     else:
+       chart.temp.fun = chart.top
+       status = return_status.SUPER
+     return status
+
+   @spy_on  # enables the live_trace/live_spy capabilities
    def inner_state(chart, e):
      # we do this for all events
      chart.temp.fun = outer_state
@@ -133,23 +231,30 @@ all done within the ``trans`` method:
      # The state machine's thread will be stopped when our main thread stops
      time.sleep(0.01)
 
-Our code includes some ``@spy_on`` decorators, which wrap our state functions.
-These were added so I can instrument (automatically add logging code) to the
-state machine.  So if I run the above code I will see something like this in my
-terminal:
+The ``@spy_on`` decorators enables the live_trace and live_spy instrumentation
+capabilities of the statechart library.
+
+So if I run the above code I will see something like this in my terminal:
 
 .. code-block:: python
   
   [2019-07-22 12:22:34.050461] [ao] e->start_at() top->inner_state
 
-Let's add some more details:
+Now that we know how to instrument a statechart, let's look at how to add some
+state entry conditions.
+
+.. _recipes-entry-conditions-and-handled-events:
+
+Entry Conditions and Handled Events
+-----------------------------------
+
+We will add some entry code to both the outer_state and inner_state functions:
 
 .. image:: _static/state_recipe_3.svg
     :target: _static/state_recipe_3.pdf
     :align: center
 
-Here we see I have added entry events to both the ``outer_state`` and
-``inner_state``.  I am saying, when we enter the ``outer_state``, run a print
+The above diagram is saying, when we enter the ``outer_state``, run a print
 statement.  Then settle, which will cause an init transition into the
 ``inner_state``.  When we enter the ``inner_state`` run a different print
 statement.  If a state function receives an entry event, we don't want to change
@@ -215,8 +320,15 @@ If we run the code we see something like this:
    [2019-07-22 12:22:34.050461] [ao] e->start_at() top->inner_state
 
 So far we have been talking about signals that are included within the
-miros library: INIT_SIGNAL, ENTRY_SIGNAL.  Let's adjust our design to use
-another internal signal, EXIT_SIGNAL.
+miros library: INIT_SIGNAL, ENTRY_SIGNAL.
+
+Let's adjust our design to use another internal signal, EXIT_SIGNAL.
+
+.. _recipes-exit-conditions:
+
+
+Exit Conditions
+---------------
 
 .. image:: _static/state_recipe_4.svg
     :target: _static/state_recipe_4.pdf
@@ -226,12 +338,19 @@ Our new design describes some code that will run when we exit either state.  But
 how would we ever exit?  There is nothing on our diagram that can cause an exit,
 we can only climb into the inner_state, then sit their forever.
 
-To add some more behavior, we will have to invent a signal.  Let's call it
-``Reset``, because we will reset the chart, or put it back into the state it was
-when we first started it at the ``outer_state``.  Any signal that is not an
-internal signal, like INIT_SIGNAL, ENTRY_SIGNAL, EXIT_SIGNAL.. is called an
-external signal.  In this case our external signal ``Reset`` will be invented
-the moment we write it into the code; it is automatically declared.
+To add some more behavior, we will have to invent a signal.  
+
+.. _recipes-inventing-your-own-signals:
+
+Inventing your own Signals: External events
+-------------------------------------------
+
+Let's invent a signal and call it ``Reset``, because it will reset the chart, or
+put it back into the state it was when we first started it at the
+``outer_state``.  Any signal that is not an internal signal, like INIT_SIGNAL,
+ENTRY_SIGNAL, EXIT_SIGNAL.. is called an external signal.  In this case our
+external signal ``Reset`` will be invented the moment we write it into the code;
+it is automatically declared.
 
 So, how do we invent an event and give it a signal name and send it at our
 chart?  Well, the chart runs in a thread and it has a set of queues that it
@@ -344,11 +463,18 @@ to an ``ActiveObject``, start it, and then post events to it.
 
 What would have happened had our ``Reset`` ``elif`` clause just returned
 ``return_status.HANDLED``?  There wouldn't have been a state transition.
-When an event is caught this way it is called a hook.  Hook code can be run when
-you sent an event to the state or any of it's substates which has the name of
-that hook.  You are using the search feature of the event processor to do work
-for you, without asking it to change the state of your statechart as it reacts
-to your hook event.  This is easier to understand with a picture.
+When an event is caught this way it is called a hook.
+
+.. _recipes-hooks:
+
+Hooks
+-----
+
+Hook code can be run when you sent an event to the state or any of it's
+substates which has the name of that hook.  You are using the search feature of
+the event processor to do work for you, without asking it to change the state of
+your statechart as it reacts to your hook event.  This is easier to understand
+with a picture.
 
 .. image:: _static/state_recipe_6.svg
     :target: _static/state_recipe_6.pdf
@@ -441,6 +567,11 @@ The trace intentionally hides details.
 
 Print statements are useful if you want to see if something is working; but you
 don't always want them cluttering up your code.
+
+.. _recipes-comprehensive-instrumentation-with-the-live_spy:
+
+Comprehensive Instrumentation with the live_spy and scribble
+------------------------------------------------------------
 
 The miros library provides a second kind of instrumentation when you wrap your
 state functions inside of the ``@spy_on`` decorators.  You can turn on the
@@ -606,6 +737,11 @@ within it.  The functions merely describe how and when different memory
 operations should be performed, but the functions do not have their own memory.
 For this reason, you can attach more than one ``ActiveObject`` to the same HSM.
 
+.. _recipes-attaching-more-than-one-active-object-to-an-hsm:
+
+Attaching More than one ActiveObject to an HSM
+----------------------------------------------
+
 Here we see two different ``ActiveObject`` objects attached to the same HSM.  
 
 .. image:: _static/state_recipe_8.svg
@@ -726,8 +862,16 @@ events independent of each other; here is the output of this little program:
 We can see that our output is kind of messy.  The print messages are interleaved
 because we have two ActiveObjects running in parallel, each in their own
 thread.  It turns out that the ``print`` function is not thread safe, but the
-Python logger is.  So, let's adjust our design a bit so that our live_trace and
-our live_spy will write to the Python logger instead of the terminal's output:
+Python logger is.  
+
+.. _recipes-over-riding-the-live-instrumentation-to-the-python-logger:
+
+Making the Live Instrumentation use the Python Logger
+-----------------------------------------------------
+
+Let's adjust our design a bit so that our live_trace and our live_spy will write
+to the Python logger instead of the terminal's output.
+
 
 .. image:: _static/state_recipe_9.svg
     :target: _static/state_recipe_9.pdf
@@ -950,15 +1094,20 @@ So far we have seen how to create state functions, how to link them to an
 see a comprehensive example of all of the signal pathways supported by the Miro
 Samek event processor, look at this :ref:`example <comprehensive-comprehensive>`.
 
+.. _recipes-making-a-statechart-from-a-class:
+
+Making a Statechart from a class
+--------------------------------
+
 Is there a way to just make a statechart by instantiating a class?
 
-Of course there is, this is what the ``Factory`` class is for.  It links a set
-of signals to static methods; and assigns this linked collection to a state.
-You do this once per state, then you nest the states within one another; and the
-resulting object is a statechart.  To start it's thread, you call it's start_at
-method, just as you would with an ``ActiveObject``.
+Yes, this is what the ``Factory`` class is for.  It links a set of signals to
+static methods; and assigns this linked collection to a state.  You do this once
+per state, then you nest the states within one another; and the resulting object
+is a statechart.  To start it's thread, you call it's start_at method, just as
+you would with an ``ActiveObject``.
 
-Let's rebuild our previous example using the ``miros.Factory`` object.
+Let's rebuild our previous example using the ``miros.Factory`` class.
 
 .. image:: _static/state_recipe_10.svg
     :target: _static/state_recipe_10.pdf
@@ -1137,7 +1286,7 @@ with ``self``:
     :target: _static/state_recipe_11.pdf
     :align: center
 
-To write this design, our state functions are just state methods (this feature
+To write this design, our state functions become state methods (this feature
 was added in miros 4.1.2):
 
 .. code-block:: python
@@ -1266,6 +1415,16 @@ was added in miros 4.1.2):
 
      # let the threads catch up before we exit main
      time.sleep(0.01)
+
+.. note::
+  
+   It's nice to look at code that looks like a typical python class.  But be
+   warned, the methods you assigned to your create handlers will actually be run in
+   a separate thread from your ``__init__`` and ``start_at`` methods.  The
+   ``trace_callback`` and ``spy_callback`` and all of your state handler methods
+   will run in the statechart's thread.  This mostly isn't a problem, unless you
+   are trying to get data from your statechart into your main program.  We will see
+   how to do this shortly
 
 If we ran the code and looked at it's log file we would see:
 
@@ -1404,52 +1563,1039 @@ If we ran the code and looked at it's log file we would see:
    2019-08-01 06:28:10,253 DEBUG:S: [f2] INIT_SIGNAL:inner_state
    2019-08-01 06:28:10,253 DEBUG:S: [f2] <- Queued:(0) Deferred:(0)
 
-So, you can see as much information as you like about your statechart dynamics.
+You can see as much information as you like about your statechart dynamics.
+Typically I only turn on the spy when I'm debugging a problem; and I'll leave
+the trace on when I'm trying to see how a statechart behaves.
 
-I would normally place an attachment point on the diagram, but this is used to
-instantiate two different objects and start their state machines in two
-different states.  So, I just write my intention on the picture.
+.. _recipes-communication-between-statecharts:
 
-Here we see that we want to start two different ``ActiveObjects``
+Communication between Statecharts
+---------------------------------
 
-The ``print`` function in Python
-is not thread safe.  The output from one print my overwrite the output from
-another print.  The ``print`` function is still pretty useful, but wouldn't it
-be better to use the Python logger which is thread safe?
+To have two different statecharts communicate with one another we use the
+publish and subscribe methods (available in the ActiveObject and its
+subclasses).  Let's adjust our example a bit so that we can send a Broadcast
+event to one statechart, which will cause both charts to act.
+
+.. image:: _static/state_recipe_12.svg
+    :target: _static/state_recipe_12.pdf
+    :align: center
+
+Here is the code (highlighting pub/sub/action code):
+
+.. code-block:: python
+  :emphasize-lines: 46-49, 76, 91-94, 96-99, 142
+  
+   # simple_state_12.py
+   import re
+   import time
+   import logging
+   from functools import partial
+
+   from miros import Event
+   from miros import signals
+   from miros import Factory
+   from miros import return_status
+
+   class FactoryInstrumentationToLog(Factory):
+
+     def __init__(self, name, log_file_name=None,
+         live_trace=None, live_spy=None):
+
+       super().__init__(name)
+
+       self.live_trace = \
+         False if live_trace == None else live_trace
+       self.live_spy = \
+         False if live_spy == None else live_spy
+
+       self.log_file_name = \
+         'simple_state_12.log' if log_file_name == None else log_file_name
+
+       # clear our log every time we run this program
+       with open(self.log_file_name, "w") as fp:
+         fp.write("")
+
+       logging.basicConfig(
+         format='%(asctime)s %(levelname)s:%(message)s',
+         filename=self.log_file_name,
+         level=logging.DEBUG)
+     
+       self.register_live_spy_callback(partial(self.spy_callback))
+       self.register_live_trace_callback(partial(self.trace_callback))
+
+       self.outer_state = self.create(state="outer_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.outer_state_entry_signal). \
+         catch(signal=signals.INIT_SIGNAL,
+           handler=self.outer_state_init_signal). \
+         catch(signal=signals.Hook,
+           handler=self.outer_state_hook). \
+         catch(signal=signals.Send_Broadcast, \
+           handler=self.outer_state_send_broadcast). \
+         catch(signal=signals.BROADCAST, \
+           handler=self.outer_state_broadcast). \
+         catch(signal=signals.Reset,
+           handler=self.outer_state_reset). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.outer_state_exit_signal). \
+         to_method()
+
+       self.inner_state = self.create(state="inner_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.inner_state_entry_signal). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.inner_state_exit_signal). \
+         to_method()
+
+       self.nest(self.outer_state, parent=None). \
+         nest(self.inner_state, parent=self.outer_state)
+
+     def trace_callback(self, trace):
+       '''trace without datetime-stamp'''
+       trace_without_datetime = re.search(r'(\[.+\]) (\[.+\].+)', trace).group(2)
+       logging.debug("T: " + trace_without_datetime)
+
+     def spy_callback(self, spy):
+       '''spy with machine name pre-pended'''
+       logging.debug("S: [{}] {}".format(self.name, spy))
+     
+     def outer_state_entry_signal(self, e):
+       self.subscribe(Event(signal=signals.BROADCAST))
+       self.scribble("hello from outer_state")
+       status = return_status.HANDLED
+       return status
+
+     def outer_state_init_signal(self, e):
+       self.scribble("init")
+       status = self.trans(self.inner_state)
+       return status
+
+     def outer_state_hook(self, e):
+       status = return_status.HANDLED
+       self.scribble("run some code, but don't transition")
+       return status
+
+     def outer_state_send_broadcast(self, e):
+       status = return_status.HANDLED
+       self.publish(Event(signal=signals.BROADCAST))
+       return status
+
+     def outer_state_broadcast(self, e):
+       status = return_status.HANDLED
+       self.scribble("received broadcast")
+       return status
+
+     def outer_state_reset(self, e):
+       status = self.trans(self.outer_state)
+       return status
+
+     def outer_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting the outer_state")
+       return status
+
+     def inner_state_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("hello from inner_state")
+       return status
+
+     def inner_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting inner_state")
+       return status
+
+   if __name__ == '__main__':
+
+     f1 = FactoryInstrumentationToLog(
+       "f1",
+       live_trace=True,
+       live_spy=True
+     )
+
+     f2 = FactoryInstrumentationToLog(
+       "f2",
+       live_trace=True,
+       live_spy=True
+     )
+
+     f1.start_at(f1.outer_state)
+     f1.post_fifo(Event(signal=signals.Hook))
+     f1.post_fifo(Event(signal=signals.Reset))
+
+     f2.start_at(f2.inner_state)
+     f2.post_fifo(Event(signal=signals.Hook))
+     f2.post_fifo(Event(signal=signals.Reset))
+
+     f1.post_fifo(Event(signal=signals.Send_Broadcast))
+
+     # let the threads catch up before we exit main
+     time.sleep(0.02)
+
+The above code posts a ``Send_Broadcast`` event to f1, which in turn, publishes
+the ``Broadcast`` event.  Since both charts subscribed to this event, they will
+react to the ``Broadcast`` event.  The ``Broadcast`` signal is attached to both
+charts as a hook in their ``outer_state``, which means this hook's reactive
+behavior will be common for the outer_state and the inner_state.  The "received
+broadcast" message will be written into the spy log via the ``scribble`` method,
+if a ``Broadcast`` event is received in either state.  No state transition will
+occur as a result of the reaction to a ``Broadcast`` event; ``Broadcast`` is a
+hook and hooks don't cause state transitions.
+
+If we run our code, then filter its log file through a grep search pattern, we
+will see that both charts received the ``BROADCAST`` event:
+
+.. code-block:: text
+  :emphasize-lines: 1
+  :linenos:
+  
+  python simple_state_12.py ; cat simple_state_12.log | grep broadcast
+  2019-08-02 07:03:17,352 DEBUG:S: [f1] received broadcast
+  2019-08-02 07:03:17,355 DEBUG:S: [f2] received broadcast
+
+So now we know how:
+
+* to build a statechart within a class
+* to tie the statechart instrumentation features to the logging system (or whatever you want)
+* to have two or more statecharts communicate with one another
+* to map the statechart features into functions of static methods or methods.
+
+Can we program our states by difference?
+
+.. _recipes-overload-a-state-in-a-subclass:
+
+Overload a State in a Subclass
+------------------------------
+Suppose our specification poses a problem that can be broken into two or more
+subdesigns, and these designs are very similar.  Since we know how to tie our
+event handlers to methods in a class, we can just subclass one statechart and
+overload the event handlers that we need to change.
+
+Here is how to draw this as a UML diagram.  The F1 class is our first completed
+subdesign and F2 is just like F1, except we change the behavior of the
+inner_state's entry and exit conditions:
+
+.. image:: _static/state_recipe_13.svg
+    :target: _static/state_recipe_13.pdf
+    :align: center
+
+The diagram mostly tells us what is going on, and I have added a few notes to
+belabor the point.  Here is the code, I have highlighted the
+statechart-by-difference part of the design:
+
+.. code-block:: python
+  :emphasize-lines: 120-122, 124-127, 129-132
+  
+   # simple_state_13.py
+   import re
+   import time
+   import logging
+   from functools import partial
+
+   from miros import Event
+   from miros import signals
+   from miros import Factory
+   from miros import return_status
+
+   class F1(Factory):
+
+     def __init__(self, name, log_file_name=None,
+         live_trace=None, live_spy=None):
+
+       super().__init__(name)
+
+       self.live_trace = \
+         False if live_trace == None else live_trace
+       self.live_spy = \
+         False if live_spy == None else live_spy
+
+       self.log_file_name = \
+         'simple_state_13.log' if log_file_name == None else log_file_name
+
+       # clear our log every time we run this program
+       with open(self.log_file_name, "w") as fp:
+         fp.write("")
+
+       logging.basicConfig(
+         format='%(asctime)s %(levelname)s:%(message)s',
+         filename=self.log_file_name,
+         level=logging.DEBUG)
+     
+       self.register_live_spy_callback(partial(self.spy_callback))
+       self.register_live_trace_callback(partial(self.trace_callback))
+
+       self.outer_state = self.create(state="outer_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.outer_state_entry_signal). \
+         catch(signal=signals.INIT_SIGNAL,
+           handler=self.outer_state_init_signal). \
+         catch(signal=signals.Hook,
+           handler=self.outer_state_hook). \
+         catch(signal=signals.Send_Broadcast, \
+           handler=self.outer_state_send_broadcast). \
+         catch(signal=signals.BROADCAST, \
+           handler=self.outer_state_broadcast). \
+         catch(signal=signals.Reset,
+           handler=self.outer_state_reset). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.outer_state_exit_signal). \
+         to_method()
+
+       self.inner_state = self.create(state="inner_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.inner_state_entry_signal). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.inner_state_exit_signal). \
+         to_method()
+
+       self.nest(self.outer_state, parent=None). \
+         nest(self.inner_state, parent=self.outer_state)
+
+     def trace_callback(self, trace):
+       '''trace without datetime-stamp'''
+       trace_without_datetime = re.search(r'(\[.+\]) (\[.+\].+)', trace).group(2)
+       logging.debug("T: " + trace_without_datetime)
+
+     def spy_callback(self, spy):
+       '''spy with machine name pre-pended'''
+       logging.debug("S: [{}] {}".format(self.name, spy))
+     
+     def outer_state_entry_signal(self, e):
+       self.subscribe(Event(signal=signals.BROADCAST))
+       self.scribble("hello from outer_state")
+       status = return_status.HANDLED
+       return status
+
+     def outer_state_init_signal(self, e):
+       self.scribble("init")
+       status = self.trans(self.inner_state)
+       return status
+
+     def outer_state_hook(self, e):
+       status = return_status.HANDLED
+       self.scribble("run some code, but don't transition")
+       return status
+
+     def outer_state_send_broadcast(self, e):
+       status = return_status.HANDLED
+       self.publish(Event(signal=signals.BROADCAST))
+       return status
+
+     def outer_state_broadcast(self, e):
+       status = return_status.HANDLED
+       self.scribble("received broadcast")
+       return status
+
+     def outer_state_reset(self, e):
+       status = self.trans(self.outer_state)
+       return status
+
+     def outer_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting the outer_state")
+       return status
+
+     def inner_state_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("hello from inner_state")
+       return status
+
+     def inner_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting inner_state")
+       return status
+
+   class F2(F1):
+     def __init__(self, *args, **kwargs):
+       super().__init__(*args, **kwargs)
+
+     def inner_state_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("hello from new inner_state")
+       return status
+
+     def inner_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting new inner_state")
+       return status
+
+   if __name__ == '__main__':
+
+     f1 = F1(
+       "f1",
+       live_trace=True,
+       live_spy=True
+     )
+
+     f2 = F2(
+       "f2",
+       live_trace=True,
+       live_spy=True
+     )
+
+     f1.start_at(f1.outer_state)
+     f1.post_fifo(Event(signal=signals.Hook))
+     f1.post_fifo(Event(signal=signals.Reset))
+
+     f2.start_at(f2.inner_state)
+     f2.post_fifo(Event(signal=signals.Hook))
+     f2.post_fifo(Event(signal=signals.Reset))
+
+     f1.post_fifo(Event(signal=signals.Send_Broadcast))
+
+     # let the threads catch up before we exit main
+     time.sleep(0.02)
+
+This kind of abstraction requires a lot of understanding on the part of the
+maintenance developer.  Statechart code is already hard enough to understand
+without a diagram, but now parts of our diagram are missing too: to understand
+one diagram we need to reference another.
+
+If you find that your subdesign requirements change a lot you might want to just
+copy its superclass's code into a flat, easy-to-read/easy-to-change form,
+at the cost of repeating yourself a bit.  Then copy your diagram as a second
+stand-alone design artifact.  Subclassing is software coupling, so you will have
+to weigh the engineering-trade-offs as you build up your system.
 
 
-State methods can be structured as simple methods that have if-elif-else
-clauses.  In fact if you follow this way of programming your state methods, you
-will have a very easy time porting your design into the C/C++ programming
-language supported by the Quantum Leaps framework for embedded systems (It uses
-the same event processing algorithm).  This style is pretty much self
-documenting.
+.. _recipes-one-shots-and-heartbeats:
 
-If you have no intention of porting your work and would like to avoid sissy
-if-elif-else structures and use some :ref:`Macho Python data object
-<recipes-creating-a-statechart-inside-of-a-class>` instead, go for it.  Just
-ensure that your state methods react the way the are expected to, so that the
-event processor can discover your design while it's parsing the events.
+One-Shots, Multi-Shots and Heartbeats
+-------------------------------------
 
-If you would like to metaprogram your statecharts, UML be damned, you can.
-Miros provides several ways that you can synthesize statecharts on the fly.
+We have seen that we can post events using the ``post_fifo`` (first in first
+out) method call.  If your event needs to push itself to the front of the event
+queue (force itself to have the highest priority), you would use the
+``post_lifo`` (last in first out) method.
 
-There are different ways to create states with miros:
+The miros library can be used to send events at regular time intervals.  The
+number of times these events are sent and the regular time duration between
+these events are configurable.  To keep the library's api simple, the
+``post_fifo`` and ``post_lifo`` methods are used for this feature.  If you just
+give a posting method an event it will put it into the event queue.  But if you
+give the posting method additional timing information, it will create a
+background thread and program that thread to post your event to your statechart
+using your timing specification.
 
-1. :ref:`You can create simple state method with if-elif structures.
-   <recipes-boiler-plate-state-method-code>` (so you can easily port your design
-   back into the c programming language for embedded applications)
+To demonstrate this feature, I'll adjust the design so that between the
+outer_state and inner_state there will be a middle_state.  The purpose of the
+middle_state will be to add a one second delay between the transition into the
+inner_state from the outer_state.  The code to make a delayed event work this
+way is called a one-shot  (if it fired more than once it would be called a
+multishot, if it fired at a regular interval forever, it would be called a
+heartbeat).
 
-2. :ref:`You can use an Active Object Factory to create your statechart<recipes-creating-a-state-method-from-a-factory>`
+.. image:: _static/state_recipe_14.svg
+    :target: _static/state_recipe_14.pdf
+    :align: center
 
-3. :ref:`You can have the library generate a state method for you, then register
-   callback responses to specific events and set a parent at
-   runtime.<recipes-creating-a-state-method-from-a-template>`
+.. note::
+  
+   Our ``F2`` statechart is blissfully unaware the we have made this change to it,
+   as it only has visibility to the inner_state event handlers.
 
-.. note:: 
-  I recommend that you only use methods 1 and 2.  Method 3 was built to
-  provide method 2.  A statechart built using a factory, method 2, can always be
-  turned back into a statechart of method 1 using the ``to_code`` method.
+In our design we use the ``post_fifo`` method to make the one-shot.
+
+The ``post_fifo``/``post_lifo`` time features can be used within, or outside of,
+a statechart.  In the following code example I show a one shot within (Ready)
+and outside of (Reset for f1) of a statechart.  The code that has been changed
+from the previous example has been highlighted.
+
+.. code-block:: python
+  :emphasize-lines: 24, 58-65, 75-76, 95, 122-129, 142-144, 131-133, 135-138, 182-187, 195
+  
+   # simple_state_14.py
+   import re
+   import time
+   import logging
+   from functools import partial
+
+   from miros import Event
+   from miros import signals
+   from miros import Factory
+   from miros import return_status
+
+   class F1(Factory):
+
+     def __init__(self, name, log_file_name=None,
+         live_trace=None, live_spy=None):
+
+       super().__init__(name)
+
+       self.live_trace = \
+         False if live_trace == None else live_trace
+       self.live_spy = \
+         False if live_spy == None else live_spy
+
+       self.times_in_inner = 0
+
+       self.log_file_name = \
+         'simple_state_14.log' if log_file_name == None else log_file_name
+
+       # clear our log every time we run this program
+       with open(self.log_file_name, "w") as fp:
+         fp.write("")
+
+       logging.basicConfig(
+         format='%(asctime)s %(levelname)s:%(message)s',
+         filename=self.log_file_name,
+         level=logging.DEBUG)
+     
+       self.register_live_spy_callback(partial(self.spy_callback))
+       self.register_live_trace_callback(partial(self.trace_callback))
+
+       self.outer_state = self.create(state="outer_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.outer_state_entry_signal). \
+         catch(signal=signals.INIT_SIGNAL,
+           handler=self.outer_state_init_signal). \
+         catch(signal=signals.Hook,
+           handler=self.outer_state_hook). \
+         catch(signal=signals.Send_Broadcast, \
+           handler=self.outer_state_send_broadcast). \
+         catch(signal=signals.BROADCAST, \
+           handler=self.outer_state_broadcast). \
+         catch(signal=signals.Reset,
+           handler=self.outer_state_reset). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.outer_state_exit_signal). \
+         to_method()
+
+       self.middle_state = self.create(state="middle_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.middle_state_entry_signal). \
+         catch(signal=signals.Ready,
+           handler=self.middle_state_ready). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.middle_state_exit_signal). \
+         to_method()
+
+       self.inner_state = self.create(state="inner_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.inner_state_entry_signal). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.inner_state_exit_signal). \
+         to_method()
+
+       self.nest(self.outer_state, parent=None). \
+         nest(self.middle_state, parent=self.outer_state). \
+         nest(self.inner_state, parent=self.middle_state)
+
+     def trace_callback(self, trace):
+       '''trace without datetime-stamp'''
+       trace_without_datetime = re.search(r'(\[.+\]) (\[.+\].+)', trace).group(2)
+       logging.debug("T: " + trace_without_datetime)
+
+     def spy_callback(self, spy):
+       '''spy with machine name pre-pended'''
+       logging.debug("S: [{}] {}".format(self.name, spy))
+     
+     def outer_state_entry_signal(self, e):
+       self.subscribe(Event(signal=signals.BROADCAST))
+       self.scribble("hello from outer_state")
+       status = return_status.HANDLED
+       return status
+
+     def outer_state_init_signal(self, e):
+       self.scribble("init")
+       status = self.trans(self.middle_state)
+       return status
+
+     def outer_state_hook(self, e):
+       status = return_status.HANDLED
+       self.scribble("run some code, but don't transition")
+       return status
+
+     def outer_state_send_broadcast(self, e):
+       status = return_status.HANDLED
+       self.publish(Event(signal=signals.BROADCAST))
+       return status
+
+     def outer_state_broadcast(self, e):
+       status = return_status.HANDLED
+       self.scribble("received broadcast")
+       return status
+
+     def outer_state_reset(self, e):
+       status = self.trans(self.outer_state)
+       return status
+
+     def outer_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting the outer_state")
+       return status
+
+     def middle_state_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("arming one-shot")
+       self.post_fifo(Event(signal=signals.Ready),
+         times=1,
+         period=1.0,
+         deferred=True)
+       return status
+
+     def middle_state_ready(self, e):
+       status = self.trans(self.inner_state)
+       return status
+
+     def middle_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.cancel_events(Event(signal=signals.Ready))
+       return status
+
+     def inner_state_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.times_in_inner += 1
+       self.scribble(
+         "hello from inner_state {}".format(self.times_in_inner))
+       return status
+
+     def inner_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting inner_state")
+       return status
+
+   class F2(F1):
+     def __init__(self, *args, **kwargs):
+       super().__init__(*args, **kwargs)
+
+     def inner_state_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("hello from new inner_state")
+       return status
+
+     def inner_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting new inner_state")
+       return status
+
+   if __name__ == '__main__':
+
+     f1 = F1(
+       "f1",
+       live_trace=True,
+       live_spy=True,
+     )
+
+     f2 = F2(
+       "f2",
+       live_trace=True,
+       live_spy=True,
+     )
+
+     f1.start_at(f1.outer_state)
+     f1.post_fifo(Event(signal=signals.Hook))
+     f1.post_fifo(
+       Event(signal=signals.Reset),
+       times=1,
+       period=2.0,
+       deferred=True
+       )
+
+     f2.start_at(f2.inner_state)
+     f2.post_fifo(Event(signal=signals.Hook))
+     f2.post_fifo(Event(signal=signals.Reset))
+     f1.post_fifo(Event(signal=signals.Send_Broadcast))
+
+     # delay long enough so we can see how the program behaves in time
+     time.sleep(4.00)
+
+Let's look at the design again prior to running our program:
+
+.. image:: _static/state_recipe_14.svg
+    :target: _static/state_recipe_14.pdf
+    :align: center
+
+The diagram describes how the different charts are started, but there is no
+mention of the 2 second delay before we post the ``Reset`` event to our f1 chart
+from our main thread.  We can see that in the exit condition of the f1
+middle_state the ``Reset`` one-shot is canceled.  There is a good reason for
+this: imagine that we didn't cancel the one-shot and that we were 0.5 seconds
+into our 1 second wait when a ``Reset`` event was fired at our chart from the
+main thread.  This would mean that the task managing the ``Ready`` event would
+continue to run for another 0.5 seconds, then fire the ``Ready`` event.  The
+``Ready`` event would appear to fire 0.5 seconds too early; then it would fire
+again 0.5 seconds after that (from the arming of the next one-shot event).  This
+is weird behavior that defies the spirit of our diagram.  As a rule, cancel your
+one-shots in the exit conditions of the state that created them.
+
+We have configured our live instrumentation in an NSA style: log everything so
+you can query it later if you feel like it.  After running our program we
+can take a look at the different aspects, like, what the f1 trace looks like:
+
+.. code-block:: text
+  :emphasize-lines: 1
+  
+  python simple_state_14.py ; cat simple_state_14.log | grep T:.*f1
+
+  2019-08-05 12:18:37,055 DEBUG:T: [f1] e->start_at() top->middle_state
+  2019-08-05 12:18:38,056 DEBUG:T: [f1] e->Ready() middle_state->inner_state
+  2019-08-05 12:18:39,060 DEBUG:T: [f1] e->Reset() inner_state->middle_state
+  2019-08-05 12:18:40,061 DEBUG:T: [f1] e->Ready() middle_state->inner_state
+
+Here we see that 1 second after starting, the ``Ready`` one-shot is fired and
+the statechart transitions from the middle_state into the inner_state.  Then 1
+second later, it receives the ``Reset`` event putting it back into the
+middle_state.  Then 1 second after that, the ``Ready`` one-shot is fired again
+causing a transition into the inner_state.  The ``Ready`` one shot appears to be
+working as designed.
+
+What about our new ``times_in_inner`` code in F1?  We would expect to see that
+it has written to the spy scribble twice:
+
+.. code-block:: text
+  :emphasize-lines: 1,2
+
+  python simple_state_14.py ; \
+    cat simple_state_14.log | grep S:.*f1 | grep "hello from inner"
+
+  2019-08-05 12:23:23,054 DEBUG:S: [f1] hello from inner_state 1
+  2019-08-05 12:23:25,059 DEBUG:S: [f1] hello from inner_state 2
+
+There we go, the code works.  How about F2?  What is its inner state saying?
+
+.. code-block:: text
+  :emphasize-lines: 1,2
+
+  python simple_state_14.py ; \
+    cat simple_state_14.log | grep S:.*f2 | grep "hello from new inner"
+
+  2019-08-05 12:29:55,678 DEBUG:S: [f2] hello from new inner_state
+  2019-08-05 12:29:56,686 DEBUG:S: [f2] hello from new inner_state
+
+So our update to F1's inner_state was not seen by the F2 statechart.  This
+indicates that the inheritance structure is working.  How does F2 run
+differently from F1?
+
+.. code-block:: text
+  :emphasize-lines: 1
+  
+  python simple_state_14.py ; cat simple_state_14.log | grep T:.*f2
+
+  2019-08-05 12:32:08,195 DEBUG:T: [f2] e->start_at() top->inner_state
+  2019-08-05 12:32:08,200 DEBUG:T: [f2] e->Reset() inner_state->middle_state
+  2019-08-05 12:32:09,201 DEBUG:T: [f2] e->Ready() middle_state->inner_state
+
+We see that the F2 statechart immediately transitions into the inner_state.
+This is because we asked it to do so, the 1 second time delay offered by the
+``Ready`` one-shot is by-passed, though it is still armed.  But this first
+``Ready`` one-shot is never given a chance to fire, since the ``Reset`` is sent
+to f2 immediately after it is in the inner_state.  This cancels the one-shot
+event.  The ``Reset`` eventually causes a transition into the middle_state,
+which re-arms the ``Ready`` one-shot, and we see a transition into the
+inner_state about 1 second after the middle_state was entered.
+
+.. _recipes-getting-information-out-of-your-statechart:
+
+Creating thread-safe class Attributes
+-------------------------------------
+A statechart is running in a separate thread from our main program; so how do we
+reach into it and read/write a variable?  We can't assume that it's thread
+won't be halfway through changing the variable we want to read/write at the moment we
+are trying to access it.
+
+To solve this problem we can use a thread safe queue.  If we use the
+``collections.deque`` from the Python standard library, we can build a little ring
+buffer.  The statechart can post information to it, and the main thread can
+read information from it.  If we wrap the deque in a ``@property``, our exposed
+variable will just look like an attribute from outside of the class.
+
+Here is an example design of where we turn the ``times_in_inner`` attribute into a
+thread-safe property.
+
+.. image:: _static/state_recipe_15.svg
+    :target: _static/state_recipe_15.pdf
+    :align: center
+
+There is no UML drawing syntax for creating a property, so I just add a comment
+about my intention to do this after the ``times_in_inner`` attribute.
+
+But, we can see how to do this in the code: changes highlighted:
+  
+.. code-block:: python
+  :emphasize-lines: 25-27, 81-83, 85-87, 209, 210
+  
+   # simple_state_15.py
+   import re
+   import time
+   import logging
+   from functools import partial
+   from collections import deque
+
+   from miros import Event
+   from miros import signals
+   from miros import Factory
+   from miros import return_status
+
+   class F1(Factory):
+
+     def __init__(self, name, log_file_name=None,
+         live_trace=None, live_spy=None):
+
+       super().__init__(name)
+
+       self.live_trace = \
+         False if live_trace == None else live_trace
+       self.live_spy = \
+         False if live_spy == None else live_spy
+
+       # set up a thread safe ring buffer of size 1
+       self._times_in_inner = deque(maxlen=1)
+       self._times_in_inner.append(0)
+
+       self.log_file_name = \
+         'simple_state_15.log' if log_file_name == None else log_file_name
+
+       # clear our log every time we run this program
+       with open(self.log_file_name, "w") as fp:
+         fp.write("")
+
+       logging.basicConfig(
+         format='%(asctime)s %(levelname)s:%(message)s',
+         filename=self.log_file_name,
+         level=logging.DEBUG)
+     
+       self.register_live_spy_callback(partial(self.spy_callback))
+       self.register_live_trace_callback(partial(self.trace_callback))
+
+       self.outer_state = self.create(state="outer_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.outer_state_entry_signal). \
+         catch(signal=signals.INIT_SIGNAL,
+           handler=self.outer_state_init_signal). \
+         catch(signal=signals.Hook,
+           handler=self.outer_state_hook). \
+         catch(signal=signals.Send_Broadcast, \
+           handler=self.outer_state_send_broadcast). \
+         catch(signal=signals.BROADCAST, \
+           handler=self.outer_state_broadcast). \
+         catch(signal=signals.Reset,
+           handler=self.outer_state_reset). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.outer_state_exit_signal). \
+         to_method()
+
+       self.middle_state = self.create(state="middle_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.middle_state_entry_signal). \
+         catch(signal=signals.Ready,
+           handler=self.middle_state_ready). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.middle_state_exit_signal). \
+         to_method()
+
+       self.inner_state = self.create(state="inner_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.inner_state_entry_signal). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.inner_state_exit_signal). \
+         to_method()
+
+       self.nest(self.outer_state, parent=None). \
+         nest(self.middle_state, parent=self.outer_state). \
+         nest(self.inner_state, parent=self.middle_state)
+
+     @property
+     def times_in_inner(self):
+       return self._times_in_inner[-1]
+
+     @times_in_inner.setter
+     def times_in_inner(self, value):
+       self._times_in_inner.append(value)
+
+     def trace_callback(self, trace):
+       '''trace without datetime-stamp'''
+       trace_without_datetime = re.search(r'(\[.+\]) (\[.+\].+)', trace).group(2)
+       logging.debug("T: " + trace_without_datetime)
+
+     def spy_callback(self, spy):
+       '''spy with machine name pre-pended'''
+       logging.debug("S: [{}] {}".format(self.name, spy))
+     
+     def outer_state_entry_signal(self, e):
+       self.subscribe(Event(signal=signals.BROADCAST))
+       self.scribble("hello from outer_state")
+       status = return_status.HANDLED
+       return status
+
+     def outer_state_init_signal(self, e):
+       self.scribble("init")
+       status = self.trans(self.middle_state)
+       return status
+
+     def outer_state_hook(self, e):
+       status = return_status.HANDLED
+       self.scribble("run some code, but don't transition")
+       return status
+
+     def outer_state_send_broadcast(self, e):
+       status = return_status.HANDLED
+       self.publish(Event(signal=signals.BROADCAST))
+       return status
+
+     def outer_state_broadcast(self, e):
+       status = return_status.HANDLED
+       self.scribble("received broadcast")
+       return status
+
+     def outer_state_reset(self, e):
+       status = self.trans(self.outer_state)
+       return status
+
+     def outer_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting the outer_state")
+       return status
+
+     def middle_state_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("arming one-shot")
+       self.post_fifo(Event(signal=signals.Ready),
+         times=1,
+         period=1.0,
+         deferred=True)
+       return status
+
+     def middle_state_ready(self, e):
+       status = self.trans(self.inner_state)
+       return status
+
+     def middle_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.cancel_events(Event(signal=signals.Ready))
+       return status
+
+     def inner_state_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.times_in_inner += 1
+       self.scribble(
+         "hello from inner_state {}".format(self.times_in_inner))
+       return status
+
+     def inner_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting inner_state")
+       return status
+
+   class F2(F1):
+     def __init__(self, *args, **kwargs):
+       super().__init__(*args, **kwargs)
+
+     def inner_state_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("hello from new inner_state")
+       return status
+
+     def inner_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting new inner_state")
+       return status
+
+   if __name__ == '__main__':
+
+     f1 = F1(
+       "f1",
+       live_trace=True,
+       live_spy=True,
+     )
+
+     f2 = F2(
+       "f2",
+       live_trace=True,
+       live_spy=True,
+     )
+
+     f1.start_at(f1.outer_state)
+     f1.post_fifo(Event(signal=signals.Hook))
+     f1.post_fifo(
+       Event(signal=signals.Reset),
+       times=1,
+       period=2.0,
+       deferred=True
+       )
+
+     f2.start_at(f2.inner_state)
+     f2.post_fifo(Event(signal=signals.Hook))
+     f2.post_fifo(Event(signal=signals.Reset))
+     f1.post_fifo(Event(signal=signals.Send_Broadcast))
+
+     # delay long enough so we can see how the program behaves in time
+     time.sleep(4.00)
+
+     # read information from other threads
+     print("f1 was in its inner state {} times".format(f1.times_in_inner))
+     print("f2 was in its inner state {} times".format(f2.times_in_inner))
+
+Running this program will provide the following output:
+
+.. code-block:: python
+  
+  f1 was in its inner state 2 times
+  f2 was in its inner state 0 times
+
+The f1 statechart properly reports how many times it was in its inner_state.
+The f2 inner_state doesn't write to the ``times_in_inner`` property, so it's
+output only shows how that property was initialized.
+
+Let's look at the property code in isolation from the rest of the statechart:
+
+.. code-block:: python
+  :emphasize-lines: 1
+  :linenos:
+
+  # INITIALIZATION CODE TAKEN FROM __init__
+  # set up a thread safe ring buffer of size 1
+  self._times_in_inner = deque(maxlen=1)
+  self._times_in_inner.append(0)
+  # ...
+  # PROPERTY methods used to control the deque
+  @property
+  def times_in_inner(self):
+    return self._times_in_inner[-1]
+
+  @times_in_inner.setter
+  def times_in_inner(self, value):
+    self._times_in_inner.append(value)
+  # ...
+  # CODE FROM WITHIN STATECHART using the property
+  def inner_state_entry_signal(self, e):
+    status = return_status.HANDLED
+    self.times_in_inner += 1
+    self.scribble(
+      "hello from inner_state {}".format(self.times_in_inner))
+    return status
+  # ...
+  # CODE OUTSIDE OF STATECHART accessing the property
+  print("f1 was in its inner state {} times".format(f1.times_in_inner))
+
+The initialization code on lines 3-4 of this listing, creates a private deque
+ring-buffer which can hold one item, then pushes a zero into this queue.  Since
+our ``_time_in_inner`` deque is a ring buffer of size 1, when we ``append`` new
+information into it, it's old information is shifted out of the ring (deleted).
+
+We see this kind of ``append`` taking place in the ``times_in_inner`` setter
+method on lines 12 to 13.  The value is shifted into the deque and the old information
+is pushed out.  This is a thread safe activity; if more than one thread is
+accessing this method at once, they don't both get to perform the action at the
+same time.  One will get its turn, then the other will get its turn.
+
+The ``times_in_inner`` getter method described in lines 7-9 of the listing
+shows us how we can access our information from within or outside of our
+statechart's thread.  We only read the latest member of the deque.  Since our
+deque is of size one, there is only one thing to read in it anyway.
+
+We can see how this property is used within the statechart's thread on line 18.  The
+``self.times_in_inner += 1`` calls the getter method 8-9, adds one to the result
+then calls the setter method (12-13) which appends the result into the deque,
+shifting the old information out.
+
+We can see how the ``times_in_inner`` property is accessed outside of the
+statechart thread on line 24.  The main thread accesses the getter method 8-9, and
+reports its returned value in a print statement.
+
+
+Here is a collection of tiny programs that each demonstrate how to do something
+with miros.
 
 .. _recipes-state-recipes:
 
@@ -1473,193 +2619,10 @@ There are different ways to create states with miros:
 * :ref:`Creating a statechart from a factory<recipes-creating-a-state-method-from-a-factory>`
 * :ref:`Creating a statechart inside of a class<recipes-creating-a-statechart-inside-of-a-class>`
 
-.. _recipes-what-a-state-does-and-how-to-structure-it:
-
-What a State Does and How to Structure it
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Your state methods represent the rounded rectangles in your statechart diagram.
-They contain information about how a state should react to an event and they
-contain information about how they relate to other states.  They do not
-explicitly create the behavior that you expect from your statechart, this is
-done by an event processor.  An event processor is created when you instantiate
-an active object and it is the thing that calls the state methods over and over
-again to manifest the expected behavior.
-
-When an active object uses its ``start_at`` method, it connects your state
-method to its event processor.  
-
-An event processor never actually learns or remembers the full nature of how
-your state methods are linked to one another, it only remembers it's current
-state and where it would like to transition within the diagram on its next
-pass.  It always searches them as it reacts to whatever event you have provided
-it.  So, your design is discovered as the event processor reacts to events.  Your
-state method's can be used by many different event processors, they're
-polyamorous:
-
-.. image:: _static/eventprocessors.svg
-    :target: _static/eventprocessors.pdf
-    :align: center
-
-In the diagram above we see that two different active objects can use the same
-statechart structure.  Each active object can be in a different state, even
-though they are using the same diagram.   ``ao1`` starts it's interpretation of
-the statechart in state ``c`` and ``ao2`` starts it's interpretation of the
-statechart in state ``c2``.  As someone building this design you would create
-two different active objects, and you would define three different state
-methods, then you would start the different active objects with a ``start_at``
-call.
-
-You don't explicitly call an event processor while using the miros api, it is
-called in the background when you use methods like ``start_at``, ``post_fifo``
-or ``post_lifo``.
-
-The event processor treats a state method as if it was defined within its own
-class.  It does this by using its ``self`` variable in the first argument to
-the state method call.  It then injects the event into the second argument to
-see what the state method will do about it.  
-
-The state method communicates back to it's currently connected event processor
-in two different ways.  It adjusts internal attributes on this ``self``
-variable of the thing searching it and by returning a status value.  The first
-argument of your state method does not have to be written as ``self``, it can
-be called anything.  If it is called ``chart`` or ``hsm``, it makes no
-difference to how it will actually be used by the event processor.
-
-State methods themselves are stateless.  They do not keep internal variables,
-they only react and tweak the variable states of the objects that were given to
-them as input arguments.  It is the ``self`` variable of the outside caller
-that has new information impressed upon it.  This is how state methods stay
-polyamorous.
-
-The states contain a place to anchor your application code.  They also provide
-information about the design topology of your chart.  They describe their
-parent state and they describe how some events can cause transitions to other
-state methods. That's it.  There is no full picture described in a table or in
-any other data structure.  The picture is actually written in the interaction
-of your state method code and the event processor calling it.
-
-For this reason an event processor can call your state method many times while
-it is trying to discover how your statechart is structured.  It does this
-during the ``start_at`` call, or when a ``post_fifo`` or ``post_lifo`` method
-is called with an event.
-
-As an application developer you don't have to care about `how` the event
-processor does its job you just need to tell it `what` to do.  You
-need to take your picture and turn it into code.  This is done by writing one
-state method at a time; linking them together with hierarchy and arrows.
-
-To make an arrow is fairly straight forward.  You just use the ``trans``
-method with your target state as an argument.  This is easy to code.
-
-.. image:: _static/stateapplicationcode3.svg
-    :target: _static/stateapplicationcode3.pdf
-    :align: center
-
-To describe the hierarchy is a little bit more subtle.
-
-All state methods must reveal their parent information.  They do this by using
-an if-elif-else and placing the parent information in the ``else`` clause.  It
-does this as a kind of default arrow for all events it doesn't know how to
-react to, to the next-outer-most-state.  In this ``else`` clause it:
-
-1.  sets ``self.temp.fun`` of the event processor to point to it's parent state method
-2.  return the value of ``return_status.SUPER``
-
-.. image:: _static/stateapplicationcode1.svg
-    :target: _static/stateapplicationcode1.pdf
-    :align: center
-
-For the outermost state of your state chart you set the parent  to ``self.top``.
-This state method is actually defined within the event processor and when it
-sees this state it knows that it is about to fall of the edge of your map.
-
-If your parent state isn't the outer most state, you would just set the
-``self.temp.fun`` to whatever state is:
-
-.. image:: _static/stateapplicationcode2.svg
-    :target: _static/stateapplicationcode2.pdf
-    :align: center
-
-Now that we understand how state methods relate to each other and to event
-processors let's look at a simple example to see how the pictures relate to
-working code.
-
-.. image:: _static/eventprocessors.svg
-    :target: _static/eventprocessors.pdf
-    :align: center
-
-First you would describe state's ``c``, ``c1`` and ``c2``:
-
-.. code-block:: python
-
-  from miros import spy_on
-  from miros import ActiveObject
-  from miros import signals, return_status, Event
-
-  def c(self, e):
-    status = return_status.UNHANDLED
-    if(e.signal == signals.ENTRY_SIGNAL):
-      # call c's entry code
-      status = return_status.HANDLED
-    elif(e.signal == signals.INIT_SIGNAL):
-      status = self.trans(c1)
-    elif(e.signal == signals.B):
-      status = return_status.trans(c)
-    elif(e.signal == signals.EXIT_SIGNAL):
-      # call c's exit code
-      status = return_status.HANDLED
-    else:
-      status = return_status.SUPER
-      self.temp.fun = self.top
-    return status
-
-  def c1(self, e):
-    status = return_status.UNHANDLED
-    if(e.signal == signals.ENTRY_SIGNAL):
-      status = return_status.HANDLED
-    elif(e.signal == signals.INIT_SIGNAL):
-      status = return_status.HANDLED
-    elif(e.signal == signals.A):
-      status = trans(c2)
-    elif(e.signal == signals.EXIT_SIGNAL):
-      status = return_status.HANDLED
-    else:
-      status = return_status.SUPER
-      self.temp.fun = self.c
-    return status
-
-  def c2(self, e):
-    status = return_status.UNHANDLED
-    if(e.signal == signals.ENTRY_SIGNAL):
-      status = return_status.HANDLED
-    elif(e.signal == signals.INIT_SIGNAL):
-      status = return_status.HANDLED
-    elif(e.signal == signals.A):
-      status = trans(c1)
-    elif(e.signal == signals.EXIT_SIGNAL):
-      status = return_status.HANDLED
-    else:
-      status = return_status.SUPER
-      self.temp.fun = self.c
-    return status
-
-Then you would connect the state methods into two different active objects and
-start them in their desired states:
-
-.. code-block:: python
-
-  ao1, ao2 = ActiveObject(), ActiveObject()
-  ao1.start_at(c)
-  ao2.start_at(c2)
-
-``ao1`` would act as if it owned the map, and ``ao2`` would act as if it owned
-the map.  Neither would know that `their` state methods were being used by more
-than one active object.
-
 .. _recipes-boiler-plate-state-method-code:
 
-Boiler Plate State Method Code
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Boiler Plate State Function Code
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 For a flat state:
 
 .. code-block:: python

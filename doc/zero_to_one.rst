@@ -1,8 +1,9 @@
 .. _zero_to_one-zero-to-one:
 
-  *You should focus relentlessly on something that you're good at doing, but
-  before that you must think hard about whether it will be valuable in the
-  future.*
+  *The best entrepreneurs know this: every great business is built around a
+  secret that's hidden from the outside. A great company is a conspiracy to
+  change the world; when you share your secret, the recipient becomes a fellow
+  conspirator*
 
   -- Peter Thiel, Zero to One: Notes on Startups, or How to build the Future
 
