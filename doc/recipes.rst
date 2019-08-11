@@ -10,22 +10,24 @@
 Recipes
 =======
 
-This section contains some small programs used to explain different things that miros can do.
+This section contains a set of examples that can be referenced as you are
+building up your own programs.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+.. contents:: 
+   :backlinks: entry
 
 .. _recipes-demo:
 
 Demonstration of Capabilities
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In this section I'll show you how you can use the miros library to solve your
-problems, by layering on more and more of its features into a simple program.
+In this section I'll show you how you can use the miros library by layering more
+and more of its features into a simple program.
 
+.. contents::
+  :local:
 
-.. _recipes-states:
+.. _recipes-state-abstraction:
 
 State Abstraction in Miros
 --------------------------
@@ -2597,33 +2599,40 @@ reports its returned value in a print statement.
 Here is a collection of tiny programs that each demonstrate how to do something
 with miros.
 
-.. _recipes-state-recipes:
+.. _recipes-states:
 
-**State Recipes**:
+States
+^^^^^^
 
-* :ref:`Boiler plate state method code<recipes-boiler-plate-state-method-code>`
-* :ref:`Describe a parent state<recipes-describe-a-parent-state>`
-* :ref:`Pass an event through to a parent state<recipes-pass-an-event-through-to-a-parent-state>`
-* :ref:`Transition to another state<recipes-transition-to-another-state>`
-* :ref:`Do something when the state is entered<recipes-do-something-when-the-state-is-entered>`
-* :ref:`Do something when the state is initialized<recipes-do-something-when-the-state-is-initialized>`
-* :ref:`Do something when the state is exited<recipes-do-something-when-the-state-is-exited>`
-* :ref:`Create a hook<recipes-create-a-hook>`
-* :ref:`Catch and release<recipes-catch-and-release>`
-* :ref:`Create a one-shot<recipes-create-a-one-shot-state>`
-* :ref:`Create a multi-shot<recipes-create-a-mult-shot-state>`
-* :ref:`Cancel events<recipes-cancelling-events-state>`
-* :ref:`Defer and Recall an event<recipes-deferring-an-event-state>`
-* :ref:`A Deeper look at state methods<recipes-what-a-state-does-and-how-to-structure-it>`
-* :ref:`Creating a statechart from a template<recipes-creating-a-state-method-from-a-template>`
-* :ref:`Creating a statechart from a factory<recipes-creating-a-state-method-from-a-factory>`
-* :ref:`Creating a statechart inside of a class<recipes-creating-a-statechart-inside-of-a-class>`
+.. contents:: 
+   :local:
 
-.. _recipes-boiler-plate-state-method-code:
+A lot of Python developers are moving away from using its object oriented
+features and writing most of their code within functions which call each other.
+This kind of programming is supported by miros.  You can build up your
+statechart by constructing a set of state functions, attaching one of them to a
+``miros.ActiveObject``, then using that active object as the thing to post
+events to.  The functions and the active object work together to form a
+statechart.  If you intend on porting your designs to the ``qp`` framework, I
+recommend that you write your code this way.
 
-Boiler Plate State Function Code
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-For a flat state:
+You can also build a statechart directly within one class, by inheriting from
+the ``miros.Factory``.  Within the ``__init__`` method of the derived class, you
+describe the states, link signals to state methods then add hierarchy using
+the ``nest`` method.
+
+The state recipes will be broken down into two groups, state function recipes
+and state method recipes.
+
+.. _recipes-state-function-recipes:
+
+State Function Recipes
+----------------------
+
+.. _recipes-boiler-plate-state-function-code:
+
+Boiler-plate State Function Code
+""""""""""""""""""""""""""""""""
 
 .. code-block:: python
 
@@ -2678,10 +2687,10 @@ and returned return_state.HANDLED.
 
 To see factory boiler plate go, see :ref:`this<recipes-creating-a-state-method-from-a-factory>`
 
-.. _recipes-describe-a-parent-state:
+.. _recipes-describing-your-parent-state-function:
 
-Describe a Parent State
-^^^^^^^^^^^^^^^^^^^^^^^
+Describing your Parent State Function
+"""""""""""""""""""""""""""""""""""""
 To describe your parent state:
 
 1. setting the ``temp.fun`` attribute of the first argument to point at their
@@ -2720,10 +2729,11 @@ To read more about why you structure your state methods this way, read :ref:`thi
 
 To see how to define a parent state with a factory, read :ref:`this<recipes-factory-5>`
 
-.. _recipes-pass-an-event-through-to-a-parent-state:
+.. _recipes-passing-events-to-the-parent-state-function:
 
-Pass an event through to a Parent State
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Passing events to the Parent State Function
+"""""""""""""""""""""""""""""""""""""""""""
+
 The easiest way to pass an event outward in your statechart is not to handle it
 in your ``if-elif`` clauses and let your ``else``
 :ref:`clause<recipes-describe-a-parent-state>` handle it.
@@ -2779,10 +2789,10 @@ method with the event that you want to trickle outward in your diagram.
       self.temp.fun = self.c
     return status
 
-.. _recipes-transition-to-another-state:
+.. _recipes-transition-to-another-state-function:
 
-Transition to another state
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Transition to another State Function
+""""""""""""""""""""""""""""""""""""
 To transition to another state, use the ``trans`` method:
 
 .. code-block:: python
@@ -2807,10 +2817,10 @@ To transition to another state, use the ``trans`` method:
 Make sure that you return the result of the call to your ``trans`` method, or
 the event processor will break.
 
-.. _recipes-do-something-when-the-state-is-entered:
+.. _recipes-state-function-entry-code:
 
-Do Something when the State is Entered
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+State Function Entry Code
+"""""""""""""""""""""""""
 To have your application code run when a state is entered place it in the
 ``ENTRY_SIGNAL`` clause of your state's if-elif structure.  An entry event will
 occur anytime the event processor detects a transition from the outside to the
@@ -2834,10 +2844,10 @@ inside of your state method's boundary.
       self.temp.fun = self.c
     return status
 
-.. _recipes-do-something-when-the-state-is-initialized:
+.. _recipes-state-function-initialization-code:
 
-Do Something when the State is Initialized
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+State Function Initialization Code
+""""""""""""""""""""""""""""""""""
 To have your application code run when a state is initialized place it in the
 ``INIT_SIGNAL`` clause of your state's if-elif structure.  An init event will
 occur after the entry event, if a transition is moving from the outside to the
@@ -2903,10 +2913,11 @@ from your state method call:
   process and your statechart will behave as you want it to (though, you should
   probably re-visit your design).
 
-.. _recipes-do-something-when-the-state-is-exited:
 
-Do Something when the State is Exited
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _recipes-state-function-exit-code:
+
+State Function Exit Code
+"""""""""""""""""""""""""
 To have your application code run when a state is exited place it in the
 ``EXIT_SIGNAL`` clause of your state's if-elif structure.  An exit event will
 occur anytime the event processor detects a transition from the inside to the
@@ -2930,10 +2941,10 @@ outside of of your state method's boundary.
       self.temp.fun = self.c
     return status
 
-.. _recipes-create-a-hook:
+.. _recipes-creating-a-hook-in-a-state-function:
 
-Create a Hook
-^^^^^^^^^^^^^
+Creating a Hook in a State function
+"""""""""""""""""""""""""""""""""""
 A hook is some application code that is shared between your state method and
 all of its child state method's.
 
@@ -3014,13 +3025,14 @@ its application code and returning the ``HANDLED`` value.  It stops the
 ``MY_HOOK`` event from falling off the edge of the map and returns control to
 the state that originally experienced the event.
 
-.. _recipes-catch-and-release:
+.. _recipes-catch-and-release-in-a-state-function:
 
-Catch and Release
-^^^^^^^^^^^^^^^^^
+Catch and Release in a State function
+"""""""""""""""""""""""""""""""""""""
+
 The catch and release recipe is similar to the
-:ref:`hook<recipes-create-a-hook>` recipe in that you are using the search
-phase of the event processor algorithm to run your code.
+:ref:`hook<recipes-create-a-hook>` recipe in that you are using the search phase
+of the event processor algorithm to run your code.
 
 Instead of hooking the code with an ``HANDLED`` response, your state method
 returns an ``UNHANDLED`` status.  This causes the event processor, to query it
@@ -3074,72 +3086,239 @@ do not return ``HANDLED`` when they see the ``BUBBLED`` signal.
   # demonstrate the state didn't change
   assert(ao.state.fun.__name__ == 'inner')
 
-.. _recipes-create-a-one-shot-state:
+.. _recipes-state-method-recipes:
 
-Create a One-Shot
-^^^^^^^^^^^^^^^^^
+State Method Recipes
+--------------------
+A statechart can be made using the ``miros.Factory`` class.  To see how to do
+this :ref:`look here <recipes-making-a-statechart-from-a-class>`.
 
-.. include:: i_create_a_one_shot.rst 
+.. _recipes-boiler-plate-state-handler-method:
 
-.. _recipes-create-a-mult-shot-state:
+Boiler-plate State Method
+"""""""""""""""""""""""""
+A state method is constructed by using the ``create``, ``catch`` and ``to_method``
+interface of the ``miros.Factory`` object.
 
-Create a Multi-Shot
-^^^^^^^^^^^^^^^^^^^
+Consider the outer_state of :ref:`this example <recipes-making-a-statechart-from-a-class>`:
 
-.. include:: i_create_a_multishot.rst 
-
-.. _recipes-cancelling-events-state:
-
-Canceling Events
-^^^^^^^^^^^^^^^^^
-To kill a cancel a specific event, see :ref:`this.<recipes-cancelling-a-specific-event-source>`
-
-To kill all events sharing a signal name, see :ref:`this.<recipes-cancelling-event-source-by-signal-name>`
-
-.. _recipes-deferring-an-event-state:
-
-Deferring and Recalling an Event
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. include:: i_defer_and_recall.rst 
-
-.. _recipes-create-a-guard:
-
-Create a Guard
-^^^^^^^^^^^^^^
-There will be situations where you only would like an event to cause a
-transition between two states if a condition is true.  This is called a guard,
-in UML it looks like this:
-
-.. image:: _static/guard.svg
-    :target: _static/guard.pdf
+.. image:: _static/state_recipe_10.svg
+    :target: _static/state_recipe_10.pdf
     :align: center
 
-The logic between the square brackets must be true for this event to work.  In
-this case the ``T`` event is guarded, it can only cause a transition if the the
-function ``g()`` returns ``True``, otherwise nothing will happen.
-
-The ``t()`` function is a function that runs if the ``g()`` returns True.
-
-To implement a guard in your state method is very straight forward, you use an
-if statement:
+Your outer_state state method code (highlighted) would look like this:
 
 .. code-block:: python
-  :emphasize-lines: 2
+  :emphasize-lines: 9-20
+  
+   class FactoryInstrumentationToLog(Factory):
 
-  elif(e.signal == signals.T):
-    if g():
-      t()
-      chart.trans(<state_to_transition_to)
+     def __init__(self, name, log_file_name=None,
+         live_trace=None, live_spy=None):
 
-The highlighted code is the guard.
+       super().__init__(name)
+       # ..
 
-To learn more about guards read the
-:ref:`hacking to learn example.<scribbleexample-hacking-to-learn-the-deeper-dynamics>`
+       self.outer_state = self.create(state="outer_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.outer_state_entry_signal). \
+         catch(signal=signals.INIT_SIGNAL,
+           handler=self.outer_state_init_signal). \
+         catch(signal=signals.Hook,
+           handler=self.outer_state_hook). \
+         catch(signal=signals.Reset,
+           handler=self.outer_state_reset). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.outer_state_exit_signal). \
+         to_method()
+
+      # ..
+
+The ``self.outer_state`` method construction is started with a call to the
+``miros.Factory`` ``create`` method.  Then the ``catch`` method is chained once
+for every signal your state needs to handle.  The ``catch`` method requires a
+signal and a reference to a method which will be called when an event of this
+signal is passed to your state method. To end the chain, the ``to_method`` is
+called, which converts the state into a state method.
+
+The ``self.outer_state`` method does not describe it's parent, this is
+done separately with the ``miros.Factory``'s ``nest`` interface.
+
+.. _recipes-boiler-plate-state-handler-method:
+
+Boiler-plate State Handler Method
+"""""""""""""""""""""""""""""""""
+
+When you use the ``miros.Factory`` to build a statechart, you assign one state
+handler to each signal of the state.  This means that you can have multiple state
+handlers per state.
+
+A state method tends to have the following form:
+
+.. code-block:: python
+  
+  def <name_of_state_name_of_event>(self, e):
+    status = return_status.HANDLED
+    # .. code to handle specific event
+    return status
+
+Here is an example of the outer_state method's entry event handler taken from
+:ref:`this example <recipes-making-a-statechart-from-a-class>`:
+
+.. code-block:: python
+
+  def outer_state_entry_signal(self, e):
+    self.scribble("hello from outer_state")
+    status = return_status.HANDLED
+    return status
+
+.. _recipes-describing-your-parent-state-method:
+
+Describing your Parent State using the Factory
+""""""""""""""""""""""""""""""""""""""""""""""
+
+A state method does not describe its parent state, this is done with the
+``nest`` method which follows the state definition descriptions in the
+``__init__`` of your derived factory class.
+
+If we were to add the hierarchy information for the following design:
+
+.. image:: _static/state_recipe_10.svg
+    :target: _static/state_recipe_10.pdf
+    :align: center
+
+The code would look like this:
+
+.. code-block:: python
+  
+  self.nest(self.outer_state, parent=None). \
+    nest(self.inner_state, parent=self.outer_state)
+
+To see the full example, reference: :ref:`making a statechart from a class <recipes-making-a-statechart-from-a-class>`.
+
+.. _recipes-passing-events-to-the-parent-state-method:
+
+Passing Events to the Parent State Method
+"""""""""""""""""""""""""""""""""""""""""
+By default a state method will pass an event outward to its super state if it is
+not handled by any of its handlers.
+
+.. _recipes-transition-to-another-state-method:
+
+Transition to another State Method
+""""""""""""""""""""""""""""""""""
+
+To transition to another state, use the ``trans`` method:
+
+.. code-block:: python
+  
+  def outer_state_init_signal(self, e):
+    self.scribble("init")
+    status = self.trans(self.middle_state)
+    return status
+
+To see the full example, reference: :ref:`making a statechart from a class
+<recipes-making-a-statechart-from-a-class>`.
+
+.. _recipes-state-method-entry-code:
+
+State Handlers for Entry/Exit and Initialization Signals
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. image:: _static/state_recipe_10.svg
+    :target: _static/state_recipe_10.pdf
+    :align: center
+
+We would create the outer_state and its entry/exit/initialization handlers
+this way:
+
+.. code-block:: python
+  :emphasize-lines: 12-15, 17, 18, 23-27, 29-32, 34-37
+
+   from miros import Event
+   from miros import signals
+   from miros import Factory
+   from miros import return_status
+  
+   class FactoryInstrumentationToLog(Factory):
+
+     def __init__(self, name, log_file_name=None,
+         live_trace=None, live_spy=None):
+       # ...
+       self.outer_state = self.create(state="outer_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.outer_state_entry_signal). \
+         catch(signal=signals.INIT_SIGNAL,
+           handler=self.outer_state_init_signal). \
+         # ...
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.outer_state_exit_signal). \
+         to_method()
+
+         # ...
+
+     def outer_state_entry_signal(self, e):
+       self.subscribe(Event(signal=signals.BROADCAST))
+       self.scribble("hello from outer_state")
+       status = return_status.HANDLED
+       return status
+
+     def outer_state_init_signal(self, e):
+       self.scribble("init")
+       status = self.trans(self.middle_state)
+       return status
+
+     def outer_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting the outer_state")
+       return status
+
+To see the full example, reference: :ref:`making a statechart from a class
+<recipes-making-a-statechart-from-a-class>`.
+
+.. _recipes-creating-a-hook-in-a-state-method:
+
+Creating a Hook in a State Handler
+""""""""""""""""""""""""""""""""""
+
+.. image:: _static/state_recipe_10.svg
+    :target: _static/state_recipe_10.pdf
+    :align: center
+
+We would create the outer_state and its Hook handlers this way:
+
+.. code-block:: python
+  :emphasize-lines: 11-12, 18-20
+  
+   class FactoryInstrumentationToLog(Factory):
+
+     def __init__(self, name, log_file_name=None,
+         live_trace=None, live_spy=None):
+
+       super().__init__(name)
+       # ..
+
+       self.outer_state = self.create(state="outer_state"). \
+         # ..
+         catch(signal=signals.Hook,
+           handler=self.outer_state_hook). \
+         # ..
+         to_method()
+
+      # ..
+
+     def outer_state_hook(self, e):
+       self.scribble("run some code, but don't transition")
+       return return_status.HANDLED
+
+
+To see the full example, reference: :ref:`making a statechart from a class
+<recipes-making-a-statechart-from-a-class>`.
 
 .. _recipes-events-and-signals:
+
 Events And Signals
-------------------
+^^^^^^^^^^^^^^^^^^
 
 * :ref:`Subscribing to an event posted by another Activeobject and Factories<recipes-subscribing-to-an-event-posted-by-another-active-object>`
 * :ref:`Publishing events to other Activeobjects and Factories<recipes-publishing-event-to-other-active-objects>`
@@ -3147,7 +3326,7 @@ Events And Signals
 .. _recipes-creating-an-event:
 
 Creating an Event
-^^^^^^^^^^^^^^^^^
+-----------------
 An event is something that will be passed into your statechart, it will be
 reacted to, then removed from memory.
 
@@ -3163,7 +3342,7 @@ reacted to, then removed from memory.
 .. _recipes-creating-a-signal:
 
 Creating a Signal
-^^^^^^^^^^^^^^^^^
+-----------------
 A signal is the name of an event.  Many different events can have the same
 name, or signal.  When a signal is created, it is given a number which is one
 higher than the oldest signal that was within your program.  You shouldn't have
@@ -3196,7 +3375,7 @@ signals read :ref:`this<recipes_seeing_your_signals>`.
 .. _posting_events:
 
 Posting Events
-^^^^^^^^^^^^^^
+--------------
 The Active Object ``post_fifo``, ``post_lifo``, ``defer`` and ``recall``
 methods are use to feed events to the statechart.  An Event can be thought of
 as a kind of named marble that is placed onto a topological map.  If a
@@ -3223,7 +3402,7 @@ this, they will be described in the patterns section.
 .. _recipes-posting-an-event-to-the-fifo:
 
 Posting an Event to the Fifo
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------
 To post an event to the active object first-in-first-out (fifo) buffer, you
 must have first started your statechart.  Here is a simple example:
 
@@ -3244,7 +3423,7 @@ a unique number automatically.
 .. _recipes-posting-an-event-to-the-lifo:
 
 Posting an Event to the LIFO
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------
 
 To post an event to the active object last-in-first-out (lifo) buffer, you
 must have first started your statechart.  Here is a simple example:
@@ -3264,22 +3443,55 @@ front of the active object's collection of unprocessed events.  You might want
 to do this with a timing heart beat or for any event that needs to be processed
 with a greater priority than other events.
 
+.. _recipes-create-a-guard:
+
+Create a Guard
+--------------
+There will be situations where you only would like an event to cause a
+transition between two states if a condition is true.  This is called a guard,
+in UML it looks like this:
+
+.. image:: _static/guard.svg
+    :target: _static/guard.pdf
+    :align: center
+
+The logic between the square brackets must be true for this event to work.  In
+this case the ``T`` event is guarded, it can only cause a transition if the the
+function ``g()`` returns ``True``, otherwise nothing will happen.
+
+The ``t()`` function is a function that runs if the ``g()`` returns True.
+
+To implement a guard in your state method is very straight forward, you use an
+if statement:
+
+.. code-block:: python
+  :emphasize-lines: 2
+
+  elif(e.signal == signals.T):
+    if g():
+      t()
+      chart.trans(<state_to_transition_to)
+
+The highlighted code is the guard.
+
+To learn more about guards read the
+:ref:`hacking to learn example.<scribbleexample-hacking-to-learn-the-deeper-dynamics>`
 
 .. _recipes-creating-a-one-shot-event:
 
 Creating a One-Shot Event
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
 .. include:: i_create_a_one_shot.rst 
 
 .. _recipes-creating-a-multishot-event:
 
 Creating a Multishot Event
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------
 .. include:: i_create_a_multishot.rst
 
 Canceling a Specific Event Source
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------
 The requests to the ``post_fifo`` and ``post_lifo`` methods, where ``times`` are
 specified, can be thought of as event sources.  This is because they create
 background threads which track time and periodically post events to the active
@@ -3349,7 +3561,7 @@ simpler api: the ``cancel_event``.
 .. _recipes-cancelling-event-source-by-signal-name:
 
 Canceling Event Source By Signal Name
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------
 If you would like to re-use your event source signal names through your chart,
 then you can use the :ref:`recipes-cancelling-a-specific-event-source` recipe
 to cancel a specific source and leave your other event sources running.
@@ -3394,14 +3606,14 @@ that have this signal name provided to the ``cancel_events`` call.
 .. _recipes-deferring-an-event:
 
 Deferring and Recalling an Event
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------
 
 .. include:: i_defer_and_recall.rst 
 
 .. _recipes-adding-a-payload-to-an-event:
 
 Adding a Payload to an Event
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------
 To add a payload to your event:
 
 .. code-block:: python
@@ -3465,7 +3677,7 @@ even if you aren't intending to share them between statecharts.
 .. _recipes-determining-if-an-event-has-a-payload:
 
 Determining if an Event Has a Payload
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------
 To determine if an event has a payload:
 
 .. code-block:: python
@@ -3480,7 +3692,7 @@ To determine if an event has a payload:
 .. _recipes-subscribing-to-an-event-posted-by-another-active-object:
 
 Subscribing to an Event Posted by Another Active Object
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------------------
 Your active object can subscribe to the events published by other active objects:
 
 .. code-block:: python
@@ -3533,7 +3745,7 @@ call as saying, "I would like to subscribe to this type of event".
 .. _recipes-publishing-event-to-other-active-objects:
 
 Publishing events to other Active Objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------------------
 Your active object can send data to other active objects in the system by
 publishing events.  
 
@@ -3588,7 +3800,7 @@ Here is how to publish an event with a specific priority:
 .. _recipes-activeobjects-and-factories:
 
 Activeobjects and Factories
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * :ref:`Starting an ActiveObject or Factory<recipes-starting-an-activeojbect-or-factory>`
 * :ref:`Stopping an ActiveObject or Factory<recipes-stopping-an-activeobject-or-factory>`
@@ -3602,7 +3814,7 @@ Activeobjects and Factories
 .. _recipes-starting-an-activeojbect-or-factory:
 
 Starting an Activeobject or Factory
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------------
 Once you have created an Activeobject or a
 :ref:`Factory<recipes-creating-a-state-method-from-a-factory>` you can start its
 statemachine and thread with its ``start_at`` method.
@@ -3710,7 +3922,7 @@ When we run this code we will see this result:
 .. _recipes-stopping-an-activeobject-or-factory:
 
 Stopping an ActiveObject or Factory
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------------
 If you would like to stop an Activeobject or a
 :ref:`Factory<recipes-creating-a-state-method-from-a-factory>` you can use its
 ``stop`` method.
@@ -3729,7 +3941,7 @@ the ActiveFabric will not post items to it anymore.
 .. _recipes-markup-your-event-processor:
 
 Augmentng your ActiveObject
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------
 
 It is a bad idea to add variables to the state methods, instead augment your
 active objects using the ``augment`` command.
@@ -3748,7 +3960,7 @@ active objects using the ``augment`` command.
 .. _recipes-creating-a-state-method-from-a-template:
 
 Creating a Statechart From a Template
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------
 Don't do this, use the :ref:`Factory<recipes-creating-a-state-method-from-a-factory>` instead.
 
 To have the library create your state methods for you:
@@ -3859,7 +4071,7 @@ If you need to debug or unwind your templated state methods, reference
 .. _recipes-creating-a-state-method-from-a-factory:
 
 Creating a Statechart From a Factory
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------------------
 To have the library create your state methods for you:
 
 1. :ref:`Import the correct items from the miros library<recipes-factory-1>`
@@ -3957,7 +4169,7 @@ If you need to debug or unwind your factor generated state methods, reference
 .. _recipes-creating-a-statechart-inside-of-a-class:
 
 Creating a Statechart Inside of a Class
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------------
 You can create a class that has a statechart within it.  Here are some of the benefits
 of programming this way:
 
@@ -4595,7 +4807,7 @@ between various events being dispatched across your system.
 .. _recipes-building-workers:
 
 Building and Destroying Workers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------
 If you have a long running task that has to access blocking IO or connect to a
 slow API, you can wrap it up into a worker.  Unlike stateless architectures,
 with miros you can make your workers as complicated as you want, sending them
@@ -4612,19 +4824,19 @@ prepare themselves for garbage collection.
 .. _recipes-seeing-what-is-:
 
 Seeing What is Going On
------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _recipes-determining-the-current-state:
 
 Determining the Current State
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------
 
 .. include:: i_determining_the_current_state.rst 
 
 .. _recipes-seeing-what-signals-you-have-in-your-system:
 
 Seeing what Signals You Have In Your System
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
 
 .. _recipes_seeing_your_signals:
 
@@ -4633,14 +4845,14 @@ Seeing what Signals You Have In Your System
 .. _recipes-using-the-trace:
 
 Using the Trace
-^^^^^^^^^^^^^^^
+---------------
 
 .. include:: i_trace_reactive.rst
 
 .. _recipes-using-the-spy:
 
 Using the Spy
-^^^^^^^^^^^^^
+-------------
 
 .. include:: i_spy_reactive.rst
 
@@ -4648,7 +4860,7 @@ Using the Spy
 .. _recipes-add-timing-information-to-the-spy:
 
 Add Timing Information to the Spy
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------
 The spy doesn't contain timing information, if you would like to mark it up
 with time so that you can compare it with the trace output:
 
@@ -4664,7 +4876,7 @@ with time so that you can compare it with the trace output:
 .. _recipes-tracing-live:
 
 Tracing Live
-^^^^^^^^^^^^
+------------
 There are situations where you would like to see what an active object is doing
 while it is running.  Each active object has an attribute called
 ``live_trace``.  By setting this attribute to ``True`` the active object will
@@ -4687,7 +4899,7 @@ To turn on/off the live trace:
 .. _recipes-spying-live:
 
 Spying Live
-^^^^^^^^^^^
+-----------
 
 There are situations where you would like to see what an active object is doing
 while it is running.  Each active object has an attribute called
@@ -4711,7 +4923,7 @@ To turn on/off the live spy:
 .. _recipes-scribble-on-the-spy:
 
 Scribble On the Spy
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 .. include:: i_scribble_on_the_spy.rst
 
@@ -4719,7 +4931,7 @@ Scribble On the Spy
 .. _recipes-flatting-a-state-method:
 
 Flatting a State Method
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 If you have created a state method using either a ``template`` or a ``Factory``
 and you would like to see it's code as if it where written by hand, use the
 ``to_code`` call.
@@ -4810,12 +5022,12 @@ To see how to unwind an auto-generated statechart read
 .. _recipes-describing-your-work:
 
 Describing your Work
---------------------
+^^^^^^^^^^^^^^^^^^^^
 
 .. _recipes-drawing-a-statechart:
 
 Drawing a StateChart
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 The Harel formalism was consumed by the UML standard.
 
 The UML standards were not properly curated and became overly-complicated and
@@ -4861,7 +5073,7 @@ editing, this is required if you are going to sketch in meaningful pictures.
 .. _recipes-drawing-a-sequence-diagram:
 
 Drawing a Sequence Diagram
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------
 
 .. include:: i_making_sequence_diagrams_from_trace.rst
 
@@ -4869,17 +5081,17 @@ Drawing a Sequence Diagram
 .. _recipes-testing:
 
 Testing
--------
+^^^^^^^
 
 .. _recipes-using-a-trace-as-a-test-target:
 
 Using a Trace As a Test Target
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------------
 
 .. include:: i_test_with_trace.rst
 
 Using a Spy as a Test Target
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------
 
 .. include:: i_test_with_spy.rst
 
