@@ -15,6 +15,7 @@ from miros.hsm   import HsmWithQueues
 from miros.event import signals, Signal
 from miros.event import Event as HsmEvent
 from miros.singleton import SingletonDecorator
+from miros.thread_safe_attributes import MetaThreadSafeAttributes
 
 
 def pp(item):
@@ -1030,3 +1031,9 @@ class Factory(ActiveObject):
     else:
       state_method = state
     return super().to_code(state_method)
+
+class ThreadSafeAttributes(metaclass=MetaThreadSafeAttributes): pass
+
+class ActiveObjectWithAttributes(ThreadSafeAttributes, ActiveObject): pass
+
+class FactoryWithAttributes(ThreadSafeAttributes, Factory): pass

@@ -10,3 +10,7 @@ from miros.activeobject import ActiveObject
 from miros.activeobject import Factory
 from miros.hsm import stripped
 from miros.hsm import InstrumentedHsmEventProcessor
+from miros.thread_safe_attributes import MetaThreadSafeAttributes
+from miros.activeobject import FactoryWithAttributes
+from miros.activeobject import ActiveObjectWithAttributes
+from miros.activeobject import ThreadSafeAttributes
