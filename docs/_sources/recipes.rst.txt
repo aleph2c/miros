@@ -3799,25 +3799,21 @@ Here is how to publish an event with a specific priority:
    first out queue.
 .. _recipes-activeobjects-and-factories:
 
-Activeobjects and Factories
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ActiveObjects
+^^^^^^^^^^^^^
+To build a statechart, you can create an ``ActiveObject`` and connect it to one of
+your state functions using the ``start_at`` method.  Together, the
+``ActiveObject`` and the state functions work as a statechart.
 
-* :ref:`Starting an ActiveObject or Factory<recipes-starting-an-activeojbect-or-factory>`
-* :ref:`Stopping an ActiveObject or Factory<recipes-stopping-an-activeobject-or-factory>`
-* :ref:`Augment your active object<recipes-markup-your-event-processor>`
-* :ref:`Create a statechart from a template<recipes-creating-a-state-method-from-a-template>`
-* :ref:`Create a statechart from a Factory<recipes-creating-a-state-method-from-a-factory>`
-* :ref:`Create a statechart inside of a Class<recipes-creating-a-statechart-inside-of-a-class>`
-* :ref:`Getting information out of of your Statechart<recipes-creating-a-statechart-inside-of-a-class>`
-* :ref:`Working with Multiple statecharts<recipes-multiple-statecharts>`
+.. contents::
+  :local:
 
 .. _recipes-starting-an-activeojbect-or-factory:
 
-Starting an Activeobject or Factory
------------------------------------
-Once you have created an Activeobject or a
-:ref:`Factory<recipes-creating-a-state-method-from-a-factory>` you can start its
-statemachine and thread with its ``start_at`` method.
+Starting an ActiveObject
+------------------------
+Once you have created an Activeobject you can start its statemachine and thread
+with its ``start_at`` method.
 
 There is a set of queues and threads which connect *all of your ActiveObjects
 together* (the ActiveFabric), if it hasn't been started yet, the ``start_at``
@@ -3830,13 +3826,6 @@ Here is a simple example:
     :align: center
 
 The ``start_at`` method can start the statechart in any of its states.
-
-.. note::
-  
-   The diagram needs a way to show where the miros framework starts it.  There
-   is no way to indicate this with standard UML, so I parsimoniously appropriate
-   the bottom part of the component icon; I connect it to where we want the
-   machine to start when it is first turned on.
 
 Here is the code:
 
@@ -3921,15 +3910,13 @@ When we run this code we will see this result:
 
 .. _recipes-stopping-an-activeobject-or-factory:
 
-Stopping an ActiveObject or Factory
------------------------------------
-If you would like to stop an Activeobject or a
-:ref:`Factory<recipes-creating-a-state-method-from-a-factory>` you can use its
-``stop`` method.
+Stopping an ActiveObject
+------------------------
+If you would like to stop an ``ActiveObject`` you can use its ``stop`` method.
 
-This will stop its thread, and it will stop all of that Activeobject's slave
+This will stop its thread, and it will stop all of that ``ActiveObject``'s slave
 threads (constructed by the post_fifo or post_lifo heartbeat constructors).  The
-stop method sets the Activeobject's ActiveFabric-facing queue to None, so that
+``stop`` method sets the ``ActiveObject``'s ActiveFabric-facing queue to None, so that
 the ActiveFabric will not post items to it anymore.
 
 .. note::
@@ -3957,214 +3944,26 @@ active objects using the ``augment`` command.
    An even better idea would be to include the attributes in a subclass of an
    Activeobject or Factory.
 
-.. _recipes-creating-a-state-method-from-a-template:
+.. _recipes-sharing-attributes-between-threads-activeobjects:
 
-Creating a Statechart From a Template
--------------------------------------
-Don't do this, use the :ref:`Factory<recipes-creating-a-state-method-from-a-factory>` instead.
-
-To have the library create your state methods for you:
-
-1. :ref:`Import the correct items from the miros library<recipes-template-1>`
-2. :ref:`Create a set of states from the miros template.<recipes-template-2>`
-3. :ref:`Create callback functions which you will link into the chart<recipes-template-3>`
-4. :ref:`Create an active object, and link it to your state handler<recipes-template-4>`
-5. :ref:`Register callbacks to each of your events.<recipes-template-5>`
-6. :ref:`Relate your states to one another by assigning them parents<recipes-template-6>`
-7. :ref:`Start up the active object in the desired state<recipes-template-7>`
-8. :ref:`Debugging a templated state method<recipes-template-8>`
-
-.. image:: _static/factory2.svg
-    :target: _static/factory2.pdf
-    :align: center
-
-.. _recipes-template-1:
-
-Import the correct items from the miros library:
+Sharing Attributes between Threads (ActiveObjects)
+--------------------------------------------------
+To share an attribute from your statechart's thread, inherit from the
+``ActiveObject`` and create thread safe properties by placing a ``@property``
+decorator around a ``deque`` derived object.
 
 .. code-block:: python
-
-  from miros import state_method_template
-  from miros import ActiveObject
-  from miros import signals, Event, return_status
-
-.. _recipes-template-2:
-
-Create a set of states from the miros template:
-
-.. code-block:: python
-
-  tc2_s1 = state_method_template('tc2_s1')
-  tc2_s2 = state_method_template('tc2_s2')
-  tc2_s3 = state_method_template('tc2_s3')
-
-.. _recipes-template-3:
-
-Create callback functions which you will link into your chart:
-
-.. code-block:: python
-
-  def trans_to_c2_s1(chart, e):
-    return chart.trans(tc2_s1)
-
-  def trans_to_c2_s3(chart, e):
-    return chart.trans(tc2_s3)
-
-  def trans_to_c2_s2(chart, e):
-    return chart.trans(tc2_s2)
-
-  def handled(chart, e):
-    return return_status.HANDLED
-
-.. _recipes-template-4:
-
-Create an active object and link it to your state handler:
-
-.. code-block:: python
-
-  ao = ActiveObject()
-
-.. _recipes-template-5:
-
-Register callbacks to each of your events:
-
-.. code-block:: python
-
-  ao.register_signal_callback(tc2_s1, signals.BB, trans_to_c2_s1)
-  ao.register_signal_callback(tc2_s1, signals.ENTRY_SIGNAL, handled)
-  ao.register_signal_callback(tc2_s1, signals.EXIT_SIGNAL,  handled)
-  ao.register_signal_callback(tc2_s1, signals.INIT_SIGNAL,  trans_to_c2_s2)
-
-  ao.register_signal_callback(tc2_s2, signals.A, trans_to_c2_s3)
-  ao.register_signal_callback(tc2_s2, signals.EXIT_SIGNAL,  handled)
-  ao.register_signal_callback(tc2_s2, signals.INIT_SIGNAL,  handled)
-
-  ao.register_signal_callback(tc2_s3, signals.A, trans_to_c2_s2)
-  ao.register_signal_callback(tc2_s3, signals.ENTRY_SIGNAL, handled)
-
-
-.. _recipes-template-6:
-
-Relate your states to one another by assigning them to parents:
-
-.. code-block:: python
-
-  ao.register_parent(tc2_s1, ao.top)
-  ao.register_parent(tc2_s2, tc2_s1)
-  ao.register_parent(tc2_s3, tc2_s1)
-
-.. _recipes-template-7:
-
-Start up the active object in the desired state:
-
-.. code-block:: python
-
-  ao.start_at(tc2_s2)
-
-:ref:`Then all of you usual state recipes apply<recipes-state-recipes>`.
-
-.. _recipes-template-8:
-
-If you need to debug or unwind your templated state methods, reference
-:ref:`this<recipes-flatting-a-state-method>`.
-
-.. _recipes-creating-a-state-method-from-a-factory:
-
-Creating a Statechart From a Factory
-------------------------------------
-To have the library create your state methods for you:
-
-1. :ref:`Import the correct items from the miros library<recipes-factory-1>`
-2. :ref:`Create the statechart's event callback methods<recipes-factory-2>`
-3. :ref:`Create a factory object<recipes-factory-3>`
-4. :ref:`Build up your statemethods using the factory object<recipes-factory-4>`
-5. :ref:`Add the hierarchy information to your factory object<recipes-factory-5>`
-6. :ref:`Start your statechart in the desired state<recipes-factory-6>`
-7. :ref:`Debugging a state method made from a factory<recipes-factory-7>`
-
-.. image:: _static/factory5.svg
-    :target: _static/factory5.pdf
-    :align: center
-
-.. _recipes-factory-1:
-
-Import the correct items from the miros library:
-
-.. code-block:: python
-
-  from miros import Factory
-  from miros import signals, Event, return_status
-
-.. _recipes-factory-2:
-
-Create the statechart's event callback methods:
-
-.. code-block:: python
-
-  # the statechart's event callback methods
-  def trans_to_fc(chart, e):
-    return chart.trans(fc)
-
-  def trans_to_fc1(chart, e):
-    return chart.trans(fc1)
-
-  def trans_to_fc2(chart, e):
-    return chart.trans(fc2)
-
-.. _recipes-factory-3:
-
-Create your statechart using the ``Factory`` class.
-
-.. code-block:: python
-
-  # Factory is a type of ActiveObject, so it will have it's methods
-  chart = Factory('factory_class_example')
-
-.. _recipes-factory-4:
-
-Create the state methods and describe how you want to react to different
-signals.  Then turn it it into a method.
-
-.. code-block:: python
-
-  fc = chart.create(state='fc'). \
-    catch(signal=signals.B, handler=trans_to_fc). \
-    catch(signal=signals.INIT_SIGNAL, handler=trans_to_fc1). \
-    to_method()
-
-  fc1 = chart.create(state='fc1'). \
-    catch(signal=signals.A, handler=trans_to_fc2). \
-    to_method()
-
-  fc2 = chart.create(state='fc2'). \
-    catch(signal=signals.A, handler=trans_to_fc1). \
-    to_method()
-
-.. _recipes-factory-5:
-
-Add the hierarchy information to your state methods:
-
-.. code-block:: python
-
-  chart.nest(fc,  parent=None). \
-        nest(fc1, parent=fc). \
-        nest(fc2, parent=fc)
-
-
-.. _recipes-factory-6:
-
-Start your statechart in the desired state.
-
-.. code-block:: python
-
-  chart.start_at(fc)
-
-:ref:`Then all of you usual state recipes apply<recipes-state-recipes>`.
-
-.. _recipes-factory-7:
-
-If you need to debug or unwind your factor generated state methods, reference
-:ref:`this<recipes-flatting-a-state-method>`.
+  :emphasize-lines: 1
+  :linenos:
+  
+  
+
+
+Factories
+^^^^^^^^^
+You can build a statechart within a class by using the ``miros.Factory`` class.
+The ``miros.Factory`` lets you build state methods, state handlers and start the
+chart in whichever state you need.
 
 .. _recipes-creating-a-statechart-inside-of-a-class:
 
@@ -4641,6 +4440,11 @@ classes are working together rather than three instantiated objects from the
 same class.  UML really falls-over in describing object interactions.
 
 If you have any suggestions about how to draw this better, email me.
+
+.. _recipes-sharing-attributes-between-threads-factories:
+
+Sharing Attributes between Threads (Factories)
+----------------------------------------------
 
 .. _recipes-getting-information-from-your-statecchart:
 

@@ -64,7 +64,7 @@ def c2(chart, e):
   return status
 
 class Example(ThreadSafeAttributes, ActiveObject):
-  _attributes = ['a', 'thread_safe_attr_1', 'thread_safe_attr_2']
+  _attributes = ['thread_safe_attr_1', 'thread_safe_attr_2']
 
   def __init__(self, name):
     super().__init__(name)
@@ -72,7 +72,6 @@ class Example(ThreadSafeAttributes, ActiveObject):
 if __name__ == '__main__':
   
   ao = Example('ao')
-  print(ao.a)
   ao.thread_safe_attr_1 = False
   ao.thread_safe_attr_2 = True
   ao.live_trace = True

@@ -1,11 +1,6 @@
 # to test this:
 # pytest -s -m thread_safe_attributes
-import re
-import time
-import logging
 from collections import deque
-from functools import partial
-from collections import namedtuple
 
 class ThreadSafeAttribute:
 

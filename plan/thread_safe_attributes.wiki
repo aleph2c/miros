@@ -1,0 +1,107 @@
+*Thread Safe Attributes*
+= Observer ([[local:/home/scott/.vimrc/ooda.pdf|diagram]]) = 
+== Evidence ([[evidence.thread_safe_attributes|evidence]]) ==
+
+  *What defines Success?:* ([[subgoals.thread_safe_attributes|subgoals]])
+    Users of miros can make thread safe attributes with a trivial amount of
+    code.
+
+  *What is the problem?*
+    Regular attributes can not be shared between threads, and this could be a
+    huge road-block for a new user.
+    
+    Thread safe data structures require the use of locks or queues.  To make
+    these variables more-usable, they should be wrapped in a Python @property so
+    that they look like a normal attribute.  This means that someone new to
+    miros will have to become aware of how to make thread safe attributes and
+    write a lot of boiler plate code to make these variables work.  As a library
+    author I should make this painless for them.
+    
+    Python has metaprogramming features which can be used with inheritance to
+    extend the language.  I can use these features to build something
+    reminiscent of the ruby "attr_accessor" class helper.  In this case I'll use
+    "_attributes" with a provided list of variable names, where those variables
+    represent object attributes which are expected to be thread safe.
+    
+    Multithreaded bugs are extremely dangerous.  I need to KNOW this feature
+    works before I release it via pip.
+    
+    I do not want to add this feature to the base ActiveObject and Factory
+    classes since it could add un-wanted risk to my user's code bases.  I would
+    like to provide it as a class which can be mixed into there existing code if
+    they want to use it.
+    
+    I currently don't know enough Python to make this feature.  I will have to
+    level-up on metaprogramming and on how to use the super keyword.
+    
+    (this would not be a problem if miros used a different way of dealing with
+    concurrency)
+  
+  *Discoveries/Resources:*
+  
+    David Beazley presented on metaprogramming in Python 3 at
+    [[https://www.youtube.com/watch?v=Vjx9okHzaiM|PyCon 2013]].
+
+    David Beazley wrote an entire chapter on metaprogramming in his Python
+    [[https://www.dabeaz.com/cookbook.html|cookbook]].
+    
+    Raymond Hettinger described how to use Python super to do dependency
+    injection at [[https://www.youtube.com/watch?v=EiOglTERPEo|PyCon 2015]].
+  
+= Orient =
+  *Symptoms:* [[symptoms.thread_safe_attributes|symptoms]]
+
+== Questions ==
+  *Questions for Thread Safe Attributes: >= 5*
+    How can you test if this features works?
+    Can you think of anyway to speed up your feedback cycle?
+    Do you have enough information?
+    Is your information organized?
+    What don't you know that you need to know?
+  
+  *Assumptions*
+
+= Decide =
+  [[#Questions]]
+  *Research Needed For?:*
+    * [X] Watch the metaprogramming video to get a high level idea about what
+          you need to know to implement this feature
+    * [X] Read and study chapter 9 of the Python Cookbook, 3rd Edition
+    * [X] Watch Raymond Henttinger's super video to get an understanding of
+          linearization using super and the __mro__
+
+  [[#Questions]]
+  *Idea/Hypotheses for Thread Safe Attributes: >=5*
+  * [X] Create a test which builds a hundred different threads, where all of the
+        threads read and write to the same attribute.  The adjustment to the
+        attribute should be an increment, so if our test confirms the number
+        rises monotonically, and there is no crash on an attribute read, then we
+        can safely say that the attribute is thread safe.
+  * [X] Write an active object and Factory test which manifest the same HSM.
+        Have the main program reach in and change a thread safe attribute, while
+        the charts are active.  Use the live_spy and scribble with a log file to
+        confirm that the attribute is being updated as expected across both
+        threads.  This test will confirm that the mix-in is working properly and
+        will act as an example to reference in my documents.
+  * [X] Write a metaclass which extends type.  It should create a set of
+        attributes based on another class which is using the descriptor
+        protocol.  This other class will build a attribute using a deque of size
+        1 (thread safe right buffer) and it will wrap this ring buffer within a
+        @property (getter/setter).  The metaclass should be mixed into three
+        classes, ThreadSafeAttributes, ActiveObjectWithAttributes and
+        FactoryWithAttributes.  These three classes should be exposed within the
+        main miros __init__.py file so that they are easy to import.
+  * [X] Run the test, confirm the feature is working.
+  * [X] Describe plan using OODA loop (so you can audit is later to understand
+        what you were thinking and find your resources)
+  * [X] Create release note in the [[release_notes]]
+  * [ ] Follow the [[release_plan]]
+
+  *Chosen Research-Goal/Hypothesis*
+    
+
+== Plan ([[plan.thread_safe_attributes|plan]]) ==
+
+= Act =
+  
+

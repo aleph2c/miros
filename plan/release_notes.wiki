@@ -1,10 +1,7 @@
-Allow simple methods to be registered using the ``catch`` method in the Factory
-class.
-
-The Factory class lets a miros user build state machines within a class.  Previous
-to this release only static methods could be registered to signals during the
-state construction process.
-
-* static methods are still permitted as catch handler inputs (backwards
-  compatible)
-* standard methods are now also permitted as catch handlers too.
+Added a ThreadSafeAttributes class which when inherited from will provide new
+class level syntax for building thread safe attributes.  At the class level you
+would write "_attributes = ['attr1', 'attr2', 'attr3']" to produce the thread
+safe attributes, "attr1", "attr2" and "attr3".  (Under the hood these attributes
+are actually properties of a small deque ring buffer of size 1.)  To see more
+about this feature reference the recipes section of the miros project at tag
+v4.1.3 or later.
