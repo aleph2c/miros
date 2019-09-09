@@ -26,7 +26,7 @@ def spy_callback(spy):
     fp.write(logged_spy_message+'\n')
   logging.debug(logged_spy_message)
 
-class Example2(Factory):
+class Example2(Factory, ThreadSafeAttributes):
   _attributes = ['thread_safe_attr_1', 'thread_safe_attr_2']
 
   def __init__(self, name, live_trace=None, live_spy=None):

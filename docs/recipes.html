@@ -121,31 +121,30 @@ building up your own programs.</p>
 <li><a class="reference internal" href="#sharing-attributes-between-threads-factories" id="id68">Sharing Attributes between Threads (Factories)</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#getting-information-from-your-statechart" id="id69">Getting Information from your Statechart</a></li>
-<li><a class="reference internal" href="#multiple-statecharts" id="id70">Multiple Statecharts</a><ul>
-<li><a class="reference internal" href="#building-and-destroying-workers" id="id71">Building and Destroying Workers</a></li>
+<li><a class="reference internal" href="#multiple-statecharts" id="id69">Multiple Statecharts</a><ul>
+<li><a class="reference internal" href="#building-and-destroying-workers" id="id70">Building and Destroying Workers</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#seeing-what-is-going-on" id="id72">Seeing What is Going On</a><ul>
-<li><a class="reference internal" href="#determining-the-current-state" id="id73">Determining the Current State</a></li>
-<li><a class="reference internal" href="#seeing-what-signals-you-have-in-your-system" id="id74">Seeing what Signals You Have In Your System</a></li>
-<li><a class="reference internal" href="#using-the-trace" id="id75">Using the Trace</a></li>
-<li><a class="reference internal" href="#using-the-spy" id="id76">Using the Spy</a></li>
-<li><a class="reference internal" href="#add-timing-information-to-the-spy" id="id77">Add Timing Information to the Spy</a></li>
-<li><a class="reference internal" href="#tracing-live" id="id78">Tracing Live</a></li>
-<li><a class="reference internal" href="#spying-live" id="id79">Spying Live</a></li>
-<li><a class="reference internal" href="#scribble-on-the-spy" id="id80">Scribble On the Spy</a></li>
-<li><a class="reference internal" href="#flatting-a-state-method" id="id81">Flatting a State Method</a></li>
+<li><a class="reference internal" href="#seeing-what-is-going-on" id="id71">Seeing What is Going On</a><ul>
+<li><a class="reference internal" href="#determining-the-current-state" id="id72">Determining the Current State</a></li>
+<li><a class="reference internal" href="#seeing-what-signals-you-have-in-your-system" id="id73">Seeing what Signals You Have In Your System</a></li>
+<li><a class="reference internal" href="#using-the-trace" id="id74">Using the Trace</a></li>
+<li><a class="reference internal" href="#using-the-spy" id="id75">Using the Spy</a></li>
+<li><a class="reference internal" href="#add-timing-information-to-the-spy" id="id76">Add Timing Information to the Spy</a></li>
+<li><a class="reference internal" href="#tracing-live" id="id77">Tracing Live</a></li>
+<li><a class="reference internal" href="#spying-live" id="id78">Spying Live</a></li>
+<li><a class="reference internal" href="#scribble-on-the-spy" id="id79">Scribble On the Spy</a></li>
+<li><a class="reference internal" href="#flatting-a-state-method" id="id80">Flatting a State Method</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#describing-your-work" id="id82">Describing your Work</a><ul>
-<li><a class="reference internal" href="#drawing-a-statechart" id="id83">Drawing a StateChart</a></li>
-<li><a class="reference internal" href="#drawing-a-sequence-diagram" id="id84">Drawing a Sequence Diagram</a></li>
+<li><a class="reference internal" href="#describing-your-work" id="id81">Describing your Work</a><ul>
+<li><a class="reference internal" href="#drawing-a-statechart" id="id82">Drawing a StateChart</a></li>
+<li><a class="reference internal" href="#drawing-a-sequence-diagram" id="id83">Drawing a Sequence Diagram</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#testing" id="id85">Testing</a><ul>
-<li><a class="reference internal" href="#using-a-trace-as-a-test-target" id="id86">Using a Trace As a Test Target</a></li>
-<li><a class="reference internal" href="#using-a-spy-as-a-test-target" id="id87">Using a Spy as a Test Target</a></li>
+<li><a class="reference internal" href="#testing" id="id84">Testing</a><ul>
+<li><a class="reference internal" href="#using-a-trace-as-a-test-target" id="id85">Using a Trace As a Test Target</a></li>
+<li><a class="reference internal" href="#using-a-spy-as-a-test-target" id="id86">Using a Spy as a Test Target</a></li>
 </ul>
 </li>
 </ul>
@@ -158,26 +157,26 @@ building up your own programs.</p>
 and more of its features into a simple program.</p>
 <div class="contents local topic" id="id2">
 <ul class="simple">
-<li><a class="reference internal" href="#state-abstraction-in-miros" id="id88">State Abstraction in Miros</a></li>
-<li><a class="reference internal" href="#minimal-viable-states" id="id89">Minimal Viable States</a></li>
-<li><a class="reference internal" href="#attachment-points-and-a-working-state-machine" id="id90">Attachment Points and a Working State Machine</a></li>
-<li><a class="reference internal" href="#feedback-about-behavior-through-instrumentation" id="id91">Feedback about Behavior through Instrumentation</a></li>
-<li><a class="reference internal" href="#entry-conditions-and-handled-events" id="id92">Entry Conditions and Handled Events</a></li>
-<li><a class="reference internal" href="#exit-conditions" id="id93">Exit Conditions</a></li>
-<li><a class="reference internal" href="#inventing-your-own-signals-external-events" id="id94">Inventing your own Signals: External events</a></li>
-<li><a class="reference internal" href="#hooks" id="id95">Hooks</a></li>
-<li><a class="reference internal" href="#comprehensive-instrumentation-with-the-live-spy-and-scribble" id="id96">Comprehensive Instrumentation with the live_spy and scribble</a></li>
-<li><a class="reference internal" href="#attaching-more-than-one-activeobject-to-an-hsm" id="id97">Attaching More than one ActiveObject to an HSM</a></li>
-<li><a class="reference internal" href="#making-the-live-instrumentation-use-the-python-logger" id="id98">Making the Live Instrumentation use the Python Logger</a></li>
-<li><a class="reference internal" href="#making-a-statechart-from-a-class" id="id99">Making a Statechart from a class</a></li>
-<li><a class="reference internal" href="#communication-between-statecharts" id="id100">Communication between Statecharts</a></li>
-<li><a class="reference internal" href="#overload-a-state-in-a-subclass" id="id101">Overload a State in a Subclass</a></li>
-<li><a class="reference internal" href="#one-shots-multi-shots-and-heartbeats" id="id102">One-Shots, Multi-Shots and Heartbeats</a></li>
-<li><a class="reference internal" href="#creating-thread-safe-class-attributes" id="id103">Creating thread-safe class Attributes</a></li>
+<li><a class="reference internal" href="#state-abstraction-in-miros" id="id87">State Abstraction in Miros</a></li>
+<li><a class="reference internal" href="#minimal-viable-states" id="id88">Minimal Viable States</a></li>
+<li><a class="reference internal" href="#attachment-points-and-a-working-state-machine" id="id89">Attachment Points and a Working State Machine</a></li>
+<li><a class="reference internal" href="#feedback-about-behavior-through-instrumentation" id="id90">Feedback about Behavior through Instrumentation</a></li>
+<li><a class="reference internal" href="#entry-conditions-and-handled-events" id="id91">Entry Conditions and Handled Events</a></li>
+<li><a class="reference internal" href="#exit-conditions" id="id92">Exit Conditions</a></li>
+<li><a class="reference internal" href="#inventing-your-own-signals-external-events" id="id93">Inventing your own Signals: External events</a></li>
+<li><a class="reference internal" href="#hooks" id="id94">Hooks</a></li>
+<li><a class="reference internal" href="#comprehensive-instrumentation-with-the-live-spy-and-scribble" id="id95">Comprehensive Instrumentation with the live_spy and scribble</a></li>
+<li><a class="reference internal" href="#attaching-more-than-one-activeobject-to-an-hsm" id="id96">Attaching More than one ActiveObject to an HSM</a></li>
+<li><a class="reference internal" href="#making-the-live-instrumentation-use-the-python-logger" id="id97">Making the Live Instrumentation use the Python Logger</a></li>
+<li><a class="reference internal" href="#making-a-statechart-from-a-class" id="id98">Making a Statechart from a class</a></li>
+<li><a class="reference internal" href="#communication-between-statecharts" id="id99">Communication between Statecharts</a></li>
+<li><a class="reference internal" href="#overload-a-state-in-a-subclass" id="id100">Overload a State in a Subclass</a></li>
+<li><a class="reference internal" href="#one-shots-multi-shots-and-heartbeats" id="id101">One-Shots, Multi-Shots and Heartbeats</a></li>
+<li><a class="reference internal" href="#creating-thread-safe-class-attributes" id="id102">Creating thread-safe class Attributes</a></li>
 </ul>
 </div>
 <div class="section" id="state-abstraction-in-miros">
-<span id="recipes-state-abstraction"></span><h3><a class="toc-backref" href="#id88">State Abstraction in Miros</a><a class="headerlink" href="#state-abstraction-in-miros" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-state-abstraction"></span><h3><a class="toc-backref" href="#id87">State Abstraction in Miros</a><a class="headerlink" href="#state-abstraction-in-miros" title="Permalink to this headline">¶</a></h3>
 <p>In miros a state is a behavioral specification for an event processor.  A state
 is a function that does the following:</p>
 <ul class="simple">
@@ -210,7 +209,7 @@ Formalism (picture-to-behavior rules).</p>
 let’s look at some examples.</p>
 </div>
 <div class="section" id="minimal-viable-states">
-<span id="recipes-minimal-viable-states"></span><h3><a class="toc-backref" href="#id89">Minimal Viable States</a><a class="headerlink" href="#minimal-viable-states" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-minimal-viable-states"></span><h3><a class="toc-backref" href="#id88">Minimal Viable States</a><a class="headerlink" href="#minimal-viable-states" title="Permalink to this headline">¶</a></h3>
 <p>In a statechart diagram, a state is represented by a named rounded rectangle.
 In a hierarchical state machine a state can exist within a state.  Here we see
 an inner_state placed within an outer_state:</p>
@@ -237,7 +236,7 @@ hierarchical state machine, let’s talk about how to connect it to a thread, ho
 to start it and how to give it some behavior.</p>
 </div>
 <div class="section" id="attachment-points-and-a-working-state-machine">
-<span id="recipes-attachment-points-and-a-working-state-machine"></span><h3><a class="toc-backref" href="#id90">Attachment Points and a Working State Machine</a><a class="headerlink" href="#attachment-points-and-a-working-state-machine" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-attachment-points-and-a-working-state-machine"></span><h3><a class="toc-backref" href="#id89">Attachment Points and a Working State Machine</a><a class="headerlink" href="#attachment-points-and-a-working-state-machine" title="Permalink to this headline">¶</a></h3>
 <p>A state function is lazy about how it describes its graphical relationship to
 the other states in its hierarchical state machine.  To ask it a question about
 how it sits in the hierarchy, or how it is connected to another part of the
@@ -311,7 +310,7 @@ user feedback.</p>
 how to instrument it so it provides feedback about its behavior.</p>
 </div>
 <div class="section" id="feedback-about-behavior-through-instrumentation">
-<span id="recipes-feedback-about-behavior-through-instrumentation"></span><h3><a class="toc-backref" href="#id91">Feedback about Behavior through Instrumentation</a><a class="headerlink" href="#feedback-about-behavior-through-instrumentation" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-feedback-about-behavior-through-instrumentation"></span><h3><a class="toc-backref" href="#id90">Feedback about Behavior through Instrumentation</a><a class="headerlink" href="#feedback-about-behavior-through-instrumentation" title="Permalink to this headline">¶</a></h3>
 <p>We will include the <code class="docutils literal notranslate"><span class="pre">spy_on</span></code> decorator from the miros library, then we will
 use it to decorate our state functions:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="kn">import</span> <span class="nn">time</span>
@@ -363,7 +362,7 @@ capabilities of the statechart library.</p>
 state entry conditions.</p>
 </div>
 <div class="section" id="entry-conditions-and-handled-events">
-<span id="recipes-entry-conditions-and-handled-events"></span><h3><a class="toc-backref" href="#id92">Entry Conditions and Handled Events</a><a class="headerlink" href="#entry-conditions-and-handled-events" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-entry-conditions-and-handled-events"></span><h3><a class="toc-backref" href="#id91">Entry Conditions and Handled Events</a><a class="headerlink" href="#entry-conditions-and-handled-events" title="Permalink to this headline">¶</a></h3>
 <p>We will add some entry code to both the outer_state and inner_state functions:</p>
 <a class="reference external image-reference" href="_static/state_recipe_3.pdf"><div align="center" class="align-center"><img alt="_images/state_recipe_3.svg" src="_images/state_recipe_3.svg" /></div>
 </a>
@@ -431,7 +430,7 @@ miros library: INIT_SIGNAL, ENTRY_SIGNAL.</p>
 <p>Let’s adjust our design to use another internal signal, EXIT_SIGNAL.</p>
 </div>
 <div class="section" id="exit-conditions">
-<span id="recipes-exit-conditions"></span><h3><a class="toc-backref" href="#id93">Exit Conditions</a><a class="headerlink" href="#exit-conditions" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-exit-conditions"></span><h3><a class="toc-backref" href="#id92">Exit Conditions</a><a class="headerlink" href="#exit-conditions" title="Permalink to this headline">¶</a></h3>
 <a class="reference external image-reference" href="_static/state_recipe_4.pdf"><div align="center" class="align-center"><img alt="_images/state_recipe_4.svg" src="_images/state_recipe_4.svg" /></div>
 </a>
 <p>Our new design describes some code that will run when we exit either state.  But
@@ -440,7 +439,7 @@ we can only climb into the inner_state, then sit their forever.</p>
 <p>To add some more behavior, we will have to invent a signal.</p>
 </div>
 <div class="section" id="inventing-your-own-signals-external-events">
-<span id="recipes-inventing-your-own-signals"></span><h3><a class="toc-backref" href="#id94">Inventing your own Signals: External events</a><a class="headerlink" href="#inventing-your-own-signals-external-events" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-inventing-your-own-signals"></span><h3><a class="toc-backref" href="#id93">Inventing your own Signals: External events</a><a class="headerlink" href="#inventing-your-own-signals-external-events" title="Permalink to this headline">¶</a></h3>
 <p>Let’s invent a signal and call it <code class="docutils literal notranslate"><span class="pre">Reset</span></code>, because it will reset the chart, or
 put it back into the state it was when we first started it at the
 <code class="docutils literal notranslate"><span class="pre">outer_state</span></code>.  Any signal that is not an internal signal, like INIT_SIGNAL,
@@ -552,7 +551,7 @@ upon its results.</p>
 When an event is caught this way it is called a hook.</p>
 </div>
 <div class="section" id="hooks">
-<span id="recipes-hooks"></span><h3><a class="toc-backref" href="#id95">Hooks</a><a class="headerlink" href="#hooks" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-hooks"></span><h3><a class="toc-backref" href="#id94">Hooks</a><a class="headerlink" href="#hooks" title="Permalink to this headline">¶</a></h3>
 <p>Hook code can be run when you sent an event to the state or any of it’s
 substates which has the name of that hook.  You are using the search feature of
 the event processor to do work for you, without asking it to change the state of
@@ -642,7 +641,7 @@ The trace intentionally hides details.</p>
 don’t always want them cluttering up your code.</p>
 </div>
 <div class="section" id="comprehensive-instrumentation-with-the-live-spy-and-scribble">
-<span id="recipes-comprehensive-instrumentation-with-the-live-spy"></span><h3><a class="toc-backref" href="#id96">Comprehensive Instrumentation with the live_spy and scribble</a><a class="headerlink" href="#comprehensive-instrumentation-with-the-live-spy-and-scribble" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-comprehensive-instrumentation-with-the-live-spy"></span><h3><a class="toc-backref" href="#id95">Comprehensive Instrumentation with the live_spy and scribble</a><a class="headerlink" href="#comprehensive-instrumentation-with-the-live-spy-and-scribble" title="Permalink to this headline">¶</a></h3>
 <p>The miros library provides a second kind of instrumentation when you wrap your
 state functions inside of the <code class="docutils literal notranslate"><span class="pre">&#64;spy_on</span></code> decorators.  You can turn on the
 <code class="docutils literal notranslate"><span class="pre">live_spy</span></code> instrumentation to spy on everything your event processor is
@@ -796,7 +795,7 @@ operations should be performed, but the functions do not have their own memory.
 For this reason, you can attach more than one <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code> to the same HSM.</p>
 </div>
 <div class="section" id="attaching-more-than-one-activeobject-to-an-hsm">
-<span id="recipes-attaching-more-than-one-active-object-to-an-hsm"></span><h3><a class="toc-backref" href="#id97">Attaching More than one ActiveObject to an HSM</a><a class="headerlink" href="#attaching-more-than-one-activeobject-to-an-hsm" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-attaching-more-than-one-active-object-to-an-hsm"></span><h3><a class="toc-backref" href="#id96">Attaching More than one ActiveObject to an HSM</a><a class="headerlink" href="#attaching-more-than-one-activeobject-to-an-hsm" title="Permalink to this headline">¶</a></h3>
 <p>Here we see two different <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code> objects attached to the same HSM.</p>
 <a class="reference external image-reference" href="_static/state_recipe_8.pdf"><div align="center" class="align-center"><img alt="_images/state_recipe_8.svg" src="_images/state_recipe_8.svg" /></div>
 </a>
@@ -912,7 +911,7 @@ thread.  It turns out that the <code class="docutils literal notranslate"><span 
 Python logger is.</p>
 </div>
 <div class="section" id="making-the-live-instrumentation-use-the-python-logger">
-<span id="recipes-over-riding-the-live-instrumentation-to-the-python-logger"></span><h3><a class="toc-backref" href="#id98">Making the Live Instrumentation use the Python Logger</a><a class="headerlink" href="#making-the-live-instrumentation-use-the-python-logger" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-over-riding-the-live-instrumentation-to-the-python-logger"></span><h3><a class="toc-backref" href="#id97">Making the Live Instrumentation use the Python Logger</a><a class="headerlink" href="#making-the-live-instrumentation-use-the-python-logger" title="Permalink to this headline">¶</a></h3>
 <p>Let’s adjust our design a bit so that our live_trace and our live_spy will write
 to the Python logger instead of the terminal’s output.</p>
 <a class="reference external image-reference" href="_static/state_recipe_9.pdf"><div align="center" class="align-center"><img alt="_images/state_recipe_9.svg" src="_images/state_recipe_9.svg" /></div>
@@ -1124,7 +1123,7 @@ see a comprehensive example of all of the signal pathways supported by the Miro
 Samek event processor, look at this <a class="reference internal" href="comprehensive.html#comprehensive-comprehensive"><span class="std std-ref">example</span></a>.</p>
 </div>
 <div class="section" id="making-a-statechart-from-a-class">
-<span id="recipes-making-a-statechart-from-a-class"></span><h3><a class="toc-backref" href="#id99">Making a Statechart from a class</a><a class="headerlink" href="#making-a-statechart-from-a-class" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-making-a-statechart-from-a-class"></span><h3><a class="toc-backref" href="#id98">Making a Statechart from a class</a><a class="headerlink" href="#making-a-statechart-from-a-class" title="Permalink to this headline">¶</a></h3>
 <p>Is there a way to just make a statechart by instantiating a class?</p>
 <p>Yes, this is what the <code class="docutils literal notranslate"><span class="pre">Factory</span></code> class is for.  It links a set of signals to
 static methods; and assigns this linked collection to a state.  You do this once
@@ -1576,7 +1575,7 @@ Typically I only turn on the spy when I’m debugging a problem; and I’ll leav
 the trace on when I’m trying to see how a statechart behaves.</p>
 </div>
 <div class="section" id="communication-between-statecharts">
-<span id="recipes-communication-between-statecharts"></span><h3><a class="toc-backref" href="#id100">Communication between Statecharts</a><a class="headerlink" href="#communication-between-statecharts" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-communication-between-statecharts"></span><h3><a class="toc-backref" href="#id99">Communication between Statecharts</a><a class="headerlink" href="#communication-between-statecharts" title="Permalink to this headline">¶</a></h3>
 <p>To have two different statecharts communicate with one another we use the
 publish and subscribe methods (available in the ActiveObject and its
 subclasses).  Let’s adjust our example a bit so that we can send a Broadcast
@@ -1759,7 +1758,7 @@ will see that both charts received the <code class="docutils literal notranslate
 <p>Can we program our states by difference?</p>
 </div>
 <div class="section" id="overload-a-state-in-a-subclass">
-<span id="recipes-overload-a-state-in-a-subclass"></span><h3><a class="toc-backref" href="#id101">Overload a State in a Subclass</a><a class="headerlink" href="#overload-a-state-in-a-subclass" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-overload-a-state-in-a-subclass"></span><h3><a class="toc-backref" href="#id100">Overload a State in a Subclass</a><a class="headerlink" href="#overload-a-state-in-a-subclass" title="Permalink to this headline">¶</a></h3>
 <p>Suppose our specification poses a problem that can be broken into two or more
 subdesigns, and these designs are very similar.  Since we know how to tie our
 event handlers to methods in a class, we can just subclass one statechart and
@@ -1944,7 +1943,7 @@ stand-alone design artifact.  Subclassing is software coupling, so you will have
 to weigh the engineering-trade-offs as you build up your system.</p>
 </div>
 <div class="section" id="one-shots-multi-shots-and-heartbeats">
-<span id="recipes-one-shots-and-heartbeats"></span><h3><a class="toc-backref" href="#id102">One-Shots, Multi-Shots and Heartbeats</a><a class="headerlink" href="#one-shots-multi-shots-and-heartbeats" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-one-shots-and-heartbeats"></span><h3><a class="toc-backref" href="#id101">One-Shots, Multi-Shots and Heartbeats</a><a class="headerlink" href="#one-shots-multi-shots-and-heartbeats" title="Permalink to this headline">¶</a></h3>
 <p>We have seen that we can post events using the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> (first in first
 out) method call.  If your event needs to push itself to the front of the event
 queue (force itself to have the highest priority), you would use the
@@ -2242,7 +2241,7 @@ which re-arms the <code class="docutils literal notranslate"><span class="pre">R
 inner_state about 1 second after the middle_state was entered.</p>
 </div>
 <div class="section" id="creating-thread-safe-class-attributes">
-<span id="recipes-getting-information-out-of-your-statechart"></span><h3><a class="toc-backref" href="#id103">Creating thread-safe class Attributes</a><a class="headerlink" href="#creating-thread-safe-class-attributes" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-getting-information-out-of-your-statechart"></span><h3><a class="toc-backref" href="#id102">Creating thread-safe class Attributes</a><a class="headerlink" href="#creating-thread-safe-class-attributes" title="Permalink to this headline">¶</a></h3>
 <p>A statechart is running in a separate thread from our main program; so how do we
 reach into it and read/write a variable?  We can’t assume that it’s thread
 won’t be halfway through changing the variable we want to read/write at the moment we
@@ -2574,26 +2573,26 @@ with miros.</p>
 <span id="recipes-states"></span><h2><a class="toc-backref" href="#id26">States</a><a class="headerlink" href="#states" title="Permalink to this headline">¶</a></h2>
 <div class="contents local topic" id="id3">
 <ul class="simple">
-<li><a class="reference internal" href="#state-function-recipes" id="id104">State Function Recipes</a><ul>
-<li><a class="reference internal" href="#boiler-plate-state-function-code" id="id105">Boiler-plate State Function Code</a></li>
-<li><a class="reference internal" href="#describing-your-parent-state-function" id="id106">Describing your Parent State Function</a></li>
-<li><a class="reference internal" href="#passing-events-to-the-parent-state-function" id="id107">Passing events to the Parent State Function</a></li>
-<li><a class="reference internal" href="#transition-to-another-state-function" id="id108">Transition to another State Function</a></li>
-<li><a class="reference internal" href="#state-function-entry-code" id="id109">State Function Entry Code</a></li>
-<li><a class="reference internal" href="#state-function-initialization-code" id="id110">State Function Initialization Code</a></li>
-<li><a class="reference internal" href="#state-function-exit-code" id="id111">State Function Exit Code</a></li>
-<li><a class="reference internal" href="#creating-a-hook-in-a-state-function" id="id112">Creating a Hook in a State function</a></li>
-<li><a class="reference internal" href="#catch-and-release-in-a-state-function" id="id113">Catch and Release in a State function</a></li>
+<li><a class="reference internal" href="#state-function-recipes" id="id103">State Function Recipes</a><ul>
+<li><a class="reference internal" href="#boiler-plate-state-function-code" id="id104">Boiler-plate State Function Code</a></li>
+<li><a class="reference internal" href="#describing-your-parent-state-function" id="id105">Describing your Parent State Function</a></li>
+<li><a class="reference internal" href="#passing-events-to-the-parent-state-function" id="id106">Passing events to the Parent State Function</a></li>
+<li><a class="reference internal" href="#transition-to-another-state-function" id="id107">Transition to another State Function</a></li>
+<li><a class="reference internal" href="#state-function-entry-code" id="id108">State Function Entry Code</a></li>
+<li><a class="reference internal" href="#state-function-initialization-code" id="id109">State Function Initialization Code</a></li>
+<li><a class="reference internal" href="#state-function-exit-code" id="id110">State Function Exit Code</a></li>
+<li><a class="reference internal" href="#creating-a-hook-in-a-state-function" id="id111">Creating a Hook in a State function</a></li>
+<li><a class="reference internal" href="#catch-and-release-in-a-state-function" id="id112">Catch and Release in a State function</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#state-method-recipes" id="id114">State Method Recipes</a><ul>
-<li><a class="reference internal" href="#boiler-plate-state-method" id="id115">Boiler-plate State Method</a></li>
-<li><a class="reference internal" href="#boiler-plate-state-handler-method" id="id116">Boiler-plate State Handler Method</a></li>
-<li><a class="reference internal" href="#describing-your-parent-state-using-the-factory" id="id117">Describing your Parent State using the Factory</a></li>
-<li><a class="reference internal" href="#passing-events-to-the-parent-state-method" id="id118">Passing Events to the Parent State Method</a></li>
-<li><a class="reference internal" href="#transition-to-another-state-method" id="id119">Transition to another State Method</a></li>
-<li><a class="reference internal" href="#state-handlers-for-entry-exit-and-initialization-signals" id="id120">State Handlers for Entry/Exit and Initialization Signals</a></li>
-<li><a class="reference internal" href="#creating-a-hook-in-a-state-handler" id="id121">Creating a Hook in a State Handler</a></li>
+<li><a class="reference internal" href="#state-method-recipes" id="id113">State Method Recipes</a><ul>
+<li><a class="reference internal" href="#boiler-plate-state-method" id="id114">Boiler-plate State Method</a></li>
+<li><a class="reference internal" href="#boiler-plate-state-handler-method" id="id115">Boiler-plate State Handler Method</a></li>
+<li><a class="reference internal" href="#describing-your-parent-state-using-the-factory" id="id116">Describing your Parent State using the Factory</a></li>
+<li><a class="reference internal" href="#passing-events-to-the-parent-state-method" id="id117">Passing Events to the Parent State Method</a></li>
+<li><a class="reference internal" href="#transition-to-another-state-method" id="id118">Transition to another State Method</a></li>
+<li><a class="reference internal" href="#state-handlers-for-entry-exit-and-initialization-signals" id="id119">State Handlers for Entry/Exit and Initialization Signals</a></li>
+<li><a class="reference internal" href="#creating-a-hook-in-a-state-handler" id="id120">Creating a Hook in a State Handler</a></li>
 </ul>
 </li>
 </ul>
@@ -2613,9 +2612,9 @@ the <code class="docutils literal notranslate"><span class="pre">nest</span></co
 <p>The state recipes will be broken down into two groups, state function recipes
 and state method recipes.</p>
 <div class="section" id="state-function-recipes">
-<span id="recipes-state-function-recipes"></span><h3><a class="toc-backref" href="#id104">State Function Recipes</a><a class="headerlink" href="#state-function-recipes" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-state-function-recipes"></span><h3><a class="toc-backref" href="#id103">State Function Recipes</a><a class="headerlink" href="#state-function-recipes" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="boiler-plate-state-function-code">
-<span id="recipes-boiler-plate-state-function-code"></span><h4><a class="toc-backref" href="#id105">Boiler-plate State Function Code</a><a class="headerlink" href="#boiler-plate-state-function-code" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-boiler-plate-state-function-code"></span><h4><a class="toc-backref" href="#id104">Boiler-plate State Function Code</a><a class="headerlink" href="#boiler-plate-state-function-code" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
@@ -2668,7 +2667,7 @@ and returned return_state.HANDLED.</p>
 <p>To see factory boiler plate go, see <span class="xref std std-ref">this</span></p>
 </div>
 <div class="section" id="describing-your-parent-state-function">
-<span id="recipes-describing-your-parent-state-function"></span><h4><a class="toc-backref" href="#id106">Describing your Parent State Function</a><a class="headerlink" href="#describing-your-parent-state-function" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-describing-your-parent-state-function"></span><h4><a class="toc-backref" href="#id105">Describing your Parent State Function</a><a class="headerlink" href="#describing-your-parent-state-function" title="Permalink to this headline">¶</a></h4>
 <p>To describe your parent state:</p>
 <ol class="arabic simple">
 <li>setting the <code class="docutils literal notranslate"><span class="pre">temp.fun</span></code> attribute of the first argument to point at their
@@ -2701,7 +2700,7 @@ first argument provided to your state method:</p>
 <p>To see how to define a parent state with a factory, read <span class="xref std std-ref">this</span></p>
 </div>
 <div class="section" id="passing-events-to-the-parent-state-function">
-<span id="recipes-passing-events-to-the-parent-state-function"></span><h4><a class="toc-backref" href="#id107">Passing events to the Parent State Function</a><a class="headerlink" href="#passing-events-to-the-parent-state-function" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-passing-events-to-the-parent-state-function"></span><h4><a class="toc-backref" href="#id106">Passing events to the Parent State Function</a><a class="headerlink" href="#passing-events-to-the-parent-state-function" title="Permalink to this headline">¶</a></h4>
 <p>The easiest way to pass an event outward in your statechart is not to handle it
 in your <code class="docutils literal notranslate"><span class="pre">if-elif</span></code> clauses and let your <code class="docutils literal notranslate"><span class="pre">else</span></code>
 <span class="xref std std-ref">clause</span> handle it.</p>
@@ -2754,7 +2753,7 @@ method with the event that you want to trickle outward in your diagram.</p>
 </div>
 </div>
 <div class="section" id="transition-to-another-state-function">
-<span id="recipes-transition-to-another-state-function"></span><h4><a class="toc-backref" href="#id108">Transition to another State Function</a><a class="headerlink" href="#transition-to-another-state-function" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-transition-to-another-state-function"></span><h4><a class="toc-backref" href="#id107">Transition to another State Function</a><a class="headerlink" href="#transition-to-another-state-function" title="Permalink to this headline">¶</a></h4>
 <p>To transition to another state, use the <code class="docutils literal notranslate"><span class="pre">trans</span></code> method:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sending Event(signal=signals.A) will cause a transition to c2</span>
 <span class="k">def</span> <span class="nf">c1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -2777,7 +2776,7 @@ method with the event that you want to trickle outward in your diagram.</p>
 the event processor will break.</p>
 </div>
 <div class="section" id="state-function-entry-code">
-<span id="recipes-state-function-entry-code"></span><h4><a class="toc-backref" href="#id109">State Function Entry Code</a><a class="headerlink" href="#state-function-entry-code" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-state-function-entry-code"></span><h4><a class="toc-backref" href="#id108">State Function Entry Code</a><a class="headerlink" href="#state-function-entry-code" title="Permalink to this headline">¶</a></h4>
 <p>To have your application code run when a state is entered place it in the
 <code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code> clause of your state’s if-elif structure.  An entry event will
 occur anytime the event processor detects a transition from the outside to the
@@ -2800,7 +2799,7 @@ inside of your state method’s boundary.</p>
 </div>
 </div>
 <div class="section" id="state-function-initialization-code">
-<span id="recipes-state-function-initialization-code"></span><h4><a class="toc-backref" href="#id110">State Function Initialization Code</a><a class="headerlink" href="#state-function-initialization-code" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-state-function-initialization-code"></span><h4><a class="toc-backref" href="#id109">State Function Initialization Code</a><a class="headerlink" href="#state-function-initialization-code" title="Permalink to this headline">¶</a></h4>
 <p>To have your application code run when a state is initialized place it in the
 <code class="docutils literal notranslate"><span class="pre">INIT_SIGNAL</span></code> clause of your state’s if-elif structure.  An init event will
 occur after the entry event, if a transition is moving from the outside to the
@@ -2869,7 +2868,7 @@ probably re-visit your design).</p>
 </div>
 </div>
 <div class="section" id="state-function-exit-code">
-<span id="recipes-state-function-exit-code"></span><h4><a class="toc-backref" href="#id111">State Function Exit Code</a><a class="headerlink" href="#state-function-exit-code" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-state-function-exit-code"></span><h4><a class="toc-backref" href="#id110">State Function Exit Code</a><a class="headerlink" href="#state-function-exit-code" title="Permalink to this headline">¶</a></h4>
 <p>To have your application code run when a state is exited place it in the
 <code class="docutils literal notranslate"><span class="pre">EXIT_SIGNAL</span></code> clause of your state’s if-elif structure.  An exit event will
 occur anytime the event processor detects a transition from the inside to the
@@ -2892,7 +2891,7 @@ outside of of your state method’s boundary.</p>
 </div>
 </div>
 <div class="section" id="creating-a-hook-in-a-state-function">
-<span id="recipes-creating-a-hook-in-a-state-function"></span><h4><a class="toc-backref" href="#id112">Creating a Hook in a State function</a><a class="headerlink" href="#creating-a-hook-in-a-state-function" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-creating-a-hook-in-a-state-function"></span><h4><a class="toc-backref" href="#id111">Creating a Hook in a State function</a><a class="headerlink" href="#creating-a-hook-in-a-state-function" title="Permalink to this headline">¶</a></h4>
 <p>A hook is some application code that is shared between your state method and
 all of its child state method’s.</p>
 <p>Here we will create a hook in the c1 state, linking some application code to an
@@ -2961,7 +2960,7 @@ its application code and returning the <code class="docutils literal notranslate
 the state that originally experienced the event.</p>
 </div>
 <div class="section" id="catch-and-release-in-a-state-function">
-<span id="recipes-catch-and-release-in-a-state-function"></span><h4><a class="toc-backref" href="#id113">Catch and Release in a State function</a><a class="headerlink" href="#catch-and-release-in-a-state-function" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-catch-and-release-in-a-state-function"></span><h4><a class="toc-backref" href="#id112">Catch and Release in a State function</a><a class="headerlink" href="#catch-and-release-in-a-state-function" title="Permalink to this headline">¶</a></h4>
 <p>The catch and release recipe is similar to the
 <span class="xref std std-ref">hook</span> recipe in that you are using the search phase
 of the event processor algorithm to run your code.</p>
@@ -3014,11 +3013,11 @@ do not return <code class="docutils literal notranslate"><span class="pre">HANDL
 </div>
 </div>
 <div class="section" id="state-method-recipes">
-<span id="recipes-state-method-recipes"></span><h3><a class="toc-backref" href="#id114">State Method Recipes</a><a class="headerlink" href="#state-method-recipes" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-state-method-recipes"></span><h3><a class="toc-backref" href="#id113">State Method Recipes</a><a class="headerlink" href="#state-method-recipes" title="Permalink to this headline">¶</a></h3>
 <p>A statechart can be made using the <code class="docutils literal notranslate"><span class="pre">miros.Factory</span></code> class.  To see how to do
 this <a class="reference internal" href="#recipes-making-a-statechart-from-a-class"><span class="std std-ref">look here</span></a>.</p>
 <div class="section" id="boiler-plate-state-method">
-<span id="recipes-boiler-plate-state-handler-method"></span><h4><a class="toc-backref" href="#id115">Boiler-plate State Method</a><a class="headerlink" href="#boiler-plate-state-method" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-boiler-plate-state-handler-method"></span><h4><a class="toc-backref" href="#id114">Boiler-plate State Method</a><a class="headerlink" href="#boiler-plate-state-method" title="Permalink to this headline">¶</a></h4>
 <p>A state method is constructed by using the <code class="docutils literal notranslate"><span class="pre">create</span></code>, <code class="docutils literal notranslate"><span class="pre">catch</span></code> and <code class="docutils literal notranslate"><span class="pre">to_method</span></code>
 interface of the <code class="docutils literal notranslate"><span class="pre">miros.Factory</span></code> object.</p>
 <p>Consider the outer_state of <a class="reference internal" href="#recipes-making-a-statechart-from-a-class"><span class="std std-ref">this example</span></a>:</p>
@@ -3059,7 +3058,7 @@ called, which converts the state into a state method.</p>
 done separately with the <code class="docutils literal notranslate"><span class="pre">miros.Factory</span></code>’s <code class="docutils literal notranslate"><span class="pre">nest</span></code> interface.</p>
 </div>
 <div class="section" id="boiler-plate-state-handler-method">
-<span id="id4"></span><h4><a class="toc-backref" href="#id116">Boiler-plate State Handler Method</a><a class="headerlink" href="#boiler-plate-state-handler-method" title="Permalink to this headline">¶</a></h4>
+<span id="id4"></span><h4><a class="toc-backref" href="#id115">Boiler-plate State Handler Method</a><a class="headerlink" href="#boiler-plate-state-handler-method" title="Permalink to this headline">¶</a></h4>
 <p>When you use the <code class="docutils literal notranslate"><span class="pre">miros.Factory</span></code> to build a statechart, you assign one state
 handler to each signal of the state.  This means that you can have multiple state
 handlers per state.</p>
@@ -3080,7 +3079,7 @@ handlers per state.</p>
 </div>
 </div>
 <div class="section" id="describing-your-parent-state-using-the-factory">
-<span id="recipes-describing-your-parent-state-method"></span><h4><a class="toc-backref" href="#id117">Describing your Parent State using the Factory</a><a class="headerlink" href="#describing-your-parent-state-using-the-factory" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-describing-your-parent-state-method"></span><h4><a class="toc-backref" href="#id116">Describing your Parent State using the Factory</a><a class="headerlink" href="#describing-your-parent-state-using-the-factory" title="Permalink to this headline">¶</a></h4>
 <p>A state method does not describe its parent state, this is done with the
 <code class="docutils literal notranslate"><span class="pre">nest</span></code> method which follows the state definition descriptions in the
 <code class="docutils literal notranslate"><span class="pre">__init__</span></code> of your derived factory class.</p>
@@ -3095,12 +3094,12 @@ handlers per state.</p>
 <p>To see the full example, reference: <a class="reference internal" href="#recipes-making-a-statechart-from-a-class"><span class="std std-ref">making a statechart from a class</span></a>.</p>
 </div>
 <div class="section" id="passing-events-to-the-parent-state-method">
-<span id="recipes-passing-events-to-the-parent-state-method"></span><h4><a class="toc-backref" href="#id118">Passing Events to the Parent State Method</a><a class="headerlink" href="#passing-events-to-the-parent-state-method" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-passing-events-to-the-parent-state-method"></span><h4><a class="toc-backref" href="#id117">Passing Events to the Parent State Method</a><a class="headerlink" href="#passing-events-to-the-parent-state-method" title="Permalink to this headline">¶</a></h4>
 <p>By default a state method will pass an event outward to its super state if it is
 not handled by any of its handlers.</p>
 </div>
 <div class="section" id="transition-to-another-state-method">
-<span id="recipes-transition-to-another-state-method"></span><h4><a class="toc-backref" href="#id119">Transition to another State Method</a><a class="headerlink" href="#transition-to-another-state-method" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-transition-to-another-state-method"></span><h4><a class="toc-backref" href="#id118">Transition to another State Method</a><a class="headerlink" href="#transition-to-another-state-method" title="Permalink to this headline">¶</a></h4>
 <p>To transition to another state, use the <code class="docutils literal notranslate"><span class="pre">trans</span></code> method:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">outer_state_init_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;init&quot;</span><span class="p">)</span>
@@ -3111,7 +3110,7 @@ not handled by any of its handlers.</p>
 <p>To see the full example, reference: <a class="reference internal" href="#recipes-making-a-statechart-from-a-class"><span class="std std-ref">making a statechart from a class</span></a>.</p>
 </div>
 <div class="section" id="state-handlers-for-entry-exit-and-initialization-signals">
-<span id="recipes-state-method-entry-code"></span><h4><a class="toc-backref" href="#id120">State Handlers for Entry/Exit and Initialization Signals</a><a class="headerlink" href="#state-handlers-for-entry-exit-and-initialization-signals" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-state-method-entry-code"></span><h4><a class="toc-backref" href="#id119">State Handlers for Entry/Exit and Initialization Signals</a><a class="headerlink" href="#state-handlers-for-entry-exit-and-initialization-signals" title="Permalink to this headline">¶</a></h4>
 <a class="reference external image-reference" href="_static/state_recipe_10.pdf"><div align="center" class="align-center"><img alt="_images/state_recipe_10.svg" src="_images/state_recipe_10.svg" /></div>
 </a>
 <p>We would create the outer_state and its entry/exit/initialization handlers
@@ -3158,7 +3157,7 @@ this way:</p>
 <p>To see the full example, reference: <a class="reference internal" href="#recipes-making-a-statechart-from-a-class"><span class="std std-ref">making a statechart from a class</span></a>.</p>
 </div>
 <div class="section" id="creating-a-hook-in-a-state-handler">
-<span id="recipes-creating-a-hook-in-a-state-method"></span><h4><a class="toc-backref" href="#id121">Creating a Hook in a State Handler</a><a class="headerlink" href="#creating-a-hook-in-a-state-handler" title="Permalink to this headline">¶</a></h4>
+<span id="recipes-creating-a-hook-in-a-state-method"></span><h4><a class="toc-backref" href="#id120">Creating a Hook in a State Handler</a><a class="headerlink" href="#creating-a-hook-in-a-state-handler" title="Permalink to this headline">¶</a></h4>
 <a class="reference external image-reference" href="_static/state_recipe_10.pdf"><div align="center" class="align-center"><img alt="_images/state_recipe_10.svg" src="_images/state_recipe_10.svg" /></div>
 </a>
 <p>We would create the outer_state and its Hook handlers this way:</p>
@@ -3698,14 +3697,14 @@ your state functions using the <code class="docutils literal notranslate"><span 
 <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code> and the state functions work as a statechart.</p>
 <div class="contents local topic" id="id6">
 <ul class="simple">
-<li><a class="reference internal" href="#starting-an-activeobject" id="id122">Starting an ActiveObject</a></li>
-<li><a class="reference internal" href="#stopping-an-activeobject" id="id123">Stopping an ActiveObject</a></li>
-<li><a class="reference internal" href="#augmentng-your-activeobject" id="id124">Augmentng your ActiveObject</a></li>
-<li><a class="reference internal" href="#sharing-attributes-between-threads-activeobjects" id="id125">Sharing Attributes between Threads (ActiveObjects)</a></li>
+<li><a class="reference internal" href="#starting-an-activeobject" id="id121">Starting an ActiveObject</a></li>
+<li><a class="reference internal" href="#stopping-an-activeobject" id="id122">Stopping an ActiveObject</a></li>
+<li><a class="reference internal" href="#augmentng-your-activeobject" id="id123">Augmentng your ActiveObject</a></li>
+<li><a class="reference internal" href="#sharing-attributes-between-threads-activeobjects" id="id124">Sharing Attributes between Threads (ActiveObjects)</a></li>
 </ul>
 </div>
 <div class="section" id="starting-an-activeobject">
-<span id="recipes-starting-an-activeojbect-or-factory"></span><h3><a class="toc-backref" href="#id122">Starting an ActiveObject</a><a class="headerlink" href="#starting-an-activeobject" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-starting-an-activeojbect-or-factory"></span><h3><a class="toc-backref" href="#id121">Starting an ActiveObject</a><a class="headerlink" href="#starting-an-activeobject" title="Permalink to this headline">¶</a></h3>
 <p>Once you have created an Activeobject you can start its statemachine and thread
 with its <code class="docutils literal notranslate"><span class="pre">start_at</span></code> method.</p>
 <p>There is a set of queues and threads which connect <em>all of your ActiveObjects
@@ -3792,7 +3791,7 @@ method will turn on this infrastructure as well.</p>
 </div>
 </div>
 <div class="section" id="stopping-an-activeobject">
-<span id="recipes-stopping-an-activeobject-or-factory"></span><h3><a class="toc-backref" href="#id123">Stopping an ActiveObject</a><a class="headerlink" href="#stopping-an-activeobject" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-stopping-an-activeobject-or-factory"></span><h3><a class="toc-backref" href="#id122">Stopping an ActiveObject</a><a class="headerlink" href="#stopping-an-activeobject" title="Permalink to this headline">¶</a></h3>
 <p>If you would like to stop an <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code> you can use its <code class="docutils literal notranslate"><span class="pre">stop</span></code> method.</p>
 <p>This will stop its thread, and it will stop all of that <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code>’s slave
 threads (constructed by the post_fifo or post_lifo heartbeat constructors).  The
@@ -3806,7 +3805,7 @@ running when your program has stopped running.</p>
 </div>
 </div>
 <div class="section" id="augmentng-your-activeobject">
-<span id="recipes-markup-your-event-processor"></span><h3><a class="toc-backref" href="#id124">Augmentng your ActiveObject</a><a class="headerlink" href="#augmentng-your-activeobject" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-markup-your-event-processor"></span><h3><a class="toc-backref" href="#id123">Augmentng your ActiveObject</a><a class="headerlink" href="#augmentng-your-activeobject" title="Permalink to this headline">¶</a></h3>
 <p>It is a bad idea to add variables to the state methods, instead augment your
 active objects using the <code class="docutils literal notranslate"><span class="pre">augment</span></code> command.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">chart</span> <span class="o">=</span> <span class="n">ActiveObect</span><span class="p">()</span>
@@ -3821,7 +3820,7 @@ Activeobject or Factory.</p>
 </div>
 </div>
 <div class="section" id="sharing-attributes-between-threads-activeobjects">
-<span id="recipes-sharing-attributes-between-threads-activeobjects"></span><h3><a class="toc-backref" href="#id125">Sharing Attributes between Threads (ActiveObjects)</a><a class="headerlink" href="#sharing-attributes-between-threads-activeobjects" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-sharing-attributes-between-threads-activeobjects"></span><h3><a class="toc-backref" href="#id124">Sharing Attributes between Threads (ActiveObjects)</a><a class="headerlink" href="#sharing-attributes-between-threads-activeobjects" title="Permalink to this headline">¶</a></h3>
 <p>As of miros version v4.1.3, you can create thread safe attributes in your
 derived <code class="docutils literal notranslate"><span class="pre">ActiveObect</span></code> class by also inheriting the <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code>.</p>
 <p>To create one or more thread safe attribute, you add them to the list defined
@@ -3995,7 +3994,7 @@ location in your file, within its class.</li>
 <li>effortlessly provides multi-threading without its dangers</li>
 <li>complicated <code class="docutils literal notranslate"><span class="pre">else</span></code> clauses in state callback handlers are avoided</li>
 <li>it is trivial for main to inject asynchronous information</li>
-<li>it is not hard for main to <a class="reference internal" href="#recipes-getting-information-from-your-statecchart"><span class="std std-ref">extract asynchronous information</span></a></li>
+<li>it is not hard for main to <span class="xref std std-ref">extract asynchronous information</span></li>
 <li>it is easy to build lots of these different kinds of objects and have them work as a
 federation. (systems programming)</li>
 <li>it is easy to document federations (systems design)</li>
@@ -4419,135 +4418,65 @@ same class.  UML really falls-over in describing object interactions.</p>
 <div class="section" id="sharing-attributes-between-threads-factories">
 <span id="recipes-sharing-attributes-between-threads-factories"></span><h3><a class="toc-backref" href="#id68">Sharing Attributes between Threads (Factories)</a><a class="headerlink" href="#sharing-attributes-between-threads-factories" title="Permalink to this headline">¶</a></h3>
 <p>As of miros version v4.1.3, you can create thread safe attributes in your
-derived <code class="docutils literal notranslate"><span class="pre">Factory</span></code> class by also inheriting the <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code>.</p>
+derived <code class="docutils literal notranslate"><span class="pre">Factory</span></code> class by inheriting from <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code>.</p>
 <p>To create one or more thread safe attribute, you add them to the list defined
-<code class="docutils literal notranslate"><span class="pre">_attributes</span></code>:</p>
-</div>
-</div>
-<div class="section" id="getting-information-from-your-statechart">
-<span id="recipes-getting-information-from-your-statecchart"></span><h2><a class="toc-backref" href="#id69">Getting Information from your Statechart</a><a class="headerlink" href="#getting-information-from-your-statechart" title="Permalink to this headline">¶</a></h2>
-<p>You will find yourself in situations where you would like to read information
-that has asynchronously been gathered by your statechart from your main program.
-This may happen if you have built a statechart to monitor an external device, or
-to listen to pricing signals coming in from the internet, or to track the
-weather… whatever your application, there will be times when you want the
-synchronous part of your program, main, to get information from the
-asynchronous part of your program, the statechart.</p>
-<p>But, your main program and your statechart run in different threads.  If they share a
-global variable, and one thread writes to it while the other thread reads from
-the variable, or they both partially write to the same variable at the same
-time, you have created an extremely pernicious bug called a ‘race condition’.</p>
-<p>These kinds of bugs do not behave deterministicly, because the timing between
-your threads is managed by the OS in a layer of the system in which you have no
-visibility.  Worse yet, they can happen very infrequently and leave very little
-evidence for why your program failed.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">If you would like to share information between statecharts, you have the same
-thread sharing problem; but it is mostly solved by the framework
-(publish/subscribe with namedtuples (immutable objects).  The namedtuples
-carrying your payload.</p>
-</div>
-<p>If you would like to share information between different threads you can use a
-“Threadsafe data type” like a Queue or a deque.  In this recipe I’ll show a
-simple example of the main program calling a statechart’s object method, the
-statechart will serve up information it got asynchronously to this method as
-if it were captured in a synchronous manner.</p>
-<p>Here is a picture of our design:</p>
-<a class="reference external image-reference" href="_static/sharing_information.pdf"><div align="center" class="align-center"><img alt="_images/sharing_information.svg" src="_images/sharing_information.svg" /></div>
-</a>
-<p>The <code class="docutils literal notranslate"><span class="pre">SimpleAsyncExample</span></code> statechart is built with the miros Factory.  The
-statechart within the <code class="docutils literal notranslate"><span class="pre">SimpleAcyncExample</span></code> asynchronously posts information to
-itself every 0, 1, or 2 seconds. The main part of the program creates a
-<code class="docutils literal notranslate"><span class="pre">SimpleAcyncExample</span></code> which starts a statechart running in a separate thread.
-Main then waits three seconds and then calls the <code class="docutils literal notranslate"><span class="pre">SimpleAsyncExample</span></code>’s
-synchronous <code class="docutils literal notranslate"><span class="pre">get_weather</span></code> method which can return, ‘raining’, ‘sunny’ or
-‘snowing’.</p>
-<p>Here is the code (asynchronous parts highlighted):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+<code class="docutils literal notranslate"><span class="pre">_attributes</span></code> within the class body before the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method is defined.
+See below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ThreadSafeAttributes</span>
 
-<span class="n">WeatherReport</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;WeatherReport&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;latest&#39;</span><span class="p">])</span>
+<span class="c1"># By inheriting from ThreadSafeAttributes, you can define as many thread safe</span>
+<span class="c1"># attributes you need by assigning their names as strings to the</span>
+<span class="c1"># `_attributes` list.</span>
+<span class="k">class</span> <span class="nc">Example2</span><span class="p">(</span><span class="n">Factory</span><span class="p">,</span> <span class="n">ThreadSafeAttributes</span><span class="p">):</span>
 
-<span class="k">class</span> <span class="nc">SimpleAcyncExample</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+  <span class="n">_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;thread_safe_attr_1&#39;</span><span class="p">,</span> <span class="s1">&#39;thread_safe_attr_2&#39;</span><span class="p">]</span>
 
-  <span class="n">Name</span> <span class="o">=</span> <span class="s1">&#39;weather_reader&#39;</span>
+<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
 
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="bp">True</span>  <span class="c1"># .. you can access this from main or other</span>
+                                  <span class="c1"># threads in the same way</span>
 
-    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span> <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">SimpleAcyncExample</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">weather</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_queue</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+  <span class="c1"># ... define states, link them to their signals</span>
+  <span class="c1"># ... nesting code, etc.</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+  <span class="c1"># statechart thread is created and started when `start_at` is called</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>  <span class="c1">#</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">watch_external_weather_api</span> <span class="o">=</span> \
-      <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;watch_external_weather_api&quot;</span><span class="p">)</span><span class="o">.</span> \
-        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
-          <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">watch_external_weather_api_entry</span><span class="p">)</span><span class="o">.</span> \
-        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">weather_report</span><span class="p">,</span>
-          <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">watch_external_weather_api_weather_report</span><span class="p">)</span><span class="o">.</span> \
-        <span class="n">to_method</span><span class="p">()</span>
+<span class="c1"># ... state methods defined here</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">watch_external_weather_api</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
-<span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">watch_external_weather_api</span><span class="p">)</span>
-</span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
 
-<span class="hll">  <span class="nd">@staticmethod</span>
-</span><span class="hll">  <span class="k">def</span> <span class="nf">watch_external_weather_api_entry</span><span class="p">(</span><span class="n">weather</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-</span><span class="hll">    <span class="c1"># weather is like self in a typical method</span>
-</span><span class="hll">    <span class="n">weather</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;raining&#39;</span><span class="p">,</span> <span class="s1">&#39;sunny&#39;</span><span class="p">,</span> <span class="s1">&#39;snowing&#39;</span><span class="p">]</span>
-</span><span class="hll">    <span class="n">index_and_time_delay</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">weather</span><span class="o">.</span><span class="n">choices</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-</span><span class="hll">
-</span><span class="hll">    <span class="c1"># post a fake weather report 0, 1, or 2 seconds from now</span>
-</span><span class="hll">    <span class="n">weather</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
-</span><span class="hll">      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">weather_report</span><span class="p">,</span>
-</span><span class="hll">        <span class="n">payload</span><span class="o">=</span>
-</span><span class="hll">          <span class="n">WeatherReport</span><span class="p">(</span><span class="n">latest</span><span class="o">=</span><span class="n">weather</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="n">index_and_time_delay</span><span class="p">])),</span>
-</span><span class="hll">      <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-</span><span class="hll">      <span class="n">period</span><span class="o">=</span><span class="n">index_and_time_delay</span><span class="p">,</span>
-</span><span class="hll">      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</span><span class="hll">
-</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
-</span>
-<span class="hll">  <span class="nd">@staticmethod</span>
-</span><span class="hll">  <span class="k">def</span> <span class="nf">watch_external_weather_api_weather_report</span><span class="p">(</span><span class="n">weather</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-</span><span class="hll">    <span class="n">weather</span><span class="o">.</span><span class="n">thread_safe_queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">latest</span><span class="p">)</span>
-</span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
-</span>
-  <span class="k">def</span> <span class="nf">get_weather</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_queue</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-      <span class="k">raise</span> <span class="ne">LookupError</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_queue</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">result</span>
+  <span class="n">statechart</span> <span class="o">=</span> <span class="n">Example2</span><span class="p">(</span><span class="s1">&#39;example2&#39;</span><span class="p">)</span>     <span class="c1"># thread is started and is running</span>
+                                        <span class="c1"># because `start_at` called within</span>
+                                        <span class="c1"># the `__init__` method.</span>
 
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-  <span class="c1"># create and start the asynchronous part of our program</span>
-  <span class="n">tracker</span> <span class="o">=</span> <span class="n">SimpleAcyncExample</span><span class="p">(</span><span class="s1">&#39;weather_tracker&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-  <span class="c1"># [07:36:47.80] [weather_tracker] e-&gt;start_at() top-&gt;watch_external_weather_api</span>
-  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-
-  <span class="c1"># have the synchronous part of our program get information from the</span>
-  <span class="c1"># asynchronous part of our program</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">tracker</span><span class="o">.</span><span class="n">get_weather</span><span class="p">())</span>  <span class="c1">#=&gt; sunny</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">statechart</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>  <span class="c1"># you can access the attribute which</span>
+                                        <span class="c1"># is being used by the statechart&#39;s</span>
+                                        <span class="c1"># thread, since it&#39;s wrapped</span>
+                                        <span class="c1"># by a thread-safe datastructure</span>
 </pre></div>
+</div>
+<p>By inheriting from the <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> class, we get access to the
+<code class="docutils literal notranslate"><span class="pre">_attributes</span></code> feature.  By assigning a list of strings to this <code class="docutils literal notranslate"><span class="pre">_attributes</span></code>
+class attribute, a set of thread safe attributes are created an initialized in
+the background before the Example2 <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method is called.</p>
+<p>In this example, we have created two thread safe attributes, which in reality
+are deque objects of size one, initialized with <code class="docutils literal notranslate"><span class="pre">None</span></code>, wrapped within a class
+supporting the <a class="reference external" href="https://docs.python.org/3/howto/descriptor.html">descriptor protocal</a>.  As a user of this feature,
+you don’t have to care about these details, you can just access
+<code class="docutils literal notranslate"><span class="pre">thread_safe_attr_1</span></code> and <code class="docutils literal notranslate"><span class="pre">thread_safe_attr_2</span></code> as if they were regular
+attributes.  However, unlike other attributes, you <em>can safely use them</em> from
+inside or from outside the thread running your Factory derived statechart.</p>
+<p>To see a full example look <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/thread_safe_attributes_in_factory.py">here</a>.</p>
 </div>
 </div>
 <div class="section" id="multiple-statecharts">
-<span id="recipes-multiple-statecharts"></span><h2><a class="toc-backref" href="#id70">Multiple Statecharts</a><a class="headerlink" href="#multiple-statecharts" title="Permalink to this headline">¶</a></h2>
+<span id="recipes-multiple-statecharts"></span><h2><a class="toc-backref" href="#id69">Multiple Statecharts</a><a class="headerlink" href="#multiple-statecharts" title="Permalink to this headline">¶</a></h2>
 <p>Break your design down into different interacting charts by using the
 ActiveFabric.</p>
 <p>The active fabric is a set of background tasks which act together to dispatch
@@ -4569,7 +4498,7 @@ will post events to it using its <a class="reference internal" href="#recipes-po
 active fabric.  This would only be useful if you are expecting contention
 between various events being dispatched across your system.</p>
 <div class="section" id="building-and-destroying-workers">
-<span id="recipes-building-workers"></span><h3><a class="toc-backref" href="#id71">Building and Destroying Workers</a><a class="headerlink" href="#building-and-destroying-workers" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-building-workers"></span><h3><a class="toc-backref" href="#id70">Building and Destroying Workers</a><a class="headerlink" href="#building-and-destroying-workers" title="Permalink to this headline">¶</a></h3>
 <p>If you have a long running task that has to access blocking IO or connect to a
 slow API, you can wrap it up into a worker.  Unlike stateless architectures,
 with miros you can make your workers as complicated as you want, sending them
@@ -4582,9 +4511,9 @@ prepare themselves for garbage collection.</p>
 </div>
 </div>
 <div class="section" id="seeing-what-is-going-on">
-<span id="recipes-seeing-what-is"></span><h2><a class="toc-backref" href="#id72">Seeing What is Going On</a><a class="headerlink" href="#seeing-what-is-going-on" title="Permalink to this headline">¶</a></h2>
+<span id="recipes-seeing-what-is"></span><h2><a class="toc-backref" href="#id71">Seeing What is Going On</a><a class="headerlink" href="#seeing-what-is-going-on" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="determining-the-current-state">
-<span id="recipes-determining-the-current-state"></span><h3><a class="toc-backref" href="#id73">Determining the Current State</a><a class="headerlink" href="#determining-the-current-state" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-determining-the-current-state"></span><h3><a class="toc-backref" href="#id72">Determining the Current State</a><a class="headerlink" href="#determining-the-current-state" title="Permalink to this headline">¶</a></h3>
 <p>To see what state your chart is in:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll">  <span class="c1"># state name as a string</span>
 </span><span class="hll">  <span class="n">chart</span><span class="o">.</span><span class="n">state_name</span>
@@ -4600,7 +4529,7 @@ decorator or if you have constructed your statechart with the Factory class.</p>
 </div>
 </div>
 <div class="section" id="seeing-what-signals-you-have-in-your-system">
-<span id="recipes-seeing-what-signals-you-have-in-your-system"></span><h3><a class="toc-backref" href="#id74">Seeing what Signals You Have In Your System</a><a class="headerlink" href="#seeing-what-signals-you-have-in-your-system" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-seeing-what-signals-you-have-in-your-system"></span><h3><a class="toc-backref" href="#id73">Seeing what Signals You Have In Your System</a><a class="headerlink" href="#seeing-what-signals-you-have-in-your-system" title="Permalink to this headline">¶</a></h3>
 <span class="target" id="recipes-seeing-your-signals"></span><p>A signal is the name that can be given to an event.  To get access to your
 signals:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
@@ -4660,7 +4589,7 @@ Python dictionary:</p>
 </div>
 </div>
 <div class="section" id="using-the-trace">
-<span id="recipes-using-the-trace"></span><h3><a class="toc-backref" href="#id75">Using the Trace</a><a class="headerlink" href="#using-the-trace" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-using-the-trace"></span><h3><a class="toc-backref" href="#id74">Using the Trace</a><a class="headerlink" href="#using-the-trace" title="Permalink to this headline">¶</a></h3>
 <p>If you would like to see what your active object was doing from a <strong>very high
 level</strong>, you can look at it’s <cite>trace</cite> instrumentation.  The trace will only
 create a log item if a state transition has occurred. Each line in the <cite>trace</cite>
@@ -4696,7 +4625,7 @@ to indicate how the chart was started.</p>
 more about that is described <span class="xref std std-ref">here.</span></p>
 </div>
 <div class="section" id="using-the-spy">
-<span id="recipes-using-the-spy"></span><span id="reflection-an-extremely-detailed-view"></span><h3><a class="toc-backref" href="#id76">Using the Spy</a><a class="headerlink" href="#using-the-spy" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-using-the-spy"></span><span id="reflection-an-extremely-detailed-view"></span><h3><a class="toc-backref" href="#id75">Using the Spy</a><a class="headerlink" href="#using-the-spy" title="Permalink to this headline">¶</a></h3>
 <p>If you need a <strong>very detailed description</strong> of your system’s behavior you will want
 to use the <cite>spy</cite> instrumentation.  The spy outputs:</p>
 <ol class="arabic simple">
@@ -4794,7 +4723,7 @@ spy log has run out of room, it will shift out the old data and write the new
 data at the tail end of its log.</p>
 </div>
 <div class="section" id="add-timing-information-to-the-spy">
-<span id="recipes-add-timing-information-to-the-spy"></span><h3><a class="toc-backref" href="#id77">Add Timing Information to the Spy</a><a class="headerlink" href="#add-timing-information-to-the-spy" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-add-timing-information-to-the-spy"></span><h3><a class="toc-backref" href="#id76">Add Timing Information to the Spy</a><a class="headerlink" href="#add-timing-information-to-the-spy" title="Permalink to this headline">¶</a></h3>
 <p>The spy doesn’t contain timing information, if you would like to mark it up
 with time so that you can compare it with the trace output:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
@@ -4807,7 +4736,7 @@ with time so that you can compare it with the trace output:</p>
 </div>
 </div>
 <div class="section" id="tracing-live">
-<span id="recipes-tracing-live"></span><h3><a class="toc-backref" href="#id78">Tracing Live</a><a class="headerlink" href="#tracing-live" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-tracing-live"></span><h3><a class="toc-backref" href="#id77">Tracing Live</a><a class="headerlink" href="#tracing-live" title="Permalink to this headline">¶</a></h3>
 <p>There are situations where you would like to see what an active object is doing
 while it is running.  Each active object has an attribute called
 <code class="docutils literal notranslate"><span class="pre">live_trace</span></code>.  By setting this attribute to <code class="docutils literal notranslate"><span class="pre">True</span></code> the active object will
@@ -4825,7 +4754,7 @@ output it’s trace information to the terminal while it reacts to events:</p>
 </div>
 </div>
 <div class="section" id="spying-live">
-<span id="recipes-spying-live"></span><h3><a class="toc-backref" href="#id79">Spying Live</a><a class="headerlink" href="#spying-live" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-spying-live"></span><h3><a class="toc-backref" href="#id78">Spying Live</a><a class="headerlink" href="#spying-live" title="Permalink to this headline">¶</a></h3>
 <p>There are situations where you would like to see what an active object is doing
 while it is running.  Each active object has an attribute called
 <code class="docutils literal notranslate"><span class="pre">live_spy</span></code>.  By setting this attribute to <code class="docutils literal notranslate"><span class="pre">True</span></code> the active object will
@@ -4843,7 +4772,7 @@ output it’s spy information to the terminal while it reacts to events:</p>
 </div>
 </div>
 <div class="section" id="scribble-on-the-spy">
-<span id="recipes-scribble-on-the-spy"></span><h3><a class="toc-backref" href="#id80">Scribble On the Spy</a><a class="headerlink" href="#scribble-on-the-spy" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-scribble-on-the-spy"></span><h3><a class="toc-backref" href="#id79">Scribble On the Spy</a><a class="headerlink" href="#scribble-on-the-spy" title="Permalink to this headline">¶</a></h3>
 <p>To add messaging to your spy log so that you can see how an activity is
 situated within the statechart’s behavior, use the <code class="docutils literal notranslate"><span class="pre">scribble</span></code> api within your
 state method:</p>
@@ -4871,7 +4800,7 @@ state method:</p>
 </div>
 </div>
 <div class="section" id="flatting-a-state-method">
-<span id="recipes-flatting-a-state-method"></span><h3><a class="toc-backref" href="#id81">Flatting a State Method</a><a class="headerlink" href="#flatting-a-state-method" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-flatting-a-state-method"></span><h3><a class="toc-backref" href="#id80">Flatting a State Method</a><a class="headerlink" href="#flatting-a-state-method" title="Permalink to this headline">¶</a></h3>
 <p>If you have created a state method using either a <code class="docutils literal notranslate"><span class="pre">template</span></code> or a <code class="docutils literal notranslate"><span class="pre">Factory</span></code>
 and you would like to see it’s code as if it where written by hand, use the
 <code class="docutils literal notranslate"><span class="pre">to_code</span></code> call.</p>
@@ -4953,9 +4882,9 @@ debugging purposes.</p>
 </div>
 </div>
 <div class="section" id="describing-your-work">
-<span id="recipes-describing-your-work"></span><h2><a class="toc-backref" href="#id82">Describing your Work</a><a class="headerlink" href="#describing-your-work" title="Permalink to this headline">¶</a></h2>
+<span id="recipes-describing-your-work"></span><h2><a class="toc-backref" href="#id81">Describing your Work</a><a class="headerlink" href="#describing-your-work" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="drawing-a-statechart">
-<span id="recipes-drawing-a-statechart"></span><h3><a class="toc-backref" href="#id83">Drawing a StateChart</a><a class="headerlink" href="#drawing-a-statechart" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-drawing-a-statechart"></span><h3><a class="toc-backref" href="#id82">Drawing a StateChart</a><a class="headerlink" href="#drawing-a-statechart" title="Permalink to this headline">¶</a></h3>
 <p>The Harel formalism was consumed by the UML standard.</p>
 <p>The UML standards were not properly curated and became overly-complicated and
 full of contradictions.  As a result, they are largely disregarded by the
@@ -4991,7 +4920,7 @@ your text editor.  If you don’t know how to do it yet, look up vertical
 editing, this is required if you are going to sketch in meaningful pictures.</p>
 </div>
 <div class="section" id="drawing-a-sequence-diagram">
-<span id="recipes-drawing-a-sequence-diagram"></span><h3><a class="toc-backref" href="#id84">Drawing a Sequence Diagram</a><a class="headerlink" href="#drawing-a-sequence-diagram" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-drawing-a-sequence-diagram"></span><h3><a class="toc-backref" href="#id83">Drawing a Sequence Diagram</a><a class="headerlink" href="#drawing-a-sequence-diagram" title="Permalink to this headline">¶</a></h3>
 <p>To create effective, yet inexpensive documentation, you can <a class="reference internal" href="reflection.html#reflection-a-high-level-description-of-the-behavior"><span class="std std-ref">first obtain
 a trace of your system</span></a>,
 then use it to generate a sequence diagram, with <a class="reference external" href="https://github.com/aleph2c/sequence">sequence</a>.</p>
@@ -5118,9 +5047,9 @@ you need to explain a loop?</p>
 </div>
 </div>
 <div class="section" id="testing">
-<span id="recipes-testing"></span><h2><a class="toc-backref" href="#id85">Testing</a><a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<span id="recipes-testing"></span><h2><a class="toc-backref" href="#id84">Testing</a><a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="using-a-trace-as-a-test-target">
-<span id="recipes-using-a-trace-as-a-test-target"></span><h3><a class="toc-backref" href="#id86">Using a Trace As a Test Target</a><a class="headerlink" href="#using-a-trace-as-a-test-target" title="Permalink to this headline">¶</a></h3>
+<span id="recipes-using-a-trace-as-a-test-target"></span><h3><a class="toc-backref" href="#id85">Using a Trace As a Test Target</a><a class="headerlink" href="#using-a-trace-as-a-test-target" title="Permalink to this headline">¶</a></h3>
 <p>If you would like to sketch out the high level behavior of your statechart using
 a trace output as the target for a regression test, you would:</p>
 <ol class="arabic simple">
@@ -5197,7 +5126,7 @@ into the <code class="docutils literal notranslate"><span class="pre">stripped_t
 trace of of new design into the target string and everything should be peachy.</p>
 </div>
 <div class="section" id="using-a-spy-as-a-test-target">
-<h3><a class="toc-backref" href="#id87">Using a Spy as a Test Target</a><a class="headerlink" href="#using-a-spy-as-a-test-target" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id86">Using a Spy as a Test Target</a><a class="headerlink" href="#using-a-spy-as-a-test-target" title="Permalink to this headline">¶</a></h3>
 <p>A trace does not tell the full story about what your system is doing.  For
 instance it is blind to hooks, deferred events and many other things that might
 happen in the dynamics of your active object.  If you need to look at the
@@ -5341,7 +5270,6 @@ specification.</p>
 <li><a class="reference internal" href="#sharing-attributes-between-threads-factories">Sharing Attributes between Threads (Factories)</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#getting-information-from-your-statechart">Getting Information from your Statechart</a></li>
 <li><a class="reference internal" href="#multiple-statecharts">Multiple Statecharts</a><ul>
 <li><a class="reference internal" href="#building-and-destroying-workers">Building and Destroying Workers</a></li>
 </ul>

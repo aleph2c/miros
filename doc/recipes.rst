@@ -4540,145 +4540,69 @@ If you have any suggestions about how to draw this better, email me.
 Sharing Attributes between Threads (Factories)
 ----------------------------------------------
 As of miros version v4.1.3, you can create thread safe attributes in your
-derived ``Factory`` class by also inheriting the ``ThreadSafeAttributes``.
+derived ``Factory`` class by inheriting from ``ThreadSafeAttributes``.
 
 To create one or more thread safe attribute, you add them to the list defined
-``_attributes``:
-
-.. _recipes-getting-information-from-your-statecchart:
-
-Getting Information from your Statechart
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-You will find yourself in situations where you would like to read information
-that has asynchronously been gathered by your statechart from your main program.
-This may happen if you have built a statechart to monitor an external device, or
-to listen to pricing signals coming in from the internet, or to track the
-weather... whatever your application, there will be times when you want the
-synchronous part of your program, main, to get information from the
-asynchronous part of your program, the statechart.
-
-But, your main program and your statechart run in different threads.  If they share a
-global variable, and one thread writes to it while the other thread reads from
-the variable, or they both partially write to the same variable at the same
-time, you have created an extremely pernicious bug called a 'race condition'.
-
-These kinds of bugs do not behave deterministicly, because the timing between
-your threads is managed by the OS in a layer of the system in which you have no
-visibility.  Worse yet, they can happen very infrequently and leave very little
-evidence for why your program failed.
-
-.. note::
-
-   If you would like to share information between statecharts, you have the same
-   thread sharing problem; but it is mostly solved by the framework
-   (publish/subscribe with namedtuples (immutable objects).  The namedtuples
-   carrying your payload.
-
-If you would like to share information between different threads you can use a
-"Threadsafe data type" like a Queue or a deque.  In this recipe I'll show a
-simple example of the main program calling a statechart's object method, the
-statechart will serve up information it got asynchronously to this method as
-if it were captured in a synchronous manner.
-
-Here is a picture of our design:
-
-.. image:: _static/sharing_information.svg
-    :target: _static/sharing_information.pdf
-    :align: center
-
-The ``SimpleAsyncExample`` statechart is built with the miros Factory.  The
-statechart within the ``SimpleAcyncExample`` asynchronously posts information to
-itself every 0, 1, or 2 seconds. The main part of the program creates a
-``SimpleAcyncExample`` which starts a statechart running in a separate thread.
-Main then waits three seconds and then calls the ``SimpleAsyncExample``'s
-synchronous ``get_weather`` method which can return, 'raining', 'sunny' or
-'snowing'.
-
-Here is the code (asynchronous parts highlighted):
+``_attributes`` within the class body before the ``__init__`` method is defined.
+See below:
 
 .. code-block:: python
-  :emphasize-lines: 35, 38-54, 56-60
-
-  import time
-  import random
-  from collections import deque
-  from collections import namedtuple
 
   from miros import Event
-  from miros import Factory
   from miros import signals
+  from miros import Factory
   from miros import return_status
+  from miros import ThreadSafeAttributes
 
-  WeatherReport = namedtuple('WeatherReport', ['latest'])
+  # By inheriting from ThreadSafeAttributes, you can define as many thread safe
+  # attributes you need by assigning their names as strings to the
+  # `_attributes` list.
+  class Example2(Factory, ThreadSafeAttributes):
 
-  class SimpleAcyncExample(Factory):
+    _attributes = ['thread_safe_attr_1', 'thread_safe_attr_2']
 
-    Name = 'weather_reader'
+  def __init__(self, name, live_trace=None, live_spy=None):
 
-    def __init__(self, name=None, live_trace=None, live_spy=None):
+    super().__init__(name=name)
+    self.thread_safe_attr_1 = True  # .. you can access this from main or other
+                                    # threads in the same way
 
-      super().__init__(name if name != None else SimpleAcyncExample.Name)
-      self.weather = []
-      self.thread_safe_queue = deque(maxlen=1)
+    # ... define states, link them to their signals
+    # ... nesting code, etc.
 
-      self.live_trace = False if live_trace == None else live_trace
-      self.live_spy = False if live_spy == None else live_spy
+    # statechart thread is created and started when `start_at` is called
+    self.start_at(self.c)  # 
 
-      self.watch_external_weather_api = \
-        self.create(state="watch_external_weather_api"). \
-          catch(signal=signals.ENTRY_SIGNAL,
-            handler=self.watch_external_weather_api_entry). \
-          catch(signal=signals.weather_report,
-            handler=self.watch_external_weather_api_weather_report). \
-          to_method()
+  # ... state methods defined here
 
-      self.nest(self.watch_external_weather_api, parent=None)
-      self.start_at(self.watch_external_weather_api)
-      time.sleep(0.01)
+  if __name__ == "__main__":
 
-    @staticmethod
-    def watch_external_weather_api_entry(weather, e):
-      status = return_status.HANDLED
-      # weather is like self in a typical method
-      weather.choices = ['raining', 'sunny', 'snowing']
-      index_and_time_delay = random.randint(0, len(weather.choices)-1)
+    statechart = Example2('example2')     # thread is started and is running
+                                          # because `start_at` called within
+                                          # the `__init__` method.
 
-      # post a fake weather report 0, 1, or 2 seconds from now
-      weather.post_fifo(
-        Event(signal=signals.weather_report, 
-          payload=
-            WeatherReport(latest=weather.choices[index_and_time_delay])),
-        times=1,
-        period=index_and_time_delay,
-        deferred=True)
-
-      return status
-
-    @staticmethod
-    def watch_external_weather_api_weather_report(weather, e):
-      status = return_status.HANDLED
-      weather.thread_safe_queue.append(e.payload.latest)
-      return status
-
-    def get_weather(self):
-      result = None
-      if len(self.thread_safe_queue) == 0:
-        raise LookupError
-      else:
-        result = self.thread_safe_queue.popleft()
-      return result
+    print(statechart.thread_safe_attr_1)  # you can access the attribute which
+                                          # is being used by the statechart's
+                                          # thread, since it's wrapped
+                                          # by a thread-safe datastructure
 
 
-  if __name__ == '__main__':
-    # create and start the asynchronous part of our program
-    tracker = SimpleAcyncExample('weather_tracker', live_trace=True)
-    # [07:36:47.80] [weather_tracker] e->start_at() top->watch_external_weather_api
-    time.sleep(3)
+By inheriting from the ``ThreadSafeAttributes`` class, we get access to the
+``_attributes`` feature.  By assigning a list of strings to this ``_attributes``
+class attribute, a set of thread safe attributes are created an initialized in
+the background before the Example2 ``__init__`` method is called.
 
-    # have the synchronous part of our program get information from the
-    # asynchronous part of our program
-    print(tracker.get_weather())  #=> sunny
+In this example, we have created two thread safe attributes, which in reality
+are deque objects of size one, initialized with ``None``, wrapped within a class
+supporting the `descriptor protocal
+<https://docs.python.org/3/howto/descriptor.html>`_.  As a user of this feature,
+you don't have to care about these details, you can just access
+``thread_safe_attr_1`` and ``thread_safe_attr_2`` as if they were regular
+attributes.  However, unlike other attributes, you *can safely use them* from
+inside or from outside the thread running your Factory derived statechart.
+
+To see a full example look `here
+<https://github.com/aleph2c/miros/blob/master/examples/thread_safe_attributes_in_factory.py>`_.
 
 .. _recipes-multiple-statecharts:
 
@@ -4721,7 +4645,6 @@ themselves.
 A worker can be thought of as some code sitting in a parallel thread, which will
 do work, then post the results of this work back to their federation before they
 prepare themselves for garbage collection.
-
 
 
 .. _recipes-seeing-what-is-:
