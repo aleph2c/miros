@@ -129,7 +129,6 @@ class Handler(watchdog.events.PatternMatchingEventHandler):
       self.old = self.new
   on_created = on_modified
 
-
 if __name__ == "__main__":
   event_handler = Handler()
   observer = watchdog.observers.Observer()

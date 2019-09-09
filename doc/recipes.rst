@@ -2309,13 +2309,15 @@ thread-safe property.
     :target: _static/state_recipe_15.pdf
     :align: center
 
-There is no UML drawing syntax for creating a property, so I just add a comment
-about my intention to do this after the ``times_in_inner`` attribute.
+There is no UML drawing syntax for creating a Python property, so I just add a
+comment on the diagram after the ``times_in_inner`` attribute about what it
+really is.
 
-But, we can see how to do this in the code: changes highlighted:
-  
+We can see how to make the ``times_in_inner`` thread safe attribute below (see
+the highlighted code):
+
 .. code-block:: python
-  :emphasize-lines: 25-27, 81-83, 85-87, 209, 210
+  :emphasize-lines: 25-27, 81-83, 85-87, 153, 209, 210
   
    # simple_state_15.py
    import re
@@ -2595,6 +2597,23 @@ We can see how the ``times_in_inner`` property is accessed outside of the
 statechart thread on line 24.  The main thread accesses the getter method 8-9, and
 reports its returned value in a print statement.
 
+As of miros 4.1.3, you could get create the same thread-safe-attribute like
+this:
+
+.. code-block:: python
+
+   from miros import Factory
+   # ...
+   from miros import ThreadSafeAttributes
+
+   class F1(Factory, ThreadSafeAttributes):
+      _attribute = ['times_in_inner']
+
+     def __init__(self, name, log_file_name=None,
+         live_trace=None, live_spy=None):
+       # ...
+
+----
 
 Here is a collection of tiny programs that each demonstrate how to do something
 with miros.
@@ -3948,16 +3967,88 @@ active objects using the ``augment`` command.
 
 Sharing Attributes between Threads (ActiveObjects)
 --------------------------------------------------
-To share an attribute from your statechart's thread, inherit from the
-``ActiveObject`` and create thread safe properties by placing a ``@property``
-decorator around a ``deque`` derived object.
+As of miros version v4.1.3, you can create thread safe attributes into your
+derived ``ActiveObect`` class by also inheriting the ``ThreadSafeAttributes``.
 
+To create one or more  thread safe attribute, you add them to the list defined
+``_attributes``:
+  
 .. code-block:: python
-  :emphasize-lines: 1
+  :emphasize-lines: 8, 10, 19-20, 24, 35, 40, 51, 56, 68-69, 72
   :linenos:
   
+  from miros import Event
+  from miros import spy_on
+  from miros import signals
+  from miros import ActiveObject
+  from miros import return_status
+  from miros import ThreadSafeAttributes
   
+  class ThreadSafeAttributesInActiveObject(ThreadSafeAttributes, ActiveObject):
 
+    _attributes = ['thread_safe_attr_1', 'thread_safe_attr_2']
+
+    def __init__(self, name):
+      super().__init__(name)
+
+   @spy_on
+   def c(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       chart.thread_safe_attr_1 = False
+       chart.thread_safe_attr_2 = False
+     elif(e.signal == signals.INIT_SIGNAL):
+       status = chart.trans(c1)
+     elif(e.signal == signals.B):
+       chart.thread_safe_attr_1 = True
+       status = chart.trans(c)
+     else:
+       chart.temp.fun = chart.top
+       status = return_status.SUPER
+     return status
+
+   @spy_on
+   def c1(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       chart.thread_safe_attr_1 = True
+       status = return_status.HANDLED
+     elif(e.signal == signals.A):
+       status = chart.trans(c2)
+     elif(e.signal == signals.EXIT_SIGNAL):
+       chart.thread_safe_attr_1 = False
+       status = return_status.HANDLED
+     else:
+       chart.temp.fun = c
+       status = return_status.SUPER
+     return status
+
+   @spy_on
+   def c2(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       chart.thread_safe_attr_2 = True
+       status = return_status.HANDLED
+     elif(e.signal == signals.A):
+       status = chart.trans(c1)
+     elif(e.signal == signals.EXIT_SIGNAL):
+       chart.thread_safe_attr_2 = False
+       status = return_status.HANDLED
+     else:
+       chart.temp.fun = c
+       status = return_status.SUPER
+     return status
+   
+   if __name__ == '__main__':
+      ao = ThreadSafeAttributesInActiveObject("ao")
+      ao.start_at(c)
+      # Change the ActiveObject's attributes while it is starting it's thread
+      # and starting its statemachine
+      ao.thread_safe_attr_1 = True
+      ao.thread_safe_attr_2 = False
+      ao.post_fifo(Event(signal=signals.A)
+      # Main thread can access attribute used by the ActiveObject's thread
+      print(ao.thread_safe_attr_2)
 
 Factories
 ^^^^^^^^^
@@ -4434,6 +4525,7 @@ Then to draw a federation:
 .. image:: _static/federation_drawing.svg
     :target: _static/federation_drawing.pdf
     :align: center
+
 
 There is probably a much better way to do this, since it looks like three
 classes are working together rather than three instantiated objects from the
