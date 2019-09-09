@@ -3967,10 +3967,10 @@ active objects using the ``augment`` command.
 
 Sharing Attributes between Threads (ActiveObjects)
 --------------------------------------------------
-As of miros version v4.1.3, you can create thread safe attributes into your
+As of miros version v4.1.3, you can create thread safe attributes in your
 derived ``ActiveObect`` class by also inheriting the ``ThreadSafeAttributes``.
 
-To create one or more  thread safe attribute, you add them to the list defined
+To create one or more thread safe attribute, you add them to the list defined
 ``_attributes``:
   
 .. code-block:: python
@@ -4049,6 +4049,8 @@ To create one or more  thread safe attribute, you add them to the list defined
       ao.post_fifo(Event(signal=signals.A)
       # Main thread can access attribute used by the ActiveObject's thread
       print(ao.thread_safe_attr_2)
+
+
 
 Factories
 ^^^^^^^^^
@@ -4537,6 +4539,11 @@ If you have any suggestions about how to draw this better, email me.
 
 Sharing Attributes between Threads (Factories)
 ----------------------------------------------
+As of miros version v4.1.3, you can create thread safe attributes in your
+derived ``Factory`` class by also inheriting the ``ThreadSafeAttributes``.
+
+To create one or more thread safe attribute, you add them to the list defined
+``_attributes``:
 
 .. _recipes-getting-information-from-your-statecchart:
 

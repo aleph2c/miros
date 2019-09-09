@@ -11,7 +11,7 @@ from miros import ThreadSafeAttributes
 
 logger = logging.getLogger('thread_safe_attributes')
 log_file = str(Path('.') / 'thread_safe_attribute_activeobject.log')
-f_handler = logging.FileHandler(log_file)
+f_handler = logging.FileHandler(log_file, mode='w')  # over-write each time
 f_handler.setLevel(logging.DEBUG)
 f_format = logging.Formatter('%(message)s')
 f_handler.setFormatter(f_format)
@@ -111,19 +111,6 @@ if __name__ == '__main__':
 
 # the log file will look like this:
 '''
-S: START
-S: SEARCH_FOR_SUPER_SIGNAL:c
-S: ENTRY_SIGNAL:c
-S: thread_safe_attr_1: False
-S: thread_safe_attr_2: False
-S: INIT_SIGNAL:c
-S: thread_safe_attr_1: False
-S: thread_safe_attr_2: False
-S: SEARCH_FOR_SUPER_SIGNAL:c1
-S: ENTRY_SIGNAL:c1
-S: thread_safe_attr_1: True
-S: thread_safe_attr_2: False
-S: INIT_SIGNAL:c1
 S: <- Queued:(0) Deferred:(0)
 S: START
 S: SEARCH_FOR_SUPER_SIGNAL:c

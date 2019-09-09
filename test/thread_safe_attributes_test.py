@@ -194,7 +194,7 @@ class Example2(Factory):
     self.register_live_trace_callback(partial(trace_callback, log_file=flog_file))
     self.register_live_spy_callback(partial(spy_callback, log_file=flog_file))
 
-    self.start_at(c)
+    self.start_at(self.c)
 
   def c_entry_signal(self, e):
     status = return_status.HANDLED
