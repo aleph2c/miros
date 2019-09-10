@@ -260,17 +260,28 @@ class Example2(Factory):
 ################################################################################
 #     Testing thread-safe attributes outside of a statechart (in threads)      #
 ################################################################################
-def make_test_thread(name, object_to_hammer, thread_event):
+def make_test_thread1(name, object_to_hammer, thread_event):
   def thread_runner(name, obj, e):
     while e.is_set():
       if random.choice(list(['get', 'set'])) == 'get':
-        logging.debug(name + str(obj.hammed_attribute))
+        logging.debug(name + str(obj.hammered_attribute))
       else:
-        obj.hammed_attribute += 1 
+        obj.hammered_attribute += 1 
       time.sleep(random.uniform(0, 0.5))
   return Thread(target=thread_runner, name=name, daemon=True, args=(name, object_to_hammer, thread_event))
 
-def thread_safe_attribute_test(time_in_seconds, number_of_threads, alog_file):
+def make_test_thread2(name, object_to_hammer, thread_event):
+  def thread_runner2(name, obj, e):
+    index = 0
+    while e.is_set():
+      obj.hammered_attribute += 1 
+      time.sleep(random.uniform(0, 0.005))
+      index += 1 
+      if index == 10:
+        break
+  return Thread(target=thread_runner2, name=name, daemon=True, args=(name, object_to_hammer, thread_event))
+
+def thread_safe_attribute_test1(time_in_seconds, number_of_threads, alog_file):
   '''test the thread safe attribute feature provided by miros
 
     This test will create and run a given number of threads for a given number
@@ -297,10 +308,10 @@ def thread_safe_attribute_test(time_in_seconds, number_of_threads, alog_file):
   '''
   # a class to test against
   class A3(metaclass=MetaThreadSafeAttributes):
-    _attributes = ['hammed_attribute']
+    _attributes = ['hammered_attribute']
 
     def __init__(self, a, b, c):
-      self.hammed_attribute = 0
+      self.hammered_attribute = 0
       self.a = a
       self.b = b
       self.c = c
@@ -311,12 +322,12 @@ def thread_safe_attribute_test(time_in_seconds, number_of_threads, alog_file):
   assert(a3.b == 2)
   assert(a3.c == 3)
   # confirm that the thread safe attribute is working as expected from main
-  a3.hammed_attribute = 0
-  assert(a3.hammed_attribute == 0)
-  a3.hammed_attribute += 1
-  assert(a3.hammed_attribute == 1)
-  a3.hammed_attribute -= 1
-  assert(a3.hammed_attribute == 0)
+  a3.hammered_attribute = 0
+  assert(a3.hammered_attribute == 0)
+  a3.hammered_attribute += 1
+  assert(a3.hammered_attribute == 1)
+  a3.hammered_attribute -= 1
+  assert(a3.hammered_attribute == 0)
 
   # begin the multithreaded tests
   # make an event that can turn off all threads
@@ -324,7 +335,7 @@ def thread_safe_attribute_test(time_in_seconds, number_of_threads, alog_file):
   event.set()
   # create and start the thread
   for i in range(number_of_threads):
-    thread = make_test_thread("thrd_" + "{0:02}:".format(i), a3, event)
+    thread = make_test_thread1("thrd_" + "{0:02}:".format(i), a3, event)
     thread.start()
 
   # let the test run for the desired time
@@ -341,15 +352,60 @@ def thread_safe_attribute_test(time_in_seconds, number_of_threads, alog_file):
       assert(current_last >= last_number)
       last_number = current_last
 
+def thread_safe_attribute_test2(time_in_seconds, number_of_threads, alog_file):
+  # a class to test against
+  class A4(metaclass=MetaThreadSafeAttributes):
+    _attributes = ['hammered_attribute']
+
+    def __init__(self):
+      self.hammered_attribute = 0
+
+  # confirm that normal attributes are working
+  a3 = A4()
+  # confirm that the thread safe attribute is working as expected from main
+  a3.hammered_attribute = 0
+  assert(a3.hammered_attribute == 0)
+  a3.hammered_attribute += 1
+  assert(a3.hammered_attribute == 1)
+  a3.hammered_attribute -= 1
+  assert(a3.hammered_attribute == 0)
+
+  # begin the multithreaded tests
+  # make an event that can turn off all threads
+  event = ThreadEvent()
+  event.set()
+  # create and start the thread
+  for i in range(number_of_threads):
+    thread = make_test_thread2("thrd_" + "{0:02}:".format(i), a3, event)
+    thread.start()
+
+  # let the test run for the desired time
+  time.sleep(time_in_seconds)
+  event.clear()
+  time.sleep(0.5)
+  assert(a3.hammered_attribute ==  number_of_threads * 10)
+
 @pytest.mark.thread_safe_attributes
-def test_thread_safe_attribute():
+def test_thread_safe_attribute1():
 
   with open(alog_file, 'w') as fp:
     fp.write("")
 
-  thread_safe_attribute_test(
+  thread_safe_attribute_test1(
     time_in_seconds=10,
     number_of_threads=100,
+    alog_file=alog_file)
+
+@pytest.mark.isolated
+@pytest.mark.thread_safe_attributes
+def test_thread_safe_attribute2():
+
+  with open(alog_file, 'w') as fp:
+    fp.write("")
+
+  thread_safe_attribute_test2(
+    time_in_seconds=10,
+    number_of_threads=1000,
     alog_file=alog_file)
 
 ################################################################################
