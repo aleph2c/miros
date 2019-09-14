@@ -2289,334 +2289,343 @@ inner_state about 1 second after the middle_state was entered.
 
 .. _recipes-getting-information-out-of-your-statechart:
 
-Creating thread-safe class Attributes
--------------------------------------
-A statechart is running in a separate thread from our main program; so how do we
-reach into it and read/write a variable?  We can't assume that it's thread
-won't be halfway through changing the variable we want to read/write at the moment we
-are trying to access it.
-
-To solve this problem we can use a thread safe queue.  If we use the
-``collections.deque`` from the Python standard library, we can build a little ring
-buffer.  The statechart can post information to it, and the main thread can
-read information from it.  If we wrap the deque in a ``@property``, our exposed
-variable will just look like an attribute from outside of the class.
-
-Here is an example design of where we turn the ``times_in_inner`` attribute into a
-thread-safe property.
-
-.. image:: _static/state_recipe_15.svg
-    :target: _static/state_recipe_15.pdf
-    :align: center
-
-There is no UML drawing syntax for creating a Python property, so I just add a
-comment on the diagram after the ``times_in_inner`` attribute about what it
-really is.
-
-We can see how to make the ``times_in_inner`` thread safe attribute below (see
-the highlighted code):
-
-.. code-block:: python
-  :emphasize-lines: 25-27, 81-83, 85-87, 153, 209, 210
+..
+  Creating thread-safe class Attributes
+  -------------------------------------
+  A statechart is running in a separate thread from our main program; so how do we
+  reach into it and read/write a variable?  We can't assume that it's thread
+  won't be halfway through changing the variable we want to read/write at the moment we
+  are trying to access it.
   
-   # simple_state_15.py
-   import re
-   import time
-   import logging
-   from functools import partial
-   from collections import deque
-
-   from miros import Event
-   from miros import signals
-   from miros import Factory
-   from miros import return_status
-
-   class F1(Factory):
-
-     def __init__(self, name, log_file_name=None,
-         live_trace=None, live_spy=None):
-
-       super().__init__(name)
-
-       self.live_trace = \
-         False if live_trace == None else live_trace
-       self.live_spy = \
-         False if live_spy == None else live_spy
-
-       # set up a thread safe ring buffer of size 1
-       self._times_in_inner = deque(maxlen=1)
-       self._times_in_inner.append(0)
-
-       self.log_file_name = \
-         'simple_state_15.log' if log_file_name == None else log_file_name
-
-       # clear our log every time we run this program
-       with open(self.log_file_name, "w") as fp:
-         fp.write("")
-
-       logging.basicConfig(
-         format='%(asctime)s %(levelname)s:%(message)s',
-         filename=self.log_file_name,
-         level=logging.DEBUG)
-     
-       self.register_live_spy_callback(partial(self.spy_callback))
-       self.register_live_trace_callback(partial(self.trace_callback))
-
-       self.outer_state = self.create(state="outer_state"). \
-         catch(signal=signals.ENTRY_SIGNAL,
-           handler=self.outer_state_entry_signal). \
-         catch(signal=signals.INIT_SIGNAL,
-           handler=self.outer_state_init_signal). \
-         catch(signal=signals.Hook,
-           handler=self.outer_state_hook). \
-         catch(signal=signals.Send_Broadcast, \
-           handler=self.outer_state_send_broadcast). \
-         catch(signal=signals.BROADCAST, \
-           handler=self.outer_state_broadcast). \
-         catch(signal=signals.Reset,
-           handler=self.outer_state_reset). \
-         catch(signal=signals.EXIT_SIGNAL,
-           handler=self.outer_state_exit_signal). \
-         to_method()
-
-       self.middle_state = self.create(state="middle_state"). \
-         catch(signal=signals.ENTRY_SIGNAL,
-           handler=self.middle_state_entry_signal). \
-         catch(signal=signals.Ready,
-           handler=self.middle_state_ready). \
-         catch(signal=signals.EXIT_SIGNAL,
-           handler=self.middle_state_exit_signal). \
-         to_method()
-
-       self.inner_state = self.create(state="inner_state"). \
-         catch(signal=signals.ENTRY_SIGNAL,
-           handler=self.inner_state_entry_signal). \
-         catch(signal=signals.EXIT_SIGNAL,
-           handler=self.inner_state_exit_signal). \
-         to_method()
-
-       self.nest(self.outer_state, parent=None). \
-         nest(self.middle_state, parent=self.outer_state). \
-         nest(self.inner_state, parent=self.middle_state)
-
-     @property
-     def times_in_inner(self):
-       return self._times_in_inner[-1]
-
-     @times_in_inner.setter
-     def times_in_inner(self, value):
-       self._times_in_inner.append(value)
-
-     def trace_callback(self, trace):
-       '''trace without datetime-stamp'''
-       trace_without_datetime = re.search(r'(\[.+\]) (\[.+\].+)', trace).group(2)
-       logging.debug("T: " + trace_without_datetime)
-
-     def spy_callback(self, spy):
-       '''spy with machine name pre-pended'''
-       logging.debug("S: [{}] {}".format(self.name, spy))
-     
-     def outer_state_entry_signal(self, e):
-       self.subscribe(Event(signal=signals.BROADCAST))
-       self.scribble("hello from outer_state")
-       status = return_status.HANDLED
-       return status
-
-     def outer_state_init_signal(self, e):
-       self.scribble("init")
-       status = self.trans(self.middle_state)
-       return status
-
-     def outer_state_hook(self, e):
-       status = return_status.HANDLED
-       self.scribble("run some code, but don't transition")
-       return status
-
-     def outer_state_send_broadcast(self, e):
-       status = return_status.HANDLED
-       self.publish(Event(signal=signals.BROADCAST))
-       return status
-
-     def outer_state_broadcast(self, e):
-       status = return_status.HANDLED
-       self.scribble("received broadcast")
-       return status
-
-     def outer_state_reset(self, e):
-       status = self.trans(self.outer_state)
-       return status
-
-     def outer_state_exit_signal(self, e):
-       status = return_status.HANDLED
-       self.scribble("exiting the outer_state")
-       return status
-
-     def middle_state_entry_signal(self, e):
-       status = return_status.HANDLED
-       self.scribble("arming one-shot")
-       self.post_fifo(Event(signal=signals.Ready),
-         times=1,
-         period=1.0,
-         deferred=True)
-       return status
-
-     def middle_state_ready(self, e):
-       status = self.trans(self.inner_state)
-       return status
-
-     def middle_state_exit_signal(self, e):
-       status = return_status.HANDLED
-       self.cancel_events(Event(signal=signals.Ready))
-       return status
-
-     def inner_state_entry_signal(self, e):
-       status = return_status.HANDLED
-       self.times_in_inner += 1
-       self.scribble(
-         "hello from inner_state {}".format(self.times_in_inner))
-       return status
-
-     def inner_state_exit_signal(self, e):
-       status = return_status.HANDLED
-       self.scribble("exiting inner_state")
-       return status
-
-   class F2(F1):
-     def __init__(self, *args, **kwargs):
-       super().__init__(*args, **kwargs)
-
-     def inner_state_entry_signal(self, e):
-       status = return_status.HANDLED
-       self.scribble("hello from new inner_state")
-       return status
-
-     def inner_state_exit_signal(self, e):
-       status = return_status.HANDLED
-       self.scribble("exiting new inner_state")
-       return status
-
-   if __name__ == '__main__':
-
-     f1 = F1(
-       "f1",
-       live_trace=True,
-       live_spy=True,
-     )
-
-     f2 = F2(
-       "f2",
-       live_trace=True,
-       live_spy=True,
-     )
-
-     f1.start_at(f1.outer_state)
-     f1.post_fifo(Event(signal=signals.Hook))
-     f1.post_fifo(
-       Event(signal=signals.Reset),
-       times=1,
-       period=2.0,
-       deferred=True
+  To solve this problem we can use a thread safe queue.  If we use the
+  ``collections.deque`` from the Python standard library, we can build a little ring
+  buffer.  The statechart can post information to it, and the main thread can
+  read information from it.  If we wrap the deque in a ``@property``, our exposed
+  variable will just look like an attribute from outside of the class.
+  
+  Here is an example design of where we turn the ``times_in_inner`` attribute into a
+  thread-safe property.
+  
+  .. image:: _static/state_recipe_15.svg
+      :target: _static/state_recipe_15.pdf
+      :align: center
+  
+  There is no UML drawing syntax for creating a Python property, so I just add a
+  comment on the diagram after the ``times_in_inner`` attribute about what it
+  really is.
+  
+  We can see how to make the ``times_in_inner`` thread safe attribute below (see
+  the highlighted code):
+  
+  .. code-block:: python
+    :emphasize-lines: 25-27, 81-83, 85-87, 153, 209, 210
+    
+     # simple_state_15.py
+     import re
+     import time
+     import logging
+     from functools import partial
+     from collections import deque
+  
+     from miros import Event
+     from miros import signals
+     from miros import Factory
+     from miros import return_status
+  
+     class F1(Factory):
+  
+       def __init__(self, name, log_file_name=None,
+           live_trace=None, live_spy=None):
+  
+         super().__init__(name)
+  
+         self.live_trace = \
+           False if live_trace == None else live_trace
+         self.live_spy = \
+           False if live_spy == None else live_spy
+  
+         # set up a thread safe ring buffer of size 1
+         self._times_in_inner = deque(maxlen=1)
+         self._times_in_inner.append(0)
+  
+         self.log_file_name = \
+           'simple_state_15.log' if log_file_name == None else log_file_name
+  
+         # clear our log every time we run this program
+         with open(self.log_file_name, "w") as fp:
+           fp.write("")
+  
+         logging.basicConfig(
+           format='%(asctime)s %(levelname)s:%(message)s',
+           filename=self.log_file_name,
+           level=logging.DEBUG)
+       
+         self.register_live_spy_callback(partial(self.spy_callback))
+         self.register_live_trace_callback(partial(self.trace_callback))
+  
+         self.outer_state = self.create(state="outer_state"). \
+           catch(signal=signals.ENTRY_SIGNAL,
+             handler=self.outer_state_entry_signal). \
+           catch(signal=signals.INIT_SIGNAL,
+             handler=self.outer_state_init_signal). \
+           catch(signal=signals.Hook,
+             handler=self.outer_state_hook). \
+           catch(signal=signals.Send_Broadcast, \
+             handler=self.outer_state_send_broadcast). \
+           catch(signal=signals.BROADCAST, \
+             handler=self.outer_state_broadcast). \
+           catch(signal=signals.Reset,
+             handler=self.outer_state_reset). \
+           catch(signal=signals.EXIT_SIGNAL,
+             handler=self.outer_state_exit_signal). \
+           to_method()
+  
+         self.middle_state = self.create(state="middle_state"). \
+           catch(signal=signals.ENTRY_SIGNAL,
+             handler=self.middle_state_entry_signal). \
+           catch(signal=signals.Ready,
+             handler=self.middle_state_ready). \
+           catch(signal=signals.EXIT_SIGNAL,
+             handler=self.middle_state_exit_signal). \
+           to_method()
+  
+         self.inner_state = self.create(state="inner_state"). \
+           catch(signal=signals.ENTRY_SIGNAL,
+             handler=self.inner_state_entry_signal). \
+           catch(signal=signals.EXIT_SIGNAL,
+             handler=self.inner_state_exit_signal). \
+           to_method()
+  
+         self.nest(self.outer_state, parent=None). \
+           nest(self.middle_state, parent=self.outer_state). \
+           nest(self.inner_state, parent=self.middle_state)
+  
+       @property
+       def times_in_inner(self):
+         return self._times_in_inner[-1]
+  
+       @times_in_inner.setter
+       def times_in_inner(self, value):
+         self._times_in_inner.append(value)
+  
+       def trace_callback(self, trace):
+         '''trace without datetime-stamp'''
+         trace_without_datetime = re.search(r'(\[.+\]) (\[.+\].+)', trace).group(2)
+         logging.debug("T: " + trace_without_datetime)
+  
+       def spy_callback(self, spy):
+         '''spy with machine name pre-pended'''
+         logging.debug("S: [{}] {}".format(self.name, spy))
+       
+       def outer_state_entry_signal(self, e):
+         self.subscribe(Event(signal=signals.BROADCAST))
+         self.scribble("hello from outer_state")
+         status = return_status.HANDLED
+         return status
+  
+       def outer_state_init_signal(self, e):
+         self.scribble("init")
+         status = self.trans(self.middle_state)
+         return status
+  
+       def outer_state_hook(self, e):
+         status = return_status.HANDLED
+         self.scribble("run some code, but don't transition")
+         return status
+  
+       def outer_state_send_broadcast(self, e):
+         status = return_status.HANDLED
+         self.publish(Event(signal=signals.BROADCAST))
+         return status
+  
+       def outer_state_broadcast(self, e):
+         status = return_status.HANDLED
+         self.scribble("received broadcast")
+         return status
+  
+       def outer_state_reset(self, e):
+         status = self.trans(self.outer_state)
+         return status
+  
+       def outer_state_exit_signal(self, e):
+         status = return_status.HANDLED
+         self.scribble("exiting the outer_state")
+         return status
+  
+       def middle_state_entry_signal(self, e):
+         status = return_status.HANDLED
+         self.scribble("arming one-shot")
+         self.post_fifo(Event(signal=signals.Ready),
+           times=1,
+           period=1.0,
+           deferred=True)
+         return status
+  
+       def middle_state_ready(self, e):
+         status = self.trans(self.inner_state)
+         return status
+  
+       def middle_state_exit_signal(self, e):
+         status = return_status.HANDLED
+         self.cancel_events(Event(signal=signals.Ready))
+         return status
+  
+       def inner_state_entry_signal(self, e):
+         status = return_status.HANDLED
+         self.times_in_inner += 1
+         self.scribble(
+           "hello from inner_state {}".format(self.times_in_inner))
+         return status
+  
+       def inner_state_exit_signal(self, e):
+         status = return_status.HANDLED
+         self.scribble("exiting inner_state")
+         return status
+  
+     class F2(F1):
+       def __init__(self, *args, **kwargs):
+         super().__init__(*args, **kwargs)
+  
+       def inner_state_entry_signal(self, e):
+         status = return_status.HANDLED
+         self.scribble("hello from new inner_state")
+         return status
+  
+       def inner_state_exit_signal(self, e):
+         status = return_status.HANDLED
+         self.scribble("exiting new inner_state")
+         return status
+  
+     if __name__ == '__main__':
+  
+       f1 = F1(
+         "f1",
+         live_trace=True,
+         live_spy=True,
        )
-
-     f2.start_at(f2.inner_state)
-     f2.post_fifo(Event(signal=signals.Hook))
-     f2.post_fifo(Event(signal=signals.Reset))
-     f1.post_fifo(Event(signal=signals.Send_Broadcast))
-
-     # delay long enough so we can see how the program behaves in time
-     time.sleep(4.00)
-
-     # read information from other threads
-     print("f1 was in its inner state {} times".format(f1.times_in_inner))
-     print("f2 was in its inner state {} times".format(f2.times_in_inner))
-
-Running this program will provide the following output:
-
-.. code-block:: python
   
-  f1 was in its inner state 2 times
-  f2 was in its inner state 0 times
-
-The f1 statechart properly reports how many times it was in its inner_state.
-The f2 inner_state doesn't write to the ``times_in_inner`` property, so it's
-output only shows how that property was initialized.
-
-Let's look at the property code in isolation from the rest of the statechart:
-
-.. code-block:: python
-  :emphasize-lines: 1
-  :linenos:
-
-  # INITIALIZATION CODE TAKEN FROM __init__
-  # set up a thread safe ring buffer of size 1
-  self._times_in_inner = deque(maxlen=1)
-  self._times_in_inner.append(0)
-  # ...
-  # PROPERTY methods used to control the deque
-  @property
-  def times_in_inner(self):
-    return self._times_in_inner[-1]
-
-  @times_in_inner.setter
-  def times_in_inner(self, value):
-    self._times_in_inner.append(value)
-  # ...
-  # CODE FROM WITHIN STATECHART using the property
-  def inner_state_entry_signal(self, e):
-    status = return_status.HANDLED
-    self.times_in_inner += 1
-    self.scribble(
-      "hello from inner_state {}".format(self.times_in_inner))
-    return status
-  # ...
-  # CODE OUTSIDE OF STATECHART accessing the property
-  print("f1 was in its inner state {} times".format(f1.times_in_inner))
-
-The initialization code on lines 3-4 of this listing, creates a private deque
-ring-buffer which can hold one item, then pushes a zero into this queue.  Since
-our ``_time_in_inner`` deque is a ring buffer of size 1, when we ``append`` new
-information into it, it's old information is shifted out of the ring (deleted).
-
-We see this kind of ``append`` taking place in the ``times_in_inner`` setter
-method on lines 12 to 13.  The value is shifted into the deque and the old information
-is pushed out.  This is a thread safe activity; if more than one thread is
-accessing this method at once, they don't both get to perform the action at the
-same time.  One will get its turn, then the other will get its turn.
-
-The ``times_in_inner`` getter method described in lines 7-9 of the listing
-shows us how we can access our information from within or outside of our
-statechart's thread.  We only read the latest member of the deque.  Since our
-deque is of size one, there is only one thing to read in it anyway.
-
-We can see how this property is used within the statechart's thread on line 18.  The
-``self.times_in_inner += 1`` calls the getter method 8-9, adds one to the result
-then calls the setter method (12-13) which appends the result into the deque,
-shifting the old information out.
-
-We can see how the ``times_in_inner`` property is accessed outside of the
-statechart thread on line 24.  The main thread accesses the getter method 8-9, and
-reports its returned value in a print statement.
-
-As of miros 4.1.3, you could get create the same thread-safe-attribute like
-this:
-
-.. code-block:: python
-
-   from miros import Factory
-   # ...
-   from miros import ThreadSafeAttributes
-
-   class F1(Factory, ThreadSafeAttributes):
-      _attribute = ['times_in_inner']
-
-     def __init__(self, name, log_file_name=None,
-         live_trace=None, live_spy=None):
-       # ...
+       f2 = F2(
+         "f2",
+         live_trace=True,
+         live_spy=True,
+       )
+  
+       f1.start_at(f1.outer_state)
+       f1.post_fifo(Event(signal=signals.Hook))
+       f1.post_fifo(
+         Event(signal=signals.Reset),
+         times=1,
+         period=2.0,
+         deferred=True
+         )
+  
+       f2.start_at(f2.inner_state)
+       f2.post_fifo(Event(signal=signals.Hook))
+       f2.post_fifo(Event(signal=signals.Reset))
+       f1.post_fifo(Event(signal=signals.Send_Broadcast))
+  
+       # delay long enough so we can see how the program behaves in time
+       time.sleep(4.00)
+  
+       # read information from other threads
+       print("f1 was in its inner state {} times".format(f1.times_in_inner))
+       print("f2 was in its inner state {} times".format(f2.times_in_inner))
+  
+  Running this program will provide the following output:
+  
+  .. code-block:: python
+    
+    f1 was in its inner state 2 times
+    f2 was in its inner state 0 times
+  
+  The f1 statechart properly reports how many times it was in its inner_state.
+  The f2 inner_state doesn't write to the ``times_in_inner`` property, so it's
+  output only shows how that property was initialized.
+  
+  Let's look at the property code in isolation from the rest of the statechart:
+  
+  .. code-block:: python
+    :emphasize-lines: 1
+    :linenos:
+  
+    # INITIALIZATION CODE TAKEN FROM __init__
+    # set up a thread safe ring buffer of size 1
+    self._times_in_inner = deque(maxlen=1)
+    self._times_in_inner.append(0)
+    # ...
+    # PROPERTY methods used to control the deque
+    @property
+    def times_in_inner(self):
+      return self._times_in_inner[-1]
+  
+    @times_in_inner.setter
+    def times_in_inner(self, value):
+      self._times_in_inner.append(value)
+    # ...
+    # CODE FROM WITHIN STATECHART using the property
+    def inner_state_entry_signal(self, e):
+      status = return_status.HANDLED
+      self.times_in_inner += 1
+      self.scribble(
+        "hello from inner_state {}".format(self.times_in_inner))
+      return status
+    # ...
+    # CODE OUTSIDE OF STATECHART accessing the property
+    print("f1 was in its inner state {} times".format(f1.times_in_inner))
+  
+  The initialization code on lines 3-4 of this listing, creates a private deque
+  ring-buffer which can hold one item, then pushes a zero into this queue.  Since
+  our ``_time_in_inner`` deque is a ring buffer of size 1, when we ``append`` new
+  information into it, it's old information is shifted out of the ring (deleted).
+  
+  We see this kind of ``append`` taking place in the ``times_in_inner`` setter
+  method on lines 12 to 13.  The value is shifted into the deque and the old information
+  is pushed out.  This is a thread safe activity; if more than one thread is
+  accessing this method at once, they don't both get to perform the action at the
+  same time.  One will get its turn, then the other will get its turn.
+  
+  The ``times_in_inner`` getter method described in lines 7-9 of the listing
+  shows us how we can access our information from within or outside of our
+  statechart's thread.  We only read the latest member of the deque.  Since our
+  deque is of size one, there is only one thing to read in it anyway.
+  
+  We can see how this property is used within the statechart's thread on line 18.  The
+  ``self.times_in_inner += 1`` calls the getter method 8-9, adds one to the result
+  then calls the setter method (12-13) which appends the result into the deque,
+  shifting the old information out.
+  
+  We can see how the ``times_in_inner`` property is accessed outside of the
+  statechart thread on line 24.  The main thread accesses the getter method 8-9, and
+  reports its returned value in a print statement.
+  
+  As of miros 4.1.3, you could create the same thread-safe-attribute like
+  this:
+  
+  .. code-block:: python
+  
+     from miros import Factory
+     # ...
+     from miros import ThreadSafeAttributes
+  
+     class F1(Factory, ThreadSafeAttributes):
+        _attribute = ['times_in_inner']
+  
+       def __init__(self, name, log_file_name=None,
+           live_trace=None, live_spy=None):
+         # ...
+  
+  The ThreadSafeAttributes class contains code which automatically makes the
+  deque, initializes and wraps the deque within a property.  To build such
+  attributes, we place the thread-safe-attribute names in a list and assign it to
+  ``_attributes``, as seen above.  If you would like to read more about this,
+  consider:
+  
+  * :ref:`Sharing attributes between threads (ActiveObjects) <recipes-sharing-attributes-between-threads-activeobjects>` 
+  * :ref:`Sharing attributes between threads (Factories)<recipes-sharing-attributes-between-threads-factories>`
 
 ----
 
-Here is a collection of tiny programs that each demonstrate how to do something
-with miros.
+Here is a collection of tiny programs that each demonstrate how to do things in miros.
 
 .. _recipes-states:
 
@@ -3965,90 +3974,91 @@ active objects using the ``augment`` command.
 
 .. _recipes-sharing-attributes-between-threads-activeobjects:
 
-Sharing Attributes between Threads (ActiveObjects)
---------------------------------------------------
-As of miros version v4.1.3, you can create thread safe attributes in your
-derived ``ActiveObect`` class by also inheriting the ``ThreadSafeAttributes``.
-
-To create one or more thread safe attribute, you add them to the list defined
-``_attributes``:
+..
+  Sharing Attributes between Threads (ActiveObjects)
+  --------------------------------------------------
+  As of miros version v4.1.3, you can create thread safe attributes in your
+  derived ``ActiveObect`` class by also inheriting the ``ThreadSafeAttributes``.
   
-.. code-block:: python
-  :emphasize-lines: 8, 10, 19-20, 24, 35, 40, 51, 56, 68-69, 72
-  :linenos:
+  To create one or more thread safe attribute, you add them to the list defined
+  ``_attributes``:
+    
+  .. code-block:: python
+    :emphasize-lines: 8, 10, 19-20, 24, 35, 40, 51, 56, 68-69, 72
+    :linenos:
+    
+    from miros import Event
+    from miros import spy_on
+    from miros import signals
+    from miros import ActiveObject
+    from miros import return_status
+    from miros import ThreadSafeAttributes
+    
+    class ThreadSafeAttributesInActiveObject(ThreadSafeAttributes, ActiveObject):
   
-  from miros import Event
-  from miros import spy_on
-  from miros import signals
-  from miros import ActiveObject
-  from miros import return_status
-  from miros import ThreadSafeAttributes
+      _attributes = ['thread_safe_attr_1', 'thread_safe_attr_2']
   
-  class ThreadSafeAttributesInActiveObject(ThreadSafeAttributes, ActiveObject):
-
-    _attributes = ['thread_safe_attr_1', 'thread_safe_attr_2']
-
-    def __init__(self, name):
-      super().__init__(name)
-
-   @spy_on
-   def c(chart, e):
-     status = return_status.UNHANDLED
-     if(e.signal == signals.ENTRY_SIGNAL):
-       chart.thread_safe_attr_1 = False
-       chart.thread_safe_attr_2 = False
-     elif(e.signal == signals.INIT_SIGNAL):
-       status = chart.trans(c1)
-     elif(e.signal == signals.B):
-       chart.thread_safe_attr_1 = True
-       status = chart.trans(c)
-     else:
-       chart.temp.fun = chart.top
-       status = return_status.SUPER
-     return status
-
-   @spy_on
-   def c1(chart, e):
-     status = return_status.UNHANDLED
-     if(e.signal == signals.ENTRY_SIGNAL):
-       chart.thread_safe_attr_1 = True
-       status = return_status.HANDLED
-     elif(e.signal == signals.A):
-       status = chart.trans(c2)
-     elif(e.signal == signals.EXIT_SIGNAL):
-       chart.thread_safe_attr_1 = False
-       status = return_status.HANDLED
-     else:
-       chart.temp.fun = c
-       status = return_status.SUPER
-     return status
-
-   @spy_on
-   def c2(chart, e):
-     status = return_status.UNHANDLED
-     if(e.signal == signals.ENTRY_SIGNAL):
-       chart.thread_safe_attr_2 = True
-       status = return_status.HANDLED
-     elif(e.signal == signals.A):
-       status = chart.trans(c1)
-     elif(e.signal == signals.EXIT_SIGNAL):
-       chart.thread_safe_attr_2 = False
-       status = return_status.HANDLED
-     else:
-       chart.temp.fun = c
-       status = return_status.SUPER
-     return status
-   
-   if __name__ == '__main__':
-      ao = ThreadSafeAttributesInActiveObject("ao")
-      ao.start_at(c)
-      # Change the ActiveObject's attributes while it is starting it's thread
-      # and starting its statemachine
-      ao.thread_safe_attr_1 = True
-      ao.thread_safe_attr_2 = False
-      ao.post_fifo(Event(signal=signals.A)
-      # Main thread can access attribute used by the ActiveObject's thread
-      print(ao.thread_safe_attr_2)
+      def __init__(self, name):
+        super().__init__(name)
+  
+     @spy_on
+     def c(chart, e):
+       status = return_status.UNHANDLED
+       if(e.signal == signals.ENTRY_SIGNAL):
+         chart.thread_safe_attr_1 = False
+         chart.thread_safe_attr_2 = False
+       elif(e.signal == signals.INIT_SIGNAL):
+         status = chart.trans(c1)
+       elif(e.signal == signals.B):
+         chart.thread_safe_attr_1 = True
+         status = chart.trans(c)
+       else:
+         chart.temp.fun = chart.top
+         status = return_status.SUPER
+       return status
+  
+     @spy_on
+     def c1(chart, e):
+       status = return_status.UNHANDLED
+       if(e.signal == signals.ENTRY_SIGNAL):
+         chart.thread_safe_attr_1 = True
+         status = return_status.HANDLED
+       elif(e.signal == signals.A):
+         status = chart.trans(c2)
+       elif(e.signal == signals.EXIT_SIGNAL):
+         chart.thread_safe_attr_1 = False
+         status = return_status.HANDLED
+       else:
+         chart.temp.fun = c
+         status = return_status.SUPER
+       return status
+  
+     @spy_on
+     def c2(chart, e):
+       status = return_status.UNHANDLED
+       if(e.signal == signals.ENTRY_SIGNAL):
+         chart.thread_safe_attr_2 = True
+         status = return_status.HANDLED
+       elif(e.signal == signals.A):
+         status = chart.trans(c1)
+       elif(e.signal == signals.EXIT_SIGNAL):
+         chart.thread_safe_attr_2 = False
+         status = return_status.HANDLED
+       else:
+         chart.temp.fun = c
+         status = return_status.SUPER
+       return status
+     
+     if __name__ == '__main__':
+        ao = ThreadSafeAttributesInActiveObject("ao")
+        ao.start_at(c)
+        # Change the ActiveObject's attributes while it is starting it's thread
+        # and starting its statemachine
+        ao.thread_safe_attr_1 = True
+        ao.thread_safe_attr_2 = False
+        ao.post_fifo(Event(signal=signals.A)
+        # Main thread can access attribute used by the ActiveObject's thread
+        print(ao.thread_safe_attr_2)
 
 
 
@@ -4537,72 +4547,73 @@ If you have any suggestions about how to draw this better, email me.
 
 .. _recipes-sharing-attributes-between-threads-factories:
 
-Sharing Attributes between Threads (Factories)
-----------------------------------------------
-As of miros version v4.1.3, you can create thread safe attributes in your
-derived ``Factory`` class by inheriting from ``ThreadSafeAttributes``.
+..
+  Sharing Attributes between Threads (Factories)
+  ----------------------------------------------
+  As of miros version v4.1.3, you can create thread safe attributes in your
+  derived ``Factory`` class by inheriting from ``ThreadSafeAttributes``.
+  
+  To create one or more thread safe attribute, you add them to the list defined
+  ``_attributes`` within the class body before the ``__init__`` method is defined.
+  See below:
+  
+  .. code-block:: python
+  
+    from miros import Event
+    from miros import signals
+    from miros import Factory
+    from miros import return_status
+    from miros import ThreadSafeAttributes
+  
+    # By inheriting from ThreadSafeAttributes, you can define as many thread safe
+    # attributes you need by assigning their names as strings to the
+    # `_attributes` list.
+    class Example2(Factory, ThreadSafeAttributes):
+  
+      _attributes = ['thread_safe_attr_1', 'thread_safe_attr_2']
+  
+    def __init__(self, name, live_trace=None, live_spy=None):
+  
+      super().__init__(name=name)
+      self.thread_safe_attr_1 = True  # .. you can access this from main or other
+                                      # threads in the same way
+  
+      # ... define states, link them to their signals
+      # ... nesting code, etc.
+  
+      # statechart thread is created and started when `start_at` is called
+      self.start_at(self.c)  # 
 
-To create one or more thread safe attribute, you add them to the list defined
-``_attributes`` within the class body before the ``__init__`` method is defined.
-See below:
-
-.. code-block:: python
-
-  from miros import Event
-  from miros import signals
-  from miros import Factory
-  from miros import return_status
-  from miros import ThreadSafeAttributes
-
-  # By inheriting from ThreadSafeAttributes, you can define as many thread safe
-  # attributes you need by assigning their names as strings to the
-  # `_attributes` list.
-  class Example2(Factory, ThreadSafeAttributes):
-
-    _attributes = ['thread_safe_attr_1', 'thread_safe_attr_2']
-
-  def __init__(self, name, live_trace=None, live_spy=None):
-
-    super().__init__(name=name)
-    self.thread_safe_attr_1 = True  # .. you can access this from main or other
-                                    # threads in the same way
-
-    # ... define states, link them to their signals
-    # ... nesting code, etc.
-
-    # statechart thread is created and started when `start_at` is called
-    self.start_at(self.c)  # 
-
-  # ... state methods defined here
-
-  if __name__ == "__main__":
-
-    statechart = Example2('example2')     # thread is started and is running
-                                          # because `start_at` called within
-                                          # the `__init__` method.
-
-    print(statechart.thread_safe_attr_1)  # you can access the attribute which
-                                          # is being used by the statechart's
-                                          # thread, since it's wrapped
-                                          # by a thread-safe datastructure
-
-
-By inheriting from the ``ThreadSafeAttributes`` class, we get access to the
-``_attributes`` feature.  By assigning a list of strings to this ``_attributes``
-class attribute, a set of thread safe attributes are created an initialized in
-the background before the Example2 ``__init__`` method is called.
-
-In this example, we have created two thread safe attributes, which in reality
-are deque objects of size one, initialized with ``None``, wrapped within a class
-supporting the `descriptor protocal
-<https://docs.python.org/3/howto/descriptor.html>`_.  As a user of this feature,
-you don't have to care about these details, you can just access
-``thread_safe_attr_1`` and ``thread_safe_attr_2`` as if they were regular
-attributes.  However, unlike other attributes, you *can safely use them* from
-inside or from outside the thread running your Factory derived statechart.
-
-To see a full example look `here
-<https://github.com/aleph2c/miros/blob/master/examples/thread_safe_attributes_in_factory.py>`_.
+    # ... state methods defined here
+  
+    if __name__ == "__main__":
+  
+      statechart = Example2('example2')     # thread is started and is running
+                                            # because `start_at` called within
+                                            # the `__init__` method.
+  
+      print(statechart.thread_safe_attr_1)  # you can access the attribute which
+                                            # is being used by the statechart's
+                                            # thread, since it's wrapped
+                                            # by a thread-safe datastructure
+  
+  
+  By inheriting from the ``ThreadSafeAttributes`` class, we get access to the
+  ``_attributes`` feature.  By assigning a list of strings to this ``_attributes``
+  class attribute, a set of thread safe attributes are created an initialized in
+  the background before the Example2 ``__init__`` method is called.
+  
+  In this example, we have created two thread safe attributes, which in reality
+  are deque objects of size one, initialized with ``None``, wrapped within a class
+  supporting the `descriptor protocal
+  <https://docs.python.org/3/howto/descriptor.html>`_.  As a user of this feature,
+  you don't have to care about these details, you can just access
+  ``thread_safe_attr_1`` and ``thread_safe_attr_2`` as if they were regular
+  attributes.  However, unlike other attributes, you *can safely use them* from
+  inside or from outside the thread running your Factory derived statechart.
+  
+  To see a full example look `here
+  <https://github.com/aleph2c/miros/blob/master/examples/thread_safe_attributes_in_factory.py>`_.
 
 .. _recipes-multiple-statecharts:
 
@@ -4645,7 +4656,6 @@ themselves.
 A worker can be thought of as some code sitting in a parallel thread, which will
 do work, then post the results of this work back to their federation before they
 prepare themselves for garbage collection.
-
 
 .. _recipes-seeing-what-is-:
 

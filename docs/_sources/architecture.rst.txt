@@ -9,7 +9,8 @@ How the miros library is structured:
    :maxdepth: 2
    :caption: Contents:
 
-   event
    hsm
+   event
+   foreign
    activeobject
-
+   thread_safe_attributes

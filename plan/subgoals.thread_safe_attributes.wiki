@@ -1,0 +1,80 @@
+*Thread safety through using locks, the descriptor protocol and iadd*
+= Observer ([[local:C:/Vim8.1/.vim/ooda.pdf|diagram]]) = 
+== Evidence ([[evidence.subgoals.thread_safe_attributes|evidence]]) ==
+
+  *What defines Success?:* ([[subgoals.subgoals.thread_safe_attributes|subgoals]])
+    Find a test that can fail when a technique is not working.
+    Identify all non-atomic attribute paths a user would make, and make those
+    paths thread safe.
+    Re-release the thread-safe attribute feature, where I'm convinced I'm not
+    going to be injecting nasty bugs into my user's codebases. (no code changes
+    on the part of the userbase)
+    
+  *What is the problem?*
+    The "+=" operatation is not atomic.  Python 3 switches between threads every
+    15 milliseconds, so your previous thread-safety tests may not have actually
+    been able to test a failure in your technique.  I becoming more convinced
+    that my tests can't tell when the thread safe attributes feature is not
+    working.
+  
+  *Discoveries:*
+    
+    Laurent Luce's description of [[http://www.laurentluce.com/posts/python-threads-synchronization-locks-rlocks-semaphores-conditions-events-and-queues/|threading]]
+    Eldamir's "make python @property handle +=, -= etc on [[https://stackoverflow.com/questions/23288559/make-python-property-handle-etc|stackoverflow]]
+    Jess Jiryu Davis' article on the [[https://emptysqua.re/blog/grok-the-gil-fast-thread-safe-python/|GIL]]
+    
+= Orient =
+  *Symptoms:* [[symptoms.subgoals.thread_safe_attributes|symptoms]]
+
+== Questions ==
+  *Questions for Thread safety through using locks, the descriptor protocol and iadd: >= 5*
+    Do you have enough information?
+    How do I make the tests fail?
+    Are your resources organized so you can quickly find them?
+    Can you reproduce the problem?
+    Can you simplify the test?
+    What recently changed?
+    What don't you know that you need to know?
+    Is it possible it works as is?
+    Can you get this done quickly?  You may have broken code in the field.
+    Can you rollback the release until you are more confident?
+  
+  *Assumptions*
+    I'm assuming that the current design is broken, but I can't confirm it.
+
+= Decide =
+  [[#Questions]]
+  *Research Needed For?:*
+    Read anything by Beazley on thread safe attributes
+    
+    Search:
+      "Thread safe properties python"
+      "Make properties atomic python"
+      "Thread locks and the descriptor protocol python"
+      
+
+  [[#Questions]]
+  *Idea/Hypotheses for Thread safety through using locks, the descriptor protocol and iadd: >=5*
+  * [ ] Remove any mention of this from your docs immediately
+  * [ ] Use the iadd method to wrap the descriptor protocol (may need indirection)
+  * [ ] Investigate the concurrency technique in your examples directory
+  * [ ] Can you use put/get with a queue instead?
+  * [ ] Make the tests fail
+  * [ ] The system is working
+  * [ ] Make better tests, the current tests seem weak
+  * [ ] Remove the feature entirely and just demonstrate good techniques in the
+        docs
+
+  *Chosen Research-Goal/Hypothesis*
+    Use the iadd method to wrap the descriptor protocol (may need indirection)
+
+== Plan ([[plan.subgoals.thread_safe_attributes|plan]]) ==
+  * add the iadd method, place a break point in the method and see if you can get
+    an existing test to land here
+  * if not, examine some form of indirect, a property in a property?  Something
+    like this, wrestle with this problem to see if there is a clean way to add
+    locks around non-atom code while using the descriptor protocol
+
+= Act =
+  
+

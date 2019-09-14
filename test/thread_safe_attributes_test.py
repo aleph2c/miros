@@ -274,8 +274,17 @@ def make_test_thread2(name, object_to_hammer, thread_event):
   def thread_runner2(name, obj, e):
     index = 0
     while e.is_set():
-      obj.hammered_attribute += 1 
-      time.sleep(random.uniform(0, 0.005))
+      obj.hammered_attribute += 1  # 1
+      obj.hammered_attribute += 1  # 2
+      obj.hammered_attribute += 1  # 3
+      obj.hammered_attribute += 1  # 4
+      obj.hammered_attribute += 1  # 5
+      obj.hammered_attribute += 1  # 6
+      obj.hammered_attribute += 1  # 7
+      obj.hammered_attribute += 1  # 8
+      obj.hammered_attribute += 1  # 9
+      obj.hammered_attribute += 1  # 10
+      #time.sleep(random.uniform(0, 0.005))
       index += 1 
       if index == 10:
         break
@@ -383,7 +392,7 @@ def thread_safe_attribute_test2(time_in_seconds, number_of_threads, alog_file):
   time.sleep(time_in_seconds)
   event.clear()
   time.sleep(0.5)
-  assert(a3.hammered_attribute ==  number_of_threads * 10)
+  assert(a3.hammered_attribute ==  number_of_threads * 100)
 
 @pytest.mark.thread_safe_attributes
 def test_thread_safe_attribute1():
@@ -404,8 +413,8 @@ def test_thread_safe_attribute2():
     fp.write("")
 
   thread_safe_attribute_test2(
-    time_in_seconds=10,
-    number_of_threads=1000,
+    time_in_seconds=100,
+    number_of_threads=1,
     alog_file=alog_file)
 
 ################################################################################
