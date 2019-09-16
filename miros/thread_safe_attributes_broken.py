@@ -10,7 +10,6 @@ class ThreadSafeAttribute:
     self._value.append(self._initial_value)
 
   def __get__(self, obj, objtype):
-    print("my name is fuck you")
     return self._value[-1]
 
   def __set__(self, obj, val):
