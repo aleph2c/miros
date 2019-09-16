@@ -1,66 +1,101 @@
-class IntFeeder(int):
-  def __new__(cls, value):
-    return int.__new__(cls, value)
+import re
+import inspect
+from threading import RLock
+from collections import namedtuple
 
-class FeedStock(IntFeeder):
-  def __iadd__(self, other):
-    print("locking in __iadd__")
-    if hasattr(super(), '__iadd__'):
-      print("here")
-      return super(FeedStock, self).__iadd__(other)
-    else:
-      return self + other
+# __iadd__ has been removed from this example because it is not needed
+# the data descriptor is more fundamental than the __iadd__, __iadd__ will call
+# its __get__ and __set__ method.  If we lock across these methods we can avoid
+# the complexity of having to write __iadd__ and it's family of magic methods.
 
-class NameInClassSpace1():
+# demonstration of how to make a thread safe attribute using a data descriptor
+
+FrameData = namedtuple('FrameData', [
+  'filename', 
+  'line_number',
+  'function_name',
+  'lines',
+  'index'])
+
+class NameInClassSpace1(object):
 
   def __init__(self):
-    self._name = FeedStock(0)
+    self._name = 0
+    self._is_atomic = True
+    self._lock = RLock()
 
   def __get__(self, instance, owner):
-    print('getting1 ', self._name)
+    self._is_atomic = True
+    print("get acquiring lock")
+    self._lock.acquire(blocking=True)
+    previous_frame = inspect.currentframe().f_back
+    fdata = FrameData(*inspect.getframeinfo(previous_frame))
+    if re.search(r'([+-/*@^&|<>%]=)|([/<>*]{2}=)', fdata.lines[0]) is not None:
+      print('{} not atomic'.format(fdata.lines[0]))
+      self._is_atomic = False
+    else:
+      print('{} is atomic'.format(fdata.lines[0]))
+      print("get releasing lock")
+      self._lock.release()
     return self._name
 
-  def __set__(self, instance, name):
-    print('setting1 ', name)
-    self._name = name
+  def __set__(self, instance, value):
+    if not self._is_atomic:
+      print("set continuing non atomic operation")
+    else:
+      print("set aquiring lock")
+      self._lock.acquire(blocking=True)
+    self._name = value
+    print("set releasing lock")
+    self._lock.release()
+    self._is_atomic = True
 
-  def __delete__(self, instance):
-    print('deleting1 ', self._name)
-    del self._name
-
-class NameInClassSpace1Sub():
+class NameInClassSpace2():
   name = NameInClassSpace1()
 
-class NameInClassSpace2(object):
-
-  def __init__(self):
-    self._name = FeedStock(0)
-
-  def fget(self):
-    print('locking and getting ', self._name)
-    return self._name
-
-  def fset(self, name):
-    print('locking and setting ', name)
-    self._name = name
-
-  def fdel(self):
-    print('deleting ', self._name)
-    del self._name
-
-  name = property(fget, fset, fdel, doc="")
-
-user = NameInClassSpace1Sub()
-user.name = 1
-user.name += 1
-user.name
-del user.name
-import pdb; pdb.set_trace()
 a = NameInClassSpace2()
+a.name -= 1
+a.name = 1
+print("")
+a.name *= 1
+a.name = 1
+print("")
+#a.name @= 1
+#a.name = 1
+a.name /= 1
+a.name = 1
+print("")
+a.name //= 1
+a.name = 1
+print("")
+a.name %= 1
+a.name = 1
+print("")
+a.name **= 1
+a.name = 1
+print("")
+a.name <<= 1
+a.name = 1
+print("")
+a.name >>= 1
+a.name = 1
+print("")
+a.name &= 1
+a.name = 1
+print("")
+a.name ^= 1
+a.name = 1
+print("")
+a.name |= 1
+a.name = 1
+print("")
+
+print("")
+a.name = 3
+print(a.name)
 print("")
 a.name += 1
-#user = Forced()
-#user.name2.name = 1
-#user.name2.name += 1
-#del user.name2.name
+print("")
+a.name = 1
+print("")
 

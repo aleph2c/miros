@@ -20,6 +20,9 @@ from miros import FactoryWithAttributes
 from miros import ActiveObjectWithAttributes
 from miros import MetaThreadSafeAttributes
 
+#from miros.thread_safe_attributes_broken import MetaThreadSafeAttributes
+#class ThreadSafeAttributes(metaclass=MetaThreadSafeAttributes): pass
+
 # the basic logger is not working, so build a custom logger
 this_dir = (Path(__file__) / '..').resolve()
 alog_file = str((this_dir / 'thread_safe_attribute_active_object.log'))
@@ -56,7 +59,7 @@ def get_spy_as_list(log_file):
   with open(log_file, 'r') as fp:
     output = [line for line in fp.readlines()]
     for line in output:
-      print(line, end='')
+      #print(line, end='')
       if line[0] == 'S':
         results += line
   return results.split("\n")
@@ -66,7 +69,7 @@ def get_trace_as_list(log_file):
   with open(log_file, 'r') as fp:
     output = [line for line in fp.readlines()]
     for line in output:
-      print(line, end='')
+      #print(line, end='')
       if line[0] == 'T':
         results += line
   return results.split("\n")
@@ -356,7 +359,7 @@ def thread_safe_attribute_test1(time_in_seconds, number_of_threads, alog_file):
   last_number = 0
   with open(alog_file, 'r') as fp:
     for line in fp.readlines():
-      print(line, end='')
+      #print(line, end='')
       current_last = int(line.split(':')[-1])
       assert(current_last >= last_number)
       last_number = current_last
@@ -413,8 +416,8 @@ def test_thread_safe_attribute2():
     fp.write("")
 
   thread_safe_attribute_test2(
-    time_in_seconds=100,
-    number_of_threads=1,
+    time_in_seconds=3,
+    number_of_threads=100,
     alog_file=alog_file)
 
 ################################################################################
@@ -576,3 +579,7 @@ def test_thread_safe_in_factory():
 
   # remove comment if debugging this test
   os.remove(flog_file)
+
+if __name__ == '__main__':
+  test_thread_safe_in_active_object()
+  test_thread_safe_in_factory()

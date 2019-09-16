@@ -1,112 +1,51 @@
 # to test this:
 # pytest -s -m thread_safe_attributes
-import types
+import re
+import inspect
 from threading import RLock
+from collections import namedtuple
 
-class ThreadSafeAttributeMixin():
+FrameData = namedtuple('FrameData', [
+  'filename', 
+  'line_number',
+  'function_name',
+  'lines',
+  'index'])
 
-  def __new__(cls, *args, **kwargs):
-    try:
-      return super().__new__(cls, *args, **kwargs)
-    except:
-      # immutable 
-      return super().__new__(cls)
+class ThreadSafeAttribute:
 
-  def __init__(self, *args, **kwargs):
-    try:
-      # mutable
-      super().__init__(*args, **kwargs)
-    except:
-      # immutable 
-      super().__init__()
+  def __init__(self, initial_value=None):
+    self._initial_value = initial_value
+    self._is_atomic = True
+    self._lock = RLock()
+    self._value = initial_value
 
-    if 'value' in kwargs:
-      self._value = kwargs['value']
+  def __get__(self, instance, owner):
+    self._is_atomic = True
+    #print("get acquiring lock")
+    self._lock.acquire(blocking=True)
+    previous_frame = inspect.currentframe().f_back
+    fdata = FrameData(*inspect.getframeinfo(previous_frame))
+    if re.search(r'([+-/*@^&|<>%]=)|([/<>*]{2}=)', fdata.lines[0]) is not None:
+      #print('{} not atomic'.format(fdata.lines[0]))
+      self._is_atomic = False
+    else:
+      #print('{} is atomic'.format(fdata.lines[0]))
+      #print("get releasing lock")
+      self._lock.release()
+    return self._value
 
-    if 'lock' in kwargs:
-      self.lock = kwargs['lock']
-
-  def __iadd__(self, other):
-    with self.lock:
-      return super().__iadd__(other)
-
-  def __isub__(self, other):
-    with self.lock:
-      return super().__isub__(other)
-
-  def __imul__(self, other):
-    with self.lock:
-      return super().__imul__(other)
-
-  def __imatmul__(self, other):
-    with self.lock:
-      return super().__imatmul__(other)
-
-  def __itruediv__(self, other):
-    with self.lock:
-      return super().__itruediv__(other)
-
-  def __ifloordiv__(self, other):
-    with self.lock:
-      return super().__ifloordiv__(other)
-
-  def __imod__(self, other):
-    with self.lock:
-      return super().__imod__(other)
-
-  def __ilshift__(self, other):
-    with self.lock:
-      return super().__ilshift__(other)
-
-  def __irshift__(self, other):
-    with self.lock:
-      return super().__irshift__(other)
-
-  def __iand__(self, other):
-    with self.lock:
-      return super().__iand__(other)
-
-  def __ixor__(self, other):
-    with self.lock:
-      return super().__ixor__(other)
-
-  def __ior__(self, other):
-    with self.lock:
-      return super().__ior__(other)
-
-class ThreadSafeAttribute(ThreadSafeAttributeMixin):
-
-  def __init__(self, initial_value=0):
-    self.lock = RLock()
-    super().__init__(lock=self.lock)
-    self.__coerse_object__(initial_value)
-
-  def __coerse_object__(self, initial_value):
-    cls_dict = dict(initial_value.__class__.__dict__)
-    cls_dict.update(ThreadSafeAttributeMixin.__dict__)
-    DynamicClass = types.new_class(
-      'DynamicClass', 
-      (ThreadSafeAttributeMixin, initial_value.__class__), 
-      {}, 
-      lambda ns: ns.update(cls_dict))
-    DynamicClass.__module__ == __name__
-    self._value_base_class = initial_value.__class__
-    value = DynamicClass(initial_value)
-    setattr(value, 'lock', self.lock)
+  def __set__(self, instance, value):
+    if not self._is_atomic:
+      #print("set continuing non atomic operation")
+      pass
+    else:
+      #print("set aquiring lock")
+      self._lock.acquire(blocking=True)
     self._value = value
-    self._value = ThreadSafeAttributeMixin()
-
-  def __get__(self, obj, objtype):
-    with self.lock:
-      return self._value
-
-  def __set__(self, obj, val):
-    with self.lock:
-      if not isinstance(val, self._value_base_class) or not issubclass(val.__class__, self._value_base_class):
-        self.__coerse_object__(obj)
-        self._value = val
-      else:
-        self._value = val
+    #print("set releasing lock")
+    self._is_atomic = True
+    self._lock.release()
 
 class MetaThreadSafeAttributes(type):
 
@@ -114,5 +53,5 @@ class MetaThreadSafeAttributes(type):
     '''Build thread safe attributes'''
     if hasattr(cls, '_attributes'):
       for name in list(set(cls._attributes)):
-        setattr(cls, name, ThreadSafeAttribute(initial_value=1))
+        setattr(cls, name, ThreadSafeAttribute(initial_value=0))
     super().__init__(*args, **kwargs)

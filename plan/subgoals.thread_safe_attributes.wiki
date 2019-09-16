@@ -4,11 +4,16 @@
 
   *What defines Success?:* ([[subgoals.subgoals.thread_safe_attributes|subgoals]])
     Find a test that can fail when a technique is not working.
+    
     Identify all non-atomic attribute paths a user would make, and make those
     paths thread safe.
+    
     Re-release the thread-safe attribute feature, where I'm convinced I'm not
     going to be injecting nasty bugs into my user's codebases. (no code changes
     on the part of the userbase)
+
+    Re-write the recipe docs Write an example describing how this was done so
+    you can have other's critique the method.
     
   *What is the problem?*
     The "+=" operatation is not atomic.  Python 3 switches between threads every
@@ -16,6 +21,10 @@
     been able to test a failure in your technique.  I becoming more convinced
     that my tests can't tell when the thread safe attributes feature is not
     working.
+    
+    I have found a way to build a thread safe attribute using a data descriptor
+    and an Rlock, now I merge it into the meta programming technique that was
+    used to make the last faulty version of the feature.
   
   *Discoveries:*
     
@@ -23,21 +32,16 @@
     Eldamir's "make python @property handle +=, -= etc on [[https://stackoverflow.com/questions/23288559/make-python-property-handle-etc|stackoverflow]]
     Jess Jiryu Davis' article on the [[https://emptysqua.re/blog/grok-the-gil-fast-thread-safe-python/|GIL]]
     
+    See <base>/examples/iadd_example.py for example of a thread safe data
+    descriptor.
+    
 = Orient =
   *Symptoms:* [[symptoms.subgoals.thread_safe_attributes|symptoms]]
 
 == Questions ==
   *Questions for Thread safety through using locks, the descriptor protocol and iadd: >= 5*
-    Do you have enough information?
     How do I make the tests fail?
     Are your resources organized so you can quickly find them?
-    Can you reproduce the problem?
-    Can you simplify the test?
-    What recently changed?
-    What don't you know that you need to know?
-    Is it possible it works as is?
-    Can you get this done quickly?  You may have broken code in the field.
-    Can you rollback the release until you are more confident?
   
   *Assumptions*
     I'm assuming that the current design is broken, but I can't confirm it.
@@ -46,34 +50,26 @@
   [[#Questions]]
   *Research Needed For?:*
     Read anything by Beazley on thread safe attributes
-    
-    Search:
-      "Thread safe properties python"
-      "Make properties atomic python"
-      "Thread locks and the descriptor protocol python"
-      
 
   [[#Questions]]
   *Idea/Hypotheses for Thread safety through using locks, the descriptor protocol and iadd: >=5*
-  * [ ] Remove any mention of this from your docs immediately
-  * [ ] Use the iadd method to wrap the descriptor protocol (may need indirection)
-  * [ ] Investigate the concurrency technique in your examples directory
-  * [ ] Can you use put/get with a queue instead?
-  * [ ] Make the tests fail
-  * [ ] The system is working
   * [ ] Make better tests, the current tests seem weak
-  * [ ] Remove the feature entirely and just demonstrate good techniques in the
-        docs
+  * [X] Remove any mention of this from your docs immediately
+  * [X] Investigate the concurrency technique in your examples directory
+  * [X] Merge the iadd_example.py file into your previous work
+  * [X] Uncomment print statements inside of lock code to confirm it is running
+  * [X] Adust test so that object type changes when using the descriptor pattern (get)
+  * [X] Get current test running against new code
+  * [ ] Maybe the old code worked for some weird reason
+  * [X] Move old "broken" code into another file
+  * [ ] Build a new much-harder test to break the old code
+  * [ ] Run the new much-harder test against the new code
 
   *Chosen Research-Goal/Hypothesis*
-    Use the iadd method to wrap the descriptor protocol (may need indirection)
+  * [ ] Merge the iadd_example.py file into your previous work
 
 == Plan ([[plan.subgoals.thread_safe_attributes|plan]]) ==
-  * add the iadd method, place a break point in the method and see if you can get
-    an existing test to land here
-  * if not, examine some form of indirect, a property in a property?  Something
-    like this, wrestle with this problem to see if there is a clean way to add
-    locks around non-atom code while using the descriptor protocol
+  * 
 
 = Act =
   

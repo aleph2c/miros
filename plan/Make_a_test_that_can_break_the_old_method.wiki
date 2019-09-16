@@ -1,0 +1,118 @@
+[[subgoals.subgoals.thread_safe_attributes|back]]
+*Make A Test That Can Break The Old Method*
+= Observer ([[local:C:/Vim8.1/.vim/ooda.pdf|diagram]]) = 
+== Evidence ([[evidence.Make_a_test_that_can_break_the_old_method|evidence]]) ==
+
+  *What defines Success?:* ([[subgoals.Make_a_test_that_can_break_the_old_method|subgoals]])
+    Write a test which will demonstrate a race condition in the old
+    shared-attributes technique.
+
+  *What is the problem?*
+    Python task switches every 15 ms, the old tests were not detecting anything
+    broken in the old technique, even though I'm convinced it couldn't work.
+    
+  *Discoveries:*
+  
+  [[https://stackoverflow.com/questions/19602535/how-can-i-reproduce-the-race-conditions-in-this-python-code-reliably|race stackoverflow1 in python]]
+  
+  
+  The thread failure example
+  [[https://opensource.com/article/17/4/grok-gil|here]] will not fail on my
+  computer. (ran it a million times with no failure).
+  
+  *Valgrind Deadend (~2.5 hours, free as in mattress):*
+
+  I think that the 'helgrind' tool for 'valgrind' is the thing that will force
+  race conditions:
+  
+  [[https://stackoverflow.com/questions/40355474/valgrind-does-not-work-with-wsl|building valgrind WSL]]
+  [[https://stackoverflow.com/questions/3982036/how-can-i-use-valgrind-with-python-c-extensions|using valgrind with python]]
+ 
+  This following command fails entirely, but we don't care about memchecks
+  
+  valgrind --tool=memcheck --suppressions=valgrind-python.supp \ 
+    python -E -tt ./thread_safe_attributes_test.py
+ 
+  To test thread safety with valgrind, use the helgrind tool:
+ 
+  To see if the tool works at all run a baby program against it:
+  > valgrind --tool=helgrind --suppressions=valgrind-python.supp \ 
+      python -E -tt ./valgrind_simple_1.py
+  results: no errors
+  
+  To see if miros is broken according to valgrind:
+  > valgrind --tool=helgrind --suppressions=valgrind-python.supp \ 
+      python -E -tt ./valgrind_simple_2.py
+  results: errors
+  conclusion:
+  Either valgrind is broken, python threading is broken, or miros is broken
+   
+  To run against the simple multithreaded program that doesn't do anything, this
+  code does not use the miros library:
+  > valgrind --tool=helgrind --suppressions=valgrind-python.supp \ 
+      python -E -tt ./valgrind_simple_3.py
+  results: many errors
+  conclusion:
+  Either valgrind is broken, python threading is broken
+    
+  run against the broken "thread safe" code
+  > valgrind --tool=helgrind --suppressions=valgrind-python.supp \ 
+      python -E -tt ./thread_safe_attributes_test.py
+  results: many errors
+  conclusion: 
+  Can't conclude anything because valgrind doesn't work against vanilla
+  threading in Python while running in the WSL.
+  
+  To use valgrind to test for race conditions using python 3.5 on the WSL is a
+  dead end.  Valgrind is entirely a black box to me, but I have been using python
+  3.5 for a long time.  I am assuming that it's threading mechanisms are
+  working.  Valgrind failed the memory test out of the gate, so there might be
+  something weird about the WSL environment and how it ties it's threading in to
+  the windows OS.  Needless to say the failure of valgrind against
+  valgrind_simple_3.py tells me that I can't use valgrind test for thread safe
+  attributes.
+    
+= Orient =
+  *Symptoms:* [[symptoms.Make_a_test_that_can_break_the_old_method|symptoms]]
+
+== Questions ==
+  *Questions for Make A Test That Can Break The Old Method: >= 5*
+    Do you have enough information?
+    Are your resources organized so you can quickly find them?
+    Can you reproduce the problem?
+    Can you simplify the test?
+    What recently changed?
+    What don't you know that you need to know?
+    Is it possible that miros without this feature is not thread safe?
+  
+  *Assumptions*
+    Python threading is not broken
+
+= Decide =
+  [[#Questions]]
+  *Research Needed For?:*
+    google, test multithreading python
+            test race conditions
+
+  [[#Questions]]
+  *Idea/Hypotheses for Make A Test That Can Break The Old Method: >=5*
+  * [ ] Have threads go in different directions, like vectors
+  * [ ] Have += operation take a long time (beyond 15 ms)
+  * [ ] Use an external tool like valgrind with helgrind to find race conditions
+  * [ ] See if you can get [[https://opensource.com/article/17/4/grok-gil|code]] to fail like it did in his example, if so expand upon it
+  * [ ] Reseach maths that doen't have the associative property, and use this to
+        find if the threads are stomping on each other's variables.
+  * [ ] There is something usual happening in the WSL, you thread failures
+        aren't happening for some reason.  Run the code that should fail on a
+        linux box and see if it behaves differently.
+
+  *Chosen Research-Goal/Hypothesis*
+   
+   Run the code that should have failed on a linux box.
+
+== Plan ([[plan.Make_a_test_that_can_break_the_old_method|plan]]) ==
+  
+  
+= Act =
+  
+
