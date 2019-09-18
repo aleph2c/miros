@@ -18,7 +18,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Cellular Automata" href="cellular_automata.html" />
-    <link rel="prev" title="Interacting Statecharts (Same Machine)" href="interactingcharts.html" />
+    <link rel="prev" title="Using and Unwinding a Factory" href="towardsthefactoryexample.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -712,14 +712,14 @@ protect your own code (highlighting how to get the lock):</p>
 </pre></div>
 </td></tr></table></div>
 <p>The lock can be obtained by calling <code class="docutils literal notranslate"><span class="pre">_,</span> <span class="pre">_lock</span> <span class="pre">=</span> <span class="pre">&lt;thread_safe_attribute&gt;</span></code>.</p>
-<p>This is little nasty piece of metaprogramming that baffle a beginner or anyone
-who looks at the thread safe attribute.  Most of the time your thread safe
-attribute acts as an attribute, but other times it acts as an iterable, what
-gives?  It only acts as an interable when proceeded by <code class="docutils literal notranslate"><span class="pre">_,</span> <span class="pre">_lock</span></code>.  If you use
-this technique in one of your threads, you must use it in all of your threads.
-Once again I recommend against performing calculations directly on your shared
-attributes.  Instead, copy their variable into a temp, perform a calculation
-then assign the results into them.</p>
+<p>This is a little nasty piece of metaprogramming that could baffle a beginner or
+anyone who looks at the thread safe attribute.  Most of the time your thread
+safe attribute acts as an attribute, but other times it acts as an iterable,
+what gives?  It only acts as an interable when proceeded by <code class="docutils literal notranslate"><span class="pre">_,</span> <span class="pre">_lock</span></code>.  If
+you use this technique in one of your threads, you must use it in all of your
+threads.  Once again I recommend against performing calculations directly on
+your shared attributes.  Instead, copy their variable into a temp, perform a
+calculation then assign the results into them.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> feature actually reads the last line of code you
@@ -742,7 +742,7 @@ syntactically inconsistent way.</p>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="examples.html">Examples</a><ul>
-      <li>Previous: <a href="interactingcharts.html" title="previous chapter">Interacting Statecharts (Same Machine)</a></li>
+      <li>Previous: <a href="towardsthefactoryexample.html" title="previous chapter">Using and Unwinding a Factory</a></li>
       <li>Next: <a href="cellular_automata.html" title="next chapter">Cellular Automata</a></li>
   </ul></li>
   </ul></li>

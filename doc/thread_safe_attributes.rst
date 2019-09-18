@@ -470,14 +470,14 @@ protect your own code (highlighting how to get the lock):
 
 The lock can be obtained by calling ``_, _lock = <thread_safe_attribute>``.
 
-This is little nasty piece of metaprogramming that baffle a beginner or anyone
-who looks at the thread safe attribute.  Most of the time your thread safe
-attribute acts as an attribute, but other times it acts as an iterable, what
-gives?  It only acts as an interable when proceeded by ``_, _lock``.  If you use
-this technique in one of your threads, you must use it in all of your threads.
-Once again I recommend against performing calculations directly on your shared
-attributes.  Instead, copy their variable into a temp, perform a calculation
-then assign the results into them.
+This is a little nasty piece of metaprogramming that could baffle a beginner or
+anyone who looks at the thread safe attribute.  Most of the time your thread
+safe attribute acts as an attribute, but other times it acts as an iterable,
+what gives?  It only acts as an interable when proceeded by ``_, _lock``.  If
+you use this technique in one of your threads, you must use it in all of your
+threads.  Once again I recommend against performing calculations directly on
+your shared attributes.  Instead, copy their variable into a temp, perform a
+calculation then assign the results into them.
 
 .. note::
 
