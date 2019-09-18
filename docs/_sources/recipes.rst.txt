@@ -2289,6 +2289,9 @@ inner_state about 1 second after the middle_state was entered.
 
 .. _recipes-getting-information-out-of-your-statechart:
 
+Creating thread-safe class Attributes
+-------------------------------------
+
 ..
   Creating thread-safe class Attributes
   -------------------------------------

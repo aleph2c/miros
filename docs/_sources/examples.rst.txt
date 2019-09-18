@@ -13,6 +13,7 @@ Examples
    scribbleexample
    interactingcharts
    towardsthefactoryexample
+   thread_safe_attributes
    cellular_automata
    i_mongol_example
 

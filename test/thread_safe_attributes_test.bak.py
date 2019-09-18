@@ -154,7 +154,7 @@ class Example1(ThreadSafeAttributes, ActiveObject):
 ################################################################################
 #                Factory representation of a Simple Statechart                 #
 ################################################################################
-class Example2(ThreadSafeAttributes, Factory):
+class Example2(Factory):
   _attributes = ['thread_safe_attr_1', 'thread_safe_attr_2']
 
   def __init__(self, name, live_trace=None, live_spy=None):
@@ -408,6 +408,7 @@ def test_thread_safe_attribute1():
     number_of_threads=100,
     alog_file=alog_file)
 
+@pytest.mark.isolated
 @pytest.mark.thread_safe_attributes
 def test_thread_safe_attribute2():
 
@@ -578,138 +579,6 @@ def test_thread_safe_in_factory():
 
   # remove comment if debugging this test
   os.remove(flog_file)
-
-#@pytest.mark.isolated
-@pytest.mark.thread_safe_attributes
-def test_no_lock_access():
-
-  class GetLock1(ThreadSafeAttributes):
-    _attributes = ['thread_safe_attr_1']
-
-    def __init__(self):
-      self.event = ThreadEvent()
-      self.event.set()
-      self.thread_safe_attr_1 = 0
-
-    def thread_method_1(self):
-      while(self.event.is_set()):
-        self.thread_safe_attr_1 += 1
-        print("here1 ", self.thread_safe_attr_1)
-        time.sleep(0.015)
-
-    def thread_method_2(self):
-      while(self.event.is_set()):
-        self.thread_safe_attr_1 -= 1
-        print("here2 ", self.thread_safe_attr_1)
-        time.sleep(0.015)
-
-    def thread_method_3(self):
-      while(self.event.is_set()):
-        self.thread_safe_attr_1 += 1
-        print("here3 ", self.thread_safe_attr_1)
-        time.sleep(0.015)
-
-    def thread_stopper(self):
-      time.sleep(2)
-      self.event.clear()
-
-  class GetLock2():
-    def __init__(self, event, gl1):
-      self.event = event
-      self.gl1   = gl1
-
-    def thread_method_4(self):
-      while(self.event.is_set()):
-        self.gl1.thread_safe_attr_1 -= 1
-        print("here4 ", self.gl1.thread_safe_attr_1)
-        time.sleep(0.015)
-
-  gl1 = GetLock1()
-  gl2 = GetLock2(event=gl1.event, gl1=gl1)
-
-  threads = []
-  threads.append(Thread(target=gl1.thread_method_1, name='t1', args=()))
-  threads.append(Thread(target=gl1.thread_method_2, name='t2', args=()))
-  threads.append(Thread(target=gl1.thread_method_3, name='t3', args=()))
-  threads.append(Thread(target=gl2.thread_method_4, name='t4', args=()))
-
-  for thread in threads:
-    thread.start()
-
-  thread_stopper = Thread(target=gl1.thread_stopper, name='thread_stopper', args=())
-  thread_stopper.start()
-  thread_stopper.join()
-
-@pytest.mark.isolated
-@pytest.mark.thread_safe_attributes
-def test_lock_access():
-
-  class GetLock1(ThreadSafeAttributes):
-    _attributes = ['thread_safe_attr_1']
-
-    def __init__(self):
-      self.event = ThreadEvent()
-      self.event.set()
-      self.thread_safe_attr_1 = 0
-
-    def thread_method_1(self):
-      _, _lock = self.thread_safe_attr_1
-      while(self.event.is_set()):
-        with _lock:
-          self.thread_safe_attr_1 += 1
-          self.thread_safe_attr_1 = self.thread_safe_attr_1 * 2
-          print("here1 ", _lock, self.thread_safe_attr_1)
-        time.sleep(0.015)
-
-    def thread_method_2(self):
-      _, _lock = self.thread_safe_attr_1
-      while(self.event.is_set()):
-        with _lock:
-          self.thread_safe_attr_1 -= 5
-          self.thread_safe_attr_1 = self.thread_safe_attr_1 / 10.0
-        print("here2 ", _lock, self.thread_safe_attr_1)
-        time.sleep(0.015)
-
-    def thread_method_3(self):
-      _, _lock = self.thread_safe_attr_1
-      while(self.event.is_set()):
-        with _lock:
-          self.thread_safe_attr_1 += 1
-        print("here3 ", _lock, self.thread_safe_attr_1)
-        time.sleep(0.015)
-
-    def thread_stopper(self):
-      time.sleep(2)
-      self.event.clear()
-
-  class GetLock2():
-    def __init__(self, event, gl1):
-      self.event = event
-      self.gl1   = gl1
-
-    def thread_method_4(self):
-      _, _lock = self.gl1.thread_safe_attr_1
-      while(self.event.is_set()):
-        with _lock:
-          self.gl1.thread_safe_attr_1 += 1
-        print("here4 ", _lock, self.gl1.thread_safe_attr_1)
-        time.sleep(0.015)
-
-  gl1 = GetLock1()
-  gl2 = GetLock2(event=gl1.event, gl1=gl1)
-
-  threads = []
-  threads.append(Thread(target=gl1.thread_method_1, name='t1', args=()))
-  threads.append(Thread(target=gl1.thread_method_2, name='t2', args=()))
-  threads.append(Thread(target=gl1.thread_method_3, name='t3', args=()))
-  threads.append(Thread(target=gl2.thread_method_4, name='t4', args=()))
-
-  for thread in threads:
-    thread.start()
-
-  thread_stopper = Thread(target=gl1.thread_stopper, name='thread_stopper', args=())
-  thread_stopper.start()
-  thread_stopper.join()
 
 if __name__ == '__main__':
   test_thread_safe_in_active_object()

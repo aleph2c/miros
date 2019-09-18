@@ -1,0 +1,143 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>&lt;no title&gt; &#8212; miros 2.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <p>Anytime you start a statechart, your program is multi-threaded.  Sometimes, you
+will want to access an attribute of your statechart from another thread,
+like the main part of your program.  When you do this, you are trying to
+access memory that could be changed in one thread while it is being read in by
+another thread.</p>
+<p>To see why this is an issue imagine using a calculator to solve a simple math
+problem: calculate the value of <code class="docutils literal notranslate"><span class="pre">b</span></code>, starting with <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">==</span> <span class="pre">0.35</span></code>, given the
+following equation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.45</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="n">a</span><span class="o">^</span><span class="mf">1.2</span>
+</pre></div>
+</div>
+<p>Seems simple enough.  You pick a straight-forward strategy:</p>
+<blockquote>
+<div><ul class="simple">
+<li>mark down the value of <code class="docutils literal notranslate"><span class="pre">a</span></code> on a piece of paper so you can reference it as you work</li>
+<li>break the calculation into <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">*</span> <span class="pre">cos(0.45)</span></code> and <code class="docutils literal notranslate"><span class="pre">3*a*1.2</span></code></li>
+<li>then add these results together to find <code class="docutils literal notranslate"><span class="pre">b</span></code></li>
+</ul>
+</div></blockquote>
+<p>But while calculated the <code class="docutils literal notranslate"><span class="pre">a*cos(0.45)</span></code> part of the problem, someone grabs your
+paper, changes your temporary value of <code class="docutils literal notranslate"><span class="pre">a</span></code> to <code class="docutils literal notranslate"><span class="pre">0.3</span></code>, then puts it back on
+your desk.  You don’t notice.  When you get to the <code class="docutils literal notranslate"><span class="pre">3*a^1.2</span></code> part of the
+calculation, you use the wrong <code class="docutils literal notranslate"><span class="pre">a</span></code> value, so you get the wrong answer for <code class="docutils literal notranslate"><span class="pre">b</span></code>.</p>
+<p>This is called a <strong>race condition</strong>.  Here our <code class="docutils literal notranslate"><span class="pre">a</span></code> variable was shared between
+two threads, you and the other person.  When you program with multiple
+concurrent processes/threads and you share memory, you are exposed to this kind
+of problem.</p>
+<p>A simple way to avoid such a situation is to not share the temporary paper in
+the first place.  Do not use shared attributes.</p>
+<p>Another way to deal with it is to have one thread change a shared attribute and
+have the other thread read the shared attribute.  But, this will required that
+maintenance developers understand there are hidden rules in your code base;
+they could innocently change something an introduce extremely subtle bugs.</p>
+<p>Typically, shared variables are protected using thread locks.  A lock is a flag
+which works across multiple threads.  You can lock the object for read/writing
+while you use it.  In our example, we would lock <code class="docutils literal notranslate"><span class="pre">a</span></code> in its <code class="docutils literal notranslate"><span class="pre">0.35</span></code> state
+while calculating both sub-parts of our problem then unlock it when we are done.
+The other process, would simply wait until the thread-lock cleared, then they
+would change the value of <code class="docutils literal notranslate"><span class="pre">a</span></code> to <code class="docutils literal notranslate"><span class="pre">0.3</span></code> and do their own work.  So, there is
+a cost, you block one thread while waiting for the other to work, and you have
+to share lock variables across all of your threads.  It is easy to screw this
+up, and it is very hard to test for race conditions.</p>
+<p>But why is it hard to test for race conditions?  As of Python 3, a thread will
+run for 15 milliseconds before Python passes control to another thread.  Most of
+the time, the common memory that is used by both threads will work as you expect
+it to.  Infrequently a thread switch will occur midway through a non-atomic
+operation, where some shared value happen to also be changed by the other
+thread.  When the Python task manager switches back to your thread, the result
+of your calculation will be wrong.  These kinds of bugs are more probabilistic
+than deterministic, because Python’s access to the system clock is jittery: It’s
+timing will never be the same every two runs of the program, so it will be hard
+for you to reproduce your issue.</p>
+<p>The miros library accepts that people will want to access a statechart’s internal
+attributes from the outside.  Significant efforts have been made to make this
+kind of activity easy for you to do in a “thread-safe” manner.  The
+<code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> class was constructed to make this easy for you.</p>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
+  <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
+</a></p><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/i_thread_safe_attributes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Scott Volk.
+      
+      |
+      <a href="_sources/i_thread_safe_attributes.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

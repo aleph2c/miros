@@ -1,3 +1,7 @@
+[[thread_safe_attributes|back]]
+= Subgoals =
+* [ ] Explain how the thing works [[Explain_how_the_thing_works|link]]
+
 *Thread safety through using locks, the descriptor protocol and iadd*
 = Observer ([[local:C:/Vim8.1/.vim/ooda.pdf|diagram]]) = 
 == Evidence ([[evidence.subgoals.thread_safe_attributes|evidence]]) ==
@@ -16,15 +20,41 @@
     you can have other's critique the method.
     
   *What is the problem?*
-    The "+=" operatation is not atomic.  Python 3 switches between threads every
+    The "+=" operation is not atomic.  Python 3 switches between threads every
     15 milliseconds, so your previous thread-safety tests may not have actually
     been able to test a failure in your technique.  I becoming more convinced
-    that my tests can't tell when the thread safe attributes feature is not
+    that my tests can't tell when the thread "safe attributes" feature is not
     working.
     
-    I have found a way to build a thread safe attribute using a data descriptor
-    and an Rlock, now I merge it into the meta programming technique that was
-    used to make the last faulty version of the feature.
+    I think I have found a way to build a thread safe attribute using a data
+    descriptor and an Rlock, now I have merged it into the meta programming
+    technique that was used to make the last faulty version of the feature.  It
+    will detect:
+   
+    The following will be internally wrapped in locks and should be thread safe:
+    
+      ao.a  # external 
+      b = self.a
+      self.a += 10
+      
+    This code will NOT be thread safe
+    
+      ao.a = ao.a + ao
+      self.a = 10 * self.a
+      
+    This code will not be thread safe
+    
+      ao.a = 10
+      ao.a += 15
+      ao.a = 10 + b + ao.a
+      
+      
+    This code will not be thread safe
+    
+      self.a = 10
+      self.a += 15
+      self.a = 10 + b + self.a
+      
   
   *Discoveries:*
     
@@ -60,8 +90,6 @@
   * [X] Uncomment print statements inside of lock code to confirm it is running
   * [X] Adust test so that object type changes when using the descriptor pattern (get)
   * [X] Get current test running against new code
-  * [ ] Maybe the old code worked for some weird reason
-  * [X] Move old "broken" code into another file
   * [ ] Build a new much-harder test to break the old code
   * [ ] Run the new much-harder test against the new code
 
