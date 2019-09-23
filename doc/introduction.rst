@@ -18,6 +18,58 @@ thread.  If you program using statecharts, you will have the ability to
 :ref:`quickly translate your design goals into robust, understandable, working
 code <quick-start>`.
 
+This library ports the Miro Samek event processor to Python.  If you use this
+library to prototype your designs in Python, it should be a straight forward
+process to port them back to his  `qp framework <https://state-machine.com>`_
+for a huge performance gain.
+
+About this Documentation
+------------------------
+
+Statecharts provide a powerful programming technique which can be used to map
+complex behavior into a set of very small and simple diagrams.  When I was first
+introduced to the technique as a junior developer, I found it baffling.  This is
+the documentation I wish someone had given to me back then.
+
+The technique for drawing a statechart was absorbed by the UML movement in the
+1990's.  UML is obsolete, it can't begin to describe the expressive power of
+Python, but it can be used to sketch out your ideas well enough so that someone
+else can understand what you mean.  I can't expect you to know UML; so part of this
+documentation :ref:`explains how to draw your pictures <reading_diagrams-reading-diagrams>`.
+
+If you are new to statecharts, the statechart concepts and mechanics are
+explained through stories and tutorials in :ref:`zero to one
+<zero_to_one-zero-to-one>`.
+
+If you already understand statecharts, you can immediately jump to the
+:ref:`quick start <quick-start>` and look at how I implemented a networked,
+robotic sprinkler using the open weather API with miros in Python.  It
+demonstrates 3 different concurrent statecharts working together.
+
+Miro Samek pulled a lot of the difficult parts of statechart specification out
+of his code to make it compact and fast.  Then he spent an entire chapter of his
+`latest book <http://www.state-machine.com/psicc2/>`_ showing how to regain
+these features by making simple adjustments to your code; he called this section
+patterns.  In the :ref:`pattern section <patterns>`, I demonstrate how to
+implement Miro's patterns and then show a few more.
+
+The :ref:`recipes section <recipes>` contains a list of things that you might
+want to do and a concise example of how to do it.
+
+The :ref:`examples section <examples>` contain some more extended examples which
+can be referenced and then extended for your own designs.
+
+The :ref:`reflection section <reflection>` goes into the details about how to
+use the instrumentation that has been built into the miros library.  Two
+different types of sensible logging have been added to this library, you can use
+them see how your statechart is reactive its environment.
+
+The :ref:`testing section <testing-testing>` will demonstrate a set of simple
+patterns so that you can verify your designs are working as you expect them to.
+
+Finally, if you would like to link your statecharts across a computer network
+(for IOT applications), you can use the `miros-rabbitmq <https://aleph2c.github.io/miros-rabbitmq/index.html>`_ plugin.
+
 .. _introduction-history-and-context:
 
 History and Context
@@ -33,8 +85,9 @@ object-oriented programming (circa 1966), he was inspired by biology. He saw
 plants and animals as extremely complicated systems of systems, made up of cells
 who's inner states and clocks were hidden from one another. The only way that
 these cells could work together was by producing small chemical messages and
-exchanging them with their adjacent cells. He saw this as a great example of how
-to think about programming.
+exchanging them with their adjacent cells. He saw this as a great analogy for
+managing complexity.  He invented a programming language called, small-talk, and
+the parts of it which he modeled from the cell, he called ``objects``.
 
 .. image:: _static/cell-communication-and-signalling.jpg
     :target: https://lms.biotecnika.org/course/csir-net-unit-4-cell-communication-cell-signalling/
@@ -62,8 +115,8 @@ But statecharts build from the miros library, each act as if they were running
 on their own computer, so they can pass messages like cells pass messages. When
 a message is passed this way, it is called an **event**. This means that we have to
 re-name our objects to something else to differentiate them from instantiated
-Frankenstein structures, very much like Alan Kay did. An object that runs in
-it's own thread is called an **active object**.
+Frankenstein-structures, very much like Alan Kay did. An object that runs in
+it's own thread is called an `active object <https://en.wikipedia.org/wiki/Active_object>`_.
 
 .. note::
 
@@ -80,38 +133,41 @@ method call. It can do this because it has its own thread (it runs like it owns
 its own computer). This ability to process in parallel is called
 **orthogonality** in statechart theory.
 
-The **statechart** was invented by the Mathematician David Harel in 1983 as a
-conceptual tool to help the avionics industry manage their engineering
-complexity. Instead of working from a metaphor, David Harel's innovations
-occurred while working shoulder to shoulder with Israeli software engineers,
-while he watched them build a jet fighter. He noticed that they could answer
-questions like, “What algorithm is used by the radar to measure the distance to
-a target?”, but they did not have answers to questions that seemed more basic,
-such as “What happens when you press this button [...] under all possible
-circumstances?” After asking such questions, he would watch the engineers dive
-into a two-volume, 2000 page document; attempting to cross-reference different
-parts of the tome, written by different authors.
+The **statechart** was invented by the Mathematician `David Harel
+<https://en.wikipedia.org/wiki/David_Harel>`_ in 1983 as a conceptual tool to
+help the avionics industry manage their engineering complexity. Instead of
+working from a metaphor, David Harel's innovations occurred while working
+shoulder to shoulder with Israeli software engineers, while he watched them
+build a jet fighter. He noticed that they could answer questions like, “What
+algorithm is used by the radar to measure the distance to a target?”, but they
+did not have answers to questions that seemed more basic, such as “What happens
+when you press this button [...] under all possible circumstances?” After asking
+such questions, he would watch the engineers dive into a two-volume, 2000 page
+document; attempting to cross-reference different parts of the tome, written by
+different authors.
 
 .. image:: _static/DavidHarel.png
     :target: https://www.lemonde.fr/blog/binaire/files/2015/04/statechart.png
     :align: center
 
 Many large scale engineering disasters occur due to “interface failures,” not as
-a result of a single component, but of the integration between them. The
-interface failures are the direct result of teams not having answers to the
-simple-seeming questions that David Harel asked his avionics team.
+a result of a single component failure, but as a failure of those parts to
+interface properly with one another. The interface failures are the direct
+result of teams not having answers to the simple-seeming questions that David
+Harel asked his avionics team.
 
 We are lucky that David Harel comes from a strong background in mathematical
 topology and not from a programming perspective. He watched the engineers like
-an anthropologist, and mapped how they talked about things into simple pictures;
-often on napkins. He didn't try to imagine how to program their descriptions but
-specifically focused on how to draw a picture of what they said, then thought of
-a way to formalize the pictures into a set of rules. The rules were simple
-enough that anyone looking at the diagram could quickly understand what would
-have otherwise taken pages to write down. The pictures described different
-working parts of the systems as **states**, and often, these states of operation
-would also contain the behaviour of other states. From this, he formalized the
-notion of a **hierarchical state machine (HSM)**. Using this formalism, it was
+an anthropologist would have, and mapped how they talked about things into
+simple topological maps; often on napkins. He didn't try to imagine how to
+program their descriptions but specifically focused on how to draw a picture of
+what they said, then thought of a way to formalize the pictures into a set of
+rules. The rules were simple enough that anyone looking at the diagram could
+quickly understand what would have otherwise taken pages to write down. The
+pictures described different working parts of the systems as **states**, and
+often, these states of operation would also contain the behaviour of other
+states. From this, he formalized the notion of a **hierarchical state machine
+(HSM)**. Using this formalism (rules for mapping ideas into pictures), it was
 possible to build a software framework that could take pages and pages of a
 complex specification, convert it into a compacted diagram that could quickly be
 understood by another person, or a team, and compile it into working software.
@@ -146,7 +202,10 @@ promised systems-understanding through pictures. To do this, they pulled
 together 14 different ways that people were drawing software systems into one
 standard.
 
-Then the movement lost momentum because they drew the wrong pictures: they
+Then the movement lost momentum because they tried to turn their pictures into
+it's own programming language.  More and more icons got added, weirder names
+where invented, and the pictures and theory created social skisms between
+"architects" and the practitioners who actually wrote the code.  Also, UML
 emphasized class diagrams without statechart diagrams.
 
 A class diagram only shows how the code is structured, but a statechart diagram
@@ -162,19 +221,12 @@ the code that is described by a behavioural statechart diagram? Well, that's the
 point of this library: it provides you with the syntax, concurrency, queuing
 and messaging infrastructure needed to make it work in Python.
 
-The UML movement contained two different philosophically opposed groups. The
-first wanted to construct a set of picture languages, whose semantics were
-powerful enough to compile down to working executables. The second group wanted
-the pictures as sketches of the software so that teams could quickly share
-complex ideas and use the images to determine what to program. The miros library
-is in the second camp.
-
 To create machine code from a picture is called `model-driven development
 <https://en.wikipedia.org/wiki/Model-driven_engineering>`_.  Model-driven
 software is typically proprietary, niched to a specific problem space and
 expensive. When statecharts first started to gain momentum in the late 1990s,
 the only way to access their expressive power was to spend a lot of money on
-proprietary software.
+this kind of proprietary software.
 
 David Harel was involved in a few of these software companies, and as a result,
 he was placed in an economical conundrum. If he demonstrated how to implement
@@ -189,10 +241,10 @@ statecharts ended up containing contradictions, which led to fragmentation.
 In the early 2000s **Dr. Miro Samek** liberated statechart theory from
 proprietary model-driven software by implementing a statechart framework in
 c/C++, and then he showed everyone how he did it. He wrote two different books
-and a series of articles.  Miro Samek took a `code-centric` approach; showing
-how to build his framework using c/C++ in his code listings. If you were to
-become confused by a term or a diagram, you could just look at his working code
-and see what he meant.
+and a series of articles.  Miro Samek took a `code-centric` approach, so that it
+made sense to people who actually program; showing how to build his framework
+using c/C++ in his code listings. If you were to become confused by a term or a
+diagram, you could just look at his working code and see what he meant.
 
 As a firmware developer, Dr. Samek ran into the tight memory and processing
 constraints that confine a developer while they write code for small processors.
@@ -266,53 +318,6 @@ etc.), you can just write the code onto your diagram.
 
 .. _introduction-what-this-documentation-will-provide:
 
-About this Documentation
-------------------------
-
-This library ports the Miro Samek event processor to Python.  It provides the
-same concurrent statechart features, but instead of using a high-speed busing
-algorithm written in c/C++, it uses the Python threading and queuing modules
-contained in the Python standard library.
-
-A lot of people who have been training in the C++ tradition of UML still don't
-understand statecharts, if they did, UML would still be fashionable.  So part of
-this documentation will demonstrate how to read a statechart diagram and
-understand what it means.  I can't expect you to know UML; so part of the
-documentation :ref:`explains enough UML to draw your pictures
-<reading_diagrams-reading-diagrams>`.
-
-If you are new to statecharts, the statechart concepts and mechanics are
-explained through stories and tutorials in :ref:`zero to one
-<zero_to_one-zero-to-one>`.
-
-If you already understand statecharts, you can immediately jump to the
-:ref:`quick start <quick-start>` and look at how I implemented a networked,
-robotic sprinkler using the open weather API with miros in Python.  It
-demonstrates 3 different concurrent statecharts working together.
-
-Miro Samek pulled a lot of the difficult parts of statechart specification out
-of his code to make it compact and fast.  Then he spent an entire chapter of his
-`latest book <http://www.state-machine.com/psicc2/>`_ showing how to regain
-these features by making simple adjustments to your code; he called this section
-patterns.  In the :ref:`pattern section <patterns>`, I demonstrate how to
-implement Miro's patterns and then show a few more.
-
-The :ref:`recipes section <recipes>` contains a list of things that you might
-want to do and a concise example of how to do it.
-
-The :ref:`examples section <examples>` contain some more extended examples which
-can be referenced and then extended for your own designs.
-
-The :ref:`reflection section <reflection>` goes into the details about how to
-use the instrumentation that has been built into the miros library.  Two
-different types of sensible logging have been added to this library, you can use
-them see how your statechart is reactive its environment.
-
-The :ref:`testing section <testing-testing>` will demonstrate a set of simple
-patterns so that you can verify your designs are working as you expect them to.
-
-Finally, if you would like to link your statecharts across a computer network
-(for IOT applications), you can use the `miros-rabbitmq <https://aleph2c.github.io/miros-rabbitmq/index.html>`_ plugin.
 
 .. raw:: html
 
