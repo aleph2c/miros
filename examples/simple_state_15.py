@@ -3,15 +3,16 @@ import re
 import time
 import logging
 from functools import partial
-from collections import deque
 
 from miros import Event
 from miros import signals
 from miros import Factory
 from miros import return_status
+from miros import ThreadSafeAttributes
 
+class F1(Factory, ThreadSafeAttributes):
 
-class F1(Factory):
+  _attributes = ['times_in_inner']
 
   def __init__(self, name, log_file_name=None,
       live_trace=None, live_spy=None):
@@ -22,10 +23,6 @@ class F1(Factory):
       False if live_trace == None else live_trace
     self.live_spy = \
       False if live_spy == None else live_spy
-
-    # set up a thread safe ring buffer of size 1
-    self._times_in_inner = deque(maxlen=1)
-    self._times_in_inner.append(0)
 
     self.log_file_name = \
       'simple_state_15.log' if log_file_name == None else log_file_name
@@ -78,14 +75,6 @@ class F1(Factory):
     self.nest(self.outer_state, parent=None). \
       nest(self.middle_state, parent=self.outer_state). \
       nest(self.inner_state, parent=self.middle_state)
-
-  @property
-  def times_in_inner(self):
-    return self._times_in_inner[-1]
-
-  @times_in_inner.setter
-  def times_in_inner(self, value):
-    self._times_in_inner.append(value)
 
   def trace_callback(self, trace):
     '''trace without datetime-stamp'''

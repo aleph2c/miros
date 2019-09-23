@@ -58,7 +58,7 @@ drawing techniques that would help them communicate their thinking in a compact
 form.</p>
 <p>To make a picture language, or any programming language is complicated, so as
 the rules governing the picture language became more complex, it became less
-useful for those who just wanted to use it to share ideas.</p>
+useful for software practitioners.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>Aspects of UML are still alive and well.  They have been integrated into
@@ -84,25 +84,25 @@ set of images.</p>
 <p>Martin Fowler rendered down the complexity of the UML standard into: <a class="reference external" href="https://martinfowler.com/books/uml.html">UML
 distilled</a>.  If you want a very solid
 understanding about Harel formalism as it relates to UML, go to the source and
-read <a class="reference external" href="https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download">Practical UML Statecharts in C/C++, 2nd Edition</a> by Miro
-Samek.</p>
+read <a class="reference external" href="https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download">Practical UML Statecharts in C/C++, 2nd Edition</a> by Dr.
+Miro Samek.</p>
 <p>But do you need to read these books before you use UML? No, because we are not
 going to treat UML as a formal computer language with mathematical semantics. We
 will use UML as something to sketch with.</p>
+<p>The formal language we will use is Python.</p>
+<p>This section should give you enough information so that you can make your own
+pictures.</p>
 <blockquote>
 <div><p><em>Software modelers depend on and use engineering analogies but often fail to
-understand them.  Engineers realize that the models aren’t the product; they’re
-abstractions of the product.  In fact, in most cases, the models are only
-partial abstractions of the product, used to hightlight aspects that the
-engineer should know about the product.  The term
-‘executable specification’ is an oxymoron – if the specification were truly executable, it would
+understand them.  Engineers realize that the models aren’t the product;
+they’re abstractions of the product.  In fact, in most cases, the models are
+only partial abstractions of the product, used to highlight aspects that the
+engineer should know about the product.  The term ‘executable specification’
+is an oxymoron – if the specification were truly executable, it would
 actually be “the thing”.  Otherwise, it would merely model “the thing,” which
 by definition is partial and incomplete.</em></p>
 <p class="attribution">&mdash;Dave Thomas</p>
 </div></blockquote>
-<p>The formal language we will use is Python.</p>
-<p>This section should give you enough information so that you can make your own
-pictures.</p>
 <div class="section" id="install-drawing-software">
 <span id="reading-diagrams-install-drawing-software"></span><h3>Install drawing software<a class="headerlink" href="#install-drawing-software" title="Permalink to this headline">¶</a></h3>
 <p>If you don’t have a UML drawing package, go and get one.</p>
@@ -112,7 +112,7 @@ pictures.</p>
 <p>UMLet is dependent upon Java.  So, you will need that.</p>
 <p>Install <a class="reference external" href="https://www.umlet.com/">UMLet</a>.</p>
 <p>If you would like to use my pallets, remove the <code class="docutils literal notranslate"><span class="pre">palettes</span></code> folder from the
-<code class="docutils literal notranslate"><span class="pre">UMLet</span></code> directory, then naviage to that directory in your shell and type:</p>
+<code class="docutils literal notranslate"><span class="pre">UMLet</span></code> directory, then navigate to that directory in your shell and type:</p>
 <div class="last highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone git@github.com:aleph2c/umlet-statechart-template.git palettes
 </pre></div>
 </div>
@@ -121,6 +121,7 @@ pictures.</p>
 <div class="section" id="the-most-important-rule-in-uml">
 <span id="reading-diagrams-the-most-important-rule-in-uml"></span><h3>The Most Important Rule in UML<a class="headerlink" href="#the-most-important-rule-in-uml" title="Permalink to this headline">¶</a></h3>
 <p><strong>You don’t have to draw everything on your picture.</strong></p>
+<p>Sometimes less is more.</p>
 </div>
 <div class="section" id="classes">
 <span id="reading-diagrams-classes"></span><h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
@@ -206,6 +207,13 @@ Probably not; inheritance can get you into a lot of trouble if it’s too deep.<
 <p>If you are going to inherit ask yourself if the “is-a”, or “is-an”, relationship
 holds true when you use the two class names in a sentence.  “The ToasterOven
 class is an ActiveObject”; yes, that makes sense.  Ok, I’ll use inheritance.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Technically speaking, you <a href="#id9"><span class="problematic" id="id10">`can't draw static inheritance
+diagrams&lt;https://www.youtube.com/watch?v=EiOglTERPEo&gt;`_</span></a> when you use Python.
+It is the child class that determines what <code class="docutils literal notranslate"><span class="pre">super</span></code> means, because the MRO
+is determined dynamically using a process called linearization.</p>
+</div>
 <p>If you want all of the states of your statechart to react the same when they see
 a specific event, use the <a class="reference internal" href="patterns.html#patterns-ultimate-hook"><span class="std std-ref">ultimate hook pattern</span></a>.
 This gives you all of the benefits of inheritance while still having debuggable

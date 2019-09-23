@@ -17,8 +17,8 @@
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Cellular Automata" href="cellular_automata.html" />
-    <link rel="prev" title="Using and Unwinding a Factory" href="towardsthefactoryexample.html" />
+    <link rel="next" title="Hacking to Learn" href="scribbleexample.html" />
+    <link rel="prev" title="Comprehensive" href="comprehensive.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -35,9 +35,13 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="thread-safe-attributes">
+  <blockquote>
+<div><p><em>The best is the enemy of the good.</em></p>
+<p class="attribution">&mdash;Voltaire</p>
+</div></blockquote>
+<div class="section" id="thread-safe-attributes">
 <span id="thread-safe-attributes-thread-safe-attributes"></span><h1>Thread Safe Attributes<a class="headerlink" href="#thread-safe-attributes" title="Permalink to this headline">¶</a></h1>
-<p>If you use a statechart, your program is multi-threaded.</p>
+<p>If you use a miros statechart, your program is multi-threaded.</p>
 <p>Sometimes, you will want to access an attribute of your statechart from another
 thread, like the main part of your program.  When you do this, you are trying to
 access memory that could be changed in one thread while it is being read in by
@@ -99,7 +103,7 @@ operations (use of the “=”) within thread-safe locks.  In addition to this, 
 non-atomic “+=”, “-=” … “//=” statements using thread-safe attributes were
 also wrapped within locks.  For more complex situations, the
 thread-safety features provided by the <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> class can be
-used get to get the thread lock explicitly.</p>
+used to get the thread lock explicitly.</p>
 <p>I will introduce these ideas gradually through a set of examples.  Let’s
 begin by looking at four interacting threads (possible race conditions are
 highlighted):</p>
@@ -737,15 +741,34 @@ protect your own code (highlighting how to get the lock):</p>
 <p class="last">You can download the above code <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/thread_safe_attributes_4.py">here</a></p>
 </div>
 <p>The lock can be obtained by calling <code class="docutils literal notranslate"><span class="pre">_,</span> <span class="pre">_lock</span> <span class="pre">=</span> <span class="pre">&lt;thread_safe_attribute&gt;</span></code>.</p>
-<p>This is a little nasty piece of metaprogramming that could baffle a beginner or
-anyone who looks at the thread safe attribute.  Most of the time your thread
-safe attribute acts as an attribute, but other times it acts as an iterable,
-what is going on?  It only acts as an interable when proceeded by <code class="docutils literal notranslate"><span class="pre">_,</span> <span class="pre">_lock</span></code>.
-If you use this technique in one of your threads, you must use it in all of your
-threads.</p>
-<p>Once again I recommend against performing calculations directly on your shared
-attributes.  Instead, copy their variable into a temp, perform a calculation
-then assign the results into them.</p>
+<p>This nasty little piece of metaprogramming could baffle a beginner or anyone who
+looks at the thread safe attribute:  Most of the time your thread-safe attribute
+acts as an attribute, but other times it acts as an iterable, what is going on?
+It only acts as an iterable when proceeded by <code class="docutils literal notranslate"><span class="pre">_,</span> <span class="pre">_lock</span></code>.  <strong>If you use this
+technique in one of your threads, you must also explicitly get the lock in all
+other threads that share the attribute.</strong></p>
+<p>This lock-access feature was added for difficult situations, where the client
+code absolutely needs the lock, maybe for advanced database calls or that kind
+of thing.</p>
+<p><strong>I recommend against explicitely getting a lock</strong> and performing calculations
+directly on your shared attributes.</p>
+<p>Instead, copy their contents into a local variable (automatically locked) ,
+perform a calculation using local variables, then assign the results back into
+the shared attribute (automatically locked).</p>
+<p>In our example, we don’t need to use shared attribute at all, so we shouldn’t.
+The example was arbitrary, a better way to perform the calculation can be seen
+in the following code listing.  If we needed to place the <code class="docutils literal notranslate"><span class="pre">0.3</span></code> back into the
+shared-attribute, we can do that, but we keep the shared-attribute out of our
+equation.   The equation will use non-shared, thread-safe, local variables which
+are placed on the stack during a thread’s context switch.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># code which doesn&#39;t require an explicit lock</span>
+<span class="n">temp</span> <span class="o">=</span> <span class="mf">0.30</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.45</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">temp</span> <span class="o">**</span> <span class="mf">1.2</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;thr2: &quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="c1"># this code will be implicitly locked by ThreadSafeAttributes</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">temp</span>
+</pre></div>
+</div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> feature actually reads the last line of code you
@@ -769,8 +792,8 @@ syntactically inconsistent way.</p>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="examples.html">Examples</a><ul>
-      <li>Previous: <a href="towardsthefactoryexample.html" title="previous chapter">Using and Unwinding a Factory</a></li>
-      <li>Next: <a href="cellular_automata.html" title="next chapter">Cellular Automata</a></li>
+      <li>Previous: <a href="comprehensive.html" title="previous chapter">Comprehensive</a></li>
+      <li>Next: <a href="scribbleexample.html" title="next chapter">Hacking to Learn</a></li>
   </ul></li>
   </ul></li>
 </ul>

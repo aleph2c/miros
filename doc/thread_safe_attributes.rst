@@ -1,9 +1,14 @@
+
+   *The best is the enemy of the good.*
+
+   -- Voltaire
+
 .. _thread_safe_attributes-thread-safe-attributes:
 
 Thread Safe Attributes
 ======================
 
-If you use a statechart, your program is multi-threaded.
+If you use a miros statechart, your program is multi-threaded.
 
 Sometimes, you will want to access an attribute of your statechart from another
 thread, like the main part of your program.  When you do this, you are trying to
@@ -74,7 +79,7 @@ operations (use of the "=") within thread-safe locks.  In addition to this, the
 non-atomic "+=", "-=" ... "//=" statements using thread-safe attributes were
 also wrapped within locks.  For more complex situations, the
 thread-safety features provided by the ``ThreadSafeAttributes`` class can be
-used get to get the thread lock explicitly.
+used to get the thread lock explicitly.
 
 I will introduce these ideas gradually through a set of examples.  Let's
 begin by looking at four interacting threads (possible race conditions are
@@ -500,16 +505,39 @@ protect your own code (highlighting how to get the lock):
 
 The lock can be obtained by calling ``_, _lock = <thread_safe_attribute>``.
 
-This is a little nasty piece of metaprogramming that could baffle a beginner or
-anyone who looks at the thread safe attribute.  Most of the time your thread
-safe attribute acts as an attribute, but other times it acts as an iterable,
-what is going on?  It only acts as an interable when proceeded by ``_, _lock``.
-If you use this technique in one of your threads, you must use it in all of your
-threads.  
+This nasty little piece of metaprogramming could baffle a beginner or anyone who
+looks at the thread safe attribute:  Most of the time your thread-safe attribute
+acts as an attribute, but other times it acts as an iterable, what is going on?
+It only acts as an iterable when proceeded by ``_, _lock``.  **If you use this
+technique in one of your threads, you must also explicitly get the lock in all
+other threads that share the attribute.**
 
-Once again I recommend against performing calculations directly on your shared
-attributes.  Instead, copy their variable into a temp, perform a calculation
-then assign the results into them.
+This lock-access feature was added for difficult situations, where the client
+code absolutely needs the lock, maybe for advanced database calls or that kind
+of thing.
+
+**I recommend against explicitely getting a lock** and performing calculations
+directly on your shared attributes.  
+
+Instead, copy their contents into a local variable (automatically locked) ,
+perform a calculation using local variables, then assign the results back into
+the shared attribute (automatically locked).
+
+In our example, we don't need to use shared attribute at all, so we shouldn't.
+The example was arbitrary, a better way to perform the calculation can be seen
+in the following code listing.  If we needed to place the ``0.3`` back into the
+shared-attribute, we can do that, but we keep the shared-attribute out of our
+equation.   The equation will use non-shared, thread-safe, local variables which
+are placed on the stack during a thread's context switch.
+
+.. code-block:: python
+ 
+   # code which doesn't require an explicit lock
+   temp = 0.30
+   b = temp * math.cos(0.45) + 3 * temp ** 1.2
+   print("thr2: ", b)
+   # this code will be implicitly locked by ThreadSafeAttributes
+   self.gl1.a = temp
 
 .. note::
 

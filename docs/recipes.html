@@ -152,7 +152,9 @@ building up your own programs.</p>
 <div class="section" id="demonstration-of-capabilities">
 <span id="recipes-demo"></span><h2><a class="toc-backref" href="#id9">Demonstration of Capabilities</a><a class="headerlink" href="#demonstration-of-capabilities" title="Permalink to this headline">¶</a></h2>
 <p>In this section I’ll show you how you can use the miros library by layering more
-and more of its features into a simple program.</p>
+and more of its features into a simple program.  This program will be arbitrary,
+it serves no purpose other than to show how to do the common things you will
+want to do when you build your own systems.</p>
 <div class="contents local topic" id="id2">
 <ul class="simple">
 <li><a class="reference internal" href="#state-abstraction-in-miros" id="id85">State Abstraction in Miros</a></li>
@@ -204,7 +206,7 @@ the event processor calls them over and over again.  What emerges from this
 interplay is a Hierarchical State Machine (HSM) behavior which follows the Harel
 Formalism (picture-to-behavior rules).</p>
 <p>Now that we understand a bit of theory and how the miros abstraction works,
-let’s look at some examples.</p>
+let’s write some code.</p>
 </div>
 <div class="section" id="minimal-viable-states">
 <span id="recipes-minimal-viable-states"></span><h3><a class="toc-backref" href="#id86">Minimal Viable States</a><a class="headerlink" href="#minimal-viable-states" title="Permalink to this headline">¶</a></h3>
@@ -2240,6 +2242,297 @@ inner_state about 1 second after the middle_state was entered.</p>
 </div>
 <div class="section" id="creating-thread-safe-class-attributes">
 <span id="recipes-getting-information-out-of-your-statechart"></span><h3><a class="toc-backref" href="#id100">Creating thread-safe class Attributes</a><a class="headerlink" href="#creating-thread-safe-class-attributes" title="Permalink to this headline">¶</a></h3>
+<p>If you build a statechart using miros your program is multithreaded.  This means
+that if you would like to access the same variable across two threads, you need
+to lock it so that one thread doesn’t write to it while another thread is using
+it.</p>
+<p>Here is an example design of where we turn the <code class="docutils literal notranslate"><span class="pre">times_in_inner</span></code> attribute into a
+thread-safe property using the <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> class (available in
+miros &gt;= 4.1.3).</p>
+<a class="reference external image-reference" href="_static/state_recipe_15.pdf"><div align="center" class="align-center"><img alt="_images/state_recipe_15.svg" src="_images/state_recipe_15.svg" /></div>
+</a>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There is no UML drawing syntax for describing an attribute wrapped by a
+property.  There is no UML diagram to show a thread lock, or how multiple
+inheritance works through <a class="reference external" href="https://www.youtube.com/watch?v=EiOglTERPEo">linearization of parent classes</a> using Python <code class="docutils literal notranslate"><span class="pre">super()</span></code>.
+Our UML is just a sketch, so we make a note that the <code class="docutils literal notranslate"><span class="pre">times_in_inner</span></code>
+is a thread safe attribute and move on.</p>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> class tries to protect you from race conditions by
+inspecting the line of code where the <code class="docutils literal notranslate"><span class="pre">times_in_inner</span></code> variable is used and
+wrap it within a thread lock.  The <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> is <a class="reference internal" href="thread_safe_attributes.html#thread-safe-attributes-thread-safe-attributes"><span class="std std-ref">limited in
+it’s capabilities</span></a>, but it will
+lock the non-atomic <code class="docutils literal notranslate"><span class="pre">+=</span></code> operation seen below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1"># simple_state_15.py</span>
+ <span class="kn">import</span> <span class="nn">re</span>
+ <span class="kn">import</span> <span class="nn">time</span>
+ <span class="kn">import</span> <span class="nn">logging</span>
+ <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+ <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+<span class="hll"> <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ThreadSafeAttributes</span>
+</span>
+ <span class="k">class</span> <span class="nc">F1</span><span class="p">(</span><span class="n">Factory</span><span class="p">,</span> <span class="n">ThreadSafeAttributes</span><span class="p">):</span>
+
+<span class="hll">   <span class="n">_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;times_in_inner&#39;</span><span class="p">]</span>
+</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+       <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> \
+       <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> \
+       <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span> <span class="o">=</span> \
+       <span class="s1">&#39;simple_state_15.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
+
+     <span class="c1"># clear our log every time we run this program</span>
+     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+       <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+     <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+       <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+       <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span><span class="p">,</span>
+       <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">register_live_spy_callback</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spy_callback</span><span class="p">))</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">register_live_trace_callback</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace_callback</span><span class="p">))</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;outer_state&quot;</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_init_signal</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_hook</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Send_Broadcast</span><span class="p">,</span> \
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_send_broadcast</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BROADCAST</span><span class="p">,</span> \
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_broadcast</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_reset</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_exit_signal</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">to_method</span><span class="p">()</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">middle_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;middle_state&quot;</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middle_state_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Ready</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middle_state_ready</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middle_state_exit_signal</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">to_method</span><span class="p">()</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;inner_state&quot;</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_exit_signal</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">to_method</span><span class="p">()</span>
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">middle_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span><span class="o">.</span> \
+       <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middle_state</span><span class="p">)</span>
+
+   <span class="k">def</span> <span class="nf">trace_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+     <span class="sd">&#39;&#39;&#39;trace without datetime-stamp&#39;&#39;&#39;</span>
+     <span class="n">trace_without_datetime</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\[.+\]) (\[.+\].+)&#39;</span><span class="p">,</span> <span class="n">trace</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;T: &quot;</span> <span class="o">+</span> <span class="n">trace_without_datetime</span><span class="p">)</span>
+
+   <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spy</span><span class="p">):</span>
+     <span class="sd">&#39;&#39;&#39;spy with machine name pre-pended&#39;&#39;&#39;</span>
+     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
+
+   <span class="k">def</span> <span class="nf">outer_state_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BROADCAST</span><span class="p">))</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;hello from outer_state&quot;</span><span class="p">)</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="k">def</span> <span class="nf">outer_state_init_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;init&quot;</span><span class="p">)</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">middle_state</span><span class="p">)</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="k">def</span> <span class="nf">outer_state_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;run some code, but don&#39;t transition&quot;</span><span class="p">)</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="k">def</span> <span class="nf">outer_state_send_broadcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BROADCAST</span><span class="p">))</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="k">def</span> <span class="nf">outer_state_broadcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;received broadcast&quot;</span><span class="p">)</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="k">def</span> <span class="nf">outer_state_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="k">def</span> <span class="nf">outer_state_exit_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;exiting the outer_state&quot;</span><span class="p">)</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="k">def</span> <span class="nf">middle_state_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;arming one-shot&quot;</span><span class="p">)</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Ready</span><span class="p">),</span>
+       <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+       <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+       <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="k">def</span> <span class="nf">middle_state_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span><span class="p">)</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="k">def</span> <span class="nf">middle_state_exit_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Ready</span><span class="p">))</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="k">def</span> <span class="nf">inner_state_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="o">+=</span> <span class="mi">1</span>
+</span>     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span>
+       <span class="s2">&quot;hello from inner_state {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span><span class="p">))</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="k">def</span> <span class="nf">inner_state_exit_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;exiting inner_state&quot;</span><span class="p">)</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+ <span class="k">class</span> <span class="nc">F2</span><span class="p">(</span><span class="n">F1</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+   <span class="k">def</span> <span class="nf">inner_state_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;hello from new inner_state&quot;</span><span class="p">)</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+   <span class="k">def</span> <span class="nf">inner_state_exit_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;exiting new inner_state&quot;</span><span class="p">)</span>
+     <span class="k">return</span> <span class="n">status</span>
+
+ <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+   <span class="n">f1</span> <span class="o">=</span> <span class="n">F1</span><span class="p">(</span>
+     <span class="s2">&quot;f1&quot;</span><span class="p">,</span>
+     <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+     <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+   <span class="p">)</span>
+
+   <span class="n">f2</span> <span class="o">=</span> <span class="n">F2</span><span class="p">(</span>
+     <span class="s2">&quot;f2&quot;</span><span class="p">,</span>
+     <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+     <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+   <span class="p">)</span>
+
+   <span class="n">f1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+   <span class="n">f1</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">))</span>
+   <span class="n">f1</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
+     <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">),</span>
+     <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+     <span class="n">period</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+     <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span>
+     <span class="p">)</span>
+
+   <span class="n">f2</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">f2</span><span class="o">.</span><span class="n">inner_state</span><span class="p">)</span>
+   <span class="n">f2</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">))</span>
+   <span class="n">f2</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
+   <span class="n">f1</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Send_Broadcast</span><span class="p">))</span>
+
+   <span class="c1"># delay long enough so we can see how the program behaves in time</span>
+   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">4.00</span><span class="p">)</span>
+
+   <span class="c1"># read information from other threads</span>
+<span class="hll">   <span class="k">print</span><span class="p">(</span><span class="s2">&quot;f1 was in its inner state {} times&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">times_in_inner</span><span class="p">))</span>
+</span><span class="hll">   <span class="k">print</span><span class="p">(</span><span class="s2">&quot;f2 was in its inner state {} times&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f2</span><span class="o">.</span><span class="n">times_in_inner</span><span class="p">))</span>
+</span></pre></div>
+</div>
+<p>So where is the lock?</p>
+<p>It’s hidden from view.  The <code class="docutils literal notranslate"><span class="pre">times_in_inner</span></code> is a kind of <code class="docutils literal notranslate"><span class="pre">&#64;property</span></code> and
+the variable that holds its information is protected by another hidden variable
+that is the lock.</p>
+<p>Running this program will provide the following output:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f1</span> <span class="n">was</span> <span class="ow">in</span> <span class="n">its</span> <span class="n">inner</span> <span class="n">state</span> <span class="mi">2</span> <span class="n">times</span>
+<span class="n">f2</span> <span class="n">was</span> <span class="ow">in</span> <span class="n">its</span> <span class="n">inner</span> <span class="n">state</span> <span class="mi">0</span> <span class="n">times</span>
+</pre></div>
+</div>
+<p>The f1 statechart properly reports how many times it was in its inner_state.
+The f2 inner_state doesn’t write to the <code class="docutils literal notranslate"><span class="pre">times_in_inner</span></code> property, so it’s
+output only shows how that property was initialized.</p>
+<p>Let’s look at the thread safe code in isolation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+<span class="c1"># ...</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ThreadSafeAttributes</span>
+
+<span class="k">class</span> <span class="nc">F1</span><span class="p">(</span><span class="n">Factory</span><span class="p">,</span> <span class="n">ThreadSafeAttributes</span><span class="p">):</span>
+   <span class="n">_attribute</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;times_in_inner&#39;</span><span class="p">]</span>  <span class="c1"># Uses a metaclass to make the</span>
+                                    <span class="c1"># times_in_inner property, with its</span>
+                                    <span class="c1"># protecting lock</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="o">=</span> <span class="mi">0</span>
+
+  <span class="k">def</span> <span class="nf">some_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="c1"># ..</span>
+    <span class="c1"># Inside of the state thread small operations on the times_in_inner</span>
+    <span class="c1"># attribute can use used in a thread safe way</span>
+    <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span><span class="p">)</span>  <span class="c1"># safe</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span>     <span class="c1"># safe</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="o">=</span> <span class="mi">1</span>     <span class="c1"># safe</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="o">+=</span> <span class="mi">1</span>    <span class="c1"># safe</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="o">+=</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="c1"># NOT safe</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># NOT safe</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span>  <span class="c1"># NOT safe</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> class behaves like a macro, wrapping the getting
+and setting of the thread safe attribute within a thread lock.  It also wraps
+simple, <code class="docutils literal notranslate"><span class="pre">+=</span></code>, <code class="docutils literal notranslate"><span class="pre">-=</span></code>, …, <code class="docutils literal notranslate"><span class="pre">&lt;&lt;=</span></code> statements within a lock.  But that’s it.
+It can’t protect other types of statements from race conditions.  If you need to
+use your thread safe attribute to perform more complex operations, use a
+temporary variable and copy the results into the thread safe attribute when you
+are done.</p>
+<p>Better yet, share information using published events.  But, the thread safe
+attributes feature is very useful when you are sharing information between a
+statechart and a thread which is not a statechart, like main.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Accessing a thread safe attribute will be very slow.  In the background
+the <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> uses a metaclass, and the descriptor protocol.
+Within the descriptor protocol it uses the <code class="docutils literal notranslate"><span class="pre">inspect</span></code> library to read the
+previous line of code and compares it to a regular expression.  Keep this in
+mind when you use this feature.</p>
+</div>
+<ul class="simple">
+<li><a class="reference internal" href="#recipes-sharing-attributes-between-threads-activeobjects"><span class="std std-ref">Sharing attributes between threads (ActiveObjects)</span></a></li>
+<li><a class="reference internal" href="#recipes-sharing-attributes-between-threads-factories"><span class="std std-ref">Sharing attributes between threads (Factories)</span></a></li>
+</ul>
+<p>If you have gotten this far, you have a good handle on how to use this library
+and all of its features.  But you can take it to another level though.  Your
+statecharts can send encrypted messages to one another and act in concert while
+running on different machines.  To see how to do this, look at the
+<a class="reference external" href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq</a> library.</p>
 <hr class="docutils" />
 <p>Here is a collection of tiny programs that each demonstrate how to do things in miros.</p>
 </div>

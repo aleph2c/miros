@@ -22,7 +22,9 @@ Demonstration of Capabilities
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In this section I'll show you how you can use the miros library by layering more
-and more of its features into a simple program.
+and more of its features into a simple program.  This program will be arbitrary,
+it serves no purpose other than to show how to do the common things you will
+want to do when you build your own systems.
 
 .. contents::
   :local:
@@ -57,7 +59,7 @@ interplay is a Hierarchical State Machine (HSM) behavior which follows the Harel
 Formalism (picture-to-behavior rules).
 
 Now that we understand a bit of theory and how the miros abstraction works,
-let's look at some examples.
+let's write some code.
 
 .. _recipes-minimal-viable-states:
 
@@ -2291,340 +2293,313 @@ inner_state about 1 second after the middle_state was entered.
 
 Creating thread-safe class Attributes
 -------------------------------------
+If you build a statechart using miros your program is multithreaded.  This means
+that if you would like to access the same variable across two threads, you need
+to lock it so that one thread doesn't write to it while another thread is using
+it.
 
-..
-  Creating thread-safe class Attributes
-  -------------------------------------
-  A statechart is running in a separate thread from our main program; so how do we
-  reach into it and read/write a variable?  We can't assume that it's thread
-  won't be halfway through changing the variable we want to read/write at the moment we
-  are trying to access it.
+Here is an example design of where we turn the ``times_in_inner`` attribute into a
+thread-safe property using the ``ThreadSafeAttributes`` class (available in
+miros >= 4.1.3).
   
-  To solve this problem we can use a thread safe queue.  If we use the
-  ``collections.deque`` from the Python standard library, we can build a little ring
-  buffer.  The statechart can post information to it, and the main thread can
-  read information from it.  If we wrap the deque in a ``@property``, our exposed
-  variable will just look like an attribute from outside of the class.
-  
-  Here is an example design of where we turn the ``times_in_inner`` attribute into a
-  thread-safe property.
-  
-  .. image:: _static/state_recipe_15.svg
-      :target: _static/state_recipe_15.pdf
-      :align: center
-  
-  There is no UML drawing syntax for creating a Python property, so I just add a
-  comment on the diagram after the ``times_in_inner`` attribute about what it
-  really is.
-  
-  We can see how to make the ``times_in_inner`` thread safe attribute below (see
-  the highlighted code):
-  
-  .. code-block:: python
-    :emphasize-lines: 25-27, 81-83, 85-87, 153, 209, 210
+.. image:: _static/state_recipe_15.svg
+    :target: _static/state_recipe_15.pdf
+    :align: center
+ 
+.. note::
+
+   There is no UML drawing syntax for describing an attribute wrapped by a
+   property.  There is no UML diagram to show a thread lock, or how multiple
+   inheritance works through `linearization of parent classes
+   <https://www.youtube.com/watch?v=EiOglTERPEo>`_ using Python ``super()``.
+   Our UML is just a sketch, so we make a note that the ``times_in_inner``
+   is a thread safe attribute and move on.
+
+The ``ThreadSafeAttributes`` class tries to protect you from race conditions by
+inspecting the line of code where the ``times_in_inner`` variable is used and
+wrap it within a thread lock.  The ``ThreadSafeAttributes`` is :ref:`limited in
+it's capabilities <thread_safe_attributes-thread-safe-attributes>`, but it will
+lock the non-atomic ``+=`` operation seen below:
+
+.. code-block:: python
+  :emphasize-lines: 11, 15, 143, 199, 200
     
-     # simple_state_15.py
-     import re
-     import time
-     import logging
-     from functools import partial
-     from collections import deque
-  
-     from miros import Event
-     from miros import signals
-     from miros import Factory
-     from miros import return_status
-  
-     class F1(Factory):
-  
-       def __init__(self, name, log_file_name=None,
-           live_trace=None, live_spy=None):
-  
-         super().__init__(name)
-  
-         self.live_trace = \
-           False if live_trace == None else live_trace
-         self.live_spy = \
-           False if live_spy == None else live_spy
-  
-         # set up a thread safe ring buffer of size 1
-         self._times_in_inner = deque(maxlen=1)
-         self._times_in_inner.append(0)
-  
-         self.log_file_name = \
-           'simple_state_15.log' if log_file_name == None else log_file_name
-  
-         # clear our log every time we run this program
-         with open(self.log_file_name, "w") as fp:
-           fp.write("")
-  
-         logging.basicConfig(
-           format='%(asctime)s %(levelname)s:%(message)s',
-           filename=self.log_file_name,
-           level=logging.DEBUG)
-       
-         self.register_live_spy_callback(partial(self.spy_callback))
-         self.register_live_trace_callback(partial(self.trace_callback))
-  
-         self.outer_state = self.create(state="outer_state"). \
-           catch(signal=signals.ENTRY_SIGNAL,
-             handler=self.outer_state_entry_signal). \
-           catch(signal=signals.INIT_SIGNAL,
-             handler=self.outer_state_init_signal). \
-           catch(signal=signals.Hook,
-             handler=self.outer_state_hook). \
-           catch(signal=signals.Send_Broadcast, \
-             handler=self.outer_state_send_broadcast). \
-           catch(signal=signals.BROADCAST, \
-             handler=self.outer_state_broadcast). \
-           catch(signal=signals.Reset,
-             handler=self.outer_state_reset). \
-           catch(signal=signals.EXIT_SIGNAL,
-             handler=self.outer_state_exit_signal). \
-           to_method()
-  
-         self.middle_state = self.create(state="middle_state"). \
-           catch(signal=signals.ENTRY_SIGNAL,
-             handler=self.middle_state_entry_signal). \
-           catch(signal=signals.Ready,
-             handler=self.middle_state_ready). \
-           catch(signal=signals.EXIT_SIGNAL,
-             handler=self.middle_state_exit_signal). \
-           to_method()
-  
-         self.inner_state = self.create(state="inner_state"). \
-           catch(signal=signals.ENTRY_SIGNAL,
-             handler=self.inner_state_entry_signal). \
-           catch(signal=signals.EXIT_SIGNAL,
-             handler=self.inner_state_exit_signal). \
-           to_method()
-  
-         self.nest(self.outer_state, parent=None). \
-           nest(self.middle_state, parent=self.outer_state). \
-           nest(self.inner_state, parent=self.middle_state)
-  
-       @property
-       def times_in_inner(self):
-         return self._times_in_inner[-1]
-  
-       @times_in_inner.setter
-       def times_in_inner(self, value):
-         self._times_in_inner.append(value)
-  
-       def trace_callback(self, trace):
-         '''trace without datetime-stamp'''
-         trace_without_datetime = re.search(r'(\[.+\]) (\[.+\].+)', trace).group(2)
-         logging.debug("T: " + trace_without_datetime)
-  
-       def spy_callback(self, spy):
-         '''spy with machine name pre-pended'''
-         logging.debug("S: [{}] {}".format(self.name, spy))
-       
-       def outer_state_entry_signal(self, e):
-         self.subscribe(Event(signal=signals.BROADCAST))
-         self.scribble("hello from outer_state")
-         status = return_status.HANDLED
-         return status
-  
-       def outer_state_init_signal(self, e):
-         self.scribble("init")
-         status = self.trans(self.middle_state)
-         return status
-  
-       def outer_state_hook(self, e):
-         status = return_status.HANDLED
-         self.scribble("run some code, but don't transition")
-         return status
-  
-       def outer_state_send_broadcast(self, e):
-         status = return_status.HANDLED
-         self.publish(Event(signal=signals.BROADCAST))
-         return status
-  
-       def outer_state_broadcast(self, e):
-         status = return_status.HANDLED
-         self.scribble("received broadcast")
-         return status
-  
-       def outer_state_reset(self, e):
-         status = self.trans(self.outer_state)
-         return status
-  
-       def outer_state_exit_signal(self, e):
-         status = return_status.HANDLED
-         self.scribble("exiting the outer_state")
-         return status
-  
-       def middle_state_entry_signal(self, e):
-         status = return_status.HANDLED
-         self.scribble("arming one-shot")
-         self.post_fifo(Event(signal=signals.Ready),
-           times=1,
-           period=1.0,
-           deferred=True)
-         return status
-  
-       def middle_state_ready(self, e):
-         status = self.trans(self.inner_state)
-         return status
-  
-       def middle_state_exit_signal(self, e):
-         status = return_status.HANDLED
-         self.cancel_events(Event(signal=signals.Ready))
-         return status
-  
-       def inner_state_entry_signal(self, e):
-         status = return_status.HANDLED
-         self.times_in_inner += 1
-         self.scribble(
-           "hello from inner_state {}".format(self.times_in_inner))
-         return status
-  
-       def inner_state_exit_signal(self, e):
-         status = return_status.HANDLED
-         self.scribble("exiting inner_state")
-         return status
-  
-     class F2(F1):
-       def __init__(self, *args, **kwargs):
-         super().__init__(*args, **kwargs)
-  
-       def inner_state_entry_signal(self, e):
-         status = return_status.HANDLED
-         self.scribble("hello from new inner_state")
-         return status
-  
-       def inner_state_exit_signal(self, e):
-         status = return_status.HANDLED
-         self.scribble("exiting new inner_state")
-         return status
-  
-     if __name__ == '__main__':
-  
-       f1 = F1(
-         "f1",
-         live_trace=True,
-         live_spy=True,
-       )
-  
-       f2 = F2(
-         "f2",
-         live_trace=True,
-         live_spy=True,
-       )
-  
-       f1.start_at(f1.outer_state)
-       f1.post_fifo(Event(signal=signals.Hook))
-       f1.post_fifo(
-         Event(signal=signals.Reset),
+   # simple_state_15.py
+   import re
+   import time
+   import logging
+   from functools import partial
+
+   from miros import Event
+   from miros import signals
+   from miros import Factory
+   from miros import return_status
+   from miros import ThreadSafeAttributes
+
+   class F1(Factory, ThreadSafeAttributes):
+
+     _attributes = ['times_in_inner']
+
+     def __init__(self, name, log_file_name=None,
+         live_trace=None, live_spy=None):
+
+       super().__init__(name)
+
+       self.live_trace = \
+         False if live_trace == None else live_trace
+       self.live_spy = \
+         False if live_spy == None else live_spy
+
+       self.log_file_name = \
+         'simple_state_15.log' if log_file_name == None else log_file_name
+
+       # clear our log every time we run this program
+       with open(self.log_file_name, "w") as fp:
+         fp.write("")
+
+       logging.basicConfig(
+         format='%(asctime)s %(levelname)s:%(message)s',
+         filename=self.log_file_name,
+         level=logging.DEBUG)
+     
+       self.register_live_spy_callback(partial(self.spy_callback))
+       self.register_live_trace_callback(partial(self.trace_callback))
+
+       self.outer_state = self.create(state="outer_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.outer_state_entry_signal). \
+         catch(signal=signals.INIT_SIGNAL,
+           handler=self.outer_state_init_signal). \
+         catch(signal=signals.Hook,
+           handler=self.outer_state_hook). \
+         catch(signal=signals.Send_Broadcast, \
+           handler=self.outer_state_send_broadcast). \
+         catch(signal=signals.BROADCAST, \
+           handler=self.outer_state_broadcast). \
+         catch(signal=signals.Reset,
+           handler=self.outer_state_reset). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.outer_state_exit_signal). \
+         to_method()
+
+       self.middle_state = self.create(state="middle_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.middle_state_entry_signal). \
+         catch(signal=signals.Ready,
+           handler=self.middle_state_ready). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.middle_state_exit_signal). \
+         to_method()
+
+       self.inner_state = self.create(state="inner_state"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.inner_state_entry_signal). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.inner_state_exit_signal). \
+         to_method()
+
+       self.nest(self.outer_state, parent=None). \
+         nest(self.middle_state, parent=self.outer_state). \
+         nest(self.inner_state, parent=self.middle_state)
+
+     def trace_callback(self, trace):
+       '''trace without datetime-stamp'''
+       trace_without_datetime = re.search(r'(\[.+\]) (\[.+\].+)', trace).group(2)
+       logging.debug("T: " + trace_without_datetime)
+
+     def spy_callback(self, spy):
+       '''spy with machine name pre-pended'''
+       logging.debug("S: [{}] {}".format(self.name, spy))
+     
+     def outer_state_entry_signal(self, e):
+       self.subscribe(Event(signal=signals.BROADCAST))
+       self.scribble("hello from outer_state")
+       status = return_status.HANDLED
+       return status
+
+     def outer_state_init_signal(self, e):
+       self.scribble("init")
+       status = self.trans(self.middle_state)
+       return status
+
+     def outer_state_hook(self, e):
+       status = return_status.HANDLED
+       self.scribble("run some code, but don't transition")
+       return status
+
+     def outer_state_send_broadcast(self, e):
+       status = return_status.HANDLED
+       self.publish(Event(signal=signals.BROADCAST))
+       return status
+
+     def outer_state_broadcast(self, e):
+       status = return_status.HANDLED
+       self.scribble("received broadcast")
+       return status
+
+     def outer_state_reset(self, e):
+       status = self.trans(self.outer_state)
+       return status
+
+     def outer_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting the outer_state")
+       return status
+
+     def middle_state_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("arming one-shot")
+       self.post_fifo(Event(signal=signals.Ready),
          times=1,
-         period=2.0,
-         deferred=True
-         )
+         period=1.0,
+         deferred=True)
+       return status
+
+     def middle_state_ready(self, e):
+       status = self.trans(self.inner_state)
+       return status
+
+     def middle_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.cancel_events(Event(signal=signals.Ready))
+       return status
+
+     def inner_state_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.times_in_inner += 1
+       self.scribble(
+         "hello from inner_state {}".format(self.times_in_inner))
+       return status
+
+     def inner_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting inner_state")
+       return status
+
+   class F2(F1):
+     def __init__(self, *args, **kwargs):
+       super().__init__(*args, **kwargs)
+
+     def inner_state_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("hello from new inner_state")
+       return status
+
+     def inner_state_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.scribble("exiting new inner_state")
+       return status
+
+   if __name__ == '__main__':
+
+     f1 = F1(
+       "f1",
+       live_trace=True,
+       live_spy=True,
+     )
+
+     f2 = F2(
+       "f2",
+       live_trace=True,
+       live_spy=True,
+     )
+
+     f1.start_at(f1.outer_state)
+     f1.post_fifo(Event(signal=signals.Hook))
+     f1.post_fifo(
+       Event(signal=signals.Reset),
+       times=1,
+       period=2.0,
+       deferred=True
+       )
+
+     f2.start_at(f2.inner_state)
+     f2.post_fifo(Event(signal=signals.Hook))
+     f2.post_fifo(Event(signal=signals.Reset))
+     f1.post_fifo(Event(signal=signals.Send_Broadcast))
+
+     # delay long enough so we can see how the program behaves in time
+     time.sleep(4.00)
+
+     # read information from other threads
+     print("f1 was in its inner state {} times".format(f1.times_in_inner))
+     print("f2 was in its inner state {} times".format(f2.times_in_inner))
+
+So where is the lock?  
+
+It's hidden from view.  The ``times_in_inner`` is a kind of ``@property`` and
+the variable that holds its information is protected by another hidden variable
+that is the lock.
+
+Running this program will provide the following output:
+
+.. code-block:: python
   
-       f2.start_at(f2.inner_state)
-       f2.post_fifo(Event(signal=signals.Hook))
-       f2.post_fifo(Event(signal=signals.Reset))
-       f1.post_fifo(Event(signal=signals.Send_Broadcast))
-  
-       # delay long enough so we can see how the program behaves in time
-       time.sleep(4.00)
-  
-       # read information from other threads
-       print("f1 was in its inner state {} times".format(f1.times_in_inner))
-       print("f2 was in its inner state {} times".format(f2.times_in_inner))
-  
-  Running this program will provide the following output:
-  
-  .. code-block:: python
-    
-    f1 was in its inner state 2 times
-    f2 was in its inner state 0 times
-  
-  The f1 statechart properly reports how many times it was in its inner_state.
-  The f2 inner_state doesn't write to the ``times_in_inner`` property, so it's
-  output only shows how that property was initialized.
-  
-  Let's look at the property code in isolation from the rest of the statechart:
-  
-  .. code-block:: python
-    :emphasize-lines: 1
-    :linenos:
-  
-    # INITIALIZATION CODE TAKEN FROM __init__
-    # set up a thread safe ring buffer of size 1
-    self._times_in_inner = deque(maxlen=1)
-    self._times_in_inner.append(0)
-    # ...
-    # PROPERTY methods used to control the deque
-    @property
-    def times_in_inner(self):
-      return self._times_in_inner[-1]
-  
-    @times_in_inner.setter
-    def times_in_inner(self, value):
-      self._times_in_inner.append(value)
-    # ...
-    # CODE FROM WITHIN STATECHART using the property
-    def inner_state_entry_signal(self, e):
-      status = return_status.HANDLED
-      self.times_in_inner += 1
-      self.scribble(
-        "hello from inner_state {}".format(self.times_in_inner))
-      return status
-    # ...
-    # CODE OUTSIDE OF STATECHART accessing the property
-    print("f1 was in its inner state {} times".format(f1.times_in_inner))
-  
-  The initialization code on lines 3-4 of this listing, creates a private deque
-  ring-buffer which can hold one item, then pushes a zero into this queue.  Since
-  our ``_time_in_inner`` deque is a ring buffer of size 1, when we ``append`` new
-  information into it, it's old information is shifted out of the ring (deleted).
-  
-  We see this kind of ``append`` taking place in the ``times_in_inner`` setter
-  method on lines 12 to 13.  The value is shifted into the deque and the old information
-  is pushed out.  This is a thread safe activity; if more than one thread is
-  accessing this method at once, they don't both get to perform the action at the
-  same time.  One will get its turn, then the other will get its turn.
-  
-  The ``times_in_inner`` getter method described in lines 7-9 of the listing
-  shows us how we can access our information from within or outside of our
-  statechart's thread.  We only read the latest member of the deque.  Since our
-  deque is of size one, there is only one thing to read in it anyway.
-  
-  We can see how this property is used within the statechart's thread on line 18.  The
-  ``self.times_in_inner += 1`` calls the getter method 8-9, adds one to the result
-  then calls the setter method (12-13) which appends the result into the deque,
-  shifting the old information out.
-  
-  We can see how the ``times_in_inner`` property is accessed outside of the
-  statechart thread on line 24.  The main thread accesses the getter method 8-9, and
-  reports its returned value in a print statement.
-  
-  As of miros 4.1.3, you could create the same thread-safe-attribute like
-  this:
-  
-  .. code-block:: python
-  
-     from miros import Factory
-     # ...
-     from miros import ThreadSafeAttributes
-  
-     class F1(Factory, ThreadSafeAttributes):
-        _attribute = ['times_in_inner']
-  
-       def __init__(self, name, log_file_name=None,
-           live_trace=None, live_spy=None):
-         # ...
-  
-  The ThreadSafeAttributes class contains code which automatically makes the
-  deque, initializes and wraps the deque within a property.  To build such
-  attributes, we place the thread-safe-attribute names in a list and assign it to
-  ``_attributes``, as seen above.  If you would like to read more about this,
-  consider:
-  
-  * :ref:`Sharing attributes between threads (ActiveObjects) <recipes-sharing-attributes-between-threads-activeobjects>` 
-  * :ref:`Sharing attributes between threads (Factories)<recipes-sharing-attributes-between-threads-factories>`
+  f1 was in its inner state 2 times
+  f2 was in its inner state 0 times
+
+The f1 statechart properly reports how many times it was in its inner_state.
+The f2 inner_state doesn't write to the ``times_in_inner`` property, so it's
+output only shows how that property was initialized.
+
+Let's look at the thread safe code in isolation:
+
+.. code-block:: python
+
+   from miros import Factory
+   # ...
+   from miros import ThreadSafeAttributes
+
+   class F1(Factory, ThreadSafeAttributes):
+      _attribute = ['times_in_inner']  # Uses a metaclass to make the
+                                       # times_in_inner property, with its
+                                       # protecting lock
+
+     def __init__(self, name, log_file_name=None,
+         live_trace=None, live_spy=None):
+       # ...
+       self.times_in_inner = 0
+
+     def some_state(self, e):
+       # ..
+       # Inside of the state thread small operations on the times_in_inner
+       # attribute can use used in a thread safe way
+       print(self.times_in_inner)  # safe
+       a = self.times_in_inner     # safe
+       self.times_in_inner = 1     # safe
+       self.times_in_inner += 1    # safe
+       self.times_in_inner += 2 * self.times_in_inner # NOT safe
+       self.times_in_inner = self.times_in_inner + 1  # NOT safe
+       self.times_in_inner = 2 * self.times_in_inner  # NOT safe
+
+The ``ThreadSafeAttributes`` class behaves like a macro, wrapping the getting
+and setting of the thread safe attribute within a thread lock.  It also wraps
+simple, ``+=``, ``-=``, ..., ``<<=`` statements within a lock.  But that's it.
+It can't protect other types of statements from race conditions.  If you need to
+use your thread safe attribute to perform more complex operations, use a
+temporary variable and copy the results into the thread safe attribute when you
+are done.
+
+Better yet, share information using published events.  But, the thread safe
+attributes feature is very useful when you are sharing information between a
+statechart and a thread which is not a statechart, like main.
+
+.. note::
+
+  Accessing a thread safe attribute will be very slow.  In the background
+  the ``ThreadSafeAttributes`` uses a metaclass, and the descriptor protocol.
+  Within the descriptor protocol it uses the ``inspect`` library to read the
+  previous line of code and compares it to a regular expression.  Keep this in
+  mind when you use this feature.
+
+* :ref:`Sharing attributes between threads (ActiveObjects) <recipes-sharing-attributes-between-threads-activeobjects>` 
+* :ref:`Sharing attributes between threads (Factories)<recipes-sharing-attributes-between-threads-factories>`
+
+If you have gotten this far, you have a good handle on how to use this library
+and all of its features.  But you can take it to another level though.  Your
+statecharts can send encrypted messages to one another and act in concert while
+running on different machines.  To see how to do this, look at the
+`miros-rabbitmq <https://aleph2c.github.io/miros-rabbitmq/index.html>`_ library.
 
 ----
 

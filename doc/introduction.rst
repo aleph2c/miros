@@ -261,8 +261,8 @@ about it.
 
 Python has advanced significantly since the 90s. UML cannot capture all of the
 expressive power of the language, but it doesn't have to; if you don't know how
-to draw your intention (list comprehensions, generators, properties, etc.), you
-can just write the code onto your diagram.
+to draw your intention (super, list comprehensions, generators, properties,
+etc.), you can just write the code onto your diagram.
 
 .. _introduction-what-this-documentation-will-provide:
 

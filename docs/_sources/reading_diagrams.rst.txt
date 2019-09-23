@@ -29,7 +29,7 @@ form.
 
 To make a picture language, or any programming language is complicated, so as
 the rules governing the picture language became more complex, it became less
-useful for those who just wanted to use it to share ideas.
+useful for software practitioners.
 
 .. note::
 
@@ -60,29 +60,28 @@ Martin Fowler rendered down the complexity of the UML standard into: `UML
 distilled <https://martinfowler.com/books/uml.html>`_.  If you want a very solid
 understanding about Harel formalism as it relates to UML, go to the source and
 read `Practical UML Statecharts in C/C++, 2nd Edition
-<https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download>`_ by Miro
-Samek.
+<https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download>`_ by Dr.
+Miro Samek.
 
 But do you need to read these books before you use UML? No, because we are not
 going to treat UML as a formal computer language with mathematical semantics. We
 will use UML as something to sketch with.
 
-  *Software modelers depend on and use engineering analogies but often fail to
-  understand them.  Engineers realize that the models aren't the product; they're
-  abstractions of the product.  In fact, in most cases, the models are only
-  partial abstractions of the product, used to hightlight aspects that the
-  engineer should know about the product.  The term 
-  'executable specification' is an oxymoron -- if the specification were truly executable, it would
-  actually be "the thing".  Otherwise, it would merely model "the thing," which
-  by definition is partial and incomplete.*
-
-  -- Dave Thomas
-
-
 The formal language we will use is Python.
 
 This section should give you enough information so that you can make your own
 pictures.
+
+  *Software modelers depend on and use engineering analogies but often fail to
+  understand them.  Engineers realize that the models aren't the product;
+  they're abstractions of the product.  In fact, in most cases, the models are
+  only partial abstractions of the product, used to highlight aspects that the
+  engineer should know about the product.  The term 'executable specification'
+  is an oxymoron -- if the specification were truly executable, it would
+  actually be "the thing".  Otherwise, it would merely model "the thing," which
+  by definition is partial and incomplete.*
+
+  -- Dave Thomas
 
 .. _reading_diagrams-install-drawing-software:
 
@@ -99,7 +98,7 @@ If you don't have a UML drawing package, go and get one.
    Install `UMLet <https://www.umlet.com/>`_.
 
    If you would like to use my pallets, remove the ``palettes`` folder from the
-   ``UMLet`` directory, then naviage to that directory in your shell and type:
+   ``UMLet`` directory, then navigate to that directory in your shell and type:
 
    .. code-block:: bash
      
@@ -112,6 +111,8 @@ The Most Important Rule in UML
 ------------------------------
 
 **You don't have to draw everything on your picture.**
+
+Sometimes less is more.
 
 .. _reading_diagrams-classes:
 
@@ -236,6 +237,13 @@ If you are going to inherit ask yourself if the "is-a", or "is-an", relationship
 holds true when you use the two class names in a sentence.  "The ToasterOven
 class is an ActiveObject"; yes, that makes sense.  Ok, I'll use inheritance.
 
+.. note::
+ 
+   Technically speaking, you `can't draw static inheritance
+   diagrams<https://www.youtube.com/watch?v=EiOglTERPEo>`_ when you use Python.
+   It is the child class that determines what ``super`` means, because the MRO
+   is determined dynamically using a process called linearization.
+   
 If you want all of the states of your statechart to react the same when they see
 a specific event, use the :ref:`ultimate hook pattern <patterns-ultimate-hook>`.
 This gives you all of the benefits of inheritance while still having debuggable
