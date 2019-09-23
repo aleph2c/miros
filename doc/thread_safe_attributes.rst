@@ -8,7 +8,7 @@
 Thread Safe Attributes
 ======================
 
-If you use a miros statechart, your program is multi-threaded.
+If you use a miros statechart, your program is `multi-threaded <http://www.laurentluce.com/posts/python-threads-synchronization-locks-rlocks-semaphores-conditions-events-and-queues/>`_.
 
 Sometimes, you will want to access an attribute of your statechart from another
 thread, like the main part of your program.  When you do this, you are trying to
@@ -74,9 +74,9 @@ The miros library accepts that people will want to access a statechart's
 internal attributes from the outside.  Significant efforts have been made to
 make this kind of activity easy for you to do in a "thread-safe" manner.  The
 ``ThreadSafeAttributes`` class was constructed to eat the complexity of making
-thread-safe attributes by wrapping "getting" (use of the ".") and "setting"
-operations (use of the "=") within thread-safe locks.  In addition to this, the
-non-atomic "+=", "-=" ... "//=" statements using thread-safe attributes were
+thread-safe attributes by wrapping "getting" (use of the ``.``) and "setting"
+operations (use of the ``=``) within thread-safe locks.  In addition to this, the
+non-atomic ``+=``, ``-=`` ... ``//=`` statements using thread-safe attributes were
 also wrapped within locks.  For more complex situations, the
 thread-safety features provided by the ``ThreadSafeAttributes`` class can be
 used to get the thread lock explicitly.
@@ -170,7 +170,7 @@ The ``ThreadSafeAttributes`` class tries to protect you.  When we write the
 ``_attributes = ['thread_safe_attr_1']`` syntax, ``ThreadSafeAttributes`` creates
 a set of hidden attributes, which are wrapped inside of a `descriptor protocol
 <https://docs.python.org/3.6/howto/descriptor.html>`_ (think @property).  One of
-the hidden attributes, `_lock` is a `threading.RLock
+the hidden attributes, ``_lock`` is a `threading.RLock
 <https://docs.python.org/3.5/library/threading.html#rlock-objects>`_.  It is
 used to lock and unlock itself around accesses to the other hidden attribute
 `_value`.  Essentially this means that this code:
@@ -217,7 +217,7 @@ When using the ``ThreadSafeAttributes`` class the above code turns into somethin
     gl1.thread_safe_attr_1 = temp 
 
 So the ``ThreadSafeAttributes`` class protects calls to the
-seemingly-innocuous-looking, yet dangerous, "+=", "-=", ... "//=" family of
+seemingly-innocuous-looking, yet dangerous, ``+=``, ``-=``, ... ``//=`` family of
 Python calls.  They are dangerous because they are not-atomic and can cause race
 conditions if they are applied to attributes shared across threads.
 

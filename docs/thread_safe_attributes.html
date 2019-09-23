@@ -41,7 +41,7 @@
 </div></blockquote>
 <div class="section" id="thread-safe-attributes">
 <span id="thread-safe-attributes-thread-safe-attributes"></span><h1>Thread Safe Attributes<a class="headerlink" href="#thread-safe-attributes" title="Permalink to this headline">¶</a></h1>
-<p>If you use a miros statechart, your program is multi-threaded.</p>
+<p>If you use a miros statechart, your program is <a class="reference external" href="http://www.laurentluce.com/posts/python-threads-synchronization-locks-rlocks-semaphores-conditions-events-and-queues/">multi-threaded</a>.</p>
 <p>Sometimes, you will want to access an attribute of your statechart from another
 thread, like the main part of your program.  When you do this, you are trying to
 access memory that could be changed in one thread while it is being read in by
@@ -98,9 +98,9 @@ playing a slot machine) so, it will be hard for you to reproduce your issue.</p>
 internal attributes from the outside.  Significant efforts have been made to
 make this kind of activity easy for you to do in a “thread-safe” manner.  The
 <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> class was constructed to eat the complexity of making
-thread-safe attributes by wrapping “getting” (use of the “.”) and “setting”
-operations (use of the “=”) within thread-safe locks.  In addition to this, the
-non-atomic “+=”, “-=” … “//=” statements using thread-safe attributes were
+thread-safe attributes by wrapping “getting” (use of the <code class="docutils literal notranslate"><span class="pre">.</span></code>) and “setting”
+operations (use of the <code class="docutils literal notranslate"><span class="pre">=</span></code>) within thread-safe locks.  In addition to this, the
+non-atomic <code class="docutils literal notranslate"><span class="pre">+=</span></code>, <code class="docutils literal notranslate"><span class="pre">-=</span></code> … <code class="docutils literal notranslate"><span class="pre">//=</span></code> statements using thread-safe attributes were
 also wrapped within locks.  For more complex situations, the
 thread-safety features provided by the <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> class can be
 used to get the thread lock explicitly.</p>
@@ -247,7 +247,7 @@ the above example):</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> class tries to protect you.  When we write the
 <code class="docutils literal notranslate"><span class="pre">_attributes</span> <span class="pre">=</span> <span class="pre">['thread_safe_attr_1']</span></code> syntax, <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> creates
 a set of hidden attributes, which are wrapped inside of a <a class="reference external" href="https://docs.python.org/3.6/howto/descriptor.html">descriptor protocol</a> (think &#64;property).  One of
-the hidden attributes, <cite>_lock</cite> is a <a class="reference external" href="https://docs.python.org/3.5/library/threading.html#rlock-objects">threading.RLock</a>.  It is
+the hidden attributes, <code class="docutils literal notranslate"><span class="pre">_lock</span></code> is a <a class="reference external" href="https://docs.python.org/3.5/library/threading.html#rlock-objects">threading.RLock</a>.  It is
 used to lock and unlock itself around accesses to the other hidden attribute
 <cite>_value</cite>.  Essentially this means that this code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span>
@@ -284,7 +284,7 @@ attributes:</p>
 </pre></div>
 </div>
 <p>So the <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> class protects calls to the
-seemingly-innocuous-looking, yet dangerous, “+=”, “-=”, … “//=” family of
+seemingly-innocuous-looking, yet dangerous, <code class="docutils literal notranslate"><span class="pre">+=</span></code>, <code class="docutils literal notranslate"><span class="pre">-=</span></code>, … <code class="docutils literal notranslate"><span class="pre">//=</span></code> family of
 Python calls.  They are dangerous because they are not-atomic and can cause race
 conditions if they are applied to attributes shared across threads.</p>
 <p>So our example, written without the <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> class, but with the

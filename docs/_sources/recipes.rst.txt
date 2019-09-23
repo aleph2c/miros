@@ -3952,92 +3952,93 @@ active objects using the ``augment`` command.
 
 .. _recipes-sharing-attributes-between-threads-activeobjects:
 
-..
-  Sharing Attributes between Threads (ActiveObjects)
-  --------------------------------------------------
-  As of miros version v4.1.3, you can create thread safe attributes in your
-  derived ``ActiveObect`` class by also inheriting the ``ThreadSafeAttributes``.
-  
-  To create one or more thread safe attribute, you add them to the list defined
-  ``_attributes``:
-    
-  .. code-block:: python
-    :emphasize-lines: 8, 10, 19-20, 24, 35, 40, 51, 56, 68-69, 72
-    :linenos:
-    
-    from miros import Event
-    from miros import spy_on
-    from miros import signals
-    from miros import ActiveObject
-    from miros import return_status
-    from miros import ThreadSafeAttributes
-    
-    class ThreadSafeAttributesInActiveObject(ThreadSafeAttributes, ActiveObject):
-  
-      _attributes = ['thread_safe_attr_1', 'thread_safe_attr_2']
-  
-      def __init__(self, name):
-        super().__init__(name)
-  
-     @spy_on
-     def c(chart, e):
-       status = return_status.UNHANDLED
-       if(e.signal == signals.ENTRY_SIGNAL):
-         chart.thread_safe_attr_1 = False
-         chart.thread_safe_attr_2 = False
-       elif(e.signal == signals.INIT_SIGNAL):
-         status = chart.trans(c1)
-       elif(e.signal == signals.B):
-         chart.thread_safe_attr_1 = True
-         status = chart.trans(c)
-       else:
-         chart.temp.fun = chart.top
-         status = return_status.SUPER
-       return status
-  
-     @spy_on
-     def c1(chart, e):
-       status = return_status.UNHANDLED
-       if(e.signal == signals.ENTRY_SIGNAL):
-         chart.thread_safe_attr_1 = True
-         status = return_status.HANDLED
-       elif(e.signal == signals.A):
-         status = chart.trans(c2)
-       elif(e.signal == signals.EXIT_SIGNAL):
-         chart.thread_safe_attr_1 = False
-         status = return_status.HANDLED
-       else:
-         chart.temp.fun = c
-         status = return_status.SUPER
-       return status
-  
-     @spy_on
-     def c2(chart, e):
-       status = return_status.UNHANDLED
-       if(e.signal == signals.ENTRY_SIGNAL):
-         chart.thread_safe_attr_2 = True
-         status = return_status.HANDLED
-       elif(e.signal == signals.A):
-         status = chart.trans(c1)
-       elif(e.signal == signals.EXIT_SIGNAL):
-         chart.thread_safe_attr_2 = False
-         status = return_status.HANDLED
-       else:
-         chart.temp.fun = c
-         status = return_status.SUPER
-       return status
-     
-     if __name__ == '__main__':
-        ao = ThreadSafeAttributesInActiveObject("ao")
-        ao.start_at(c)
-        # Change the ActiveObject's attributes while it is starting it's thread
-        # and starting its statemachine
-        ao.thread_safe_attr_1 = True
-        ao.thread_safe_attr_2 = False
-        ao.post_fifo(Event(signal=signals.A)
-        # Main thread can access attribute used by the ActiveObject's thread
-        print(ao.thread_safe_attr_2)
 
+Sharing Attributes between Threads (ActiveObjects)
+--------------------------------------------------
+As of miros version v4.1.3 (fixed in v4.1.4), you can create
+:ref:`thread-safe-attributes <thread_safe_attributes-thread-safe-attributes>` in
+your derived ``ActiveObject`` class by also inheriting the
+``ThreadSafeAttributes``.
+
+To create one or more thread safe attribute, you add them to the list defined
+``_attributes``:
+  
+.. code-block:: python
+  :emphasize-lines: 8, 10, 19-20, 24, 35, 40, 51, 56, 68-69, 72
+  :linenos:
+  
+  from miros import Event
+  from miros import spy_on
+  from miros import signals
+  from miros import ActiveObject
+  from miros import return_status
+  from miros import ThreadSafeAttributes
+  
+  class ThreadSafeAttributesInActiveObject(ThreadSafeAttributes, ActiveObject):
+
+    _attributes = ['thread_safe_attr_1', 'thread_safe_attr_2']
+
+    def __init__(self, name):
+      super().__init__(name)
+
+   @spy_on
+   def c(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       chart.thread_safe_attr_1 = False
+       chart.thread_safe_attr_2 = False
+     elif(e.signal == signals.INIT_SIGNAL):
+       status = chart.trans(c1)
+     elif(e.signal == signals.B):
+       chart.thread_safe_attr_1 = True
+       status = chart.trans(c)
+     else:
+       chart.temp.fun = chart.top
+       status = return_status.SUPER
+     return status
+
+   @spy_on
+   def c1(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       chart.thread_safe_attr_1 = True
+       status = return_status.HANDLED
+     elif(e.signal == signals.A):
+       status = chart.trans(c2)
+     elif(e.signal == signals.EXIT_SIGNAL):
+       chart.thread_safe_attr_1 = False
+       status = return_status.HANDLED
+     else:
+       chart.temp.fun = c
+       status = return_status.SUPER
+     return status
+
+   @spy_on
+   def c2(chart, e):
+     status = return_status.UNHANDLED
+     if(e.signal == signals.ENTRY_SIGNAL):
+       chart.thread_safe_attr_2 = True
+       status = return_status.HANDLED
+     elif(e.signal == signals.A):
+       status = chart.trans(c1)
+     elif(e.signal == signals.EXIT_SIGNAL):
+       chart.thread_safe_attr_2 = False
+       status = return_status.HANDLED
+     else:
+       chart.temp.fun = c
+       status = return_status.SUPER
+     return status
+   
+   if __name__ == '__main__':
+      ao = ThreadSafeAttributesInActiveObject("ao")
+      ao.start_at(c)
+      # Change the ActiveObject's attributes while it is starting it's thread
+      # and starting its statemachine
+      ao.thread_safe_attr_1 = True
+      ao.thread_safe_attr_2 = False
+      ao.post_fifo(Event(signal=signals.A)
+      # Main thread can access attribute used by the ActiveObject's thread
+      print(ao.thread_safe_attr_2)
 
 
 Factories
@@ -4525,73 +4526,64 @@ If you have any suggestions about how to draw this better, email me.
 
 .. _recipes-sharing-attributes-between-threads-factories:
 
-..
-  Sharing Attributes between Threads (Factories)
-  ----------------------------------------------
-  As of miros version v4.1.3, you can create thread safe attributes in your
-  derived ``Factory`` class by inheriting from ``ThreadSafeAttributes``.
-  
-  To create one or more thread safe attribute, you add them to the list defined
-  ``_attributes`` within the class body before the ``__init__`` method is defined.
-  See below:
-  
-  .. code-block:: python
-  
-    from miros import Event
-    from miros import signals
-    from miros import Factory
-    from miros import return_status
-    from miros import ThreadSafeAttributes
-  
-    # By inheriting from ThreadSafeAttributes, you can define as many thread safe
-    # attributes you need by assigning their names as strings to the
-    # `_attributes` list.
-    class Example2(Factory, ThreadSafeAttributes):
-  
-      _attributes = ['thread_safe_attr_1', 'thread_safe_attr_2']
-  
-    def __init__(self, name, live_trace=None, live_spy=None):
-  
-      super().__init__(name=name)
-      self.thread_safe_attr_1 = True  # .. you can access this from main or other
-                                      # threads in the same way
-  
-      # ... define states, link them to their signals
-      # ... nesting code, etc.
-  
-      # statechart thread is created and started when `start_at` is called
-      self.start_at(self.c)  # 
+Sharing Attributes between Threads (Factories)
+----------------------------------------------
+As of miros version v4.1.3 (fixed in v4.1.4), you can create
+:ref:`thread-safe-attributes <thread_safe_attributes-thread-safe-attributes>` in
+your derived ``Factory`` class by inheriting from ``ThreadSafeAttributes``.
 
-    # ... state methods defined here
-  
-    if __name__ == "__main__":
-  
-      statechart = Example2('example2')     # thread is started and is running
-                                            # because `start_at` called within
-                                            # the `__init__` method.
-  
-      print(statechart.thread_safe_attr_1)  # you can access the attribute which
-                                            # is being used by the statechart's
-                                            # thread, since it's wrapped
-                                            # by a thread-safe datastructure
-  
-  
-  By inheriting from the ``ThreadSafeAttributes`` class, we get access to the
-  ``_attributes`` feature.  By assigning a list of strings to this ``_attributes``
-  class attribute, a set of thread safe attributes are created an initialized in
-  the background before the Example2 ``__init__`` method is called.
-  
-  In this example, we have created two thread safe attributes, which in reality
-  are deque objects of size one, initialized with ``None``, wrapped within a class
-  supporting the `descriptor protocal
-  <https://docs.python.org/3/howto/descriptor.html>`_.  As a user of this feature,
-  you don't have to care about these details, you can just access
-  ``thread_safe_attr_1`` and ``thread_safe_attr_2`` as if they were regular
-  attributes.  However, unlike other attributes, you *can safely use them* from
-  inside or from outside the thread running your Factory derived statechart.
-  
-  To see a full example look `here
-  <https://github.com/aleph2c/miros/blob/master/examples/thread_safe_attributes_in_factory.py>`_.
+To create one or more thread safe attribute, you add them to the list defined
+``_attributes`` within the class body before the ``__init__`` method is defined.
+See below:
+
+.. code-block:: python
+
+  from miros import Event
+  from miros import signals
+  from miros import Factory
+  from miros import return_status
+  from miros import ThreadSafeAttributes
+
+  # By inheriting from ThreadSafeAttributes, you can define as many thread safe
+  # attributes you need by assigning their names as strings to the
+  # `_attributes` list.
+  class Example2(Factory, ThreadSafeAttributes):
+
+    _attributes = ['thread_safe_attr_1', 'thread_safe_attr_2']
+
+  def __init__(self, name, live_trace=None, live_spy=None):
+
+    super().__init__(name=name)
+    self.thread_safe_attr_1 = True  # .. you can access this from main or other
+                                    # threads in the same way
+
+    # ... define states, link them to their signals
+    # ... nesting code, etc.
+
+    # statechart thread is created and started when `start_at` is called
+    self.start_at(self.c)  # 
+
+  # ... state methods defined here
+
+  if __name__ == "__main__":
+
+    statechart = Example2('example2')     # thread is started and is running
+                                          # because `start_at` called within
+                                          # the `__init__` method.
+
+    print(statechart.thread_safe_attr_1)  # you can access the attribute which
+                                          # is being used by the statechart's
+                                          # thread, since it's wrapped
+                                          # by a thread-safe datastructure
+
+
+By inheriting from the ``ThreadSafeAttributes`` class, we get access to the
+``_attributes`` feature.  By assigning a list of strings to this ``_attributes``
+class attribute, a set of thread safe attributes are created an initialized in
+the background before the Example2 ``__init__`` method is called.
+
+To see a full example look `here
+<https://github.com/aleph2c/miros/blob/master/examples/thread_safe_attributes_in_factory.py>`_.
 
 .. _recipes-multiple-statecharts:
 
