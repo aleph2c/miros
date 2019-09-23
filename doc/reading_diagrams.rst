@@ -112,8 +112,6 @@ The Most Important Rule in UML
 
 **You don't have to draw everything on your picture.**
 
-Sometimes less is more.
-
 .. _reading_diagrams-classes:
 
 Classes
@@ -239,8 +237,7 @@ class is an ActiveObject"; yes, that makes sense.  Ok, I'll use inheritance.
 
 .. note::
  
-   Technically speaking, you `can't draw static inheritance
-   diagrams<https://www.youtube.com/watch?v=EiOglTERPEo>`_ when you use Python.
+   Technically speaking, you `can't draw static inheritance diagrams <https://www.youtube.com/watch?v=EiOglTERPEo>`_ when you use Python.
    It is the child class that determines what ``super`` means, because the MRO
    is determined dynamically using a process called linearization.
    

@@ -61,14 +61,15 @@ can be referenced and then extended for your own designs.
 
 The :ref:`reflection section <reflection>` goes into the details about how to
 use the instrumentation that has been built into the miros library.  Two
-different types of sensible logging have been added to this library, you can use
-them see how your statechart is reactive its environment.
+different types of sensible logging have been added to this miros, you can use
+them to see how your statechart is reacting to its environment.
 
 The :ref:`testing section <testing-testing>` will demonstrate a set of simple
 patterns so that you can verify your designs are working as you expect them to.
 
 Finally, if you would like to link your statecharts across a computer network
-(for IOT applications), you can use the `miros-rabbitmq <https://aleph2c.github.io/miros-rabbitmq/index.html>`_ plugin.
+(for IOT applications), you can use the `miros-rabbitmq
+<https://aleph2c.github.io/miros-rabbitmq/index.html>`_ plugin.
 
 .. _introduction-history-and-context:
 
@@ -310,11 +311,6 @@ To use this library is to program in Python, not pictures; so **there is no
 picture-to-code compiler here**. This means you can use whatever picture drawing
 technology you want. I use `UMLet`_, but if you find something better, email me
 about it.
-
-Python has advanced significantly since the 90s. UML cannot capture all of the
-expressive power of the language, but it doesn't have to; if you don't know how
-to draw your intention (super, list comprehensions, generators, properties,
-etc.), you can just write the code onto your diagram.
 
 .. _introduction-what-this-documentation-will-provide:
 
