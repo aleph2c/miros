@@ -582,6 +582,7 @@ def test_thread_safe_in_factory():
 #@pytest.mark.isolated
 @pytest.mark.thread_safe_attributes
 def test_no_lock_access():
+  '''requires visual inspection'''
 
   class GetLock1(ThreadSafeAttributes):
     _attributes = ['thread_safe_attr_1']
@@ -643,6 +644,7 @@ def test_no_lock_access():
 @pytest.mark.isolated
 @pytest.mark.thread_safe_attributes
 def test_lock_access():
+  '''requires visual inspection'''
 
   class GetLock1(ThreadSafeAttributes):
     _attributes = ['thread_safe_attr_1']
