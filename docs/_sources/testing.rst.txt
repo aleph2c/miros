@@ -17,6 +17,14 @@
   
   -- Richard Feynman
 
+  *You always start with a fantasy. Part of the fantasy technique is to
+  visualize something as perfect. Then with the experiments you work back from
+  the fantasy to reality, hacking away at the components.*
+
+  -- Edwin H. Land 
+
+
+
 .. _testing-testing:
 
 Testing

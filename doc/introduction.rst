@@ -87,8 +87,9 @@ plants and animals as extremely complicated systems of systems, made up of cells
 who's inner states and clocks were hidden from one another. The only way that
 these cells could work together was by producing small chemical messages and
 exchanging them with their adjacent cells. He saw this as a great analogy for
-managing complexity.  He invented a programming language called, small-talk, and
-the parts of it which he modeled from the cell, he called ``objects``.
+managing complexity.  He invented a programming language called, `smalltalk
+<https://pdfs.semanticscholar.org/442f/0f5205c7d4674612204ecc8357367dabbf45.pdf>`_,
+and the parts of it which he modeled from the cell, he called ``objects``.
 
 .. image:: _static/cell-communication-and-signalling.jpg
     :target: https://lms.biotecnika.org/course/csir-net-unit-4-cell-communication-cell-signalling/

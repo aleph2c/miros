@@ -1,3 +1,4 @@
+.. included from examples
 .. _i_mongol_example-mongol-horsemen:
 
   *It ain't what you don't know that gets you into trouble.  It's what you know

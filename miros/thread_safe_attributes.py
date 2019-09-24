@@ -19,7 +19,7 @@ class ThreadSafeAttribute:
     self._is_atomic = True
     self._lock = RLock()
     self._value = initial_value
-
+   
   def is_not_atomic(self, previous_line):
     is_not_atomic = True
     # search for '+=', '-=' ... '<<=', '**='

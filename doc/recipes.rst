@@ -23,8 +23,7 @@ Demonstration of Capabilities
 
 In this section I'll show you how you can use the miros library by layering more
 and more of its features into a simple program.  This program will be arbitrary,
-it serves no purpose other than to show how to do the common things you will
-want to do when you build your own systems.
+it serves no purpose other than to show how to do some common things.
 
 .. contents::
   :local:

@@ -14,6 +14,7 @@ Examples
    scribbleexample
    interactingcharts
    towardsthefactoryexample
+   batterychargingexample
    cellular_automata
    i_mongol_example
 
