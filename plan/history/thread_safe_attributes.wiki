@@ -1,0 +1,227 @@
+*Thread Safe Attributes*
+= Observer ([[local:/home/scott/.vimrc/ooda.pdf|diagram]]) = 
+== Evidence ([[evidence.thread_safe_attributes|evidence]]) ==
+
+  *What defines Success?:* ([[subgoals.thread_safe_attributes|subgoals]])
+    Users of miros can make thread safe attributes with a trivial amount of
+    code.
+
+  *What is the problem?*
+    Regular attributes can not be shared between threads, and this could be a
+    huge road-block for a new user.
+    
+    Thread safe data structures require the use of locks or queues.  To make
+    these variables more-usable, they should be wrapped in a Python @property so
+    that they look like a normal attribute.  This means that someone new to
+    miros will have to become aware of how to make thread safe attributes and
+    write a lot of boiler plate code to make these variables work.  As a library
+    author I should make this painless for them.
+    
+    Python has metaprogramming features which can be used with inheritance to
+    extend the language.  I can use these features to build something
+    reminiscent of the ruby "attr_accessor" class helper.  In this case I'll use
+    "_attributes" with a provided list of variable names, where those variables
+    represent object attributes which are expected to be thread safe.
+    
+    Multithreaded bugs are extremely dangerous.  I need to KNOW this feature
+    works before I release it via pip.
+    
+    I do not want to add this feature to the base ActiveObject and Factory
+    classes since it could add un-wanted risk to my user's code bases.  I would
+    like to provide it as a class which can be mixed into there existing code if
+    they want to use it.
+    
+    I currently don't know enough Python to make this feature.  I will have to
+    level-up on metaprogramming and on how to use the super keyword.
+    
+    (this would not be a problem if miros used a different way of dealing with
+    concurrency)
+  
+    Descriptors work in class space, you define named properties outside of
+    __init__ or in any of the methods.  To make a descriptor, you can use the
+    __get__, __set__, __del__ technique or the fget, fset, fdel and property
+    technique, or you can use the property decorator.
+    
+    When defining a property, you create an inner attribute which is typically
+    prepended with a '_' to indicate that it is private.  If you make this
+    attribute using a class which has a '__iadd__' method, that method will be
+    called if the outer property experienced a '+=' operation on it.
+    Unfortunately, this call happens after the initial call to 'fget'.
+    
+    I am trying to have '__iadd__' called, and from within it fget and fset
+    called, so that the whole operation can be run within a locking context
+    manager.  If I could find a way to do this, I could meta-program the code for
+    the user and they would have a convenient way of sharing attributes.
+    
+    Found a way to detect if a fget was being called non-atomically.
+    
+  *Discoveries/Resources:*
+  
+    David Beazley presented on metaprogramming in Python 3 at
+    [[https://www.youtube.com/watch?v=Vjx9okHzaiM|PyCon 2013]].
+
+    David Beazley wrote an entire chapter on metaprogramming in his Python
+    [[https://www.dabeaz.com/cookbook.html|cookbook]].
+    
+    Raymond Hettinger described how to use Python super to do dependency
+    injection at [[https://www.youtube.com/watch?v=EiOglTERPEo|PyCon 2015]].
+    
+    Laurent Luce's description of [[http://www.laurentluce.com/posts/python-threads-synchronization-locks-rlocks-semaphores-conditions-events-and-queues/|threading]]
+    
+    Eldamir's "make python @property handle +=, -= etc on [[https://stackoverflow.com/questions/23288559/make-python-property-handle-etc|stackoverflow]]
+    
+    Jess Jiryu Davis' article on the [[https://emptysqua.re/blog/grok-the-gil-fast-thread-safe-python/|GIL]]
+    
+    [[https://stackoverflow.com/questions/19602535/how-can-i-reproduce-the-race-conditions-in-this-python-code-reliably|race stackoverflow1 in python]]
+    
+    
+    See <base>/examples/iadd_example.py for example of a thread safe data
+    descriptor.
+  
+    Descriptors work in class space, you define named properties outside of
+    __init__ or in any of the methods.  To make a descriptor, you can use the
+    __get__, __set__, __del__ technique or the fget, fset, fdel and property
+    technique, or you can use the property decorator.
+    
+    When defining a property, you create an inner attribute which is typically
+    prepended with a '_' to indicate that it is private.  If you make this
+    attribute using a class which has a '__iadd__' method, that method will be
+    called if the outer property experienced a '+=' operation on it.
+    Unfortunately, this call happens after the initial call to 'fget'.
+    
+    I was trying to have '__iadd__' called, and from within it to call fget and
+    fset.  I was trying to make the whole operation run within a locking context
+    manager.  It turns out this approach was needlessly complex.  I found a way
+    to get the descriptor protocol to work independant of the `__iadd__` family
+    of methods.
+    
+    Found a way to detect if a fget was being called non-atomically, using a
+    regular expression and by looking at the previous code in the frame.
+    
+    The thread failure example
+    [[https://opensource.com/article/17/4/grok-gil|here]] will not fail on my
+    computer. (ran it a million times with no failure).
+    
+    *Valgrind Deadend (~2.5 hours, free as in mattress):*
+
+    I think that the 'helgrind' tool for 'valgrind' is the thing that will force
+    race conditions:
+    
+    [[https://stackoverflow.com/questions/40355474/valgrind-does-not-work-with-wsl|building valgrind WSL]]
+    [[https://stackoverflow.com/questions/3982036/how-can-i-use-valgrind-with-python-c-extensions|using valgrind with python]]
+   
+    This following command fails entirely, but we don't care about memchecks
+    
+    valgrind --tool=memcheck --suppressions=valgrind-python.supp \ 
+      python -E -tt ./thread_safe_attributes_test.py
+   
+    To test thread safety with valgrind, use the helgrind tool:
+   
+    To see if the tool works at all run a baby program against it:
+    > valgrind --tool=helgrind --suppressions=valgrind-python.supp \ 
+        python -E -tt ./valgrind_simple_1.py
+    results: no errors
+    
+    To see if miros is broken according to valgrind:
+    > valgrind --tool=helgrind --suppressions=valgrind-python.supp \ 
+        python -E -tt ./valgrind_simple_2.py
+    results: errors
+    conclusion:
+    Either valgrind is broken, python threading is broken, or miros is broken
+     
+    To run against the simple multithreaded program that doesn't do anything, this
+    code does not use the miros library:
+    > valgrind --tool=helgrind --suppressions=valgrind-python.supp \ 
+        python -E -tt ./valgrind_simple_3.py
+    results: many errors
+    conclusion:
+    Either valgrind is broken, python threading is broken
+      
+    run against the broken "thread safe" code
+    > valgrind --tool=helgrind --suppressions=valgrind-python.supp \ 
+        python -E -tt ./thread_safe_attributes_test.py
+    results: many errors
+    conclusion: 
+    Can't conclude anything because valgrind doesn't work against vanilla
+    threading in Python while running in the WSL.
+    
+    To use valgrind to test for race conditions using python 3.5 on the WSL is a
+    dead end.  Valgrind is entirely a black box to me, but I have been using python
+    3.5 for a long time.  I am assuming that it's threading mechanisms are
+    working.  Valgrind failed the memory test out of the gate, so there might be
+    something weird about the WSL environment and how it ties it's threading in to
+    the windows OS.  Needless to say the failure of valgrind against
+    valgrind_simple_3.py tells me that I can't use valgrind test for thread safe
+    attributes.
+    
+= Orient =
+  *Symptoms:* [[symptoms.thread_safe_attributes|symptoms]]
+
+== Questions ==
+  *Questions for Thread Safe Attributes: >= 5*
+    How can you test if this features works?
+    Can you think of anyway to speed up your feedback cycle?
+    Do you have enough information?
+    Is your information organized?
+    What don't you know that you need to know?
+  
+  *Assumptions*
+
+= Decide =
+  [[#Questions]]
+  *Research Needed For?:*
+    * [X] Watch the metaprogramming video to get a high level idea about what
+          you need to know to implement this feature
+    * [X] Read and study chapter 9 of the Python Cookbook, 3rd Edition
+    * [X] Watch Raymond Henttinger's super video to get an understanding of
+          linearization using super and the __mro__
+    * [X] Install Valgrind and use it's helgrind tooling to detect unsafe code
+          [dead end]
+    * [X] Understand the descriptor protocol
+    * [X] Learn more about non-atomic methods in Python
+    * [ ] Learn how to detect race conditions in python multi-threaded code
+          (haven't found this yet)
+
+  [[#Questions]]
+  *Idea/Hypotheses for Thread Safe Attributes: >=5*
+  * [X] Create a test which builds a hundred different threads, where all of the
+        threads read and write to the same attribute.  The adjustment to the
+        attribute should be an increment, so if our test confirms the number
+        rises monotonically, and there is no crash on an attribute read, then we
+        can safely say that the attribute is thread safe. [doesn't work]
+  * [X] Write an active object and Factory test which manifest the same HSM.
+        Have the main program reach in and change a thread safe attribute, while
+        the charts are active.  Use the live_spy and scribble with a log file to
+        confirm that the attribute is being updated as expected across both
+        threads.  This test will confirm that the mix-in is working properly and
+        will act as an example to reference in my documents. [doesn't detect
+        race conditions]
+  * [X] Write a metaclass which extends type.  It should create a set of
+        attributes based on another class which is using the descriptor
+        protocol.  This other class will build a attribute using a deque of size
+        1 (thread safe right buffer) and it will wrap this ring buffer within a
+        @property (getter/setter).  The metaclass should be mixed into three
+        classes, ThreadSafeAttributes, ActiveObjectWithAttributes and
+        FactoryWithAttributes.  These three classes should be exposed within the
+        main miros __init__.py file so that they are easy to import.
+  * [X] Run the test, confirm the feature is working. [fiction: the test didn't
+        detect errors]
+  * [X] Describe plan using OODA loop (so you can audit is later to understand
+        what you were thinking and find your resources)
+  * [X] Create release note in the [[release_notes]]
+  * [X] Follow the [[release_plan]]
+  * [X] Write up the thread-safe-attributes feature in recipes, or examples
+        (make sure to write that it is only available in v4.1.3)
+  * [X] Publish docs to github
+  * [ ] Remove docs, because the method is suspect
+  * [ ] Create a more traditional approach to thread safety, using locks.
+        Re-run all tests (useless since they can't find race conditions).
+
+  *Chosen Research-Goal/Hypothesis*
+    
+
+== Plan ([[plan.thread_safe_attributes|plan]]) ==
+
+= Act =
+  
+

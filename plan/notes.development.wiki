@@ -1,0 +1,140 @@
+= Metaprogramming =
+
+  David Beazley presented on metaprogramming in Python 3 at
+  [[https://www.youtube.com/watch?v=Vjx9okHzaiM|PyCon 2013]].
+
+  David Beazley wrote an entire chapter on metaprogramming in his Python
+  [[https://www.dabeaz.com/cookbook.html|cookbook]].
+  
+= On how Super Works in Python =
+  Raymond Hettinger described how to use Python super to do dependency
+  injection at [[https://www.youtube.com/watch?v=EiOglTERPEo|PyCon 2015]].
+
+= Threading in Python =
+  Laurent Luce's description of [[http://www.laurentluce.com/posts/python-threads-synchronization-locks-rlocks-semaphores-conditions-events-and-queues/|threading]]
+  Jess Jiryu Davis' article on the [[https://emptysqua.re/blog/grok-the-gil-fast-thread-safe-python/|GIL]]
+  
+= On the Descriptor Protocol =
+  Descriptors work in class space, you define named properties outside of
+  __init__ or in any of the methods.  To make a descriptor, you can use the
+  __get__, __set__, __del__ technique or the fget, fset, fdel and property
+  technique, or you can use the property decorator.
+  
+  When defining a property, you create an inner attribute which is typically
+  prepended with a '_' to indicate that it is private.  If you make this
+  attribute using a class which has a '__iadd__' method, that method will be
+  called if the outer property experienced a '+=' operation on it.
+  Unfortunately, this call happens after the initial call to 'fget'.
+  
+  I am trying to have '__iadd__' called, and from within it fget and fset
+  called, so that the whole operation can be run within a locking context
+  manager.  If I could find a way to do this, I could meta-program the code for
+  the user and they would have a convenient way of sharing attributes.
+  
+  Found a way to detect if a fget was being called non-atomically.
+  
+= Inability to detect race conditions through testing =
+  [[https://stackoverflow.com/questions/19602535/how-can-i-reproduce-the-race-conditions-in-this-python-code-reliably|race stackoverflow1 in python]]
+  
+  The thread failure example
+  [[https://opensource.com/article/17/4/grok-gil|here]] will not fail on my
+  computer. (ran it a million times with no failure).
+  
+    Ran the thread failure example in a Linux system, and it did not fail there
+    either.
+  
+  *Valgrind Deadend (~2.5 hours, free as in mattress):*
+
+  I think that the 'helgrind' tool for 'valgrind' is the thing that will force
+  race conditions:
+  
+  [[https://stackoverflow.com/questions/40355474/valgrind-does-not-work-with-wsl|building valgrind WSL]]
+  [[https://stackoverflow.com/questions/3982036/how-can-i-use-valgrind-with-python-c-extensions|using valgrind with python]]
+ 
+  This following command fails entirely, but we don't care about memchecks
+  
+  valgrind --tool=memcheck --suppressions=valgrind-python.supp \ 
+    python -E -tt ./thread_safe_attributes_test.py
+ 
+  To test thread safety with valgrind, use the helgrind tool:
+ 
+  To see if the tool works at all run a baby program against it:
+  > valgrind --tool=helgrind --suppressions=valgrind-python.supp \ 
+      python -E -tt ./valgrind_simple_1.py
+  results: no errors
+  
+  To see if miros is broken according to valgrind:
+  > valgrind --tool=helgrind --suppressions=valgrind-python.supp \ 
+      python -E -tt ./valgrind_simple_2.py
+  results: errors
+  conclusion:
+  Either valgrind is broken, python threading is broken, or miros is broken
+   
+  To run against the simple multithreaded program that doesn't do anything, this
+  code does not use the miros library:
+  > valgrind --tool=helgrind --suppressions=valgrind-python.supp \ 
+      python -E -tt ./valgrind_simple_3.py
+  results: many errors
+  conclusion:
+  Either valgrind is broken, python threading is broken
+    
+  run against the broken "thread safe" code
+  > valgrind --tool=helgrind --suppressions=valgrind-python.supp \ 
+      python -E -tt ./thread_safe_attributes_test.py
+  results: many errors
+  conclusion: 
+  Can't conclude anything because valgrind doesn't work against vanilla
+  threading in Python while running in the WSL.
+  
+  To use valgrind to test for race conditions using python 3.5 on the WSL is a
+  dead end.  Valgrind is entirely a black box to me, but I have been using python
+  3.5 for a long time.  I am assuming that it's threading mechanisms are
+  working.  Valgrind failed the memory test out of the gate, so there might be
+  something weird about the WSL environment and how it ties it's threading in to
+  the windows OS.  Needless to say the failure of valgrind against
+  valgrind_simple_3.py tells me that I can't use valgrind test for thread safe
+  attributes.
+  
+= Non atomic Operations =
+
+  The "+=" operation is not atomic.  Python 3 switches between threads every
+  15 milliseconds, so your previous thread-safety tests may not have actually
+  been able to test a failure in your technique.  I becoming more convinced
+  that my tests can't tell when the thread "safe attributes" feature is not
+  working.
+  
+  I think I have found a way to build a thread safe attribute using a data
+  descriptor and an Rlock, now I have merged it into the meta programming
+  technique that was used to make the last faulty version of the feature.  It
+  will detect:
+  
+  The following will be internally wrapped in locks and should be thread safe:
+  
+    ao.a  # external 
+    b = self.a
+    self.a += 10
+    
+  This code will NOT be thread safe
+  
+    ao.a = ao.a + ao
+    self.a = 10 * self.a
+    
+  This code will not be thread safe
+  
+    ao.a = 10
+    ao.a += 15
+    ao.a = 10 + b + ao.a
+    
+    
+  This code will not be thread safe
+  
+    self.a = 10
+    self.a += 15
+    self.a = 10 + b + self.a
+  
+  Laurent Luce's description of [[http://www.laurentluce.com/posts/python-threads-synchronization-locks-rlocks-semaphores-conditions-events-and-queues/|threading]]
+  Eldamir's "make python @property handle +=, -= etc on [[https://stackoverflow.com/questions/23288559/make-python-property-handle-etc|stackoverflow]]
+  Jess Jiryu Davis' article on the [[https://emptysqua.re/blog/grok-the-gil-fast-thread-safe-python/|GIL]]
+  
+  See <base>/examples/iadd_example.py for example of a thread safe data
+  descriptor.

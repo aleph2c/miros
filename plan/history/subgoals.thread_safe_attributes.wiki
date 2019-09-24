@@ -1,0 +1,103 @@
+[[thread_safe_attributes|back]]
+= Subgoals =
+* [ ] Explain how the thing works [[Explain_how_the_thing_works|link]]
+
+*Thread safety through using locks, the descriptor protocol and iadd*
+= Observer ([[local:C:/Vim8.1/.vim/ooda.pdf|diagram]]) = 
+== Evidence ([[evidence.subgoals.thread_safe_attributes|evidence]]) ==
+
+  *What defines Success?:* ([[subgoals.subgoals.thread_safe_attributes|subgoals]])
+    Find a test that can fail when a technique is not working.
+    
+    Identify all non-atomic attribute paths a user would make, and make those
+    paths thread safe.
+    
+    Re-release the thread-safe attribute feature, where I'm convinced I'm not
+    going to be injecting nasty bugs into my user's codebases. (no code changes
+    on the part of the userbase)
+
+    Re-write the recipe docs Write an example describing how this was done so
+    you can have other's critique the method.
+    
+  *What is the problem?*
+    The "+=" operation is not atomic.  Python 3 switches between threads every
+    15 milliseconds, so your previous thread-safety tests may not have actually
+    been able to test a failure in your technique.  I becoming more convinced
+    that my tests can't tell when the thread "safe attributes" feature is not
+    working.
+    
+    I think I have found a way to build a thread safe attribute using a data
+    descriptor and an Rlock, now I have merged it into the meta programming
+    technique that was used to make the last faulty version of the feature.  It
+    will detect:
+   
+    The following will be internally wrapped in locks and should be thread safe:
+    
+      ao.a  # external 
+      b = self.a
+      self.a += 10
+      
+    This code will NOT be thread safe
+    
+      ao.a = ao.a + ao
+      self.a = 10 * self.a
+      
+    This code will not be thread safe
+    
+      ao.a = 10
+      ao.a += 15
+      ao.a = 10 + b + ao.a
+      
+      
+    This code will not be thread safe
+    
+      self.a = 10
+      self.a += 15
+      self.a = 10 + b + self.a
+  
+  *Discoveries:*
+    
+    Laurent Luce's description of [[http://www.laurentluce.com/posts/python-threads-synchronization-locks-rlocks-semaphores-conditions-events-and-queues/|threading]]
+    Eldamir's "make python @property handle +=, -= etc on [[https://stackoverflow.com/questions/23288559/make-python-property-handle-etc|stackoverflow]]
+    Jess Jiryu Davis' article on the [[https://emptysqua.re/blog/grok-the-gil-fast-thread-safe-python/|GIL]]
+    
+    See <base>/examples/iadd_example.py for example of a thread safe data
+    descriptor.
+    
+= Orient =
+  *Symptoms:* [[symptoms.subgoals.thread_safe_attributes|symptoms]]
+
+== Questions ==
+  *Questions for Thread safety through using locks, the descriptor protocol and iadd: >= 5*
+    How do I make the tests fail?
+    Are your resources organized so you can quickly find them?
+  
+  *Assumptions*
+    I'm assuming that the current design is broken, but I can't confirm it.
+
+= Decide =
+  [[#Questions]]
+  *Research Needed For?:*
+    Read anything by Beazley on thread safe attributes
+
+  [[#Questions]]
+  *Idea/Hypotheses for Thread safety through using locks, the descriptor protocol and iadd: >=5*
+  * [ ] Make better tests, the current tests seem weak
+  * [X] Remove any mention of this from your docs immediately
+  * [X] Investigate the concurrency technique in your examples directory
+  * [X] Merge the iadd_example.py file into your previous work
+  * [X] Uncomment print statements inside of lock code to confirm it is running
+  * [X] Adust test so that object type changes when using the descriptor pattern (get)
+  * [X] Get current test running against new code
+  * [ ] Build a new much-harder test to break the old code
+  * [ ] Run the new much-harder test against the new code
+
+  *Chosen Research-Goal/Hypothesis*
+  * [ ] Merge the iadd_example.py file into your previous work
+
+== Plan ([[plan.subgoals.thread_safe_attributes|plan]]) ==
+  * 
+
+= Act =
+  
+
