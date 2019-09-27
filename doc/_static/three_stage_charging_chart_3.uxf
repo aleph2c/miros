@@ -1,0 +1,1379 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>666</x>
+      <y>630</y>
+      <w>567</w>
+      <h>486</h>
+    </coordinates>
+    <panel_attributes>*charging*
+--
+entry /
+  self.sec = 0
+  # start our repeating events
+  [self.post_fifo(Event(signal=signal, 
+     deferred=True, 
+     period=period,
+     times=0)) for (signal, period) in [
+      (signals.Sample_Voltage, self.volt_sec),
+      (signals.Sample_Current, self.cur_in_sec),
+      (signals.Pulse, self.pulse_sec)
+    ]
+  ]
+  
+Sample_Current /
+  self.amps = sample_current()
+
+Sample_Voltage /
+  self.volts = sample_voltage()
+
+Pulse /
+ self.sec += self.pulse_sec
+ self.post_fifo(Event(signal=signals.Tick,
+   payload=SecInCharge(sec=self.sec))
+
+
+
+
+exit /
+  [self.cancel_events(
+    Event(signal=signal)) for signal in
+       [signals.Sample_Voltage,
+        signals.Sample_Current,
+        signals.Pulse]]
+
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>918</x>
+      <y>684</y>
+      <w>189</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>*constant_current_control*
+--
+entry /
+  self.control = self.c_control
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>918</x>
+      <y>819</y>
+      <w>189</w>
+      <h>261</h>
+    </coordinates>
+    <panel_attributes>*constant_voltage_control*
+--
+entry /
+	self.control = self.v_control
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>1179</x>
+      <y>720</y>
+      <w>18</w>
+      <h>18</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1125</x>
+      <y>720</y>
+      <w>72</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>702</x>
+      <y>594</y>
+      <w>27</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1125</x>
+      <y>738</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>To_Bulk
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>120.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1125</x>
+      <y>765</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Force_Bulk
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>120.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1125</x>
+      <y>873</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>To_Abs
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>120.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1125</x>
+      <y>900</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Force_Abs
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>120.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1125</x>
+      <y>945</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>To_Float
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>120.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1125</x>
+      <y>972</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Force_Float
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>120.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1080</x>
+      <y>1017</y>
+      <w>171</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Force_Equ
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>170.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSyncBarVertical</id>
+    <coordinates>
+      <x>1125</x>
+      <y>711</y>
+      <w>18</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>template=txt
+title=titletext
+layer=3
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSyncBarVertical</id>
+    <coordinates>
+      <x>1125</x>
+      <y>873</y>
+      <w>18</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>template=txt
+title=titletext
+layer=3
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSyncBarVertical</id>
+    <coordinates>
+      <x>1125</x>
+      <y>945</y>
+      <w>18</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>template=txt
+title=titletext
+layer=3
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1080</x>
+      <y>765</y>
+      <w>72</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1080</x>
+      <y>963</y>
+      <w>72</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1080</x>
+      <y>900</y>
+      <w>72</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>720</x>
+      <y>972</y>
+      <w>171</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>SecInCharge = namedtuple(
+  'SecInCharge', ['sec'])
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>378</x>
+      <y>513</y>
+      <w>261</w>
+      <h>189</h>
+    </coordinates>
+    <panel_attributes>*bulk*
+--
+entry /
+  self.control.reference =
+    self.battery_spec.bulk_ref_amps
+  self.start_sec = self.sec
+
+Tick as e /
+  if e.sec - self.start_sec &gt; \
+     self.battery_spec.bulk_timeout_sec or
+     self.volt &gt; self.battery_spec.bulk_exit_volts:
+     
+  self.post_fifo(Event(signal=signals.To_Abs))
+	  
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>378</x>
+      <y>711</y>
+      <w>261</w>
+      <h>189</h>
+    </coordinates>
+    <panel_attributes>*absorption*
+--
+entry /
+  self.control.reference =
+    self.battery_spec.abs_ref_volts
+  self.start_sec = self.sec
+
+Tick as e /
+  if e.sec - self.start_sec &gt; \
+     self.battery_spec.abs_timeout_sec or
+     self.amps &gt; self.battery_spec.abs_exit_amps:
+     
+  self.post_fifo(Event(signal=signals.To_Float))
+	  
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>378</x>
+      <y>909</y>
+      <w>261</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>*float*
+--
+entry /
+  self.control.reference = \
+    self.battery_spec.float_ref_volts
+  
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>378</x>
+      <y>999</y>
+      <w>261</w>
+      <h>189</h>
+    </coordinates>
+    <panel_attributes>*equalize*
+--
+entry /
+  self.control.reference =
+    self.battery_spec.equ_ref_volts
+  self.start_sec = self.sec
+
+Tick as e /
+  if e.sec - self.start_sec &gt; \
+     self.battery_spec.equ_timeout_sec:
+  self.post_fifo(Event(signal=signals.To_Float))
+	  
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>963</x>
+      <y>747</y>
+      <w>126</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>*bulk*
+symbol=substate
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>954</x>
+      <y>882</y>
+      <w>135</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>*absorption*
+symbol=substate
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>954</x>
+      <y>945</y>
+      <w>135</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>*float*
+symbol=substate
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>954</x>
+      <y>1008</y>
+      <w>135</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>*equalize*
+symbol=substate
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>594</x>
+      <y>36</y>
+      <w>27</w>
+      <h>351</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;370.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>594</x>
+      <y>351</y>
+      <w>585</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;20.0;630.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>756</x>
+      <y>36</y>
+      <w>27</w>
+      <h>351</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;370.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>900</x>
+      <y>36</y>
+      <w>27</w>
+      <h>351</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;370.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1044</x>
+      <y>36</y>
+      <w>27</w>
+      <h>342</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;360.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>594</x>
+      <y>189</y>
+      <w>189</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>fg=red
+layer=3</panel_attributes>
+    <additional_attributes>190.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>756</x>
+      <y>189</y>
+      <w>171</w>
+      <h>162</h>
+    </coordinates>
+    <panel_attributes>fg=red
+layer=3</panel_attributes>
+    <additional_attributes>170.0;160.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>900</x>
+      <y>324</y>
+      <w>171</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>fg=red
+layer=3</panel_attributes>
+    <additional_attributes>170.0;20.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1044</x>
+      <y>324</y>
+      <w>117</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>fg=red
+layer=3</panel_attributes>
+    <additional_attributes>110.0;10.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>594</x>
+      <y>162</y>
+      <w>189</w>
+      <h>171</h>
+    </coordinates>
+    <panel_attributes>fg=blue
+layer=3</panel_attributes>
+    <additional_attributes>190.0;10.0;10.0;170.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>756</x>
+      <y>162</y>
+      <w>171</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>fg=blue
+layer=3</panel_attributes>
+    <additional_attributes>170.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>900</x>
+      <y>234</y>
+      <w>171</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>fg=blue
+layer=3</panel_attributes>
+    <additional_attributes>170.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>900</x>
+      <y>162</y>
+      <w>27</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>fg=blue
+layer=3</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1044</x>
+      <y>108</y>
+      <w>27</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>fg=blue
+layer=3</panel_attributes>
+    <additional_attributes>10.0;150.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1044</x>
+      <y>108</y>
+      <w>117</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>fg=blue
+layer=3</panel_attributes>
+    <additional_attributes>110.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>576</x>
+      <y>180</y>
+      <w>45</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>
+layer=3
+fg=red</panel_attributes>
+    <additional_attributes>10.0;20.0;30.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>576</x>
+      <y>225</y>
+      <w>45</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;20.0;30.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>576</x>
+      <y>153</y>
+      <w>45</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;20.0;30.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>576</x>
+      <y>99</y>
+      <w>45</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;20.0;30.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>531</x>
+      <y>18</y>
+      <w>81</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Current (A)
+style=wordwrap
+layer=3
+fg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>531</x>
+      <y>0</y>
+      <w>90</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>Voltage (DC)
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1080</x>
+      <y>342</y>
+      <w>63</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Time
+style=wordwrap
+layer=3
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1053</x>
+      <y>126</y>
+      <w>108</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>Equalization
+(manual stage)
+style=wordwrap
+layer=3
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>918</x>
+      <y>126</y>
+      <w>108</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>Stage 3: Float
+(automatic stage)
+style=wordwrap
+layer=3
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>765</x>
+      <y>126</y>
+      <w>135</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>Stage 2: Absorption
+(automatic stage)
+style=wordwrap
+layer=3
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>603</x>
+      <y>126</y>
+      <w>135</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>Stage 2: Bulk
+(automatic stage)
+style=wordwrap
+layer=3
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>621</x>
+      <y>45</y>
+      <w>117</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>Constant current
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>774</x>
+      <y>45</y>
+      <w>108</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>Constant voltage
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>495</x>
+      <y>225</y>
+      <w>90</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>float_ref_volts
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>495</x>
+      <y>153</y>
+      <w>90</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>bulk_exit_volts
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>495</x>
+      <y>99</y>
+      <w>90</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>equ_ref_volts
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>972</x>
+      <y>360</y>
+      <w>27</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>
+layer=3</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>756</x>
+      <y>369</y>
+      <w>27</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>756</x>
+      <y>423</y>
+      <w>243</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.&gt;
+layer=3</panel_attributes>
+    <additional_attributes>250.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>576</x>
+      <y>324</y>
+      <w>45</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>fg=red
+layer=3</panel_attributes>
+    <additional_attributes>30.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>594</x>
+      <y>369</y>
+      <w>27</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>792</x>
+      <y>360</y>
+      <w>27</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>
+layer=3</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>594</x>
+      <y>396</y>
+      <w>225</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.&gt;
+layer=3</panel_attributes>
+    <additional_attributes>230.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>873</x>
+      <y>63</y>
+      <w>234</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;240.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>567</x>
+      <y>441</y>
+      <w>171</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Time-outs act as insurance
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1044</x>
+      <y>351</y>
+      <w>27</w>
+      <h>144</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;140.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1134</x>
+      <y>108</y>
+      <w>27</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>fg=blue
+layer=3</panel_attributes>
+    <additional_attributes>10.0;150.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1134</x>
+      <y>351</y>
+      <w>27</w>
+      <h>144</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;140.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1044</x>
+      <y>450</y>
+      <w>117</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.&gt;
+layer=3</panel_attributes>
+    <additional_attributes>110.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>954</x>
+      <y>450</y>
+      <w>108</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>equ_timeout_sec
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>576</x>
+      <y>270</y>
+      <w>45</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;20.0;30.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>495</x>
+      <y>396</y>
+      <w>117</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>bulk_timeout_sec
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>657</x>
+      <y>414</y>
+      <w>153</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>abs_timeout_sec
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>495</x>
+      <y>324</y>
+      <w>99</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>abs_exit_amps
+style=wordwrap
+layer=3
+fg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>495</x>
+      <y>270</y>
+      <w>108</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>bulk_entry_volts
+style=wordwrap
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>495</x>
+      <y>189</y>
+      <w>99</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>bulk_ref_amps
+style=wordwrap
+layer=3
+fg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>900</x>
+      <y>1368</y>
+      <w>207</w>
+      <h>225</h>
+    </coordinates>
+    <panel_attributes>*Charger*
+--
+pulse_sec
+volt_sec
+curr_sec
+volts
+amps
+sec
+start_sec
+--
+sample_voltage()
+sample_current()
+
+layer=1
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1053</x>
+      <y>1332</y>
+      <w>27</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1017</x>
+      <y>1314</y>
+      <w>90</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>CustomFactory
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>657</x>
+      <y>1548</y>
+      <w>261</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;10.0;270.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1053</x>
+      <y>1287</y>
+      <w>27</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1017</x>
+      <y>1269</y>
+      <w>90</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Factory
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>972</x>
+      <y>1539</y>
+      <w>108</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>charging
+symbol=substate
+layer=2
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>495</x>
+      <y>1251</y>
+      <w>198</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>*ControlSystem*
+--
+reference  # current or voltage
+input         # current or voltage
+kp
+ki
+kd
+output
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>432</x>
+      <y>1377</y>
+      <w>207</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>*ChargerCurrentControlSystem*
+--
+
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>486</x>
+      <y>1431</y>
+      <w>207</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>*ChargerVoltageControlSystem*
+--
+
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>522</x>
+      <y>1350</y>
+      <w>27</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>657</x>
+      <y>1350</y>
+      <w>27</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>729</x>
+      <y>1332</y>
+      <w>153</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>*BatterySpecificSettings*
+--
+bulk_timeout_sec
+abs_timeout_sec
+equ_timeout_sec
+--
+bulk_entry_volts
+bulk_exit_volts
+abs_exit_amps
+--
+bulk_ref_amps
+float_ref_volts
+abs_ref_volts
+equ_ref_volts
+
+
+
+
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>531</x>
+      <y>1503</y>
+      <w>135</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>*ChargerParameters*
+--
+c_control
+v_control
+battery_spec
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>657</x>
+      <y>1503</y>
+      <w>153</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;30.0;150.0;30.0;150.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>621</x>
+      <y>1467</y>
+      <w>27</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>459</x>
+      <y>1413</y>
+      <w>90</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+fg=blue</panel_attributes>
+    <additional_attributes>80.0;150.0;10.0;150.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1053</x>
+      <y>1512</y>
+      <w>27</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]
+layer=3
+fg=black</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+</diagram>

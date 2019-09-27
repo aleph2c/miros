@@ -204,10 +204,7 @@ if the charger has been in it too long.  And we need to be able to set some
 parameters based on the kind of battery we are attached too.</p>
 <p>The bulk stage is where the battery is charged quickly.  Charging the battery is
 what our customer’s care about the most, but battery maintenance is very
-important too.  Management might try to downgrade the need for battery
-maintenance because this isn’t driving our customer’s purchasing decision. If
-this happens remind them that if we damage batteries over the long term, we
-should plan for a class action lawsuit. Then start working on your resume.</p>
+important too.</p>
 <p>The charger will have a rated current, the more money we put into its hardware,
 the higher this current can be.  The problem is if we over-build this, our
 charger will be too big for a lot of systems and these customers will buy
@@ -216,16 +213,248 @@ someone else’s product because it is cheaper than ours.</p>
 with more versions of itself.  That way we can keep the costs low, and if a
 customer needs a lot of current, they can buy as many of our products as they
 need and gang them together in parallel.</p>
-<p>The added benefit of this approach is that if one of their chargers fail, there
+<p>The added benefit of this approach is that if one of their chargers fails, there
 batteries can still be charged by the others in their system.  It offers them
 some resilience.  If they felt so inclined, they could actually over-build their
-charging system to increase their system’s reliability.  Batteries are
-expensive, heavy and dangerous, and chargers are relatively cheap and easy to
-work with and install.</p>
+charging system to increase their system’s reliability (think military
+contracts).  Batteries are expensive, heavy and dangerous, and chargers are
+relatively cheap and easy to work with and install.</p>
 <p>Another problem our customers have is with the parameters.  We can’t expect them
-to figure out what all of the values and timeouts mean.  They really don’t care,
-we need to eat this complexity on their behalf, especially if we are expecting
-them to buy a bunch of our products for a single installation.</p>
+to figure out what all of the values and time-outs mean.  They really don’t
+care, we need to eat this complexity on their behalf, especially if we are
+expecting them to buy a bunch of our products for a single installation.</p>
+<p>Often the hardest thing to do on a project is to pack knowledge into a
+specification.  The specification should be simple and full of pictures, if it
+isn’t nobody will look a it, and nobody will change it to match what the system
+actually does.  Engineers talk with pictures, because pictures transmit more
+information than writing.  Pictures also illicit conversation.  When you are
+talking to technical people they often forget that they know a lot of things you
+don’t know, and if you are both pointing and talking about a picture you can
+extract this knowledge.</p>
+<hr class="docutils" />
+<p>Specification iteration 1:</p>
+<ul class="simple">
+<li><span class="new-spec">A charger has two control systems: constant current and constant voltage.</span></li>
+<li><span class="new-spec">The bulk stage is a constant current control technique.</span></li>
+<li><span class="new-spec">The absorption, float and equalization stages are constant voltage control
+techniques.</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_1.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_1.svg" src="_images/three_stage_charging_chart_1.svg" /></div>
+</a>
+<p>I show the diagram to the electrical engineer I’m working with, and he says,
+“Yeah, it looks good, but can you make sure the two control systems are
+generalizeable?”  What do you mean?  “Well, I want to just give the current
+control system a reference current and it will drive the device to output that
+current.  The same idea applies to the voltage controller.”  He continues, “A
+control system is just some math, you give it a goal called a <code class="docutils literal notranslate"><span class="pre">reference</span></code>,
+then you give it the value of the thing it is trying to control, call this the
+<code class="docutils literal notranslate"><span class="pre">input</span></code> and the math will drive the <code class="docutils literal notranslate"><span class="pre">output</span></code> towards the goal.  We connect
+this output value to our hardware and it will behave as expected.  I want to use
+the same math to solve the current and voltage control problems, so give me a
+reference and give me the input and I’ll make it work.”  You turn to leave and
+he says, “Oh, one more thing, I need to tune the two control systems
+differently, so make sure I can set some variables <code class="docutils literal notranslate"><span class="pre">ki</span></code>, <code class="docutils literal notranslate"><span class="pre">kp</span></code> and <code class="docutils literal notranslate"><span class="pre">kd</span></code>.
+That should be good”.</p>
+<p>So now we have to start thinking about all of the parameters, each can be
+changed for a different battery type.  We change the language on the diagram to
+match how our electrical engineer talks about things.</p>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_1.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_parameters.svg" src="_images/three_stage_charging_parameters.svg" /></div>
+</a>
+<p>After we update the image we show our electrical engineer the new picture.  He
+looks at it and asks, “What are these arrows connecting the boxes together?”
+You answer, it’s just a way of saying that the <code class="docutils literal notranslate"><span class="pre">reference</span></code>, <code class="docutils literal notranslate"><span class="pre">input</span></code>, <code class="docutils literal notranslate"><span class="pre">kp</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ki</span></code> and <code class="docutils literal notranslate"><span class="pre">kd</span></code> values will be in both of the current and voltage control
+classes.  It’s just a drawing short hand.   He says, “Ok, it looks good.”</p>
+<hr class="docutils" />
+<p>Specification iteration 2:</p>
+<ul class="simple">
+<li>A charger has two control systems: constant current and constant voltage.</li>
+<li>The bulk stage is a constant current control technique.</li>
+<li>The absorption, float and equalization stages are constant voltage control
+techniques.</li>
+<li><span class="new-spec">The electrical profile of the system will look like this:</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_1.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_parameters.svg" src="_images/three_stage_charging_parameters.svg" /></div>
+</a>
+<ul class="simple">
+<li><span class="new-spec">The behavior of the system will look like this:</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_1.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_1.svg" src="_images/three_stage_charging_chart_1.svg" /></div>
+</a>
+<p>We still haven’t solved the parameter issue.  I need to create a data structure
+that has the control system information and the battery stuff in one place.  How
+about this:</p>
+<a class="reference external image-reference" href="_static/three_stage_charging_parameters_2.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_parameters_2.svg" src="_images/three_stage_charging_parameters_2.svg" /></div>
+</a>
+<p>So we make a <code class="docutils literal notranslate"><span class="pre">ChargerParameter</span></code> class that “has a” (black diamond arrow)
+<code class="docutils literal notranslate"><span class="pre">CurrentControlSystem</span></code>, a <code class="docutils literal notranslate"><span class="pre">VoltageControlSystem</span></code> and some
+<code class="docutils literal notranslate"><span class="pre">BatterySpecificInformation</span></code>.  If someone wants to see what the different
+values mean, they can reference the graph below.  It assumes that they
+understand something about battery charging, and they do because they are
+working with us on this project.</p>
+<p>Ok, we know how our data is structured, now we need to go back to our behavioral
+diagram and figure out how to get information from the world.</p>
+<p>We go back to the electrical engineer and ask him, “How fast to I need to read
+the voltage and the current?”  He says, well, I have to read these values very
+quickly in the embedded device’s interrupt service routines, the control systems
+will be running at 20 Khz, but you don’t have to worry about that.  Changing
+between the various stages can happen slowly.  I’ll be reading the input, I’ll
+use raw ADC readings to keep my code fast and I’ll use the PWM peripherals on
+the part to set the output current and voltage via an H-bridge.  But I will need
+you to determine which control system to run and I’ll need you to set it’s
+reference.  Make it so I can tune these values later if I need to, but for now
+you can sample the current, voltage and make decisions at 2 Hz”. (every 0.5
+seconds)</p>
+<p>You say, “Wait, I’m not controlling the current or voltage?”.  He laughs and
+says, “Not with Python you aren’t, but you control which control system will
+run, and you will control that controllers reference and tuning parameters,
+think meta, man!”</p>
+<p>Here we are seeing some of the power of statecharts.  They allow us to wrap deep
+expertise inside of a system with a rich set of other features.  The electrical
+engineer will manage the control system and the circuits needed to make the
+device work, but that is where his expertise stops.  We need to manage which of
+the control strategies are applied, and what their goals are.</p>
+<p>Let’s pack this new knowledge into our pictures.  Let’s
+start with the data model.  We want to attach it to our statechart so that our
+statechart can use it:</p>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_2_data.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_2_data.svg" src="_images/three_stage_charging_chart_2_data.svg" /></div>
+</a>
+<p>We talk to the electrical engineer again and he says, “What are those diamond
+arrows?”  You answer, it’s just a way of saying one class has an attribute of
+another class.  For instance the <code class="docutils literal notranslate"><span class="pre">battery_spec</span></code> in the <code class="docutils literal notranslate"><span class="pre">ChargerParameter</span></code>
+class is a <code class="docutils literal notranslate"><span class="pre">BatterySpecificInformation</span></code> class.  You leave the
+<code class="docutils literal notranslate"><span class="pre">BatterySpecificInformation</span></code> class on the picture so you can see what it’s
+attribute names are.</p>
+<p>“It seems kind of complicated, can you just show me in code?”</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ControlSystem</span><span class="p">:</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># ..</span>
+
+ <span class="k">class</span> <span class="nc">CurrentControlSystem</span><span class="p">(</span><span class="n">ControlSystem</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+ <span class="k">class</span> <span class="nc">VoltageControlSystem</span><span class="p">(</span><span class="n">ControlSystem</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+ <span class="k">class</span> <span class="nc">BatterySpecificSettings</span><span class="p">:</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">bulk_timeout_sec</span> <span class="o">=</span> <span class="mi">700</span>
+     <span class="c1"># ..</span>
+
+ <span class="k">class</span> <span class="nc">ChargerParameters</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="bp">None</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">c_control</span> <span class="o">=</span> <span class="n">CurrentControlSystem</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">v_control</span> <span class="o">=</span> <span class="n">VoltageControlSystem</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">battery_spec</span> <span class="o">=</span> <span class="n">BatterySpecificSettings</span><span class="p">()</span>
+
+ <span class="k">class</span> <span class="nc">Charger</span><span class="p">(</span><span class="n">ChargerParameters</span><span class="p">,</span> <span class="n">CustomFactory</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+       <span class="c1"># ..</span>
+
+ <span class="k">if</span> <span class="vm">__name__</span> <span class="o">=</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">charger</span> <span class="o">=</span> <span class="n">Charger</span><span class="p">()</span>
+    <span class="n">charge</span><span class="o">.</span><span class="n">c_control</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> <span class="mf">40.0</span>
+    <span class="n">charge</span><span class="o">.</span><span class="n">battery_spec</span><span class="o">.</span><span class="n">bulk_timeout_sec</span> <span class="o">=</span> <span class="mi">600</span>
+    <span class="c1"># ..</span>
+</pre></div>
+</div>
+<p>He looks at the picture and the code for a while, then says, “Ok, I see how it
+works, but why are the diamond arrows backwards?”  You answer, “The head of the
+diamond describes who owns the other thing.  If you want to know why it was set
+that way you will have to ask the committee that decided this in the 1990’s”</p>
+<p>Then he asks, “What’s the ball and the stick?”  That’s where the data will
+connect to the software that drives the charger’s behavior.  The behavior will need the
+data, and if you see the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> class inherits from the <code class="docutils literal notranslate"><span class="pre">CustomFactory</span></code>
+class which contains all of the code that can drive behavior.  Inheritance is
+just programming by difference, that arrow is like a copy and paste, it’s as if
+I have copied and pasted all of that <code class="docutils literal notranslate"><span class="pre">CustomFactory</span></code> and <code class="docutils literal notranslate"><span class="pre">ChargerParameters</span></code>
+code into the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> class.  The ball is just short hand for saying the
+data attaches to the behavior here.  The here in this case is the “charging
+state” which will be described somewhere else.  He looks confused, and says, “I
+guess you will have to show me when you make it.”</p>
+<p>The data model seems good enough so let’s start designing the system behavior.
+We need to start programming time, so we will construct three heart beats,
+something that will sample the current, something that will sample the voltage and
+something that will drive the statechart’s decisions.  To make a
+current or a voltage readings we create two hooks in the charging state.
+Finally, we make sure that these heart beats are turned off when we leave the
+state; we can’t remember why this is important, but we know it is.</p>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_2_chart.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_2_chart.svg" src="_images/three_stage_charging_chart_2_chart.svg" /></div>
+</a>
+<p>We also adjust the chart so that the correct control system is selected when we
+enter a charging stage, and then we use our data model and our behavior to
+select which current or voltage reference will be set in each stage.</p>
+<p>Now we want to talk to our electrical engineer about behavior, but we know we
+should accompany the statechart diagram with the electrical profile, or it might
+be a bit much for him.</p>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_2_graph.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_2_graph.svg" src="_images/three_stage_charging_chart_2_graph.svg" /></div>
+</a>
+<p>We show him the diagram, and say, “Listen, some stuff is missing on this, but I
+just want you to look at how the current and voltage is sampled, and how the
+control systems are set up.”  He says, “Ok, show me.”</p>
+<p>You say, “In the entry stage we create three different named pulses that repeat
+forever, or until the charging state is exited. The chart can react to these
+named pulses and change state, or just run some code.”  He says, “keep going.”</p>
+<p>Alright, see that <code class="docutils literal notranslate"><span class="pre">Sample_Current</span></code> pulse, it will fire forever with a period of
+<code class="docutils literal notranslate"><span class="pre">cur_in_sec</span></code> which we will probably just set to 0.5 seconds, but we can tune
+it, we can make this something else if we need to.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Sample_Current</span></code> and <code class="docutils literal notranslate"><span class="pre">Sample_Voltage</span></code> events will be sent at the chart
+and the chart will react to them, but in our case, we just hook these signals
+to sample the current and voltage.  The chart won’t actually change state when
+these events are seen by it, it will just use the events to update a <code class="docutils literal notranslate"><span class="pre">curr</span></code>
+and <code class="docutils literal notranslate"><span class="pre">volt</span></code> attribute in it’s data structure so these values can be kept fresh
+enough that the chart can make good decisions with the information.</p>
+<p>Does that make sense?  “Yeah, it’s just a timer right?”  You answer, “Yeah, but
+look there is another one, called <code class="docutils literal notranslate"><span class="pre">Pulse</span></code>, it’s not wired up yet, but soon it
+will be the thing that drives the chart’s decisions”</p>
+<p>Now I’ll show you how the controllers are set up.  After the charging state is
+entered, it will set up these pulses, then it will enter the bulk state.  When
+it enters the <code class="docutils literal notranslate"><span class="pre">constant_current_state</span></code>, it sets the control system to use the
+<code class="docutils literal notranslate"><span class="pre">CurrentControlSystem</span></code> and then when it enters the bulk state, it sets the
+reference of this control system to be <code class="docutils literal notranslate"><span class="pre">battery_spec.ref_amps</span></code> from our data
+model.</p>
+<p>He looks at it for a while, and say, “Yeah, this is what I wanted, ok, yeah, I
+get it.  How do I get into the other states?”  I haven’t set that up yet, but
+suppose we were to enter the <code class="docutils literal notranslate"><span class="pre">absorption</span></code> state, we would first have to enter
+the <code class="docutils literal notranslate"><span class="pre">constant_voltage_state</span></code>.  This would cause our control system to change,
+we would detach the current control system, and attach the voltage control
+system.  We would then use all of that control system’s <code class="docutils literal notranslate"><span class="pre">kp</span></code>, <code class="docutils literal notranslate"><span class="pre">ki</span></code> and
+<code class="docutils literal notranslate"><span class="pre">kd</span></code> parameters.  “Yeah, ok, good, this is what I wanted”.</p>
+<p>Things seem to be coming together, so we go back and work on our spec:</p>
+<hr class="docutils" />
+<p>Specification iteration 3:</p>
+<ul class="simple">
+<li>This product will be a three stage charger with an equalization feature.</li>
+<li>The charger has two control systems: constant current and constant voltage.</li>
+<li>The bulk stage is a constant current control technique.</li>
+<li>The absorption, float and equalization stages are constant voltage control
+techniques.</li>
+<li><span class="new-spec">The charging electrical profile can be seen here</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_2_graph.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_2_graph.svg" src="_images/three_stage_charging_chart_2_graph.svg" /></div>
+</a>
+<p>Functional Specification iteration 3:</p>
+<ul class="simple">
+<li><span class="new-spec">The software system will be broken into two parts, fast running c code and slower running Python code</span></li>
+<li><span class="new-spec">The c code will run in ISRs at a frequency of 20 Khz and will control the charger in either a constant current or
+constant voltage mode. (see separate doc)</span></li>
+<li><span class="new-spec">The Python code will determine which control strategy the c code is
+using, it will also set the c code’s control system parameters.  The Python code will not directly control the electrical output of the unit`</span></li>
+<li><span class="new-spec">The Python code will sample the current and voltage and make decisions every 0.5 seconds`</span></li>
+<li><span class="new-spec">The Python data architecture can be seen here.</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_2_data.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_2_data.svg" src="_images/three_stage_charging_chart_2_data.svg" /></div>
+</a>
+<ul class="simple">
+<li><span class="new-spec">The Python behavioral architecture can be seen here.</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_2_chart.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_2_chart.svg" src="_images/three_stage_charging_chart_2_chart.svg" /></div>
+</a>
+<hr class="docutils" />
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
 
