@@ -198,17 +198,32 @@ care, we need to eat this complexity on their behalf, especially if we are
 expecting them to buy a bunch of our products for a single installation.
 
 Often the hardest thing to do on a project is to pack knowledge into a
-specification.  The specification should be simple and full of pictures, if it
-isn't nobody will look a it, and nobody will change it to match what the system
-actually does.  Engineers talk with pictures, because pictures transmit more
-information than writing.  Pictures also illicit conversation.  When you are
-talking to technical people they often forget that they know a lot of things you
-don't know, and if you are both pointing and talking about a picture you can
-extract this knowledge.
+specification (spec).  The specification should be simple and full of pictures,
+if it isn't nobody will look a it, and nobody will change it to match what the
+system actually does.  Engineers talk with pictures, because pictures transmit
+more information than writing.  Pictures also illicit conversation which moves
+relevant personal knowledge into project knowledge:  When you are talking to
+technical people they often forget that they know a lot of things you don't
+know. If you are both pointing to and talking about a picture, you will both
+learn more about each others contribution and thinking in regards to the
+project.  Once things are discovered from one another they should be packed into
+a couple of notes and pictures and added to the spec.
+
+The spec should be short enough that it can be read and understood by everyone
+involved.  If specific drawings are too technical for some members, efforts
+should be made to explain what they mean so everyone can participate in the
+conversation.  Here is an example of such a conversation to discover how to
+build a single three stage battery charger.  But if you want to skip the
+conversation and just jump to the design, click :ref:`here <batterychargingexample-single-unit-three-stage-battery-charger-design>`.
 
 ----
 
-Specification iteration 1:
+.. note::
+
+  New knowledge and things said by other imagined people will be
+  :new_spec:`highlighted.`
+
+Specification (1):
 
 * :new_spec:`A charger has two control systems: constant current and constant voltage.`
 * :new_spec:`The bulk stage is a constant current control technique.`
@@ -219,20 +234,21 @@ Specification iteration 1:
     :target: _static/three_stage_charging_chart_1.pdf
     :align: center
 
-I show the diagram to the electrical engineer I'm working with, and he says,
-"Yeah, it looks good, but can you make sure the two control systems are
-generalizeable?"  What do you mean?  "Well, I want to just give the current
+I show the above diagram to the :new_spec:`electrical engineer` I'm working with, and he says,
+:new_spec:`Yeah, it looks good, but can you make sure the two control systems are
+generalizeable?`  What do you mean?  :new_spec:`Well, I want to just give the current
 control system a reference current and it will drive the device to output that
-current.  The same idea applies to the voltage controller."  He continues, "A
-control system is just some math, you give it a goal called a ``reference``,
+current.  The same idea applies to the voltage controller.`  He continues,
+:new_spec:`A control system is just some math, you give it a goal called a "reference".
 then you give it the value of the thing it is trying to control, call this the
-``input`` and the math will drive the ``output`` towards the goal.  We connect
+"input" and the math will drive the "output" towards the goal.  We connect
 this output value to our hardware and it will behave as expected.  I want to use
 the same math to solve the current and voltage control problems, so give me a
-reference and give me the input and I'll make it work."  You turn to leave and
-he says, "Oh, one more thing, I need to tune the two control systems
-differently, so make sure I can set some variables ``ki``, ``kp`` and ``kd``.
-That should be good".
+reference and give me the input and I'll make it work.`  
+
+You turn to leave and he says, :new_spec:`Oh, one more thing, I need to tune the
+two control systems differently, so make sure I can set some variables "ki",
+"kp" and "kd".  That should be good`.
 
 So now we have to start thinking about all of the parameters, each can be
 changed for a different battery type.  We change the language on the diagram to
@@ -243,14 +259,15 @@ match how our electrical engineer talks about things.
     :align: center
 
 After we update the image we show our electrical engineer the new picture.  He
-looks at it and asks, "What are these arrows connecting the boxes together?"
-You answer, it's just a way of saying that the ``reference``, ``input``, ``kp``,
-``ki`` and ``kd`` values will be in both of the current and voltage control
-classes.  It's just a drawing short hand.   He says, "Ok, it looks good."
+looks at it and asks, :new_spec:`What are these arrows connecting the boxes
+together?` You answer, it's just a way of saying that the ``reference``,
+``input``, ``kp``, ``ki`` and ``kd`` values will be in both of the current and
+voltage control classes.  It's just a drawing short hand.   He says,
+:new_spec:`Ok, it looks good.`
 
 ----
 
-Specification iteration 2:
+Specification (2):
 
 * A charger has two control systems: constant current and constant voltage.
 * The bulk stage is a constant current control technique.
@@ -268,6 +285,8 @@ Specification iteration 2:
     :target: _static/three_stage_charging_chart_1.pdf
     :align: center
 
+----
+
 We still haven't solved the parameter issue.  I need to create a data structure
 that has the control system information and the battery stuff in one place.  How
 about this:
@@ -278,30 +297,27 @@ about this:
 
 So we make a ``ChargerParameter`` class that "has a" (black diamond arrow)
 ``CurrentControlSystem``, a ``VoltageControlSystem`` and some
-``BatterySpecificInformation``.  If someone wants to see what the different
-values mean, they can reference the graph below.  It assumes that they
-understand something about battery charging, and they do because they are
-working with us on this project.
+``BatterySpecificInformation``.
 
-Ok, we know how our data is structured, now we need to go back to our behavioral
+OK, we know how our data is structured, now we need to go back to our behavioral
 diagram and figure out how to get information from the world.
 
 We go back to the electrical engineer and ask him, "How fast to I need to read
-the voltage and the current?"  He says, well, I have to read these values very
-quickly in the embedded device's interrupt service routines, the control systems
-will be running at 20 Khz, but you don't have to worry about that.  Changing
-between the various stages can happen slowly.  I'll be reading the input, I'll
-use raw ADC readings to keep my code fast and I'll use the PWM peripherals on
-the part to set the output current and voltage via an H-bridge.  But I will need
-you to determine which control system to run and I'll need you to set it's
-reference.  Make it so I can tune these values later if I need to, but for now
-you can sample the current, voltage and make decisions at 2 Hz". (every 0.5
-seconds)
+the voltage and the current?"  He says, :new_spec:`Well, I have to read these
+values very quickly in the embedded device's interrupt service routines, the
+control systems will be running at 20 Khz, but you don't have to worry about
+that.  Changing between the various stages can happen slowly.  I'll be reading
+the input, I'll use raw ADC readings to keep my code fast and I'll use the PWM
+peripherals on the part to set the output current and voltage via an H-bridge.
+But I will need you to determine which control system to run and I'll need you
+to set it's reference.  Make it so I can tune these values later if I need to,
+but for now you can sample the current, voltage and make decisions at 2 Hz".
+(every 0.5 seconds)`
 
 You say, "Wait, I'm not controlling the current or voltage?".  He laughs and
-says, "Not with Python you aren't, but you control which control system will
-run, and you will control that controllers reference and tuning parameters,
-think meta, man!"
+says, :new_spec:`Not with Python you aren't, but you control which control
+system will run, and you will control that controllers reference and tuning
+parameters, think meta, man!`
 
 Here we are seeing some of the power of statecharts.  They allow us to wrap deep
 expertise inside of a system with a rich set of other features.  The electrical
@@ -309,22 +325,22 @@ engineer will manage the control system and the circuits needed to make the
 device work, but that is where his expertise stops.  We need to manage which of
 the control strategies are applied, and what their goals are.
 
-Let's pack this new knowledge into our pictures.  Let's
-start with the data model.  We want to attach it to our statechart so that our
-statechart can use it:
+Let's pack this new knowledge into our pictures.  Let's start with the data
+model.  We want to attach it to our statechart so that our statechart can use
+it:
 
 .. image:: _static/three_stage_charging_chart_2_data.svg
     :target: _static/three_stage_charging_chart_2_data.pdf
     :align: center
 
-We talk to the electrical engineer again and he says, "What are those diamond
-arrows?"  You answer, it's just a way of saying one class has an attribute of
-another class.  For instance the ``battery_spec`` in the ``ChargerParameter``
-class is a ``BatterySpecificInformation`` class.  You leave the
-``BatterySpecificInformation`` class on the picture so you can see what it's
+We talk to the electrical engineer again and he says, :new_spec:`What are those
+diamond arrows?`  You answer, it's just a way of saying one class has an
+attribute of another class.  For instance the ``battery_spec`` in the
+``ChargerParameter`` class is a ``BatterySpecificInformation`` class.  You leave
+the ``BatterySpecificInformation`` class on the picture so you can see what it's
 attribute names are.
 
-"It seems kind of complicated, can you just show me in code?"
+:new_spec:`It seems kind of complicated, can you just show me in code?`
 
 .. code-block:: python
   
@@ -363,29 +379,30 @@ attribute names are.
       charge.battery_spec.bulk_timeout_sec = 600
       # ..
 
-He looks at the picture and the code for a while, then says, "Ok, I see how it
-works, but why are the diamond arrows backwards?"  You answer, "The head of the
-diamond describes who owns the other thing.  If you want to know why it was set
-that way you will have to ask the committee that decided this in the 1990's"
+He looks at the picture and the code for a while, then says, :new_spec:`OK, I
+see how it works, but why are the diamond arrows backwards?`  You answer, "The
+head of the diamond describes who owns the other thing.  If you want to know why
+it was set that way you will have to ask the committee that decided this in the
+1990's"
 
-Then he asks, "What's the ball and the stick?"  That's where the data will
+Then he asks, :new_spec:`What's the ball and the stick?`  That's where the data will
 connect to the software that drives the charger's behavior.  The behavior will need the
 data, and if you see the ``Charger`` class inherits from the ``CustomFactory``
 class which contains all of the code that can drive behavior.  Inheritance is
 just programming by difference, that arrow is like a copy and paste, it's as if
 I have copied and pasted all of that ``CustomFactory`` and ``ChargerParameters``
 code into the ``Charger`` class.  The ball is just short hand for saying the
-data attaches to the behavior here.  The here in this case is the "charging
-state" which will be described somewhere else.  He looks confused, and says, "I
-guess you will have to show me when you make it."
+data attaches to the behavior here.  The "here" in this case is the "charging
+state" which will be described somewhere else.  He looks confused, and says,
+:new_spec:`I guess you will have to show me when you make it.`
 
 The data model seems good enough so let's start designing the system behavior.
 We need to start programming time, so we will construct three heart beats,
-something that will sample the current, something that will sample the voltage and
-something that will drive the statechart's decisions.  To make a
-current or a voltage readings we create two hooks in the charging state.
-Finally, we make sure that these heart beats are turned off when we leave the
-state; we can't remember why this is important, but we know it is.
+something that will sample the current, something that will sample the voltage
+and something that will drive the statechart's decisions.  To make current and
+voltage readings, we create two hooks in the charging state.  Finally, we make
+sure that these heart beats are turned off when we leave the state; we can't
+remember why this is important, but we know it is.
 
 .. image:: _static/three_stage_charging_chart_2_chart.svg
     :target: _static/three_stage_charging_chart_2_chart.pdf
@@ -404,48 +421,52 @@ be a bit much for him.
     :align: center
 
 We show him the diagram, and say, "Listen, some stuff is missing on this, but I
-just want you to look at how the current and voltage is sampled, and how the
-control systems are set up."  He says, "Ok, show me."
+just want you to look at how the current and voltage are sampled, and how the
+control systems are set up."  He says, :new_spec:`Ok, show me.`
 
 You say, "In the entry stage we create three different named pulses that repeat
 forever, or until the charging state is exited. The chart can react to these
-named pulses and change state, or just run some code."  He says, "keep going."
+named pulses and change state, or just run some code." I pause and look at him,
+he says, :new_spec:`Keep going.`
 
-Alright, see that ``Sample_Current`` pulse, it will fire forever with a period of
+"Alright, see that ``Sample_Current`` pulse, it will fire forever with a period of
 ``cur_in_sec`` which we will probably just set to 0.5 seconds, but we can tune
-it, we can make this something else if we need to.
+it, we can make this something else if we need to."
 
-The ``Sample_Current`` and ``Sample_Voltage`` events will be sent at the chart
+"The ``Sample_Current`` and ``Sample_Voltage`` events will be sent at the chart
 and the chart will react to them, but in our case, we just hook these signals
 to sample the current and voltage.  The chart won't actually change state when
 these events are seen by it, it will just use the events to update a ``curr``
 and ``volt`` attribute in it's data structure so these values can be kept fresh
-enough that the chart can make good decisions with the information.  
+enough that the chart can make good decisions with the information."
 
-Does that make sense?  "Yeah, it's just a timer right?"  You answer, "Yeah, but
-look there is another one, called ``Pulse``, it's not wired up yet, but soon it
-will be the thing that drives the chart's decisions"
+"Does that make sense?"  :new_spec:`Yeah, it's just a timer right?`  You answer,
+"Yeah, but look there is another one, called ``Pulse``, it's not wired up yet,
+but soon it will be the thing that drives the chart's decisions"
 
-Now I'll show you how the controllers are set up.  After the charging state is
+"Now I'll show you how the controllers are set up.  After the charging state is
 entered, it will set up these pulses, then it will enter the bulk state.  When
 it enters the ``constant_current_state``, it sets the control system to use the
 ``CurrentControlSystem`` and then when it enters the bulk state, it sets the
 reference of this control system to be ``battery_spec.ref_amps`` from our data
-model.  
+model."
 
-He looks at it for a while, and say, "Yeah, this is what I wanted, ok, yeah, I
-get it.  How do I get into the other states?"  I haven't set that up yet, but
-suppose we were to enter the ``absorption`` state, we would first have to enter
-the ``constant_voltage_state``.  This would cause our control system to change,
-we would detach the current control system, and attach the voltage control
-system.  We would then use all of that control system's ``kp``, ``ki`` and
-``kd`` parameters.  "Yeah, ok, good, this is what I wanted".
+He looks at it for a while, and says, :new_spec:`Yeah, this is what I wanted, ok,
+yeah, I get it.  How do I get into the other states?`  "I haven't set that up
+yet, but suppose we were to enter the ``absorption`` state, we would first have
+to enter the ``constant_voltage_state``.  This would cause our control system to
+change, we would detach the current control system, and attach the voltage
+control system.  We would then use all of that control system's ``kp``, ``ki``
+and ``kd`` parameters."  :new_spec:`Yeah, ok, good, this is what I wanted.`
 
-Things seem to be coming together, so we go back and work on our spec:
+Things seem to be coming together, so we go back and work on our spec, teasing
+apart our high level descriptions from our technical design.
 
 ----
 
 Specification iteration 3:
+
+**High level Specification (3)**
 
 * This product will be a three stage charger with an equalization feature.
 * The charger has two control systems: constant current and constant voltage.
@@ -458,14 +479,14 @@ Specification iteration 3:
     :target: _static/three_stage_charging_chart_2_graph.pdf
     :align: center
 
-Functional Specification iteration 3:
+**Sofware Functional Specification (3)**
 
 * :new_spec:`The software system will be broken into two parts, fast running c code and slower running Python code`
 * :new_spec:`The c code will run in ISRs at a frequency of 20 Khz and will control the charger in either a constant current or
   constant voltage mode. (see separate doc)`
 * :new_spec:`The Python code will determine which control strategy the c code is
-  using, it will also set the c code's control system parameters.  The Python code will not directly control the electrical output of the unit``
-* :new_spec:`The Python code will sample the current and voltage and make decisions every 0.5 seconds``
+  using, it will also set the c code's control system parameters.  The Python code will not directly control the electrical output of the unit`
+* :new_spec:`The Python code will sample the current and voltage and make decisions every 0.5 seconds`
 * :new_spec:`The Python data architecture can be seen here.`
 
 .. image:: _static/three_stage_charging_chart_2_data.svg
@@ -479,6 +500,180 @@ Functional Specification iteration 3:
     :align: center
 
 ----
+
+Let's wire up the ``Pulse`` event and add more functionality to our chart.  We
+want the charger to:
+
+   * change it's charging state to match our electrical/time profile
+   * be able to be forced into any of the charge states
+
+Here is a new design that does these things:
+
+.. image:: _static/three_stage_charging_chart_3_chart.svg
+    :target: _static/three_stage_charging_chart_3_chart.pdf
+    :align: center
+
+Since there is a need for timeouts in various states, we invent a new signal
+called ``Tick``.  ``Tick`` is driven by our ``Pulse`` event, and it is given a payload
+which is the time in seconds since the charging state was entered.
+
+Time to show our electrical engineer.  
+
+We approach him with the diagrams and he says, :new_spec:`Ok walk me through
+it`.  "When the ``charging`` state is entered the ``sec`` is set to 0, then the
+three heart beats are initiated.  Two of the heart beats drive the current and
+voltage readings, but the third heart beat, ``Pulse``, will fire every
+``pulse_sec`` seconds.  We will probably set ``pulse_sec`` to 0.5.  The key
+thing to notice on this picture is that Pulse drives another event called
+``Tick`` which is given a payload of ``sec`` which is how much time has passed
+since the charging state was entered."
+
+:new_spec:`Wait, how does this tick thing work?`.  "When system turns on the
+first thing that will happen is it will enter the ``charging`` state. When the
+``charging`` state is entered a bunch of heart beats are setup, these are
+basically named timers, ``Sample_Current``, ``Sample_Voltage`` and ``Pulse``.
+Then the charging state initializes, causing a transition into the ``bulk``
+state.  While this happens, the ``constant_current_state`` is entered, setting
+the control system to use your current control system, then it enters the
+``bulk`` state, which sets the reference of your current control system."  He
+looks at the diagram and after some time says, :new_spec:`Ok, yeah, I see that,
+but how does this pulse stuff work?`  
+
+"The Pulse event will fire every, say 0.5 seconds, but it is caught by a hook,
+which invents another signal called ``Tick`` which has a payload, ``sec``.  The
+``sec`` payload of the Tick signal will have the time in seconds since the
+charging state was entered.  It's this ``Tick`` event, which can make stuff
+happen.  Do you see it?"  :new_spec:`I see it.  So how do these charging stage
+time outs work?  Can you show me the electrical profile and the statechart
+timing mechanisms together?`
+
+.. image:: _static/three_stage_charging_chart_3_graph.svg
+    :target: _static/three_stage_charging_chart_3_graph.pdf
+    :align: center
+
+"Ok, so first of all we enter the bulk state, then we start getting ``Tick``
+events with ``sec`` payloads representing the amount of time in seconds since
+the beginning of ``charging``.  Notice that when the ``bulk`` state is entered,
+the time at which this happened is squirreled away in the ``start_sec``
+attribute.  From then on, every ``pulse_sec`` a ``Tick`` signal will be seen by
+the bulk state.  Your current control system will charge the battery.  While this
+is happening the ``bulk`` state will see a whole lot of ``Tick`` events which it
+will ignore.  But once the time in bulk is equal to or greater than
+``abs_timeout_sec`` or if the battery voltage is equal to or greater than
+``bulk_exit_volt``, the ``bulk`` state will post a ``To_Abs`` event to the chart."
+
+"The ``To_Abs`` event, will cause an exit from the ``bulk`` state, then an exit
+from the ``constant_current_control`` state.  Then it will enter into the
+``constant_voltage_control`` state, which will switch the control system to use
+a voltage controller, then enter the ``absorption`` state which will set the
+voltage reference to ``abs_ref_volts``".  :new_spec:`I see how it works and I
+see how the same thing happens for transitions to float from absorption.  Also,
+I see that you can only force your way into the equalize state, that's good eh.`  
+
+He looks a bit longer and says, :new_spec:`So the charger will try and spend
+most of its time in float eh? But how to we get back into bulk if there is a big
+draw on the batteries? Say our customer has a big DC load that draws the voltage
+down below the bulk_entry_volts.  What happens then?`
+
+You look at the chart and see that you can't get back into bulk, "Right now you
+can't, I missed that, but let me fix it"  You spend a moment adjusting the
+chart, "Look at this:"
+
+.. image:: _static/three_stage_charging_chart_3_chart_1.svg
+    :target: _static/three_stage_charging_chart_3_chart_1.pdf
+    :align: center
+
+"See how I adjusted the ``Sample_Voltage`` hook to post a ``To_Bulk`` signal when
+the voltage is below the ``bulk_entry_volts``.  I have added a ``To_Bulk`` hook
+in the ``bulk`` state which blocks this event from causing a transition from
+``charging`` to ``bulk`` while the unit is in bulk but the voltage is still
+lower than the ``bulk_exit_volts``."  He asks, :new_spec:`Why would that happen?`.  "The
+charger would probably need some time to get the voltage above the
+``bulk_entry_volts`` once it fell below this threshold, maybe because of a big
+DC draw on the battery."  He says, :new_spec:`Yeah, that will probably happen in
+some situations`.
+
+You ask him, "Do we need to separate the timing of our current, voltage and
+decision pulses?"  He says, :new_spec:`No, it's not that important, what's the
+cost of having extra timers anyway?`  "It's not a big deal, just each heart beat
+will have it's own thread, and when I'm looking at the logs it could get kind of
+cluttered having all of those signals firing at the same time.  So, maybe I could
+simplify the design by just having one heart beat."  :new_spec:`Yeah, simple is
+good, we probably won't need separate timers.`
+
+You spend a moment adjusting the chart.  "Here, it's less cluttered now":
+
+.. image:: _static/three_stage_charging_chart_3_chart_2.svg
+    :target: _static/three_stage_charging_chart_3_chart_2.pdf
+    :align: center
+
+Do you see anything else we could pull out of there?  :new_spec:`No, it seems
+pretty compact, how are you going to test this thing anyway?  I'm not going to
+have hardware for you for a couple of weeks, can you test it before that?`.
+"I will run it on a PC and feed it fake electrical profiles, I also plan
+to squeeze time so I can run it through all of it's states quickly".
+
+Things seem to be coming together, so we go back and work on our spec, teasing
+apart our high level descriptions from our technical design.
+
+.. _batterychargingexample-single-unit-three-stage-battery-charger-design:
+
+Single Unit Three Stage Battery Charger Design
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**High level Specification (4)**
+
+* This product will be a three stage charger with an equalization feature.
+* The charger has two control systems: constant current and constant voltage.
+* The bulk stage is a constant current control technique.
+* The absorption, float and equalization stages are constant voltage control
+  techniques.
+* The charging electrical profile can be seen here
+
+.. image:: _static/three_stage_charging_chart_2_graph.svg
+    :target: _static/three_stage_charging_chart_2_graph.pdf
+    :align: center
+
+**Sofware Functional Specification (4)**
+
+* The software system will be broken into two parts, fast running c code and slower running Python code
+* The c code will run in ISRs at a frequency of 20 Khz and will control the charger in either a constant current or
+  constant voltage mode. (see separate doc)
+* The Python code will determine which control strategy the c code is
+  using, it will also set the c code's control system parameters.  The Python code will not directly control the electrical output of the unit
+* The Python code will sample the current and voltage and make decisions every 0.5 seconds
+* The Python data architecture can be seen here.
+
+.. image:: _static/three_stage_charging_chart_4_data.svg
+    :target: _static/three_stage_charging_chart_4_data.pdf
+    :align: center
+
+* The Python behavioral architecture can be seen here.
+
+.. image:: _static/three_stage_charging_chart_4_chart.svg
+    :target: _static/three_stage_charging_chart_4_chart.pdf
+    :align: center
+
+----
+
+We have enough knowledge now to build something.  Let's start with the data
+model:
+
+.. image:: _static/three_stage_charging_chart_4_data.svg
+    :target: _static/three_stage_charging_chart_4_data.pdf
+    :align: center
+
+.. code-block:: python
+  :emphasize-lines: 1
+  :linenos:
+  
+  place code here
+
+.. code-block:: python
+  :emphasize-lines: 1
+  :linenos:
+  
+  place code here
 
 ..
    I don't know about you, but I'm starting to feel like I have been drinking from

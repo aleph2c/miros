@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>252</x>
+      <y>189</y>
+      <w>567</w>
+      <h>486</h>
+    </coordinates>
+    <panel_attributes>*charging*
+--
+entry /
+  self.sec = 0
+  # start our repeating events
+  [self.post_fifo(Event(signal=signal, 
+     deferred=True, 
+     period=period,
+     times=0)) for (signal, period) in [
+      (signals.Sample_Voltage, self.volt_sec),
+      (signals.Sample_Current, self.cur_in_sec),
+      (signals.Pulse, self.pulse_sec)
+    ]
+  ]
+  
+Sample_Current /
+  self.amps = sample_current()
+
+Sample_Voltage /
+  self.volts = sample_voltage()
+
+Pulse /
+ self.sec += self.pulse_sec
+ self.post_fifo(Event(signal=signals.Tick,
+   payload=SecInCharge(sec=self.sec))
+
+
+
+
+exit /
+  [self.cancel_events(
+    Event(signal=signal)) for signal in
+       [signals.Sample_Voltage,
+        signals.Sample_Current,
+        signals.Pulse]]
+
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>504</x>
+      <y>243</y>
+      <w>189</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>*constant_current_control*
+--
+entry /
+  self.control = self.c_control
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>504</x>
+      <y>378</y>
+      <w>189</w>
+      <h>261</h>
+    </coordinates>
+    <panel_attributes>*constant_voltage_control*
+--
+entry /
+	self.control = self.v_control
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>765</x>
+      <y>279</y>
+      <w>18</w>
+      <h>18</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>711</x>
+      <y>279</y>
+      <w>72</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>288</x>
+      <y>153</y>
+      <w>27</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>711</x>
+      <y>297</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>To_Bulk
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>120.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>711</x>
+      <y>324</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Force_Bulk
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>120.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>711</x>
+      <y>432</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>To_Abs
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>120.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>711</x>
+      <y>459</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Force_Abs
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>120.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>711</x>
+      <y>504</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>To_Float
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>120.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>711</x>
+      <y>531</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Force_Float
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>120.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>666</x>
+      <y>576</y>
+      <w>171</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Force_Equ
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>170.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSyncBarVertical</id>
+    <coordinates>
+      <x>711</x>
+      <y>270</y>
+      <w>18</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>template=txt
+title=titletext
+layer=3
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSyncBarVertical</id>
+    <coordinates>
+      <x>711</x>
+      <y>432</y>
+      <w>18</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>template=txt
+title=titletext
+layer=3
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSyncBarVertical</id>
+    <coordinates>
+      <x>711</x>
+      <y>504</y>
+      <w>18</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>template=txt
+title=titletext
+layer=3
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>666</x>
+      <y>324</y>
+      <w>72</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>666</x>
+      <y>522</y>
+      <w>72</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>666</x>
+      <y>459</y>
+      <w>72</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>306</x>
+      <y>531</y>
+      <w>171</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>SecInCharge = namedtuple(
+  'SecInCharge', ['sec'])
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>549</x>
+      <y>306</y>
+      <w>126</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>*bulk*
+symbol=substate
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>540</x>
+      <y>441</y>
+      <w>135</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>*absorption*
+symbol=substate
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>540</x>
+      <y>504</y>
+      <w>135</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>*float*
+symbol=substate
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>540</x>
+      <y>567</y>
+      <w>135</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>*equalize*
+symbol=substate
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>855</x>
+      <y>99</y>
+      <w>261</w>
+      <h>189</h>
+    </coordinates>
+    <panel_attributes>*bulk*
+--
+entry /
+  self.control.reference =
+    self.battery_spec.bulk_ref_amps
+  self.start_sec = self.sec
+
+Tick as e /
+  if e.sec - self.start_sec &gt; \
+     self.battery_spec.bulk_timeout_sec or
+     self.volt &gt; self.battery_spec.bulk_exit_volts:
+     
+  self.post_fifo(Event(signal=signals.To_Abs))
+	  
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>855</x>
+      <y>297</y>
+      <w>261</w>
+      <h>189</h>
+    </coordinates>
+    <panel_attributes>*absorption*
+--
+entry /
+  self.control.reference =
+    self.battery_spec.abs_ref_volts
+  self.start_sec = self.sec
+
+Tick as e /
+  if e.sec - self.start_sec &gt; \
+     self.battery_spec.abs_timeout_sec or
+     self.amps &gt; self.battery_spec.abs_exit_amps:
+     
+  self.post_fifo(Event(signal=signals.To_Float))
+	  
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>855</x>
+      <y>495</y>
+      <w>261</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>*float*
+--
+entry /
+  self.control.reference = \
+    self.battery_spec.float_ref_volts
+  
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>855</x>
+      <y>585</y>
+      <w>261</w>
+      <h>189</h>
+    </coordinates>
+    <panel_attributes>*equalize*
+--
+entry /
+  self.control.reference =
+    self.battery_spec.equ_ref_volts
+  self.start_sec = self.sec
+
+Tick as e /
+  if e.sec - self.start_sec &gt; \
+     self.battery_spec.equ_timeout_sec:
+  self.post_fifo(Event(signal=signals.To_Float))
+	  
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
