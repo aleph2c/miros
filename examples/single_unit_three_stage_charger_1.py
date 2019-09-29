@@ -355,13 +355,15 @@ class Charger(ChargerParameters, CustomFactory):
         reference=50.0,
         kp=0.5,
         ki=0.03,
-        kd=0.04)
+        kd=0.04
+      )
 
       v_control = VoltageControlSystem(
         reference=12.0,
         kp=0.5,
         ki=0.02,
-        kd=0.005)
+        kd=0.005
+      )
 
       battery_spec = BatterySpecificationSettings(
         bulk_timeout_sec=700,
@@ -373,7 +375,8 @@ class Charger(ChargerParameters, CustomFactory):
         bulk_ref_amps=240,
         float_ref_volts=24.0,
         abs_ref_volts=28.0,
-        equ_ref_volts=30.0)
+        equ_ref_volts=30.0
+      )
     else:
       c_control = charger_params.c_control
       v_control = charger_params.v_control
@@ -384,7 +387,8 @@ class Charger(ChargerParameters, CustomFactory):
         v_control=v_control,
         battery_spec=battery_spec,
         live_trace=live_trace,
-        live_spy=live_spy)
+        live_spy=live_spy
+    )
 
   def sample_current(self):
     pass
@@ -393,19 +397,24 @@ class Charger(ChargerParameters, CustomFactory):
     pass
 
 if __name__ == '__main__':
-  
+ 
+  # current control system
   ccs = CurrentControlSystem(
     reference=50.0,  # 50 amps
     kp=0.5,
     ki=0.03,
-    kd=0.04)
+    kd=0.04
+  )
 
+  # voltage control system
   vcs = VoltageControlSystem(
     reference=12.0, # 12 volts
     kp=0.4,
     ki=0.02,
-    kd=0.005)
+    kd=0.005
+  )
 
+  # battery specification
   battery_spec = BatterySpecificationSettings(
     bulk_timeout_sec=700,
     abs_timeout_sec=900,
@@ -416,14 +425,19 @@ if __name__ == '__main__':
     bulk_ref_amps=240,
     float_ref_volts=24.0,
     abs_ref_volts=28.0,
-    equ_ref_volts=30.0)
+    equ_ref_volts=30.0
+  )
 
+  # aggregated charger paramters
   charger_params = ChargerParameters(
     c_control=ccs,
     v_control=vcs,
-    battery_spec=battery_spec)
+    battery_spec=battery_spec
+  )
 
+  # the charger data and behavior
   three_stage_charger = Charger(
     name='charger',
     charger_params=charger_params,
-    live_trace=True)
+    live_trace=True
+  )
