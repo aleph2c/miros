@@ -297,13 +297,14 @@ class ChargerParameters(ThreadSafeAttributes):
     self.v_control = v_control
     self.battery_spec = battery_spec
 
-class CustomFactory(Factory, ThreadSafeAttributes):
-  def __init__(self, name, *, log_file=None, live_trace=None, live_spy=None):
-    super().__init__(name)
+class LoggedBehavior(Factory):
+  def __init__(self, name, log_file=None, live_trace=None, live_spy=None, **kwargs):
+    super().__init__(name, *kwargs)
     self.live_trace = False if live_trace == None else live_trace
     self.live_spy = False if live_spy == None else live_spy
     self.log_file = 'single_unit_three_stage_charger_2.log' if log_file == None else log_file
 
+    # clear our old log file
     with open(self.log_file, "w") as fp:
       fp.write("")
 
@@ -326,7 +327,7 @@ class CustomFactory(Factory, ThreadSafeAttributes):
 
 SecInCharge = namedtuple('SecInCharge', ['sec'])
 
-class Charger(ChargerParameters, CustomFactory):
+class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
 
   # The charger will be multithreaded, provide simple locks around data accesses
   # to these attributes
@@ -346,13 +347,16 @@ class Charger(ChargerParameters, CustomFactory):
     the reference and turning parameters of these controllers will be accessible
     to this python code via SWIG.
 
-    To understand this class reference
+    To understand this class reference:
     
       1) the three stage charging electrical profile drawing:
+        `link <https://aleph2c.github.io/miros/_static/three_stage_charging_chart_4_graph.pdf>`_
 
       2) the three stage charging data architecture drawing:
+        `link <https://aleph2c.github.io/miros/_static/three_stage_charging_chart_4_data.pdf>`_
 
       3) the three stage charging state chart drawing:
+        `link <https://aleph2c.github.io/miros/_static/three_stage_charging_chart_4_chart.pdf>`_
 
     **Args**:
        | ``name`` (str): name of the charging state chart
