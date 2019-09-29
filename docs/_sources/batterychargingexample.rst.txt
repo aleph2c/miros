@@ -663,17 +663,22 @@ model:
     :target: _static/three_stage_charging_chart_4_data.pdf
     :align: center
 
-.. code-block:: python
-  :emphasize-lines: 1
-  :linenos:
-  
-  place code here
+The code to make this model can be found `here
+<https://github.com/aleph2c/miros/blob/master/examples/single_unit_three_stage_charger_1.py>`_
 
-.. code-block:: python
-  :emphasize-lines: 1
-  :linenos:
-  
-  place code here
+It would be simple enough to adjust our code to use a SQL database, or an
+object-relational-mapper, like `SQLAlchemy <https://www.sqlalchemy.org>`_ to
+track the different types of battery specifications.  For now we will leave our
+model as Python code, but if you had a lot of different battery types, you might
+want to keep them in a database.
+
+Next, let's write the statechart:
+
+.. image:: _static/three_stage_charging_chart_4_chart.svg
+    :target: _static/three_stage_charging_chart_4_chart.pdf
+    :align: center
+
+
 
 ..
    I don't know about you, but I'm starting to feel like I have been drinking from

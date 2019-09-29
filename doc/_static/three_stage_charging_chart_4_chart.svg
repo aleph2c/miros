@@ -71,7 +71,7 @@
       /><text x="5" font-size="13px" y="37.0938" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >entry /</text
       ><text x="5" font-size="13px" y="52.1406" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >  self.control.reference =</text
+      >  self.control.reference = \</text
       ><text x="5" font-size="13px" y="67.1875" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >    self.battery_spec.equ_ref_volts</text
       ><text x="5" font-size="13px" y="82.2344" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
@@ -81,10 +81,12 @@
       ><text x="5" font-size="13px" y="127.375" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >  if e.payload.sec - self.start_sec &gt; \</text
       ><text x="5" font-size="13px" y="142.4219" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >     self.battery_spec.equ_timeout_sec:</text
+      >    self.battery_spec.equ_timeout_sec:</text
       ><text x="5" font-size="13px" y="157.4688" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >  self.post_fifo(Event(signal=signals.To_Float))</text
+      >     </text
       ><text x="5" font-size="13px" y="172.5156" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+      >    self.post_fifo(Event(signal=signals.To_Float))</text
+      ><text x="5" font-size="13px" y="187.5625" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >	  </text
     ></g
     ><g fill="rgb(255,255,255)" fill-opacity="0" transform="translate(670,470)" stroke-opacity="0" stroke="rgb(255,255,255)"
@@ -115,7 +117,7 @@
       /><text x="5" font-size="13px" y="37.0938" clip-path="url(#clipPath4)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >entry /</text
       ><text x="5" font-size="13px" y="52.1406" clip-path="url(#clipPath4)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >  self.control.reference =</text
+      >  self.control.reference = \</text
       ><text x="5" font-size="13px" y="67.1875" clip-path="url(#clipPath4)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >    self.battery_spec.abs_ref_volts</text
       ><text x="5" font-size="13px" y="82.2344" clip-path="url(#clipPath4)" font-family="sans-serif" stroke="none" xml:space="preserve"
@@ -125,13 +127,13 @@
       ><text x="5" font-size="13px" y="127.375" clip-path="url(#clipPath4)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >  if e.payload.sec - self.start_sec &gt; \</text
       ><text x="5" font-size="13px" y="142.4219" clip-path="url(#clipPath4)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >     self.battery_spec.abs_timeout_sec or</text
+      >    self.battery_spec.abs_timeout_sec or</text
       ><text x="5" font-size="13px" y="157.4688" clip-path="url(#clipPath4)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >     self.amps &gt; self.battery_spec.abs_exit_amps:</text
+      >    self.amps &gt; self.battery_spec.abs_exit_amps:</text
       ><text x="5" font-size="13px" y="172.5156" clip-path="url(#clipPath4)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >     </text
       ><text x="5" font-size="13px" y="187.5625" clip-path="url(#clipPath4)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >  self.post_fifo(Event(signal=signals.To_Float))</text
+      >    self.post_fifo(Event(signal=signals.To_Float))</text
       ><text x="5" font-size="13px" y="202.6094" clip-path="url(#clipPath4)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >	  </text
     ></g
@@ -146,7 +148,7 @@
       /><text x="5" font-size="13px" y="37.0938" clip-path="url(#clipPath5)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >entry /</text
       ><text x="5" font-size="13px" y="52.1406" clip-path="url(#clipPath5)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >  self.control.reference =</text
+      >  self.control.reference = \</text
       ><text x="5" font-size="13px" y="67.1875" clip-path="url(#clipPath5)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >    self.battery_spec.bulk_ref_amps</text
       ><text x="5" font-size="13px" y="82.2344" clip-path="url(#clipPath5)" font-family="sans-serif" stroke="none" xml:space="preserve"
@@ -158,13 +160,13 @@
       ><text x="5" font-size="13px" y="157.4688" clip-path="url(#clipPath5)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >  if e.payload.sec - self.start_sec &gt; \</text
       ><text x="5" font-size="13px" y="172.5156" clip-path="url(#clipPath5)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >     self.battery_spec.bulk_timeout_sec or</text
+      >    self.battery_spec.bulk_timeout_sec or</text
       ><text x="5" font-size="13px" y="187.5625" clip-path="url(#clipPath5)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >     self.volt &gt; self.battery_spec.bulk_exit_volts:</text
+      >    self.volt &gt; self.battery_spec.bulk_exit_volts:</text
       ><text x="5" font-size="13px" y="202.6094" clip-path="url(#clipPath5)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >     </text
       ><text x="5" font-size="13px" y="217.6562" clip-path="url(#clipPath5)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >  self.post_fifo(Event(signal=signals.To_Abs))</text
+      >    self.post_fifo(Event(signal=signals.To_Abs))</text
       ><text x="5" font-size="13px" y="232.7031" clip-path="url(#clipPath5)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >	  </text
     ></g
@@ -293,13 +295,13 @@
       ><text x="5" font-size="13px" y="67.1875" clip-path="url(#clipPath10)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >  # start our repeating events</text
       ><text x="5" font-size="13px" y="82.2344" clip-path="url(#clipPath10)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >  self.post_fifo(Event(signal=signals.Pulse, </text
+      >  self.post_fifo(Event(signal=signals.Pulse), </text
       ><text x="5" font-size="13px" y="97.2812" clip-path="url(#clipPath10)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >     deferred=True, </text
       ><text x="5" font-size="13px" y="112.3281" clip-path="url(#clipPath10)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >     period=period,</text
+      >     period=self.pulse_sec,</text
       ><text x="5" font-size="13px" y="127.375" clip-path="url(#clipPath10)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >     times=0))</text
+      >     times=0)</text
       ><text x="5" font-size="13px" y="142.4219" clip-path="url(#clipPath10)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >  </text
       ><text x="5" font-size="13px" y="157.4688" clip-path="url(#clipPath10)" font-family="sans-serif" stroke="none" xml:space="preserve"
@@ -317,7 +319,7 @@
       ><text x="5" font-size="13px" y="247.75" clip-path="url(#clipPath10)" font-family="sans-serif" stroke="none" xml:space="preserve"
       > self.post_fifo(Event(signal=signals.Tick,</text
       ><text x="5" font-size="13px" y="262.7969" clip-path="url(#clipPath10)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >   payload=SecInCharge(sec=self.sec))</text
+      >   payload=SecInCharge(sec=self.sec)))</text
       ><text x="5" font-size="13px" y="292.8906" clip-path="url(#clipPath10)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >exit /</text
       ><text x="5" font-size="13px" y="307.9375" clip-path="url(#clipPath10)" font-family="sans-serif" stroke="none" xml:space="preserve"

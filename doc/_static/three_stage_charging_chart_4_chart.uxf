@@ -14,10 +14,10 @@
 entry /
   self.sec = 0
   # start our repeating events
-  self.post_fifo(Event(signal=signals.Pulse, 
+  self.post_fifo(Event(signal=signals.Pulse), 
      deferred=True, 
-     period=period,
-     times=0))
+     period=self.pulse_sec,
+     times=0)
   
 Pulse /
  self.amps = sample_current()
@@ -26,7 +26,7 @@ Pulse /
     self.post_fifo(Event(signals=signal.To_Bulk)
  self.sec += self.pulse_sec
  self.post_fifo(Event(signal=signals.Tick,
-   payload=SecInCharge(sec=self.sec))
+   payload=SecInCharge(sec=self.sec)))
 
 exit /
   self.cancel_events(
@@ -352,7 +352,7 @@ layer=2</panel_attributes>
     <panel_attributes>*bulk*
 --
 entry /
-  self.control.reference =
+  self.control.reference = \
     self.battery_spec.bulk_ref_amps
   self.start_sec = self.sec
 
@@ -360,10 +360,10 @@ To_Bulk / {}
 
 Tick as e /
   if e.payload.sec - self.start_sec &gt; \
-     self.battery_spec.bulk_timeout_sec or
-     self.volt &gt; self.battery_spec.bulk_exit_volts:
+    self.battery_spec.bulk_timeout_sec or
+    self.volt &gt; self.battery_spec.bulk_exit_volts:
      
-  self.post_fifo(Event(signal=signals.To_Abs))
+    self.post_fifo(Event(signal=signals.To_Abs))
 	  
 valign=top
 layer=2
@@ -381,16 +381,16 @@ layer=2
     <panel_attributes>*absorption*
 --
 entry /
-  self.control.reference =
+  self.control.reference = \
     self.battery_spec.abs_ref_volts
   self.start_sec = self.sec
 
 Tick as e /
   if e.payload.sec - self.start_sec &gt; \
-     self.battery_spec.abs_timeout_sec or
-     self.amps &gt; self.battery_spec.abs_exit_amps:
+    self.battery_spec.abs_timeout_sec or
+    self.amps &gt; self.battery_spec.abs_exit_amps:
      
-  self.post_fifo(Event(signal=signals.To_Float))
+    self.post_fifo(Event(signal=signals.To_Float))
 	  
 valign=top
 layer=2
@@ -427,14 +427,15 @@ layer=2
     <panel_attributes>*equalize*
 --
 entry /
-  self.control.reference =
+  self.control.reference = \
     self.battery_spec.equ_ref_volts
   self.start_sec = self.sec
 
 Tick as e /
   if e.payload.sec - self.start_sec &gt; \
-     self.battery_spec.equ_timeout_sec:
-  self.post_fifo(Event(signal=signals.To_Float))
+    self.battery_spec.equ_timeout_sec:
+     
+    self.post_fifo(Event(signal=signals.To_Float))
 	  
 valign=top
 layer=2
