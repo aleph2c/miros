@@ -223,6 +223,7 @@ relatively cheap and easy to work with and install.</p>
 to figure out what all of the values and time-outs mean.  They really don’t
 care, we need to eat this complexity on their behalf, especially if we are
 expecting them to buy a bunch of our products for a single installation.</p>
+<hr class="docutils" />
 <p>Often the hardest thing to do on a project is to pack knowledge into a
 specification (spec).  The specification should be simple and full of pictures,
 if it isn’t nobody will look a it, and nobody will change it to match what the
@@ -390,6 +391,7 @@ code into the <code class="docutils literal notranslate"><span class="pre">Charg
 data attaches to the behavior here.  The “here” in this case is the “charging
 state” which will be described somewhere else.  He looks confused, and says,
 <span class="new-spec">I guess you will have to show me when you make it.</span></p>
+<hr class="docutils" />
 <p>The data model seems good enough so let’s start designing the system behavior.
 We need to start programming time, so we will construct three heart beats,
 something that will sample the current, something that will sample the voltage
@@ -610,6 +612,441 @@ want to keep them in a database.</p>
 <p>Next, let’s write the statechart:</p>
 <a class="reference external image-reference" href="_static/three_stage_charging_chart_4_chart.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_4_chart.svg" src="_images/three_stage_charging_chart_4_chart.svg" /></div>
 </a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Charger</span><span class="p">(</span><span class="n">ChargerParameters</span><span class="p">,</span> <span class="n">LoggedBehavior</span><span class="p">,</span> <span class="n">ThreadSafeAttributes</span><span class="p">):</span>
+
+  <span class="c1"># The charger will be multithreaded, provide simple locks around data</span>
+  <span class="c1"># accesses to these attributes</span>
+  <span class="n">_attributes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;amps&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;volts&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sec&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;control&#39;</span><span class="p">,</span>
+  <span class="p">]</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">charger_params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pulse_sec</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Three stage battery charger feature management</span>
+
+<span class="sd">    This class will manage the data and the behavior of our three stage</span>
+<span class="sd">    battery charger.  The control systems used by the charge will be</span>
+<span class="sd">    written in c, but the reference and turning parameters of these</span>
+<span class="sd">    controllers will be accessible to this python code via SWIG.</span>
+
+<span class="sd">    To understand this class reference:</span>
+
+<span class="sd">      1) the three stage charging electrical profile drawing:</span>
+
+<span class="sd">      2) the three stage charging data architecture drawing:</span>
+
+<span class="sd">      3) the three stage charging state chart drawing:</span>
+
+<span class="sd">    **Args**:</span>
+<span class="sd">       | ``name`` (str): name of the charging state chart</span>
+<span class="sd">       | ``charger_params=None`` (ChargerParameters):</span>
+<span class="sd">       |                           parameters/controller</span>
+<span class="sd">       |                           needed by charger</span>
+<span class="sd">       | ``live_trace=None(bool)``: enable live_trace feature?</span>
+<span class="sd">       | ``live_spy=None(bool)``: enable live_spy feature?</span>
+<span class="sd">       | ``pulse_sec=None``(float): how often to same current/voltage</span>
+<span class="sd">       |                            and make decisions about</span>
+<span class="sd">       |                            state changes</span>
+
+<span class="sd">    **Example(s)**:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">      ccs = CurrentControlSystem(# ...)</span>
+<span class="sd">      vcs = VoltageControlSystem(# ...)</span>
+<span class="sd">      battery_spec = BatterySpecificationSettings(# ...)</span>
+<span class="sd">      charge_params = ChargerParameters(</span>
+<span class="sd">        c_control=ccs,</span>
+<span class="sd">        v_control=vcs,</span>
+<span class="sd">        battery_spec=battery_spec)</span>
+
+<span class="sd">      three_stage_charger = Charger(</span>
+<span class="sd">        &#39;charger&#39;,</span>
+<span class="sd">        charger_params=charger_params,</span>
+<span class="sd">        live_trace=True)</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pulse_sec</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="k">if</span> <span class="n">pulse_sec</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">pulse_sec</span>
+    <span class="n">c_control</span> <span class="o">=</span> <span class="n">charger_params</span><span class="o">.</span><span class="n">c_control</span>
+    <span class="n">v_control</span> <span class="o">=</span> <span class="n">charger_params</span><span class="o">.</span><span class="n">v_control</span>
+    <span class="n">battery_spec</span> <span class="o">=</span> <span class="n">charger_params</span><span class="o">.</span><span class="n">battery_spec</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+      <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+      <span class="n">live_trace</span><span class="o">=</span><span class="n">live_trace</span><span class="p">,</span>
+      <span class="n">live_spy</span><span class="o">=</span><span class="n">live_spy</span><span class="p">,</span>
+      <span class="n">c_control</span><span class="o">=</span><span class="n">c_control</span><span class="p">,</span>
+      <span class="n">v_control</span><span class="o">=</span><span class="n">v_control</span><span class="p">,</span>
+      <span class="n">battery_spec</span><span class="o">=</span><span class="n">battery_spec</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">charging</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;charging&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging_init_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Pulse</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging_pulse</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">To_Bulk</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging_to_bulk</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Force_Bulk</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging_force_bulk</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">To_Abs</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging_to_abs</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Force_Abs</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging_force_abs</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">To_Float</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging_to_float</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Force_Float</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging_force_float</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Force_Equ</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging_force_equ</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging_exit_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">constant_current_control</span> <span class="o">=</span> \
+      <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;constant_current_control&quot;</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+          <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_current_control_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">constant_voltage_control</span> <span class="o">=</span> \
+      <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;constant_voltage_control&quot;</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY</span><span class="p">,</span>
+          <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">contant_voltage_control_entry</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">bulk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;bulk&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bulk_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">To_Bulk</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bulk_to_bulk</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Tick</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bulk_tick</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">absorption</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;absorption&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">absorption_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Tick</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">absorption_tick</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">float_entry</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">equalize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;equalize&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">equalize_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Tick</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">equalize_tick</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">charging</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_current_control</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_voltage_control</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bulk</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_current_control</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">absorption</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_voltage_control</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_voltage_control</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">equalize</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_voltage_control</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">charging</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">charging_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sec</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Pulse</span><span class="p">),</span>
+      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+      <span class="n">period</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pulse_sec</span><span class="p">,</span>
+      <span class="n">times</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">charging_init_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_current_control</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">charging_pulse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">amps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_current</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">volts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_voltage</span><span class="p">()</span>
+    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">volts</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">battery_spec</span><span class="o">.</span><span class="n">bulk_entry_volts</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">To_Bulk</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sec</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pulse_sec</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Tick</span><span class="p">,</span>
+      <span class="n">payload</span><span class="o">=</span><span class="n">SecInCharge</span><span class="p">(</span><span class="n">sec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sec</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">charging_to_bulk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bulk</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">charging_force_bulk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bulk</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">charging_to_abs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">absorption</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">charging_force_abs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">absorption</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">charging_to_float</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">charging_force_float</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">charging_force_equ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">equalize</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">charging_exit_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Pulse</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">constant_current_control_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_control</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">contant_voltage_control_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_voltage</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">bulk_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">referece</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">battery_spec</span><span class="o">.</span><span class="n">bulk_ref_amps</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">start_sec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sec</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">bulk_to_bulk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">bulk_tick</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">sec</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_sec</span> <span class="o">&gt;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">battery_spec</span><span class="o">.</span><span class="n">bulk_timeout_sec</span> <span class="ow">or</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">volts</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">battery_spec</span><span class="o">.</span><span class="n">bulk_exit_volts</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">To_Abs</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">absorption_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> \
+      <span class="bp">self</span><span class="o">.</span><span class="n">battery_spec</span><span class="o">.</span><span class="n">abs_ref_volts</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">start_sec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sec</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">absorption_tick</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">sec</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_sec</span> <span class="o">&gt;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">battery_spec</span><span class="o">.</span><span class="n">abs_timeout_sec</span> <span class="ow">or</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">amps</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">battery_spec</span><span class="o">.</span><span class="n">abs_exit_amps</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">To_Float</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">float_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">battery_spec</span><span class="o">.</span><span class="n">float_ref_volts</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">equalize_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> \
+      <span class="bp">self</span><span class="o">.</span><span class="n">battery_spec</span><span class="o">.</span><span class="n">equ_ref_volts</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">start_sec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sec</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">equalize_tick</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">sec</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_sec</span> <span class="o">&gt;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">battery_spec</span><span class="o">.</span><span class="n">equ_timeout_sec</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">To_Float</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">sample_current</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;return 20 amps&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="mi">20</span>
+
+  <span class="k">def</span> <span class="nf">sample_voltage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;return 12 volts&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="mi">12</span>
+</pre></div>
+</div>
+<p>You can see the full code listing <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/single_unit_three_stage_charger_2.py">here</a>.</p>
+<p>Before we continue, let’s tune the trace and spy instrumentation to write to a
+log file.  We will do this by writing a <code class="docutils literal notranslate"><span class="pre">LoggedBehavior</span></code> class which forces
+the trace and spy to write to a log file called “single_unit_three_stage_charger.log”.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LoggedBehavior</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">,</span>
+    <span class="n">log_file</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> \
+      <span class="k">else</span> <span class="n">live_trace</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> \
+      <span class="k">else</span> <span class="n">live_spy</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span> <span class="o">=</span> <span class="s1">&#39;single_unit_three_stage_charger.log&#39;</span> \
+      <span class="k">if</span> <span class="n">log_file</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">log_file</span>
+
+    <span class="c1"># clear our old log file</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+      <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+      <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+      <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">,</span>
+      <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">register_live_spy_callback</span><span class="p">(</span>
+      <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spy_callback</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">register_live_trace_callback</span><span class="p">(</span>
+      <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace_callback</span><span class="p">)</span>
+    <span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">trace_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;trace without datetimestamp&#39;&#39;&#39;</span>
+    <span class="n">trace_without_datetime</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\[.+\]) (\[.+\].+)&#39;</span><span class="p">,</span> <span class="n">trace</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;T: &quot;</span> <span class="o">+</span> <span class="n">trace_without_datetime</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spy</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;spy with machine name pre-pending&#39;&#39;&#39;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>To see the behavior of the chart we need to setup a data model, then create
+the statechart.  We will do this at the bottom of the <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/single_unit_three_stage_charger_2.py">file</a>
+so it’s easy to test.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+  <span class="c1"># current control system</span>
+  <span class="n">ccs</span> <span class="o">=</span> <span class="n">CurrentControlSystem</span><span class="p">(</span>
+    <span class="n">reference</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span>  <span class="c1"># 50 amps</span>
+    <span class="n">kp</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">ki</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span>
+    <span class="n">kd</span><span class="o">=</span><span class="mf">0.04</span>
+  <span class="p">)</span>
+
+  <span class="c1"># voltage control system</span>
+  <span class="n">vcs</span> <span class="o">=</span> <span class="n">VoltageControlSystem</span><span class="p">(</span>
+    <span class="n">reference</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span> <span class="c1"># 12 volts</span>
+    <span class="n">kp</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+    <span class="n">ki</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
+    <span class="n">kd</span><span class="o">=</span><span class="mf">0.005</span>
+  <span class="p">)</span>
+
+  <span class="c1"># battery specification</span>
+  <span class="n">battery_spec</span> <span class="o">=</span> <span class="n">BatterySpecificationSettings</span><span class="p">(</span>
+    <span class="n">bulk_timeout_sec</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span>
+    <span class="n">abs_timeout_sec</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span>
+    <span class="n">equ_timeout_sec</span><span class="o">=</span><span class="mi">86400</span><span class="p">,</span>
+    <span class="n">bulk_entry_volts</span><span class="o">=</span><span class="mf">18.0</span><span class="p">,</span>
+    <span class="n">bulk_exit_volts</span><span class="o">=</span><span class="mf">28.0</span><span class="p">,</span>
+    <span class="n">abs_exit_amps</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+    <span class="n">bulk_ref_amps</span><span class="o">=</span><span class="mi">240</span><span class="p">,</span>
+    <span class="n">float_ref_volts</span><span class="o">=</span><span class="mf">24.0</span><span class="p">,</span>
+    <span class="n">abs_ref_volts</span><span class="o">=</span><span class="mf">28.0</span><span class="p">,</span>
+    <span class="n">equ_ref_volts</span><span class="o">=</span><span class="mf">30.0</span>
+  <span class="p">)</span>
+
+  <span class="c1"># aggregated charger paramters</span>
+  <span class="n">charger_params</span> <span class="o">=</span> <span class="n">ChargerParameters</span><span class="p">(</span>
+    <span class="n">c_control</span><span class="o">=</span><span class="n">ccs</span><span class="p">,</span>
+    <span class="n">v_control</span><span class="o">=</span><span class="n">vcs</span><span class="p">,</span>
+    <span class="n">battery_spec</span><span class="o">=</span><span class="n">battery_spec</span>
+  <span class="p">)</span>
+
+  <span class="c1"># the charger data and behavior</span>
+  <span class="n">three_stage_charger</span> <span class="o">=</span> <span class="n">Charger</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;charger&#39;</span><span class="p">,</span>
+    <span class="n">charger_params</span><span class="o">=</span><span class="n">charger_params</span><span class="p">,</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+  <span class="p">)</span>
+
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When we run this <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/single_unit_three_stage_charger_2.py">code</a>
+it will write our custom <code class="docutils literal notranslate"><span class="pre">spy</span></code> and <code class="docutils literal notranslate"><span class="pre">trace</span></code> output to the log file.</p>
+<p>To view the results, you can <cite>cat</cite> and grep for the <code class="docutils literal notranslate"><span class="pre">trace</span></code> log:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cat <span class="s1">&#39;single_unit_three_stage_charger.log&#39;</span> <span class="p">|</span> grep T:
+<span class="m">19</span>:54:21,801 DEBUG:T: <span class="o">[</span>charger<span class="o">]</span> e-&gt;start_at<span class="o">()</span> top-&gt;constant_current_control
+<span class="m">19</span>:54:22,304 DEBUG:T: <span class="o">[</span>charger<span class="o">]</span> e-&gt;To_Bulk<span class="o">()</span> constant_current_control-&gt;bulk
+</pre></div>
+</div>
+<p>Or view the <code class="docutils literal notranslate"><span class="pre">spy</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cat <span class="s1">&#39;single_unit_three_stage_charger.log&#39;</span> <span class="p">|</span> grep S:
+.
+.
+.
+<span class="m">19</span>:56:38,706 DEBUG:S: <span class="o">[</span>charger<span class="o">]</span> &lt;- Queued:<span class="o">(</span><span class="m">0</span><span class="o">)</span> Deferred:<span class="o">(</span><span class="m">0</span><span class="o">)</span>
+<span class="m">19</span>:56:39,204 DEBUG:S: <span class="o">[</span>charger<span class="o">]</span> Pulse:bulk
+<span class="m">19</span>:56:39,204 DEBUG:S: <span class="o">[</span>charger<span class="o">]</span> Pulse:constant_current_control
+<span class="m">19</span>:56:39,205 DEBUG:S: <span class="o">[</span>charger<span class="o">]</span> Pulse:charging
+<span class="m">19</span>:56:39,205 DEBUG:S: <span class="o">[</span>charger<span class="o">]</span> POST_FIFO:To_Bulk
+<span class="m">19</span>:56:39,205 DEBUG:S: <span class="o">[</span>charger<span class="o">]</span> POST_FIFO:Tick
+<span class="m">19</span>:56:39,205 DEBUG:S: <span class="o">[</span>charger<span class="o">]</span> Pulse:charging:HOOK
+<span class="m">19</span>:56:39,205 DEBUG:S: <span class="o">[</span>charger<span class="o">]</span> &lt;- Queued:<span class="o">(</span><span class="m">2</span><span class="o">)</span> Deferred:<span class="o">(</span><span class="m">0</span><span class="o">)</span>
+<span class="m">19</span>:56:39,206 DEBUG:S: <span class="o">[</span>charger<span class="o">]</span> To_Bulk:bulk
+<span class="m">19</span>:56:39,206 DEBUG:S: <span class="o">[</span>charger<span class="o">]</span> To_Bulk:bulk:HOOK
+<span class="m">19</span>:56:39,206 DEBUG:S: <span class="o">[</span>charger<span class="o">]</span> &lt;- Queued:<span class="o">(</span><span class="m">1</span><span class="o">)</span> Deferred:<span class="o">(</span><span class="m">0</span><span class="o">)</span>
+<span class="m">19</span>:56:39,207 DEBUG:S: <span class="o">[</span>charger<span class="o">]</span> Tick:bulk
+<span class="m">19</span>:56:39,207 DEBUG:S: <span class="o">[</span>charger<span class="o">]</span> Tick:bulk:HOOK
+<span class="m">19</span>:56:39,207 DEBUG:S: <span class="o">[</span>charger<span class="o">]</span> &lt;- Queued:<span class="o">(</span><span class="m">0</span><span class="o">)</span> Deferred:<span class="o">(</span><span class="m">0</span><span class="o">)</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+<p>Our electrical engineer comes up to us, <span class="new-spec">How is it going?</span>, you
+answer, “No plan ever survives first contact with the enemy.”</p>
+<p><span class="new-spec">That well hey?</span> “It’s going well enough, I have the data model
+and statechart written, I can see that it might be working, and I only had
+to change a few things in the design do get it there.  Now I have to figure
+out how to test it.”</p>
+<p><span class="new-spec">Any ideas?</span>.  “I would like to feed in a graph or a CSV file,
+and have the statechart respond to the graph.  I would have to instrument
+it in such a way that the statechart’s log output would be easy to
+interpret next to the graph.”</p>
+<p><span class="new-spec">If you figure that out, I would like to use it too.  That’s the
+nice thing about software, it’s so gullible, it’s so easy to lie to
+software eh?</span>  You look at him for a while, and say, “yeah, I guess you are
+right, maybe I could mock it out using dependency injection via subclassing
+or something like that”.  <span class="new-spec">Why do you software guys always invent
+these complicated names for things?</span>  You think for a while and surprise
+him with an answer, “I think it happens because we try to keep everything
+as general as possible, and we aren’t that creative about naming, because
+naming isn’t the thing we think is important at the time, we are usually
+trying to solve a specific problem when we come up with the name.  So you
+think of something, and the first idea is usually bad, but you don’t care
+and you move on.  Then that name sticks and everyone else has to endure
+your shitty name.  Nobody has control of the language once it is released
+to the public, so the language just lingers around like a bad smell.” He
+laughs and says, <span class="new-spec">Well at least you aren’t using Latin.</span></p>
+<p><span class="new-spec">Why don’t you just add your testing design into the spec, this
+stuff you have written needs to work, or you could burn down someone’s
+house eh?  No pressure, eh?  Just add it to the spec, then make it happen.</span></p>
+<hr class="docutils" />
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
 </div>

@@ -197,6 +197,8 @@ to figure out what all of the values and time-outs mean.  They really don't
 care, we need to eat this complexity on their behalf, especially if we are
 expecting them to buy a bunch of our products for a single installation.
 
+----
+
 Often the hardest thing to do on a project is to pack knowledge into a
 specification (spec).  The specification should be simple and full of pictures,
 if it isn't nobody will look a it, and nobody will change it to match what the
@@ -395,6 +397,8 @@ code into the ``Charger`` class.  The ball is just short hand for saying the
 data attaches to the behavior here.  The "here" in this case is the "charging
 state" which will be described somewhere else.  He looks confused, and says,
 :new_spec:`I guess you will have to show me when you make it.`
+
+----
 
 The data model seems good enough so let's start designing the system behavior.
 We need to start programming time, so we will construct three heart beats,
@@ -677,6 +681,462 @@ Next, let's write the statechart:
 .. image:: _static/three_stage_charging_chart_4_chart.svg
     :target: _static/three_stage_charging_chart_4_chart.pdf
     :align: center
+
+.. code-block:: python
+  
+   class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
+
+     # The charger will be multithreaded, provide simple locks around data
+     # accesses to these attributes
+     _attributes = [
+       'amps',
+       'volts',
+       'sec',
+       'control',
+     ]
+
+     def __init__(self, name=None, charger_params=None, live_trace=None,
+         live_spy=None, pulse_sec=None):
+       '''Three stage battery charger feature management
+
+       This class will manage the data and the behavior of our three stage
+       battery charger.  The control systems used by the charge will be
+       written in c, but the reference and turning parameters of these
+       controllers will be accessible to this python code via SWIG.
+
+       To understand this class reference:
+       
+         1) the three stage charging electrical profile drawing:
+
+         2) the three stage charging data architecture drawing:
+
+         3) the three stage charging state chart drawing:
+
+       **Args**:
+          | ``name`` (str): name of the charging state chart
+          | ``charger_params=None`` (ChargerParameters):
+          |                           parameters/controller
+          |                           needed by charger
+          | ``live_trace=None(bool)``: enable live_trace feature?
+          | ``live_spy=None(bool)``: enable live_spy feature?
+          | ``pulse_sec=None``(float): how often to same current/voltage
+          |                            and make decisions about
+          |                            state changes
+
+       **Example(s)**:
+         
+       .. code-block:: python
+        
+         ccs = CurrentControlSystem(# ...)
+         vcs = VoltageControlSystem(# ...)
+         battery_spec = BatterySpecificationSettings(# ...)
+         charge_params = ChargerParameters(
+           c_control=ccs,
+           v_control=vcs,
+           battery_spec=battery_spec)
+
+         three_stage_charger = Charger(
+           'charger',
+           charger_params=charger_params,
+           live_trace=True)
+
+       '''
+       self.pulse_sec = 0.5 if pulse_sec is None else pulse_sec
+       c_control = charger_params.c_control
+       v_control = charger_params.v_control
+       battery_spec = charger_params.battery_spec
+
+       super().__init__(
+         name=name, 
+         live_trace=live_trace,
+         live_spy=live_spy,
+         c_control=c_control, 
+         v_control=v_control,
+         battery_spec=battery_spec,
+       )
+
+       self.charging = self.create(state="charging"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.charging_entry_signal). \
+         catch(signal=signals.INIT_SIGNAL,
+           handler=self.charging_init_signal). \
+         catch(signal=signals.Pulse,
+           handler=self.charging_pulse). \
+         catch(signal=signals.To_Bulk,
+           handler=self.charging_to_bulk). \
+         catch(signal=signals.Force_Bulk,
+           handler=self.charging_force_bulk). \
+         catch(signal=signals.To_Abs,
+           handler=self.charging_to_abs). \
+         catch(signal=signals.Force_Abs,
+           handler=self.charging_force_abs). \
+         catch(signal=signals.To_Float,
+           handler=self.charging_to_float). \
+         catch(signal=signals.Force_Float,
+           handler=self.charging_force_float). \
+         catch(signal=signals.Force_Equ,
+           handler=self.charging_force_equ). \
+         catch(signal=signals.EXIT_SIGNAL,
+           handler=self.charging_exit_signal). \
+         to_method()
+
+       self.constant_current_control = \
+         self.create(state="constant_current_control"). \
+           catch(signal=signals.ENTRY_SIGNAL,
+             handler=self.constant_current_control_entry_signal). \
+         to_method()
+
+       self.constant_voltage_control = \
+         self.create(state="constant_voltage_control"). \
+           catch(signal=signals.ENTRY,
+             handler=self.contant_voltage_control_entry). \
+         to_method()
+
+       self.bulk = self.create(state="bulk"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.bulk_entry_signal). \
+         catch(signal=signals.To_Bulk,
+           handler=self.bulk_to_bulk). \
+         catch(signal=signals.Tick,
+           handler=self.bulk_tick). \
+         to_method()
+
+       self.absorption = self.create(state="absorption"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.absorption_entry_signal). \
+         catch(signal=signals.Tick,
+           handler=self.absorption_tick). \
+         to_method()
+
+       self.float = self.create(state="float"). \
+         catch(signal=signals.ENTRY,
+           handler=self.float_entry). \
+         to_method()
+
+       self.equalize = self.create(state="equalize"). \
+         catch(signal=signals.ENTRY_SIGNAL,
+           handler=self.equalize_entry_signal). \
+         catch(signal=signals.Tick,
+           handler=self.equalize_tick). \
+         to_method()
+
+       self.nest(self.charging, parent=None). \
+         nest(self.constant_current_control, parent=self.charging). \
+         nest(self.constant_voltage_control, parent=self.charging). \
+         nest(self.bulk, parent=self.constant_current_control). \
+         nest(self.absorption, parent=self.constant_voltage_control). \
+         nest(self.float, parent=self.constant_voltage_control). \
+         nest(self.equalize, parent=self.constant_voltage_control)
+
+       self.start_at(self.charging)
+
+     def charging_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.sec = 0
+       self.post_fifo(Event(signal=signals.Pulse),
+         deferred=True,
+         period=self.pulse_sec,
+         times=0)
+       return status
+
+     def charging_init_signal(self, e):
+       status = self.trans(self.constant_current_control)
+       return status
+
+     def charging_pulse(self, e):
+       status = return_status.HANDLED
+       self.amps = self.sample_current()
+       self.volts = self.sample_voltage()
+       if(self.volts < self.battery_spec.bulk_entry_volts):
+         self.post_fifo(Event(signal=signals.To_Bulk))
+       self.sec += self.pulse_sec
+       self.post_fifo(Event(signal=signals.Tick,
+         payload=SecInCharge(sec=self.sec)))
+       return status
+
+     def charging_to_bulk(self, e):
+       status = self.trans(self.bulk)
+       return status
+
+     def charging_force_bulk(self, e):
+       status = self.trans(self.bulk)
+       return status
+
+     def charging_to_abs(self, e):
+       status = self.trans(self.absorption)
+       return status
+
+     def charging_force_abs(self, e):
+       status = self.trans(self.absorption)
+       return status
+
+     def charging_to_float(self, e):
+       status = self.trans(self.float)
+       return status
+
+     def charging_force_float(self, e):
+       status = self.trans(self.float)
+       return status
+
+     def charging_force_equ(self, e):
+       status = self.trans(self.equalize)
+       return status
+
+     def charging_exit_signal(self, e):
+       status = return_status.HANDLED
+       self.cancel_events(Event(signal=signals.Pulse))
+       return status
+
+     def constant_current_control_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.control = self.c_control
+       return status
+
+     def contant_voltage_control_entry(self, e):
+       status = return_status.HANDLED
+       self.control = self.c_voltage
+       return status
+
+     def bulk_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.control.referece = self.battery_spec.bulk_ref_amps
+       self.start_sec = self.sec
+       return status
+
+     def bulk_to_bulk(self, e):
+       status = return_status.HANDLED
+       return status
+
+     def bulk_tick(self, e):
+       status = return_status.HANDLED
+       if(e.payload.sec - self.start_sec >
+         self.battery_spec.bulk_timeout_sec or 
+         self.volts > self.battery_spec.bulk_exit_volts):
+         self.post_fifo(Event(signal=signals.To_Abs))
+       return status
+
+     def absorption_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.control.reference = \
+         self.battery_spec.abs_ref_volts
+       self.start_sec = self.sec
+       return status
+
+     def absorption_tick(self, e):
+       status = return_status.HANDLED
+       if(e.payload.sec - self.start_sec > 
+         self.battery_spec.abs_timeout_sec or
+         self.amps > self.battery_spec.abs_exit_amps):
+         self.post_fifo(Event(signal=signals.To_Float))
+       return status
+
+     def float_entry(self, e):
+       status = return_status.HANDLED
+       self.control.reference = self.battery_spec.float_ref_volts
+       return status
+
+     def equalize_entry_signal(self, e):
+       status = return_status.HANDLED
+       self.control.reference = \
+         self.battery_spec.equ_ref_volts
+       self.start_sec = self.sec
+       return status
+
+     def equalize_tick(self, e):
+       status = return_status.HANDLED
+       if(e.payload.sec - self.start_sec > 
+         self.battery_spec.equ_timeout_sec):
+         self.post_fifo(Event(signal=signals.To_Float))
+       return status
+
+     def sample_current(self):
+       '''return 20 amps'''
+       return 20
+
+     def sample_voltage(self):
+       '''return 12 volts'''
+       return 12
+
+You can see the full code listing `here
+<https://github.com/aleph2c/miros/blob/master/examples/single_unit_three_stage_charger_2.py>`_.
+
+Before we continue, let's tune the trace and spy instrumentation to write to a
+log file.  We will do this by writing a ``LoggedBehavior`` class which forces
+the trace and spy to write to a log file called "single_unit_three_stage_charger.log".
+
+.. code-block:: python
+  
+   class LoggedBehavior(Factory):
+     def __init__(self, 
+       name,
+       log_file=None,
+       live_trace=None, 
+       live_spy=None, 
+       **kwargs):
+
+       super().__init__(name, *kwargs)
+
+       self.live_trace = False if live_trace == None \
+         else live_trace
+
+       self.live_spy = False if live_spy == None \
+         else live_spy
+
+       self.log_file = 'single_unit_three_stage_charger.log' \
+         if log_file == None else log_file
+
+       # clear our old log file
+       with open(self.log_file, "w") as fp:
+         fp.write("")
+
+       logging.basicConfig(
+         format='%(asctime)s %(levelname)s:%(message)s',
+         filename=self.log_file,
+         level=logging.DEBUG)
+
+       self.register_live_spy_callback(
+         partial(self.spy_callback)
+       )
+       self.register_live_trace_callback(
+         partial(self.trace_callback)
+       )
+
+     def trace_callback(self, trace):
+       '''trace without datetimestamp'''
+       trace_without_datetime = re.search(r'(\[.+\]) (\[.+\].+)', trace).group(2)
+       logging.debug("T: " + trace_without_datetime)
+
+     def spy_callback(self, spy):
+       '''spy with machine name pre-pending'''
+       logging.debug("S: [{}] {}".format(self.name, spy))
+
+To see the behavior of the chart we need to setup a data model, then create
+the statechart.  We will do this at the bottom of the `file
+<https://github.com/aleph2c/miros/blob/master/examples/single_unit_three_stage_charger_2.py>`_
+so it's easy to test.
+
+.. code-block:: python
+
+   if __name__ == '__main__':
+    
+     # current control system
+     ccs = CurrentControlSystem(
+       reference=50.0,  # 50 amps
+       kp=0.5,
+       ki=0.03,
+       kd=0.04
+     )
+
+     # voltage control system
+     vcs = VoltageControlSystem(
+       reference=12.0, # 12 volts
+       kp=0.4,
+       ki=0.02,
+       kd=0.005
+     )
+
+     # battery specification
+     battery_spec = BatterySpecificationSettings(
+       bulk_timeout_sec=700,
+       abs_timeout_sec=900,
+       equ_timeout_sec=86400,
+       bulk_entry_volts=18.0,
+       bulk_exit_volts=28.0,
+       abs_exit_amps=12,
+       bulk_ref_amps=240,
+       float_ref_volts=24.0,
+       abs_ref_volts=28.0,
+       equ_ref_volts=30.0
+     )
+
+     # aggregated charger paramters
+     charger_params = ChargerParameters(
+       c_control=ccs,
+       v_control=vcs,
+       battery_spec=battery_spec
+     )
+
+     # the charger data and behavior
+     three_stage_charger = Charger(
+       name='charger',
+       charger_params=charger_params,
+       live_trace=True,
+       live_spy=True,
+     )
+
+     time.sleep(10)
+
+When we run this `code
+<https://github.com/aleph2c/miros/blob/master/examples/single_unit_three_stage_charger_2.py>`_
+it will write our custom ``spy`` and ``trace`` output to the log file.
+  
+To view the results, you can `cat` and grep for the ``trace`` log:
+
+.. code-block:: bash
+  
+  cat 'single_unit_three_stage_charger.log' | grep T:
+  19:54:21,801 DEBUG:T: [charger] e->start_at() top->constant_current_control
+  19:54:22,304 DEBUG:T: [charger] e->To_Bulk() constant_current_control->bulk
+
+Or view the ``spy``:
+
+.. code-block:: bash
+  
+  cat 'single_unit_three_stage_charger.log' | grep S:
+  .
+  .
+  .
+  19:56:38,706 DEBUG:S: [charger] <- Queued:(0) Deferred:(0)
+  19:56:39,204 DEBUG:S: [charger] Pulse:bulk
+  19:56:39,204 DEBUG:S: [charger] Pulse:constant_current_control
+  19:56:39,205 DEBUG:S: [charger] Pulse:charging
+  19:56:39,205 DEBUG:S: [charger] POST_FIFO:To_Bulk
+  19:56:39,205 DEBUG:S: [charger] POST_FIFO:Tick
+  19:56:39,205 DEBUG:S: [charger] Pulse:charging:HOOK
+  19:56:39,205 DEBUG:S: [charger] <- Queued:(2) Deferred:(0)
+  19:56:39,206 DEBUG:S: [charger] To_Bulk:bulk
+  19:56:39,206 DEBUG:S: [charger] To_Bulk:bulk:HOOK
+  19:56:39,206 DEBUG:S: [charger] <- Queued:(1) Deferred:(0)
+  19:56:39,207 DEBUG:S: [charger] Tick:bulk
+  19:56:39,207 DEBUG:S: [charger] Tick:bulk:HOOK
+  19:56:39,207 DEBUG:S: [charger] <- Queued:(0) Deferred:(0)
+
+----
+
+Our electrical engineer comes up to us, :new_spec:`How is it going?`, you
+answer, "No plan ever survives first contact with the enemy."
+
+:new_spec:`That well hey?` "It's going well enough, I have the data model
+and statechart written, I can see that it might be working, and I only had
+to change a few things in the design do get it there.  Now I have to figure
+out how to test it."
+
+:new_spec:`Any ideas?`.  "I would like to feed in a graph or a CSV file,
+and have the statechart respond to the graph.  I would have to instrument
+it in such a way that the statechart's log output would be easy to
+interpret next to the graph."
+
+:new_spec:`If you figure that out, I would like to use it too.  That's the
+nice thing about software, it's so gullible, it's so easy to lie to
+software eh?`  You look at him for a while, and say, "yeah, I guess you are
+right, maybe I could mock it out using dependency injection via subclassing
+or something like that".  :new_spec:`Why do you software guys always invent
+these complicated names for things?`  You think for a while and surprise
+him with an answer, "I think it happens because we try to keep everything
+as general as possible, and we aren't that creative about naming, because
+naming isn't the thing we think is important at the time, we are usually
+trying to solve a specific problem when we come up with the name.  So you
+think of something, and the first idea is usually bad, but you don't care
+and you move on.  Then that name sticks and everyone else has to endure
+your shitty name.  Nobody has control of the language once it is released
+to the public, so the language just lingers around like a bad smell." He
+laughs and says, :new_spec:`Well at least you aren't using Latin.`
+
+:new_spec:`Why don't you just add your testing design into the spec, this
+stuff you have written needs to work, or you could burn down someone's
+house eh?  No pressure, eh?  Just add it to the spec, then make it happen.`
+
+----
 
 
 

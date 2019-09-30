@@ -1,4 +1,4 @@
-# single_unit_three_stage_charge_1.py
+# single_unit_three_stage_charge_2.py
 import re
 import time
 import logging
@@ -17,28 +17,33 @@ class ControlSystem:
 
     **Note**:
 
-       (If this was a real system we would SWIG in the c-code used to make the
-       control systems work, for now we just pretend this is going to happen so
-       that we can continue with our example).
+       (If this was a real system we would SWIG in the c-code used to make
+       the control systems work, for now we just pretend this is going to
+       happen so that we can continue with our example).
 
-       This class is intended to be subclassed.  At some point we will use it to
-       change the reference and control parameters of another control system
-       written in c, but SWIG'd into this code base. (we will do this once we
-       get the hardware)
+       This class is intended to be subclassed.  At some point we will use
+       it to change the reference and control parameters of another control
+       system written in c, but SWIG'd into this code base. (we will do
+       this once we get the hardware)
 
        The controller's parameters are wrapped within properties, it is our
-       intention to connect these property accesses (getting/setting) to c-code
-       which is running on the DSP at 20 Khz.  This Python code will govern the
-       parameters and the reference, but the c-code will actually run the
-       control systems, setting the output for a given input (which it will
-       read).
+       intention to connect these property accesses (getting/setting) to
+       c-code which is running on the DSP at 20 Khz.  This Python code will
+       govern the parameters and the reference, but the c-code will
+       actually run the control systems, setting the output for a given
+       input (which it will read).
 
     **Args**:
-       | ``reference=None`` (float): What the controller will force the system towards
-       | ``input=None`` (float): The current value of our system
-       | ``kp=None`` (float): proportional gain parameter
-       | ``ki=None`` (float): integral gain parameter
-       | ``kd=None`` (float): differential gain parameter
+       | ``reference=None`` (float): 
+       |     What the controller will force the system towards
+       | ``input=None`` (float): 
+       |     The current value of our system
+       | ``kp=None`` (float): 
+       |     Proportional gain parameter
+       | ``ki=None`` (float): 
+       |     Integral gain parameter
+       | ``kd=None`` (float): 
+       |     Differential gain parameter
 
     **Example(s)**:
       
@@ -106,18 +111,23 @@ class CurrentControlSystem(ControlSystem):
     '''The Current Control System
 
     **Note**:
-      This PID control system will pass on it's reference and parameters to the
-      c-written control system, SWIG'd into our system.  This class will not
-      directly control the current, but it will provide the targets and control
-      parameters to the c-written control system which will be responsible for
-      control the charger's current.
+      This PID control system will pass on it's reference and parameters to
+      the c-written control system, SWIG'd into our system.  This class
+      will not directly control the current, but it will provide the
+      targets and control parameters to the c-written control system which
+      will be responsible for control the charger's current.
 
     **Args**:
-       | ``reference=None`` (float): What the controller will force the system towards
-       | ``input=None`` (float): The current value of our system
-       | ``kp=None`` (float): proportional gain parameter
-       | ``ki=None`` (float): integral gain parameter
-       | ``kd=None`` (float): differential gain parameter
+       | ``reference=None`` (float): 
+       |     What the controller will force the system towards
+       | ``input=None`` (float): 
+       |     The current value of our system
+       | ``kp=None`` (float): 
+       |     Proportional gain parameter
+       | ``ki=None`` (float): 
+       |     Integral gain parameter
+       | ``kd=None`` (float): 
+       |     Differential gain parameter
 
     **Example(s)**:
       
@@ -143,18 +153,23 @@ class VoltageControlSystem(ControlSystem):
     '''The Voltage Control System
 
     **Note**:
-      This PID control system will pass on it's reference and parameters to the
-      c-written control system, SWIG'd into our system.  This class will not
-      directly control the current, but it will provide the targets and control
-      parameters to the c-written control system which will be responsible for
-      control the charger's current.
+      This PID control system will pass on it's reference and parameters to
+      the c-written control system, SWIG'd into our system.  This class
+      will not directly control the current, but it will provide the
+      targets and control parameters to the c-written control system which
+      will be responsible for control the charger's current.
 
     **Args**:
-       | ``reference=None`` (float): What the controller will force the system towards
-       | ``input=None`` (float): The current value of our system
-       | ``kp=None`` (float): proportional gain parameter
-       | ``ki=None`` (float): integral gain parameter
-       | ``kd=None`` (float): differential gain parameter
+       | ``reference=None`` (float): 
+       |     What the controller will force the system towards
+       | ``input=None`` (float): 
+       |     The current value of our system
+       | ``kp=None`` (float): 
+       |     Proportional gain parameter
+       | ``ki=None`` (float): 
+       |     Integral gain parameter
+       | ``kd=None`` (float): 
+       |     Differential gain parameter
 
     **Example(s)**:
       
@@ -189,28 +204,31 @@ class BatterySpecificationSettings:
     '''The battery specification setting for the three stage charger.
 
     **Args**:
-       | ``bulk_timeout_sec=None`` (float): Maximum time in the bulk stage
-       | ``abs_timeout_sec=None`` (float):  Maximum time in the absorption stage
-       | ``equ_timeout_sec=None`` (float):  Maximum time in the equalization
-       |                                    stage
-       | ``bulk_entry_volts=None`` (float): Voltage under-which we force a
-       |                                    transition into the bulk charging
-       |                                    stage
-       | ``bulk_exit_volts=None`` (float):  Voltage over-which we transition to
-       |                                    absorption stage
-       | ``abs_exit_amps=None`` (float):    Current over-which we transition to float
-       | ``bulk_ref_amps=None`` (float):    Constant current value driven into
-       |                                    battery during the bulk stage
-       | ``float_ref_volts=None`` (float):   Constant voltage value expressed
-       |                                    across battery terminal during float
-       |                                    stage
-       | ``abs_ref_volts=None`` (float):    Constant voltage value expressed
-       |                                    across battery terminal during
-       |                                    absorption stage
-       | ``equ_ref_volts=None`` (float):    Constant voltage value expressed
-       |                                    across battery terminal during
-       |                                    equalization stage
-
+       | ``bulk_timeout_sec=None`` (float): 
+       |     Max time in the bulk stage
+       | ``abs_timeout_sec=None`` (float): 
+       |     Max time in the absorption stage
+       | ``equ_timeout_sec=None`` (float):  
+       |     Max time in the equalization stage
+       | ``bulk_entry_volts=None`` (float): 
+       |     Voltage under-which we force a transition into 
+       |     the bulk charging stage
+       | ``bulk_exit_volts=None`` (float):  
+       |     Voltage over-which we transition to absorption stage
+       | ``abs_exit_amps=None`` (float):
+       |     Current over-which we transition to float
+       | ``bulk_ref_amps=None`` (float):
+       |     Constant current value driven into battery during the bulk
+       |     stage
+       | ``float_ref_volts=None`` (float): 
+       |     Constant voltage value expressed across battery terminal
+       |     during float stage
+       | ``abs_ref_volts=None`` (float): 
+       |     Constant voltage value expressed across battery terminal
+       |     during absorption stage
+       | ``equ_ref_volts=None`` (float): 
+       |     Constant voltage value expressed across battery terminal
+       |     during equalization stage
 
     **Returns**:
        (BatterySpecificationSettings):  this obj
@@ -247,13 +265,20 @@ class ChargerParameters(ThreadSafeAttributes):
 
   _attributes = ['c_control', 'v_control', 'battery_spec']
 
-  def __init__(self, *args, c_control=None, v_control=None, battery_spec=None, **kwargs):
+  def __init__(self, 
+    *args, 
+    c_control=None, 
+    v_control=None,
+    battery_spec=None,
+    **kwargs):
     '''Battery Charger Parameters
 
     **Args**:
        | ``c_control`` (CurrentControlSystem): The current PID parameters
        | ``v_control`` (VoltageControlSystem): The voltage PID parameters
-       | ``battery_spec`` (BatterySpecificationSettings):  The battery specific settings 
+       | ``battery_spec`` (BatterySpecificationSettings):  The battery
+       |                                                   specific
+       |                                                   settings 
 
     **Returns**:
        (ChargerParameters): 
@@ -298,11 +323,23 @@ class ChargerParameters(ThreadSafeAttributes):
     self.battery_spec = battery_spec
 
 class LoggedBehavior(Factory):
-  def __init__(self, name, log_file=None, live_trace=None, live_spy=None, **kwargs):
+  def __init__(self, 
+      name, 
+      log_file=None, 
+      live_trace=None, 
+      live_spy=None, 
+      **kwargs):
+
     super().__init__(name, *kwargs)
-    self.live_trace = False if live_trace == None else live_trace
-    self.live_spy = False if live_spy == None else live_spy
-    self.log_file = 'single_unit_three_stage_charger_2.log' if log_file == None else log_file
+
+    self.live_trace = False \
+      if live_trace == None else live_trace
+
+    self.live_spy = False \
+      if live_spy == None else live_spy
+
+    self.log_file = 'single_unit_three_stage_charger.log' \
+      if log_file == None else log_file
 
     # clear our old log file
     with open(self.log_file, "w") as fp:
@@ -313,12 +350,17 @@ class LoggedBehavior(Factory):
       filename=self.log_file,
       level=logging.DEBUG)
 
-    self.register_live_spy_callback(partial(self.spy_callback))
-    self.register_live_trace_callback(partial(self.trace_callback))
+    self.register_live_spy_callback(
+      partial(self.spy_callback)
+    )
+    self.register_live_trace_callback(
+      partial(self.trace_callback)
+    )
 
   def trace_callback(self, trace):
     '''trace without datetimestamp'''
-    trace_without_datetime = re.search(r'(\[.+\]) (\[.+\].+)', trace).group(2)
+    trace_without_datetime = \
+      re.search(r'(\[.+\]) (\[.+\].+)', trace).group(2)
     logging.debug("T: " + trace_without_datetime)
 
   def spy_callback(self, spy):
@@ -329,8 +371,8 @@ SecInCharge = namedtuple('SecInCharge', ['sec'])
 
 class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
 
-  # The charger will be multithreaded, provide simple locks around data accesses
-  # to these attributes
+  # The charger will be multithreaded, provide simple locks around data
+  # accesses to these attributes
   _attributes = [
     'amps',
     'volts',
@@ -342,10 +384,10 @@ class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
       live_spy=None, pulse_sec=None):
     '''Three stage battery charger feature management
 
-    This class will manage the data and the behavior of our three stage battery
-    charger.  The control systems used by the charge will be written in c, but
-    the reference and turning parameters of these controllers will be accessible
-    to this python code via SWIG.
+    This class will manage the data and the behavior of our three stage
+    battery charger.  The control systems used by the charge will be
+    written in c, but the reference and turning parameters of these
+    controllers will be accessible to this python code via SWIG.
 
     To understand this class reference:
     
@@ -360,12 +402,14 @@ class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
 
     **Args**:
        | ``name`` (str): name of the charging state chart
-       | ``charger_params=None`` (ChargerParameters):  parameters/controller
-       |                                               needed by charger
+       | ``charger_params=None`` (ChargerParameters):  
+       |                           parameters/controller
+       |                           needed by charger
        | ``live_trace=None(bool)``: enable live_trace feature?
        | ``live_spy=None(bool)``: enable live_spy feature?
-       | ``pulse_sec=None``(float): how often to same current/voltage and make
-       |                            decisions about state changes
+       | ``pulse_sec=None``(float): 
+       |                        how often to same current/voltage and make
+       |                        decisions about state changes
 
     **Example(s)**:
       
