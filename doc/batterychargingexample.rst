@@ -622,8 +622,8 @@ apart our high level descriptions from our technical design.
 
 .. _batterychargingexample-single-unit-three-stage-battery-charger-design:
 
-Single Unit Three Stage Battery Charger Design
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Single Unit Three Stage Battery Charger Design (1)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **High level Specification (4)**
 
@@ -1106,39 +1106,406 @@ Or view the ``spy``:
 Our electrical engineer comes up to us, :new_spec:`How is it going?`, you
 answer, "No plan ever survives first contact with the enemy."
 
-:new_spec:`That well hey?` "It's going well enough, I have the data model
-and statechart written, I can see that it might be working, and I only had
-to change a few things in the design do get it there.  Now I have to figure
-out how to test it."
+:new_spec:`That well hey?` "It's going well enough, I have the data model and
+statechart written, I can see that it might be working, and I only had to change
+a few things in the design do get it there.  Now I have to figure out how to
+test it. I have no idea if it actually works"
 
-:new_spec:`Any ideas?`.  "I would like to feed in a graph or a CSV file,
-and have the statechart respond to the graph.  I would have to instrument
-it in such a way that the statechart's log output would be easy to
-interpret next to the graph."
+:new_spec:`Any ideas?`.  "I would like to feed in a graph or a CSV file, and
+have the statechart respond to the graph.  I would have to instrument it in such
+a way that the statechart's log output would be easy to interpret next to the
+graph."
 
-:new_spec:`If you figure that out, I would like to use it too.  That's the
-nice thing about software, it's so gullible, it's so easy to lie to
-software eh?`  You look at him for a while, and say, "yeah, I guess you are
-right, maybe I could mock it out using dependency injection via subclassing
-or something like that".  :new_spec:`Why do you software guys always invent
-these complicated names for things?`  You think for a while and surprise
-him with an answer, "I think it happens because we try to keep everything
-as general as possible, and we aren't that creative about naming, because
-naming isn't the thing we think is important at the time, we are usually
-trying to solve a specific problem when we come up with the name.  So you
-think of something, and the first idea is usually bad, but you don't care
-and you move on.  Then that name sticks and everyone else has to endure
-your shitty name.  Nobody has control of the language once it is released
-to the public, so the language just lingers around like a bad smell." He
-laughs and says, :new_spec:`Well at least you aren't using Latin.`
+:new_spec:`If you figure that out, i would like to use it too.  that's the nice
+thing about software, it's so gullible, it's so easy to lie to software eh?` You
+look at him for a while, and say, "Yeah, I guess you are right, maybe I could
+mock it out using dependency injection via subclassing or something like that".
+:new_spec:`Why do you software guys always invent these complicated names for
+things?`
 
-:new_spec:`Why don't you just add your testing design into the spec, this
-stuff you have written needs to work, or you could burn down someone's
-house eh?  No pressure, eh?  Just add it to the spec, then make it happen.`
+You think for a while and surprise him with an answer, "I think it happens
+because we try to keep everything as general as possible, and we aren't that
+creative about naming, because naming isn't the thing we think is important at
+the time. We are usually trying to solve some other specific problem when we
+have to come up with a name.  So, a name just becomes the first, most general
+description that pops into our mind, and first ideas are usually bad. But
+we don't care because we don't think that the name is important when we invent
+it. Then that name sticks, and whatever the specific problem we were trying to
+solve is forgotten. Nobody has control of the language once it is released to
+the public (unless you are French), so the dumb language just lingers like a bad
+smell" 
+
+He laughs and says, :new_spec:`Well at least you aren't using Latin.  I think
+your industry comes up with bad names because the names are made by academics,
+and they will increase their chances of being published, -- paid --, if they
+make things sound as complicated and mysterious as possible.`
+
+:new_spec:`Why don't you just add your testing design into the spec, this stuff
+you have written needs to work, or you could burn down someone's house eh?  No
+pressure, eh?  Just add it to the spec, then make it happen.  Oh, and try and
+keep your gobbledegook out of the spec, I have to read it too.`
 
 ----
 
+Single Unit Three Stage Battery Charger Design (2)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+**High level Specification (5)**
+
+* This product will be a three stage charger with an equalization feature.
+* The charger has two control systems: constant current and constant voltage.
+* The bulk stage is a constant current control technique.
+* The absorption, float and equalization stages are constant voltage control
+  techniques.
+* The charging electrical profile can be seen here
+
+.. image:: _static/three_stage_charging_chart_2_graph.svg
+    :target: _static/three_stage_charging_chart_2_graph.pdf
+    :align: center
+
+**Sofware Functional Specification (5)**
+
+* The software system will be broken into two parts, fast running c code and slower running Python code.
+* The c code will run in ISRs at a frequency of 20 Khz and will control the charger in either a constant current or
+  constant voltage mode. (see separate doc)
+* The Python code will determine which control strategy the c code is
+  using, it will also set the c code's control system parameters.  The Python code will not directly control the electrical output of the unit
+* The Python code will sample the current and voltage and make decisions every 0.5 seconds
+* The Python data architecture can be seen here.
+
+.. image:: _static/three_stage_charging_chart_4_data.svg
+    :target: _static/three_stage_charging_chart_4_data.pdf
+    :align: center
+
+* The Python behavioral architecture can be seen here.
+
+.. image:: _static/three_stage_charging_chart_4_chart.svg
+    :target: _static/three_stage_charging_chart_4_chart.pdf
+    :align: center
+
+**Software Testing Specification (5)**
+
+* :new_spec:`The charger's data/behavioral software will be adjusted to use
+  data instead of real electrical readings.`
+
+* :new_spec:`The software that will be shipped (production code) should be
+  identical to the software that is being tested.  The software testing code
+  should pass data into the production code and observe the production code's
+  behavior without the production code knowing it is under test.`
+
+* :new_spec:`A simple physics model will be developed to describe the
+  relationship between the battery and the charger.  The testing code will use
+  this model to confirm that the charger's behavioral software is working as
+  designed.  The physics model should be parameterized so that it can test
+  different battery types.`
+
+----
+
+I approach my electrical engineer, "Hey, can I get some help about how to think
+about my model?" :new_spec:`Sure, what do you need to know that you don't know
+already?`.
+
+"Well, I need to build something that will give me different voltages over time
+after I feed the bulk current, and different current when I feed a constant
+voltage"
+
+:new_spec:`Hold on, show me what you want`.  You place the electrical profile in
+front of him:
+
+.. image:: _static/three_stage_charging_chart_2_graph.svg
+    :target: _static/three_stage_charging_chart_2_graph.pdf
+    :align: center
+
+"I have to be able to fake out these electrical profiles.  Any ideas?"
+
+:new_spec:`Yeah, I can help you with that, but first you have to understand a
+few things about batteries.  Do you have time for that?`
+
+"Of course."
+
+:new_spec:`Ok, well, batteries are very complicated, their behaviors are
+effected by their chemistry, age, the temperature, how fast they have been
+discharged, how they have been charged.. it goes on.  But, there are some common
+ways of thinking about battery characteristics.  Once you understand some of
+these ideas, I will draw some pictures which simplify how a battery works well
+enough so that you can build your software model.`
+
+:new_spec:`Now suppose, the battery in your car is "dead".  It still has some
+charge in it, but it can't drive enough current to turn your car on.  When you
+place a voltage meter across its terminals you see that it measures 11 volts.
+That's lower than it should be, so you connect a trickle charger across the
+terminals and plug it in.  When you measure the battery terminal voltage again,
+you see that it's the same as the voltage of the trickle charger, 13.5 Volts.
+You go and get a cup of coffee.  Later, you come back to your car and out of
+curiosity, you disconnect the charger and measure the battery voltage, then you
+watch the number on your meter fall from 13 to 12 to 11.5.  It stabilizes onto
+11.5 V.  This stabilized voltage is called the "Open Circuit Voltage" of the
+battery.`
+
+:new_spec:`The "Open Circuit Voltage" is a kind of hidden state of the
+battery.  When the charger was connected, we could not read this "Open Circuit
+Voltage" from the terminals, because the charger was holding the voltage at 13.5
+V.`
+
+:new_spec:`But, this "Open Circuit Voltage" isn't what you really care about,
+you just want to turn your car on right?  To do that, your battery will need to
+drive enough current to crank your engine and start the car.  When you drive
+charge through a circuit it's called current, or how much charge passes through
+the circuit in a given amount of time.  If your battery is "dead", it means that
+the charge it is holding is less than the charge you need to deliver to your
+car's starter for the time needed for the engine to start.`
+
+:new_spec:`But how much charge can your battery hold anyway?  Well The total
+amount of charge a battery can hold is dependent upon it's physical size and its
+chemistry.  A battery's capacity to store charge will go down over time, since
+you break down some of the materials required to make the electro-chemical
+reaction as you charge and discharge the battery.  But your *new* battery would
+have been rated in "amp-hours".  This "amp-hours" rating describes the constant
+current it could deliver for one full hour.`
+
+:new_spec:`To make it easy to compare the characteristics of batteries of
+different "amp-hour" ratings, we talk about it indirectly, we talk about the
+"state of charge" of the battery, or what percentage of charge exists in the
+battery.  For our car, when the battery was dead, this might have been 10
+percent.  When we tested it, after having the coffee, it might have been 25
+percent.  It turns out that measuring the "state of charge" of a battery is a very
+challenging problem.`
+
+:new_spec:`So you climb in your car, and try the engine again and hurray, it
+starts.  You drive to work, and here you are with me, now we have a different
+problem. You need to make a battery model to test your software, eh?`
+
+:new_spec:`Let me show you how the "Open Circuit Voltage" relates to a lead
+acid battery's "State of Charge".  It kind of looks like this`.  He draws this
+on a napkin:
+
+.. image:: _static/ocv_soc.svg
+    :target: _static/ocv_soc.pdf
+    :align: center
+
+:new_spec:`Now get this, for a lead acid battery, it takes 24 hours for the open
+circuit voltage to stabilize.  So if you wanted to make that graph, you would
+have to completely discharge a battery, then wait a day then charge it a bit and
+wait a day, and a couple of months later you would have a graph.  I'm glad I
+don't have to do that.  God bless the researcher. Oh! And get this: the curve
+changes depending on direction of the charge flow, you will make a different
+graph if you start from a dead battery and incrementally charge it,  or if you
+start from a full battery and incrementally discharge it. So things can get
+complicated.`
+
+"Yeah, it seems that way."
+
+:new_spec:`Don't worry, your simulator doesn't have to be that good.  You just
+want to generate currents and voltages that kind of look like something we could
+get from a lead acid system.`
+
+:new_spec:`Now remember what I said about the "Open circuit Voltage" being a
+hidden voltage within the battery? To make a simple equivalent circuit, we
+pretend that the battery has a resistor in series with its hidden "Open circuit
+Voltage"`:
+
+.. image:: _static/battery_model_1.svg
+    :target: _static/battery_model_1.pdf
+    :align: center
+
+:new_spec:`Look`  He points to the diagram. :new_spec:`When there is no current
+the voltage across the resistor falls to zero and the "Open circuit Voltage" is
+expressed at the battery terminals.`  He pauses and waits.  "I see that".
+
+:new_spec:`When a constant voltage charger is connected, the "Battery Terminal Voltage"
+is equal to the voltage across the resistor plus the "Open Circuit Voltage".
+You can calculate the current, then use that information to update the battery's
+state of charge, for your next increment of time.`
+
+:new_spec:`When a constant current charger is connected, the "Battery Terminal
+Voltage" is equal to the voltage across the resistor plus the "Open Circuit
+Voltage".  You can calculate the V_r and add it to the "Open Circuit Voltage"
+and that will be your terminal voltage.  Like before, you can use the current to
+update the battery's state of charge for your next increment of time.`
+
+:new_spec:`You now know enough to make a simulator.  But there is something else
+I think you should add to it.  We are going to over-charge the battery, and we
+aren't going to let the battery settle to its true open circuit voltage.  We will be
+charging at c/3.`
+
+You ask, "What is c?"
+
+:new_spec:`C is a measure of the rate of the battery's charge or discharge.  If
+your battery was rated at 1Ah it should be able to source 1 Amp for 1 hour.  If
+you discharged at 2C your battery could source 2 Amps for 30 minutes.`
+
+"Then why don't we charge at 5C or 100C?  Why wait around?"
+
+:new_spec:`Heat.  Your lead-acid battery would probably bubble and explode in
+flames if you did that.  Think flaming acid, eh?  I don't know what would happen,
+but it would be bad.  See that equivalent resistor in the diagram, it does a
+decent job of modelling what is happening in our system.  The heat produced from
+the battery while we charge it is proportional to the current times itself.
+This squared relationship limits how fast we can charge the system.`
+
+:new_spec:`I probably should have explained the C-rating first, since it's
+actually from this that the amp-hour rating comes from.  Battery manufacturers
+cheat using these ideas.`
+
+"What do you mean?"
+
+:new_spec:`Well, if you discharge your battery over a very very long time, you
+avoid losing energy through heat.  So, if you discharge a full battery at 0.2C,
+or 5 hours, then set your battery's amp hour rating based on this information,
+you will fool your customer into thinking that your battery can source this
+amp-hour rating at 1 hour.  This is not true, there is a non-linear relationship
+which means you will produce a lot of heat and you won't get anywhere near as
+much current as has been advertized.`
+
+"Wow, so the rating isn't the rating?"  
+
+:new_spec:`Well, it's all complicated, so the manufacturers find ways of making
+their numbers look better than their competition's numbers.  The market settles
+things out.  Anyway, an amp-hour rating really isn't what they say it is, so we
+will charge at C/3 to avoid any problems.`
+
+"Wait a minute, if we can't trust the ratings, how can you safely charge the
+battery?"
+
+:new_spec:`Don't worry, C/3 is typically ok, and we will also attach a battery
+temperature sensor.  If the temperature gets too high we will change the control
+system's reference to a lower number, reducing the amount of current sourced
+from our charger.`
+
+:new_spec:`Here is the graph I would like you to use:`
+
+.. image:: _static/ocv_soc_2.svg
+    :target: _static/ocv_soc_2.pdf
+    :align: center
+
+:new_spec:`Use the blue line.`
+
+"This graph doesn't really make any sense to me, you said the open circuit
+voltage on a lead acid battery can't be found for 24 hours, how can we talk
+about it while we are charging?"
+
+:new_spec:`Exactly, the black line is the one a researcher might get for us, and
+the blue line is the "hidden" voltage of our battery while we charge at c/3.
+It's technically not an "open circuit voltage" anymore because we won't let the
+voltage truly settle, but it's useful anyway.  Imagine that it was measured 20
+seconds after we have disconnected the charger.  The blue line represents a kind
+of instantaneous hidden voltage of the battery.  But, if you were to stop
+charging at some point along the x-axis, in 24 hours the voltage would settle to
+the black line for the same state of charge. I just want you to make the line go
+up once we have over-charged the battery.  Like with horse shoes and hand
+grenades, we just need to be close enough.`
+
+"How can I put more than 100 percent charge in the battery?"
+
+:new_spec:`Good question, you can't really, but if you drive more current than
+what it was rated for, the voltage will start to go up like I drew on the
+picture.  This is a useful property it tells us when we are done, so I would
+like you to add it to your model.`
+
+:new_spec:`Use this equivalent circuit:`
+
+.. image:: _static/battery_model_2.svg
+    :target: _static/battery_model_2.pdf
+    :align: center
+
+"What numbers should I use?"  :new_spec:`I would like you to make your battery
+model parameterizable, but for now set the far right knee on the graph to 13.0
+V.  Make your model's "C/3" profile dependent upon data, since this is
+all emperical stuff.  Good luck!`
+
+----
+
+You grab a pad of paper and a pencil and head out to a cafe.  Once you sit down
+you determine that you need to start with a data set, and from that data set to
+be able to create a function that can give you an open circuit voltage given a
+battery state of charge.  You head back, and build the following ``ocv_soc.csv``
+file:
+
+.. code-block:: csv
+  
+   state_of_charge,open_circuit_voltage
+   0,0.00
+   3,3.23
+   6,7.52
+   9,9.89
+   12,10.75
+   15,11.61
+   18,12.04
+   19,12.10
+   20,12.15
+   30,12.26
+   40,12.36
+   50,12.47
+   60,12.59
+   70,12.69
+   80,12.79
+   90,12.90
+   100,12.90
+   101,13.01
+   103,13.33
+   105,13.65
+   107,14.62
+   110,15.80
+   120,20.80
+
+Then using something like the following code you plot your data and the function
+approximation of the data:
+
+.. code-block:: python
+  
+  import numpy as np
+  import matplotlib.pyplot as plt
+  from scipy.interpolate import interp1d
+
+  data_ocv_soc = np.genfromtxt(
+    'ocv_soc.csv',
+    delimiter=',',
+    skip_header=1,
+    names=['state_of_charge', 'open_circuit_voltage'],
+    dtype="float, float",
+  )
+
+  # build the function which will approximate the data set
+  fn_soc_to_ocv = interp1d(
+    data_ocv_soc['state_of_charge'], 
+    data_ocv_soc['open_circuit_voltage'] 
+  )
+
+  colors = {
+    'csv_color': 'tab:red',
+    'function_color': 'tab:blue',
+  }
+
+  # plot the data and the approximation function
+  fig, (ax1, ax2) = plt.subplots(2, sharey=True)
+  ax1.plot(
+    data_ocv_soc['state_of_charge'], 
+    data_ocv_soc['open_circuit_voltage'],
+    color=colors['csv_color']
+  )
+  ax1.set(title="Battery Profile", ylabel="open_circuit_voltage csv")
+  x_new = np.linspace(x[0], x[-1], 50)
+  y_new = fn_soc_to_ocv(x_new)
+  ax2.plot(x_new, y_new, color=colors['function_color'])
+  ax2.set(xlabel="state_of_charge", ylabel="fn_soc_to_ocv")
+
+  plt.savefig('battery_profile.svg')
+  plt.savefig('battery_profile.pdf')
+  plt.show()
+  sys.exit(0)
+
+The data plot looks like this:
+
+.. image:: _static/battery_profile.svg
+    :target: _static/battery_profile.pdf
+    :align: center
+
+Feeling satisfied that we can build a basic battery profile, we then sit down and
+draw out the following battery simulator design:
+
+.. image:: _static/battery_model_3.svg
+    :target: _static/battery_model_3.pdf
+    :align: center
 
 ..
    I don't know about you, but I'm starting to feel like I have been drinking from
