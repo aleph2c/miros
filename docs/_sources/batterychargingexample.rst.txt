@@ -1507,6 +1507,8 @@ draw out the following battery simulator design:
     :target: _static/battery_model_3.pdf
     :align: center
 
+
+
 ..
    I don't know about you, but I'm starting to feel like I have been drinking from
    a fire hose.  To simplify what I have learned about how one charger should
