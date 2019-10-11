@@ -51,21 +51,67 @@ class InstrumentedFactory(Factory):
 
 
 class BatteryAttributes(ThreadSafeAttributes):
-  _attributes = ['soc_per', 'amp_hours', 'last_sample_time' 'last_current_amps', 'open_circuit_volts', 'last_terminal_volts']
+  _attributes = [
+    'soc_per',
+    'amp_hours', 
+    'last_sample_time',
+    'last_current_amps',
+    'open_circuit_volts',
+    'last_terminal_volts'
+  ]
 
 class Battery(InstrumentedFactory, BatteryAttributes):
 
   def __init__(self,
-      name, 
-      batt_r_ohms,
-      initial_soc_per,
-      rated_amp_hours,
-      start_time=None, 
-      battery_profile_csv=None,
-      live_trace=None,
-      live_spy=None
-      ):
+    name,
+    batt_r_ohms,
+    initial_soc_per,
+    rated_amp_hours,
+    start_time=None,
+    battery_profile_csv=None,
+    live_trace=None,
+    live_spy=None):
 
+    '''Battery simulator
+
+    **Note**:
+       This model requires a state_of_charge vrs open_circuit_volts csv file
+       from which it can build a model.
+
+    **Args**:
+       | ``name`` (str): 
+       | ``batt_r_ohms`` (float): 
+       | ``initial_soc_per`` (float): 
+       | ``rated_amp_hours`` (float): 
+       | ``start_time=None`` (datetime): 
+       | ``battery_profile_csv=None`` (str): 
+       | ``live_trace=None``: enable live_trace feature?
+       | ``live_spy=None``: enable live_spy feature?
+
+
+    **Returns**:
+       (Battery): A battery simulator which can be fed Amps, AmpsAndTime, Volts,
+       VoltsAndTime or AmpHours via the amps, amp_and_time, volts,
+       volts_and_time and amp_hour signals respectively
+
+    **Example(s)**:
+      
+    .. code-block:: python
+       
+      battery = Battery(
+       rated_amp_hours=100,
+       batt_r_ohms=0.014,
+       battery_profile_csv='ocv_soc.csv',
+       initial_soc_per=75.0,
+       name="battery_example",
+       live_trace=True)
+
+      while battery.soc_per < 80.0:
+        battery.post_fifo(Event(signal=signals.amps, payload=Amps(80.0)))
+        print(str(battery), end='')
+        time.sleep(1)
+
+    '''
     super().__init__(name, live_trace=live_trace, live_spy=live_spy)
 
     self.last_terminal_voltage = 0.0
@@ -118,6 +164,29 @@ class Battery(InstrumentedFactory, BatteryAttributes):
     self.start_at(self.build_ocv_soc_profile)
 
   def __str__(self):
+    '''Turn the battery simulator into a str to describe its characteristics.
+
+    **Returns**:
+       (str): The state of the battery simulator
+
+    **Example(s)**:
+
+    .. code-block:: python
+
+       # After making a battery obj, you can see its
+       # state by casting it as a str then printing that str:
+
+       print(str(battery)) # =>
+         ---
+         time_s:        7.10
+         term_v:     13.8614
+         batt_o:      0.0140
+         losses_w:   89.6000
+         amps_a:     80.0000
+         ocv_v:      12.7416
+         soc_%:      75.1577
+
+    '''
     return """
 ---
 time_s:   {0:9.2f}
@@ -223,9 +292,6 @@ soc_%:    {6:9.4f}""".format(
       self.soc_per / 100.0 * self.rated_amp_hours + e.payload.amp_hours
     self.soc_per = self.amp_hours / self.rated_amp_hours * 100.0
     self.open_circuit_volts = self.fn_soc_to_ocv(self.soc_per)
-    #print('-'*19)
-    #print(self.soc_per)
-    #print(self.open_circuit_volts)
     return status
 
   def _amps_given_terminal_volts(self, terminal_volts):
@@ -262,18 +328,22 @@ if __name__ == '__main__':
    initial_soc_per=75.0,
    name="battery_example",
    live_trace=True)
+
   # time 3149, 52 minutes (80 amps at 10 percent capacity)
   abs_volts = 13.91
   abs_volts = 11
 
-  #while battery.soc_per < 80.0:
-  #  battery.post_fifo(Event(signal=signals.amps, payload=Amps(80.0)))
-  #  print(str(battery), end='')
-  #  time.sleep(1)
-  #  abs_voltage = battery.last_terminal_voltage
+  while battery.soc_per < 80.0:
+    battery.post_fifo(Event(signal=signals.amps, payload=Amps(80.0)))
+    print(str(battery), end='')
+    time.sleep(1)
+    abs_voltage = battery.last_terminal_voltage
+
   for i in range(40):
     battery.post_fifo(Event(signal=signals.volts, payload=Volts(abs_volts)))
     print(str(battery), end='')
     time.sleep(1)
+
+  print("")
 
 

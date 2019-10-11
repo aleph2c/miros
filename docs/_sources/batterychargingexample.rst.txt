@@ -1500,13 +1500,20 @@ The data plot looks like this:
     :target: _static/battery_profile.pdf
     :align: center
 
-Feeling satisfied that we can build a basic battery profile, we then sit down and
-draw out the following battery simulator design:
+----
+
+After `completing the work
+<https://github.com/aleph2c/miros/blob/master/examples/battery_model.py>`_ you
+track down your electrical engineer and say, "Hey I have a battery simulator, do
+you want to see it?"  :new_spec:`Sure`.
+
+"I wrote everything onto a picture before I wrote the code, then I went back and
+forth between my picture and the code until I got it working, here is something
+I think works:"
 
 .. image:: _static/battery_model_3.svg
     :target: _static/battery_model_3.pdf
     :align: center
-
 
 
 ..
