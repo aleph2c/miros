@@ -1765,13 +1765,14 @@ percent. What charge current do you want?"
     <iframe width="560" height="315" src="https://www.youtube.com/embed/qI8-3kF5nlU" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> 
   </center>
 
-new_spec:`It looks like you got the transition working, but I don't think you
+
+:new_spec:`It looks like you got the transition working, but I don't think you
 have enough loss in your battery, where did you get your internal resistance
 number from?`
 
 "I pulled it off of a battery vendor's data sheet."
 
-new_spec:`Ah yes, that is another way for vendor's to white-lie about their
+:new_spec:`Ah yes, that is another way for vendor's to white-lie about their
 batteries, the internal resistance changes as you charge the battery.  Would it
 be hard for you to add another curve?  The battery resistence changes with its
 state of charge.  If you add this your simulator will behave more like a real
@@ -1786,7 +1787,17 @@ would be finding good data and updating the diagram with a graphic."
 
 Being a sucker for a challenge, you head back to the `cadex website
 <https://batteryuniversity.com/learn/archive/how_does_internal_resistance_affect_performance>`_
-and find a open circuit voltage versus internal resistance graph.
+and find a open circuit voltage versus internal resistance graph for a lead acid
+battery:
+
+.. image:: _static/battery_resistance_profile.svg
+    :target: _static/battery_resistance_profile.pdf
+    :align: center
+
+Then you update the battery simulator to have a dynamic internal resistance
+based on the open circuit voltage of the battery:
+
+
 
 
     

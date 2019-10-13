@@ -355,6 +355,27 @@ soc_%:    {6:9.4f}""".format(
     fn_ocv_to_batt_r = poly.Polynomial(coefs)
     return fn_ocv_to_batt_r
 
+  def amps_into_terminals(self, amps, sample_time=None):
+    if sample_time is None:
+      self.post_fifo(Event(signal=signals.amps, payload=Amps(amps)))
+    else:
+      self.post_fifo(Event(signal=signals.amps_and_time,
+        payload=AmpsAndTime(amps=amps, time=sample_time)))
+
+  def volts_across_terminals(self, volts, sample_time=None):
+    if sample_time is None:
+      self.post_fifo(Event(signal=signals.volts, payload=Volts(volts)))
+    else:
+      self.post_fifo(Event(signal=signals.volts_and_time,
+        payload=VoltsAndTime(volts=volts, time=sample_time)))
+
+  def charge_into_terminals(self, amp_hours, sample_time=None):
+    if sample_time is None:
+      self.post_fifo(Event(signal=signals.amp_hours,
+        payload=AmpsHours(amps_hours)))
+    else:
+      self.post_fifo(Event(signal=signals.amps_and_time,
+        payload=AmpsAndTime(amps=amps, time=sample_time)))
 
 if __name__ == '__main__':
 
@@ -369,13 +390,13 @@ if __name__ == '__main__':
    live_trace=True)
 
   while battery.soc_per < 80.0:
-    battery.post_fifo(Event(signal=signals.amps, payload=Amps(30.0)))
+    battery.amps_into_terminals(30.0)
     print(str(battery), end='')
     time.sleep(1)
     abs_volts = battery.last_terminal_voltage
 
   for i in range(3):
-    battery.post_fifo(Event(signal=signals.volts, payload=Volts(abs_volts)))
+    battery.volts_across_terminals(abs_volts)
     print(str(battery), end='')
     time.sleep(1)
 
