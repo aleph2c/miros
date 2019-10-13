@@ -348,7 +348,7 @@ layer=3</panel_attributes>
     <panel_attributes>*build_ocv_soc_profile*
 --
 entry /
-  self.start_time = datetime.now()
+  self.last_sample_time = datetime.now()
   self.fn_soc_to_ocv = \
     self.create_battery_model(self.battery_profile_csv)
 
@@ -389,8 +389,8 @@ batt_r_ohms # given
 initial_soc_per # given
 rated_amp_hours # given
 start_time=None # optional
-battery_profile_csv=None # given
-live_trace=None
+battery_profile_csv=None # optional
+live_trace=None 
 live_spy=None
 
 --
@@ -863,14 +863,14 @@ layer=3</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>351</x>
+      <x>396</x>
       <y>513</y>
-      <w>144</w>
+      <w>99</w>
       <h>45</h>
     </coordinates>
     <panel_attributes>lt=.
 layer=3</panel_attributes>
-    <additional_attributes>10.0;30.0;10.0;10.0;140.0;10.0</additional_attributes>
+    <additional_attributes>10.0;30.0;10.0;10.0;90.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
@@ -912,7 +912,7 @@ layer=3</panel_attributes>
     <coordinates>
       <x>846</x>
       <y>333</y>
-      <w>108</w>
+      <w>135</w>
       <h>27</h>
     </coordinates>
     <panel_attributes>open_circuit_volts

@@ -13,6 +13,7 @@ from miros import return_status
 import matplotlib.pyplot as plt
 from miros import ThreadSafeAttributes
 from scipy.interpolate import interp1d
+import numpy.polynomial.polynomial as poly
 
 Amps = namedtuple('Amps', ['amps'])
 Volts = namedtuple('Volts', ['volts'])
@@ -64,35 +65,38 @@ class Battery(InstrumentedFactory, BatteryAttributes):
 
   def __init__(self,
     name,
-    batt_r_ohms,
     initial_soc_per,
     rated_amp_hours,
     start_time=None,
-    battery_profile_csv=None,
+    ocv_vrs_r_profile_csv=None,
+    soc_vrs_ocv_profile_csv=None,
     live_trace=None,
     live_spy=None):
 
     '''Battery simulator
 
     **Note**:
-       This model requires a state_of_charge vrs open_circuit_volts csv file
-       from which it can build a model.
+       This model requires ocv_vrs_r_profile_csv and oc_vrs_ocv_profile_csv
+       files.
 
     **Args**:
        | ``name`` (str): 
-       | ``batt_r_ohms`` (float): 
-       | ``initial_soc_per`` (float): 
-       | ``rated_amp_hours`` (float): 
-       | ``start_time=None`` (datetime): 
-       | ``battery_profile_csv=None`` (str): 
+       | ``initial_soc_per`` (float): initial battery charge %
+       | ``rated_amp_hours`` (float): battery's rated amps hours
+       | ``start_time=None`` (datetime): starting time of simulation
+       | ``ocv_vrs_r_profile_csv=None`` (str): open circuit volts vrs internal
+       |                                       battery resistance
+       | ``soc_vrs_ocv_profile_csv=None`` (str): state of charge % vrs
+       |                                         open circuit voltage
        | ``live_trace=None``: enable live_trace feature?
        | ``live_spy=None``: enable live_spy feature?
 
 
     **Returns**:
-       (Battery): A battery simulator which can be fed Amps, AmpsAndTime, Volts,
-       VoltsAndTime or AmpHours via the amps, amp_and_time, volts,
-       volts_and_time and amp_hour signals respectively
+       (Battery): 
+         A battery simulator which can be fed Amps, AmpsAndTime, Volts,
+         VoltsAndTime or AmpHours via the amps, amp_and_time, volts,
+         volts_and_time and amp_hour signals respectively
 
     **Example(s)**:
       
@@ -100,10 +104,10 @@ class Battery(InstrumentedFactory, BatteryAttributes):
        
       battery = Battery(
        rated_amp_hours=100,
-       batt_r_ohms=0.014,
-       battery_profile_csv='ocv_soc.csv',
-       initial_soc_per=75.0,
+       initial_soc_per=10.0,
        name="battery_example",
+       soc_vrs_ocv_profile_csv='soc_ocv.csv',
+       ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
        live_trace=True)
 
       while battery.soc_per < 80.0:
@@ -116,15 +120,17 @@ class Battery(InstrumentedFactory, BatteryAttributes):
 
     self.last_terminal_voltage = 0.0
     self.last_current_amps = 0.0
-    self.batt_r_ohms = float(batt_r_ohms)
     self.soc_per = float(initial_soc_per)
     self.rated_amp_hours = float(rated_amp_hours)
 
     self.start_time = datetime.now() if start_time is None else start_time
     self.last_sample_time = datetime.now()
 
-    self.battery_profile_csv = "ocv_soc.csv" if \
-      battery_profile_csv is None else battery_profile_csv
+    self.ocv_vrs_r_profile_csv = 'ocv_internal_resistance.csv' if \
+      ocv_vrs_r_profile_csv is None else ocv_vrs_r_profile_csv
+
+    self.soc_vrs_ocv_profile_csv = "ocv_soc.csv" if \
+      soc_vrs_ocv_profile_csv is None else soc_vrs_ocv_profile_csv
 
     self.build_ocv_soc_profile = self.create(state="build_ocv_soc_profile"). \
       catch(signal=signals.ENTRY_SIGNAL,
@@ -206,7 +212,14 @@ soc_%:    {6:9.4f}""".format(
 
   def build_ocv_soc_profile_entry_signal(self, e):
     self.last_sample_time = datetime.now()
-    self.fn_soc_to_ocv = self._create_battery_model(self.battery_profile_csv)
+    self.fn_soc_to_ocv = self._create_soc_to_ocv_model(
+      self.soc_vrs_ocv_profile_csv
+    )
+    self.fn_ocv_to_batt_r = self._create_ocv_to_batt_r_model(
+      self.ocv_vrs_r_profile_csv
+    )
+    self.batt_r_ohms = self._ohms_given_soc(self.soc_per)
+
     return return_status.HANDLED
 
   def build_ocv_soc_profile_init_signal(self, e):
@@ -291,7 +304,7 @@ soc_%:    {6:9.4f}""".format(
     self.amp_hours = \
       self.soc_per / 100.0 * self.rated_amp_hours + e.payload.amp_hours
     self.soc_per = self.amp_hours / self.rated_amp_hours * 100.0
-    self.open_circuit_volts = self.fn_soc_to_ocv(self.soc_per)
+    self.batt_r_ohms = self._ohms_given_soc(self.soc_per)
     return status
 
   def _amps_given_terminal_volts(self, terminal_volts):
@@ -306,9 +319,14 @@ soc_%:    {6:9.4f}""".format(
     amp_hours = amps * delta_t_sec / 3600.0
     return amp_hours
 
-  def _create_battery_model(self, battery_profile_csv):
+  def _ohms_given_soc(self, soc):
+    ocv = self.fn_soc_to_ocv(self.soc_per)
+    batt_r_ohms = self.fn_ocv_to_batt_r(ocv)
+    return batt_r_ohms
+
+  def _create_soc_to_ocv_model(self, soc_vrs_ocv_profile_csv):
     data_ocv_soc = np.genfromtxt(
-      battery_profile_csv,
+      soc_vrs_ocv_profile_csv,
       delimiter=',',
       skip_header=1,
       names=['state_of_charge', 'open_circuit_voltage'],
@@ -320,16 +338,34 @@ soc_%:    {6:9.4f}""".format(
     )
     return fn_soc_to_ocv
 
+  def _create_ocv_to_batt_r_model(self, soc_vrs_ocv_profile_csv):
+    data_ocv_internal_resistance = np.genfromtxt(
+      self.ocv_vrs_r_profile_csv,
+      delimiter=',',
+      skip_header=1,
+      names=['open_circuit_volts', 'resistance_ohms'],
+      dtype="float, float",
+    )
+
+    coefs = poly.polyfit(
+      data_ocv_internal_resistance['open_circuit_volts'],
+      data_ocv_internal_resistance['resistance_ohms'],
+      5,
+    )
+    fn_ocv_to_batt_r = poly.Polynomial(coefs)
+    return fn_ocv_to_batt_r
+
+
 if __name__ == '__main__':
 
   # time 3149, 52 minutes (80 amps at 10 percent capacity)
 
   battery = Battery(
    rated_amp_hours=100,
-   batt_r_ohms=0.014,
-   battery_profile_csv='ocv_soc.csv',
-   initial_soc_per=79.9,
+   initial_soc_per=10.0,
    name="battery_example",
+   soc_vrs_ocv_profile_csv='soc_ocv.csv',
+   ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
    live_trace=True)
 
   while battery.soc_per < 80.0:

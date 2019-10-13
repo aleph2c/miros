@@ -3,6 +3,10 @@
 .. role:: new_spec
   :class: new_spec
 
+`Software should be treated not as a static product, but as a living
+manifestation of the development team's collective understanding.
+<https://www.csc.gov.sg/articles/how-to-build-good-software>`_ -- `Li Hongyi <http://theindependent.sg/li-hongyi-singapore-has-a-lot-of-problems-but-we-have-political-stability-and-resources/>`_
+
 Distributed Battery Charging Example
 ====================================
 Lead acid batteries are very heavy.  But they are cheaper than lithium ion
@@ -1242,10 +1246,9 @@ watch the number on your meter fall from 13 to 12 to 11.5.  It stabilizes onto
 11.5 V.  This stabilized voltage is called the "Open Circuit Voltage" of the
 battery.`
 
-:new_spec:`The "Open Circuit Voltage" is a kind of hidden state of the
-battery.  When the charger was connected, we could not read this "Open Circuit
-Voltage" from the terminals, because the charger was holding the voltage at 13.5
-V.`
+:new_spec:`The "Open Circuit Voltage" is a kind of hidden state.  When the
+charger was connected, we could not read this "Open Circuit Voltage" from the
+terminals, because the charger was holding the voltage at 13.5 V.`
 
 :new_spec:`But, this "Open Circuit Voltage" isn't what you really care about,
 you just want to turn your car on right?  To do that, your battery will need to
@@ -1255,13 +1258,14 @@ the circuit in a given amount of time.  If your battery is "dead", it means that
 the charge it is holding is less than the charge you need to deliver to your
 car's starter for the time needed for the engine to start.`
 
-:new_spec:`But how much charge can your battery hold anyway?  Well The total
-amount of charge a battery can hold is dependent upon it's physical size and its
-chemistry.  A battery's capacity to store charge will go down over time, since
-you break down some of the materials required to make the electro-chemical
-reaction as you charge and discharge the battery.  But your *new* battery would
-have been rated in "amp-hours".  This "amp-hours" rating describes the constant
-current it could deliver for one full hour.`
+He pauses for a moment and takes a breath.  Then he says,  :new_spec:`But how
+much charge can your battery hold anyway?  Well The total amount of charge a
+battery can hold is dependent upon it's physical size and its chemistry.  A
+battery's capacity to store charge will go down over time, since you break down
+some of the materials required to make the electro-chemical reaction as you
+charge and discharge the battery.  But your *new* battery would have been rated
+in "amp-hours".  This "amp-hours" rating describes the constant current it could
+deliver for one full hour.`
 
 :new_spec:`To make it easy to compare the characteristics of batteries of
 different "amp-hour" ratings, we talk about it indirectly, we talk about the
@@ -1287,7 +1291,7 @@ on a napkin:
 circuit voltage to stabilize.  So if you wanted to make that graph, you would
 have to completely discharge a battery, then wait a day then charge it a bit and
 wait a day, and a couple of months later you would have a graph.  I'm glad I
-don't have to do that.  God bless the researcher. Oh! And get this: the curve
+don't have to do that.  God bless the researcher.  Oh! And get this: the curve
 changes depending on direction of the charge flow, you will make a different
 graph if you start from a dead battery and incrementally charge it,  or if you
 start from a full battery and incrementally discharge it. So things can get
@@ -1484,7 +1488,11 @@ approximation of the data:
     color=colors['csv_color']
   )
   ax1.set(title="Battery Profile", ylabel="open_circuit_voltage csv")
-  x_new = np.linspace(x[0], x[-1], 50)
+  x_new = np.linspace(
+    data_ocv_soc['state_of_charge'][0], 
+    data_ocv_soc['state_of_charge'],
+    50
+  )
   y_new = fn_soc_to_ocv(x_new)
   ax2.plot(x_new, y_new, color=colors['function_color'])
   ax2.set(xlabel="state_of_charge", ylabel="fn_soc_to_ocv")
@@ -1505,15 +1513,288 @@ The data plot looks like this:
 After `completing the work
 <https://github.com/aleph2c/miros/blob/master/examples/battery_model.py>`_ you
 track down your electrical engineer and say, "Hey I have a battery simulator, do
-you want to see it?"  :new_spec:`Sure`.
+you want to see it?"  
+
+:new_spec:`Sure`.
 
 "I wrote everything onto a picture before I wrote the code, then I went back and
-forth between my picture and the code until I got it working, here is something
-I think works:"
+forth between my picture and the code until I got it working, here is what I
+have so far:"
 
 .. image:: _static/battery_model_3.svg
     :target: _static/battery_model_3.pdf
     :align: center
+
+:new_spec:`Another statechart eh?`  
+
+"Yes, shall we start from the top?"  Not waiting for his answer you begin.
+
+"Like before, the top of the diagram describes data and some methods and the
+bottom part of the diagram describes the behavior of the software."
+
+"I have written two methods, ``_amp_given_terminal_volts`` and
+``_amp_hours_given_amps`` at the top of the diagram, near the simple circuit
+drawing so I can see them near that picture."
+
+He reads these methods, and nods, then his eyes shift to the
+``BatteryAttributes`` class and asks, :new_spec:`What are the BatteryAttributes
+and why aren't they just in the Battery?`.
+
+"I pulled those out into their own class, because I want to read and write
+those attributes from more than one thread. The ``BatteryAttributes`` class
+inherits from the ``ThreadSafeAttributes`` class so it can access thread safe
+features.  Then I pulled the ``BatteryAttributes`` code into the ``Battery``
+class using the multiple inheritance feature of Python (which is just kind of
+like a copy and paste).  Since they are in their own box on the diagram, with a
+glance I can see what attributes are thread safe and what aren't."
+
+:new_spec:`How does the circuit work with your software?`
+
+"It describes the relationship between the terminal volts, the battery current
+and the open_circuit_volts.  The open_circuit_volts has a relationship with the
+state_of_charge of the battery, so from this simple circuit and the function
+derived from the battery_profile_csv data, you can build the full simulator.
+You can charge and discharge a simulated battery."
+
+:new_spec:`How can you do that from this?` and points to the picture.
+
+"I wanted the model to be 'generalizeable', as you say.  So, its based on
+data that you feed it via the ``battery_profile.csv``.  Which is a simple spread
+sheet describing the battery's state_of_charge vrs the open_circuit_volts. Here
+is a graph of that data:"
+
+.. image:: _static/battery_profile.svg
+    :target: _static/battery_profile.pdf
+    :align: center
+
+He looks at it and says, :new_spec:`Where did you get these data?`.
+
+"Cadex posts a lot of their data online.  I used one of their pictures as a
+reference. My CSV file isn't real though, I just eyeballed their graph to make
+mine."
+
+He says, :new_spec:`Good enough, what is the second graph?`  
+
+"The software can't use the CSV file directly, it needs a function, so I build a
+function from this data and this function was used to draw the second graph."
+:new_spec:`So the second graph isn't the data?  Wow, not bad, it looks the same
+as the CSV file.`  
+
+"It took me a while to find something that would work, at first I tried to match
+the data with a polynomial but it was very wiggly, I had something that looked
+alright at order 8 but at order 9 it was starting to over-fit.  In the end I
+just went with an interpolation provided by ``scipy.interpolate``.  I think its
+called a linear spline or something.  The point is that from the data I can
+build a function.  From this function I can get the open_circuit_voltage given a
+battery state_of_charge."
+
+"You can see that I build this function when the statechart enters the
+``build_ocv_soc_profile``." as I point to the statechart.  
+
+He asks, :new_spec:`Why did you put that in the statechart and not just in the
+constructor of your python Battery class?`  
+
+"I wanted to be able to switch graphs. If we decide to make the battery more
+sophisticated we will have to do something like that;  when I was researching
+how this relationship works I saw that the graph profile changes based on
+charge-current, temperature and so on.  If I leave the function construction in
+the statechart I can hot-swap it based on what is happening in the battery."
+
+:new_spec:`I don't think we will need something that sophisticated.  How does
+the behavior work anyway?`
+
+"I wanted something that would look like how it looks when you are using a real
+battery, so I made it's time our time.  :new_spec:`What do you mean by that?`
+
+"You can feed the statechart `amp` or `volt` once it has started, and the
+simulator will just assume that is what you are doing until you send it another
+sample.  It's like you are feeding it DC Amps or Volts until you send it new
+information.  So, if we build a 100 Amp Hour battery, it will take in the order
+of an hour to charge the battery at 100 Amps while we run it."  :new_spec:`So it
+literally acts like a battery in real time?`  
+
+"Yeah, but I also wanted the option of compressing time, so that I don't have to
+sit around while I'm testing the software.  I'll use the battery in our time
+frame, to build data sets which can be run almost instantaneously later."
+
+:new_spec:`Ok, how does that work, pull up the design and show me.`
+
+.. image:: _static/battery_model_3.svg
+    :target: _static/battery_model_3.pdf
+    :align: center
+
+"So to build one of these you would write something like this:"
+
+.. code-block:: python
+  
+  battery = Battery(
+   rated_amp_hours=100,
+   batt_r_ohms=0.014,
+   battery_profile_csv='ocv_soc.csv',
+   initial_soc_per=10.0,
+   name="battery_example",
+   live_trace=True)
+
+"Here we would have a battery that's rated at 100 Amp hours, with an internal
+resistance of 0.014 Ohms that is 10 percent full.  I already showed you the
+state_of_charge versus open_circuit_voltage graph which will be used."  
+
+"When the chart starts, it builds a ``fn_soc_to_ocv`` which we already talked
+about, then climbs into the ``update_charge_state`` and waits for events.  From
+here you can sent it ``amp_hours``, ``amps``, ``amps_and_time``, ``volts`` or
+``volts_and_time`` events.  Any one of these events can change the battery state."
+
+"Suppose we wanted to control the battery in constant voltage mode.  We would
+send it a ``volts`` event containing a ``Volts`` payload.  The code would look like
+this:"
+
+.. code-block:: python
+  
+  battery.send_fifo(Event(signal=signal.volts, payload=Volts(11.7)))
+
+"This event would be caught by the ``volts`` hook in the ``volts_to_amps`` state
+and it would be turned into a ``volts_and_time``."
+
+:new_spec:`What is that time relative to?`
+
+"When the battery is started, the ``last_sample_time`` is stored, so it will be
+relative to that."  
+
+You pause, he nods.
+
+So you continue, "There is a ``volts_and_time`` event, which is captured by the
+``volts_to_amps`` state, which calculates the amps based on the current state of
+charge and the terminal volts.  The ``last_terminal_voltage`` is squirreled
+away, and then a ``amps_and_time`` event is invented and posted to the chart.
+Following that, a transition is made into the ``amps_to_amp_hours`` state."
+
+"The ``amps_to_amps_hours`` state, catches this ``amps_to_time`` event, and
+figures out the ``terminal_voltage`` again and calculates the ``amp_hours`` being
+produced by this sample of ``amps``.
+
+You pause for a breath then say, "The ``amps_to_time`` signal handler squirrels
+away the ``last_current_amps``, the ``last_sample_time``, and the
+``last_terminal_volts`` and then it invents the ``Amp_Hours`` event and posts it
+to the chart. Finally, it transitions to the ``update_charge_state``.
+
+You wait for him to make eye contact, he studies the chart and without looking
+at you says, :new_spec:`Keep going.`
+
+This ``update_charge_state`` receives the ``amp_hours`` event, calculates the
+new total amp hours for the battery, figures out a new state of charge, then
+figures out what the new open circuit voltage is.  These values are thread-safe
+so they can be read from within the statechart's thread, or from any other
+object that has a reference to the battery (like main).
+
+"So, from our original volt event, we have a new battery state".
+
+:new_spec:`Why is it so complicated?  Why not just update the battery information
+directly from the terminal voltage using the battery circuit equations?`
+
+"It's not that complicated, because it forces re-use of the same calculation
+pathways.  The exact same logic will be followed if a constant current is
+applied, but instead of the amps being calculated from the volts, they are
+provided directly from the event.  Look, you can see something very similar
+happens if an ``amps`` event is sent."  You point to the ``amps_to_amp_hours``
+state on the diagram. "Try and describe to me how it works."
+
+He looks at it and asks, :new_spec:`Where is the state machine usually
+sitting?`  "It's usually in the ``update_charge_state``".  He concentrates for a
+moment and says, :new_spec:`Yeah, ok, the amps event kind of works the same way, it
+generates a amps_and_time event, which is caught then fed as a amp_hours event,
+and eventually the chart climbs back into the update_charge_state, like before.`
+
+He pauses, then says, :new_spec:`I think I see a problem though, what happens if an amps
+event is being processed while the volts event was being processed?`
+
+"It's not a problem because the invented signals are posted using ``post_lifo``
+calls.  This will automatically change the order of the events in the queue, if
+an ``amp`` event is received by the battery while it is still chewing on the
+``volts`` event, the invented ``amps_and_time`` and ``amp_hours`` events will be
+invented an processed before the ``amps`` event is dealt with. The call to
+``post_lifo`` is very selfish; It will always push itself to the front of the
+queue."
+
+:new_spec:`That reminds me of some ex-olympians I hosted during the 2010 games.
+Just try and get those people to do their dishes.  Ok, so think I kind of
+understand your design, let's see it work.`
+
+"It's kind of boring to watch, what do you want to see?"
+
+:new_spec:`Well, let's watch the point at which the charger should switch
+between bulk to absorption.  Ideally I would like to see this happen when the
+battery is 80 percent charged.`
+
+"Ok, so I'll place the battery near an 80 percent state of charge and transition
+from a constant current to a constant voltage technique once it's charged to 80
+percent. What charge current do you want?"
+
+:new_spec:`What is the battery rating?`  You say, "100 Ah."
+
+:new_spec:`Charge it at c/3, or about 30 amps`.
+
+"To do that in code I would write:"
+
+.. code-block:: python
+  
+   battery = Battery(
+     rated_amp_hours=100,
+     batt_r_ohms=0.014,
+     battery_profile_csv='ocv_soc.csv',
+     initial_soc_per=79.9,
+     name='battery_example')
+
+   while battery.soc_per < 80.0:
+     battery.post_fifo(Event(signal=signal.amps, payload=Amps(30.0)))
+     print(str(battery), end='')
+     time.sleep(1)
+     abs_volts = battery.last_terminal_voltage
+
+   for i in range(3):
+     battery.post_fifo(Event(signal=signals.volts, payload=Volts(abs_volts))
+     print(str(battery), end='')
+     time.sleep(1)
+
+   print("")
+
+"Let's watch it work:"
+
+.. raw:: html
+
+  <center>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/qI8-3kF5nlU" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> 
+  </center>
+
+new_spec:`It looks like you got the transition working, but I don't think you
+have enough loss in your battery, where did you get your internal resistance
+number from?`
+
+"I pulled it off of a battery vendor's data sheet."
+
+new_spec:`Ah yes, that is another way for vendor's to white-lie about their
+batteries, the internal resistance changes as you charge the battery.  Would it
+be hard for you to add another curve?  The battery resistence changes with its
+state of charge.  If you add this your simulator will behave more like a real
+battery.`
+
+"No, it would be simple, I would just do what I did before, the hardest part
+would be finding good data and updating the diagram with a graphic."
+
+:new_spec:`If it isn't a big deal add it.  Otherwise, this is good enough.`
+
+----
+
+Being a sucker for a challenge, you head back to the `cadex website
+<https://batteryuniversity.com/learn/archive/how_does_internal_resistance_affect_performance>`_
+and find a open circuit voltage versus internal resistance graph.
+
+
+    
+
+
+
+
+
 
 
 ..
