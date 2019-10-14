@@ -327,7 +327,7 @@ if __name__ == '__main__':
   battery = Battery(
    rated_amp_hours=100,
    batt_r_ohms=0.014,
-   battery_profile_csv='ocv_soc.csv',
+   battery_profile_csv='soc_ocv.csv',
    initial_soc_per=79.9,
    name="battery_example",
    live_trace=True)
