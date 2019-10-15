@@ -1553,8 +1553,53 @@ and find a open circuit voltage versus internal resistance graph for a lead acid
 battery:</p>
 <a class="reference external image-reference" href="_static/battery_resistance_profile.pdf"><div align="center" class="align-center"><img alt="_images/battery_resistance_profile.svg" src="_images/battery_resistance_profile.svg" /></div>
 </a>
-<p>Then you update the battery simulator to have a dynamic internal resistance
-based on the open circuit voltage of the battery:</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Above 14 V, the battery resistence was just made up.  This data was not
+provided by cadex, I am just imagining how it would work.</p>
+</div>
+<p>Then you update the battery simulator design:</p>
+<a class="reference external image-reference" href="_static/battery_model_4.pdf"><div align="center" class="align-center"><img alt="_images/battery_model_4.svg" src="_images/battery_model_4.svg" /></div>
+</a>
+<p><span class="new-spec">You know, if you can just add more and more features like this to the
+battery simulator you are going to have something that is very useful, not just
+for us.</span></p>
+<p>“All I need is data, its <cite>numpy</cite> and <cite>scipy</cite> that does the heavy lifting and the
+statechart manages the complexity.  I have simplified things by adding the
+<code class="docutils literal notranslate"><span class="pre">amps_into_terminal</span></code> and <code class="docutils literal notranslate"><span class="pre">volts_across_terminal</span></code> methods.  You shouldn’t
+have to know about event names if you are using the simulator, the code should
+figure that out for you.</p>
+<p><span class="new-spec">Can you speed it up? Maybe compress time by 1000? Like, make an
+hour of charging in the battery’s time happen in 36 seconds of our time.</span></p>
+<p>“I haven’t tried it yet, but yes, I was designed to do that.  Hmm, I guess we
+could write something like this:”</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime.datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
+
+<span class="n">battery</span> <span class="o">=</span> <span class="n">Battery</span><span class="p">(</span>
+  <span class="n">rated_amp_hours</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+  <span class="n">initial_soc_per</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+  <span class="n">name</span><span class="o">=</span><span class="s2">&quot;lead_acid_battery_100Ah&quot;</span><span class="p">,</span>
+  <span class="n">soc_vrs_ocv_profile_csv</span><span class="o">=</span><span class="s1">&#39;soc_ocv.csv&#39;</span><span class="p">,</span>
+  <span class="n">ocv_vrs_r_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_internal_resistance.csv&#39;</span><span class="p">,</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">simulation_start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+<span class="n">seconds_into_the_future</span> <span class="o">=</span> <span class="mi">3600</span>
+<span class="n">time_series</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="n">simulation_start_time</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">second</span><span class="p">)</span> \
+    <span class="k">for</span> <span class="n">second</span> <span class="ow">in</span> <span class="n">seconds_into_the_future</span>
+<span class="p">]</span>
+
+<span class="k">for</span> <span class="n">moment</span> <span class="ow">in</span> <span class="n">time_series</span>
+   <span class="k">while</span> <span class="n">battery</span><span class="o">.</span><span class="n">soc_per</span> <span class="o">&lt;</span> <span class="mf">80.0</span><span class="p">:</span>
+     <span class="n">battery</span><span class="o">.</span><span class="n">amps_into_terminals</span><span class="p">(</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
+     <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+     <span class="n">abs_volts</span> <span class="o">=</span> <span class="n">battery</span><span class="o">.</span><span class="n">last_terminal_voltage</span>
+
+   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+     <span class="n">battery</span><span class="o">.</span><span class="n">volts_across_terminals</span><span class="p">(</span><span class="n">abs_volts</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
+</pre></div>
+</div>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
 </div>

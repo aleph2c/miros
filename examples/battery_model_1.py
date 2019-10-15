@@ -2,6 +2,7 @@ import re
 import time
 import logging
 from datetime import datetime
+from datetime import timedelta
 from functools import partial
 from collections import namedtuple
 
@@ -219,6 +220,7 @@ soc_%:    {6:9.4f}""".format(
       self.ocv_vrs_r_profile_csv
     )
     self.batt_r_ohms = self._ohms_given_soc(self.soc_per)
+    self.open_circuit_volts = self.fn_soc_to_ocv(self.soc_per)
 
     return return_status.HANDLED
 
@@ -281,7 +283,7 @@ soc_%:    {6:9.4f}""".format(
 
     amps = e.payload.amps
     terminal_volts = amps * self.batt_r_ohms + self.open_circuit_volts
-
+    #print(" {} * {} +  {}".format(str(amps), str(self.batt_r_ohms), str(self.open_circuit_volts)))
     self.last_terminal_voltage = terminal_volts
     self.last_current_amps = amps
 
@@ -305,11 +307,13 @@ soc_%:    {6:9.4f}""".format(
       self.soc_per / 100.0 * self.rated_amp_hours + e.payload.amp_hours
     self.soc_per = self.amp_hours / self.rated_amp_hours * 100.0
     self.batt_r_ohms = self._ohms_given_soc(self.soc_per)
+    self.open_circuit_volts = self.fn_soc_to_ocv(self.soc_per)
     return status
 
   def _amps_given_terminal_volts(self, terminal_volts):
     soc_per = self.soc_per
     voc = self.fn_soc_to_ocv(soc_per)
+    #batt_r_ohms = self.fn_ocv_to_batt_r(voc)
     v_r_volts = terminal_volts - voc
     amps = v_r_volts / self.batt_r_ohms
     return amps
@@ -369,7 +373,7 @@ soc_%:    {6:9.4f}""".format(
       self.post_fifo(Event(signal=signals.volts_and_time,
         payload=VoltsAndTime(volts=volts, time=sample_time)))
 
-  def charge_into_terminals(self, amp_hours, sample_time=None):
+  def charge_into_battery(self, amp_hours, sample_time=None):
     if sample_time is None:
       self.post_fifo(Event(signal=signals.amp_hours,
         payload=AmpsHours(amps_hours)))
@@ -379,27 +383,46 @@ soc_%:    {6:9.4f}""".format(
 
 if __name__ == '__main__':
 
-  # time 3149, 52 minutes (80 amps at 10 percent capacity)
-
   battery = Battery(
    rated_amp_hours=100,
-   initial_soc_per=10.0,
-   name="battery_example",
+   initial_soc_per=70.0,
+   name="lead_acid_battery_100Ah",
    soc_vrs_ocv_profile_csv='soc_ocv.csv',
    ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
    live_trace=True)
 
-  while battery.soc_per < 80.0:
-    battery.amps_into_terminals(30.0)
-    print(str(battery), end='')
-    time.sleep(1)
-    abs_volts = battery.last_terminal_voltage
+  simulation_start_time = datetime.now()
+  simulation_hours = 3.0
+  seconds_into_the_future = simulation_hours * 60 * 60
+  time_series = [
+    simulation_start_time + timedelta(seconds=second) \
+      for second in range(int(seconds_into_the_future))
+  ]
+  abs_volts = 12.8576
 
-  for i in range(3):
-    battery.volts_across_terminals(abs_volts)
-    print(str(battery), end='')
-    time.sleep(1)
+  times_in_abs = 0
+  max_times_in_abs = 4000
+  for moment in time_series:
+    if battery.soc_per < 80.0:
+      battery.amps_into_terminals(30.0, moment)
+      print(str(battery), end='')
+      abs_volts = battery.last_terminal_voltage
+    else:
+      #if times_in_abs >= max_times_in_abs:
+      #  #print(" {} here".format(times_in_abs))
+      #  break;
+      #else:
+      #  #if times_in_abs == 2:
+      #  #  import pdb; pdb.set_trace()
+      #  battery.volts_across_terminals(abs_volts, moment)
+      #  #print('here ', str(times_in_abs))
+      #  print(str(battery), end='')
+      #  times_in_abs += 1
+      #  #print(" {} abs".format(times_in_abs))
+      battery.volts_across_terminals(abs_volts, moment)
+      print(str(battery), end='')
 
   print("")
+  print(seconds_into_the_future)
 
 

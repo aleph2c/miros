@@ -207,6 +207,7 @@ soc_%:    {6:9.4f}""".format(
   def build_ocv_soc_profile_entry_signal(self, e):
     self.last_sample_time = datetime.now()
     self.fn_soc_to_ocv = self._create_battery_model(self.battery_profile_csv)
+    self.open_circuit_volts = self.fn_soc_to_ocv(self.soc_per)
     return return_status.HANDLED
 
   def build_ocv_soc_profile_init_signal(self, e):

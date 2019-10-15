@@ -1794,16 +1794,60 @@ battery:
     :target: _static/battery_resistance_profile.pdf
     :align: center
 
-Then you update the battery simulator to have a dynamic internal resistance
-based on the open circuit voltage of the battery:
+.. note::
 
+  Above 14 V, the battery resistence was just made up.  This data was not
+  provided by cadex, I am just imagining how it would work.
 
+Then you update the battery simulator design:
 
+.. image:: _static/battery_model_4.svg
+    :target: _static/battery_model_4.pdf
+    :align: center
 
-    
+:new_spec:`You know, if you can just add more and more features like this to the
+battery simulator you are going to have something that is very useful, not just
+for us.`
 
+"All I need is data, its `numpy` and `scipy` that does the heavy lifting and the
+statechart manages the complexity.  I have simplified things by adding the
+``amps_into_terminal`` and ``volts_across_terminal`` methods.  You shouldn't
+have to know about event names if you are using the simulator, the code should
+figure that out for you.
 
+:new_spec:`Can you speed it up? Maybe compress time by 1000? Like, make an
+hour of charging in the battery's time happen in 36 seconds of our time.`
 
+"I haven't tried it yet, but yes, I was designed to do that.  Hmm, I guess we
+could write something like this:"
+
+.. code-block:: python
+ 
+  from datetime.datetime import timedelta
+
+  battery = Battery(
+    rated_amp_hours=100,
+    initial_soc_per=10.0,
+    name="lead_acid_battery_100Ah",
+    soc_vrs_ocv_profile_csv='soc_ocv.csv',
+    ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
+    live_trace=True)
+
+  simulation_start_time = datetime.now()
+  seconds_into_the_future = 3600
+  time_series = [
+    simulation_start_time + timedelta(seconds=second) \
+      for second in seconds_into_the_future
+  ]
+
+  for moment in time_series
+     while battery.soc_per < 80.0:
+       battery.amps_into_terminals(30.0, moment)
+       print(str(battery), end='')
+       abs_volts = battery.last_terminal_voltage
+
+     for i in range(3):
+       battery.volts_across_terminals(abs_volts, moment)
 
 
 
