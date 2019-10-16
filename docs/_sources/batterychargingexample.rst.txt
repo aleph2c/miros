@@ -293,22 +293,22 @@ Specification (2):
 
 ----
 
-We still haven't solved the parameter issue.  I need to create a data structure
-that has the control system information and the battery stuff in one place.  How
-about this:
+But we still haven't solved the parameter issue.  To create a data structure
+that has the control system information and the battery stuff in one place we
+adjust our data model to look like this:
 
 .. image:: _static/three_stage_charging_parameters_2.svg
     :target: _static/three_stage_charging_parameters_2.pdf
     :align: center
 
-So we make a ``ChargerParameter`` class that "has a" (black diamond arrow)
+The ``ChargerParameter`` class "has a" (black diamond arrow)
 ``CurrentControlSystem``, a ``VoltageControlSystem`` and some
 ``BatterySpecificInformation``.
 
-OK, we know how our data is structured, now we need to go back to our behavioral
-diagram and figure out how to get information from the world.
+Now that we have a plan for structuring our data, we need to go back to our
+behavioral diagram and figure out how to get information from the world.
 
-We go back to the electrical engineer and ask him, "How fast to I need to read
+We track down our electrical engineer and ask him, "How fast to I need to read
 the voltage and the current?"  He says, :new_spec:`Well, I have to read these
 values very quickly in the embedded device's interrupt service routines, the
 control systems will be running at 20 Khz, but you don't have to worry about
@@ -320,10 +320,13 @@ to set it's reference.  Make it so I can tune these values later if I need to,
 but for now you can sample the current, voltage and make decisions at 2 Hz".
 (every 0.5 seconds)`
 
-You say, "Wait, I'm not controlling the current or voltage?".  He laughs and
-says, :new_spec:`Not with Python you aren't, but you control which control
-system will run, and you will control that controllers reference and tuning
-parameters, think meta, man!`
+You say, "Wait, I'm not controlling the current or voltage?".  
+
+He laughs and says, :new_spec:`Not with Python you aren't, but you control which
+control system will run, and you will control that controllers reference and
+tuning parameters, think meta, man!`
+
+----
 
 Here we are seeing some of the power of statecharts.  They allow us to wrap deep
 expertise inside of a system with a rich set of other features.  The electrical
@@ -339,12 +342,14 @@ it:
     :target: _static/three_stage_charging_chart_2_data.pdf
     :align: center
 
-We talk to the electrical engineer again and he says, :new_spec:`What are those
-diamond arrows?`  You answer, it's just a way of saying one class has an
+We show our design to the electrical engineer and he says, :new_spec:`What are
+those diamond arrows?`  
+
+You answer, "It's just a way of saying one class has an
 attribute of another class.  For instance the ``battery_spec`` in the
 ``ChargerParameter`` class is a ``BatterySpecificInformation`` class.  You leave
 the ``BatterySpecificInformation`` class on the picture so you can see what it's
-attribute names are.
+attribute names are."
 
 :new_spec:`It seems kind of complicated, can you just show me in code?`
 
@@ -386,21 +391,25 @@ attribute names are.
       # ..
 
 He looks at the picture and the code for a while, then says, :new_spec:`OK, I
-see how it works, but why are the diamond arrows backwards?`  You answer, "The
-head of the diamond describes who owns the other thing.  If you want to know why
-it was set that way you will have to ask the committee that decided this in the
-1990's"
+see how it works, but why are the diamond arrows backwards?`  
 
-Then he asks, :new_spec:`What's the ball and the stick?`  That's where the data will
-connect to the software that drives the charger's behavior.  The behavior will need the
-data, and if you see the ``Charger`` class inherits from the ``CustomFactory``
-class which contains all of the code that can drive behavior.  Inheritance is
-just programming by difference, that arrow is like a copy and paste, it's as if
-I have copied and pasted all of that ``CustomFactory`` and ``ChargerParameters``
-code into the ``Charger`` class.  The ball is just short hand for saying the
-data attaches to the behavior here.  The "here" in this case is the "charging
-state" which will be described somewhere else.  He looks confused, and says,
-:new_spec:`I guess you will have to show me when you make it.`
+You answer, "The head of the diamond describes who owns the other thing.  If you
+want to know why it was set that way you will have to ask the committee that
+decided this in the 1990's"
+
+Then he asks, :new_spec:`What's the ball and the stick?`  
+
+"That's where the data will connect to the software that drives the charger's
+behavior.  The behavior will need the data, and if you see the ``Charger`` class
+inherits from the ``CustomFactory`` class which contains all of the code that
+can drive behavior.  Inheritance is just programming by difference, that arrow
+is like a copy and paste, it's as if I have copied and pasted all of that
+``CustomFactory`` and ``ChargerParameters`` code into the ``Charger`` class.
+The ball is just short hand for saying the data attaches to the behavior here.
+The "here" in this case is the "charging state" which will be described
+somewhere else."
+
+He looks confused, and says, :new_spec:`I guess you will have to show me when you make it.`
 
 ----
 
@@ -1567,17 +1576,25 @@ is a graph of that data:"
     :target: _static/battery_profile.pdf
     :align: center
 
-He looks at it and says, :new_spec:`Where did you get these data?`.
+.. note::
 
-"Cadex posts a lot of their data online.  I used one of their pictures as a
-reference. My CSV file isn't real though, I just eyeballed their graph to make
-mine."
+  You can find the data to generate this model `here
+  <https://github.com/aleph2c/miros/blob/master/examples/soc_ocv.csv>`_, and the
+  code to make the graphs `here
+  <https://github.com/aleph2c/miros/blob/master/examples/soc_ocv.py>`_.
+
+He looks at it and says, :new_spec:`Where did you get your data?`.
+
+"`Cadex <https://www.cadex.com/en>`_ posts a lot of their information online.  I
+used one of their pictures as a reference. My CSV file isn't real though, I just
+eyeballed their graph to make mine."
 
 He says, :new_spec:`Good enough, what is the second graph?`  
 
 "The software can't use the CSV file directly, it needs a function, so I build a
 function from this data and this function was used to draw the second graph."
-:new_spec:`So the second graph isn't the data?  Wow, not bad, it looks the same
+
+:new_spec:`So the second graph isn't the data?  Not bad, it looks the same
 as the CSV file.`  
 
 "It took me a while to find something that would work, at first I tried to match
@@ -1699,10 +1716,12 @@ happens if an ``amps`` event is sent."  You point to the ``amps_to_amp_hours``
 state on the diagram. "Try and describe to me how it works."
 
 He looks at it and asks, :new_spec:`Where is the state machine usually
-sitting?`  "It's usually in the ``update_charge_state``".  He concentrates for a
-moment and says, :new_spec:`Yeah, ok, the amps event kind of works the same way, it
-generates a amps_and_time event, which is caught then fed as a amp_hours event,
-and eventually the chart climbs back into the update_charge_state, like before.`
+sitting?`  "It's usually in the ``update_charge_state``".  
+
+He concentrates for a moment and says, :new_spec:`Yeah, ok, the amps event kind
+of works the same way, it generates a amps_and_time event, which is caught then
+fed as a amp_hours event, and eventually the chart climbs back into the
+update_charge_state, like before.`
 
 He pauses, then says, :new_spec:`I think I see a problem though, what happens if an amps
 event is being processed while the volts event was being processed?`
@@ -1715,9 +1734,7 @@ invented an processed before the ``amps`` event is dealt with. The call to
 ``post_lifo`` is very selfish; It will always push itself to the front of the
 queue."
 
-:new_spec:`That reminds me of some ex-olympians I hosted during the 2010 games.
-Just try and get those people to do their dishes.  Ok, so think I kind of
-understand your design, let's see it work.`
+:new_spec:`Ok, so I think I kind of understand your design, let's see it work.`
 
 "It's kind of boring to watch, what do you want to see?"
 
@@ -1765,10 +1782,19 @@ percent. What charge current do you want?"
     <iframe width="560" height="315" src="https://www.youtube.com/embed/qI8-3kF5nlU" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> 
   </center>
 
+:new_spec:`There seems to be something weird happening with the time.`
 
-:new_spec:`It looks like you got the transition working, but I don't think you
-have enough loss in your battery, where did you get your internal resistance
-number from?`
+"Yeah, the time print out is the difference in seconds from when the simulation
+started and when the reading was being made, you are watching python slip.  When
+you write ``time.sleep(1)`` you don't actually sleep 1 second you sleep a bit
+more than that.  This slip is dependent upon your operating system and what
+other kinds of computational loads you are running.  Because of this, no two
+runs of the program will generate the same results, since the time difference
+comes to play in how the state of charge is accumulated."
+
+:new_spec:`Ok, well it looks like you got the transition working, but I don't
+think you have enough loss in your battery, where did you get your internal
+resistance number from?`
 
 "I pulled it off of a battery vendor's data sheet."
 
@@ -1778,8 +1804,8 @@ be hard for you to add another curve?  The battery resistence changes with its
 state of charge.  If you add this your simulator will behave more like a real
 battery.`
 
-"No, it would be simple, I would just do what I did before, the hardest part
-would be finding good data and updating the diagram with a graphic."
+"No, it wouldn't be that hard, I would just do what I did before, the hardest
+part would be finding good data and updating the diagram with a graphic."
 
 :new_spec:`If it isn't a big deal add it.  Otherwise, this is good enough.`
 
@@ -1799,59 +1825,210 @@ battery:
   Above 14 V, the battery resistence was just made up.  This data was not
   provided by cadex, I am just imagining how it would work.
 
+  You can find the data to generate this model `here
+  <https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.csv>`_, and the
+  code to make the graphs `here
+  <https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.py>`_.
+
+
 Then you update the battery simulator design:
 
 .. image:: _static/battery_model_4.svg
     :target: _static/battery_model_4.pdf
     :align: center
 
-:new_spec:`You know, if you can just add more and more features like this to the
-battery simulator you are going to have something that is very useful, not just
-for us.`
+:new_spec:`You know, if you keep adding features like this to the battery
+simulator you are going to have something that is very useful, not just for us.`
 
 "All I need is data, its `numpy` and `scipy` that does the heavy lifting and the
-statechart manages the complexity.  I have simplified things by adding the
-``amps_into_terminal`` and ``volts_across_terminal`` methods.  You shouldn't
-have to know about event names if you are using the simulator, the code should
-figure that out for you.
+statechart manages the time and the design complexity.  Speaking of which, I
+have simplified things by adding the ``amps_into_terminal`` and
+``volts_across_terminal`` methods.  You shouldn't have to know about event names
+if you are using the simulator, the code should figure that out for you.
 
-:new_spec:`Can you speed it up? Maybe compress time by 1000? Like, make an
-hour of charging in the battery's time happen in 36 seconds of our time.`
+:new_spec:`Can you speed it up? Maybe compress time? Like, make an
+hour of charging in the battery's time happen in tens of seconds in our time
+frame?`
 
-"I haven't tried it yet, but yes, I was designed to do that.  Hmm, I guess we
-could write something like this:"
+"Yes, I added a time_series static function to the battery model, here is how we
+would speed things up:"
 
 .. code-block:: python
+
+  # .. simulator code above
+  if __name__ == "__main__":
  
-  from datetime.datetime import timedelta
+     battery = Battery(
+       rated_amp_hours=100,
+       initial_soc_per=10.0,
+       name="lead_acid_battery_100Ah",
+       soc_vrs_ocv_profile_csv='soc_ocv.csv',
+       ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
+       live_trace=True
+     )
 
-  battery = Battery(
-    rated_amp_hours=100,
-    initial_soc_per=10.0,
-    name="lead_acid_battery_100Ah",
-    soc_vrs_ocv_profile_csv='soc_ocv.csv',
-    ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
-    live_trace=True)
+     hours = 1
 
-  simulation_start_time = datetime.now()
-  seconds_into_the_future = 3600
-  time_series = [
-    simulation_start_time + timedelta(seconds=second) \
-      for second in seconds_into_the_future
-  ]
+     time_series = battery.time_series(
+       duration_in_sec=hours*60*60,
+     )
 
-  for moment in time_series
-     while battery.soc_per < 80.0:
-       battery.amps_into_terminals(30.0, moment)
-       print(str(battery), end='')
-       abs_volts = battery.last_terminal_voltage
+     for moment in time_series:
+       if battery.soc_per < 80.0:
+         battery.amps_into_terminals(33.0, moment)
+         print(str(battery), end='')
+         abs_volts = battery.last_terminal_voltage
+       else:
+         battery.volts_across_terminals(abs_volts, moment)
+         print(str(battery), end='')
 
-     for i in range(3):
-       battery.volts_across_terminals(abs_volts, moment)
+"This code will get us around our Python time-slippage issue.  See how I
+pre-calculate the time in the ``time_series``?"  
+
+:new_spec:`Not really.`  
+
+"The call to the ``time_series`` function basically creates a set
+of time stamps ranging from "now" till one hour from now, 1 second apart.  There
+will be 3600 of them.  We then try to slam the battery with data as fast as main
+will run.  The battery model doesn't know that its running one hour into our
+future; we feed it its time reference."
+
+:new_spec:`Show me.`
+
+.. raw:: html
+
+  <center>
+     <iframe width="560" height="315" src="https://www.youtube.com/embed/HFwYUzvyIxk" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </center>
+
+:new_spec:`It looks good, but why does your simulator only run to 3581 and not
+closer to 3600?`
+
+"I didn't see that."  
+
+You think for a moment and say, "It's losing events, the main program is running
+faster than the battery model's thread.  If you added a small time delay at the
+end of the loop the battery would be able to keep up.  Main is basically doing a
+denial of service attack on the battery.  Despite this, the simulator seems to
+work as you would expect."
+
+:new_spec:`That's kind of cool, but your tests will be non-deterministic.`
+
+"Yeah, I'll add a delay when we use the simulator to test the charger.  You have
+identified a bigger issue than the time-slippage issue, but it is much easier to
+fix."
+
+----
+
+Now that we have a way to simulate a battery, we will add this information to
+our specification:
+
+Single Unit Three Stage Battery Charger Design (3)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**High level Specification (6)**
+
+* This product will be a three stage charger with an equalization feature.
+* The charger has two control systems: constant current and constant voltage.
+* The bulk stage is a constant current control technique.
+* The absorption, float and equalization stages are constant voltage control
+  techniques.
+* The charging electrical profile can be seen here
+
+.. image:: _static/three_stage_charging_chart_2_graph.svg
+    :target: _static/three_stage_charging_chart_2_graph.pdf
+    :align: center
+
+**Sofware Functional Specification (6)**
+
+* The software system will be broken into two parts, fast running c code and slower running Python code.
+* The c code will run in ISRs at a frequency of 20 Khz and will control the charger in either a constant current or
+  constant voltage mode. (see separate doc)
+* The Python code will determine which control strategy the c code is
+  using, it will also set the c code's control system parameters.  The Python code will not directly control the electrical output of the unit
+* The Python code will sample the current and voltage and make decisions every 0.5 seconds
+* The Python data architecture can be seen here.
+
+.. image:: _static/three_stage_charging_chart_4_data.svg
+    :target: _static/three_stage_charging_chart_4_data.pdf
+    :align: center
+
+* The Python behavioral architecture can be seen here.
+
+.. image:: _static/three_stage_charging_chart_4_chart.svg
+    :target: _static/three_stage_charging_chart_4_chart.pdf
+    :align: center
+
+**Software Testing Specification (6)**
+
+* The charger's data/behavioral software will be adjusted to use data instead of real electrical readings.
+
+* The software that will be shipped (production code) should be
+  identical to the software that is being tested.  The software testing code
+  should pass data into the production code and observe the production code's
+  behavior without the production code knowing it is under test.
+
+* A simple physics model will be developed to describe the
+  relationship between the battery and the charger.  The testing code will use
+  this model to confirm that the charger's behavioral software is working as
+  designed.  The physics model should be parameterized so that it can test
+  different battery types.
+
+**Sofware Testing Functional Specification (6)**
+
+* :new_spec:`The battery simulation (simple physical model)` `software <https://github.com/aleph2c/miros/blob/master/examples/battery_model_1.py>`_ :new_spec:`is described below:`
+
+   .. image:: _static/battery_model_4.svg
+       :target: _static/battery_model_4.pdf
+       :align: center
+
+   * :new_spec:`To change how the simulator profiles a given battery type, include two different
+     spread-sheets, the "soc_ocv.csv" and the "ocv_internal_resistance.csv" for the
+     battery you are mimicing.`
+
+      * :new_spec:`An example of the "soc_ocv.csv" can be found` `here <https://github.com/aleph2c/miros/blob/master/examples/soc_ocv.csv>`_ :new_spec:`and it's` `data
+        plot <https://github.com/aleph2c/miros/blob/master/examples/soc_ocv.py>`_ :new_spec:`would look like this:`
+
+      .. image:: _static/battery_profile.svg
+          :target: _static/battery_profile.pdf
+          :align: center
+
+      * :new_spec:`An example of the "ocv_internal_resistance.csv" can be found` `here <https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.csv>`_
+        :new_spec:`and it's` `data plot <https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.py>`_ :new_spec:`would look like this:`
 
 
+      .. image:: _static/battery_resistance_profile.svg
+          :target: _static/battery_resistance_profile.pdf
+          :align: center
 
+   * :new_spec:`To build and run the battery simulator:`
 
+      .. code-block:: python
+
+        battery = Battery(
+          rated_amp_hours=100,
+          initial_soc_per=10.0,
+          name="lead_acid_battery_100Ah",
+          soc_vrs_ocv_profile_csv='soc_ocv.csv',
+          ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
+          live_trace=True
+        )
+
+        hours = 1
+
+        time_series = battery.time_series(
+          duration_in_sec=hours*60*60,
+        )
+        for moment in time_series:
+          if battery.soc_per < 80.0:
+            battery.amps_into_terminals(33.0, moment)
+            print(str(battery), end='')
+            abs_volts = battery.last_terminal_voltage
+          else:
+            battery.volts_across_terminals(abs_volts, moment)
+            print(str(battery), end='')
+          time.sleep(0.0001)
+     
 ..
    I don't know about you, but I'm starting to feel like I have been drinking from
    a fire hose.  To simplify what I have learned about how one charger should

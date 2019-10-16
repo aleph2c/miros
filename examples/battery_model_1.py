@@ -134,11 +134,11 @@ class Battery(InstrumentedFactory, BatteryAttributes):
     self.soc_vrs_ocv_profile_csv = "ocv_soc.csv" if \
       soc_vrs_ocv_profile_csv is None else soc_vrs_ocv_profile_csv
 
-    self.build_ocv_soc_profile = self.create(state="build_ocv_soc_profile"). \
+    self.build_fns_from_data = self.create(state="build_fns_from_data"). \
       catch(signal=signals.ENTRY_SIGNAL,
-        handler=self.build_ocv_soc_profile_entry_signal). \
+        handler=self.build_fns_from_data_entry_signal). \
       catch(signal=signals.INIT_SIGNAL,
-        handler=self.build_ocv_soc_profile_init_signal). \
+        handler=self.build_fns_from_data_init_signal). \
       to_method()
 
     self.volts_to_amps = self.create(state="volts_to_amps"). \
@@ -164,12 +164,12 @@ class Battery(InstrumentedFactory, BatteryAttributes):
         handler=self.update_charge_state_amp_hours). \
       to_method()
 
-    self.nest(self.build_ocv_soc_profile, parent=None). \
-         nest(self.volts_to_amps, parent=self.build_ocv_soc_profile). \
+    self.nest(self.build_fns_from_data, parent=None). \
+         nest(self.volts_to_amps, parent=self.build_fns_from_data). \
          nest(self.amps_to_amp_hours, parent=self.volts_to_amps). \
          nest(self.update_charge_state, parent=self.amps_to_amp_hours)
 
-    self.start_at(self.build_ocv_soc_profile)
+    self.start_at(self.build_fns_from_data)
 
   def __str__(self):
     '''Turn the battery simulator into a str to describe its characteristics.
@@ -212,7 +212,7 @@ soc_%:     {6:9.4f}\n""".format(
       self.fn_soc_to_ocv(self.soc_per),
       self.soc_per)
 
-  def build_ocv_soc_profile_entry_signal(self, e):
+  def build_fns_from_data_entry_signal(self, e):
     self.last_sample_time = datetime.now()
     self.fn_soc_to_ocv = self._create_soc_to_ocv_model(
       self.soc_vrs_ocv_profile_csv
@@ -225,7 +225,7 @@ soc_%:     {6:9.4f}\n""".format(
 
     return return_status.HANDLED
 
-  def build_ocv_soc_profile_init_signal(self, e):
+  def build_fns_from_data_init_signal(self, e):
     status = self.trans(self.volts_to_amps)
     return status
 
@@ -431,7 +431,6 @@ if __name__ == '__main__':
   time_series = battery.time_series(
     duration_in_sec=hours*60*60,
   )
-
   for moment in time_series:
     if battery.soc_per < 80.0:
       battery.amps_into_terminals(33.0, moment)
@@ -440,3 +439,4 @@ if __name__ == '__main__':
     else:
       battery.volts_across_terminals(abs_volts, moment)
       print(str(battery), end='')
+    #time.sleep(0.0001)

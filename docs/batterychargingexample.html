@@ -300,17 +300,17 @@ techniques.</li>
 <a class="reference external image-reference" href="_static/three_stage_charging_chart_1.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_1.svg" src="_images/three_stage_charging_chart_1.svg" /></div>
 </a>
 <hr class="docutils" />
-<p>We still haven’t solved the parameter issue.  I need to create a data structure
-that has the control system information and the battery stuff in one place.  How
-about this:</p>
+<p>But we still haven’t solved the parameter issue.  To create a data structure
+that has the control system information and the battery stuff in one place we
+adjust our data model to look like this:</p>
 <a class="reference external image-reference" href="_static/three_stage_charging_parameters_2.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_parameters_2.svg" src="_images/three_stage_charging_parameters_2.svg" /></div>
 </a>
-<p>So we make a <code class="docutils literal notranslate"><span class="pre">ChargerParameter</span></code> class that “has a” (black diamond arrow)
+<p>The <code class="docutils literal notranslate"><span class="pre">ChargerParameter</span></code> class “has a” (black diamond arrow)
 <code class="docutils literal notranslate"><span class="pre">CurrentControlSystem</span></code>, a <code class="docutils literal notranslate"><span class="pre">VoltageControlSystem</span></code> and some
 <code class="docutils literal notranslate"><span class="pre">BatterySpecificInformation</span></code>.</p>
-<p>OK, we know how our data is structured, now we need to go back to our behavioral
-diagram and figure out how to get information from the world.</p>
-<p>We go back to the electrical engineer and ask him, “How fast to I need to read
+<p>Now that we have a plan for structuring our data, we need to go back to our
+behavioral diagram and figure out how to get information from the world.</p>
+<p>We track down our electrical engineer and ask him, “How fast to I need to read
 the voltage and the current?”  He says, <span class="new-spec">Well, I have to read these
 values very quickly in the embedded device’s interrupt service routines, the
 control systems will be running at 20 Khz, but you don’t have to worry about
@@ -321,10 +321,11 @@ But I will need you to determine which control system to run and I’ll need you
 to set it’s reference.  Make it so I can tune these values later if I need to,
 but for now you can sample the current, voltage and make decisions at 2 Hz”.
 (every 0.5 seconds)</span></p>
-<p>You say, “Wait, I’m not controlling the current or voltage?”.  He laughs and
-says, <span class="new-spec">Not with Python you aren’t, but you control which control
-system will run, and you will control that controllers reference and tuning
-parameters, think meta, man!</span></p>
+<p>You say, “Wait, I’m not controlling the current or voltage?”.</p>
+<p>He laughs and says, <span class="new-spec">Not with Python you aren’t, but you control which
+control system will run, and you will control that controllers reference and
+tuning parameters, think meta, man!</span></p>
+<hr class="docutils" />
 <p>Here we are seeing some of the power of statecharts.  They allow us to wrap deep
 expertise inside of a system with a rich set of other features.  The electrical
 engineer will manage the control system and the circuits needed to make the
@@ -335,12 +336,13 @@ model.  We want to attach it to our statechart so that our statechart can use
 it:</p>
 <a class="reference external image-reference" href="_static/three_stage_charging_chart_2_data.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_2_data.svg" src="_images/three_stage_charging_chart_2_data.svg" /></div>
 </a>
-<p>We talk to the electrical engineer again and he says, <span class="new-spec">What are those
-diamond arrows?</span>  You answer, it’s just a way of saying one class has an
+<p>We show our design to the electrical engineer and he says, <span class="new-spec">What are
+those diamond arrows?</span></p>
+<p>You answer, “It’s just a way of saying one class has an
 attribute of another class.  For instance the <code class="docutils literal notranslate"><span class="pre">battery_spec</span></code> in the
 <code class="docutils literal notranslate"><span class="pre">ChargerParameter</span></code> class is a <code class="docutils literal notranslate"><span class="pre">BatterySpecificInformation</span></code> class.  You leave
 the <code class="docutils literal notranslate"><span class="pre">BatterySpecificInformation</span></code> class on the picture so you can see what it’s
-attribute names are.</p>
+attribute names are.”</p>
 <p><span class="new-spec">It seems kind of complicated, can you just show me in code?</span></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ControlSystem</span><span class="p">:</span>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -379,20 +381,21 @@ attribute names are.</p>
 </pre></div>
 </div>
 <p>He looks at the picture and the code for a while, then says, <span class="new-spec">OK, I
-see how it works, but why are the diamond arrows backwards?</span>  You answer, “The
-head of the diamond describes who owns the other thing.  If you want to know why
-it was set that way you will have to ask the committee that decided this in the
-1990’s”</p>
-<p>Then he asks, <span class="new-spec">What’s the ball and the stick?</span>  That’s where the data will
-connect to the software that drives the charger’s behavior.  The behavior will need the
-data, and if you see the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> class inherits from the <code class="docutils literal notranslate"><span class="pre">CustomFactory</span></code>
-class which contains all of the code that can drive behavior.  Inheritance is
-just programming by difference, that arrow is like a copy and paste, it’s as if
-I have copied and pasted all of that <code class="docutils literal notranslate"><span class="pre">CustomFactory</span></code> and <code class="docutils literal notranslate"><span class="pre">ChargerParameters</span></code>
-code into the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> class.  The ball is just short hand for saying the
-data attaches to the behavior here.  The “here” in this case is the “charging
-state” which will be described somewhere else.  He looks confused, and says,
-<span class="new-spec">I guess you will have to show me when you make it.</span></p>
+see how it works, but why are the diamond arrows backwards?</span></p>
+<p>You answer, “The head of the diamond describes who owns the other thing.  If you
+want to know why it was set that way you will have to ask the committee that
+decided this in the 1990’s”</p>
+<p>Then he asks, <span class="new-spec">What’s the ball and the stick?</span></p>
+<p>“That’s where the data will connect to the software that drives the charger’s
+behavior.  The behavior will need the data, and if you see the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> class
+inherits from the <code class="docutils literal notranslate"><span class="pre">CustomFactory</span></code> class which contains all of the code that
+can drive behavior.  Inheritance is just programming by difference, that arrow
+is like a copy and paste, it’s as if I have copied and pasted all of that
+<code class="docutils literal notranslate"><span class="pre">CustomFactory</span></code> and <code class="docutils literal notranslate"><span class="pre">ChargerParameters</span></code> code into the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> class.
+The ball is just short hand for saying the data attaches to the behavior here.
+The “here” in this case is the “charging state” which will be described
+somewhere else.”</p>
+<p>He looks confused, and says, <span class="new-spec">I guess you will have to show me when you make it.</span></p>
 <hr class="docutils" />
 <p>The data model seems good enough so let’s start designing the system behavior.
 We need to start programming time, so we will construct three heart beats,
@@ -1386,14 +1389,19 @@ sheet describing the battery’s state_of_charge vrs the open_circuit_volts. Her
 is a graph of that data:”</p>
 <a class="reference external image-reference" href="_static/battery_profile.pdf"><div align="center" class="align-center"><img alt="_images/battery_profile.svg" src="_images/battery_profile.svg" /></div>
 </a>
-<p>He looks at it and says, <span class="new-spec">Where did you get these data?</span>.</p>
-<p>“Cadex posts a lot of their data online.  I used one of their pictures as a
-reference. My CSV file isn’t real though, I just eyeballed their graph to make
-mine.”</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You can find the data to generate this model <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/soc_ocv.csv">here</a>, and the
+code to make the graphs <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/soc_ocv.py">here</a>.</p>
+</div>
+<p>He looks at it and says, <span class="new-spec">Where did you get your data?</span>.</p>
+<p>“<a class="reference external" href="https://www.cadex.com/en">Cadex</a> posts a lot of their information online.  I
+used one of their pictures as a reference. My CSV file isn’t real though, I just
+eyeballed their graph to make mine.”</p>
 <p>He says, <span class="new-spec">Good enough, what is the second graph?</span></p>
 <p>“The software can’t use the CSV file directly, it needs a function, so I build a
-function from this data and this function was used to draw the second graph.”
-<span class="new-spec">So the second graph isn’t the data?  Wow, not bad, it looks the same
+function from this data and this function was used to draw the second graph.”</p>
+<p><span class="new-spec">So the second graph isn’t the data?  Not bad, it looks the same
 as the CSV file.</span></p>
 <p>“It took me a while to find something that would work, at first I tried to match
 the data with a polynomial but it was very wiggly, I had something that looked
@@ -1485,10 +1493,11 @@ provided directly from the event.  Look, you can see something very similar
 happens if an <code class="docutils literal notranslate"><span class="pre">amps</span></code> event is sent.”  You point to the <code class="docutils literal notranslate"><span class="pre">amps_to_amp_hours</span></code>
 state on the diagram. “Try and describe to me how it works.”</p>
 <p>He looks at it and asks, <span class="new-spec">Where is the state machine usually
-sitting?</span>  “It’s usually in the <code class="docutils literal notranslate"><span class="pre">update_charge_state</span></code>”.  He concentrates for a
-moment and says, <span class="new-spec">Yeah, ok, the amps event kind of works the same way, it
-generates a amps_and_time event, which is caught then fed as a amp_hours event,
-and eventually the chart climbs back into the update_charge_state, like before.</span></p>
+sitting?</span>  “It’s usually in the <code class="docutils literal notranslate"><span class="pre">update_charge_state</span></code>”.</p>
+<p>He concentrates for a moment and says, <span class="new-spec">Yeah, ok, the amps event kind
+of works the same way, it generates a amps_and_time event, which is caught then
+fed as a amp_hours event, and eventually the chart climbs back into the
+update_charge_state, like before.</span></p>
 <p>He pauses, then says, <span class="new-spec">I think I see a problem though, what happens if an amps
 event is being processed while the volts event was being processed?</span></p>
 <p>“It’s not a problem because the invented signals are posted using <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code>
@@ -1498,9 +1507,7 @@ an <code class="docutils literal notranslate"><span class="pre">amp</span></code
 invented an processed before the <code class="docutils literal notranslate"><span class="pre">amps</span></code> event is dealt with. The call to
 <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> is very selfish; It will always push itself to the front of the
 queue.”</p>
-<p><span class="new-spec">That reminds me of some ex-olympians I hosted during the 2010 games.
-Just try and get those people to do their dishes.  Ok, so think I kind of
-understand your design, let’s see it work.</span></p>
+<p><span class="new-spec">Ok, so I think I kind of understand your design, let’s see it work.</span></p>
 <p>“It’s kind of boring to watch, what do you want to see?”</p>
 <p><span class="new-spec">Well, let’s watch the point at which the charger should switch
 between bulk to absorption.  Ideally I would like to see this happen when the
@@ -1535,17 +1542,25 @@ percent. What charge current do you want?”</p>
 <p>“Let’s watch it work:”</p>
 <center>
   <iframe width="560" height="315" src="https://www.youtube.com/embed/qI8-3kF5nlU" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</center><p><span class="new-spec">It looks like you got the transition working, but I don’t think you
-have enough loss in your battery, where did you get your internal resistance
-number from?</span></p>
+</center><p><span class="new-spec">There seems to be something weird happening with the time.</span></p>
+<p>“Yeah, the time print out is the difference in seconds from when the simulation
+started and when the reading was being made, you are watching python slip.  When
+you write <code class="docutils literal notranslate"><span class="pre">time.sleep(1)</span></code> you don’t actually sleep 1 second you sleep a bit
+more than that.  This slip is dependent upon your operating system and what
+other kinds of computational loads you are running.  Because of this, no two
+runs of the program will generate the same results, since the time difference
+comes to play in how the state of charge is accumulated.”</p>
+<p><span class="new-spec">Ok, well it looks like you got the transition working, but I don’t
+think you have enough loss in your battery, where did you get your internal
+resistance number from?</span></p>
 <p>“I pulled it off of a battery vendor’s data sheet.”</p>
 <p><span class="new-spec">Ah yes, that is another way for vendor’s to white-lie about their
 batteries, the internal resistance changes as you charge the battery.  Would it
 be hard for you to add another curve?  The battery resistence changes with its
 state of charge.  If you add this your simulator will behave more like a real
 battery.</span></p>
-<p>“No, it would be simple, I would just do what I did before, the hardest part
-would be finding good data and updating the diagram with a graphic.”</p>
+<p>“No, it wouldn’t be that hard, I would just do what I did before, the hardest
+part would be finding good data and updating the diagram with a graphic.”</p>
 <p><span class="new-spec">If it isn’t a big deal add it.  Otherwise, this is good enough.</span></p>
 <hr class="docutils" />
 <p>Being a sucker for a challenge, you head back to the <a class="reference external" href="https://batteryuniversity.com/learn/archive/how_does_internal_resistance_affect_performance">cadex website</a>
@@ -1555,51 +1570,182 @@ battery:</p>
 </a>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Above 14 V, the battery resistence was just made up.  This data was not
+<p>Above 14 V, the battery resistence was just made up.  This data was not
 provided by cadex, I am just imagining how it would work.</p>
+<p class="last">You can find the data to generate this model <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.csv">here</a>, and the
+code to make the graphs <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.py">here</a>.</p>
 </div>
 <p>Then you update the battery simulator design:</p>
 <a class="reference external image-reference" href="_static/battery_model_4.pdf"><div align="center" class="align-center"><img alt="_images/battery_model_4.svg" src="_images/battery_model_4.svg" /></div>
 </a>
-<p><span class="new-spec">You know, if you can just add more and more features like this to the
-battery simulator you are going to have something that is very useful, not just
-for us.</span></p>
+<p><span class="new-spec">You know, if you keep adding features like this to the battery
+simulator you are going to have something that is very useful, not just for us.</span></p>
 <p>“All I need is data, its <cite>numpy</cite> and <cite>scipy</cite> that does the heavy lifting and the
-statechart manages the complexity.  I have simplified things by adding the
-<code class="docutils literal notranslate"><span class="pre">amps_into_terminal</span></code> and <code class="docutils literal notranslate"><span class="pre">volts_across_terminal</span></code> methods.  You shouldn’t
-have to know about event names if you are using the simulator, the code should
-figure that out for you.</p>
-<p><span class="new-spec">Can you speed it up? Maybe compress time by 1000? Like, make an
-hour of charging in the battery’s time happen in 36 seconds of our time.</span></p>
-<p>“I haven’t tried it yet, but yes, I was designed to do that.  Hmm, I guess we
-could write something like this:”</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime.datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
+statechart manages the time and the design complexity.  Speaking of which, I
+have simplified things by adding the <code class="docutils literal notranslate"><span class="pre">amps_into_terminal</span></code> and
+<code class="docutils literal notranslate"><span class="pre">volts_across_terminal</span></code> methods.  You shouldn’t have to know about event names
+if you are using the simulator, the code should figure that out for you.</p>
+<p><span class="new-spec">Can you speed it up? Maybe compress time? Like, make an
+hour of charging in the battery’s time happen in tens of seconds in our time
+frame?</span></p>
+<p>“Yes, I added a time_series static function to the battery model, here is how we
+would speed things up:”</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># .. simulator code above</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
 
-<span class="n">battery</span> <span class="o">=</span> <span class="n">Battery</span><span class="p">(</span>
+   <span class="n">battery</span> <span class="o">=</span> <span class="n">Battery</span><span class="p">(</span>
+     <span class="n">rated_amp_hours</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+     <span class="n">initial_soc_per</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;lead_acid_battery_100Ah&quot;</span><span class="p">,</span>
+     <span class="n">soc_vrs_ocv_profile_csv</span><span class="o">=</span><span class="s1">&#39;soc_ocv.csv&#39;</span><span class="p">,</span>
+     <span class="n">ocv_vrs_r_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_internal_resistance.csv&#39;</span><span class="p">,</span>
+     <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span>
+   <span class="p">)</span>
+
+   <span class="n">hours</span> <span class="o">=</span> <span class="mi">1</span>
+
+   <span class="n">time_series</span> <span class="o">=</span> <span class="n">battery</span><span class="o">.</span><span class="n">time_series</span><span class="p">(</span>
+     <span class="n">duration_in_sec</span><span class="o">=</span><span class="n">hours</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+   <span class="p">)</span>
+
+   <span class="k">for</span> <span class="n">moment</span> <span class="ow">in</span> <span class="n">time_series</span><span class="p">:</span>
+     <span class="k">if</span> <span class="n">battery</span><span class="o">.</span><span class="n">soc_per</span> <span class="o">&lt;</span> <span class="mf">80.0</span><span class="p">:</span>
+       <span class="n">battery</span><span class="o">.</span><span class="n">amps_into_terminals</span><span class="p">(</span><span class="mf">33.0</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
+       <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+       <span class="n">abs_volts</span> <span class="o">=</span> <span class="n">battery</span><span class="o">.</span><span class="n">last_terminal_voltage</span>
+     <span class="k">else</span><span class="p">:</span>
+       <span class="n">battery</span><span class="o">.</span><span class="n">volts_across_terminals</span><span class="p">(</span><span class="n">abs_volts</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
+       <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>“This code will get us around our Python time-slippage issue.  See how I
+pre-calculate the time in the <code class="docutils literal notranslate"><span class="pre">time_series</span></code>?”</p>
+<p><span class="new-spec">Not really.</span></p>
+<p>“The call to the <code class="docutils literal notranslate"><span class="pre">time_series</span></code> function basically creates a set
+of time stamps ranging from “now” till one hour from now, 1 second apart.  There
+will be 3600 of them.  We then try to slam the battery with data as fast as main
+will run.  The battery model doesn’t know that its running one hour into our
+future; we feed it its time reference.”</p>
+<p><span class="new-spec">Show me.</span></p>
+<center>
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/HFwYUzvyIxk" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center><p><span class="new-spec">It looks good, but why does your simulator only run to 3581 and not
+closer to 3600?</span></p>
+<p>“I didn’t see that.”</p>
+<p>You think for a moment and say, “It’s losing events, the main program is running
+faster than the battery model’s thread.  If you added a small time delay at the
+end of the loop the battery would be able to keep up.  Main is basically doing a
+denial of service attack on the battery.  Despite this, the simulator seems to
+work as you would expect.”</p>
+<p><span class="new-spec">That’s kind of cool, but your tests will be non-deterministic.</span></p>
+<p>“Yeah, I’ll add a delay when we use the simulator to test the charger.  You have
+identified a bigger issue than the time-slippage issue, but it is much easier to
+fix.”</p>
+<hr class="docutils" />
+<p>Now that we have a way to simulate a battery, we will add this information to
+our specification:</p>
+</div>
+<div class="section" id="single-unit-three-stage-battery-charger-design-3">
+<h2>Single Unit Three Stage Battery Charger Design (3)<a class="headerlink" href="#single-unit-three-stage-battery-charger-design-3" title="Permalink to this headline">¶</a></h2>
+<p><strong>High level Specification (6)</strong></p>
+<ul class="simple">
+<li>This product will be a three stage charger with an equalization feature.</li>
+<li>The charger has two control systems: constant current and constant voltage.</li>
+<li>The bulk stage is a constant current control technique.</li>
+<li>The absorption, float and equalization stages are constant voltage control
+techniques.</li>
+<li>The charging electrical profile can be seen here</li>
+</ul>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_2_graph.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_2_graph.svg" src="_images/three_stage_charging_chart_2_graph.svg" /></div>
+</a>
+<p><strong>Sofware Functional Specification (6)</strong></p>
+<ul class="simple">
+<li>The software system will be broken into two parts, fast running c code and slower running Python code.</li>
+<li>The c code will run in ISRs at a frequency of 20 Khz and will control the charger in either a constant current or
+constant voltage mode. (see separate doc)</li>
+<li>The Python code will determine which control strategy the c code is
+using, it will also set the c code’s control system parameters.  The Python code will not directly control the electrical output of the unit</li>
+<li>The Python code will sample the current and voltage and make decisions every 0.5 seconds</li>
+<li>The Python data architecture can be seen here.</li>
+</ul>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_4_data.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_4_data.svg" src="_images/three_stage_charging_chart_4_data.svg" /></div>
+</a>
+<ul class="simple">
+<li>The Python behavioral architecture can be seen here.</li>
+</ul>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_4_chart.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_4_chart.svg" src="_images/three_stage_charging_chart_4_chart.svg" /></div>
+</a>
+<p><strong>Software Testing Specification (6)</strong></p>
+<ul class="simple">
+<li>The charger’s data/behavioral software will be adjusted to use data instead of real electrical readings.</li>
+<li>The software that will be shipped (production code) should be
+identical to the software that is being tested.  The software testing code
+should pass data into the production code and observe the production code’s
+behavior without the production code knowing it is under test.</li>
+<li>A simple physics model will be developed to describe the
+relationship between the battery and the charger.  The testing code will use
+this model to confirm that the charger’s behavioral software is working as
+designed.  The physics model should be parameterized so that it can test
+different battery types.</li>
+</ul>
+<p><strong>Sofware Testing Functional Specification (6)</strong></p>
+<ul>
+<li><p class="first"><span class="new-spec">The battery simulation (simple physical model)</span> <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/battery_model_1.py">software</a> <span class="new-spec">is described below:</span></p>
+<blockquote>
+<div><a class="reference external image-reference" href="_static/battery_model_4.pdf"><div align="center" class="align-center"><img alt="_images/battery_model_4.svg" src="_images/battery_model_4.svg" /></div>
+</a>
+<ul>
+<li><p class="first"><span class="new-spec">To change how the simulator profiles a given battery type, include two different
+spread-sheets, the “soc_ocv.csv” and the “ocv_internal_resistance.csv” for the
+battery you are mimicing.</span></p>
+<blockquote>
+<div><ul class="simple">
+<li><span class="new-spec">An example of the “soc_ocv.csv” can be found</span> <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/soc_ocv.csv">here</a> <span class="new-spec">and it’s</span> <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/soc_ocv.py">data
+plot</a> <span class="new-spec">would look like this:</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/battery_profile.pdf"><div align="center" class="align-center"><img alt="_images/battery_profile.svg" src="_images/battery_profile.svg" /></div>
+</a>
+<ul class="simple">
+<li><span class="new-spec">An example of the “ocv_internal_resistance.csv” can be found</span> <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.csv">here</a>
+<span class="new-spec">and it’s</span> <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.py">data plot</a> <span class="new-spec">would look like this:</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/battery_resistance_profile.pdf"><div align="center" class="align-center"><img alt="_images/battery_resistance_profile.svg" src="_images/battery_resistance_profile.svg" /></div>
+</a>
+</div></blockquote>
+</li>
+<li><p class="first"><span class="new-spec">To build and run the battery simulator:</span></p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">battery</span> <span class="o">=</span> <span class="n">Battery</span><span class="p">(</span>
   <span class="n">rated_amp_hours</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
   <span class="n">initial_soc_per</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;lead_acid_battery_100Ah&quot;</span><span class="p">,</span>
   <span class="n">soc_vrs_ocv_profile_csv</span><span class="o">=</span><span class="s1">&#39;soc_ocv.csv&#39;</span><span class="p">,</span>
   <span class="n">ocv_vrs_r_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_internal_resistance.csv&#39;</span><span class="p">,</span>
-  <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span>
+<span class="p">)</span>
 
-<span class="n">simulation_start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-<span class="n">seconds_into_the_future</span> <span class="o">=</span> <span class="mi">3600</span>
-<span class="n">time_series</span> <span class="o">=</span> <span class="p">[</span>
-  <span class="n">simulation_start_time</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">second</span><span class="p">)</span> \
-    <span class="k">for</span> <span class="n">second</span> <span class="ow">in</span> <span class="n">seconds_into_the_future</span>
-<span class="p">]</span>
+<span class="n">hours</span> <span class="o">=</span> <span class="mi">1</span>
 
-<span class="k">for</span> <span class="n">moment</span> <span class="ow">in</span> <span class="n">time_series</span>
-   <span class="k">while</span> <span class="n">battery</span><span class="o">.</span><span class="n">soc_per</span> <span class="o">&lt;</span> <span class="mf">80.0</span><span class="p">:</span>
-     <span class="n">battery</span><span class="o">.</span><span class="n">amps_into_terminals</span><span class="p">(</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
-     <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-     <span class="n">abs_volts</span> <span class="o">=</span> <span class="n">battery</span><span class="o">.</span><span class="n">last_terminal_voltage</span>
-
-   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-     <span class="n">battery</span><span class="o">.</span><span class="n">volts_across_terminals</span><span class="p">(</span><span class="n">abs_volts</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
+<span class="n">time_series</span> <span class="o">=</span> <span class="n">battery</span><span class="o">.</span><span class="n">time_series</span><span class="p">(</span>
+  <span class="n">duration_in_sec</span><span class="o">=</span><span class="n">hours</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">moment</span> <span class="ow">in</span> <span class="n">time_series</span><span class="p">:</span>
+  <span class="k">if</span> <span class="n">battery</span><span class="o">.</span><span class="n">soc_per</span> <span class="o">&lt;</span> <span class="mf">80.0</span><span class="p">:</span>
+    <span class="n">battery</span><span class="o">.</span><span class="n">amps_into_terminals</span><span class="p">(</span><span class="mf">33.0</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">abs_volts</span> <span class="o">=</span> <span class="n">battery</span><span class="o">.</span><span class="n">last_terminal_voltage</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">battery</span><span class="o">.</span><span class="n">volts_across_terminals</span><span class="p">(</span><span class="n">abs_volts</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">)</span>
 </pre></div>
 </div>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
 </div>
@@ -1618,6 +1764,7 @@ could write something like this:”</p>
 <li><a class="reference internal" href="#">Distributed Battery Charging Example</a><ul>
 <li><a class="reference internal" href="#single-unit-three-stage-battery-charger-design-1">Single Unit Three Stage Battery Charger Design (1)</a></li>
 <li><a class="reference internal" href="#single-unit-three-stage-battery-charger-design-2">Single Unit Three Stage Battery Charger Design (2)</a></li>
+<li><a class="reference internal" href="#single-unit-three-stage-battery-charger-design-3">Single Unit Three Stage Battery Charger Design (3)</a></li>
 </ul>
 </li>
 </ul>
