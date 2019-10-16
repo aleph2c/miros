@@ -41,7 +41,7 @@ x_new = np.linspace(
 )
 y_new = fn_ocv_to_batt_r(x_new)
 ax2.plot(x_new, y_new, color=colors['function_color'])
-ax2.set(xlabel="state_of_charge", ylabel="fn_ocv_to_batt_r")
+ax2.set(xlabel="open_circuit_volts", ylabel="fn_ocv_to_batt_r")
 
 for i, x in enumerate(x_new):
   print("i osv:{}, ohms:{}".format(x_new[i], y_new[i]))
