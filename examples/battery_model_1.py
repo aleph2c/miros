@@ -8,6 +8,7 @@ from collections import namedtuple
 
 import numpy as np
 from miros import Event
+from numpy import arange
 from miros import signals
 from miros import Factory
 from miros import return_status
@@ -196,13 +197,13 @@ class Battery(InstrumentedFactory, BatteryAttributes):
     '''
     return """
 ---
-time_s:   {0:9.2f}
-term_v:   {1:9.4f}
-batt_o:   {2:9.4f}
-losses_w: {3:9.4f}
-amps_a:   {4:9.4f}
-ocv_v:    {5:9.4f}
-soc_%:    {6:9.4f}""".format(
+time_s:   {0:10.4f}
+term_v:    {1:9.4f}
+batt_o:    {2:9.4f}
+losses_w:  {3:9.4f}
+amps_a:    {4:9.4f}
+ocv_v:     {5:9.4f}
+soc_%:     {6:9.4f}\n""".format(
       (self.last_sample_time-self.start_time).total_seconds(),
       self.last_terminal_voltage,
       self.batt_r_ohms,
@@ -381,48 +382,61 @@ soc_%:    {6:9.4f}""".format(
       self.post_fifo(Event(signal=signals.amps_and_time,
         payload=AmpsAndTime(amps=amps, time=sample_time)))
 
+
+  @staticmethod
+  def time_series(duration_in_sec, start_time=None, time_increment_sec=None):
+    '''Build a time series 
+
+    **Args**:
+       | ``duration_in_sec`` (int|float): Duration in seconds.
+       | ``start_time=None`` (datetime): Starting time of series.
+       | ``time_increments_sec`` (int/float): time increments in second 
+
+
+    **Returns**:
+       (list of datetime items): list of times used
+
+    **Example(s)**:
+      
+    .. code-block:: python
+       
+       series = battery.time_series(duration_in_sec=3600)
+
+    '''
+    start_time = datetime.now() if start_time is None \
+      else start_time
+    time_increment_sec = 1.0 if time_increment_sec is None \
+      else time_increment_sec
+
+    time_series = [
+      start_time + timedelta(seconds=float(second_inc)) \
+        for second_inc in arange(0.0, duration_in_sec, time_increment_sec)
+    ]
+    return list(time_series)
+
+
 if __name__ == '__main__':
 
   battery = Battery(
-   rated_amp_hours=100,
-   initial_soc_per=70.0,
-   name="lead_acid_battery_100Ah",
-   soc_vrs_ocv_profile_csv='soc_ocv.csv',
-   ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
-   live_trace=True)
+    rated_amp_hours=100,
+    initial_soc_per=10.0,
+    name="lead_acid_battery_100Ah",
+    soc_vrs_ocv_profile_csv='soc_ocv.csv',
+    ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
+    live_trace=True
+  )
 
-  simulation_start_time = datetime.now()
-  simulation_hours = 3.0
-  seconds_into_the_future = simulation_hours * 60 * 60
-  time_series = [
-    simulation_start_time + timedelta(seconds=second) \
-      for second in range(int(seconds_into_the_future))
-  ]
-  abs_volts = 12.8576
+  hours = 1
 
-  times_in_abs = 0
-  max_times_in_abs = 4000
+  time_series = battery.time_series(
+    duration_in_sec=hours*60*60,
+  )
+
   for moment in time_series:
     if battery.soc_per < 80.0:
-      battery.amps_into_terminals(30.0, moment)
+      battery.amps_into_terminals(33.0, moment)
       print(str(battery), end='')
       abs_volts = battery.last_terminal_voltage
     else:
-      #if times_in_abs >= max_times_in_abs:
-      #  #print(" {} here".format(times_in_abs))
-      #  break;
-      #else:
-      #  #if times_in_abs == 2:
-      #  #  import pdb; pdb.set_trace()
-      #  battery.volts_across_terminals(abs_volts, moment)
-      #  #print('here ', str(times_in_abs))
-      #  print(str(battery), end='')
-      #  times_in_abs += 1
-      #  #print(" {} abs".format(times_in_abs))
       battery.volts_across_terminals(abs_volts, moment)
       print(str(battery), end='')
-
-  print("")
-  print(seconds_into_the_future)
-
-
