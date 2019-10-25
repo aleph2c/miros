@@ -2028,7 +2028,170 @@ Single Unit Three Stage Battery Charger Design (3)
             battery.volts_across_terminals(abs_volts, moment)
             print(str(battery), end='')
           time.sleep(0.0001)
-     
+
+----     
+
+So now we have a simulator and we have some code we want to test.  How do we
+bring them together?  Let's break it down a bit, we want:
+
+*  to build an environment where we can put our charger into dangerous situations and see how it behaves.
+*  to run the tests over tens of seconds and not over hours.  
+*  to test in isolation of our big expensive batteries until we know we won't destroy them.
+*  to build an environment where we can make mistakes, where we can feel free to try stuff and see what happens. 
+*  to make a very fast feedback cycle so we can learn quickly and stay engaged with our problem.  
+*  to reduce the tedium of our "show-and-tells" so that our teammates don't numb out.  We want them mentally "on point" so they can challenge our work.
+
+.. image:: _static/testing_challenge_1.svg
+    :target: _static/testing_challenge_1.pdf
+    :align: center
+
+We want to build the system on the right before we build the system on the left.
+Currently, it is very difficult to mock out our electrics and time features, so
+we will change the production code to make it testable:
+
+.. image:: _static/testing_challenge_2.svg
+    :target: _static/testing_challenge_2.pdf
+    :align: center
+
+We add an ``ElectricalInterface`` class, which will act as the driver layer in
+our real system.  It will receive constant current and constant voltage control
+instructions and it will provide functions to other packages that can be used to
+sample the current and the voltage.
+
+We show our high level test design to our electrical engineer.
+
+He asks, :new_spec:`What is a mock?`
+
+"It's a way to inject false information into production code so it can be
+tested.  We will want to inject false current and voltage.  And we will want to
+change the time over which the battery is operating and the tempo at which the
+charger is sampling the current and voltage."
+
+:new_spec:`Sure, Sure, but how does it work?`
+
+"We will be programming by difference (inheritance); the ``ElectricalInterfaceMock`` will
+almost be identical to the ``ElectricalInterface``, but it will be changed just
+enough so it can use the Battery simulator rather than a real battery.
+
+"The same applies to the ``ChargerMock``, but it will only over-write the parts
+of the charger that controls the sampling tempo of the charger."
+
+"Using these mocks, the ``ChargerTester`` will be able to confirm our charger
+works with our simulated battery.  Yet, the production code, (the code we
+ship), will not know that it was under test."
+
+:new_spec:`What do you mean it won't know, software doesn't know anything.`
+
+"I mean, the software we ship to the customer will be exactly the same for the
+software we test using compressed time and fake electrical data."
+
+:new_spec:`Let's see your design`:
+
+"Before I get into the details, I'll show you how the ``Charger`` and
+``ElectricalInterface`` charts will communicate using published events."
+
+.. image:: _static/three_stage_charging_chart_5_statocal.svg
+    :target: _static/three_stage_charging_chart_5_statocal.pdf
+    :align: center
+
+"You can see the ``Charger`` can request samplers, and the
+``ElectricalInterface`` will return function is can use in the
+``SET_VOLTAGE_SAMPLER`` and ``SET_CURRENT_SAMPLER`` events.  The ``Charger`` can
+drive the current or the voltage, depending on what control strategy it picks,
+and the electrical interface will use this strategy, it's reference and the
+control system provided."
+
+"Now we have a bit of a chicken and an egg problem.  If these two ActiveObjects
+are completely independent, then we can't assume they are started at the same
+time.  This means that either one needs to able to initiate and information
+exchange to get the samplers.  Moreover, we have to make sure we don't end up
+with an infinite oscillation."
+
+:new_spec:`Do you need that complexity?  Maybe you should just have something
+else start then and handle the timing?`
+
+"Yeah, I might not, it's a trade off, I'll have a bunch of stuff in the chart
+that might look confusing, but someone using the objects from the outside would
+have an easier time turning them on and making them work together.  I'll leave
+it in there for now, I can pull it later."
+
+:new_spec:`That looks a lot more complicated, walk me through it.`
+
+"Ok, either one of these objects can start first and then initiate a message
+exchange.  Now imagine the ``ElectricalInterface`` is on, then the ``Charger``
+turns on.  The ``Charger`` will publish a ``REQUEST_FOR_SAMPLER``.  The
+``ElectricalInterface`` subscribes to this, and it will respond by putting the
+function addresses of the current and voltage samples into two separate payloads
+then add these payloads to the ``SET_CURRENT_SAMPLER`` and
+``SET_VOLTAGE_SAMPLER`` events.  When the ``Charger`` receives these messages,
+it will save the functions and use them to get the electrical readings when it
+needs to."
+
+"Now imagine that as the ``Charger`` is working, and it needs to ``DRIVE_CURRENT``
+or ``DRIVE_VOLTAGE``.  You can see the payloads that will be inside of these
+events, there will be an electrical value, a control system, and the time of the
+request in seconds from when the charger turned on.
+
+These ``DRIVE_CURRENT`` and ``DRIVE_VOLTAGE`` messages will be received by the
+``ElectricalInterface``, and it will do as instructed.
+
+:new_spec:`Seems straight forward, let's see the new ElectricalInterface design.`
+
+.. image:: _static/electrical_interface_5.svg
+    :target: _static/electrical_interface_5.pdf
+    :align: center
+
+"When it starts up it sends out the current and voltage sampling functions to
+whomever is subscribed.  Then it does nothing unless, it gets a request for the
+samplers or instructions to drive the current or the voltage."
+
+"I have marked up what will be changed by the mocking code.  In production the
+``drive_current`` and ``drive_voltage`` functions will be connected to drivers
+on the hardware.  But when the unit is under test, this will send information to our
+battery simulator.
+
+:new_spec:`Alright, let's see the charger.`
+
+.. image:: _static/three_stage_charging_chart_5_chart.svg
+    :target: _static/three_stage_charging_chart_5_chart.pdf
+    :align: center
+
+"It's still pretty much the same design, it has been adjusted to receive it's
+current and voltage samplers and to drive current or voltage."  You pause, "But,
+you need to take a look at the entry condition of the ``charging`` state."
+
+:new_spec:`Ok, what's the big deal there?`
+
+"The ``Beat`` drives the ``Ticks`` event.  The ``Ticks`` event thinks it's being
+driven every ``pulse_sec``, but it we drive it faster, the charger won't know.
+We will move it out of real time and into compressed time."
+
+:new_spec:`What do you mean, "it won't know"?`
+
+"The charger has all of these "time-outs" in seconds, like the
+'bulk_timeout_sec' etc.. but, to test the unit we don't want to change those
+numbers to be different from what will ship, and don't want to sit
+around for hours while we are trying to test to see if our code and data work.
+So, we hack that one callback and we can speed everything up for testing, but
+the production code and the charger parameters look the same as the stuff we
+are going to ship"
+
+:new_spec:`So how do you speed up the beat without changing the code you are
+going to ship?`
+
+"We inherit the ``Charger`` into the ``ChargerMock`` then overload that one
+callback.  Then test using the ``ChargerMock``:"
+
+.. image:: _static/ChargerMock.svg
+    :target: _static/ChargerMock.pdf
+    :align: center
+
+"See how everything is the same, except we add a ``time_compression_scalar``.
+You can change the beat by changing this number, the charger's time can be sped
+up or slowed down.  But it won't know, it will think that it is getting a beat
+every ``pulse_sec``."
+
+
 ..
    I don't know about you, but I'm starting to feel like I have been drinking from
    a fire hose.  To simplify what I have learned about how one charger should

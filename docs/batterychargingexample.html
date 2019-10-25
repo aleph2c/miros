@@ -1746,6 +1746,122 @@ plot</a> <span class="new-spec">would look like this:</span></li>
 </div></blockquote>
 </li>
 </ul>
+<hr class="docutils" />
+<p>So now we have a simulator and we have some code we want to test.  How do we
+bring them together?  Let’s break it down a bit, we want:</p>
+<ul class="simple">
+<li>to build an environment where we can put our charger into dangerous situations and see how it behaves.</li>
+<li>to run the tests over tens of seconds and not over hours.</li>
+<li>to test in isolation of our big expensive batteries until we know we won’t destroy them.</li>
+<li>to build an environment where we can make mistakes, where we can feel free to try stuff and see what happens.</li>
+<li>to make a very fast feedback cycle so we can learn quickly and stay engaged with our problem.</li>
+<li>to reduce the tedium of our “show-and-tells” so that our teammates don’t numb out.  We want them mentally “on point” so they can challenge our work.</li>
+</ul>
+<a class="reference external image-reference" href="_static/testing_challenge_1.pdf"><div align="center" class="align-center"><img alt="_images/testing_challenge_1.svg" src="_images/testing_challenge_1.svg" /></div>
+</a>
+<p>We want to build the system on the right before we build the system on the left.
+Currently, it is very difficult to mock out our electrics and time features, so
+we will change the production code to make it testable:</p>
+<a class="reference external image-reference" href="_static/testing_challenge_2.pdf"><div align="center" class="align-center"><img alt="_images/testing_challenge_2.svg" src="_images/testing_challenge_2.svg" /></div>
+</a>
+<p>We add an <code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> class, which will act as the driver layer in
+our real system.  It will receive constant current and constant voltage control
+instructions and it will provide functions to other packages that can be used to
+sample the current and the voltage.</p>
+<p>We show our high level test design to our electrical engineer.</p>
+<p>He asks, <span class="new-spec">What is a mock?</span></p>
+<p>“It’s a way to inject false information into production code so it can be
+tested.  We will want to inject false current and voltage.  And we will want to
+change the time over which the battery is operating and the tempo at which the
+charger is sampling the current and voltage.”</p>
+<p><span class="new-spec">Sure, Sure, but how does it work?</span></p>
+<p>“We will be programming by difference (inheritance); the <code class="docutils literal notranslate"><span class="pre">ElectricalInterfaceMock</span></code> will
+almost be identical to the <code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code>, but it will be changed just
+enough so it can use the Battery simulator rather than a real battery.</p>
+<p>“The same applies to the <code class="docutils literal notranslate"><span class="pre">ChargerMock</span></code>, but it will only over-write the parts
+of the charger that controls the sampling tempo of the charger.”</p>
+<p>“Using these mocks, the <code class="docutils literal notranslate"><span class="pre">ChargerTester</span></code> will be able to confirm our charger
+works with our simulated battery.  Yet, the production code, (the code we
+ship), will not know that it was under test.”</p>
+<p><span class="new-spec">What do you mean it won’t know, software doesn’t know anything.</span></p>
+<p>“I mean, the software we ship to the customer will be exactly the same for the
+software we test using compressed time and fake electrical data.”</p>
+<p><span class="new-spec">Let’s see your design</span>:</p>
+<p>“Before I get into the details, I’ll show you how the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> charts will communicate using published events.”</p>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_5_statocal.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_5_statocal.svg" src="_images/three_stage_charging_chart_5_statocal.svg" /></div>
+</a>
+<p>“You can see the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> can request samplers, and the
+<code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> will return function is can use in the
+<code class="docutils literal notranslate"><span class="pre">SET_VOLTAGE_SAMPLER</span></code> and <code class="docutils literal notranslate"><span class="pre">SET_CURRENT_SAMPLER</span></code> events.  The <code class="docutils literal notranslate"><span class="pre">Charger</span></code> can
+drive the current or the voltage, depending on what control strategy it picks,
+and the electrical interface will use this strategy, it’s reference and the
+control system provided.”</p>
+<p>“Now we have a bit of a chicken and an egg problem.  If these two ActiveObjects
+are completely independent, then we can’t assume they are started at the same
+time.  This means that either one needs to able to initiate and information
+exchange to get the samplers.  Moreover, we have to make sure we don’t end up
+with an infinite oscillation.”</p>
+<p><span class="new-spec">Do you need that complexity?  Maybe you should just have something
+else start then and handle the timing?</span></p>
+<p>“Yeah, I might not, it’s a trade off, I’ll have a bunch of stuff in the chart
+that might look confusing, but someone using the objects from the outside would
+have an easier time turning them on and making them work together.  I’ll leave
+it in there for now, I can pull it later.”</p>
+<p><span class="new-spec">That looks a lot more complicated, walk me through it.</span></p>
+<p>“Ok, either one of these objects can start first and then initiate a message
+exchange.  Now imagine the <code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> is on, then the <code class="docutils literal notranslate"><span class="pre">Charger</span></code>
+turns on.  The <code class="docutils literal notranslate"><span class="pre">Charger</span></code> will publish a <code class="docutils literal notranslate"><span class="pre">REQUEST_FOR_SAMPLER</span></code>.  The
+<code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> subscribes to this, and it will respond by putting the
+function addresses of the current and voltage samples into two separate payloads
+then add these payloads to the <code class="docutils literal notranslate"><span class="pre">SET_CURRENT_SAMPLER</span></code> and
+<code class="docutils literal notranslate"><span class="pre">SET_VOLTAGE_SAMPLER</span></code> events.  When the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> receives these messages,
+it will save the functions and use them to get the electrical readings when it
+needs to.”</p>
+<p>“Now imagine that as the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> is working, and it needs to <code class="docutils literal notranslate"><span class="pre">DRIVE_CURRENT</span></code>
+or <code class="docutils literal notranslate"><span class="pre">DRIVE_VOLTAGE</span></code>.  You can see the payloads that will be inside of these
+events, there will be an electrical value, a control system, and the time of the
+request in seconds from when the charger turned on.</p>
+<p>These <code class="docutils literal notranslate"><span class="pre">DRIVE_CURRENT</span></code> and <code class="docutils literal notranslate"><span class="pre">DRIVE_VOLTAGE</span></code> messages will be received by the
+<code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code>, and it will do as instructed.</p>
+<p><span class="new-spec">Seems straight forward, let’s see the new ElectricalInterface design.</span></p>
+<a class="reference external image-reference" href="_static/electrical_interface_5.pdf"><div align="center" class="align-center"><img alt="_images/electrical_interface_5.svg" src="_images/electrical_interface_5.svg" /></div>
+</a>
+<p>“When it starts up it sends out the current and voltage sampling functions to
+whomever is subscribed.  Then it does nothing unless, it gets a request for the
+samplers or instructions to drive the current or the voltage.”</p>
+<p>“I have marked up what will be changed by the mocking code.  In production the
+<code class="docutils literal notranslate"><span class="pre">drive_current</span></code> and <code class="docutils literal notranslate"><span class="pre">drive_voltage</span></code> functions will be connected to drivers
+on the hardware.  But when the unit is under test, this will send information to our
+battery simulator.</p>
+<p><span class="new-spec">Alright, let’s see the charger.</span></p>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_5_chart.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_5_chart.svg" src="_images/three_stage_charging_chart_5_chart.svg" /></div>
+</a>
+<p>“It’s still pretty much the same design, it has been adjusted to receive it’s
+current and voltage samplers and to drive current or voltage.”  You pause, “But,
+you need to take a look at the entry condition of the <code class="docutils literal notranslate"><span class="pre">charging</span></code> state.”</p>
+<p><span class="new-spec">Ok, what’s the big deal there?</span></p>
+<p>“The <code class="docutils literal notranslate"><span class="pre">Beat</span></code> drives the <code class="docutils literal notranslate"><span class="pre">Ticks</span></code> event.  The <code class="docutils literal notranslate"><span class="pre">Ticks</span></code> event thinks it’s being
+driven every <code class="docutils literal notranslate"><span class="pre">pulse_sec</span></code>, but it we drive it faster, the charger won’t know.
+We will move it out of real time and into compressed time.”</p>
+<p><span class="new-spec">What do you mean, “it won’t know”?</span></p>
+<p>“The charger has all of these “time-outs” in seconds, like the
+‘bulk_timeout_sec’ etc.. but, to test the unit we don’t want to change those
+numbers to be different from what will ship, and don’t want to sit
+around for hours while we are trying to test to see if our code and data work.
+So, we hack that one callback and we can speed everything up for testing, but
+the production code and the charger parameters look the same as the stuff we
+are going to ship”</p>
+<p><span class="new-spec">So how do you speed up the beat without changing the code you are
+going to ship?</span></p>
+<p>“We inherit the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> into the <code class="docutils literal notranslate"><span class="pre">ChargerMock</span></code> then overload that one
+callback.  Then test using the <code class="docutils literal notranslate"><span class="pre">ChargerMock</span></code>:”</p>
+<a class="reference external image-reference" href="_static/ChargerMock.pdf"><div align="center" class="align-center"><img alt="_images/ChargerMock.svg" src="_images/ChargerMock.svg" /></div>
+</a>
+<p>“See how everything is the same, except we add a <code class="docutils literal notranslate"><span class="pre">time_compression_scalar</span></code>.
+You can change the beat by changing this number, the charger’s time can be sped
+up or slowed down.  But it won’t know, it will think that it is getting a beat
+every <code class="docutils literal notranslate"><span class="pre">pulse_sec</span></code>.”</p>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
 </div>

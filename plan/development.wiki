@@ -5,10 +5,17 @@
   *What defines Success?:* ([[subgoals.development|subgoals]])
   
     Book:
-      * pattern: multichart race
-      * pattern: multichart pend
-      * edit: reflection (is it any good?)
+      * have subclass add a catch to a state (see charger tester example for
+        context), add to recipes and testing sections once you verified this
+        works.
+      * have subclass stop, change then start its superclass's statechart (see
+        charger tester example for context), add to recipes and testing sections
+        once you have verified this works.
+      * pattern: multichart race (multi-unit charger)
+      * pattern: multichart pend (multi-unit charger)
+      * edit: reflection (is it any good?), add logging/grep etc
       * write the testing section, using dependency injection and mocking
+        (war-gaming this out in the multi-unit charger essay)
       * integrate with c (miros-rabbitmq)
       * write something about boiler plate code (customization?)
       * edit: glossary
@@ -17,11 +24,26 @@
       * finish random example
     
     Practical:
+      * Build a set of training slides
+      * Practice training (intro, and then deeper, aim for 10, and 45 minute
+        sessions)
+      * Provide boiler plate snippets to users so that don't have to deal with
+        the tedium of the syntax
+      * Provide a compressing shim to users, where they can pack the syntax with
+        simple worker functions (I can't build better syntax because I have to
+        be backward compatible)
+      * Now that you have used it for a while, make a very simple naming
+        standard for 
+        * ActiveObjects
+        * private-events
+        * public-events
+        * state-callbacks
+        * normal-methods
+      * Build training for OODA approach with statecharts
       * Figure out how to get paid/sponsored
         * Investigate business models which can make money
           * Lazy buttons
           * Training/Consultancy
-      * Build training material around miros (presentations/video work)
       * Move some of the docs into the README.md files to advertise what is
         going on 
     
@@ -32,15 +54,17 @@
           patterns)
         * a way to inject an HSM within another HSM (add to patterns)
         * turn XML into SVG XML (code-to-data-to-diagram)
+        * write something that can parse the AST
+        * add genetic/search algorithms and have code that writes itself
 
     Marketing:
     
       Consider changing the package name to glial, 
       Describe how to use statecharts as a thing between other things, how to
       pull designs out of the dark.
+      Ditch the current pydoc CSS, since it looks terrible on phones
 
   *What is the problem?*
-    The CSS looks terrible on phones
     
   *Discoveries:* ([[notes.development|notes]])
   

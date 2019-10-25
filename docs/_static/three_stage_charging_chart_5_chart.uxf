@@ -1,0 +1,710 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>750</x>
+      <y>430</y>
+      <w>240</w>
+      <h>270</h>
+    </coordinates>
+    <panel_attributes>*constant_current_control*
+--
+entry /
+  self.control = self.c_control
+
+electrical_change /
+  self.publish(
+    signal=signals.DRIVE_CURRENT,
+    payload=DriveCurrent(
+      amps=self.control.reference,
+      control=control,
+      sec=sec))
+      
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>750</x>
+      <y>710</y>
+      <w>240</w>
+      <h>390</h>
+    </coordinates>
+    <panel_attributes>*constant_voltage_control*
+--
+entry /
+	self.control = self.v_control
+drive /
+  self.publish(
+    signal=signals.DRIVE_VOLTAGE,
+    payload=DriveVoltage(
+      volts=self.control.reference,
+      control=control,
+      sec=sec))
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>1070</x>
+      <y>590</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>type=initial
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1010</x>
+      <y>590</y>
+      <w>80</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>420</x>
+      <y>0</y>
+      <w>30</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1010</x>
+      <y>610</y>
+      <w>160</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>To_Bulk
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>140.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1010</x>
+      <y>640</y>
+      <w>160</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Force_Bulk
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>140.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1010</x>
+      <y>870</y>
+      <w>160</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>To_Abs
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>140.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1010</x>
+      <y>900</y>
+      <w>160</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Force_Abs
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>140.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1010</x>
+      <y>950</y>
+      <w>160</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>To_Float
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>140.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1010</x>
+      <y>980</y>
+      <w>160</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Force_Float
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>140.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>910</x>
+      <y>1030</y>
+      <w>260</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Force_Equ
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>240.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSyncBarVertical</id>
+    <coordinates>
+      <x>1010</x>
+      <y>580</y>
+      <w>20</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>template=txt
+title=titletext
+layer=3
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSyncBarVertical</id>
+    <coordinates>
+      <x>1010</x>
+      <y>870</y>
+      <w>20</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>template=txt
+title=titletext
+layer=3
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSyncBarVertical</id>
+    <coordinates>
+      <x>1010</x>
+      <y>950</y>
+      <w>20</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>template=txt
+title=titletext
+layer=3
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>900</x>
+      <y>640</y>
+      <w>140</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>120.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>910</x>
+      <y>970</y>
+      <w>130</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>110.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>910</x>
+      <y>900</y>
+      <w>130</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>110.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>530</x>
+      <y>820</y>
+      <w>190</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>SecInCharge = namedtuple(
+  'SecInCharge', ['sec'])
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>770</x>
+      <y>620</y>
+      <w>140</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>*bulk*
+symbol=substate
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>770</x>
+      <y>880</y>
+      <w>150</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>*absorption*
+symbol=substate
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>770</x>
+      <y>950</y>
+      <w>150</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>*float*
+symbol=substate
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>770</x>
+      <y>1020</y>
+      <w>150</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>*equalize*
+symbol=substate
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>10</x>
+      <y>40</y>
+      <w>330</w>
+      <h>260</h>
+    </coordinates>
+    <panel_attributes>*bulk*
+--
+entry /
+  self.control.reference = \
+    self.battery_spec.bulk_ref_amps
+  self.start_sec = self.sec
+  self.post_fifo(
+    Event(signal=signals.electrical_change))
+
+To_Bulk / {}
+
+Tick as e /
+  if e.payload.sec - self.start_sec &gt; \
+    self.battery_spec.bulk_timeout_sec or
+    self.volt &gt; self.battery_spec.bulk_exit_volts:
+     
+    self.post_fifo(Event(signal=signals.To_Abs))
+	  
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>10</x>
+      <y>320</y>
+      <w>330</w>
+      <h>240</h>
+    </coordinates>
+    <panel_attributes>*absorption*
+--
+entry /
+  self.control.reference = \
+    self.battery_spec.abs_ref_volts
+  self.start_sec = self.sec
+  self.post_fifo(
+    Event(signal=signals.electrical_change))
+
+Tick as e /
+  if e.payload.sec - self.start_sec &gt; \
+    self.battery_spec.abs_timeout_sec or
+    self.amps &gt; self.battery_spec.abs_exit_amps:
+     
+    self.post_fifo(Event(signal=signals.To_Float))
+	  
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>10</x>
+      <y>570</y>
+      <w>330</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>*float*
+--
+entry /
+  self.control.reference = \
+    self.battery_spec.float_ref_volts
+  self.post_fifo(
+    Event(signal=signals.electrical_change))
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>10</x>
+      <y>700</y>
+      <w>330</w>
+      <h>230</h>
+    </coordinates>
+    <panel_attributes>*equalize*
+--
+entry /
+  self.control.reference = \
+    self.battery_spec.equ_ref_volts
+  self.start_sec = self.sec
+  self.post_fifo(
+    Event(signal=signals.electrical_change))
+
+Tick as e /
+  if e.payload.sec - self.start_sec &gt; \
+    self.battery_spec.equ_timeout_sec:
+     
+    self.post_fifo(Event(signal=signals.To_Float))
+	  
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>650</x>
+      <y>540</y>
+      <w>100</w>
+      <h>300</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>20.0;280.0;80.0;130.0;70.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>730</x>
+      <y>520</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>
+bg=red
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>750</x>
+      <y>380</y>
+      <w>240</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>DriveCurrent = namedtuple(
+  'DriveCurrent', ['amps', 'control', 'sec'])
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>760</x>
+      <y>1110</y>
+      <w>230</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>DriveVoltage = namedtuple(
+  'DriveVoltage', ['volts', 'control', 'sec'])
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>730</x>
+      <y>780</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>
+bg=red
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>370</x>
+      <y>40</y>
+      <w>810</w>
+      <h>1150</h>
+    </coordinates>
+    <panel_attributes>*wait_for_electrical_interface*
+--
+entry /
+
+  self.subscribe(
+    Event(signal=signals.SET_CURRENT_SAMPLER))
+  self.subscribe(
+    Event(signal=signals.SET_VOLTAGE_SAMPLER))
+    
+  self.publish(Event(signal=signals.REQUEST_FOR_SAMPLERS)
+    
+SET_CURRENT_SAMPLER as e /
+  self._fn_sample_current = e.payload.fn
+  if self._fn_sample_voltage != None:
+    self.post_fifo(Event(signal=signals.turn_on_charger))
+
+SET_VOLTAGE_SAMPLER as e /
+  self._fn_sample_voltage = e.payload.fn
+  if self._fn_sample_current != None:
+    self.post_fifo(Event(signal=signals.turn_on_charger))
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>970</x>
+      <y>290</y>
+      <w>230</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>turn_on_charger
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>210.0;20.0;10.0;20.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>730</x>
+      <y>120</y>
+      <w>160</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Sampler = namedtuple(
+  'Sampler', ['fn'])
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>490</x>
+      <y>760</y>
+      <w>160</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Sampler = namedtuple(
+  'Sampler', ['fn'])
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>630</x>
+      <y>620</y>
+      <w>80</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;140.0;60.0;30.0;30.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>350</x>
+      <y>200</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>
+bg=green
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>350</x>
+      <y>270</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>
+bg=green
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>350</x>
+      <y>170</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>
+bg=red
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>390</x>
+      <y>570</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>
+bg=green
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>390</x>
+      <y>620</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>
+bg=green
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>410</x>
+      <y>350</y>
+      <w>740</w>
+      <h>810</h>
+    </coordinates>
+    <panel_attributes>*charging*
+--
+entry /
+  self.post_fifo(Event(signal=signal.Pulse,
+  deferred=True,
+  period=self.pulse_sec,
+  times=0)
+
+  
+Pulse /
+ self.amps = self._fn_sample_current()
+ self.volts = self._fn_sample_voltage()
+ if self.volts &lt; self.battery_spec.bulk_entry_volts:
+    self.post_fifo(Event(signals=signal.To_Bulk)
+ self.sec += self.pulse_sec
+ self.post_fifo(Event(signal=signals.Tick,
+   payload=SecInCharge(sec=self.sec)))
+
+SET_CURRENT_SAMPLER as e /
+  self._fn_sample_current = e.payload.fn
+
+SET_VOLTAGE_SAMPLER as e /
+  self._fn_sample_voltage = e.payload.fn
+
+exit /
+  self.cancel_events(
+    Event(signal=signals.Pulse))
+valign=top
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>730</x>
+      <y>240</y>
+      <w>250</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Overload while testing to compress time
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>610</x>
+      <y>270</y>
+      <w>250</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>230.0;10.0;10.0;110.0</additional_attributes>
+  </element>
+</diagram>

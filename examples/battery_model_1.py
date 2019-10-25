@@ -29,7 +29,7 @@ class InstrumentedFactory(Factory):
 
     self.live_trace = False if live_trace == None else live_trace
     self.live_spy = False if live_spy == None else live_spy
-    self.log_file = 'battery_model.log' if log_file == None else log_file
+    self.log_file = 'single_unit_three_charger.log' if log_file == None else log_file
 
     with open(self.log_file, "w") as fp:
       fp.write("")
@@ -360,7 +360,7 @@ soc_%:     {6:9.4f}\n""".format(
     fn_ocv_to_batt_r = poly.Polynomial(coefs)
     return fn_ocv_to_batt_r
 
-  def amps_into_terminals(self, amps, sample_time=None):
+  def amps_through_terminals(self, amps, sample_time=None):
     if sample_time is None:
       self.post_fifo(Event(signal=signals.amps, payload=Amps(amps)))
     else:
@@ -433,7 +433,7 @@ if __name__ == '__main__':
   )
   for moment in time_series:
     if battery.soc_per < 80.0:
-      battery.amps_into_terminals(33.0, moment)
+      battery.amps_through_terminals(33.0, moment)
       print(str(battery), end='')
       abs_volts = battery.last_terminal_voltage
     else:
