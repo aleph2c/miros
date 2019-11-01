@@ -2095,17 +2095,15 @@ software we test using compressed time and fake electrical data."
     :align: center
 
 "You can see the ``Charger`` can request samplers, and the
-``ElectricalInterface`` will return function is can use in the
-``SET_VOLTAGE_SAMPLER`` and ``SET_CURRENT_SAMPLER`` events.  The ``Charger`` can
-drive the current or the voltage, depending on what control strategy it picks,
-and the electrical interface will use this strategy, it's reference and the
-control system provided."
+``ElectricalInterface`` will return functions in the ``SET_VOLTAGE_SAMPLER`` and
+``SET_CURRENT_SAMPLER`` events.  The ``Charger`` can drive the current or the
+voltage using the ``DRIVE_CURRENT`` and ``DRIVE_VOLTAGE`` events.
 
 "Now we have a bit of a chicken and an egg problem.  If these two ActiveObjects
 are completely independent, then we can't assume they are started at the same
-time.  This means that either one needs to able to initiate and information
-exchange to get the samplers.  Moreover, we have to make sure we don't end up
-with an infinite oscillation."
+time.  This means that either one needs to able to initiate an information
+exchange.  Moreover, we have to make sure we don't end up with an infinite
+oscillation."
 
 :new_spec:`Do you need that complexity?  Maybe you should just have something
 else start then and handle the timing?`
@@ -2113,7 +2111,7 @@ else start then and handle the timing?`
 "Yeah, I might not, it's a trade off, I'll have a bunch of stuff in the chart
 that might look confusing, but someone using the objects from the outside would
 have an easier time turning them on and making them work together.  I'll leave
-it in there for now, I can pull it later."
+it in there for now, I can pull it later if it looks too weird."
 
 :new_spec:`That looks a lot more complicated, walk me through it.`
 
@@ -2191,6 +2189,9 @@ You can change the beat by changing this number, the charger's time can be sped
 up or slowed down.  But it won't know, it will think that it is getting a beat
 every ``pulse_sec``."
 
+.. image:: _static/charger_test_results.svg
+    :target: _static/charger_test_results.pdf
+    :align: center
 
 ..
    I don't know about you, but I'm starting to feel like I have been drinking from

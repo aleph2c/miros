@@ -419,14 +419,14 @@ if __name__ == '__main__':
 
   battery = Battery(
     rated_amp_hours=100,
-    initial_soc_per=10.0,
+    initial_soc_per=79.8,
     name="lead_acid_battery_100Ah",
     soc_vrs_ocv_profile_csv='soc_ocv.csv',
     ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
     live_trace=True
   )
 
-  hours = 1
+  hours = 0.02
 
   time_series = battery.time_series(
     duration_in_sec=hours*60*60,
@@ -437,6 +437,7 @@ if __name__ == '__main__':
       print(str(battery), end='')
       abs_volts = battery.last_terminal_voltage
     else:
+      print(abs_volts)
       battery.volts_across_terminals(abs_volts, moment)
       print(str(battery), end='')
     #time.sleep(0.0001)

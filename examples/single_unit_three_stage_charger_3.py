@@ -368,8 +368,8 @@ class LoggedBehavior(Factory):
     logging.debug("S: [{}] {}".format(self.name, spy))
 
 SecInCharge = namedtuple('SecInCharge', ['sec'])
-DriveCurrent = namedtuple('DriveCurrent', ['amps', 'control', 'sec', 'state'])
-DriveVoltage = namedtuple('DriveVoltage', ['volts', 'control', 'sec', 'state'])
+DriveCurrent = namedtuple('DriveCurrent', ['amps', 'control', 'sec', 'cause'])
+DriveVoltage = namedtuple('DriveVoltage', ['volts', 'control', 'sec', 'cause'])
 Sampler = namedtuple('Sampler', ['fn'])
 
 class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
@@ -432,7 +432,8 @@ class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
         live_trace=True)
 
     '''
-    self.pulse_sec = 0.5 if pulse_sec is None else pulse_sec
+    self.pulse_sec = 1.0 if pulse_sec is None else pulse_sec
+    self.cause = None
 
     # build a default charger
     if charger_params is None:
@@ -552,8 +553,10 @@ class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
       to_method()
 
     self.float = self.create(state="float"). \
-      catch(signal=signals.ENTRY,
+      catch(signal=signals.ENTRY_SIGNAL,
         handler=self.float_entry). \
+      catch(signal=signals.Tick,
+        handler=self.float_tick). \
       to_method()
 
     self.equalize = self.create(state="equalize"). \
@@ -682,7 +685,7 @@ class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
           amps=self.control.reference,
           control=self.control,
           sec=self.sec,
-          state=self.state_name,
+          cause=self.cause,
         )
       )
     )
@@ -698,11 +701,11 @@ class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
     self.publish(
       Event(
         signal=signals.DRIVE_VOLTAGE,
-        payload=DriveCurrent(
+        payload=DriveVoltage(
           volts=self.control.reference,
           control=self.control,
           sec=self.sec,
-          state=self.state_name,
+          cause=self.cause,
         )
       )
     )
@@ -713,7 +716,7 @@ class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
     self.control.reference = self.battery_spec.bulk_ref_amps
     self.start_sec = self.sec
     self.post_fifo(Event(signal=signals.electrical_change))
-
+    self.cause = self.state_name
     return status
 
   def bulk_to_bulk(self, e):
@@ -722,9 +725,9 @@ class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
 
   def bulk_tick(self, e):
     status = return_status.HANDLED
-    if(e.payload.sec - self.start_sec >
-      self.battery_spec.bulk_timeout_sec or 
-      self.volts > self.battery_spec.bulk_exit_volts):
+    if (e.payload.sec - self.start_sec >
+       self.battery_spec.bulk_timeout_sec) or \
+       ( self.volts > self.battery_spec.bulk_exit_volts):
       self.post_fifo(Event(signal=signals.To_Abs))
     return status
 
@@ -732,22 +735,27 @@ class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
     status = return_status.HANDLED
     self.control.reference = \
       self.battery_spec.abs_ref_volts
+    self.cause = self.state_name
     self.start_sec = self.sec
     self.post_fifo(Event(signal=signals.electrical_change))
     return status
 
   def absorption_tick(self, e):
     status = return_status.HANDLED
-    if(e.payload.sec - self.start_sec > 
-      self.battery_spec.abs_timeout_sec or
-      self.amps > self.battery_spec.abs_exit_amps):
+    if(e.payload.sec - self.start_sec > self.battery_spec.abs_timeout_sec) or \
+      (self.amps <= self.battery_spec.abs_exit_amps):
       self.post_fifo(Event(signal=signals.To_Float))
     return status
 
   def float_entry(self, e):
     status = return_status.HANDLED
+    self.cause = self.state_name
     self.control.reference = self.battery_spec.float_ref_volts
     self.post_fifo(Event(signal=signals.electrical_change))
+    return status
+
+  def float_tick(self, e):
+    status = return_status.HANDLED
     return status
 
   def equalize_entry_signal(self, e):
@@ -755,6 +763,7 @@ class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
     self.control.reference = \
       self.battery_spec.equ_ref_volts
     self.start_sec = self.sec
+    self.cause = self.state_name
 
     self.post_fifo(Event(signal=signals.electrical_change))
 
@@ -844,12 +853,6 @@ class ElectricalInterface(LoggedBehavior):
   def drive_voltage_state_entry_signal(self, e):
     status = return_status.HANDLED
     return status
-
-  def drive_current(self, amps, control_system):
-    pass
-
-  def drive_voltage(self, volts, control_system):
-    pass
 
   def sample_current(self):
     return 10.0

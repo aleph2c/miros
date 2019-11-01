@@ -4,8 +4,8 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>126</x>
-      <y>108</y>
+      <x>342</x>
+      <y>90</y>
       <w>198</w>
       <h>225</h>
     </coordinates>
@@ -14,6 +14,7 @@
 _driving_terminal_amps
 _driving_terminal_volts
 _control
+pulse_sec
 --
 drive_current(current, control)
 drive_voltage(voltage, control)
@@ -26,20 +27,20 @@ layer=1</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>504</x>
-      <y>495</y>
+      <x>720</x>
+      <y>477</y>
       <w>468</w>
       <h>306</h>
     </coordinates>
     <panel_attributes>*drive_current_state*
 --
 entry /
-  datetime = datetime.now()
-  real_seconds_since_start = (datetime - self.start_datetime).total_seconds()
-  fake_seconds_since_start = real_seconds_since_start * self.time_compression
+  _datetime = datetime.now()
+  real_seconds_since_start = (_datetime - self.start_datetime).total_seconds()
+  fake_seconds_since_start = real_seconds_since_start * self.time_compression_scalar
   new_datetime = self.start_datetime + timedelta(seconds=fake_seconds_since_start)
   
-  self.battery.amps_to_terminal(
+  self.battery.amps_through_terminals(
     self._driving_terminal_amps, 
     moment=new_datetime
   )
@@ -63,8 +64,8 @@ fg=black</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>666</x>
-      <y>414</y>
+      <x>882</x>
+      <y>396</y>
       <w>351</w>
       <h>99</h>
     </coordinates>
@@ -76,8 +77,8 @@ layer=3</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>135</x>
-      <y>270</y>
+      <x>351</x>
+      <y>252</y>
       <w>180</w>
       <h>54</h>
     </coordinates>
@@ -89,8 +90,8 @@ layer=2</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>279</x>
-      <y>243</y>
+      <x>495</x>
+      <y>225</y>
       <w>27</w>
       <h>54</h>
     </coordinates>
@@ -101,8 +102,8 @@ layer=3</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>684</x>
-      <y>441</y>
+      <x>900</x>
+      <y>423</y>
       <w>225</w>
       <h>36</h>
     </coordinates>
@@ -114,8 +115,8 @@ layer=3</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>171</x>
-      <y>954</y>
+      <x>387</x>
+      <y>936</y>
       <w>216</w>
       <h>45</h>
     </coordinates>
@@ -127,8 +128,8 @@ layer=3</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>108</x>
-      <y>576</y>
+      <x>324</x>
+      <y>558</y>
       <w>18</w>
       <h>18</h>
     </coordinates>
@@ -140,8 +141,8 @@ layer=3</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>126</x>
-      <y>18</y>
+      <x>342</x>
+      <y>0</y>
       <w>99</w>
       <h>27</h>
     </coordinates>
@@ -152,8 +153,8 @@ fg=black</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>162</x>
-      <y>36</y>
+      <x>378</x>
+      <y>18</y>
       <w>27</w>
       <h>45</h>
     </coordinates>
@@ -165,8 +166,8 @@ fg=black</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>216</x>
-      <y>18</y>
+      <x>432</x>
+      <y>0</y>
       <w>45</w>
       <h>27</h>
     </coordinates>
@@ -177,8 +178,8 @@ layer=3</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>243</x>
-      <y>18</y>
+      <x>459</x>
+      <y>0</y>
       <w>81</w>
       <h>27</h>
     </coordinates>
@@ -188,8 +189,8 @@ layer=3</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>414</x>
-      <y>432</y>
+      <x>630</x>
+      <y>414</y>
       <w>144</w>
       <h>36</h>
     </coordinates>
@@ -201,8 +202,8 @@ layer=3</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>108</x>
-      <y>378</y>
+      <x>324</x>
+      <y>360</y>
       <w>18</w>
       <h>18</h>
     </coordinates>
@@ -214,8 +215,8 @@ layer=3</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>108</x>
-      <y>441</y>
+      <x>324</x>
+      <y>423</y>
       <w>18</w>
       <h>18</h>
     </coordinates>
@@ -227,8 +228,8 @@ layer=3</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>369</x>
-      <y>1143</y>
+      <x>585</x>
+      <y>1125</y>
       <w>351</w>
       <h>63</h>
     </coordinates>
@@ -240,8 +241,8 @@ layer=3</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>351</x>
-      <y>117</y>
+      <x>567</x>
+      <y>99</y>
       <w>261</w>
       <h>144</h>
     </coordinates>
@@ -261,8 +262,8 @@ fg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>225</x>
-      <y>207</y>
+      <x>441</x>
+      <y>189</y>
       <w>144</w>
       <h>27</h>
     </coordinates>
@@ -273,8 +274,8 @@ layer=3</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>675</x>
-      <y>378</y>
+      <x>891</x>
+      <y>360</y>
       <w>270</w>
       <h>54</h>
     </coordinates>
@@ -289,8 +290,8 @@ layer=3</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>126</x>
-      <y>63</y>
+      <x>342</x>
+      <y>45</y>
       <w>153</w>
       <h>27</h>
     </coordinates>
@@ -300,8 +301,8 @@ layer=3</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>189</x>
-      <y>81</y>
+      <x>405</x>
+      <y>63</y>
       <w>27</w>
       <h>45</h>
     </coordinates>
@@ -312,8 +313,8 @@ layer=3</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>126</x>
-      <y>351</y>
+      <x>342</x>
+      <y>333</y>
       <w>873</w>
       <h>801</h>
     </coordinates>
@@ -321,12 +322,12 @@ layer=3</panel_attributes>
 --
 entry /
   self.publish(
-    signal=signals.SET_CURRENT_SAMPLER
-    payload=Sampler(fn=partial(self.sample_current)))
+    Event(signal=signals.SET_CURRENT_SAMPLER
+      payload=Sampler(fn=partial(self.sample_current)))
     
   self.publish(
-    signal=signals.SET_VOLTAGE_SAMPLER
-    payload=Sampler(fn=partial(self.sample_voltage)))
+    Event(signal=signals.SET_VOLTAGE_SAMPLER
+      payload=Sampler(fn=partial(self.sample_voltage)))
 
   self.subscribe(Event(signal=signals.REQUEST_FOR_SAMPLERS))
   self.subscribe(Event(signal=signals.DRIVE_CURRENT))
@@ -335,7 +336,7 @@ entry /
   self.post_fifo(
     Event(
       signal=signals.Pulse,
-      period=self.pulse_sec * self.time_compression,
+      period= self.pulse_sec / self.time_compression_scalar,
       deferred=True,
       times=0
     )
@@ -346,8 +347,8 @@ entry /
 
 
 Pulse /
-  self.real_seconds += self.pulse_sec
-  self.fake_seconds += self.pulse_sec * self.time_compression
+  self.real_seconds += self.pulse_sec / self.time_compression_scalar
+  self.fake_seconds += self.pulse_sec
   self.post_fifo(
     Event(signal=signals.Tick
       payload=SecInCharge(sec=self.fake_seconds)
@@ -362,8 +363,8 @@ fg=black</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>171</x>
-      <y>819</y>
+      <x>387</x>
+      <y>801</y>
       <w>171</w>
       <h>36</h>
     </coordinates>
@@ -376,8 +377,8 @@ fg=black</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>900</x>
-      <y>297</y>
+      <x>1116</x>
+      <y>279</y>
       <w>99</w>
       <h>27</h>
     </coordinates>
@@ -388,8 +389,8 @@ fg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>945</x>
-      <y>315</y>
+      <x>1161</x>
+      <y>297</y>
       <w>27</w>
       <h>54</h>
     </coordinates>
@@ -400,20 +401,20 @@ fg=blue</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>504</x>
-      <y>819</y>
+      <x>720</x>
+      <y>801</y>
       <w>468</w>
       <h>315</h>
     </coordinates>
     <panel_attributes>*drive_voltage_state*
 --
 entry /
-  datetime = datetime.now()
-  real_seconds_since_start = (datetime - self.start_datetime).total_seconds()
-  fake_seconds_since_start = real_seconds_since_start * self.time_compression
+  _datetime = datetime.now()
+  real_seconds_since_start = (_datetime - self.start_datetime).total_seconds()
+  fake_seconds_since_start = real_seconds_since_start * self.time_compression_scalar
   new_datetime = self.start_datetime + timedelta(seconds=fake_seconds_since_start)
   
-  self.battery.volts_to_terminal(
+  self.battery.volts_to_terminals(
     self._driving_terminal_volts, 
     moment=new_datetime
   )
@@ -422,7 +423,7 @@ entry /
 Tick as e /
   new_datetime = self.start_datetime + timedelta(secconds=e.payload.sec)
 
-  self.battery.volts_to_terminal(
+  self.battery.volts_across_terminal(
     self._driving_terminal_volts, 
     moment=new_datetime
   )
@@ -437,8 +438,8 @@ fg=black</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>117</x>
-      <y>927</y>
+      <x>333</x>
+      <y>909</y>
       <w>405</w>
       <h>36</h>
     </coordinates>
@@ -450,8 +451,8 @@ layer=3</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>171</x>
-      <y>891</y>
+      <x>387</x>
+      <y>873</y>
       <w>270</w>
       <h>54</h>
     </coordinates>
@@ -466,8 +467,8 @@ layer=3</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>180</x>
-      <y>1143</y>
+      <x>396</x>
+      <y>1125</y>
       <w>54</w>
       <h>90</h>
     </coordinates>
@@ -479,8 +480,8 @@ layer=3</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>180</x>
-      <y>1215</y>
+      <x>396</x>
+      <y>1197</y>
       <w>18</w>
       <h>18</h>
     </coordinates>

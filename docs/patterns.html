@@ -105,8 +105,8 @@ stop searching.  <strong>A hook doesn’t cause a state transition</strong>.  It
 get the event processor’s search algorithm to do work for you without changing
 state.</p>
 <p>You see, anytime the event processor is trying to figure out what to do with an
-event it needs to <a class="reference internal" href="recipes.html#recipes-what-a-state-does-and-how-to-structure-it"><span class="std std-ref">search your
-statechart</span></a>.  If it finds
+event it needs to <span class="xref std std-ref">search your
+statechart</span>.  If it finds
 that it needs to do a transition, it will enlist the heavy-duty parts of it’s
 algorithm to make sure that the <a class="reference internal" href="glossary.html#term-harel-formalism"><span class="xref std std-term">Harel Formalism</span></a>
 occurs.  The hook has nothing to do with this, because it short circuits the
@@ -1601,8 +1601,8 @@ will allow a single thread to be shared between many different <a class="referen
 machines</span></a>.  This will be described in more detail shortly.</p>
 <p>The Piston objects will each contain their own <span class="xref std std-term">event dispatcher</span>, their own event queues; but they will all reference the same
 piston_manager <a class="reference internal" href="glossary.html#term-state-machine"><span class="xref std std-term">state machine</span></a>.</p>
-<p>We are going to use the <a class="reference internal" href="recipes.html#recipes-what-a-state-does-and-how-to-structure-it"><span class="std std-ref">polyamorous
-nature</span></a> of state methods to
+<p>We are going to use the <span class="xref std std-ref">polyamorous
+nature</span> of state methods to
 implement the 255 pistons.  Instead of having a separate piston_active
 <a class="reference internal" href="glossary.html#term-hierarchical-state-machine"><span class="xref std std-term">HSMs</span></a> defined for each of the 255 active objects we will instead define
 just one <a class="reference internal" href="glossary.html#term-hsm"><span class="xref std std-term">HSM</span></a> and share it between all of them. (saving on memory)</p>
@@ -1701,8 +1701,8 @@ piston-ready criterion.</p>
   <span class="k">return</span> <span class="n">status</span>
 </pre></div>
 </div>
-<p>The first thing we notice about this code, is that it uses the <a class="reference internal" href="recipes.html#recipes-boiler-plate-state-method-code"><span class="std std-ref">flat way
-of writing</span></a> state methods.</p>
+<p>The first thing we notice about this code, is that it uses the <span class="xref std std-ref">flat way
+of writing</span> state methods.</p>
 <p>This is because we want this <a class="reference internal" href="glossary.html#term-hsm"><span class="xref std std-term">HSM</span></a> to be shared between multiple
 Piston objects.  A <a class="reference internal" href="glossary.html#term-state-machine"><span class="xref std std-term">state machine</span></a> build up using a
 <a class="reference internal" href="glossary.html#term-factory"><span class="xref std std-term">factory</span></a> cannot be shared; it belongs to the thing that built

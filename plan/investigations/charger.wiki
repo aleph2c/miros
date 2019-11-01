@@ -1,0 +1,139 @@
+*Get the charger working with the simulator*
+= Observer ([[local:C:/Vim8.1/.vim/ooda.pdf|diagram]]) = 
+== Evidence ([[evidence.charger|evidence]]) ==
+
+  *What defines Success?:* ([[subgoals.charger|subgoals]])
+    
+    A charger working with a battery simulator in programmable time.  A graph
+    demonstrating how it works.
+    
+    Show the timeouts on the graph if they fit onto the electrical profile.
+    
+    Show battery profiles on same graph [maybe]
+
+  *What is the problem?*
+    
+    We need two plots to share two vertical axis, one for voltage and one for
+    current.  The horizontal axis will describe time.
+    
+    Mark the timeouts on the graph as vertical lines, make the charging stages
+    on the graph as well.
+    
+    The plots have weird data points that make it look like garbage. [covered up]
+    
+    There is a time bug, where the simulation span is twice as long as expected.
+    
+    There is a chance that you are totally lying to yourself, that the time
+    compression isn't working and that battery simulator is working over the
+    wrong time frame.  You could check this by:
+
+      * setting the time pulses to 1.0 second
+      * setting the time compression to 1.0 
+    
+    Then compare the results to a compressed graph with a time pulse of 0.5 and
+    time compression of 50.  If the graphs look the same, you can feel confident
+    that you haven't messed up the time domain of the battery simulation.
+    
+
+  *Discoveries:* ([[notes.charger|notes]])
+  
+    * Super interesting time bubble bug.  One time domain was driven by the
+      pulse and another time domain was being driven by driving current and
+      voltage signals.  The pulse drift in how it's wrong because of event lag
+      (python.sleep), the driving events were actually linked to the OS time, so
+      when the simulator received information from these driving signals it
+      would act crazy. [Major Lesson Here!]
+      
+    * 
+
+    * The data at the bulk to absorption transition looks like this:
+        2019-10-28 05:49:53.464611,30,13.040212273825867,78.0584534500064,bulk
+        2019-10-28 05:42:11.891061,30,13.040212273825867,78.0584534500064,absorption
+        2019-10-28 05:49:54.464611,30,13.040212273825867,78.06678678333974,absorption
+        2019-10-28 05:49:55.464611,29.968090767394077,13.04,74.22443177160964,absorption
+    ?-> 2019-10-28 05:49:56.464611,33.726022412830176,13.04,74.22443177160964,absorption
+        2019-10-28 05:49:57.464611,29.478333406406275,13.04,78.56616628502321,absorption
+        
+        The state of charge is the same for the erroneous reading
+        
+    * The data at the absorption to float transition looks like this:
+        2019-10-28 08:36:54.858763,9.991243874176176,13.04,95.62750740707233,absorption
+        2019-10-28 08:36:55.858763,9.988031765046262,13.04,95.6302818603404,float
+    ?-> 2019-10-28 08:36:56.858763,5.21294159098336,13.0,95.6302818603404,float
+    ?-> 2019-10-28 08:36:57.858763,8.720161162259988,13.0,92.61059624454052,float
+    ?-> 2019-10-28 08:36:58.858763,8.720161162259988,13.0,97.66432107641569,float
+        2019-10-28 08:36:59.858763,2.8065226876879703,13.0,97.66510066605116,float
+        
+        The state of charge is the same for the erroneous reading
+
+    * The data at the absorption to float transition looks like this:
+        2019-10-28 06:46:33.464611,9.99780358379652,13.04,95.62184129246364,absorption
+     -> 2019-10-28 06:11:52.649611,9.994589501017177,13.04,95.62461756732503,float
+        2019-10-28 06:46:34.464611,5.2195936204310405,13.0,92.60767070640914,float
+        2019-10-28 06:46:35.464611,5.2195936204310405,13.0,92.60767070640914,float
+        
+      The time seems to be lagging, but the data looks good.
+      The state of charge is the same for the two readings after the erroneous
+      reading
+      
+= Orient =
+  *Symptoms:* [[symptoms.charger|symptoms]]
+
+  * The transition to spy in the test seems to be caused by a time out rather
+    than the current dropping below the abpsortion exit threshold.
+    
+== Questions ==
+  *Questions for Get the charger working with the simulator: >= 5*
+    Can you think of anyway to speed up your feedback cycle?
+    Do you have enough information?
+    Is your information organized?
+    Can you reproduce the problem?
+    Can you simplify your test?
+    Do you have something to baseline from?
+    What recently changed?
+    What don't you know that you need to know?
+    
+  *Specific Questions:*
+    Why is the current suddenly spiking?
+    Why is the reading coming in with the wrong time stamp?
+    Is the data coming to the graph from two different places and not one?
+    How does the time compression relate to the datetime reporting?
+  
+  *Assumptions*
+
+= Decide =
+  [[#Questions]]
+  *Research Needed For?:*
+  * How does the time compression relate to the datetime reporting?
+
+  [[#Questions]]
+  *Idea/Hypotheses for Get the charger working with the simulator: >=5*
+  * [X] Investigation events that cause the spurious data points and see if you
+        can generate a better theory or better questions.
+  * [X] The outlier data points are a bug in the battery simulator [no]
+  * [X] The outlier data points are a result of two different time flows going
+        on, one for the charger and one for the battery. [partially true]
+  * [X] Add a delay for electrical interface mock state transitions 
+  * [X] Disconnect the graphing work from the simulator run, it is taking too
+        long to debug graphing issues. [graphing issues should stop grinding
+        time away]
+  * [ ] The data points are a result of event buffering, forcing the
+        simulatation to run fast, causing events to be missed then fired later,
+        passing data that is old to the simulation. [saw this at 50 times time
+        compression, a kind of overshoot in absorbtion, but it wasn't causing
+        the original graph glitches]
+  * [ ] Don't worry about where they are coming from, just scrub your data after
+        a simulation and make a clean graph, you know what it is suppose to look
+        like. [didn't do it]
+  * [ ] Just divide by two and see if you can fix it.
+    
+
+  *Chosen Research-Goal/Hypothesis*
+  * [ ] The outlier data points are a bug in the battery simulator
+    
+
+== Plan ([[plan.charger|plan]]) ==
+
+= Act =
+  
+
