@@ -9,30 +9,24 @@
     
     Show the timeouts on the graph if they fit onto the electrical profile.
     
-    Show battery profiles on same graph [maybe]
+    Show battery profiles on same graph [maybe a good idea?]
+    
+    A technical essay that demonstrates a software progress is really about the
+    accumulation of knowledge over time.  The diagrams and specification pack
+    that knowledge into a kind of road map of how to focus your attention, but
+    they do not explain everything.  The essay should show why it is hard to
+    estimate how long something will take to design and build and it should show
+    how a set of people on a design team would learn from one another while
+    challenging each other in their design process.
 
   *What is the problem?*
     
-    We need two plots to share two vertical axis, one for voltage and one for
-    current.  The horizontal axis will describe time.
+    The pictures are out of date, go back and update them to represent the
+    working code.
     
-    Mark the timeouts on the graph as vertical lines, make the charging stages
-    on the graph as well.
-    
-    The plots have weird data points that make it look like garbage. [covered up]
-    
-    There is a time bug, where the simulation span is twice as long as expected.
-    
-    There is a chance that you are totally lying to yourself, that the time
-    compression isn't working and that battery simulator is working over the
-    wrong time frame.  You could check this by:
-
-      * setting the time pulses to 1.0 second
-      * setting the time compression to 1.0 
-    
-    Then compare the results to a compressed graph with a time pulse of 0.5 and
-    time compression of 50.  If the graphs look the same, you can feel confident
-    that you haven't messed up the time domain of the battery simulation.
+    Re-factor the latest round of documentation, tighten it up and skip over a
+    lot of the banal details.  If someone wants to drill in they should know
+    enough by now, you don't have to spoon feed them.
     
 
   *Discoveries:* ([[notes.charger|notes]])
@@ -44,8 +38,6 @@
       when the simulator received information from these driving signals it
       would act crazy. [Major Lesson Here!]
       
-    * 
-
     * The data at the bulk to absorption transition looks like this:
         2019-10-28 05:49:53.464611,30,13.040212273825867,78.0584534500064,bulk
         2019-10-28 05:42:11.891061,30,13.040212273825867,78.0584534500064,absorption

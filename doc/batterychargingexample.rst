@@ -2058,6 +2058,11 @@ our real system.  It will receive constant current and constant voltage control
 instructions and it will provide functions to other packages that can be used to
 sample the current and the voltage.
 
+.. image:: _static/testing_challenge_3.svg
+    :target: _static/testing_challenge_3.pdf
+    :align: center
+
+
 We show our high level test design to our electrical engineer.
 
 He asks, :new_spec:`What is a mock?`
@@ -2087,6 +2092,12 @@ software we test using compressed time and fake electrical data."
 
 :new_spec:`Let's see your design`:
 
+"First of all this is where you would find the code":
+
+.. image:: _static/testing_challenge_4.svg
+    :target: _static/testing_challenge_4.pdf
+    :align: center
+
 "Before I get into the details, I'll show you how the ``Charger`` and
 ``ElectricalInterface`` charts will communicate using published events."
 
@@ -2101,17 +2112,16 @@ voltage using the ``DRIVE_CURRENT`` and ``DRIVE_VOLTAGE`` events.
 
 "Now we have a bit of a chicken and an egg problem.  If these two ActiveObjects
 are completely independent, then we can't assume they are started at the same
-time.  This means that either one needs to able to initiate an information
-exchange.  Moreover, we have to make sure we don't end up with an infinite
-oscillation."
+time.  This means that either active object needs to be able to initiate an
+information exchange.  Moreover, we have to make sure we don't end up with an
+infinite oscillation as a result."
 
 :new_spec:`Do you need that complexity?  Maybe you should just have something
-else start then and handle the timing?`
+else start them up and handle their timing?`
 
-"Yeah, I might not, it's a trade off, I'll have a bunch of stuff in the chart
-that might look confusing, but someone using the objects from the outside would
-have an easier time turning them on and making them work together.  I'll leave
-it in there for now, I can pull it later if it looks too weird."
+"Yeah, there is a trade off here, I want the use of the objects to be simple,
+but it means that their internal design is a bit more complicated, I'll leave it
+in there for now, I can pull it later if it looks too weird."
 
 :new_spec:`That looks a lot more complicated, walk me through it.`
 
