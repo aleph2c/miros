@@ -398,10 +398,10 @@ class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
         `link <https://aleph2c.github.io/miros/_static/three_stage_charging_chart_4_graph.pdf>`_
 
       2) the three stage charging data architecture drawing:
-        `link <https://aleph2c.github.io/miros/_static/three_stage_charging_chart_4_data.pdf>`_
+        `link <https://aleph2c.github.io/miros/_static/three_stage_charging_chart_5_data.pdf>`_
 
       3) the three stage charging state chart drawing:
-        `link <https://aleph2c.github.io/miros/_static/three_stage_charging_chart_4_chart.pdf>`_
+        `link <https://aleph2c.github.io/miros/_static/three_stage_charging_chart_5_chart.pdf>`_
 
     **Args**:
        | ``name`` (str): name of the charging state chart

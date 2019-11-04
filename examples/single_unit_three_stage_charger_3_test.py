@@ -25,11 +25,54 @@ from single_unit_three_stage_charger_3 import BatterySpecificationSettings
 
 Seconds = namedtuple('Seconds', ['sec'])
 
+class TestOutputCsv:
+
+  def __init__(self, test_csv_output_file=None):
+
+    self.test_csv_output_file =  "charger_test_results.csv" # if test_with_simulator == None else test_csv_output_file
+
+    self.fieldnames = ['time', 'current', 'voltage', 'soc', 'state']
+
+    with open(self.test_csv_output_file, mode="w") as csv_file:
+      writer = csv.DictWriter(csv_file, fieldnames=self.fieldnames)
+      writer.writeheader()
+    self.data = []
+
+  def append_row(self, time, current, voltage, soc, state):
+    self.data.append(
+      {'time':time,
+       'current':current,
+       'voltage':voltage,
+       'soc':soc,
+       'state':state})
+
+  def write(self):
+    with open(self.test_csv_output_file, mode="a") as csv_file:
+      writer = csv.DictWriter(csv_file, fieldnames=self.fieldnames)
+      for row in self.data:
+        writer.writerow(row)
+
+  def make_backup(self):
+      shutil.copy(
+        self.test_csv_output_file,
+        self.test_csv_output_file + '.bak'
+      )
+
+  def read(self):
+    # genfromtxt is garbage, find a better api for future projects
+    data = np.genfromtxt(
+      self.test_csv_output_file,
+      delimiter=',',
+      skip_header=1,
+      names=self.fieldnames,
+      dtype="|S27, float, float, float, |S10"
+    )
+    return data
+
 class ChargerMock(Charger):
   def __init__(self, *args, time_compression_scalar, **kwargs):
     self.time_compression_scalar = time_compression_scalar
     super().__init__(*args, **kwargs)
-    #self.stop()  # stop the parent statechart if it has been started
 
   def charging_entry_signal(self, e):
     status = return_status.HANDLED
@@ -49,23 +92,24 @@ class ElectricalInterfaceMock(ElectricalInterface):
 
     self.pulse_sec = 1.0
     self.battery = battery
-    self.charger_state = None
+    self._charger_state = None
 
     self._last_current_amps = None
     self._last_terminal_voltage = None
 
     self.time_compression_scalar = time_compression_scalar
+    self.test_output_csv = TestOutputCsv()
 
-    self.test_csv_output_file = "charger_test_results.csv"
-    self.fieldnames = ['time', 'current', 'voltage', 'soc', 'state']
+    #self.test_csv_output_file = "charger_test_results.csv"
+    #self.fieldnames = ['time', 'current', 'voltage', 'soc', 'state']
     
     # we just want to test our graph
     if time_compression_scalar == -1:
       return
 
-    with open(self.test_csv_output_file, mode="w") as csv_file:
-      writer = csv.DictWriter(csv_file, fieldnames=self.fieldnames)
-      writer.writeheader()
+    #with open(self.test_csv_output_file, mode="w") as csv_file:
+    #  writer = csv.DictWriter(csv_file, fieldnames=self.fieldnames)
+    #  writer.writeheader()
 
     super().__init__(
       name=name, 
@@ -76,7 +120,7 @@ class ElectricalInterfaceMock(ElectricalInterface):
     self.respond_to_control_changes = self.create(state="respond_to_control_changes"). \
       catch(signal=signals.ENTRY_SIGNAL,
         handler=self.respond_to_control_changes_entry_signal). \
-      catch(signal=signals.Pulse2,
+      catch(signal=signals.Pulse,
         handler=self.respond_to_control_changes_pulse). \
       catch(signal=signals.DRIVE_CURRENT,
         handler=self.respond_to_control_changes_drive_current). \
@@ -135,7 +179,7 @@ class ElectricalInterfaceMock(ElectricalInterface):
     self.subscribe(Event(signal=signals.DRIVE_VOLTAGE))
 
     self.post_fifo(
-      Event(signal=signals.Pulse2),
+      Event(signal=signals.Pulse),
       period=self.pulse_sec / self.time_compression_scalar,
       deferred=True,
       times=0
@@ -143,8 +187,8 @@ class ElectricalInterfaceMock(ElectricalInterface):
     self.real_seconds = 0
     self.fake_seconds = 0
     self.start_datetime=datetime.now()
-    self.csv_file = open(self.test_csv_output_file, mode="a")
-    self.writer = csv.DictWriter(self.csv_file, self.fieldnames)
+    #self.csv_file = open(self.test_csv_output_file, mode="a")
+    #self.writer = csv.DictWriter(self.csv_file, self.fieldnames)
     return status
 
   def respond_to_control_changes_pulse(self, e):
@@ -162,14 +206,14 @@ class ElectricalInterfaceMock(ElectricalInterface):
   def respond_to_control_changes_drive_current(self, e):
     self._driving_terminal_volts = None
     self._driving_terminal_amps = e.payload.amps
-    self.charger_state = e.payload.cause
+    self._charger_state = e.payload.cause
     status = self.trans(self.drive_current_state)
     return status
 
   def respond_to_control_changes_drive_voltage(self, e):
     self._driving_terminal_volts = e.payload.volts
     self._driving_terminal_amps = None
-    self.charger_state = e.payload.cause
+    self._charger_state = e.payload.cause
     status = self.trans(self.drive_voltage_state)
     return status
 
@@ -180,7 +224,8 @@ class ElectricalInterfaceMock(ElectricalInterface):
 
   def respond_to_control_changes_stop(self, e):
     status = return_status.HANDLED
-    self.csv_file.close()
+    #self.csv_file.close()
+    self.test_output_csv.write()
     self.stop()
     return status
 
@@ -203,18 +248,25 @@ class ElectricalInterfaceMock(ElectricalInterface):
       self._driving_terminal_amps,
       sample_time=new_datetime
     )
-    print(self.charger_state)
+    print(self._charger_state)
     if self._last_current_amps and self._last_terminal_voltage:
       print('a ', self._last_current_amps)
       print('v ', self._last_terminal_voltage)
 
-      self.writer.writerow(
-        {'time':new_datetime,
-         'current':self._last_current_amps,
-         'voltage':self._last_terminal_voltage,
-         'soc':self.battery.soc_per,
-         'state':self.charger_state}
-      )
+      self.test_output_csv.append_row(
+          time=new_datetime,
+          current=self._last_current_amps,
+          voltage=self._last_terminal_voltage,
+          soc=self.battery.soc_per,
+          state=self._charger_state)
+
+      #self.writer.writerow(
+      #  {'time':new_datetime,
+      #   'current':self._last_current_amps,
+      #   'voltage':self._last_terminal_voltage,
+      #   'soc':self.battery.soc_per,
+      #   'state':self._charger_state}
+      #)
     return status
 
   def drive_voltage_state_entry_signal(self, e):
@@ -225,7 +277,7 @@ class ElectricalInterfaceMock(ElectricalInterface):
       self._driving_terminal_volts,
       sample_time=new_datetime
     )
-    print(self.charger_state)
+    print(self._charger_state)
     print('a ', self.battery.last_current_amps)
     print('v ', self.battery.last_terminal_voltage)
     return status
@@ -238,16 +290,15 @@ class ElectricalInterfaceMock(ElectricalInterface):
       self._driving_terminal_volts,
       sample_time=new_datetime
     )
-    print(self.charger_state)
+    print(self._charger_state)
     print('a ', self._last_current_amps)
     print('v ', self._last_terminal_voltage)
-    self.writer.writerow(
-      {'time':new_datetime,
-       'current':self._last_current_amps,
-       'voltage':self._last_terminal_voltage,
-       'soc':self.battery.soc_per,
-       'state':self.charger_state}
-    )
+    self.test_output_csv.append_row(
+        time=new_datetime,
+        current=self._last_current_amps,
+        voltage=self._last_terminal_voltage,
+        soc=self.battery.soc_per,
+        state=self._charger_state)
     return status
 
 class ChargerTester:
@@ -267,7 +318,9 @@ class ChargerTester:
     battery_initial_soc_per,
     battery_soc_vrs_ocv_profile_csv,
     battery_ocv_vrs_r_profile_csv,
-    time_compression_scalar):
+    time_compression_scalar,
+    live_trace=None,
+    live_spy=None):
 
     self.time_compression_scalar = time_compression_scalar
 
@@ -309,12 +362,12 @@ class ChargerTester:
     )
 
     # hack the pulse of the charger and start it up
-    self.charger = ChargerMock(
+    self.charger_mock = ChargerMock(
       name="charger_under_test",
       charger_params=charger_params,
       time_compression_scalar=time_compression_scalar,
-      live_spy=True,
-      live_trace=True
+      live_spy=live_spy,
+      live_trace=live_trace
     )
 
     # make a battery simulator and start it up
@@ -324,20 +377,21 @@ class ChargerTester:
       name="lead_acid_battery_{}Ah".format(battery_rated_amp_hours),
       soc_vrs_ocv_profile_csv=battery_soc_vrs_ocv_profile_csv,
       ocv_vrs_r_profile_csv=battery_ocv_vrs_r_profile_csv,
-      live_trace=True,
-      live_spy=True
+      live_trace=live_trace,
+      live_spy=live_spy
     )
     
     # create an electrical interface mock that will be tied
     # to the battery simulator
-    self.electrical_interface = ElectricalInterfaceMock(
+    self.electrical_interface_mock = ElectricalInterfaceMock(
       name="interface_mock",
       battery=self.battery,
       time_compression_scalar=time_compression_scalar,
       live_trace=True,
       live_spy=True
     )
-    self.charger.post_fifo(Event(signal=signals.Force_Bulk))
+    self.charger_mock.post_fifo(Event(signal=signals.Force_Bulk))
+    self.test_output_csv = self.electrical_interface_mock.test_output_csv
 
   def plot_profile(self, csv_file_to_graph=None):
 
@@ -349,20 +403,14 @@ class ChargerTester:
       'time_bar':       'tab:cyan',
     }
 
-    if csv_file_to_graph is None:
-      csv_file_to_graph = self.electrical_interface.test_csv_output_file
+    #if csv_file_to_graph is None:
+    #  csv_file_to_graph = self.electrical_interface_mock.test_output_csv.test_csv_output_file
 
     to_datetime = lambda x: \
       datetime.strptime(x.decode('utf-8'), "%Y-%m-%d %H:%M:%S.%f")
 
     # genfromtxt is garbage, find a better api for future projects
-    data = np.genfromtxt(
-      self.electrical_interface.test_csv_output_file,
-      delimiter=',',
-      skip_header=1,
-      names=self.electrical_interface.fieldnames,
-      dtype="|S27, float, float, float, |S10"
-    )
+    data = self.test_output_csv.read()
 
     time_list_datetime = [to_datetime(string) for string in data['time'].tolist()]
     time_list = [(d - time_list_datetime[0]).total_seconds() for i, d in enumerate(time_list_datetime)]
@@ -429,17 +477,16 @@ class ChargerTester:
     labs = [l.get_label() for l in lhs]
     ax2.legend(lhs, labs, loc=1)
     plt.show()
-    plt.savefig('./../doc/_static/charger_test_results.svg')
-    plt.savefig('./../doc/_static/charger_test_results.pdf')
-
+    plt.savefig('./../docs/_static/charger_test_results.svg')
+    plt.savefig('./../docs/_static/charger_test_results.pdf')
 
 if __name__ == '__main__':
 
   copy_csv_to_bak = True
-  test_with_simulator = False
+  test_with_simulator = True
 
   if test_with_simulator:
-    time_compression_scalar = 30
+    time_compression_scalar = 50
     simulated_duration_in_hours = 1.0
     fake_sec = simulated_duration_in_hours * 3600.0
     real_delay_needed_sec = fake_sec / time_compression_scalar
@@ -462,23 +509,21 @@ if __name__ == '__main__':
     battery_initial_soc_per=65.0,
     battery_soc_vrs_ocv_profile_csv='soc_ocv.csv',
     battery_ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
-    time_compression_scalar=time_compression_scalar
+    time_compression_scalar=time_compression_scalar,
+    live_trace=False,
+    live_spy=False,
   )
 
   time.sleep(real_delay_needed_sec)
-
   if test_with_simulator:
-    ct.electrical_interface.post_lifo(Event(signal=signals.stop))
+    ct.electrical_interface_mock.post_lifo(Event(signal=signals.stop))
     if copy_csv_to_bak:
-      shutil.copy(
-        ct.electrical_interface.test_csv_output_file,
-        ct.electrical_interface.test_csv_output_file + '.bak'
-      )
+      ct.electrical_interface_mock.test_output_csv.make_backup()
     ct.plot_profile()
 
   else:
     ct.plot_profile(
-      csv_file_to_graph=ct.electrical_interface.test_csv_output_file + '.bak'
+      csv_file_to_graph=ct.electrical_interface_mock.test_output_csv.test_csv_output_file + '.bak'
     )
   time.sleep(1)
 

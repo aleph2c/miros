@@ -258,31 +258,34 @@ techniques.</span></li>
 </ul>
 <a class="reference external image-reference" href="_static/three_stage_charging_chart_1.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_1.svg" src="_images/three_stage_charging_chart_1.svg" /></div>
 </a>
-<p>I show the above diagram to the <span class="new-spec">electrical engineer</span> I’m working with, and he says,
-<span class="new-spec">Yeah, it looks good, but can you make sure the two control systems are
-generalizeable?</span>  What do you mean?  <span class="new-spec">Well, I want to just give the current
-control system a reference current and it will drive the device to output that
-current.  The same idea applies to the voltage controller.</span>  He continues,
-<span class="new-spec">A control system is just some math, you give it a goal called a “reference”.
-then you give it the value of the thing it is trying to control, call this the
-“input” and the math will drive the “output” towards the goal.  We connect
-this output value to our hardware and it will behave as expected.  I want to use
-the same math to solve the current and voltage control problems, so give me a
-reference and give me the input and I’ll make it work.</span></p>
+<p>I show the above diagram to the <span class="new-spec">electrical engineer</span> I’m working
+with, and he says, <span class="new-spec">Yeah, it looks good, but can you make sure the two
+control systems are generalizeable?</span></p>
+<p>“What do you mean?”</p>
+<p><span class="new-spec">Well, I want to just give the current control system a reference
+current and it will drive the device to output that current.  The same idea
+applies to the voltage controller.</span></p>
+<p>He continues, <span class="new-spec">A control system is just some math, you give it a goal
+called a “reference”.  then you give it the value of the thing it is trying to
+control, call this the “input” and the math will drive the “output” towards the
+goal.  We connect this output value to our hardware and it will behave as
+expected.  I want to use the same math to solve the current and voltage control
+problems, so give me a reference and give me the input and I’ll make it work.</span></p>
 <p>You turn to leave and he says, <span class="new-spec">Oh, one more thing, I need to tune the
 two control systems differently, so make sure I can set some variables “ki”,
 “kp” and “kd”.  That should be good</span>.</p>
 <p>So now we have to start thinking about all of the parameters, each can be
 changed for a different battery type.  We change the language on the diagram to
-match how our electrical engineer talks about things.</p>
+match how our electrical engineer speaks.</p>
 <a class="reference external image-reference" href="_static/three_stage_charging_chart_1.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_parameters.svg" src="_images/three_stage_charging_parameters.svg" /></div>
 </a>
-<p>After we update the image we show our electrical engineer the new picture.  He
-looks at it and asks, <span class="new-spec">What are these arrows connecting the boxes
-together?</span> You answer, it’s just a way of saying that the <code class="docutils literal notranslate"><span class="pre">reference</span></code>,
+<p>After we update the image we show our electrical engineer the new picture.</p>
+<p>He looks at it and asks, <span class="new-spec">What are these arrows connecting the boxes
+together?</span></p>
+<p>You answer, “It’s just a way of saying that the <code class="docutils literal notranslate"><span class="pre">reference</span></code>,
 <code class="docutils literal notranslate"><span class="pre">input</span></code>, <code class="docutils literal notranslate"><span class="pre">kp</span></code>, <code class="docutils literal notranslate"><span class="pre">ki</span></code> and <code class="docutils literal notranslate"><span class="pre">kd</span></code> values will be in both of the current and
-voltage control classes.  It’s just a drawing short hand.   He says,
-<span class="new-spec">Ok, it looks good.</span></p>
+voltage control classes.  Think of it as a drawing short hand.”</p>
+<p>He says, <span class="new-spec">Ok, it looks good.</span></p>
 <hr class="docutils" />
 <p>Specification (2):</p>
 <ul class="simple">
@@ -311,16 +314,16 @@ adjust our data model to look like this:</p>
 <p>Now that we have a plan for structuring our data, we need to go back to our
 behavioral diagram and figure out how to get information from the world.</p>
 <p>We track down our electrical engineer and ask him, “How fast to I need to read
-the voltage and the current?”  He says, <span class="new-spec">Well, I have to read these
-values very quickly in the embedded device’s interrupt service routines, the
-control systems will be running at 20 Khz, but you don’t have to worry about
-that.  Changing between the various stages can happen slowly.  I’ll be reading
-the input, I’ll use raw ADC readings to keep my code fast and I’ll use the PWM
-peripherals on the part to set the output current and voltage via an H-bridge.
-But I will need you to determine which control system to run and I’ll need you
-to set it’s reference.  Make it so I can tune these values later if I need to,
-but for now you can sample the current, voltage and make decisions at 2 Hz”.
-(every 0.5 seconds)</span></p>
+the voltage and the current?”</p>
+<p>He says, <span class="new-spec">Well, I have to read these values very quickly in the
+embedded device’s interrupt service routines, the control systems will be
+running at 20 Khz, but you don’t have to worry about that.  Changing between the
+various stages can happen slowly.  I’ll be reading the input, I’ll use raw ADC
+readings to keep my code fast and I’ll use the PWM peripherals on the part to
+set the output current and voltage via an H-bridge.  But I will need you to
+determine which control system to run and I’ll need you to set it’s reference.
+Make it so I can tune these values later if I need to, but for now you can
+sample the current, voltage and make decisions at 2 Hz”.  (every 0.5 seconds)</span></p>
 <p>You say, “Wait, I’m not controlling the current or voltage?”.</p>
 <p>He laughs and says, <span class="new-spec">Not with Python you aren’t, but you control which
 control system will run, and you will control that controllers reference and
@@ -340,7 +343,7 @@ it:</p>
 those diamond arrows?</span></p>
 <p>You answer, “It’s just a way of saying one class has an
 attribute of another class.  For instance the <code class="docutils literal notranslate"><span class="pre">battery_spec</span></code> in the
-<code class="docutils literal notranslate"><span class="pre">ChargerParameter</span></code> class is a <code class="docutils literal notranslate"><span class="pre">BatterySpecificInformation</span></code> class.  You leave
+<code class="docutils literal notranslate"><span class="pre">ChargerParameter</span></code> class “is a” <code class="docutils literal notranslate"><span class="pre">BatterySpecificInformation</span></code> class.  You leave
 the <code class="docutils literal notranslate"><span class="pre">BatterySpecificInformation</span></code> class on the picture so you can see what it’s
 attribute names are.”</p>
 <p><span class="new-spec">It seems kind of complicated, can you just show me in code?</span></p>
@@ -392,7 +395,7 @@ inherits from the <code class="docutils literal notranslate"><span class="pre">C
 can drive behavior.  Inheritance is just programming by difference, that arrow
 is like a copy and paste, it’s as if I have copied and pasted all of that
 <code class="docutils literal notranslate"><span class="pre">CustomFactory</span></code> and <code class="docutils literal notranslate"><span class="pre">ChargerParameters</span></code> code into the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> class.
-The ball is just short hand for saying the data attaches to the behavior here.
+The ball is just short hand for saying the data attaches to the behavior “here”.
 The “here” in this case is the “charging state” which will be described
 somewhere else.”</p>
 <p>He looks confused, and says, <span class="new-spec">I guess you will have to show me when you make it.</span></p>
@@ -416,11 +419,12 @@ be a bit much for him.</p>
 </a>
 <p>We show him the diagram, and say, “Listen, some stuff is missing on this, but I
 just want you to look at how the current and voltage are sampled, and how the
-control systems are set up.”  He says, <span class="new-spec">Ok, show me.</span></p>
+control systems are set up.”</p>
+<p>He says, <span class="new-spec">Ok, show me.</span></p>
 <p>You say, “In the entry stage we create three different named pulses that repeat
 forever, or until the charging state is exited. The chart can react to these
-named pulses and change state, or just run some code.” I pause and look at him,
-he says, <span class="new-spec">Keep going.</span></p>
+named pulses and change state, or just run some code.”</p>
+<p>I pause and look at him, he says, <span class="new-spec">Keep going.</span></p>
 <p>“Alright, see that <code class="docutils literal notranslate"><span class="pre">Sample_Current</span></code> pulse, it will fire forever with a period of
 <code class="docutils literal notranslate"><span class="pre">cur_in_sec</span></code> which we will probably just set to 0.5 seconds, but we can tune
 it, we can make this something else if we need to.”</p>
@@ -430,9 +434,10 @@ to sample the current and voltage.  The chart won’t actually change state when
 these events are seen by it, it will just use the events to update a <code class="docutils literal notranslate"><span class="pre">curr</span></code>
 and <code class="docutils literal notranslate"><span class="pre">volt</span></code> attribute in it’s data structure so these values can be kept fresh
 enough that the chart can make good decisions with the information.”</p>
-<p>“Does that make sense?”  <span class="new-spec">Yeah, it’s just a timer right?</span>  You answer,
-“Yeah, but look there is another one, called <code class="docutils literal notranslate"><span class="pre">Pulse</span></code>, it’s not wired up yet,
-but soon it will be the thing that drives the chart’s decisions”</p>
+<p>“Does that make sense?”</p>
+<p><span class="new-spec">Yeah, it’s just a timer right?</span></p>
+<p>You answer, “Yeah, but look there is another one, called <code class="docutils literal notranslate"><span class="pre">Pulse</span></code>, it’s not
+wired up yet, but soon it will be the thing that drives the chart’s decisions”</p>
 <p>“Now I’ll show you how the controllers are set up.  After the charging state is
 entered, it will set up these pulses, then it will enter the bulk state.  When
 it enters the <code class="docutils literal notranslate"><span class="pre">constant_current_state</span></code>, it sets the control system to use the
@@ -440,12 +445,13 @@ it enters the <code class="docutils literal notranslate"><span class="pre">const
 reference of this control system to be <code class="docutils literal notranslate"><span class="pre">battery_spec.ref_amps</span></code> from our data
 model.”</p>
 <p>He looks at it for a while, and says, <span class="new-spec">Yeah, this is what I wanted, ok,
-yeah, I get it.  How do I get into the other states?</span>  “I haven’t set that up
-yet, but suppose we were to enter the <code class="docutils literal notranslate"><span class="pre">absorption</span></code> state, we would first have
-to enter the <code class="docutils literal notranslate"><span class="pre">constant_voltage_state</span></code>.  This would cause our control system to
-change, we would detach the current control system, and attach the voltage
-control system.  We would then use all of that control system’s <code class="docutils literal notranslate"><span class="pre">kp</span></code>, <code class="docutils literal notranslate"><span class="pre">ki</span></code>
-and <code class="docutils literal notranslate"><span class="pre">kd</span></code> parameters.”  <span class="new-spec">Yeah, ok, good, this is what I wanted.</span></p>
+yeah, I get it.  How do I get into the other states?</span></p>
+<p>“I haven’t set that up yet, but suppose we were to enter the <code class="docutils literal notranslate"><span class="pre">absorption</span></code>
+state, we would first have to enter the <code class="docutils literal notranslate"><span class="pre">constant_voltage_state</span></code>.  This would
+cause our control system to change, we would detach the current control system,
+and attach the voltage control system.  We would then use all of that control
+system’s <code class="docutils literal notranslate"><span class="pre">kp</span></code>, <code class="docutils literal notranslate"><span class="pre">ki</span></code> and <code class="docutils literal notranslate"><span class="pre">kd</span></code> parameters.”</p>
+<p><span class="new-spec">Yeah, ok, good, this is what I wanted.</span></p>
 <p>Things seem to be coming together, so we go back and work on our spec, teasing
 apart our high level descriptions from our technical design.</p>
 <hr class="docutils" />
@@ -491,34 +497,36 @@ want the charger to:</p>
 <a class="reference external image-reference" href="_static/three_stage_charging_chart_3_chart.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_3_chart.svg" src="_images/three_stage_charging_chart_3_chart.svg" /></div>
 </a>
 <p>Since there is a need for timeouts in various states, we invent a new signal
-called <code class="docutils literal notranslate"><span class="pre">Tick</span></code>.  <code class="docutils literal notranslate"><span class="pre">Tick</span></code> is driven by our <code class="docutils literal notranslate"><span class="pre">Pulse</span></code> event, and it is given a payload
-which is the time in seconds since the charging state was entered.</p>
+called <code class="docutils literal notranslate"><span class="pre">Tick</span></code>.  <code class="docutils literal notranslate"><span class="pre">Tick</span></code> is driven by our <code class="docutils literal notranslate"><span class="pre">Pulse</span></code> event, and it is given a
+payload which is the time in seconds since the charging state was entered.</p>
 <p>Time to show our electrical engineer.</p>
 <p>We approach him with the diagrams and he says, <span class="new-spec">Ok walk me through
-it</span>.  “When the <code class="docutils literal notranslate"><span class="pre">charging</span></code> state is entered the <code class="docutils literal notranslate"><span class="pre">sec</span></code> is set to 0, then the
+it</span>.</p>
+<p>“When the <code class="docutils literal notranslate"><span class="pre">charging</span></code> state is entered the <code class="docutils literal notranslate"><span class="pre">sec</span></code> is set to 0, then the
 three heart beats are initiated.  Two of the heart beats drive the current and
 voltage readings, but the third heart beat, <code class="docutils literal notranslate"><span class="pre">Pulse</span></code>, will fire every
 <code class="docutils literal notranslate"><span class="pre">pulse_sec</span></code> seconds.  We will probably set <code class="docutils literal notranslate"><span class="pre">pulse_sec</span></code> to 0.5.  The key
 thing to notice on this picture is that Pulse drives another event called
 <code class="docutils literal notranslate"><span class="pre">Tick</span></code> which is given a payload of <code class="docutils literal notranslate"><span class="pre">sec</span></code> which is how much time has passed
 since the charging state was entered.”</p>
-<p><span class="new-spec">Wait, how does this tick thing work?</span>.  “When system turns on the
+<p><span class="new-spec">Wait, how does this tick thing work?</span>.</p>
+<p>“When system turns on the
 first thing that will happen is it will enter the <code class="docutils literal notranslate"><span class="pre">charging</span></code> state. When the
 <code class="docutils literal notranslate"><span class="pre">charging</span></code> state is entered a bunch of heart beats are setup, these are
 basically named timers, <code class="docutils literal notranslate"><span class="pre">Sample_Current</span></code>, <code class="docutils literal notranslate"><span class="pre">Sample_Voltage</span></code> and <code class="docutils literal notranslate"><span class="pre">Pulse</span></code>.
 Then the charging state initializes, causing a transition into the <code class="docutils literal notranslate"><span class="pre">bulk</span></code>
 state.  While this happens, the <code class="docutils literal notranslate"><span class="pre">constant_current_state</span></code> is entered, setting
 the control system to use your current control system, then it enters the
-<code class="docutils literal notranslate"><span class="pre">bulk</span></code> state, which sets the reference of your current control system.”  He
-looks at the diagram and after some time says, <span class="new-spec">Ok, yeah, I see that,
-but how does this pulse stuff work?</span></p>
+<code class="docutils literal notranslate"><span class="pre">bulk</span></code> state, which sets the reference of your current control system.”</p>
+<p>He looks at the diagram and after some time says, <span class="new-spec">Ok, yeah, I see
+that, but how does this pulse stuff work?</span></p>
 <p>“The Pulse event will fire every, say 0.5 seconds, but it is caught by a hook,
 which invents another signal called <code class="docutils literal notranslate"><span class="pre">Tick</span></code> which has a payload, <code class="docutils literal notranslate"><span class="pre">sec</span></code>.  The
 <code class="docutils literal notranslate"><span class="pre">sec</span></code> payload of the Tick signal will have the time in seconds since the
 charging state was entered.  It’s this <code class="docutils literal notranslate"><span class="pre">Tick</span></code> event, which can make stuff
-happen.  Do you see it?”  <span class="new-spec">I see it.  So how do these charging stage
-time outs work?  Can you show me the electrical profile and the statechart
-timing mechanisms together?</span></p>
+happen.  Do you see it?”</p>
+<p><span class="new-spec">I see it.  So how do these charging stage time outs work?  Can you
+show me the electrical profile and the statechart timing mechanisms together?</span></p>
 <a class="reference external image-reference" href="_static/three_stage_charging_chart_3_graph.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_3_graph.svg" src="_images/three_stage_charging_chart_3_graph.svg" /></div>
 </a>
 <p>“Ok, so first of all we enter the bulk state, then we start getting <code class="docutils literal notranslate"><span class="pre">Tick</span></code>
@@ -535,11 +543,12 @@ will ignore.  But once the time in bulk is equal to or greater than
 from the <code class="docutils literal notranslate"><span class="pre">constant_current_control</span></code> state.  Then it will enter into the
 <code class="docutils literal notranslate"><span class="pre">constant_voltage_control</span></code> state, which will switch the control system to use
 a voltage controller, then enter the <code class="docutils literal notranslate"><span class="pre">absorption</span></code> state which will set the
-voltage reference to <code class="docutils literal notranslate"><span class="pre">abs_ref_volts</span></code>”.  <span class="new-spec">I see how it works and I
-see how the same thing happens for transitions to float from absorption.  Also,
-I see that you can only force your way into the equalize state, that’s good eh.</span></p>
+voltage reference to <code class="docutils literal notranslate"><span class="pre">abs_ref_volts</span></code>”.</p>
+<p><span class="new-spec">I see how it works and I see how the same thing happens for
+transitions to float from absorption.  Also, I see that you can only force your
+way into the equalize state, that’s good.</span></p>
 <p>He looks a bit longer and says, <span class="new-spec">So the charger will try and spend
-most of its time in float eh? But how to we get back into bulk if there is a big
+most of its time in float? But how to we get back into bulk if there is a big
 draw on the batteries? Say our customer has a big DC load that draws the voltage
 down below the bulk_entry_volts.  What happens then?</span></p>
 <p>You look at the chart and see that you can’t get back into bulk, “Right now you
@@ -551,25 +560,29 @@ chart, “Look at this:”</p>
 the voltage is below the <code class="docutils literal notranslate"><span class="pre">bulk_entry_volts</span></code>.  I have added a <code class="docutils literal notranslate"><span class="pre">To_Bulk</span></code> hook
 in the <code class="docutils literal notranslate"><span class="pre">bulk</span></code> state which blocks this event from causing a transition from
 <code class="docutils literal notranslate"><span class="pre">charging</span></code> to <code class="docutils literal notranslate"><span class="pre">bulk</span></code> while the unit is in bulk but the voltage is still
-lower than the <code class="docutils literal notranslate"><span class="pre">bulk_exit_volts</span></code>.”  He asks, <span class="new-spec">Why would that happen?</span>.  “The
-charger would probably need some time to get the voltage above the
+lower than the <code class="docutils literal notranslate"><span class="pre">bulk_exit_volts</span></code>.”</p>
+<p>He asks, <span class="new-spec">Why would that happen?</span>.</p>
+<p>“The charger would probably need some time to get the voltage above the
 <code class="docutils literal notranslate"><span class="pre">bulk_entry_volts</span></code> once it fell below this threshold, maybe because of a big
-DC draw on the battery.”  He says, <span class="new-spec">Yeah, that will probably happen in
-some situations</span>.</p>
+DC draw on the battery.”</p>
+<p>He says, <span class="new-spec">Yeah, that will probably happen in some situations</span>.</p>
 <p>You ask him, “Do we need to separate the timing of our current, voltage and
-decision pulses?”  He says, <span class="new-spec">No, it’s not that important, what’s the
-cost of having extra timers anyway?</span>  “It’s not a big deal, just each heart beat
-will have it’s own thread, and when I’m looking at the logs it could get kind of
-cluttered having all of those signals firing at the same time.  So, maybe I could
-simplify the design by just having one heart beat.”  <span class="new-spec">Yeah, simple is
-good, we probably won’t need separate timers.</span></p>
+decision pulses?”</p>
+<p>He says, <span class="new-spec">No, it’s not that important, what’s the cost of having extra
+timers anyway?</span></p>
+<p>“It’s not a big deal, just each heart beat will have it’s own thread, and when
+I’m looking at the logs it could get kind of cluttered having all of those
+signals firing at the same time.  So, maybe I could simplify the design by just
+having one heart beat.”</p>
+<p><span class="new-spec">Yeah, simple is good, we probably won’t need separate timers.</span></p>
 <p>You spend a moment adjusting the chart.  “Here, it’s less cluttered now”:</p>
 <a class="reference external image-reference" href="_static/three_stage_charging_chart_3_chart_2.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_3_chart_2.svg" src="_images/three_stage_charging_chart_3_chart_2.svg" /></div>
 </a>
-<p>Do you see anything else we could pull out of there?  <span class="new-spec">No, it seems
-pretty compact, how are you going to test this thing anyway?  I’m not going to
-have hardware for you for a couple of weeks, can you test it before that?</span>.
-“I will run it on a PC and feed it fake electrical profiles, I also plan
+<p>Do you see anything else we could pull out of there?</p>
+<p><span class="new-spec">No, it seems pretty compact, how are you going to test this thing
+anyway?  I’m not going to have hardware for you for a couple of weeks, can you
+test it before that?</span>.</p>
+<p>“I will run it on a PC and feed it fake electrical profiles, I also plan
 to squeeze time so I can run it through all of it’s states quickly”.</p>
 <p>Things seem to be coming together, so we go back and work on our spec, teasing
 apart our high level descriptions from our technical design.</p>
@@ -1023,21 +1036,22 @@ it will write our custom <code class="docutils literal notranslate"><span class=
 </pre></div>
 </div>
 <hr class="docutils" />
-<p>Our electrical engineer comes up to us, <span class="new-spec">How is it going?</span>, you
-answer, “No plan ever survives first contact with the enemy.”</p>
-<p><span class="new-spec">That well hey?</span> “It’s going well enough, I have the data model and
-statechart written, I can see that it might be working, and I only had to change
-a few things in the design do get it there.  Now I have to figure out how to
-test it. I have no idea if it actually works”</p>
-<p><span class="new-spec">Any ideas?</span>.  “I would like to feed in a graph or a CSV file, and
-have the statechart respond to the graph.  I would have to instrument it in such
-a way that the statechart’s log output would be easy to interpret next to the
-graph.”</p>
+<p>Our electrical engineer comes up to us, <span class="new-spec">How is it going?</span>.</p>
+<p>You answer, “No plan ever survives first contact with the enemy.”</p>
+<p><span class="new-spec">That well hey?</span></p>
+<p>“It’s going well enough, I have the data model and statechart written, I can see
+that it might be working, and I only had to change a few things in the design do
+get it there.  Now I have to figure out how to test it. I have no idea if it
+<em>actually</em> works”</p>
+<p><span class="new-spec">Any ideas?</span></p>
+<p>“I would like to feed in a graph or a CSV file, and have the statechart respond
+to the graph.  I would have to instrument it in such a way that the statechart’s
+log output would be easy to interpret next to the graph.”</p>
 <p><span class="new-spec">If you figure that out, i would like to use it too.  that’s the nice
-thing about software, it’s so gullible, it’s so easy to lie to software eh?</span> You
-look at him for a while, and say, “Yeah, I guess you are right, maybe I could
-mock it out using dependency injection via subclassing or something like that”.
-<span class="new-spec">Why do you software guys always invent these complicated names for
+thing about software, it’s so gullible, it’s so easy to lie to software?</span></p>
+<p>You look at him for a while, and say, “Yeah, I guess you are right, maybe I could
+mock it out using dependency injection via subclassing or something like that”.</p>
+<p><span class="new-spec">Why do you software guys always invent these complicated names for
 things?</span></p>
 <p>You think for a while and surprise him with an answer, “I think it happens
 because we try to keep everything as general as possible, and we aren’t that
@@ -1048,16 +1062,16 @@ description that pops into our mind, and first ideas are usually bad. But
 we don’t care because we don’t think that the name is important when we invent
 it. Then that name sticks, and whatever the specific problem we were trying to
 solve is forgotten. Nobody has control of the language once it is released to
-the public (unless you are French), so the dumb language just lingers like a bad
-smell”</p>
+the public (unless it’s French), so the dumb language just lingers like a bad
+smell.”</p>
 <p>He laughs and says, <span class="new-spec">Well at least you aren’t using Latin.  I think
 your industry comes up with bad names because the names are made by academics,
 and they will increase their chances of being published, – paid –, if they
 make things sound as complicated and mysterious as possible.</span></p>
 <p><span class="new-spec">Why don’t you just add your testing design into the spec, this stuff
 you have written needs to work, or you could burn down someone’s house eh?  No
-pressure, eh?  Just add it to the spec, then make it happen.  Oh, and try and
-keep your gobbledegook out of the spec, I have to read it too.</span></p>
+pressure.</span> He smiles. <span class="new-spec">Just add it to the spec, then make it happen.
+Oh, and try and keep your gobbledegook out of the spec, I have to read it too.</span></p>
 </div>
 <hr class="docutils" />
 <div class="section" id="single-unit-three-stage-battery-charger-design-2">
@@ -1106,18 +1120,18 @@ different battery types.</span></li>
 </ul>
 <hr class="docutils" />
 <p>I approach my electrical engineer, “Hey, can I get some help about how to think
-about my model?” <span class="new-spec">Sure, what do you need to know that you don’t know
-already?</span>.</p>
+about my model?”</p>
+<p><span class="new-spec">Sure, what do you need to know that you don’t know already?</span>.</p>
 <p>“Well, I need to build something that will give me different voltages over time
 after I feed the bulk current, and different current when I feed a constant
 voltage”</p>
-<p><span class="new-spec">Hold on, show me what you want</span>.  You place the electrical profile in
-front of him:</p>
+<p><span class="new-spec">Hold on, show me what you want</span>.</p>
+<p>You place the electrical profile in front of him:</p>
 <a class="reference external image-reference" href="_static/three_stage_charging_chart_2_graph.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_2_graph.svg" src="_images/three_stage_charging_chart_2_graph.svg" /></div>
 </a>
 <p>“I have to be able to fake out these electrical profiles.  Any ideas?”</p>
 <p><span class="new-spec">Yeah, I can help you with that, but first you have to understand a
-few things about batteries.  Do you have time for that?</span></p>
+few things about batteries.  Do you have time?</span></p>
 <p>“Of course.”</p>
 <p><span class="new-spec">Ok, well, batteries are very complicated, their behaviors are
 effected by their chemistry, age, the temperature, how fast they have been
@@ -1252,8 +1266,8 @@ seconds after we have disconnected the charger.  The blue line represents a kind
 of instantaneous hidden voltage of the battery.  But, if you were to stop
 charging at some point along the x-axis, in 24 hours the voltage would settle to
 the black line for the same state of charge. I just want you to make the line go
-up once we have over-charged the battery.  Like with horse shoes and hand
-grenades, we just need to be close enough.</span></p>
+up once we have over-charged the battery.  Like “horse shoes” and “hand
+grenades”; we just need to be close enough.</span></p>
 <p>“How can I put more than 100 percent charge in the battery?”</p>
 <p><span class="new-spec">Good question, you can’t really, but if you drive more current than
 what it was rated for, the voltage will start to go up like I drew on the
@@ -1298,8 +1312,8 @@ file:</p>
 120,20.80
 </pre></div>
 </div>
-<p>Then using something like the following code you plot your data and the function
-approximation of the data:</p>
+<p>Then using something like the following code you plot your data and the
+functional approximation of the data:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
@@ -1399,7 +1413,7 @@ code to make the graphs <a class="reference external" href="https://github.com/a
 used one of their pictures as a reference. My CSV file isn’t real though, I just
 eyeballed their graph to make mine.”</p>
 <p>He says, <span class="new-spec">Good enough, what is the second graph?</span></p>
-<p>“The software can’t use the CSV file directly, it needs a function, so I build a
+<p>“The software can’t use the CSV file directly, it needs a function, so I built a
 function from this data and this function was used to draw the second graph.”</p>
 <p><span class="new-spec">So the second graph isn’t the data?  Not bad, it looks the same
 as the CSV file.</span></p>
@@ -1422,13 +1436,14 @@ the statechart I can hot-swap it based on what is happening in the battery.”</
 <p><span class="new-spec">I don’t think we will need something that sophisticated.  How does
 the behavior work anyway?</span></p>
 <p>“I wanted something that would look like how it looks when you are using a real
-battery, so I made it’s time our time.  <span class="new-spec">What do you mean by that?</span></p>
-<p>“You can feed the statechart <cite>amp</cite> or <cite>volt</cite> once it has started, and the
-simulator will just assume that is what you are doing until you send it another
-sample.  It’s like you are feeding it DC Amps or Volts until you send it new
-information.  So, if we build a 100 Amp Hour battery, it will take in the order
-of an hour to charge the battery at 100 Amps while we run it.”  <span class="new-spec">So it
-literally acts like a battery in real time?</span></p>
+battery, so I made it’s time our time.</p>
+<p><span class="new-spec">What do you mean by that?</span></p>
+<p>“You can feed the statechart <code class="docutils literal notranslate"><span class="pre">amp</span></code> or <code class="docutils literal notranslate"><span class="pre">volt</span></code> events once it has started, and
+the simulator will just assume that is what you are doing until you send it
+another sample.  It’s like you are feeding it DC Amps or Volts until you send it
+new information.  So, if we build a 100 Amp Hour battery, it will take in the
+order of an hour to charge the battery at 100 Amps while we run it.”</p>
+<p><span class="new-spec">So it literally acts like a battery in real time?</span></p>
 <p>“Yeah, but I also wanted the option of compressing time, so that I don’t have to
 sit around while I’m testing the software.  I’ll use the battery in our time
 frame, to build data sets which can be run almost instantaneously later.”</p>
@@ -1493,7 +1508,8 @@ provided directly from the event.  Look, you can see something very similar
 happens if an <code class="docutils literal notranslate"><span class="pre">amps</span></code> event is sent.”  You point to the <code class="docutils literal notranslate"><span class="pre">amps_to_amp_hours</span></code>
 state on the diagram. “Try and describe to me how it works.”</p>
 <p>He looks at it and asks, <span class="new-spec">Where is the state machine usually
-sitting?</span>  “It’s usually in the <code class="docutils literal notranslate"><span class="pre">update_charge_state</span></code>”.</p>
+sitting?</span></p>
+<p>“It’s usually in the <code class="docutils literal notranslate"><span class="pre">update_charge_state</span></code>”.</p>
 <p>He concentrates for a moment and says, <span class="new-spec">Yeah, ok, the amps event kind
 of works the same way, it generates a amps_and_time event, which is caught then
 fed as a amp_hours event, and eventually the chart climbs back into the
@@ -1515,7 +1531,8 @@ battery is 80 percent charged.</span></p>
 <p>“Ok, so I’ll place the battery near an 80 percent state of charge and transition
 from a constant current to a constant voltage technique once it’s charged to 80
 percent. What charge current do you want?”</p>
-<p><span class="new-spec">What is the battery rating?</span>  You say, “100 Ah.”</p>
+<p><span class="new-spec">What is the battery rating?</span></p>
+<p>You say, “100 Ah.”</p>
 <p><span class="new-spec">Charge it at c/3, or about 30 amps</span>.</p>
 <p>“To do that in code I would write:”</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">battery</span> <span class="o">=</span> <span class="n">Battery</span><span class="p">(</span>
@@ -1549,7 +1566,7 @@ you write <code class="docutils literal notranslate"><span class="pre">time.slee
 more than that.  This slip is dependent upon your operating system and what
 other kinds of computational loads you are running.  Because of this, no two
 runs of the program will generate the same results, since the time difference
-comes to play in how the state of charge is accumulated.”</p>
+comes to play in how the state-of-charge is accumulated.”</p>
 <p><span class="new-spec">Ok, well it looks like you got the transition working, but I don’t
 think you have enough loss in your battery, where did you get your internal
 resistance number from?</span></p>
@@ -1563,7 +1580,7 @@ battery.</span></p>
 part would be finding good data and updating the diagram with a graphic.”</p>
 <p><span class="new-spec">If it isn’t a big deal add it.  Otherwise, this is good enough.</span></p>
 <hr class="docutils" />
-<p>Being a sucker for a challenge, you head back to the <a class="reference external" href="https://batteryuniversity.com/learn/archive/how_does_internal_resistance_affect_performance">cadex website</a>
+<p>You head back to the <a class="reference external" href="https://batteryuniversity.com/learn/archive/how_does_internal_resistance_affect_performance">cadex website</a>
 and find a open circuit voltage versus internal resistance graph for a lead acid
 battery:</p>
 <a class="reference external image-reference" href="_static/battery_resistance_profile.pdf"><div align="center" class="align-center"><img alt="_images/battery_resistance_profile.svg" src="_images/battery_resistance_profile.svg" /></div>
@@ -1580,11 +1597,11 @@ code to make the graphs <a class="reference external" href="https://github.com/a
 </a>
 <p><span class="new-spec">You know, if you keep adding features like this to the battery
 simulator you are going to have something that is very useful, not just for us.</span></p>
-<p>“All I need is data, its <cite>numpy</cite> and <cite>scipy</cite> that does the heavy lifting and the
-statechart manages the time and the design complexity.  Speaking of which, I
-have simplified things by adding the <code class="docutils literal notranslate"><span class="pre">amps_into_terminal</span></code> and
-<code class="docutils literal notranslate"><span class="pre">volts_across_terminal</span></code> methods.  You shouldn’t have to know about event names
-if you are using the simulator, the code should figure that out for you.</p>
+<p>“All I need is data, its the Python <cite>numpy</cite> and <cite>scipy</cite> packages that are doing
+the heavy lifting and the statechart manages the time and the design complexity.
+Speaking of which, I have simplified things by adding the <code class="docutils literal notranslate"><span class="pre">amps_into_terminal</span></code>
+and <code class="docutils literal notranslate"><span class="pre">volts_across_terminal</span></code> methods.  You shouldn’t have to know about event
+names if you are using the simulator, the code should figure that out for you.”</p>
 <p><span class="new-spec">Can you speed it up? Maybe compress time? Like, make an
 hour of charging in the battery’s time happen in tens of seconds in our time
 frame?</span></p>
@@ -1747,11 +1764,11 @@ plot</a> <span class="new-spec">would look like this:</span></li>
 </li>
 </ul>
 <hr class="docutils" />
-<p>So now we have a simulator and we have some code we want to test.  How do we
-bring them together?  Let’s break it down a bit, we want:</p>
+<p>Now we have a simulator and we have some code we want to test with it.  How do we
+bring them together?</p>
+<p>Let’s consider our high level goals:</p>
 <ul class="simple">
 <li>to build an environment where we can put our charger into dangerous situations and see how it behaves.</li>
-<li>to run the tests over tens of seconds and not over hours.</li>
 <li>to test in isolation of our big expensive batteries until we know we won’t destroy them.</li>
 <li>to build an environment where we can make mistakes, where we can feel free to try stuff and see what happens.</li>
 <li>to make a very fast feedback cycle so we can learn quickly and stay engaged with our problem.</li>
@@ -1761,15 +1778,20 @@ bring them together?  Let’s break it down a bit, we want:</p>
 </a>
 <p>We want to build the system on the right before we build the system on the left.
 Currently, it is very difficult to mock out our electrics and time features, so
-we will change the production code to make it testable:</p>
+we will change the production code to make it testable by adding an
+<code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> class:</p>
 <a class="reference external image-reference" href="_static/testing_challenge_2.pdf"><div align="center" class="align-center"><img alt="_images/testing_challenge_2.svg" src="_images/testing_challenge_2.svg" /></div>
 </a>
-<p>We add an <code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> class, which will act as the driver layer in
-our real system.  It will receive constant current and constant voltage control
+<p>The <code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> class will act as the driver layer in our real
+system.  It will receive constant current and constant voltage control
 instructions and it will provide functions to other packages that can be used to
 sample the current and the voltage.</p>
 <a class="reference external image-reference" href="_static/testing_challenge_3.pdf"><div align="center" class="align-center"><img alt="_images/testing_challenge_3.svg" src="_images/testing_challenge_3.svg" /></div>
 </a>
+<p>With our new design we can mock-out the charger and the electrical interface
+then, connect these mocks to our battery simulator.  Our test code will generate
+electrical profile graphs so we can quickly see if our charger is working or
+not.</p>
 <p>We show our high level test design to our electrical engineer.</p>
 <p>He asks, <span class="new-spec">What is a mock?</span></p>
 <p>“It’s a way to inject false information into production code so it can be
@@ -1792,61 +1814,63 @@ software we test using compressed time and fake electrical data.”</p>
 <p>“First of all this is where you would find the code”:</p>
 <a class="reference external image-reference" href="_static/testing_challenge_4.pdf"><div align="center" class="align-center"><img alt="_images/testing_challenge_4.svg" src="_images/testing_challenge_4.svg" /></div>
 </a>
-<p>“Before I get into the details, I’ll show you how the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> and
+<p>“Before I get into the details, I’ll show you how the shippable, <code class="docutils literal notranslate"><span class="pre">Charger</span></code> and
 <code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> charts will communicate using published events.”</p>
 <a class="reference external image-reference" href="_static/three_stage_charging_chart_5_statocal.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_5_statocal.svg" src="_images/three_stage_charging_chart_5_statocal.svg" /></div>
 </a>
 <p>“You can see the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> can request samplers, and the
 <code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> will return functions in the <code class="docutils literal notranslate"><span class="pre">SET_VOLTAGE_SAMPLER</span></code> and
 <code class="docutils literal notranslate"><span class="pre">SET_CURRENT_SAMPLER</span></code> events.  The <code class="docutils literal notranslate"><span class="pre">Charger</span></code> can drive the current or the
-voltage using the <code class="docutils literal notranslate"><span class="pre">DRIVE_CURRENT</span></code> and <code class="docutils literal notranslate"><span class="pre">DRIVE_VOLTAGE</span></code> events.</p>
+voltage using <code class="docutils literal notranslate"><span class="pre">DRIVE_CURRENT</span></code> and <code class="docutils literal notranslate"><span class="pre">DRIVE_VOLTAGE</span></code>.</p>
 <p>“Now we have a bit of a chicken and an egg problem.  If these two ActiveObjects
 are completely independent, then we can’t assume they are started at the same
 time.  This means that either active object needs to be able to initiate an
 information exchange.  Moreover, we have to make sure we don’t end up with an
-infinite oscillation as a result.”</p>
+infinite oscillation.”</p>
 <p><span class="new-spec">Do you need that complexity?  Maybe you should just have something
 else start them up and handle their timing?</span></p>
 <p>“Yeah, there is a trade off here, I want the use of the objects to be simple,
 but it means that their internal design is a bit more complicated, I’ll leave it
 in there for now, I can pull it later if it looks too weird.”</p>
-<p><span class="new-spec">That looks a lot more complicated, walk me through it.</span></p>
-<p>“Ok, either one of these objects can start first and then initiate a message
-exchange.  Now imagine the <code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> is on, then the <code class="docutils literal notranslate"><span class="pre">Charger</span></code>
-turns on.  The <code class="docutils literal notranslate"><span class="pre">Charger</span></code> will publish a <code class="docutils literal notranslate"><span class="pre">REQUEST_FOR_SAMPLER</span></code>.  The
-<code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> subscribes to this, and it will respond by putting the
-function addresses of the current and voltage samples into two separate payloads
-then add these payloads to the <code class="docutils literal notranslate"><span class="pre">SET_CURRENT_SAMPLER</span></code> and
-<code class="docutils literal notranslate"><span class="pre">SET_VOLTAGE_SAMPLER</span></code> events.  When the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> receives these messages,
-it will save the functions and use them to get the electrical readings when it
-needs to.”</p>
-<p>“Now imagine that as the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> is working, and it needs to <code class="docutils literal notranslate"><span class="pre">DRIVE_CURRENT</span></code>
-or <code class="docutils literal notranslate"><span class="pre">DRIVE_VOLTAGE</span></code>.  You can see the payloads that will be inside of these
-events, there will be an electrical value, a control system, and the time of the
-request in seconds from when the charger turned on.</p>
-<p>These <code class="docutils literal notranslate"><span class="pre">DRIVE_CURRENT</span></code> and <code class="docutils literal notranslate"><span class="pre">DRIVE_VOLTAGE</span></code> messages will be received by the
-<code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code>, and it will do as instructed.</p>
-<p><span class="new-spec">Seems straight forward, let’s see the new ElectricalInterface design.</span></p>
-<a class="reference external image-reference" href="_static/electrical_interface_5.pdf"><div align="center" class="align-center"><img alt="_images/electrical_interface_5.svg" src="_images/electrical_interface_5.svg" /></div>
-</a>
-<p>“When it starts up it sends out the current and voltage sampling functions to
-whomever is subscribed.  Then it does nothing unless, it gets a request for the
-samplers or instructions to drive the current or the voltage.”</p>
-<p>“I have marked up what will be changed by the mocking code.  In production the
-<code class="docutils literal notranslate"><span class="pre">drive_current</span></code> and <code class="docutils literal notranslate"><span class="pre">drive_voltage</span></code> functions will be connected to drivers
-on the hardware.  But when the unit is under test, this will send information to our
-battery simulator.</p>
-<p><span class="new-spec">Alright, let’s see the charger.</span></p>
+<p><span class="new-spec">Walk me through the new charger statechart.</span></p>
 <a class="reference external image-reference" href="_static/three_stage_charging_chart_5_chart.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_5_chart.svg" src="_images/three_stage_charging_chart_5_chart.svg" /></div>
 </a>
+<p>“So the charger’s job is to read electrical values then pick which control
+system to use and whether we should be charging with a constant current or
+voltage approach.”</p>
+<p>“Either the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> or the <code class="docutils literal notranslate"><span class="pre">ElectricalInterfaces</span></code> can start first and
+initiate a message exchange.  Imagine the <code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> is on, then
+the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> turns on.  The <code class="docutils literal notranslate"><span class="pre">Charger</span></code> will publish a
+<code class="docutils literal notranslate"><span class="pre">REQUEST_FOR_SAMPLER</span></code>.  The <code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> subscribes to this, and it
+will respond by putting the function addresses of the current and voltage
+samples into two separate payloads of the <code class="docutils literal notranslate"><span class="pre">SET_CURRENT_SAMPLER</span></code> and
+<code class="docutils literal notranslate"><span class="pre">SET_VOLTAGE_SAMPLER</span></code>.  When the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> receives these messages,
+it will save the functions and use them to get the electrical readings from then
+on.”</p>
+<p>“There is a chance that the Charger’s statechart could start before the
+<code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code>, which means, that the <code class="docutils literal notranslate"><span class="pre">REQUEST_FOR_SAMPLER</span></code> event was
+ignored by the system.  This doesn’t matter, since the <code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code>
+will post the <code class="docutils literal notranslate"><span class="pre">SET_CURRENT_SAMPLER</span></code> and <code class="docutils literal notranslate"><span class="pre">SET_VOLTAGE_SAMPLER</span></code> when it
+starts, this will turn on the charger.  However, if these events are received
+again, they will be caught by hooks in the <code class="docutils literal notranslate"><span class="pre">charging</span></code> state.</p>
+<p><span class="new-spec">That is the complexity you added to let either object start at
+anytime?</span></p>
+<p>You say, “That’s right.”</p>
+<p><span class="new-spec">Ok, what else has changed?</span></p>
+<p>“As the <code class="docutils literal notranslate"><span class="pre">Charger</span></code> making decisions about what it should do it publishes a
+<code class="docutils literal notranslate"><span class="pre">DRIVE_CURRENT</span></code> or <code class="docutils literal notranslate"><span class="pre">DRIVE_VOLTAGE</span></code>.  Inside of these events there will be an
+electrical value, a control system, and the time of the request in seconds from
+when the charger turned on.</p>
+<p>These <code class="docutils literal notranslate"><span class="pre">DRIVE_CURRENT</span></code> and <code class="docutils literal notranslate"><span class="pre">DRIVE_VOLTAGE</span></code> messages will be received by the
+<code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code>, and it will do as instructed.</p>
 <p>“It’s still pretty much the same design, it has been adjusted to receive it’s
 current and voltage samplers and to drive current or voltage.”  You pause, “But,
 you need to take a look at the entry condition of the <code class="docutils literal notranslate"><span class="pre">charging</span></code> state.”</p>
 <p><span class="new-spec">Ok, what’s the big deal there?</span></p>
 <p>“The <code class="docutils literal notranslate"><span class="pre">Beat</span></code> drives the <code class="docutils literal notranslate"><span class="pre">Ticks</span></code> event.  The <code class="docutils literal notranslate"><span class="pre">Ticks</span></code> event thinks it’s being
-driven every <code class="docutils literal notranslate"><span class="pre">pulse_sec</span></code>, but it we drive it faster, the charger won’t know.
+driven every <code class="docutils literal notranslate"><span class="pre">pulse_sec</span></code>, but it we drive it faster and the charger doesn’t know.
 We will move it out of real time and into compressed time.”</p>
-<p><span class="new-spec">What do you mean, “it won’t know”?</span></p>
+<p><span class="new-spec">What do you mean, “it doesn’t know”?</span></p>
 <p>“The charger has all of these “time-outs” in seconds, like the
 ‘bulk_timeout_sec’ etc.. but, to test the unit we don’t want to change those
 numbers to be different from what will ship, and don’t want to sit
@@ -1864,6 +1888,307 @@ callback.  Then test using the <code class="docutils literal notranslate"><span 
 You can change the beat by changing this number, the charger’s time can be sped
 up or slowed down.  But it won’t know, it will think that it is getting a beat
 every <code class="docutils literal notranslate"><span class="pre">pulse_sec</span></code>.”</p>
+<p><span class="new-spec">That part seems fairly straight forward, let’s see the ElectricalInterface design.</span></p>
+<a class="reference external image-reference" href="_static/electrical_interface_5.pdf"><div align="center" class="align-center"><img alt="_images/electrical_interface_5.svg" src="_images/electrical_interface_5.svg" /></div>
+</a>
+<p>“The <code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> is just that, it will read from our battery’s
+electrical values and it will be used to drive the battery current and terminal voltage.”</p>
+<p>“When it starts up it sends out the current and voltage sampling functions to
+whomever is subscribed.  Then it does nothing unless, it gets a request for the
+samplers or instructions to drive the current or the voltage.”</p>
+<p>“I have marked up what will be changed by the mocking code.  In production the
+<code class="docutils literal notranslate"><span class="pre">drive_current</span></code> and <code class="docutils literal notranslate"><span class="pre">drive_voltage</span></code> functions will be connected to drivers
+on the hardware.  But when the unit is under test, this will send information to our
+battery simulator.</p>
+<p><span class="new-spec">Ok, show me the electical interface mock.</span></p>
+<p>“This is a bit more complex:”</p>
+<a class="reference external image-reference" href="_static/electrical_interface_5_mock.pdf"><div align="center" class="align-center"><img alt="_images/electrical_interface_5_mock.svg" src="_images/electrical_interface_5_mock.svg" /></div>
+</a>
+<p>“The <code class="docutils literal notranslate"><span class="pre">ElectricalInterface</span></code> sends functions out to whomever wants to read the
+current and the voltage.  I haven’t seen this before, functions inside of
+events, but it works and it keeps everything decoupled.    The functions are
+sent out as payloads inside of the <code class="docutils literal notranslate"><span class="pre">SET_CURRENT_SAMPLER</span></code> and
+<code class="docutils literal notranslate"><span class="pre">SET_VOLTAGE_SAMPLER</span></code>.  If anything else in our system needs a set of samplers
+they just have to ask by publishing a <code class="docutils literal notranslate"><span class="pre">REQUEST_FOR_SAMPLER</span></code>.  Our <code class="docutils literal notranslate"><span class="pre">Charger</span></code>
+sends this out when it starts up and that is how it gets its drivers. And the
+<code class="docutils literal notranslate"><span class="pre">Charger</span></code> doesn’t have to know it’s using a <code class="docutils literal notranslate"><span class="pre">BatterySimulator</span></code>.”</p>
+<p>“The electrical interface doesn’t just read values, you can force it to drive
+electrical values too.  It will respond to anything sending a <code class="docutils literal notranslate"><span class="pre">DRIVE_VOLTAGE</span></code>
+or <code class="docutils literal notranslate"><span class="pre">DRIVE_CURRENT</span></code>.  Inside of these events is the electrical information and
+the control system that should be used by the interface.  We aren’t going to use
+the control system in this part of the test, because it is up to you to test
+that, but know this is how it will be passed around.  If you look at the
+<code class="docutils literal notranslate"><span class="pre">drive_current_state</span></code> and the <code class="docutils literal notranslate"><span class="pre">drive_voltage_state</span></code> you will see this is
+where we call the battery simulator.  The drive-events will also cause us to
+write down data that will be graphed once the test is finished.”</p>
+<p><span class="new-spec">How do you make time programmable with this mock?</span></p>
+<p>“This is very tricky, because time is being driven by the <code class="docutils literal notranslate"><span class="pre">Pulse</span></code> event which
+is started up in the entry condition.  But, this is the important thing to know:
+the <code class="docutils literal notranslate"><span class="pre">Pulse</span></code> event won’t actually be sent with the expected tempo, because this
+isn’t a real-time system. The <code class="docutils literal notranslate"><span class="pre">Pulse</span></code> event will drift forward in time
+every time it is emitted by its sourcing thread.  So the clock of the
+<code class="docutils literal notranslate"><span class="pre">ElectricalInterfaceMock</span></code> is sloppy because it is Python running on a native
+OS.  When I first designed this part of the system I had the weirdest
+time-traveling-bug, the entry conditions of the drive states where using
+converted OS time rather than the slipping <code class="docutils literal notranslate"><span class="pre">Pulse</span></code> time frame.  I would ask
+the OS for the time, then calculate the equivalent time using the
+<code class="docutils literal notranslate"><span class="pre">time_compression_scalar</span></code>, and the battery simulator would go nuts.  My
+mistake was I was using two clocks instead of one clock, the OS time was not the
+same as the <code class="docutils literal notranslate"><span class="pre">Pulse</span></code> time, it wasn’t slipping forward, so I was accidentally sending
+electrical information back in time to the battery simulator when I either drove
+the voltage or current.  The bug wrecked my head for a while.”</p>
+<p><span class="new-spec">A time traveling bug?  What are you talking about?</span></p>
+<p>“I was using two clocks, one which was pretty good and one which was slipping
+forward in time.  I needed to just use one clock, so I picked the sloppy one and
+the simulator stopped receiving messages from two different time frames and it
+started to behave as I was expecting it to behave.”</p>
+<p><span class="new-spec">There is a lot going on, show me that high level diagram again.</span></p>
+<p>“You mean this one?”</p>
+<a class="reference external image-reference" href="_static/testing_challenge_3.pdf"><div align="center" class="align-center"><img alt="_images/testing_challenge_3.svg" src="_images/testing_challenge_3.svg" /></div>
+</a>
+<p><span class="new-spec">Yeah, how do you run the code, like, how do you get the whole thing
+going and what is the output look like?</span></p>
+<p>“To start up the charger test you need to provide it with a lot of data, it
+would look something like this:”</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">time_compression_scalar</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">simulated_duration_in_hours</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">fake_sec</span> <span class="o">=</span> <span class="n">simulated_duration_in_hours</span> <span class="o">*</span> <span class="mf">3600.0</span>
+<span class="n">real_delay_needed_sec</span> <span class="o">=</span> <span class="n">fake_sec</span> <span class="o">/</span> <span class="n">time_compression_scalar</span>
+
+<span class="n">ct</span> <span class="o">=</span> <span class="n">ChargerTester</span><span class="p">(</span>
+  <span class="n">charger_bulk_timeout_sec</span><span class="o">=</span><span class="mi">1600</span><span class="p">,</span>
+  <span class="n">charger_abs_timeout_sec</span><span class="o">=</span><span class="mi">1300</span><span class="p">,</span>
+  <span class="n">charger_equ_timeout_sec</span><span class="o">=</span><span class="mi">1300</span><span class="p">,</span>
+  <span class="n">charger_bulk_entry_volts</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span>
+  <span class="n">charger_bulk_exit_volts</span><span class="o">=</span><span class="mf">13.04</span><span class="p">,</span>
+  <span class="n">charger_abs_exit_amps</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
+  <span class="n">charger_bulk_ref_amps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+  <span class="n">charger_float_ref_volts</span><span class="o">=</span><span class="mf">12.9</span><span class="p">,</span>
+  <span class="n">charger_abs_ref_volts</span><span class="o">=</span><span class="mf">13.04</span><span class="p">,</span>
+  <span class="n">charger_equ_ref_volts</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
+  <span class="n">battery_rated_amp_hours</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+  <span class="n">battery_initial_soc_per</span><span class="o">=</span><span class="mf">65.0</span><span class="p">,</span>
+  <span class="n">battery_soc_vrs_ocv_profile_csv</span><span class="o">=</span><span class="s1">&#39;soc_ocv.csv&#39;</span><span class="p">,</span>
+  <span class="n">battery_ocv_vrs_r_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_internal_resistance.csv&#39;</span><span class="p">,</span>
+  <span class="n">time_compression_scalar</span><span class="o">=</span><span class="n">time_compression_scalar</span><span class="p">,</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+  <span class="n">live_spy</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">real_delay_needed_sec</span><span class="p">)</span>
+<span class="n">ct</span><span class="o">.</span><span class="n">electrical_interface_mock</span><span class="o">.</span><span class="n">post_lifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">stop</span><span class="p">))</span>
+<span class="n">ct</span><span class="o">.</span><span class="n">plot_profile</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>And here is what the result would look like.  I would take about 72 seconds to
+run the test:</p>
+<a class="reference external image-reference" href="_static/charger_test_results.pdf"><div align="center" class="align-center"><img alt="_images/charger_test_results.svg" src="_images/charger_test_results.svg" /></div>
+</a>
+<p><span class="new-spec">Ok, that graph makes sense to me, more so than the rest of it.  You
+should pack everything you have done into the spec.</span></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="single-unit-three-stage-battery-charger-design-4">
+<h2>Single Unit Three Stage Battery Charger Design (4)<a class="headerlink" href="#single-unit-three-stage-battery-charger-design-4" title="Permalink to this headline">¶</a></h2>
+<p><strong>High level Specification (7)</strong></p>
+<ul class="simple">
+<li>This product will be a three stage charger with an equalization feature.</li>
+<li>The charger has two control systems: constant current and constant voltage.</li>
+<li>The bulk stage is a constant current control technique.</li>
+<li>The absorption, float and equalization stages are constant voltage control
+techniques.</li>
+<li>The charging electrical profile can be seen here</li>
+</ul>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_2_graph.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_2_graph.svg" src="_images/three_stage_charging_chart_2_graph.svg" /></div>
+</a>
+<p><strong>Sofware Functional Specification (7)</strong></p>
+<ul class="simple">
+<li>The software system will be broken into two parts, fast running c code and slower running Python code.</li>
+<li>The c code will run in ISRs at a frequency of 20 Khz and will control the charger in either a constant current or
+constant voltage mode. (see separate doc)</li>
+<li>The Python code will determine which control strategy the c code is
+using, it will also set the c code’s control system parameters.  The Python code will not directly control the electrical output of the unit.</li>
+<li>The Python code will sample the current and voltage and make decisions every 0.5 seconds</li>
+<li>The Python data architecture can be seen here.</li>
+</ul>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_5_data.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_5_data.svg" src="_images/three_stage_charging_chart_5_data.svg" /></div>
+</a>
+<ul>
+<li><p class="first"><span class="new-spec">The Python behavioral architecture will be primarily broken into two parts:</span></p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><span class="new-spec">The Charger will sample the battery current and voltage and make decisions
+about which control system to use.</span></li>
+<li><span class="new-spec">ElectricalInterface will contain the software needed to read and
+set the current and voltage of the battery:</span></li>
+</ol>
+</div></blockquote>
+</li>
+<li><p class="first"><span class="new-spec">From a high level the Charger and ElectricalInterface will
+communicate using asychronous messages:</span></p>
+</li>
+</ul>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_5_high.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_5_high.svg" src="_images/three_stage_charging_chart_5_high.svg" /></div>
+</a>
+<ul class="simple">
+<li><span class="new-spec">The ElectricalInterface behavioral architecture can be seen below:</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/electrical_interface_5.pdf"><div align="center" class="align-center"><img alt="_images/electrical_interface_5.svg" src="_images/electrical_interface_5.svg" /></div>
+</a>
+<ul class="simple">
+<li><span class="new-spec">The Charger behavioral architecture can be seen below:</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/three_stage_charging_chart_5_chart.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_5_chart.svg" src="_images/three_stage_charging_chart_5_chart.svg" /></div>
+</a>
+<p><strong>Software Testing Specification (7)</strong></p>
+<ul class="simple">
+<li>The charger’s data/behavioral software will be adjusted to use data instead of real electrical readings.</li>
+<li>The software that will be shipped (production code) should be
+identical to the software that is being tested.  The software testing code
+should pass data into the production code and observe the production code’s
+behavior without the production code knowing it is under test.</li>
+<li><span class="new-spec">The software tests should occur over tens of seconds and not over
+the hours required to test with real batteries.</span></li>
+<li><span class="new-spec">The testing environment should be able to create electrical
+conditions which could destroy a real battery.</span></li>
+<li>A simple physics model will be developed to describe the
+relationship between the battery and the charger.  The physics model will be
+wrapped within software and called the battery simulator.  The testing code will use
+this simulator to confirm that the charger’s behavioral software is working as
+designed.  The battery simulator should be parameterized so that it can test
+different battery types.</li>
+<li><span class="new-spec">Due to the complexity of the battery and charging system
+interactions, the output of the test should produce a simple graph which can
+quickly be parsed by any engineer on the team.  Here is an example of such a graph:</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/charger_test_results.pdf"><div align="center" class="align-center"><img alt="_images/charger_test_results.svg" src="_images/charger_test_results.svg" /></div>
+</a>
+<p><strong>Sofware Testing Functional Specification (7)</strong></p>
+<ul class="simple">
+<li><span class="new-spec">From a high level the testing architecture can be seen in this
+diagram:</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/testing_challenge_2.pdf"><div align="center" class="align-center"><img alt="_images/testing_challenge_2.svg" src="_images/testing_challenge_2.svg" /></div>
+</a>
+<ul class="simple">
+<li><span class="new-spec">Here is a more detailed description of the testing software
+architecture:</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/testing_challenge_3.pdf"><div align="center" class="align-center"><img alt="_images/testing_challenge_3.svg" src="_images/testing_challenge_3.svg" /></div>
+</a>
+<ul class="simple">
+<li><span class="new-spec">The class-to-file lookup can be seen here:</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/testing_challenge_4.pdf"><div align="center" class="align-center"><img alt="_images/testing_challenge_4.svg" src="_images/testing_challenge_4.svg" /></div>
+</a>
+<ul>
+<li><p class="first">The battery simulation <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/battery_model_1.py">software</a>
+is described below:</p>
+<blockquote>
+<div><a class="reference external image-reference" href="_static/battery_model_4.pdf"><div align="center" class="align-center"><img alt="_images/battery_model_4.svg" src="_images/battery_model_4.svg" /></div>
+</a>
+<ul>
+<li><p class="first">To change how the simulator profiles a given battery type, include two different
+spread-sheets, the “soc_ocv.csv” and the “ocv_internal_resistance.csv” for the
+battery you are mimicing.</p>
+<blockquote>
+<div><ul class="simple">
+<li>An example of the “soc_ocv.csv” can be found <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/soc_ocv.csv">here</a> and it’s <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/soc_ocv.py">data
+plot</a> would look like this:</li>
+</ul>
+<a class="reference external image-reference" href="_static/battery_profile.pdf"><div align="center" class="align-center"><img alt="_images/battery_profile.svg" src="_images/battery_profile.svg" /></div>
+</a>
+<ul class="simple">
+<li>An example of the “ocv_internal_resistance.csv” can be found <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.csv">here</a>
+and it’s <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.py">data plot</a> would look like this:</li>
+</ul>
+<a class="reference external image-reference" href="_static/battery_resistance_profile.pdf"><div align="center" class="align-center"><img alt="_images/battery_resistance_profile.svg" src="_images/battery_resistance_profile.svg" /></div>
+</a>
+</div></blockquote>
+</li>
+<li><p class="first">To build and run the battery simulator:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">battery</span> <span class="o">=</span> <span class="n">Battery</span><span class="p">(</span>
+  <span class="n">rated_amp_hours</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+  <span class="n">initial_soc_per</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+  <span class="n">name</span><span class="o">=</span><span class="s2">&quot;lead_acid_battery_100Ah&quot;</span><span class="p">,</span>
+  <span class="n">soc_vrs_ocv_profile_csv</span><span class="o">=</span><span class="s1">&#39;soc_ocv.csv&#39;</span><span class="p">,</span>
+  <span class="n">ocv_vrs_r_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_internal_resistance.csv&#39;</span><span class="p">,</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span>
+<span class="p">)</span>
+
+<span class="n">hours</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">time_series</span> <span class="o">=</span> <span class="n">battery</span><span class="o">.</span><span class="n">time_series</span><span class="p">(</span>
+  <span class="n">duration_in_sec</span><span class="o">=</span><span class="n">hours</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">moment</span> <span class="ow">in</span> <span class="n">time_series</span><span class="p">:</span>
+  <span class="k">if</span> <span class="n">battery</span><span class="o">.</span><span class="n">soc_per</span> <span class="o">&lt;</span> <span class="mf">80.0</span><span class="p">:</span>
+    <span class="n">battery</span><span class="o">.</span><span class="n">amps_into_terminals</span><span class="p">(</span><span class="mf">33.0</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">abs_volts</span> <span class="o">=</span> <span class="n">battery</span><span class="o">.</span><span class="n">last_terminal_voltage</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">battery</span><span class="o">.</span><span class="n">volts_across_terminals</span><span class="p">(</span><span class="n">abs_volts</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first"><span class="new-spec">The ChargerMock will contain all of the Charger code but with a
+slight adjustment so that the internal clock of the Charger is sped up to
+match the tempo of the software test.</span></p>
+</li>
+</ul>
+<a class="reference external image-reference" href="_static/ChargerMock.pdf"><div align="center" class="align-center"><img alt="_images/ChargerMock.svg" src="_images/ChargerMock.svg" /></div>
+</a>
+<ul class="simple">
+<li><span class="new-spec">The ElectricalInterfaceMock will contain code which will sample
+from the battery simulator and drive the current and voltage values to the
+battery simulator in the programmable reference-time set by the ChargerTester:</span></li>
+</ul>
+<a class="reference external image-reference" href="_static/electrical_interface_5_mock.pdf"><div align="center" class="align-center"><img alt="_images/electrical_interface_5_mock.svg" src="_images/electrical_interface_5_mock.svg" /></div>
+</a>
+<ul class="simple">
+<li><span class="new-spec">The ChargerTester will aggregate the information required to build
+and run the charger product and the battery simulator.  It will construct the
+ChargerMock and the ElectricalInterfaceMock and run them with the battery
+simulation all within the same compressed time reference.  The output of the
+charger will be stored in a CSV file, this file will be used to generate a
+graph.  Here is an example of how to use the ChargerTester class and
+how to graph its output:</span></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">time_compression_scalar</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">simulated_duration_in_hours</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">fake_sec</span> <span class="o">=</span> <span class="n">simulated_duration_in_hours</span> <span class="o">*</span> <span class="mf">3600.0</span>
+<span class="n">real_delay_needed_sec</span> <span class="o">=</span> <span class="n">fake_sec</span> <span class="o">/</span> <span class="n">time_compression_scalar</span>
+
+<span class="n">ct</span> <span class="o">=</span> <span class="n">ChargerTester</span><span class="p">(</span>
+  <span class="n">charger_bulk_timeout_sec</span><span class="o">=</span><span class="mi">1600</span><span class="p">,</span>
+  <span class="n">charger_abs_timeout_sec</span><span class="o">=</span><span class="mi">1300</span><span class="p">,</span>
+  <span class="n">charger_equ_timeout_sec</span><span class="o">=</span><span class="mi">86400</span><span class="p">,</span>
+  <span class="n">charger_bulk_entry_volts</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span>
+  <span class="n">charger_bulk_exit_volts</span><span class="o">=</span><span class="mf">13.04</span><span class="p">,</span>
+  <span class="n">charger_abs_exit_amps</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
+  <span class="n">charger_bulk_ref_amps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+  <span class="n">charger_float_ref_volts</span><span class="o">=</span><span class="mf">12.9</span><span class="p">,</span>
+  <span class="n">charger_abs_ref_volts</span><span class="o">=</span><span class="mf">13.04</span><span class="p">,</span>
+  <span class="n">charger_equ_ref_volts</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
+  <span class="n">battery_rated_amp_hours</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+  <span class="n">battery_initial_soc_per</span><span class="o">=</span><span class="mf">65.0</span><span class="p">,</span>
+  <span class="n">battery_soc_vrs_ocv_profile_csv</span><span class="o">=</span><span class="s1">&#39;soc_ocv.csv&#39;</span><span class="p">,</span>
+  <span class="n">battery_ocv_vrs_r_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_internal_resistance.csv&#39;</span><span class="p">,</span>
+  <span class="n">time_compression_scalar</span><span class="o">=</span><span class="n">time_compression_scalar</span><span class="p">,</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+  <span class="n">live_spy</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">real_delay_needed_sec</span><span class="p">)</span>
+<span class="n">ct</span><span class="o">.</span><span class="n">electrical_interface_mock</span><span class="o">.</span><span class="n">post_lifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">stop</span><span class="p">))</span>
+<span class="n">ct</span><span class="o">.</span><span class="n">plot_profile</span><span class="p">()</span>
+</pre></div>
+</div>
 <a class="reference external image-reference" href="_static/charger_test_results.pdf"><div align="center" class="align-center"><img alt="_images/charger_test_results.svg" src="_images/charger_test_results.svg" /></div>
 </a>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
@@ -1885,6 +2210,7 @@ every <code class="docutils literal notranslate"><span class="pre">pulse_sec</sp
 <li><a class="reference internal" href="#single-unit-three-stage-battery-charger-design-1">Single Unit Three Stage Battery Charger Design (1)</a></li>
 <li><a class="reference internal" href="#single-unit-three-stage-battery-charger-design-2">Single Unit Three Stage Battery Charger Design (2)</a></li>
 <li><a class="reference internal" href="#single-unit-three-stage-battery-charger-design-3">Single Unit Three Stage Battery Charger Design (3)</a></li>
+<li><a class="reference internal" href="#single-unit-three-stage-battery-charger-design-4">Single Unit Three Stage Battery Charger Design (4)</a></li>
 </ul>
 </li>
 </ul>

@@ -240,17 +240,22 @@ Specification (1):
     :target: _static/three_stage_charging_chart_1.pdf
     :align: center
 
-I show the above diagram to the :new_spec:`electrical engineer` I'm working with, and he says,
-:new_spec:`Yeah, it looks good, but can you make sure the two control systems are
-generalizeable?`  What do you mean?  :new_spec:`Well, I want to just give the current
-control system a reference current and it will drive the device to output that
-current.  The same idea applies to the voltage controller.`  He continues,
-:new_spec:`A control system is just some math, you give it a goal called a "reference".
-then you give it the value of the thing it is trying to control, call this the
-"input" and the math will drive the "output" towards the goal.  We connect
-this output value to our hardware and it will behave as expected.  I want to use
-the same math to solve the current and voltage control problems, so give me a
-reference and give me the input and I'll make it work.`  
+I show the above diagram to the :new_spec:`electrical engineer` I'm working
+with, and he says, :new_spec:`Yeah, it looks good, but can you make sure the two
+control systems are generalizeable?`  
+
+"What do you mean?"  
+
+:new_spec:`Well, I want to just give the current control system a reference
+current and it will drive the device to output that current.  The same idea
+applies to the voltage controller.`  
+
+He continues, :new_spec:`A control system is just some math, you give it a goal
+called a "reference".  then you give it the value of the thing it is trying to
+control, call this the "input" and the math will drive the "output" towards the
+goal.  We connect this output value to our hardware and it will behave as
+expected.  I want to use the same math to solve the current and voltage control
+problems, so give me a reference and give me the input and I'll make it work.`  
 
 You turn to leave and he says, :new_spec:`Oh, one more thing, I need to tune the
 two control systems differently, so make sure I can set some variables "ki",
@@ -258,18 +263,22 @@ two control systems differently, so make sure I can set some variables "ki",
 
 So now we have to start thinking about all of the parameters, each can be
 changed for a different battery type.  We change the language on the diagram to
-match how our electrical engineer talks about things.
+match how our electrical engineer speaks.
 
 .. image:: _static/three_stage_charging_parameters.svg
     :target: _static/three_stage_charging_chart_1.pdf
     :align: center
 
-After we update the image we show our electrical engineer the new picture.  He
-looks at it and asks, :new_spec:`What are these arrows connecting the boxes
-together?` You answer, it's just a way of saying that the ``reference``,
+After we update the image we show our electrical engineer the new picture.  
+
+He looks at it and asks, :new_spec:`What are these arrows connecting the boxes
+together?` 
+
+You answer, "It's just a way of saying that the ``reference``,
 ``input``, ``kp``, ``ki`` and ``kd`` values will be in both of the current and
-voltage control classes.  It's just a drawing short hand.   He says,
-:new_spec:`Ok, it looks good.`
+voltage control classes.  Think of it as a drawing short hand."
+
+He says, :new_spec:`Ok, it looks good.`
 
 ----
 
@@ -309,16 +318,17 @@ Now that we have a plan for structuring our data, we need to go back to our
 behavioral diagram and figure out how to get information from the world.
 
 We track down our electrical engineer and ask him, "How fast to I need to read
-the voltage and the current?"  He says, :new_spec:`Well, I have to read these
-values very quickly in the embedded device's interrupt service routines, the
-control systems will be running at 20 Khz, but you don't have to worry about
-that.  Changing between the various stages can happen slowly.  I'll be reading
-the input, I'll use raw ADC readings to keep my code fast and I'll use the PWM
-peripherals on the part to set the output current and voltage via an H-bridge.
-But I will need you to determine which control system to run and I'll need you
-to set it's reference.  Make it so I can tune these values later if I need to,
-but for now you can sample the current, voltage and make decisions at 2 Hz".
-(every 0.5 seconds)`
+the voltage and the current?"  
+
+He says, :new_spec:`Well, I have to read these values very quickly in the
+embedded device's interrupt service routines, the control systems will be
+running at 20 Khz, but you don't have to worry about that.  Changing between the
+various stages can happen slowly.  I'll be reading the input, I'll use raw ADC
+readings to keep my code fast and I'll use the PWM peripherals on the part to
+set the output current and voltage via an H-bridge.  But I will need you to
+determine which control system to run and I'll need you to set it's reference.
+Make it so I can tune these values later if I need to, but for now you can
+sample the current, voltage and make decisions at 2 Hz".  (every 0.5 seconds)`
 
 You say, "Wait, I'm not controlling the current or voltage?".  
 
@@ -347,7 +357,7 @@ those diamond arrows?`
 
 You answer, "It's just a way of saying one class has an
 attribute of another class.  For instance the ``battery_spec`` in the
-``ChargerParameter`` class is a ``BatterySpecificInformation`` class.  You leave
+``ChargerParameter`` class "is a" ``BatterySpecificInformation`` class.  You leave
 the ``BatterySpecificInformation`` class on the picture so you can see what it's
 attribute names are."
 
@@ -405,7 +415,7 @@ inherits from the ``CustomFactory`` class which contains all of the code that
 can drive behavior.  Inheritance is just programming by difference, that arrow
 is like a copy and paste, it's as if I have copied and pasted all of that
 ``CustomFactory`` and ``ChargerParameters`` code into the ``Charger`` class.
-The ball is just short hand for saying the data attaches to the behavior here.
+The ball is just short hand for saying the data attaches to the behavior "here".
 The "here" in this case is the "charging state" which will be described
 somewhere else."
 
@@ -439,12 +449,15 @@ be a bit much for him.
 
 We show him the diagram, and say, "Listen, some stuff is missing on this, but I
 just want you to look at how the current and voltage are sampled, and how the
-control systems are set up."  He says, :new_spec:`Ok, show me.`
+control systems are set up."  
+
+He says, :new_spec:`Ok, show me.`
 
 You say, "In the entry stage we create three different named pulses that repeat
 forever, or until the charging state is exited. The chart can react to these
-named pulses and change state, or just run some code." I pause and look at him,
-he says, :new_spec:`Keep going.`
+named pulses and change state, or just run some code." 
+
+I pause and look at him, he says, :new_spec:`Keep going.`
 
 "Alright, see that ``Sample_Current`` pulse, it will fire forever with a period of
 ``cur_in_sec`` which we will probably just set to 0.5 seconds, but we can tune
@@ -457,9 +470,12 @@ these events are seen by it, it will just use the events to update a ``curr``
 and ``volt`` attribute in it's data structure so these values can be kept fresh
 enough that the chart can make good decisions with the information."
 
-"Does that make sense?"  :new_spec:`Yeah, it's just a timer right?`  You answer,
-"Yeah, but look there is another one, called ``Pulse``, it's not wired up yet,
-but soon it will be the thing that drives the chart's decisions"
+"Does that make sense?"  
+
+:new_spec:`Yeah, it's just a timer right?`  
+
+You answer, "Yeah, but look there is another one, called ``Pulse``, it's not
+wired up yet, but soon it will be the thing that drives the chart's decisions"
 
 "Now I'll show you how the controllers are set up.  After the charging state is
 entered, it will set up these pulses, then it will enter the bulk state.  When
@@ -469,12 +485,15 @@ reference of this control system to be ``battery_spec.ref_amps`` from our data
 model."
 
 He looks at it for a while, and says, :new_spec:`Yeah, this is what I wanted, ok,
-yeah, I get it.  How do I get into the other states?`  "I haven't set that up
-yet, but suppose we were to enter the ``absorption`` state, we would first have
-to enter the ``constant_voltage_state``.  This would cause our control system to
-change, we would detach the current control system, and attach the voltage
-control system.  We would then use all of that control system's ``kp``, ``ki``
-and ``kd`` parameters."  :new_spec:`Yeah, ok, good, this is what I wanted.`
+yeah, I get it.  How do I get into the other states?`  
+
+"I haven't set that up yet, but suppose we were to enter the ``absorption``
+state, we would first have to enter the ``constant_voltage_state``.  This would
+cause our control system to change, we would detach the current control system,
+and attach the voltage control system.  We would then use all of that control
+system's ``kp``, ``ki`` and ``kd`` parameters."  
+
+:new_spec:`Yeah, ok, good, this is what I wanted.`
 
 Things seem to be coming together, so we go back and work on our spec, teasing
 apart our high level descriptions from our technical design.
@@ -531,13 +550,15 @@ Here is a new design that does these things:
     :align: center
 
 Since there is a need for timeouts in various states, we invent a new signal
-called ``Tick``.  ``Tick`` is driven by our ``Pulse`` event, and it is given a payload
-which is the time in seconds since the charging state was entered.
+called ``Tick``.  ``Tick`` is driven by our ``Pulse`` event, and it is given a
+payload which is the time in seconds since the charging state was entered.
 
 Time to show our electrical engineer.  
 
 We approach him with the diagrams and he says, :new_spec:`Ok walk me through
-it`.  "When the ``charging`` state is entered the ``sec`` is set to 0, then the
+it`.  
+
+"When the ``charging`` state is entered the ``sec`` is set to 0, then the
 three heart beats are initiated.  Two of the heart beats drive the current and
 voltage readings, but the third heart beat, ``Pulse``, will fire every
 ``pulse_sec`` seconds.  We will probably set ``pulse_sec`` to 0.5.  The key
@@ -545,24 +566,28 @@ thing to notice on this picture is that Pulse drives another event called
 ``Tick`` which is given a payload of ``sec`` which is how much time has passed
 since the charging state was entered."
 
-:new_spec:`Wait, how does this tick thing work?`.  "When system turns on the
+:new_spec:`Wait, how does this tick thing work?`.  
+
+"When system turns on the
 first thing that will happen is it will enter the ``charging`` state. When the
 ``charging`` state is entered a bunch of heart beats are setup, these are
 basically named timers, ``Sample_Current``, ``Sample_Voltage`` and ``Pulse``.
 Then the charging state initializes, causing a transition into the ``bulk``
 state.  While this happens, the ``constant_current_state`` is entered, setting
 the control system to use your current control system, then it enters the
-``bulk`` state, which sets the reference of your current control system."  He
-looks at the diagram and after some time says, :new_spec:`Ok, yeah, I see that,
-but how does this pulse stuff work?`  
+``bulk`` state, which sets the reference of your current control system." 
+
+He looks at the diagram and after some time says, :new_spec:`Ok, yeah, I see
+that, but how does this pulse stuff work?`  
 
 "The Pulse event will fire every, say 0.5 seconds, but it is caught by a hook,
 which invents another signal called ``Tick`` which has a payload, ``sec``.  The
 ``sec`` payload of the Tick signal will have the time in seconds since the
 charging state was entered.  It's this ``Tick`` event, which can make stuff
-happen.  Do you see it?"  :new_spec:`I see it.  So how do these charging stage
-time outs work?  Can you show me the electrical profile and the statechart
-timing mechanisms together?`
+happen.  Do you see it?"  
+
+:new_spec:`I see it.  So how do these charging stage time outs work?  Can you
+show me the electrical profile and the statechart timing mechanisms together?`
 
 .. image:: _static/three_stage_charging_chart_3_graph.svg
     :target: _static/three_stage_charging_chart_3_graph.pdf
@@ -583,12 +608,14 @@ will ignore.  But once the time in bulk is equal to or greater than
 from the ``constant_current_control`` state.  Then it will enter into the
 ``constant_voltage_control`` state, which will switch the control system to use
 a voltage controller, then enter the ``absorption`` state which will set the
-voltage reference to ``abs_ref_volts``".  :new_spec:`I see how it works and I
-see how the same thing happens for transitions to float from absorption.  Also,
-I see that you can only force your way into the equalize state, that's good eh.`  
+voltage reference to ``abs_ref_volts``".  
+
+:new_spec:`I see how it works and I see how the same thing happens for
+transitions to float from absorption.  Also, I see that you can only force your
+way into the equalize state, that's good.`  
 
 He looks a bit longer and says, :new_spec:`So the charger will try and spend
-most of its time in float eh? But how to we get back into bulk if there is a big
+most of its time in float? But how to we get back into bulk if there is a big
 draw on the batteries? Say our customer has a big DC load that draws the voltage
 down below the bulk_entry_volts.  What happens then?`
 
@@ -604,19 +631,28 @@ chart, "Look at this:"
 the voltage is below the ``bulk_entry_volts``.  I have added a ``To_Bulk`` hook
 in the ``bulk`` state which blocks this event from causing a transition from
 ``charging`` to ``bulk`` while the unit is in bulk but the voltage is still
-lower than the ``bulk_exit_volts``."  He asks, :new_spec:`Why would that happen?`.  "The
-charger would probably need some time to get the voltage above the
+lower than the ``bulk_exit_volts``."  
+
+He asks, :new_spec:`Why would that happen?`.  
+
+"The charger would probably need some time to get the voltage above the
 ``bulk_entry_volts`` once it fell below this threshold, maybe because of a big
-DC draw on the battery."  He says, :new_spec:`Yeah, that will probably happen in
-some situations`.
+DC draw on the battery."  
+
+He says, :new_spec:`Yeah, that will probably happen in some situations`.
 
 You ask him, "Do we need to separate the timing of our current, voltage and
-decision pulses?"  He says, :new_spec:`No, it's not that important, what's the
-cost of having extra timers anyway?`  "It's not a big deal, just each heart beat
-will have it's own thread, and when I'm looking at the logs it could get kind of
-cluttered having all of those signals firing at the same time.  So, maybe I could
-simplify the design by just having one heart beat."  :new_spec:`Yeah, simple is
-good, we probably won't need separate timers.`
+decision pulses?"  
+
+He says, :new_spec:`No, it's not that important, what's the cost of having extra
+timers anyway?`  
+
+"It's not a big deal, just each heart beat will have it's own thread, and when
+I'm looking at the logs it could get kind of cluttered having all of those
+signals firing at the same time.  So, maybe I could simplify the design by just
+having one heart beat."  
+
+:new_spec:`Yeah, simple is good, we probably won't need separate timers.`
 
 You spend a moment adjusting the chart.  "Here, it's less cluttered now":
 
@@ -624,9 +660,12 @@ You spend a moment adjusting the chart.  "Here, it's less cluttered now":
     :target: _static/three_stage_charging_chart_3_chart_2.pdf
     :align: center
 
-Do you see anything else we could pull out of there?  :new_spec:`No, it seems
-pretty compact, how are you going to test this thing anyway?  I'm not going to
-have hardware for you for a couple of weeks, can you test it before that?`.
+Do you see anything else we could pull out of there?  
+
+:new_spec:`No, it seems pretty compact, how are you going to test this thing
+anyway?  I'm not going to have hardware for you for a couple of weeks, can you
+test it before that?`.
+
 "I will run it on a PC and feed it fake electrical profiles, I also plan
 to squeeze time so I can run it through all of it's states quickly".
 
@@ -1116,23 +1155,29 @@ Or view the ``spy``:
 
 ----
 
-Our electrical engineer comes up to us, :new_spec:`How is it going?`, you
-answer, "No plan ever survives first contact with the enemy."
+Our electrical engineer comes up to us, :new_spec:`How is it going?`. 
 
-:new_spec:`That well hey?` "It's going well enough, I have the data model and
-statechart written, I can see that it might be working, and I only had to change
-a few things in the design do get it there.  Now I have to figure out how to
-test it. I have no idea if it actually works"
+You answer, "No plan ever survives first contact with the enemy."
 
-:new_spec:`Any ideas?`.  "I would like to feed in a graph or a CSV file, and
-have the statechart respond to the graph.  I would have to instrument it in such
-a way that the statechart's log output would be easy to interpret next to the
-graph."
+:new_spec:`That well hey?` 
+
+"It's going well enough, I have the data model and statechart written, I can see
+that it might be working, and I only had to change a few things in the design do
+get it there.  Now I have to figure out how to test it. I have no idea if it
+*actually* works"
+
+:new_spec:`Any ideas?`  
+
+"I would like to feed in a graph or a CSV file, and have the statechart respond
+to the graph.  I would have to instrument it in such a way that the statechart's
+log output would be easy to interpret next to the graph."
 
 :new_spec:`If you figure that out, i would like to use it too.  that's the nice
-thing about software, it's so gullible, it's so easy to lie to software eh?` You
-look at him for a while, and say, "Yeah, I guess you are right, maybe I could
+thing about software, it's so gullible, it's so easy to lie to software?` 
+
+You look at him for a while, and say, "Yeah, I guess you are right, maybe I could
 mock it out using dependency injection via subclassing or something like that".
+
 :new_spec:`Why do you software guys always invent these complicated names for
 things?`
 
@@ -1145,8 +1190,8 @@ description that pops into our mind, and first ideas are usually bad. But
 we don't care because we don't think that the name is important when we invent
 it. Then that name sticks, and whatever the specific problem we were trying to
 solve is forgotten. Nobody has control of the language once it is released to
-the public (unless you are French), so the dumb language just lingers like a bad
-smell" 
+the public (unless it's French), so the dumb language just lingers like a bad
+smell." 
 
 He laughs and says, :new_spec:`Well at least you aren't using Latin.  I think
 your industry comes up with bad names because the names are made by academics,
@@ -1155,8 +1200,8 @@ make things sound as complicated and mysterious as possible.`
 
 :new_spec:`Why don't you just add your testing design into the spec, this stuff
 you have written needs to work, or you could burn down someone's house eh?  No
-pressure, eh?  Just add it to the spec, then make it happen.  Oh, and try and
-keep your gobbledegook out of the spec, I have to read it too.`
+pressure.` He smiles. :new_spec:`Just add it to the spec, then make it happen.
+Oh, and try and keep your gobbledegook out of the spec, I have to read it too.`
 
 ----
 
@@ -1215,15 +1260,17 @@ Single Unit Three Stage Battery Charger Design (2)
 ----
 
 I approach my electrical engineer, "Hey, can I get some help about how to think
-about my model?" :new_spec:`Sure, what do you need to know that you don't know
-already?`.
+about my model?" 
+
+:new_spec:`Sure, what do you need to know that you don't know already?`.
 
 "Well, I need to build something that will give me different voltages over time
 after I feed the bulk current, and different current when I feed a constant
 voltage"
 
-:new_spec:`Hold on, show me what you want`.  You place the electrical profile in
-front of him:
+:new_spec:`Hold on, show me what you want`.  
+
+You place the electrical profile in front of him:
 
 .. image:: _static/three_stage_charging_chart_2_graph.svg
     :target: _static/three_stage_charging_chart_2_graph.pdf
@@ -1232,7 +1279,7 @@ front of him:
 "I have to be able to fake out these electrical profiles.  Any ideas?"
 
 :new_spec:`Yeah, I can help you with that, but first you have to understand a
-few things about batteries.  Do you have time for that?`
+few things about batteries.  Do you have time?`
 
 "Of course."
 
@@ -1405,8 +1452,8 @@ seconds after we have disconnected the charger.  The blue line represents a kind
 of instantaneous hidden voltage of the battery.  But, if you were to stop
 charging at some point along the x-axis, in 24 hours the voltage would settle to
 the black line for the same state of charge. I just want you to make the line go
-up once we have over-charged the battery.  Like with horse shoes and hand
-grenades, we just need to be close enough.`
+up once we have over-charged the battery.  Like "horse shoes" and "hand
+grenades"; we just need to be close enough.`
 
 "How can I put more than 100 percent charge in the battery?"
 
@@ -1461,8 +1508,8 @@ file:
    110,15.80
    120,20.80
 
-Then using something like the following code you plot your data and the function
-approximation of the data:
+Then using something like the following code you plot your data and the
+functional approximation of the data:
 
 .. code-block:: python
   
@@ -1591,7 +1638,7 @@ eyeballed their graph to make mine."
 
 He says, :new_spec:`Good enough, what is the second graph?`  
 
-"The software can't use the CSV file directly, it needs a function, so I build a
+"The software can't use the CSV file directly, it needs a function, so I built a
 function from this data and this function was used to draw the second graph."
 
 :new_spec:`So the second graph isn't the data?  Not bad, it looks the same
@@ -1621,14 +1668,17 @@ the statechart I can hot-swap it based on what is happening in the battery."
 the behavior work anyway?`
 
 "I wanted something that would look like how it looks when you are using a real
-battery, so I made it's time our time.  :new_spec:`What do you mean by that?`
+battery, so I made it's time our time.  
 
-"You can feed the statechart `amp` or `volt` once it has started, and the
-simulator will just assume that is what you are doing until you send it another
-sample.  It's like you are feeding it DC Amps or Volts until you send it new
-information.  So, if we build a 100 Amp Hour battery, it will take in the order
-of an hour to charge the battery at 100 Amps while we run it."  :new_spec:`So it
-literally acts like a battery in real time?`  
+:new_spec:`What do you mean by that?`
+
+"You can feed the statechart ``amp`` or ``volt`` events once it has started, and
+the simulator will just assume that is what you are doing until you send it
+another sample.  It's like you are feeding it DC Amps or Volts until you send it
+new information.  So, if we build a 100 Amp Hour battery, it will take in the
+order of an hour to charge the battery at 100 Amps while we run it."
+
+:new_spec:`So it literally acts like a battery in real time?`  
 
 "Yeah, but I also wanted the option of compressing time, so that I don't have to
 sit around while I'm testing the software.  I'll use the battery in our time
@@ -1716,7 +1766,9 @@ happens if an ``amps`` event is sent."  You point to the ``amps_to_amp_hours``
 state on the diagram. "Try and describe to me how it works."
 
 He looks at it and asks, :new_spec:`Where is the state machine usually
-sitting?`  "It's usually in the ``update_charge_state``".  
+sitting?`  
+
+"It's usually in the ``update_charge_state``".  
 
 He concentrates for a moment and says, :new_spec:`Yeah, ok, the amps event kind
 of works the same way, it generates a amps_and_time event, which is caught then
@@ -1746,7 +1798,9 @@ battery is 80 percent charged.`
 from a constant current to a constant voltage technique once it's charged to 80
 percent. What charge current do you want?"
 
-:new_spec:`What is the battery rating?`  You say, "100 Ah."
+:new_spec:`What is the battery rating?`  
+
+You say, "100 Ah."
 
 :new_spec:`Charge it at c/3, or about 30 amps`.
 
@@ -1790,7 +1844,7 @@ you write ``time.sleep(1)`` you don't actually sleep 1 second you sleep a bit
 more than that.  This slip is dependent upon your operating system and what
 other kinds of computational loads you are running.  Because of this, no two
 runs of the program will generate the same results, since the time difference
-comes to play in how the state of charge is accumulated."
+comes to play in how the state-of-charge is accumulated."
 
 :new_spec:`Ok, well it looks like you got the transition working, but I don't
 think you have enough loss in your battery, where did you get your internal
@@ -1811,7 +1865,7 @@ part would be finding good data and updating the diagram with a graphic."
 
 ----
 
-Being a sucker for a challenge, you head back to the `cadex website
+You head back to the `cadex website
 <https://batteryuniversity.com/learn/archive/how_does_internal_resistance_affect_performance>`_
 and find a open circuit voltage versus internal resistance graph for a lead acid
 battery:
@@ -1830,7 +1884,6 @@ battery:
   code to make the graphs `here
   <https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.py>`_.
 
-
 Then you update the battery simulator design:
 
 .. image:: _static/battery_model_4.svg
@@ -1840,11 +1893,11 @@ Then you update the battery simulator design:
 :new_spec:`You know, if you keep adding features like this to the battery
 simulator you are going to have something that is very useful, not just for us.`
 
-"All I need is data, its `numpy` and `scipy` that does the heavy lifting and the
-statechart manages the time and the design complexity.  Speaking of which, I
-have simplified things by adding the ``amps_into_terminal`` and
-``volts_across_terminal`` methods.  You shouldn't have to know about event names
-if you are using the simulator, the code should figure that out for you.
+"All I need is data, its the Python `numpy` and `scipy` packages that are doing
+the heavy lifting and the statechart manages the time and the design complexity.
+Speaking of which, I have simplified things by adding the ``amps_into_terminal``
+and ``volts_across_terminal`` methods.  You shouldn't have to know about event
+names if you are using the simulator, the code should figure that out for you."
 
 :new_spec:`Can you speed it up? Maybe compress time? Like, make an
 hour of charging in the battery's time happen in tens of seconds in our time
@@ -2031,11 +2084,12 @@ Single Unit Three Stage Battery Charger Design (3)
 
 ----     
 
-So now we have a simulator and we have some code we want to test.  How do we
-bring them together?  Let's break it down a bit, we want:
+Now we have a simulator and we have some code we want to test with it.  How do we
+bring them together?  
+
+Let's consider our high level goals:
 
 *  to build an environment where we can put our charger into dangerous situations and see how it behaves.
-*  to run the tests over tens of seconds and not over hours.  
 *  to test in isolation of our big expensive batteries until we know we won't destroy them.
 *  to build an environment where we can make mistakes, where we can feel free to try stuff and see what happens. 
 *  to make a very fast feedback cycle so we can learn quickly and stay engaged with our problem.  
@@ -2047,14 +2101,15 @@ bring them together?  Let's break it down a bit, we want:
 
 We want to build the system on the right before we build the system on the left.
 Currently, it is very difficult to mock out our electrics and time features, so
-we will change the production code to make it testable:
+we will change the production code to make it testable by adding an
+``ElectricalInterface`` class:
 
 .. image:: _static/testing_challenge_2.svg
     :target: _static/testing_challenge_2.pdf
     :align: center
 
-We add an ``ElectricalInterface`` class, which will act as the driver layer in
-our real system.  It will receive constant current and constant voltage control
+The ``ElectricalInterface`` class will act as the driver layer in our real
+system.  It will receive constant current and constant voltage control
 instructions and it will provide functions to other packages that can be used to
 sample the current and the voltage.
 
@@ -2062,6 +2117,10 @@ sample the current and the voltage.
     :target: _static/testing_challenge_3.pdf
     :align: center
 
+With our new design we can mock-out the charger and the electrical interface
+then, connect these mocks to our battery simulator.  Our test code will generate
+electrical profile graphs so we can quickly see if our charger is working or
+not.
 
 We show our high level test design to our electrical engineer.
 
@@ -2098,7 +2157,7 @@ software we test using compressed time and fake electrical data."
     :target: _static/testing_challenge_4.pdf
     :align: center
 
-"Before I get into the details, I'll show you how the ``Charger`` and
+"Before I get into the details, I'll show you how the shippable, ``Charger`` and
 ``ElectricalInterface`` charts will communicate using published events."
 
 .. image:: _static/three_stage_charging_chart_5_statocal.svg
@@ -2108,13 +2167,13 @@ software we test using compressed time and fake electrical data."
 "You can see the ``Charger`` can request samplers, and the
 ``ElectricalInterface`` will return functions in the ``SET_VOLTAGE_SAMPLER`` and
 ``SET_CURRENT_SAMPLER`` events.  The ``Charger`` can drive the current or the
-voltage using the ``DRIVE_CURRENT`` and ``DRIVE_VOLTAGE`` events.
+voltage using ``DRIVE_CURRENT`` and ``DRIVE_VOLTAGE``.
 
 "Now we have a bit of a chicken and an egg problem.  If these two ActiveObjects
 are completely independent, then we can't assume they are started at the same
 time.  This means that either active object needs to be able to initiate an
 information exchange.  Moreover, we have to make sure we don't end up with an
-infinite oscillation as a result."
+infinite oscillation."
 
 :new_spec:`Do you need that complexity?  Maybe you should just have something
 else start them up and handle their timing?`
@@ -2123,46 +2182,47 @@ else start them up and handle their timing?`
 but it means that their internal design is a bit more complicated, I'll leave it
 in there for now, I can pull it later if it looks too weird."
 
-:new_spec:`That looks a lot more complicated, walk me through it.`
-
-"Ok, either one of these objects can start first and then initiate a message
-exchange.  Now imagine the ``ElectricalInterface`` is on, then the ``Charger``
-turns on.  The ``Charger`` will publish a ``REQUEST_FOR_SAMPLER``.  The
-``ElectricalInterface`` subscribes to this, and it will respond by putting the
-function addresses of the current and voltage samples into two separate payloads
-then add these payloads to the ``SET_CURRENT_SAMPLER`` and
-``SET_VOLTAGE_SAMPLER`` events.  When the ``Charger`` receives these messages,
-it will save the functions and use them to get the electrical readings when it
-needs to."
-
-"Now imagine that as the ``Charger`` is working, and it needs to ``DRIVE_CURRENT``
-or ``DRIVE_VOLTAGE``.  You can see the payloads that will be inside of these
-events, there will be an electrical value, a control system, and the time of the
-request in seconds from when the charger turned on.
-
-These ``DRIVE_CURRENT`` and ``DRIVE_VOLTAGE`` messages will be received by the
-``ElectricalInterface``, and it will do as instructed.
-
-:new_spec:`Seems straight forward, let's see the new ElectricalInterface design.`
-
-.. image:: _static/electrical_interface_5.svg
-    :target: _static/electrical_interface_5.pdf
-    :align: center
-
-"When it starts up it sends out the current and voltage sampling functions to
-whomever is subscribed.  Then it does nothing unless, it gets a request for the
-samplers or instructions to drive the current or the voltage."
-
-"I have marked up what will be changed by the mocking code.  In production the
-``drive_current`` and ``drive_voltage`` functions will be connected to drivers
-on the hardware.  But when the unit is under test, this will send information to our
-battery simulator.
-
-:new_spec:`Alright, let's see the charger.`
+:new_spec:`Walk me through the new charger statechart.`
 
 .. image:: _static/three_stage_charging_chart_5_chart.svg
     :target: _static/three_stage_charging_chart_5_chart.pdf
     :align: center
+
+"So the charger's job is to read electrical values then pick which control
+system to use and whether we should be charging with a constant current or
+voltage approach."
+
+"Either the ``Charger`` or the ``ElectricalInterfaces`` can start first and
+initiate a message exchange.  Imagine the ``ElectricalInterface`` is on, then
+the ``Charger`` turns on.  The ``Charger`` will publish a
+``REQUEST_FOR_SAMPLER``.  The ``ElectricalInterface`` subscribes to this, and it
+will respond by putting the function addresses of the current and voltage
+samples into two separate payloads of the ``SET_CURRENT_SAMPLER`` and
+``SET_VOLTAGE_SAMPLER``.  When the ``Charger`` receives these messages,
+it will save the functions and use them to get the electrical readings from then
+on."
+
+"There is a chance that the Charger's statechart could start before the
+``ElectricalInterface``, which means, that the ``REQUEST_FOR_SAMPLER`` event was
+ignored by the system.  This doesn't matter, since the ``ElectricalInterface``
+will post the ``SET_CURRENT_SAMPLER`` and ``SET_VOLTAGE_SAMPLER`` when it
+starts, this will turn on the charger.  However, if these events are received
+again, they will be caught by hooks in the ``charging`` state.
+
+:new_spec:`That is the complexity you added to let either object start at
+anytime?`  
+
+You say, "That's right."  
+
+:new_spec:`Ok, what else has changed?`
+
+"As the ``Charger`` making decisions about what it should do it publishes a
+``DRIVE_CURRENT`` or ``DRIVE_VOLTAGE``.  Inside of these events there will be an
+electrical value, a control system, and the time of the request in seconds from
+when the charger turned on.
+
+These ``DRIVE_CURRENT`` and ``DRIVE_VOLTAGE`` messages will be received by the
+``ElectricalInterface``, and it will do as instructed.
 
 "It's still pretty much the same design, it has been adjusted to receive it's
 current and voltage samplers and to drive current or voltage."  You pause, "But,
@@ -2171,10 +2231,10 @@ you need to take a look at the entry condition of the ``charging`` state."
 :new_spec:`Ok, what's the big deal there?`
 
 "The ``Beat`` drives the ``Ticks`` event.  The ``Ticks`` event thinks it's being
-driven every ``pulse_sec``, but it we drive it faster, the charger won't know.
+driven every ``pulse_sec``, but it we drive it faster and the charger doesn't know.
 We will move it out of real time and into compressed time."
 
-:new_spec:`What do you mean, "it won't know"?`
+:new_spec:`What do you mean, "it doesn't know"?`
 
 "The charger has all of these "time-outs" in seconds, like the
 'bulk_timeout_sec' etc.. but, to test the unit we don't want to change those
@@ -2198,6 +2258,349 @@ callback.  Then test using the ``ChargerMock``:"
 You can change the beat by changing this number, the charger's time can be sped
 up or slowed down.  But it won't know, it will think that it is getting a beat
 every ``pulse_sec``."
+
+:new_spec:`That part seems fairly straight forward, let's see the ElectricalInterface design.`
+
+.. image:: _static/electrical_interface_5.svg
+    :target: _static/electrical_interface_5.pdf
+    :align: center
+
+"The ``ElectricalInterface`` is just that, it will read from our battery's
+electrical values and it will be used to drive the battery current and terminal voltage."
+
+"When it starts up it sends out the current and voltage sampling functions to
+whomever is subscribed.  Then it does nothing unless, it gets a request for the
+samplers or instructions to drive the current or the voltage."
+
+"I have marked up what will be changed by the mocking code.  In production the
+``drive_current`` and ``drive_voltage`` functions will be connected to drivers
+on the hardware.  But when the unit is under test, this will send information to our
+battery simulator.
+
+:new_spec:`Ok, show me the electical interface mock.`
+
+"This is a bit more complex:"
+
+.. image:: _static/electrical_interface_5_mock.svg
+    :target: _static/electrical_interface_5_mock.pdf
+    :align: center
+
+"The ``ElectricalInterface`` sends functions out to whomever wants to read the
+current and the voltage.  I haven't seen this before, functions inside of
+events, but it works and it keeps everything decoupled.    The functions are
+sent out as payloads inside of the ``SET_CURRENT_SAMPLER`` and
+``SET_VOLTAGE_SAMPLER``.  If anything else in our system needs a set of samplers
+they just have to ask by publishing a ``REQUEST_FOR_SAMPLER``.  Our ``Charger``
+sends this out when it starts up and that is how it gets its drivers. And the
+``Charger`` doesn't have to know it's using a ``BatterySimulator``."
+
+"The electrical interface doesn't just read values, you can force it to drive
+electrical values too.  It will respond to anything sending a ``DRIVE_VOLTAGE``
+or ``DRIVE_CURRENT``.  Inside of these events is the electrical information and
+the control system that should be used by the interface.  We aren't going to use
+the control system in this part of the test, because it is up to you to test
+that, but know this is how it will be passed around.  If you look at the
+``drive_current_state`` and the ``drive_voltage_state`` you will see this is
+where we call the battery simulator.  The drive-events will also cause us to
+write down data that will be graphed once the test is finished."
+
+:new_spec:`How do you make time programmable with this mock?`
+
+"This is very tricky, because time is being driven by the ``Pulse`` event which
+is started up in the entry condition.  But, this is the important thing to know:
+the ``Pulse`` event won't actually be sent with the expected tempo, because this
+isn't a real-time system. The ``Pulse`` event will drift forward in time
+every time it is emitted by its sourcing thread.  So the clock of the
+``ElectricalInterfaceMock`` is sloppy because it is Python running on a native
+OS.  When I first designed this part of the system I had the weirdest
+time-traveling-bug, the entry conditions of the drive states where using
+converted OS time rather than the slipping ``Pulse`` time frame.  I would ask
+the OS for the time, then calculate the equivalent time using the
+``time_compression_scalar``, and the battery simulator would go nuts.  My
+mistake was I was using two clocks instead of one clock, the OS time was not the
+same as the ``Pulse`` time, it wasn't slipping forward, so I was accidentally sending
+electrical information back in time to the battery simulator when I either drove
+the voltage or current.  The bug wrecked my head for a while."
+
+:new_spec:`A time traveling bug?  What are you talking about?`
+
+"I was using two clocks, one which was pretty good and one which was slipping
+forward in time.  I needed to just use one clock, so I picked the sloppy one and
+the simulator stopped receiving messages from two different time frames and it
+started to behave as I was expecting it to behave."
+
+:new_spec:`There is a lot going on, show me that high level diagram again.`
+
+"You mean this one?"
+
+.. image:: _static/testing_challenge_3.svg
+    :target: _static/testing_challenge_3.pdf
+    :align: center
+
+:new_spec:`Yeah, how do you run the code, like, how do you get the whole thing
+going and what is the output look like?`
+
+"To start up the charger test you need to provide it with a lot of data, it
+would look something like this:"
+
+.. code-block:: python
+
+   time_compression_scalar = 50
+   simulated_duration_in_hours = 1.0
+   fake_sec = simulated_duration_in_hours * 3600.0
+   real_delay_needed_sec = fake_sec / time_compression_scalar
+   
+   ct = ChargerTester(
+     charger_bulk_timeout_sec=1600,
+     charger_abs_timeout_sec=1300,
+     charger_equ_timeout_sec=1300,
+     charger_bulk_entry_volts=12.0,
+     charger_bulk_exit_volts=13.04,
+     charger_abs_exit_amps=20.0,
+     charger_bulk_ref_amps=30,
+     charger_float_ref_volts=12.9,
+     charger_abs_ref_volts=13.04,
+     charger_equ_ref_volts=16.0,
+     battery_rated_amp_hours=100,
+     battery_initial_soc_per=65.0,
+     battery_soc_vrs_ocv_profile_csv='soc_ocv.csv',
+     battery_ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
+     time_compression_scalar=time_compression_scalar,
+     live_trace=False,
+     live_spy=False,
+   )
+   time.sleep(real_delay_needed_sec)
+   ct.electrical_interface_mock.post_lifo(Event(signal=signals.stop))
+   ct.plot_profile()
+
+And here is what the result would look like.  I would take about 72 seconds to
+run the test:
+
+.. image:: _static/charger_test_results.svg
+    :target: _static/charger_test_results.pdf
+    :align: center
+
+:new_spec:`Ok, that graph makes sense to me, more so than the rest of it.  You
+should pack everything you have done into the spec.`
+
+----
+
+Single Unit Three Stage Battery Charger Design (4)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**High level Specification (7)**
+
+* This product will be a three stage charger with an equalization feature.
+* The charger has two control systems: constant current and constant voltage.
+* The bulk stage is a constant current control technique.
+* The absorption, float and equalization stages are constant voltage control
+  techniques.
+* The charging electrical profile can be seen here
+
+.. image:: _static/three_stage_charging_chart_2_graph.svg
+    :target: _static/three_stage_charging_chart_2_graph.pdf
+    :align: center
+
+**Sofware Functional Specification (7)**
+
+* The software system will be broken into two parts, fast running c code and slower running Python code.
+* The c code will run in ISRs at a frequency of 20 Khz and will control the charger in either a constant current or
+  constant voltage mode. (see separate doc)
+* The Python code will determine which control strategy the c code is
+  using, it will also set the c code's control system parameters.  The Python code will not directly control the electrical output of the unit.
+* The Python code will sample the current and voltage and make decisions every 0.5 seconds
+* The Python data architecture can be seen here.
+
+.. image:: _static/three_stage_charging_chart_5_data.svg
+    :target: _static/three_stage_charging_chart_5_data.pdf
+    :align: center
+
+* :new_spec:`The Python behavioral architecture will be primarily broken into two parts:`
+
+   1. :new_spec:`The Charger will sample the battery current and voltage and make decisions
+      about which control system to use.`
+
+   2. :new_spec:`ElectricalInterface will contain the software needed to read and
+      set the current and voltage of the battery:`
+
+* :new_spec:`From a high level the Charger and ElectricalInterface will
+  communicate using asychronous messages:`
+
+.. image:: _static/three_stage_charging_chart_5_high.svg
+    :target: _static/three_stage_charging_chart_5_high.pdf
+    :align: center
+
+* :new_spec:`The ElectricalInterface behavioral architecture can be seen below:`
+
+.. image:: _static/electrical_interface_5.svg
+    :target: _static/electrical_interface_5.pdf
+    :align: center
+
+* :new_spec:`The Charger behavioral architecture can be seen below:`
+
+.. image:: _static/three_stage_charging_chart_5_chart.svg
+    :target: _static/three_stage_charging_chart_5_chart.pdf
+    :align: center
+
+**Software Testing Specification (7)**
+
+* The charger's data/behavioral software will be adjusted to use data instead of real electrical readings.
+
+* The software that will be shipped (production code) should be
+  identical to the software that is being tested.  The software testing code
+  should pass data into the production code and observe the production code's
+  behavior without the production code knowing it is under test.
+
+* :new_spec:`The software tests should occur over tens of seconds and not over
+  the hours required to test with real batteries.`
+
+* :new_spec:`The testing environment should be able to create electrical
+  conditions which could destroy a real battery.`
+
+* A simple physics model will be developed to describe the
+  relationship between the battery and the charger.  The physics model will be
+  wrapped within software and called the battery simulator.  The testing code will use
+  this simulator to confirm that the charger's behavioral software is working as
+  designed.  The battery simulator should be parameterized so that it can test
+  different battery types.
+
+* :new_spec:`Due to the complexity of the battery and charging system
+  interactions, the output of the test should produce a simple graph which can
+  quickly be parsed by any engineer on the team.  Here is an example of such a graph:`
+
+.. image:: _static/charger_test_results.svg
+    :target: _static/charger_test_results.pdf
+    :align: center
+
+**Sofware Testing Functional Specification (7)**
+
+* :new_spec:`From a high level the testing architecture can be seen in this
+  diagram:`
+
+.. image:: _static/testing_challenge_2.svg
+    :target: _static/testing_challenge_2.pdf
+    :align: center
+
+* :new_spec:`Here is a more detailed description of the testing software
+  architecture:`
+
+.. image:: _static/testing_challenge_3.svg
+    :target: _static/testing_challenge_3.pdf
+    :align: center
+
+* :new_spec:`The class-to-file lookup can be seen here:`
+
+.. image:: _static/testing_challenge_4.svg
+    :target: _static/testing_challenge_4.pdf
+    :align: center
+
+* The battery simulation `software
+  <https://github.com/aleph2c/miros/blob/master/examples/battery_model_1.py>`_
+  is described below:
+
+   .. image:: _static/battery_model_4.svg
+       :target: _static/battery_model_4.pdf
+       :align: center
+
+   * To change how the simulator profiles a given battery type, include two different
+     spread-sheets, the "soc_ocv.csv" and the "ocv_internal_resistance.csv" for the
+     battery you are mimicing.
+
+      * An example of the "soc_ocv.csv" can be found `here <https://github.com/aleph2c/miros/blob/master/examples/soc_ocv.csv>`_ and it's `data
+        plot <https://github.com/aleph2c/miros/blob/master/examples/soc_ocv.py>`_ would look like this:
+
+      .. image:: _static/battery_profile.svg
+          :target: _static/battery_profile.pdf
+          :align: center
+
+      * An example of the "ocv_internal_resistance.csv" can be found `here <https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.csv>`_
+        and it's `data plot <https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.py>`_ would look like this:
+
+      .. image:: _static/battery_resistance_profile.svg
+          :target: _static/battery_resistance_profile.pdf
+          :align: center
+
+   * To build and run the battery simulator:
+
+      .. code-block:: python
+
+        battery = Battery(
+          rated_amp_hours=100,
+          initial_soc_per=10.0,
+          name="lead_acid_battery_100Ah",
+          soc_vrs_ocv_profile_csv='soc_ocv.csv',
+          ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
+          live_trace=True
+        )
+
+        hours = 1
+
+        time_series = battery.time_series(
+          duration_in_sec=hours*60*60,
+        )
+        for moment in time_series:
+          if battery.soc_per < 80.0:
+            battery.amps_into_terminals(33.0, moment)
+            print(str(battery), end='')
+            abs_volts = battery.last_terminal_voltage
+          else:
+            battery.volts_across_terminals(abs_volts, moment)
+            print(str(battery), end='')
+          time.sleep(0.0001)
+
+* :new_spec:`The ChargerMock will contain all of the Charger code but with a
+  slight adjustment so that the internal clock of the Charger is sped up to
+  match the tempo of the software test.`
+
+.. image:: _static/ChargerMock.svg
+    :target: _static/ChargerMock.pdf
+    :align: center
+
+* :new_spec:`The ElectricalInterfaceMock will contain code which will sample
+  from the battery simulator and drive the current and voltage values to the
+  battery simulator in the programmable reference-time set by the ChargerTester:`
+
+.. image:: _static/electrical_interface_5_mock.svg
+    :target: _static/electrical_interface_5_mock.pdf
+    :align: center
+
+* :new_spec:`The ChargerTester will aggregate the information required to build
+  and run the charger product and the battery simulator.  It will construct the
+  ChargerMock and the ElectricalInterfaceMock and run them with the battery
+  simulation all within the same compressed time reference.  The output of the
+  charger will be stored in a CSV file, this file will be used to generate a
+  graph.  Here is an example of how to use the ChargerTester class and
+  how to graph its output:`
+
+.. code-block:: python
+
+   time_compression_scalar = 50
+   simulated_duration_in_hours = 1.0
+   fake_sec = simulated_duration_in_hours * 3600.0
+   real_delay_needed_sec = fake_sec / time_compression_scalar
+   
+   ct = ChargerTester(
+     charger_bulk_timeout_sec=1600,
+     charger_abs_timeout_sec=1300,
+     charger_equ_timeout_sec=86400,
+     charger_bulk_entry_volts=12.0,
+     charger_bulk_exit_volts=13.04,
+     charger_abs_exit_amps=20.0,
+     charger_bulk_ref_amps=30,
+     charger_float_ref_volts=12.9,
+     charger_abs_ref_volts=13.04,
+     charger_equ_ref_volts=16.0,
+     battery_rated_amp_hours=100,
+     battery_initial_soc_per=65.0,
+     battery_soc_vrs_ocv_profile_csv='soc_ocv.csv',
+     battery_ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
+     time_compression_scalar=time_compression_scalar,
+     live_trace=False,
+     live_spy=False,
+   )
+   time.sleep(real_delay_needed_sec)
+   ct.electrical_interface_mock.post_lifo(Event(signal=signals.stop))
+   ct.plot_profile()
 
 .. image:: _static/charger_test_results.svg
     :target: _static/charger_test_results.pdf
