@@ -261,6 +261,9 @@ build a single three stage battery charger.</p>
 <p class="last">New knowledge and things said by other imagined people will be
 <span class="new-spec">highlighted.</span></p>
 </div>
+</div>
+<div class="section" id="spec-1-control-systems">
+<span id="batterychargingexample-spec-1-control-systems"></span><h2>Spec 1: Control Systems<a class="headerlink" href="#spec-1-control-systems" title="Permalink to this headline">¶</a></h2>
 <p>Specification (1):</p>
 <ul class="simple">
 <li><span class="new-spec">A charger has two control systems: constant current and constant voltage.</span></li>
@@ -270,6 +273,7 @@ techniques.</span></li>
 </ul>
 <a class="reference external image-reference" href="_static/three_stage_charging_chart_1.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_1.svg" src="_images/three_stage_charging_chart_1.svg" /></div>
 </a>
+<hr class="docutils" />
 <p>I show the above diagram to the <span class="new-spec">electrical engineer</span> I’m working
 with, and he says, <span class="new-spec">Yeah, it looks good, but can you make sure the two
 control systems are generalizeable?</span></p>
@@ -299,7 +303,9 @@ together?</span></p>
 voltage control classes.  Think of it as a drawing short hand.”</p>
 <p>He says, <span class="new-spec">Ok, it looks good.</span></p>
 <hr class="docutils" />
-<p>Specification (2):</p>
+</div>
+<div class="section" id="spec-2-battery-parameters">
+<span id="batterychargingexample-spec-2-battery-parameters"></span><h2>Spec 2: Battery Parameters<a class="headerlink" href="#spec-2-battery-parameters" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>A charger has two control systems: constant current and constant voltage.</li>
 <li>The bulk stage is a constant current control technique.</li>
@@ -467,6 +473,9 @@ system’s <code class="docutils literal notranslate"><span class="pre">kp</span
 <p>Things seem to be coming together, so we go back and work on our spec, teasing
 apart our high level descriptions from our technical design.</p>
 <hr class="docutils" />
+</div>
+<div class="section" id="spec-3-electrical-charging-profile">
+<span id="batterychargingexample-spec-3-electrical-charging-profile"></span><h2>Spec 3: Electrical Charging Profile<a class="headerlink" href="#spec-3-electrical-charging-profile" title="Permalink to this headline">¶</a></h2>
 <p>Specification iteration 3:</p>
 <p><strong>High level Specification (3)</strong></p>
 <ul class="simple">
@@ -598,9 +607,10 @@ test it before that?</span>.</p>
 to squeeze time so I can run it through all of it’s states quickly”.</p>
 <p>Things seem to be coming together, so we go back and work on our spec, teasing
 apart our high level descriptions from our technical design.</p>
+<hr class="docutils" />
 </div>
-<div class="section" id="single-unit-three-stage-battery-charger-design-1">
-<span id="batterychargingexample-single-unit-three-stage-battery-charger-design"></span><h2>Single Unit Three Stage Battery Charger Design (1)<a class="headerlink" href="#single-unit-three-stage-battery-charger-design-1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="spec-4-charger-behavioral-design">
+<span id="batterychargingexample-spec-4-charger-behavior-design"></span><h2>Spec 4: Charger Behavioral Design<a class="headerlink" href="#spec-4-charger-behavioral-design" title="Permalink to this headline">¶</a></h2>
 <p><strong>High level Specification (4)</strong></p>
 <ul class="simple">
 <li>This product will be a three stage charger with an equalization feature.</li>
@@ -1085,10 +1095,10 @@ make things sound as complicated and mysterious as possible.</span></p>
 you have written needs to work, or you could burn down someone’s house eh?  No
 pressure.</span> He smiles. <span class="new-spec">Just add it to the spec, then make it happen.
 Oh, and try and keep your gobbledegook out of the spec, I have to read it too.</span></p>
-</div>
 <hr class="docutils" />
-<div class="section" id="single-unit-three-stage-battery-charger-design-2">
-<h2>Single Unit Three Stage Battery Charger Design (2)<a class="headerlink" href="#single-unit-three-stage-battery-charger-design-2" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="spec-5-high-level-verification-goals">
+<span id="batterychargingexample-spec-5-high-level-verification-goals"></span><h2>Spec 5: High Level Verification Goals<a class="headerlink" href="#spec-5-high-level-verification-goals" title="Permalink to this headline">¶</a></h2>
 <p><strong>High level Specification (5)</strong></p>
 <ul class="simple">
 <li>This product will be a three stage charger with an equalization feature.</li>
@@ -1136,8 +1146,8 @@ different battery types.</span></li>
 about my model?”</p>
 <p><span class="new-spec">Sure, what do you need to know that you don’t know already?</span>.</p>
 <p>“Well, I need to build something that will give me different voltages over time
-after I feed the bulk current, and different current when I feed a constant
-voltage”</p>
+after I feed in the bulk current, and different current over time when I express a constant
+voltage across it’s “virtual” battery terminals.”</p>
 <p><span class="new-spec">Hold on, show me what you want</span>.</p>
 <p>You place the electrical profile in front of him:</p>
 <a class="reference external image-reference" href="_static/three_stage_charging_chart_2_graph.pdf"><div align="center" class="align-center"><img alt="_images/three_stage_charging_chart_2_graph.svg" src="_images/three_stage_charging_chart_2_graph.svg" /></div>
@@ -1671,12 +1681,12 @@ work as you would expect.”</p>
 <p>“Yeah, I’ll add a delay when we use the simulator to test the charger.  You have
 identified a bigger issue than the time-slippage issue, but it is much easier to
 fix.”</p>
-<hr class="docutils" />
 <p>Now that we have a way to simulate a battery, we will add this information to
 our specification:</p>
+<hr class="docutils" />
 </div>
-<div class="section" id="single-unit-three-stage-battery-charger-design-3">
-<h2>Single Unit Three Stage Battery Charger Design (3)<a class="headerlink" href="#single-unit-three-stage-battery-charger-design-3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="spec-6-battery-simulator">
+<span id="batterychargingexample-spec-6-battery-simulator"></span><h2>Spec 6: Battery Simulator<a class="headerlink" href="#spec-6-battery-simulator" title="Permalink to this headline">¶</a></h2>
 <p><strong>High level Specification (6)</strong></p>
 <ul class="simple">
 <li>This product will be a three stage charger with an equalization feature.</li>
@@ -1998,10 +2008,10 @@ run the test:</p>
 </a>
 <p><span class="new-spec">Ok, that graph makes sense to me, more so than the rest of it.  You
 should pack everything you have done into the spec.</span></p>
-</div>
 <hr class="docutils" />
-<div class="section" id="single-unit-three-stage-battery-charger-design-4">
-<h2>Single Unit Three Stage Battery Charger Design (4)<a class="headerlink" href="#single-unit-three-stage-battery-charger-design-4" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="spec-7-single-unit-battery-charger">
+<span id="batterychargingexample-spec-7-single-unit-battery-charger"></span><h2>Spec 7: Single Unit Battery Charger<a class="headerlink" href="#spec-7-single-unit-battery-charger" title="Permalink to this headline">¶</a></h2>
 <p><strong>High level Specification (7)</strong></p>
 <ul class="simple">
 <li>This product will be a three stage charger with an equalization feature.</li>
@@ -2221,10 +2231,13 @@ how to graph its output:</span></li>
   <ul>
 <li><a class="reference internal" href="#">Distributed Battery Charging</a><ul>
 <li><a class="reference internal" href="#high-level-introduction-to-how-batteries-and-chargers-work">High Level Introduction to how Batteries and Chargers Work</a></li>
-<li><a class="reference internal" href="#single-unit-three-stage-battery-charger-design-1">Single Unit Three Stage Battery Charger Design (1)</a></li>
-<li><a class="reference internal" href="#single-unit-three-stage-battery-charger-design-2">Single Unit Three Stage Battery Charger Design (2)</a></li>
-<li><a class="reference internal" href="#single-unit-three-stage-battery-charger-design-3">Single Unit Three Stage Battery Charger Design (3)</a></li>
-<li><a class="reference internal" href="#single-unit-three-stage-battery-charger-design-4">Single Unit Three Stage Battery Charger Design (4)</a></li>
+<li><a class="reference internal" href="#spec-1-control-systems">Spec 1: Control Systems</a></li>
+<li><a class="reference internal" href="#spec-2-battery-parameters">Spec 2: Battery Parameters</a></li>
+<li><a class="reference internal" href="#spec-3-electrical-charging-profile">Spec 3: Electrical Charging Profile</a></li>
+<li><a class="reference internal" href="#spec-4-charger-behavioral-design">Spec 4: Charger Behavioral Design</a></li>
+<li><a class="reference internal" href="#spec-5-high-level-verification-goals">Spec 5: High Level Verification Goals</a></li>
+<li><a class="reference internal" href="#spec-6-battery-simulator">Spec 6: Battery Simulator</a></li>
+<li><a class="reference internal" href="#spec-7-single-unit-battery-charger">Spec 7: Single Unit Battery Charger</a></li>
 </ul>
 </li>
 </ul>

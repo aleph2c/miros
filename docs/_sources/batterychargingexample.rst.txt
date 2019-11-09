@@ -250,6 +250,11 @@ build a single three stage battery charger.
   New knowledge and things said by other imagined people will be
   :new_spec:`highlighted.`
 
+.. _batterychargingexample-spec-1:-control-systems:
+
+Spec 1: Control Systems
+^^^^^^^^^^^^^^^^^^^^^^^
+
 Specification (1):
 
 * :new_spec:`A charger has two control systems: constant current and constant voltage.`
@@ -260,6 +265,8 @@ Specification (1):
 .. image:: _static/three_stage_charging_chart_1.svg
     :target: _static/three_stage_charging_chart_1.pdf
     :align: center
+
+----
 
 I show the above diagram to the :new_spec:`electrical engineer` I'm working
 with, and he says, :new_spec:`Yeah, it looks good, but can you make sure the two
@@ -303,7 +310,10 @@ He says, :new_spec:`Ok, it looks good.`
 
 ----
 
-Specification (2):
+.. _batterychargingexample-spec-2:-battery-parameters:
+
+Spec 2: Battery Parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * A charger has two control systems: constant current and constant voltage.
 * The bulk stage is a constant current control technique.
@@ -522,6 +532,11 @@ apart our high level descriptions from our technical design.
 
 ----
 
+.. _batterychargingexample-spec-3:-electrical-charging-profile:
+
+Spec 3: Electrical Charging Profile
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Specification iteration 3:
 
 **High level Specification (3)**
@@ -694,10 +709,12 @@ to squeeze time so I can run it through all of it's states quickly".
 Things seem to be coming together, so we go back and work on our spec, teasing
 apart our high level descriptions from our technical design.
 
-.. _batterychargingexample-single-unit-three-stage-battery-charger-design:
+----
 
-Single Unit Three Stage Battery Charger Design (1)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _batterychargingexample-spec-4:-charger-behavior-design:
+
+Spec 4: Charger Behavioral Design
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **High level Specification (4)**
 
@@ -1227,8 +1244,10 @@ Oh, and try and keep your gobbledegook out of the spec, I have to read it too.`
 
 ----
 
-Single Unit Three Stage Battery Charger Design (2)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _batterychargingexample-spec-5:-high-level-verification-goals:
+
+Spec 5: High Level Verification Goals
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **High level Specification (5)**
 
@@ -1287,8 +1306,8 @@ about my model?"
 :new_spec:`Sure, what do you need to know that you don't know already?`.
 
 "Well, I need to build something that will give me different voltages over time
-after I feed the bulk current, and different current when I feed a constant
-voltage"
+after I feed in the bulk current, and different current over time when I express a constant
+voltage across it's "virtual" battery terminals."
 
 :new_spec:`Hold on, show me what you want`.  
 
@@ -1993,13 +2012,16 @@ work as you would expect."
 identified a bigger issue than the time-slippage issue, but it is much easier to
 fix."
 
-----
 
 Now that we have a way to simulate a battery, we will add this information to
 our specification:
 
-Single Unit Three Stage Battery Charger Design (3)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----
+
+.. _batterychargingexample-spec-6:-battery-simulator:
+
+Spec 6: Battery Simulator
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **High level Specification (6)**
 
@@ -2407,8 +2429,10 @@ should pack everything you have done into the spec.`
 
 ----
 
-Single Unit Three Stage Battery Charger Design (4)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _batterychargingexample-spec-7:-single-unit-battery-charger:
+
+Spec 7: Single Unit Battery Charger
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **High level Specification (7)**
 
