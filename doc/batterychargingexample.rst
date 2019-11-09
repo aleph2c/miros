@@ -1,4 +1,3 @@
-.. _batterychargingexample-battery-charging-example:
 
 .. role:: new_spec
   :class: new_spec
@@ -7,8 +6,31 @@
 manifestation of the development team's collective understanding.
 <https://www.csc.gov.sg/articles/how-to-build-good-software>`_ -- `Li Hongyi <http://theindependent.sg/li-hongyi-singapore-has-a-lot-of-problems-but-we-have-political-stability-and-resources/>`_
 
-Distributed Battery Charging Example
-====================================
+----
+
+.. _batterychargingexample-battery-charging-example:
+
+Distributed Battery Charging
+============================
+
+This essay describes two engineers working together to build a distributed three
+stage battery charger.  You will watch them as they learn from one another and
+challenge each other's work.  As their progress evolves against their shared
+knowledge, they pack what they have learned and what they have done, into a very
+short document called the specification (spec).
+
+They treat their specification as a time capsule they are sending into the
+future, as an artifact to help the engineers of tomorrow (who might just be older
+versions of themselves) make sense of their system.
+
+Before we start with the story, here is a bit of background information that
+will help provide some context.
+
+.. _batterychargingexample-high-level-summary-of-batteries-and-chargers:
+
+High Level Introduction to how Batteries and Chargers Work
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Lead acid batteries are very heavy.  But they are cheaper than lithium ion
 batteries and this is why they are used in a lot of off-grid electrical systems.
 
@@ -219,8 +241,7 @@ The spec should be short enough that it can be read and understood by everyone
 involved.  If specific drawings are too technical for some members, efforts
 should be made to explain what they mean so everyone can participate in the
 conversation.  Here is an example of such a conversation to discover how to
-build a single three stage battery charger.  But if you want to skip the
-conversation and just jump to the design, click :ref:`here <batterychargingexample-single-unit-three-stage-battery-charger-design>`.
+build a single three stage battery charger.  
 
 ----
 
@@ -357,7 +378,7 @@ those diamond arrows?`
 
 You answer, "It's just a way of saying one class has an
 attribute of another class.  For instance the ``battery_spec`` in the
-``ChargerParameter`` class "is a" ``BatterySpecificInformation`` class.  You leave
+``ChargerParameter`` class "has a" ``BatterySpecificInformation`` class.  You leave
 the ``BatterySpecificInformation`` class on the picture so you can see what it's
 attribute names are."
 
@@ -428,8 +449,9 @@ We need to start programming time, so we will construct three heart beats,
 something that will sample the current, something that will sample the voltage
 and something that will drive the statechart's decisions.  To make current and
 voltage readings, we create two hooks in the charging state.  Finally, we make
-sure that these heart beats are turned off when we leave the state; we can't
-remember why this is important, but we know it is.
+sure that these heart beats are turned off when we leave the state; :ref:`we
+can't remember why this is important, but we know it is.
+<recipes-avoiding-heart-beat-bleed-bugs>`
 
 .. image:: _static/three_stage_charging_chart_2_chart.svg
     :target: _static/three_stage_charging_chart_2_chart.pdf

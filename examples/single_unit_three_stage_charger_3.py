@@ -575,7 +575,9 @@ class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
       nest(self.float, parent=self.constant_voltage_control). \
       nest(self.equalize, parent=self.constant_voltage_control)
 
+  def start(self):
     self.start_at(self.wait_for_electrical_interface)
+    return self
 
   def wait_for_electrical_interface_entry_signal(self, e):
     status = return_status.HANDLED
@@ -735,8 +737,8 @@ class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
     status = return_status.HANDLED
     self.control.reference = \
       self.battery_spec.abs_ref_volts
-    self.cause = self.state_name
     self.start_sec = self.sec
+    self.cause = self.state_name
     self.post_fifo(Event(signal=signals.electrical_change))
     return status
 
@@ -749,8 +751,8 @@ class Charger(ChargerParameters, LoggedBehavior, ThreadSafeAttributes):
 
   def float_entry(self, e):
     status = return_status.HANDLED
-    self.cause = self.state_name
     self.control.reference = self.battery_spec.float_ref_volts
+    self.cause = self.state_name
     self.post_fifo(Event(signal=signals.electrical_change))
     return status
 
@@ -799,6 +801,8 @@ class ElectricalInterface(LoggedBehavior):
        handler=self.respond_to_control_changes_drive_voltage). \
       catch(signal=signals.REQUEST_FOR_SAMPLERS,
         handler=self.respond_to_control_changes_request_for_samplers). \
+      catch(signal=signals.EXIT_SIGNAL,
+        handler=self.respond_to_control_changes_exit_signal). \
       to_method()
 
     self.drive_current_state = self.create(
@@ -817,7 +821,9 @@ class ElectricalInterface(LoggedBehavior):
       nest(self.drive_current_state, parent=self.respond_to_control_changes). \
       nest(self.drive_voltage_state, parent=self.respond_to_control_changes)
 
+  def start(self):
     self.start_at(self.respond_to_control_changes)
+    return self
 
   def respond_to_control_changes_entry_signal(self, e):
     status = return_status.HANDLED
@@ -832,6 +838,11 @@ class ElectricalInterface(LoggedBehavior):
 
     self.subscribe(Event(signal=signals.DRIVE_CURRENT))
     self.subscribe(Event(signal=signals.DRIVE_VOLTAGE))
+    return status
+
+  def respond_to_control_changes_exit_signal(self, e):
+    status = return_status.HANDLED
+    self.cancel_events(Event(signal=signals.Pulse))
     return status
 
   def respond_to_control_changes_drive_current(self, e):
@@ -859,6 +870,12 @@ class ElectricalInterface(LoggedBehavior):
 
   def sample_voltage(self):
     return 12.0
+
+  def drive_current(self, amps, control):
+    pass
+
+  def drive_voltage(self, volts, control):
+    pass
 
 # current control system
 ccs = CurrentControlSystem(
@@ -898,18 +915,17 @@ charger_params = ChargerParameters(
 )
 
 if __name__ == '__main__':
- 
 
   # the charger data and behavior
   three_stage_charger = Charger(
     name='charger',
     charger_params=charger_params,
     live_spy=True,
-  )
+  ).start()
 
   electrics = ElectricalInterface(
     name="electrical_interface",
     live_trace=True
-  )
+  ).start()
 
   time.sleep(10)

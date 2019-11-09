@@ -29,7 +29,8 @@ class TestOutputCsv:
 
   def __init__(self, test_csv_output_file=None):
 
-    self.test_csv_output_file =  "charger_test_results.csv" # if test_with_simulator == None else test_csv_output_file
+    self.test_csv_output_file =  "charger_test_results.csv" \
+      if test_csv_output_file == None else test_csv_output_file
 
     self.fieldnames = ['time', 'current', 'voltage', 'soc', 'state']
 
@@ -70,6 +71,7 @@ class TestOutputCsv:
     return data
 
 class ChargerMock(Charger):
+
   def __init__(self, *args, time_compression_scalar, **kwargs):
     self.time_compression_scalar = time_compression_scalar
     super().__init__(*args, **kwargs)
@@ -90,12 +92,18 @@ class ElectricalInterfaceMock(ElectricalInterface):
 
   def __init__(self, time_compression_scalar, battery, name=None, live_trace=None, live_spy=None):
 
+
     self.pulse_sec = 1.0
     self.battery = battery
     self._charger_state = None
 
     self._last_current_amps = None
     self._last_terminal_voltage = None
+
+    self.real_seconds = None
+    self.fake_seconds = None
+    self.start_datetime = None
+    self._charger_state = None
 
     self.time_compression_scalar = time_compression_scalar
     self.test_output_csv = TestOutputCsv()
@@ -120,7 +128,7 @@ class ElectricalInterfaceMock(ElectricalInterface):
     self.respond_to_control_changes = self.create(state="respond_to_control_changes"). \
       catch(signal=signals.ENTRY_SIGNAL,
         handler=self.respond_to_control_changes_entry_signal). \
-      catch(signal=signals.Pulse,
+      catch(signal=signals.Pulse1,
         handler=self.respond_to_control_changes_pulse). \
       catch(signal=signals.DRIVE_CURRENT,
         handler=self.respond_to_control_changes_drive_current). \
@@ -128,6 +136,8 @@ class ElectricalInterfaceMock(ElectricalInterface):
         handler=self.respond_to_control_changes_drive_voltage). \
       catch(signal=signals.REQUEST_FOR_SAMPLERS,
         handler=self.respond_to_control_changes_request_for_samplers). \
+      catch(signal=signals.EXIT_SIGNAL,
+        handler=self.respond_to_control_changes_exit_signal). \
       catch(signal=signals.stop,
         handler=self.respond_to_control_changes_stop). \
       to_method()
@@ -150,8 +160,6 @@ class ElectricalInterfaceMock(ElectricalInterface):
       nest(self.drive_current_state, parent=self.respond_to_control_changes). \
       nest(self.drive_voltage_state, parent=self.respond_to_control_changes)
 
-    self.start_at(self.respond_to_control_changes)
-
   def sample_current(self):
     self._last_current_amps = self.battery.last_current_amps
     return self._last_current_amps
@@ -162,6 +170,7 @@ class ElectricalInterfaceMock(ElectricalInterface):
 
   def respond_to_control_changes_entry_signal(self, e):
     status = return_status.HANDLED
+    self.cancel_events(Event(signal=signals.Pulse1))
     self.publish(
       Event(
         signal=signals.SET_CURRENT_SAMPLER,
@@ -178,8 +187,10 @@ class ElectricalInterfaceMock(ElectricalInterface):
     self.subscribe(Event(signal=signals.DRIVE_CURRENT))
     self.subscribe(Event(signal=signals.DRIVE_VOLTAGE))
 
+    self.scribble("making Pulse1")
+
     self.post_fifo(
-      Event(signal=signals.Pulse),
+      Event(signal=signals.Pulse1),
       period=self.pulse_sec / self.time_compression_scalar,
       deferred=True,
       times=0
@@ -187,20 +198,23 @@ class ElectricalInterfaceMock(ElectricalInterface):
     self.real_seconds = 0
     self.fake_seconds = 0
     self.start_datetime=datetime.now()
-    #self.csv_file = open(self.test_csv_output_file, mode="a")
-    #self.writer = csv.DictWriter(self.csv_file, self.fieldnames)
     return status
 
   def respond_to_control_changes_pulse(self, e):
     status = return_status.HANDLED
-    self.real_seconds += (self.pulse_sec / self.time_compression_scalar)
-    self.fake_seconds += self.pulse_sec / 2.0
+    self.real_seconds += self.pulse_sec / self.time_compression_scalar
+    self.fake_seconds += self.pulse_sec
     self.post_fifo(
       Event(
         signal=signals.Tick,
         payload=Seconds(sec=self.fake_seconds)
       )
     )
+    return status
+
+  def respond_to_control_changes_exit_signal(self, e):
+    status = return_status.HANDLED
+    self.cancel_events(Event(signal=signals.Pulse))
     return status
 
   def respond_to_control_changes_drive_current(self, e):
@@ -259,14 +273,6 @@ class ElectricalInterfaceMock(ElectricalInterface):
           voltage=self._last_terminal_voltage,
           soc=self.battery.soc_per,
           state=self._charger_state)
-
-      #self.writer.writerow(
-      #  {'time':new_datetime,
-      #   'current':self._last_current_amps,
-      #   'voltage':self._last_terminal_voltage,
-      #   'soc':self.battery.soc_per,
-      #   'state':self._charger_state}
-      #)
     return status
 
   def drive_voltage_state_entry_signal(self, e):
@@ -368,7 +374,7 @@ class ChargerTester:
       time_compression_scalar=time_compression_scalar,
       live_spy=live_spy,
       live_trace=live_trace
-    )
+    ).start()
 
     # make a battery simulator and start it up
     self.battery = Battery(
@@ -389,7 +395,8 @@ class ChargerTester:
       time_compression_scalar=time_compression_scalar,
       live_trace=True,
       live_spy=True
-    )
+    ).start()
+
     self.charger_mock.post_fifo(Event(signal=signals.Force_Bulk))
     self.test_output_csv = self.electrical_interface_mock.test_output_csv
 

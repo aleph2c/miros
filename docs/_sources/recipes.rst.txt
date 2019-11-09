@@ -444,7 +444,7 @@ ran the print statement associated with this signal, while it was still in the
    Another way to think about internal and external signals is that internal
    signals are sent from the event processor to the state functions without the
    user explicitly asking it to do so.  But, external signals are only sent to the
-   chart when a user explicitely posts the event into the statechart.
+   chart when a user explicitly posts the event into the statechart.
 
 So the event processor needed to follow some rules.  It needed to figure out how
 and when to post each event to our two simple state functions.  It needed to
@@ -3802,6 +3802,57 @@ Here is how to publish an event with a specific priority:
    priority is 1.  By default all published events are given a priority of 1000.
    If two events have the same priority the queue will behave like a first in
    first out queue.
+
+.. _recipes-avoiding-bugs-which-travel-through-time:
+
+Avoiding Bugs Which Travel Through Time
+---------------------------------------
+If you have build a statechart which is dependent upon an internal heartbeat to
+track time, you have built a clock.  Such a clock will slip backward in time
+relative to your Operating System's clock.  This is because the threads which
+are created to drive your heart beat use Python's ``time.sleep`` function, and it
+is not precise in how it works.  A call to ``time.sleep`` means it will sleep
+for at-least a given amount of time, not the precise number giving to it as
+an argument.
+
+If you mix another clock into your design, by calling out to get the your
+operating system's version of time, and mix that information with the time you
+have calculated from your heart beat, you will have created a time traveling
+bug.  One time measurement will be in the future of the others time reference.
+
+This relative time slippage is non-deterministic because ``time.sleep`` is
+dependent upon what your computer is doing outside of your program.  The time
+distortion will get larger the longer your program runs.
+
+To avoid such issues, only use one clock reference per statechart.  If you have
+constructed a federation of statecharts which need to have their time
+synchronized, then use one time reference for the federation.
+
+.. _recipes-avoiding-double-time-heart-beat-bugs:
+
+Avoiding double time heart beat bugs
+------------------------------------
+
+If you are seeing more heart beats than you want, look to see if you have
+designed in the :ref:`double start bug <recipes-inheritance-and-starting-(factories)>` or the 
+:ref:`heart-beat-bleed bug <recipes-avoiding-heart-beat-bleed-bugs>`.
+
+.. _recipes-avoiding-heart-beat-bleed-bugs:
+
+Avoiding Heart-Beat-Bleed Bugs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+When you create a heart beat in an entry condition to a state, you will want to
+turn it off in the exit condition of the same state.  If you don't, the thread
+producing its events will continue to run and post events to your chart.  This
+may not be an issue outside of the state that is reacting to these events, but
+once you re-enter the state and re-create the heart beat, you will now have two
+threads sending beats into that part of your system.
+
+You can find such bugs by monitoring the spy output of your statechart, or by
+remembering that every time you create a heart beat, you must cancel it in the
+exit condition.
+
+
 .. _recipes-activeobjects-and-factories:
 
 ActiveObjects
@@ -4088,9 +4139,10 @@ which is attached to an event processor, and it starts in the
 
 Let's bring this design to life with some code (we will highlight the
 asynchronous aspects of the program):
-
+  
 .. code-block:: python
-  :emphasize-lines: 57, 63-66, 68-73, 75-80, 82-85, 87-92, 94-97, 99-102, 104-109, 111-116, 118-119, 121-122
+  :emphasize-lines: 58, 65-67, 69-73, 75-79, 81-83, 85-89, 91-93, 95-97, 99-103, 105-109
+  :linenos:
 
   import time
 
@@ -4147,66 +4199,59 @@ asynchronous aspects of the program):
           nest(self.b1, parent=self.common_behaviors). \
           nest(self.b11, parent=self.b1)
 
+    def start(self):
       # start our statechart, which will start its thread
       self.start_at(self.common_behaviors)
-
-      # let the internal statechart initialize before you give back control
-      # to the synchronous part of your program
+      # give your thread a moment to start and climb into 
+      # the appropriate state prior to handing back control
+      # to our client code
       time.sleep(0.001)
+      return self
 
-    @staticmethod
-    def common_behaviors_init(chart, e):
-      status = chart.trans(chart.a1)
+    def common_behaviors_init(self, e):
+      status = self.trans(self.a1)
       return status
 
-    @staticmethod
-    def common_behaviors_hook_1(chart, e):
+    def common_behaviors_hook_1(self, e):
       status = return_status.HANDLED
       # call the ClassWithStatechartInIt work2 method
-      chart.worker1()
+      self.worker1()
       return status
 
-    @staticmethod
-    def common_behaviors_hook_2(chart, e):
+    def common_behaviors_hook_2(self, e):
       status = return_status.HANDLED
       # call the ClassWithStatechartInIt work2 method
-      chart.worker2()
+      self.worker2()
       return status
 
-    @staticmethod
-    def common_behaviors_reset(chart, e):
-      status = chart.trans(chart.common_behaviors)
+    def common_behaviors_reset(self, e):
+      status = self.trans(self.common_behaviors)
       return status
 
-    @staticmethod
-    def a1_entry(chart, e):
+    def a1_entry(self, e):
       status = return_status.HANDLED
       # post an event to ourselves
-      chart.post_fifo(Event(signal=signals.to_b1))
+      self.post_fifo(Event(signal=signals.to_b1))
       return status
 
-    @staticmethod
-    def a1_to_b1(chart, e):
-      status = chart.trans(chart.b1)
+    def a1_to_b1(self, e):
+      status = self.trans(self.b1)
       return status
 
-    @staticmethod
-    def b1_init(chart, e):
+    def b1_init(self, e):
       status = return_status.HANDLED
       return status
 
-    @staticmethod
-    def b1_entry(chart, e):
+    def b1_entry(self, e):
       status = return_status.HANDLED
       # post an event to ourselves
-      chart.post_fifo(Event(signal=signals.hook_1))
+      self.post_fifo(Event(signal=signals.hook_1))
       return status
 
-    @staticmethod
-    def b1_exit(chart, e):
+    def b1_exit(self, e):
       status = return_status.HANDLED
       # post an event to ourselves
-      chart.post_fifo(Event(signal=signals.hook_2))
+      self.post_fifo(Event(signal=signals.hook_2))
       return status
 
     def worker1(self):
@@ -4216,7 +4261,7 @@ asynchronous aspects of the program):
       print('worker2 called')
 
   if __name__ == '__main__':
-    chart = ClassWithStatechartInIt(name='chart', live_trace=True)
+    chart = ClassWithStatechartInIt(name='chart', live_trace=True).start()
     chart.post_fifo(Event(signal=signals.reset))
     time.sleep(1)
 
@@ -4231,6 +4276,10 @@ This will result in the following output:
    worker2 called
    [2019-06-19 06:16:02.665011] [chart] e->to_b1() a1->b1
    worker1 called
+
+.. note::
+
+  To see why we start the statechart this way read :ref:`avoiding the double start bug <recipes-inheritance-and-starting-(factories)>`.
 
 Here is something a bit weirder, a concurrent statechart:
 
@@ -4269,9 +4318,10 @@ We will make three of these charts, turn on some instrumentation, run them in
 parallel and see what happens.
 
 Here is the code (asynchronous parts highlighted):
-
+  
 .. code-block:: python
-  :emphasize-lines: 67, 73-76, 78-82, 84-89, 91-96, 98-101, 103-106, 108-114, 116-119, 121-124, 126-131, 133-138, 140-144, 146-150, 152-155, 157-158, 160-161
+  :emphasize-lines: 68, 75-77, 79-82, 84-88, 90-94, 96-98, 100-102, 104-109, 111-113, 115-117, 119-123, 125-129, 131-134, 136-139, 141-143
+  :linenos:
 
   import time
   import random
@@ -4338,94 +4388,82 @@ Here is the code (asynchronous parts highlighted):
           nest(self.b1, parent=self.common_behaviors). \
           nest(self.b11, parent=self.b1)
 
+    def start(self):
       # start our statechart, which will start its thread
       self.start_at(self.common_behaviors)
+      # give your thread a moment to start and climb into 
+      # the appropriate state prior to handing back control
+      # to our client code
+      time.sleep(0.001)
+      return self
 
-      # let the internal statechart initialize before you give back control
-      # to the synchronous part of your program
-      time.sleep(0.01)
-
-    @staticmethod
-    def common_behaviors_init(chart, e):
-      status = chart.trans(chart.a1)
+    def common_behaviors_init(self, e):
+      status = self.trans(self.a1)
       return status
 
-    @staticmethod
-    def common_behaviors_entry(chart, e):
+    def common_behaviors_entry(self, e):
       status = return_status.HANDLED
-      chart.subscribe(Event(signal=signals.OTHER_INNER_MOST))
+      self.subscribe(Event(signal=signals.OTHER_INNER_MOST))
       return status
 
-    @staticmethod
-    def common_behaviors_hook_1(chart, e):
+    def common_behaviors_hook_1(self, e):
       status = return_status.HANDLED
       # call the ClassWithStatechartInIt work2 method
-      chart.worker1()
+      self.worker1()
       return status
 
-    @staticmethod
-    def common_behaviors_hook_2(chart, e):
+    def common_behaviors_hook_2(self, e):
       status = return_status.HANDLED
       # call the ClassWithStatechartInIt work2 method
-      chart.worker2()
+      self.worker2()
       return status
 
-    @staticmethod
-    def common_behaviors_reset(chart, e):
-      status = chart.trans(chart.common_behaviors)
+    def common_behaviors_reset(self, e):
+      status = self.trans(self.common_behaviors)
       return status
 
-    @staticmethod
-    def common_behaviors_other_inner_most(chart, e):
-      status = chart.trans(chart.b11)
+    def common_behaviors_other_inner_most(self, e):
+      status = self.trans(self.b11)
       return status
 
-    @staticmethod
-    def a1_entry(chart, e):
+    def a1_entry(self, e):
       status = return_status.HANDLED
       # post an event to ourselves 2/5 of the time
       if random.randint(1, 5) <= 3:
-        chart.post_fifo(Event(signal=signals.to_b1))
+        self.post_fifo(Event(signal=signals.to_b1))
       return status
 
-    @staticmethod
-    def a1_to_b1(chart, e):
-      status = chart.trans(chart.b1)
+    def a1_to_b1(self, e):
+      status = self.trans(self.b1)
       return status
 
-    @staticmethod
-    def b1_init(chart, e):
-      status = chart.trans(chart.b11)
+    def b1_init(self, e):
+      status = self.trans(self.b11)
       return status
 
-    @staticmethod
-    def b1_entry(chart, e):
+    def b1_entry(self, e):
       status = return_status.HANDLED
       # post an event to ourselves
-      chart.post_fifo(Event(signal=signals.hook_1))
+      self.post_fifo(Event(signal=signals.hook_1))
       return status
 
-    @staticmethod
-    def b1_exit(chart, e):
+    def b1_exit(self, e):
       status = return_status.HANDLED
       # post an event to ourselves
-      chart.post_fifo(Event(signal=signals.hook_2))
+      self.post_fifo(Event(signal=signals.hook_2))
       return status
 
-    @staticmethod
-    def b11_entry(chart, e):
+    def b11_entry(self, e):
       status = return_status.HANDLED
-      chart.post_fifo(Event(signal=signals.inner_most))
+      self.post_fifo(Event(signal=signals.inner_most))
       return status
 
-    @staticmethod
-    def b11_inner_most(chart, e):
+    def b11_inner_most(self, e):
       status = return_status.HANDLED
-      chart.publish(Event(signal=signals.OTHER_INNER_MOST))
+      self.publish(Event(signal=signals.OTHER_INNER_MOST))
       return status
 
-    @staticmethod
-    def b11_other_inner_most(chart, e):
+    def b11_other_inner_most(self, e):
       status = return_status.HANDLED
       return status
 
@@ -4436,9 +4474,9 @@ Here is the code (asynchronous parts highlighted):
       print('{} worker2 called'.format(self.name))
 
   if __name__ == '__main__':
-    chart1 = ClassWithStatechartInIt(name='chart1', live_trace=True)
-    chart2 = ClassWithStatechartInIt(name='chart2', live_trace=True)
-    chart3 = ClassWithStatechartInIt(name='chart3', live_trace=True)
+    chart1 = ClassWithStatechartInIt(name='chart1', live_trace=True).start()
+    chart2 = ClassWithStatechartInIt(name='chart2', live_trace=True).start()
+    chart3 = ClassWithStatechartInIt(name='chart3', live_trace=True).start()
     # send a reset event to chart1
     chart1.post_fifo(Event(signal=signals.reset))
     time.sleep(0.2)
@@ -4522,6 +4560,140 @@ classes are working together rather than three instantiated objects from the
 same class.  UML really falls-over in describing object interactions.
 
 If you have any suggestions about how to draw this better, email me.
+
+.. _recipes-inheritance-and-starting-(factories):
+
+Inheritance and Starting (Factories)
+------------------------------------
+
+If you write the ``start_at`` call inside of the ``__init__`` method of a
+Factory object which you are intending to overload using inheritance, you are in
+for a world of trouble-shooting pain.  Your inherited class will inadvertently
+start its parent active object, your heart-beat events will be duplicated and
+your chart will appear to run (n+1)X as fast, where n is the number of inheritance
+actions you have taken on your factory-derived class.
+
+.. code-block:: python
+
+   class Charger(Factory):
+
+      def __init__(self, name, live_trace, live_spy):
+
+         super().__init__(name)
+
+         # define attributes ...
+         # define states ...
+         # nest states ...
+         # start the chart (making a debugging time-bomb by having this in the
+         # __init__ method)
+         self.start_at(<state_name>) # starts a thread
+
+   class ChargerChild(Charger):
+
+      def __init__(self, name, live_trace, live_spy):
+        
+         # this will construct the parents state machine and start it
+         super().__init__(name, live_trace, live_spy)
+
+         # overload attributes ...
+         # overload states ...
+         # nest states ...
+         # start the chart, BUT IT IS ALREADY RUNNING!
+         self.start_at(<state_name>) # starts another thread
+
+   if __name__ == "__main__":
+
+      # This object has two threads running its active object, so any 
+      # heart beat will be running twice as fast and along with other weird
+      # multithreading race bugs.
+      charger_child = ChargerChild(
+        name="charger", live_trace=False, live_spy=False
+      )
+
+To avoid such an issue, you can explicitly call the ``start_at`` method with the
+state you would like your statechart to start in *outside* of the ``__init__``
+call.  But, if you do this ``state_at`` call is made entirely outside of the
+Factory, you will no longer be data-hiding its state information from the client
+code, (which defeats one of the reasons to use a Factory in the first place).
+
+.. code-block:: python
+
+   class Charger(Factory):
+
+      def __init__(self, name, live_trace, live_spy):
+
+         super().__init__(name)
+
+         # define attributes ...
+         # define states ...
+         # nest states ...
+
+   class ChargerChild(Charger):
+
+      def __init__(self, name, live_trace, live_spy):
+        
+         # this will construct the parents state machine and start it
+         super().__init__(name, live_trace, live_spy)
+
+         # overload attributes ...
+         # overload states ...
+         # nest states ...
+
+   if __name__ == "__main__":
+
+      charger_child = ChargerChild(
+        name="charger", live_trace=False, live_spy=False
+      )
+      # Create a thread and start the object in the <state_name> state
+      # (but I don't want to have to know how the charger_child object works.
+      # The Charger knows where it needs to start, but I don't want it to start
+      # itself in the __init__ state (for the reasons described above).
+      charger_child.start_at(charger_child.<state_name>)
+
+Instead, create a ``start`` method which returns self.  This way you can create
+and start an active object in one chained-call, hide state from the client and
+still have the option of opening up the active object for re-writes through
+inheritance without accidently starting parent renegade threads.
+
+.. code-block:: python
+
+   class Charger(Factory):
+
+      def __init__(self, name, live_trace, live_spy):
+
+         super().__init__(name)
+
+         # define attributes ...
+         # define states ...
+         # nest states ...
+
+      def start(self):
+         self.start_at(self.<state_name>)
+         return self
+
+   class ChargerChild(Charger):
+
+      def __init__(self, name, live_trace, live_spy):
+        
+         # this will construct the parents state machine and start it
+         super().__init__(name, live_trace, live_spy)
+
+         # overload attributes ...
+         # overload states ...
+         # nest states ...
+         # start the chart, BUT IT IS ALREADY RUNNING!
+
+   if __name__ == "__main__":
+
+      # Initialize the ChargerChild statechart and start it, the starting state
+      # is hidden within the obj, so as a client I don't have to know how its
+      # inner state machine works.
+      charger_child = ChargerChild(
+        name="charger", live_trace=False, live_spy=False
+      ).start()
+
+The added benefit of this approach is that the subclass can start the object in
+a different initial state by overloading the ``start`` method.
 
 .. _recipes-sharing-attributes-between-threads-factories:
 
