@@ -14,7 +14,7 @@ Distributed Battery Charging
 ============================
 
 This essay describes two engineers working together to build a distributed three
-stage battery charger.  You will watch them as they learn from one another and
+stage battery charger.  It follows them as they learn from one another and
 challenge each other's work.  As their progress evolves against their shared
 knowledge, they pack what they have learned and what they have done, into a very
 short document called the specification (spec).
@@ -2431,8 +2431,8 @@ should pack everything you have done into the spec.`
 
 .. _batterychargingexample-spec-7:-single-unit-battery-charger:
 
-Spec 7: Single Unit Battery Charger
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Spec 7: Testing with Physics Simulation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **High level Specification (7)**
 
@@ -2648,11 +2648,566 @@ Spec 7: Single Unit Battery Charger
    ct.electrical_interface_mock.post_lifo(Event(signal=signals.stop))
    ct.plot_profile()
 
-.. image:: _static/charger_test_results.svg
-    :target: _static/charger_test_results.pdf
+.. image:: _static/charger_test_results_1.svg
+    :target: _static/charger_test_results_1.pdf
     :align: center
 
+----
+
+The electrical engineer looks at the output of our test and says, :new_spec:`Now we are getting somewhere.`
+
+:new_spec:`Are those teal bars describing time outs?`
+
+"Yes, they mark where the charger settings would have forced a state transition based on time."
+
+:new_spec:`We can use the output of this test to describe deficit charging to
+our customers.`
+
+"You might want to explain it to me first."
+
+:new_spec:`I'll explain it with your picture.  Can you adjust your first teal
+bar so that its about 50 percent closer to the right.`
+
+"Sure I just have to change the ``bulk_timeout_sec``."
+
+.. code-block:: python
+   :emphasize-lines: 7
+
+   time_compression_scalar = 50
+   simulated_duration_in_hours = 1.0
+   fake_sec = simulated_duration_in_hours * 3600.0
+   real_delay_needed_sec = fake_sec / time_compression_scalar
+   
+   ct = ChargerTester(
+     charger_bulk_timeout_sec=800,
+     charger_abs_timeout_sec=1300,
+     charger_equ_timeout_sec=86400,
+     charger_bulk_entry_volts=12.0,
+     charger_bulk_exit_volts=13.04,
+     charger_abs_exit_amps=20.0,
+     charger_bulk_ref_amps=30,
+     charger_float_ref_volts=12.9,
+     charger_abs_ref_volts=13.04,
+     charger_equ_ref_volts=16.0,
+     battery_rated_amp_hours=100,
+     battery_initial_soc_per=65.0,
+     battery_soc_vrs_ocv_profile_csv='soc_ocv.csv',
+     battery_ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
+     time_compression_scalar=time_compression_scalar,
+     live_trace=False,
+     live_spy=False,
+   )
+   time.sleep(real_delay_needed_sec)
+   ct.electrical_interface_mock.post_lifo(Event(signal=signals.stop))
+   ct.plot_profile()
+
+.. image:: _static/charger_test_results_2.svg
+    :target: _static/charger_test_results_2.pdf
+    :align: center
+
+:new_spec:`Ok, this is great and by the way I see a bug that tells me you did
+things right:  The current being sourced in the absorption stage is above c/3
+(33 amps) and above the bulk current.  If we let this go, we could destroy the
+batteries.`
+
+"How will I stop the battery current from going above c/3 while in absorption,
+when I have no control over the current while it is in constant voltage control
+mode?"
+
+:new_spec:`It's good that you have this problem, if you didn't I wouldn't trust
+your model.  It will be up to me to keep that current below the threshold, but you will
+have to tell me what the threshold is. I'll add current limiting to the control
+system.  I'll use something called a derating.`
+
+"How does that work?"
+
+:new_spec:`Remember how I told you that the reference is the goal of the control
+system?  While in a constant voltage state you will be giving me a voltage
+reference and the control system will drive the terminal voltage to that value.
+The problem we see in the picture is that if I do this, the current will be too
+high.  Now imagine that I reduce that reference voltage a bit, just before I
+fed it into the controller. If I did that, I would output less current right?
+If you reduce your reference before sending it into your control system it's
+called derating.  So, if the current is too high, I'll just drop the reference
+voltage until the output current of my controller is just below the current
+threshold.`
+
+"If you do that, won't the terminal voltage be too low?"
+
+:new_spec:`Yes, but only for a little while.  As the battery charges, the amount
+of current it accepts goes down.  Once the current accepted by the battery
+falls below our c/3 limit I will stop derating the voltage reference and the
+controller will hold the terminal voltage to the absorption voltage.`
+
+"I don't understand, you are going to control the terminal voltage by watching
+the current somehow?"
+
+:new_spec:`Yeah, you will give me a reference voltage, but I will also monitor
+other stuff like current and temperature, and before feeding my control system
+with the reference voltage, I might reduce its value so that I output a lower
+voltage across the terminals.`
+
+"How are you going to do that exactly?"
+
+:new_spec:`Well, I'll have some options to choose from because I'm switching so
+fast.  I might put a control system in front of the voltage controller which can
+reduce the voltage reference based on current, and another one to reduce the
+voltage reference based on temperature.  By the way, don't worry about
+temperature right now. I'll use a race-to-the-bottom approach, where the lowest
+derated reference is chosen and used to drive the voltage.`
+
+"Ok I guess that makes sense, but how can I possibly model that?  I would have
+to have your control systems running within my test loop."
+
+:new_spec:`Can you query your battery physics model for the terminal voltage
+that would give you a specific current?`
+
+"I don't have it right now, but I'm sure I could do that.  My concern is that we
+would be adding a lot of fiction into our system's test model.  Maybe I can
+handle this in the charger's statechart, just move back into a kind of
+limbo-bulk stage while the current is too high."
+
+:new_spec:`I like your thinking, but this has to be fast, I don't want the
+current going above the c/3 limit, and your code will be running in slow time,
+2Hz and not at the 20Khz switching frequency of the control loops.  We can't mess
+around with this.`
+
+"Ok, so you are suggesting that I adjust my test so that the terminal voltage on
+the graphs changes based on a current limit?  You are saying if I talk to the
+battery model I can get this data, and your control systems will discover this
+same information from the real battery by experimenting against it in real
+time?"
+
+:new_spec:`Exactly, that's a good way to describe it.  A control system
+is actually a set of experiments followed by a small adjustment, done over and
+over, to move something toward a goal.  Since my system will be running a lot
+faster than yours, you can model this fast code by just asking the battery for
+the terminal voltage needed to set the current to c/3.`
+
+:new_spec:`Once you have built this into your design we will be in really good
+shape to talk about deficit charging and why we need that equalization feature.`
+He pauses, :new_spec:`So go back and find a way to query your physics model to
+get what we need.`
+
+:new_spec:`Adjust your design so that the constant voltage mode never outputs
+more current than your bulk current rating.  You will be able to see if you have
+fixed your model by just looking at the graph.`
+
+"Ok, so you want me to add clamps to the control systems?"
+
+He pauses, :new_spec:`I would like two clamps, one for voltage and one for
+current.`
+
+"You said you want the current limited to the bulk reference, what do you want
+the voltage limited to."
+
+:new_spec:`Limit it to the equalization reference voltage, it should never go
+above that.`
+
+"Just to be clear, you just want the data model to send you clamp
+information, and you want my test to behave as if you have built deratings into
+your control systems?"
+
+:new_spec:`That's all I can think of for now.`
+
+----
+
+We add the ``terminal_voltage_for`` to the battery model.  It returns the
+"terminal voltage" needed to get a given battery current based on the battery's
+state of charge:
+
+.. image:: _static/battery_model_4.svg
+    :target: _static/battery_model_4.pdf
+    :align: center
+
+We refactor our data model and add a ``voltage_clamp_volts`` and a
+``current_clamp_amps`` to the ``ControlSystem`` class.
+
+.. image:: _static/three_stage_charging_chart_6_data.svg
+    :target: _static/three_stage_charging_chart_6_data.pdf
+    :align: center
+
+Then we re-work the ``ElectricalInterfaceMock`` so that while it is in the
+``drive_voltage_state`` we clamp the voltage reference to limit the current to
+the ``current_clamp_amps`` threshold.
+
+.. image:: _static/electrical_interface_6_mock.svg
+    :target: _static/electrical_interface_6_mock.pdf
+    :align: center
+
+We re-run the program and see the following:
+
+.. image:: _static/charger_test_results_3.svg
+    :target: _static/charger_test_results_3.pdf
+    :align: center
+
+----
+
+Our electrical engineer looks at it and says, :new_spec:`Yeah, that's how the
+control system will regulate the terminal voltage in the absorption state if our
+bulk time out is too short.`  He pauses, :new_spec:`That didn't take you too
+long, I was worried that I sent you a curve ball.`
+
+"Well, since I'm using statecharts you can make these kinds of behavioral updates
+very fast."
+
+"Now I have another problem, how do I explain this in the spec?"
+
+:new_spec:`What's the problem? Just write it down.`
+
+"I want my spec to make sense to a junior software developer."
+
+:new_spec:`I don't think it's that big of a deal, if they have questions they can
+just talk to us and we can get them up to speed.`
+
+"Most documentation isn't useful, they will just see it as something else that
+was written with no intention to be legible to them, so they won't bother asking
+us about it."
+
+He laughs, :new_spec:`Good point, I see this all of the time while wrestling
+with Texas Instrument manuals.  Even the TI engineers joke about how they can't
+understand them.  You can ask TI a question on their forum and there are armies
+of people from India who pretend to answer your question right away.  Then you get
+a real answer from someone in the states but only after it sits there for a
+couple of days.  They let their customers write their documents for them, it's
+very frustrating. So, I don't bother asking questions on their forums.`
+
+"That sounds frustrating.  It's hard to write good documentation though."
+
+"I had trouble understanding the nuances of this feature and I implemented it.
+Adjusting the battery model so the test could just ask it for an answer, to
+mimic something your control systems will discover in fast-time through a set of
+experiments; that's clever man."
+
+:new_spec:`It's not a big deal to an analog guy.  We just think that way.`
+
+:new_spec:`Listen, we aren't technical writers.  They have the tough job that
+comes at the end of a project.  We just need to write enough
+down so we can draw attention to the important things in our system.`
+
+He pauses, then says, :new_spec:`Your spec can't be a full training manual.  It
+needs to be as short as possible because we are going to change it a lot.
+The longer it is, the more expensive it will be from a
+non-reoccurring-engineering cost perspective, and you will become burdened with
+trying to keep it from lying too much.  There may be a training/brevity
+trade-off, but their is a huge bargain on the side of brevity.  Keep it short
+and to the point, use a lot of pictures.`
+
+:new_spec:`But, we can use the spec as a training locus later on.  We can take
+new team members and walk them through our intentions and show them how we built
+things.  How to test things.  While we are doing this, we will try to convince
+them that we "actually" want them to look at the spec and contribute to it as
+they change the system.`
+
+:new_spec:`Ok, so work on the spec, when you are done come back and we will look
+at deficit charging.`
+
+.. _batterychargingexample-spec-8:-current-derating-in-constant-voltage-modes:
+
+Spec 8: Current Derating in Constant Voltage Modes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**High level Specification (8)**
+
+* This product will be a three stage charger with an equalization feature.
+* The charger has two control systems: constant current and constant voltage.
+* The bulk stage is a constant current control technique.
+* The absorption, float and equalization stages are constant voltage control
+  techniques.
+* The charging electrical profile can be seen here
+
+.. image:: _static/three_stage_charging_chart_2_graph.svg
+    :target: _static/three_stage_charging_chart_2_graph.pdf
+    :align: center
+
+* :new_spec:`The maximum charging current will be set to c/3.  This maximum
+  charging current will typically be used as the bulk current setting.`
+* :new_spec:`The maximum charging voltage will be set to the equalization voltage.`
+
+**Sofware Functional Specification (8)**
+
+* The software system will be broken into two parts, fast running c-code and slower running Python code.
+* The c-code will run in ISRs at a frequency of 20 Khz and will control the charger in either a constant current or
+  constant voltage mode. (see separate doc)
+* The Python code will determine which control strategy the c-code is
+  using, it will also set the c code's control system parameters.  The Python code will not directly control the electrical output of the unit.
+* The Python code will sample the current and voltage and make decisions every 0.5 seconds
+* The Python data architecture can be seen here.
+
+.. image:: _static/three_stage_charging_chart_6_data.svg
+    :target: _static/three_stage_charging_chart_6_data.pdf
+    :align: center
+
+* The Python behavioral architecture will be primarily broken into two parts:
+
+   1. The Charger will sample the battery current and voltage and make decisions
+      about which control system to use.
+
+   2. ElectricalInterface will contain the software needed to read and
+      set the current and voltage of the battery:
+
+* From a high level the Charger and ElectricalInterface will
+  communicate using asychronous messages:
+
+.. image:: _static/three_stage_charging_chart_5_high.svg
+    :target: _static/three_stage_charging_chart_5_high.pdf
+    :align: center
+
+* The ElectricalInterface behavioral architecture can be seen below:
+
+.. image:: _static/electrical_interface_5.svg
+    :target: _static/electrical_interface_5.pdf
+    :align: center
+
+* The Charger behavioral architecture can be seen below:
+
+.. image:: _static/three_stage_charging_chart_5_chart.svg
+    :target: _static/three_stage_charging_chart_5_chart.pdf
+    :align: center
+
+**Software Testing Specification (8)**
+
+* The charger's data/behavioral software will be adjusted to use data instead of real electrical readings.
+
+* The software that will be shipped (production code) should be
+  identical to the software that is being tested.  The software testing code
+  should pass data into the production code and observe the production code's
+  behavior without the production code knowing it is under test.
+
+* The software tests should occur over tens of seconds and not over
+  the hours required to test with real batteries.
+
+* The testing environment should be able to create electrical
+  conditions which could destroy a real battery.
+
+* A simple physics model will be developed to describe the
+  relationship between the battery and the charger.  The physics model will be
+  wrapped within software and called the battery simulator.  The testing code will use
+  this simulator to confirm that the charger's behavioral software is working as
+  designed.  The battery simulator should be parameterized so that it can test
+  different battery types.
+
+* Due to the complexity of the battery and charging system
+  interactions, the output of the test should produce a simple graph which can
+  quickly be parsed by any engineer on the team.  Here is an example of such a graph:
+
+.. image:: _static/charger_test_results_1.svg
+    :target: _static/charger_test_results_1.pdf
+    :align: center
+
+* :new_spec:`The c-code control systems will contain deratings to limit the
+  current and the voltage output of the unit.  A derating works by reducing the
+  reference value before it is fed into a control system so as to reduce the
+  control system's output.  Deratings are used to control secondary properties
+  that the controller might cause to exceed safe values.  For instance, the
+  constant voltage controller could output a voltage that would cause the
+  battery current to exceed its maximum current setting.  In such a situation,
+  the derating would reduce the voltage reference prior to it being fed into the
+  constant voltage control system, and thereby reduce its driving terminal
+  voltage, to ensure that the current does not exceed its maximum value.  Below
+  is a picture of such a dangerous situation.  The charger's bulk_timeout_sec is
+  set too low, so the bulk mode doesn't charge the battery enough before it
+  enters the absorption mode.  As a result, the current drawn by the battery at
+  the absorption voltage will exceed the maximum current setting (bulk amps) of
+  the charger:`
+
+.. image:: _static/charger_test_results_2.svg
+    :target: _static/charger_test_results_2.pdf
+    :align: center
+
+* :new_spec:`To ensure the above scenario does not take place a current derating
+  is designed into the c-code absorption controller. This current derating reduces the
+  terminal voltage output goal to limit the output current to the the maximum
+  current setting.  A graph with such a current derating, while in the
+  absorption mode (active in the same electrical scenario which caused the previous graph)
+  would look like this:`
+
+.. image:: _static/charger_test_results_3.svg
+    :target: _static/charger_test_results_3.pdf
+    :align: center
+
+* :new_spec:`The Python testing environment should will mimic the current
+  derating that is present in the constant voltage control modes.  Otherwise the
+  output graphs will not describe the charger and how it will behavior with a
+  real battery.`
+
+**Sofware Testing Functional Specification (8)**
+
+* From a high level the testing architecture can be seen in this
+  diagram:
+
+.. image:: _static/testing_challenge_2.svg
+    :target: _static/testing_challenge_2.pdf
+    :align: center
+
+* Here is a more detailed description of the testing software
+  architecture:
+
+.. image:: _static/testing_challenge_3.svg
+    :target: _static/testing_challenge_3.pdf
+    :align: center
+
+* The class-to-file lookup can be seen here:
+
+.. image:: _static/testing_challenge_4.svg
+    :target: _static/testing_challenge_4.pdf
+    :align: center
+
+* The battery simulation `software
+  <https://github.com/aleph2c/miros/blob/master/examples/battery_model_2.py>`_
+  is described below:
+
+   .. image:: _static/battery_model_4.svg
+       :target: _static/battery_model_4.pdf
+       :align: center
+
+   * To change how the simulator profiles a given battery type, include two different
+     spread-sheets, the "soc_ocv.csv" and the "ocv_internal_resistance.csv" for the
+     battery you are mimicing.
+
+      * An example of the "soc_ocv.csv" can be found `here <https://github.com/aleph2c/miros/blob/master/examples/soc_ocv.csv>`_ and it's `data
+        plot <https://github.com/aleph2c/miros/blob/master/examples/soc_ocv.py>`_ would look like this:
+
+      .. image:: _static/battery_profile.svg
+          :target: _static/battery_profile.pdf
+          :align: center
+
+      * An example of the "ocv_internal_resistance.csv" can be found `here <https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.csv>`_
+        and it's `data plot <https://github.com/aleph2c/miros/blob/master/examples/ocv_internal_resistance.py>`_ would look like this:
+
+      .. image:: _static/battery_resistance_profile.svg
+          :target: _static/battery_resistance_profile.pdf
+          :align: center
+
+   * To build and run the battery simulator:
+
+      .. code-block:: python
+
+        battery = Battery(
+          rated_amp_hours=100,
+          initial_soc_per=10.0,
+          name="lead_acid_battery_100Ah",
+          soc_vrs_ocv_profile_csv='soc_ocv.csv',
+          ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
+          live_trace=True
+        )
+
+        hours = 1
+
+        time_series = battery.time_series(
+          duration_in_sec=hours*60*60,
+        )
+        for moment in time_series:
+          if battery.soc_per < 80.0:
+            battery.amps_into_terminals(33.0, moment)
+            print(str(battery), end='')
+            abs_volts = battery.last_terminal_voltage
+          else:
+            battery.volts_across_terminals(abs_volts, moment)
+            print(str(battery), end='')
+          time.sleep(0.0001)
+
+* The ChargerMock will contain all of the Charger code but with a
+  slight adjustment so that the internal clock of the Charger is sped up to
+  match the tempo of the software test.
+
+.. image:: _static/ChargerMock.svg
+    :target: _static/ChargerMock.pdf
+    :align: center
+
+* The ElectricalInterfaceMock will contain code which will sample
+  from the battery simulator and drive the current and voltage values to the
+  battery simulator in the programmable reference-time set by the ChargerTester.
+
+* :new_spec:`The ElectricalInterfaceMock will mimic the current derating of
+  the constant voltage controller.  It will do this by querying the battery for
+  the terminal voltage needed to limit the current to the maximum setting of the
+  charger.  If this derated terminal voltage is less than the constant voltage
+  setting provided by the DRIVE_VOLTAGE event, it will use the derated terminal
+  voltage instead of the voltage sent from the Charger.`
+
+* :new_spec:`You can see the ElectricalInterfaceMock below:`
+
+.. image:: _static/electrical_interface_5_mock.svg
+    :target: _static/electrical_interface_5_mock.pdf
+    :align: center
+
+* The ChargerTester will aggregate the information required to build
+  and run the charger product and the battery simulator.  It will construct the
+  ChargerMock and the ElectricalInterfaceMock and run them with the battery
+  simulation all within the same compressed time reference.  The output of the
+  charger will be stored in a CSV file, this file will be used to generate a
+  graph.  Here is an example of how to use the ChargerTester class and
+  how to graph its output:
+
+.. code-block:: python
+
+   time_compression_scalar = 50
+   simulated_duration_in_hours = 1.0
+   fake_sec = simulated_duration_in_hours * 3600.0
+   real_delay_needed_sec = fake_sec / time_compression_scalar
+   
+   ct = ChargerTester(
+     charger_bulk_timeout_sec=1600,
+     charger_abs_timeout_sec=1300,
+     charger_equ_timeout_sec=86400,
+     charger_bulk_entry_volts=12.0,
+     charger_bulk_exit_volts=13.04,
+     charger_abs_exit_amps=20.0,
+     charger_bulk_ref_amps=30,
+     charger_float_ref_volts=12.9,
+     charger_abs_ref_volts=13.04,
+     charger_equ_ref_volts=16.0,
+     battery_rated_amp_hours=100,
+     battery_initial_soc_per=65.0,
+     battery_soc_vrs_ocv_profile_csv='soc_ocv.csv',
+     battery_ocv_vrs_r_profile_csv='ocv_internal_resistance.csv',
+     time_compression_scalar=time_compression_scalar,
+     live_trace=False,
+     live_spy=False,
+   )
+   time.sleep(real_delay_needed_sec)
+   ct.electrical_interface_mock.post_lifo(Event(signal=signals.stop))
+   ct.plot_profile()
+
+.. image:: _static/charger_test_results_1.svg
+    :target: _static/charger_test_results_1.pdf
+    :align: center
+
+:ref:`back to examples <examples>`
+
 ..
+   He laughs, :new_spec:`Good point, I see this all of the time while wrestling
+   with Texas Instrument manuals.  Even the TI engineers joke about how they can't
+   understand them.`
+
+   :new_spec:`Listen, we aren't technical writers.  We just need to write enough
+   down so we can draw attention to the important things in our system.`
+
+   He pauses, then says, :new_spec:`Your spec can't be a full training manual.  It
+   needs to be a short as possible because we are going to change it all of the
+   time.  The longer it is, the more expensive it will be from a
+   non-reoccurring-engineering cost perspective.  There is a trade off, but their
+   is a bargain on the side of brevity.  Keep it short and to the point so we can
+   keep it cheap and easy to change.`
+
+   :new_spec:`But, we can use the spec as a training locus.  We can take new members and
+   walk them through our intentions and show them how we built things, and how to
+   use our tests.  While we are doing this, we can show them that we "actually"
+   want them to look at the thing and contribute to it as they change the system.`  
+
+   :new_spec:`Speaking of "useful", have you added your trouble-shooting techniques
+   to your spec?`
+
+   "You haven't read it?"
+
+   He laughs, avoiding the question.  :new_spec:`Well I guess such notes belong in
+   the functional design docs, but I usually add notes about the stuff I have built
+   into my system to make it easy to trouble shoot.  A short note about such a
+   thing can save someone day's of effort later.`
+
+   "That's a good idea."
+
    I don't know about you, but I'm starting to feel like I have been drinking from
    a fire hose.  To simplify what I have learned about how one charger should
    behave I'll write some stuff down, then from this, I'll draw a picture.
@@ -2675,6 +3230,3 @@ Spec 7: Single Unit Battery Charger
    charger is charging it.  The customer might have a DC fridge or something, so if
    the battery voltage falls below the 'bulk entry voltage' you need to transition
    out of whatever stage you are in and enter bulk." 
-
-
-:ref:`back to examples <examples>`

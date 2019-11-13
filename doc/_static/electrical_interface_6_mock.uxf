@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>198</x>
+      <y>90</y>
+      <w>198</w>
+      <h>324</h>
+    </coordinates>
+    <panel_attributes>*ElectricalInterfaceMock*
+--
+pulse_sec
+battery
+_charger_state
+_last_current_amps
+_last_terminal_voltage
+time_compression_scalar
+test_output_csv
+real_seconds
+fake_seconds
+start_datetime
+--
+drive_current(current, control)
+drive_voltage(voltage, control)
+sample_current()
+sample_voltage()
+write_data_to_csv()
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>576</x>
+      <y>639</y>
+      <w>468</w>
+      <h>306</h>
+    </coordinates>
+    <panel_attributes>*drive_current_state*
+--
+entry /
+  _datetime = datetime.now()
+  real_seconds_since_start = (_datetime - self.start_datetime).total_seconds()
+  fake_seconds_since_start = real_seconds_since_start * self.time_compression_scalar
+  new_datetime = self.start_datetime + timedelta(seconds=fake_seconds_since_start)
+  
+  self.battery.amps_through_terminals(
+    self._driving_terminal_amps, 
+    moment=new_datetime
+  )
+  self.write_data_to_csv()
+
+Tick as e /
+  new_datetime = self.start_datetime + timedelta(secconds=e.payload.sec)
+
+  self.battery.amps_to_terminal(
+    self._driving_terminal_amps, 
+    moment=new_datetime
+  )
+  self.write_data_to_csv()
+    
+valign=top
+layer=2
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>738</x>
+      <y>558</y>
+      <w>351</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>370.0;20.0;10.0;20.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>207</x>
+      <y>342</y>
+      <w>180</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>respond_to_control_changes
+symbol=substate
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>351</x>
+      <y>315</y>
+      <w>27</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>756</x>
+      <y>585</y>
+      <w>225</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>DriveCurrent = namedtuple(
+  'DriveCurrent', ['amps', 'control', 'sec'])
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>243</x>
+      <y>1098</y>
+      <w>216</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>DriveVoltage = namedtuple(
+  'DriveVoltage', ['volts', 'control', 'sec'])
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>198</x>
+      <y>1071</y>
+      <w>18</w>
+      <h>18</h>
+    </coordinates>
+    <panel_attributes>
+bg=green
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>198</x>
+      <y>0</y>
+      <w>99</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>LoggedBehavior
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>234</x>
+      <y>18</y>
+      <w>27</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3
+fg=black</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>288</x>
+      <y>0</y>
+      <w>45</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>30.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>315</x>
+      <y>0</y>
+      <w>81</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Factory</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>378</x>
+      <y>621</y>
+      <w>144</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Sampler = namedtuple(
+  'Sampler', ['fn'])
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>180</x>
+      <y>477</y>
+      <w>18</w>
+      <h>18</h>
+    </coordinates>
+    <panel_attributes>
+bg=red
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>180</x>
+      <y>531</y>
+      <w>18</w>
+      <h>18</h>
+    </coordinates>
+    <panel_attributes>
+bg=red
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>441</x>
+      <y>1377</y>
+      <w>351</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>REQUEST_FOR_SAMPLERS
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0;370.0;50.0;370.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>585</x>
+      <y>225</y>
+      <w>261</w>
+      <h>144</h>
+    </coordinates>
+    <panel_attributes>For Testing:
+Sample simulator here
+
+def sample_current(self):
+  return self.battery.last_current_amps
+
+def sample_voltage(self):
+  return self.battery.last_terminal_volts
+
+layer=3
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>387</x>
+      <y>243</y>
+      <w>216</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;50.0;220.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>747</x>
+      <y>486</y>
+      <w>315</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>DRIVE_CURRENT as e / 
+  self._driving_terminal_volts = None
+  self._driving_terminal_amps = e.payload.amps
+  self._charger_state = e.payload.cause
+  self._charger_state = e.payload.cause
+  self._control = e.payload.control
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>198</x>
+      <y>45</y>
+      <w>153</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>ElectricalInterface</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>261</x>
+      <y>63</y>
+      <w>27</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>198</x>
+      <y>432</y>
+      <w>873</w>
+      <h>954</h>
+    </coordinates>
+    <panel_attributes>*respond_to_control_changes*
+--
+entry /
+  self.publish(
+    Event(signal=signals.SET_CURRENT_SAMPLER
+      payload=Sampler(fn=partial(self.sample_current)))
+    
+  self.publish(
+    Event(signal=signals.SET_VOLTAGE_SAMPLER
+      payload=Sampler(fn=partial(self.sample_voltage)))
+
+  self.subscribe(Event(signal=signals.REQUEST_FOR_SAMPLERS))
+  self.subscribe(Event(signal=signals.DRIVE_CURRENT))
+  self.subscribe(Event(signal=signals.DRIVE_VOLTAGE))
+
+  self.post_fifo(
+    Event(
+      signal=signals.Pulse,
+      period= self.pulse_sec / self.time_compression_scalar,
+      deferred=True,
+      times=0
+    )
+  )
+  self.real_seconds = 0
+  self.fake_seconds = 0
+  self.start_datetime = datetime.now()
+
+
+Pulse /
+  self.real_seconds += self.pulse_sec / self.time_compression_scalar
+  self.fake_seconds += self.pulse_sec
+  self.post_fifo(
+    Event(signal=signals.Tick
+      payload=SecInCharge(sec=self.fake_seconds)
+  )
+
+exit / 
+  self.cancel_events(Event(signal=signals.Pulse)
+valign=top
+layer=2
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>378</x>
+      <y>945</y>
+      <w>171</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>SecInCharge = namedtuple(
+  'SecInCharge', ['sec'])
+layer=3
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>576</x>
+      <y>963</y>
+      <w>468</w>
+      <h>414</h>
+    </coordinates>
+    <panel_attributes>*drive_voltage_state*
+--
+entry /
+  _datetime = datetime.now()
+  real_seconds_since_start = (_datetime - self.start_datetime).total_seconds()
+  fake_seconds_since_start = real_seconds_since_start * self.time_compression_scalar
+  new_datetime = self.start_datetime + timedelta(seconds=fake_seconds_since_start)
+
+  volts_clamp = self.battery.terminal_volts_for(current=self.control.current_clamp_amps)
+  volts = volts_clamp \
+    if self._driving_terminal_volts &gt; volts_clamp else self._driving_terminal_volts
+  
+  self.battery.volts_to_terminals(
+    volts, 
+    moment=new_datetime
+  )
+  self.write_data_to_csv()
+
+Tick as e /
+  new_datetime = self.start_datetime + timedelta(secconds=e.payload.sec)
+
+  volts_clamp = self.battery.terminal_volts_for(current=self.control.current_clamp_amps)
+  volts = volts_clamp \
+    if self._driving_terminal_volts &gt; volts_clamp else self._driving_terminal_volts
+    
+  self.battery.volts_across_terminal(
+    volts, 
+    moment=new_datetime
+  )
+  self.write_data_to_csv()
+    
+valign=top
+layer=2
+
+fg=black</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>189</x>
+      <y>1071</y>
+      <w>405</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;20.0;430.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>243</x>
+      <y>1008</y>
+      <w>306</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>DRIVE_VOLTAGE as e / 
+  self._driving_terminal_volts = None
+  self._driving_terminal_amps = e.payload.amps
+  self._control = e.payload.control
+  self._charger_state = e.payload.cause
+style=wordwrap
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>261</x>
+      <y>1377</y>
+      <w>54</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>Stop
+lt=-&gt;
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>261</x>
+      <y>1449</y>
+      <w>18</w>
+      <h>18</h>
+    </coordinates>
+    <panel_attributes>type=termination
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1008</x>
+      <y>405</y>
+      <w>27</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=()-[v]
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>1053</x>
+      <y>576</y>
+      <w>18</w>
+      <h>18</h>
+    </coordinates>
+    <panel_attributes>
+bg=green
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>432</x>
+      <y>126</y>
+      <w>90</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>TestOutputCsv</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>387</x>
+      <y>126</y>
+      <w>63</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>432</x>
+      <y>171</y>
+      <w>90</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Battery</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>387</x>
+      <y>171</y>
+      <w>63</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>288</x>
+      <y>1179</y>
+      <w>198</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>Mimic control system derating of
+reference voltage by current.  This
+is done to ensure the current going
+to the battery does not exceed a 
+safe limit while in constant voltage
+mode.
+layer=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>477</x>
+      <y>1089</y>
+      <w>126</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;120.0;120.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>477</x>
+      <y>1188</y>
+      <w>126</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=3</panel_attributes>
+    <additional_attributes>10.0;10.0;120.0;80.0</additional_attributes>
+  </element>
+</diagram>

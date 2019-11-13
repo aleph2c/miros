@@ -14,14 +14,14 @@ from miros import return_status
 import numpy as np
 import matplotlib.pyplot as plt
 
-from battery_model_1 import Battery
-from single_unit_three_stage_charger_3 import Charger
-from single_unit_three_stage_charger_3 import Sampler
-from single_unit_three_stage_charger_3 import ChargerParameters
-from single_unit_three_stage_charger_3 import ElectricalInterface
-from single_unit_three_stage_charger_3 import CurrentControlSystem
-from single_unit_three_stage_charger_3 import VoltageControlSystem
-from single_unit_three_stage_charger_3 import BatterySpecificationSettings
+from battery_model_2 import Battery
+from single_unit_three_stage_charger_4 import Charger
+from single_unit_three_stage_charger_4 import Sampler
+from single_unit_three_stage_charger_4 import ChargerParameters
+from single_unit_three_stage_charger_4 import ElectricalInterface
+from single_unit_three_stage_charger_4 import CurrentControlSystem
+from single_unit_three_stage_charger_4 import VoltageControlSystem
+from single_unit_three_stage_charger_4 import BatterySpecificationSettings
 
 Seconds = namedtuple('Seconds', ['sec'])
 
@@ -99,6 +99,7 @@ class ElectricalInterfaceMock(ElectricalInterface):
 
     self._last_current_amps = None
     self._last_terminal_voltage = None
+    self.control = None
 
     self.real_seconds = None
     self.fake_seconds = None
@@ -221,6 +222,7 @@ class ElectricalInterfaceMock(ElectricalInterface):
     self._driving_terminal_volts = None
     self._driving_terminal_amps = e.payload.amps
     self._charger_state = e.payload.cause
+    self.control = e.payload.control
     status = self.trans(self.drive_current_state)
     return status
 
@@ -228,6 +230,8 @@ class ElectricalInterfaceMock(ElectricalInterface):
     self._driving_terminal_volts = e.payload.volts
     self._driving_terminal_amps = None
     self._charger_state = e.payload.cause
+    self.control = e.payload.control
+    print(self.control._current_clamp_amps)
     status = self.trans(self.drive_voltage_state)
     return status
 
@@ -279,8 +283,16 @@ class ElectricalInterfaceMock(ElectricalInterface):
     status = return_status.HANDLED
     fake_seconds_since_start = self.fake_seconds + 0.5
     new_datetime = self.start_datetime + timedelta(seconds=fake_seconds_since_start)
+
+    volts_clamp = \
+      self.battery.terminal_volts_for(current=self.control.current_clamp_amps)
+
+    volts = volts_clamp \
+      if self._driving_terminal_volts > volts_clamp else \
+      self._driving_terminal_volts
+
     self.battery.volts_across_terminals(
-      self._driving_terminal_volts,
+      volts,
       sample_time=new_datetime
     )
     print(self._charger_state)
@@ -292,8 +304,15 @@ class ElectricalInterfaceMock(ElectricalInterface):
     status = return_status.HANDLED
     new_datetime = self.start_datetime + timedelta(seconds=e.payload.sec)
 
+    volts_clamp = \
+      self.battery.terminal_volts_for(current=self.control.current_clamp_amps)
+
+    volts = volts_clamp \
+      if self._driving_terminal_volts > volts_clamp else \
+      self._driving_terminal_volts
+
     self.battery.volts_across_terminals(
-      self._driving_terminal_volts,
+      volts,
       sample_time=new_datetime
     )
     print(self._charger_state)
@@ -330,22 +349,6 @@ class ChargerTester:
 
     self.time_compression_scalar = time_compression_scalar
 
-    # current control system
-    ccs = CurrentControlSystem(
-      reference=50.0,  # 50 amps
-      kp=0.5,
-      ki=0.03,
-      kd=0.04
-    )
-
-    # voltage control system
-    vcs = VoltageControlSystem(
-      reference=12.0, # 12 volts
-      kp=0.4,
-      ki=0.02,
-      kd=0.005
-    )
-
     # build up the charger's battery specification
     self.charger_battery_spec =  BatterySpecificationSettings(
       bulk_timeout_sec=charger_bulk_timeout_sec,
@@ -358,6 +361,26 @@ class ChargerTester:
       float_ref_volts=charger_float_ref_volts,
       abs_ref_volts=charger_abs_ref_volts,
       equ_ref_volts=charger_equ_ref_volts
+    )
+
+    # current control system
+    ccs = CurrentControlSystem(
+      reference=50.0,  # 50 amps
+      kp=0.5,
+      ki=0.03,
+      kd=0.04,
+      current_clamp_amps=charger_bulk_ref_amps,
+      voltage_clamp_volts=charger_equ_ref_volts,
+    )
+
+    # voltage control system
+    vcs = VoltageControlSystem(
+      reference=12.0, # 12 volts
+      kp=0.4,
+      ki=0.02,
+      kd=0.005,
+      current_clamp_amps=charger_bulk_ref_amps,
+      voltage_clamp_volts=charger_equ_ref_volts,
     )
 
     # merge the control systems and the battery specification
