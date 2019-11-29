@@ -1,0 +1,67 @@
+<state id="outerState">
+    <onentry>
+        <log expr="'entering outerState'"/>
+    </onentry>
+    <transition event="to_p" target="p"/>
+
+    <parallel id="p">
+         
+         <!-- event "done.state.p" called "p_final" on the diagram -->
+         <transition event="done.state.p" target="someOtherState"/>
+
+         <state id="S1" initial="S11">
+             <onentry>
+                 <log expr="'entering S1'"/>
+             </onentry>
+             <state id="S11">
+                 <onentry>
+                     <log expr="'entering S11'"/>
+                 </onentry>
+                 <transition event="e4" target="S12"/>
+                 <onexit>
+                     <log expr="'exiting S11'"/>
+                 </onexit>
+             </state>
+             <state id="S12">
+                 <onentry>
+                     <log expr="'entering S12'"/>
+                 </onentry>
+                 <transition event="e1" target="S1Final"/>
+                 <onexit>
+                     <log expr="'exiting S12'"/>
+                 </onexit>
+             </state>
+             <final id="S1Final"/>
+         </state>
+
+         <state id="S2" intial="S21">
+             <onentry>
+                 <log expr="'entering S2'"/>
+             </onentry>
+             <state id="S21">
+                 <onentry>
+                     <log expr="'entering S21'"/>
+                 </onentry>
+                 <transition event="e1" target="S22"/>
+                 <onexit>
+                     <log expr="'exiting S21'"/>
+                 </onexit>
+             </state>
+             <state id="S22">
+                 <onentry>
+                     <log expr="'entering S22'"/>
+                 </onentry>
+                 <transition event="e2" target="S2Final"/>
+                 <onexit>
+                     <log expr="'exiting S22'"/>
+                 </onexit>
+             </state>
+             <final id="S2Final"/>
+         </state>
+    </parallel>
+    <state id="someOtherState">
+        <onentry>
+            <log expr="'entering someOtherState'"/>
+        </onentry>
+    </state>
+</state>

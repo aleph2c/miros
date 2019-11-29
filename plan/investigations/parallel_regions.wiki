@@ -1,0 +1,71 @@
+*parallel regions*
+= Observer ([[local:C:/Vim8.1/.vim/ooda.pdf|diagram]]) = 
+== Evidence ([[evidence.parallel_regions|evidence]]) ==
+
+  *What defines Success?:* ([[subgoals.parallel_regions|subgoals]])
+    A working parallel regions example using miros
+
+  *What is the problem?*
+    The miros core doesn't support parallel regions, but it does support
+    orthogonal components.  It is almost trivial to make parallel regions work
+    with what miros can do, but the problem is that the instrumentation is
+    broken.
+    
+    The problem has been broken into two main peices.  The main chart is written
+    with a Factory and the parallel regions are written using orthogonal
+    components.  The spy_on method has been wrapped, to inject an orthogonal
+    regions spy instrumentation back into the spy instrumentation of the
+    Factory, but:
+    
+      *  The instrumentation from the orthogonal component is being written to
+         live spy log before the Factory's instrumention that describes how the
+         orthogonal regions was gotten to in the first place.
+         
+    To summarize, the problem is the instrumentation is out of order.
+
+  *Discoveries:* ([[notes.parallel_regions|notes]])
+ 
+    Resources:
+      * From the documentation on how CSXML orthogonal regions work, we build up
+        an exmaple.
+      *  This example's write up is called othogonalregions.rst
+      *  The main diagram is called xml_chart_1.uxf
+      *  The main program is called xml_chart.py
+  
+= Orient =
+  *Symptoms:* [[symptoms.parallel_regions|symptoms]]
+
+== Questions ==
+  *Questions for parallel regions: >= 5*
+    Can you think of anyway to speed up your feedback cycle?
+    Do you have enough information?
+    Is your information organized?
+    Can you reproduce the problem?
+    Can you simplify your test?
+    Do you have something to baseline from?
+    What recently changed?
+    What don't you know that you need to know?
+  
+  *Assumptions*
+
+= Decide =
+  [[#Questions]]
+  *Research Needed For?:*
+    
+
+  [[#Questions]]
+  *Idea/Hypotheses for parallel regions: >=5*
+  * [ ] 
+  * [ ] 
+  * [ ] 
+  * [ ] 
+  * [ ] 
+
+  *Chosen Research-Goal/Hypothesis*
+    
+
+== Plan ([[plan.parallel_regions|plan]]) ==
+
+= Act =
+  
+

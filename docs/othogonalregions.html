@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Examples &#8212; miros 2.0 documentation</title>
+    <title>Othogonal Regions With Miros &#8212; miros 2.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -17,8 +17,6 @@
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Comprehensive" href="comprehensive.html" />
-    <link rel="prev" title="Diagrams" href="reading_diagrams.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -35,24 +33,24 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="examples">
-<span id="id1"></span><h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Single Chart Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="comprehensive.html">Comprehensive</a></li>
-<li class="toctree-l1"><a class="reference internal" href="comprehensive.html#comprehensive-with-instrumentation">Comprehensive with Instrumentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="thread_safe_attributes.html">Thread Safe Attributes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="scribbleexample.html">Hacking to Learn</a></li>
-<li class="toctree-l1"><a class="reference internal" href="interactingcharts.html">Interacting Statecharts (Same Machine)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="towardsthefactoryexample.html">Using and Unwinding a Factory</a></li>
-<li class="toctree-l1"><a class="reference internal" href="batterychargingexample.html">Distributed Battery Charging</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cellular_automata.html">Cellular Automata</a></li>
-<li class="toctree-l1"><a class="reference internal" href="i_mongol_example.html">Mongol Horse Archer</a></li>
-</ul>
+  <div class="section" id="othogonal-regions-with-miros">
+<span id="othogonalregions-othogonal-regions-with-miros"></span><h1>Othogonal Regions With Miros<a class="headerlink" href="#othogonal-regions-with-miros" title="Permalink to this headline">¶</a></h1>
+<p>The CSXML standard describes an orthogonal region statechart like this:</p>
+<a class="reference external image-reference" href="_static/xml_chart_1.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_1.svg" src="_images/xml_chart_1.svg" /></div>
+</a>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The parallel CSXML parallel regions document is full of mistakes, but written
+well enough to describe how orthogonal regions should behave.</p>
 </div>
-<p>More examples can be found in the <a class="reference internal" href="patterns.html#patterns"><span class="std std-ref">patterns section</span></a>.</p>
-<a class="reference internal" href="zero_to_one.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="recipes.html"><span class="std std-ref">next</span></a></div>
+<p>If a <code class="docutils literal notranslate"><span class="pre">to_p</span></code> event is received while in the <code class="docutils literal notranslate"><span class="pre">outState</span></code> or any of its childs
+states, a transition will occur into the <code class="docutils literal notranslate"><span class="pre">p</span></code> orthogonal region.  Instead of
+one active state, the statechart will have two active states.  The <code class="docutils literal notranslate"><span class="pre">S1</span> <span class="pre">Region</span></code>
+will initialize itself to the <code class="docutils literal notranslate"><span class="pre">S11</span></code> state and the <code class="docutils literal notranslate"><span class="pre">S2</span> <span class="pre">Region</span></code> will
+initialize itself to <code class="docutils literal notranslate"><span class="pre">S21</span></code>.  So both <code class="docutils literal notranslate"><span class="pre">S11</span></code> and <code class="docutils literal notranslate"><span class="pre">S21</span></code> will be active at the
+same time.</p>
+<p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
+</div>
 
 
           </div>
@@ -66,15 +64,13 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="reading_diagrams.html" title="previous chapter">Diagrams</a></li>
-      <li>Next: <a href="comprehensive.html" title="next chapter">Comprehensive</a></li>
   </ul></li>
 </ul>
 </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/examples.rst.txt"
+      <li><a href="_sources/othogonalregions.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -98,7 +94,7 @@
       &copy;2019, Scott Volk.
       
       |
-      <a href="_sources/examples.rst.txt"
+      <a href="_sources/othogonalregions.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

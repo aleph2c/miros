@@ -4,7 +4,7 @@
 
 `Software should be treated not as a static product, but as a living
 manifestation of the development team's collective understanding.
-<https://www.csc.gov.sg/articles/how-to-build-good-software>`_ -- `Li Hongyi <http://theindependent.sg/li-hongyi-singapore-has-a-lot-of-problems-but-we-have-political-stability-and-resources/>`_
+<https://www.csc.gov.sg/articles/how-to-build-good-software>`_ -- `Li Hongyi <https://medium.com/@opengovsg/how-to-build-good-software-b13b32cb53a3>`_
 
 ----
 
@@ -2860,17 +2860,20 @@ very fast."
 :new_spec:`I don't think it's that big of a deal, if they have questions they can
 just talk to us and we can get them up to speed.`
 
-"Most documentation isn't useful, they will just see it as something else that
-was written with no intention to be legible to them, so they won't bother asking
-us about it."
+"`But most documentation isn't useful
+<https://www.youtube.com/watch?v=vtIzMaLkCaM>`_, they will just see it as
+something else that was written with no intention to be legible to them, so they
+won't bother asking us about it.  Even if they read it and they don't understand
+it, they will think it is their fault, like they are dumb.  They won't consider
+that I am just a bad writer."
 
 He laughs, :new_spec:`Good point, I see this all of the time while wrestling
 with Texas Instrument manuals.  Even the TI engineers joke about how they can't
-understand them.  You can ask TI a question on their forum and there are armies
+understand them.  You can ask TI a question on their forum and they have armies
 of people from India who pretend to answer your question right away.  Then you get
 a real answer from someone in the states but only after it sits there for a
 couple of days.  They let their customers write their documents for them, it's
-very frustrating. So, I don't bother asking questions on their forums.`
+very frustrating. I don't bother asking questions on their forums anymore.`
 
 "That sounds frustrating.  It's hard to write good documentation though."
 
@@ -2879,25 +2882,31 @@ Adjusting the battery model so the test could just ask it for an answer, to
 mimic something your control systems will discover in fast-time through a set of
 experiments; that's clever man."
 
-:new_spec:`It's not a big deal to an analog guy.  We just think that way.`
+:new_spec:`It's not a big deal to an analog guy.  We just think that way because
+that's how control systems work.`
 
-:new_spec:`Listen, we aren't technical writers.  They have the tough job that
-comes at the end of a project.  We just need to write enough
-down so we can draw attention to the important things in our system.`
+:new_spec:`Listen, we aren't technical writers.  They have the tough job but
+it's not our job.  We should write just enough down to draw attention to the
+important things in our system.`
 
-He pauses, then says, :new_spec:`Your spec can't be a full training manual.  It
+"How are we going to transfer knowledge?"
+
+:new_spec:`There is a training/brevity trade off.  It
 needs to be as short as possible because we are going to change it a lot.
 The longer it is, the more expensive it will be from a
 non-reoccurring-engineering cost perspective, and you will become burdened with
-trying to keep it from lying too much.  There may be a training/brevity
-trade-off, but their is a huge bargain on the side of brevity.  Keep it short
-and to the point, use a lot of pictures.`
+trying to keep it from lying too much.`
 
-:new_spec:`But, we can use the spec as a training locus later on.  We can take
-new team members and walk them through our intentions and show them how we built
-things.  How to test things.  While we are doing this, we will try to convince
-them that we "actually" want them to look at the spec and contribute to it as
-they change the system.`
+He pauses, then says, :new_spec:`There may be a training/brevity
+trade-off, but their is a huge bargain on the side of brevity.  Keep it short
+and to the point, use a lot of pictures.` 
+
+He pauses again, :new_spec:`Maybe there is no trade off.  We can use the spec as a
+training locus later on, when the project has stabilized.  We can take new team
+members and walk them through our intentions and show them how we built things.
+How to test things.  While we are doing this, we will try to convince them that
+we "actually" want them to look at the spec and contribute to it as they change
+the system.`
 
 :new_spec:`Ok, so work on the spec, when you are done come back and we will look
 at deficit charging.`
@@ -3026,10 +3035,11 @@ Spec 8: Current Derating in Constant Voltage Modes
     :target: _static/charger_test_results_3.pdf
     :align: center
 
-* :new_spec:`The Python testing environment should will mimic the current
+* :new_spec:`The Python testing environment should mimic the current
   derating that is present in the constant voltage control modes.  Otherwise the
-  output graphs will not describe the charger and how it will behavior with a
-  real battery.`
+  output graphs will not describe how the charger behaves with a
+  real battery. (see the ElectricalInterfaceMock functional specification notes
+  to see how this is implemented)`
 
 **Sofware Testing Functional Specification (8)**
 
@@ -3173,6 +3183,106 @@ Spec 8: Current Derating in Constant Voltage Modes
 .. image:: _static/charger_test_results_1.svg
     :target: _static/charger_test_results_1.pdf
     :align: center
+
+----
+
+"So what is deficit charging?"`
+
+:new_spec:`A deficit is a description of an amount that is too small to do the
+job.  So it follows that "deficit charging" describes when you only partially
+charge a battery before you use them again.  If you do this to a battery, its
+plates "sulfate".  If you run your system in a way which "sulfates" on every
+discharge, you will destroy your batteries in short order.`
+
+:new_spec:`Our charger won't be able to measure the battery's state-of-charge
+directly from our device.  Instead we will be charging the battery based on some
+rules of thumb (heuristics), and if we get these wrong we will significantly
+reduce how long a battery stays useful before becoming very heavy and toxic
+garbage.`
+
+:new_spec:`The charging heuristics are based on parameters.  By having
+parameter's the charger can work for all sorts of different batteries because we
+don't know what kind of battery our customer will buy.  Our customer's don't
+want to become renewable energy experts, they just want to pay someone to set up
+and install equipment that will give them power when they need it.  So they let
+their system installers configure the charger's parameters for them.  If the
+installers don't configure the charger correctly, they speed up how fast their
+batteries will be used up.`
+
+:new_spec:`Last time I checked, the batteries cost about one third the
+overall amount of a renewable energy installation, and our customers will be in
+remote locations, so replacing batteries will be both expensive in terms of
+materiel cost, transportation and labour.`
+
+:new_spec:`Here is the rub, the system installers are often the same people who
+sell batteries.  So it is the installers who stand to benifit if the system is
+not setup properly.`
+
+"I have known installers, they want to do a good job."
+
+:new_spec:`Yes, most of them do, but we would like to remove this moral hazard
+anyway.  Our customers have a very vocal community, they will call us into
+account if they think our equipment is faulty, and if we blame the shortening of
+battery life on our installers, our customers will side with the experts they
+know over the experts they don't know.  It will become our fault.`
+
+"It would be our fault, we should eat the system's complexity on behalf of our
+customers, and we should remove the moral hazard with our design.  Why can't we
+just add a battery-state-of-charge monitor into our system?"
+
+:new_spec:`They are very expensive, and we have the equalization feature, so if
+a customer is willing to equalize their batteries once a month, they can
+increase their battery's lifespan.`
+
+"Well, we can have a central database with battery settings, when a new charger
+wakes up it calls home to configure itself, so that neither the installer or the
+customer has to worry about it."
+
+:new_spec:`A lot of our customers are off-grid for a reason, they don't want
+their equipment calling home and reporting to some remote database.`  He pauses,
+then says :new_spec:`But some of
+our customer's don't care. We can collect data from them so that future
+systems can auto-configure themselves.`
+
+"You are thinking about an AI aren't you?"
+
+:new_spec:`I guess so.  If we measure all of the current information going into
+and leaving the battery, its temperature and its voltage we could build some
+powerful regression algorithms on our end. We could dynamically update the
+charger's battery settings, and even notify our customers when their battery's
+are nearing end-of-life.  But to do this we are going to need a lot of data.`
+
+"That sounds like a Tesla.  I'm in."
+
+"If we do this we could train AI on the servers then send out a tuned-up
+Python neural network in each charger via a software upgrade."
+
+"Before the charger starts, it could spend some time electrically probing it's
+battery, build up a physics model which matches it, then dial in the battery's
+charging parameters against the battery's physics model.  This model could be
+sent back to our servers, and we could audit the charger's work using a higher
+power computing platform."
+
+:new_spec:`Why bother with a physics model?  Why not just build a regressor that
+gives you the battery settings directly?`
+
+"Decoupling.  If we let the AI build a physics model, we can change our charging
+algorithm and the settings that we use without having to throw everything out."
+
+"Also, for debugging; neural networks are black boxes.  So if we use it to build
+something we understand, it won't be a black box anymore; if it constructs
+curves that don't make sense we can turn it off and fall back to sensible
+settings."
+
+"If we build a battery physics inside of the charger, then our charger could
+charge any kind of battery type.  It could detect different chemistries, it
+wouldn't just charge lead acids anymore."
+
+:new_spec:`Well I think we agree on one thing, to do this we will need a lot of
+data, and the data has to be useful.`
+
+"Yeah, but this is road map stuff, version 5, we need to think about our system
+right now."
 
 :ref:`back to examples <examples>`
 
