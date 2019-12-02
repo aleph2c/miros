@@ -257,11 +257,11 @@ def spy_on_start(fn):
 
     self.rtc.spy.append("START")
     sr = SpyTuple(
-        signal="",       state="",
-        start=True,      hook=False,
-        internal=None,   post_lifo=True,
-        post_fifo=False, post_defer=False,
-        recall=False,    datetime=stdlib_datetime.now()
+      signal="", state="",
+      start=True, hook=False,
+      internal=None, post_lifo=True,
+      post_fifo=False, post_defer=False,
+      recall=False, datetime=stdlib_datetime.now()
     )
     self.rtc.tuples.append(sr)
     # fn is start_at
