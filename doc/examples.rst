@@ -14,7 +14,7 @@ Examples
    scribbleexample
    interactingcharts
    towardsthefactoryexample
-   orthogonalregions
+   othogonalregions
    batterychargingexample
    cellular_automata
    i_mongol_example

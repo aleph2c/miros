@@ -68,7 +68,7 @@ def s1_hidden_region(p, e):
        (type): return_status
   '''
   status = return_status.UNHANDLED
-  if(e.signal == signals.start_p):
+  if(e.signal == signals.to_p):
     status = p.trans(s1_region)
   else:
     p.temp.fun = p.top
@@ -147,7 +147,7 @@ def s2_hidden_region(p, e):
        (type): return_status
   '''
   status = return_status.UNHANDLED
-  if(e.signal == signals.start_p):
+  if(e.signal == signals.to_p):
     status = p.trans(s2_region)
   else:
     p.temp.fun = p.top
@@ -211,16 +211,18 @@ def s2_region_final(p, e):
 
 class Region(HsmWithQueues):
 
-  def __init__(self, name, outer, final_event, instrumented=True):
+  def __init__(self, name, starting_state, outer, final_event, instrumented=True):
     '''Region management for othogonal regions
 
     **Args**:
        | ``name`` (str): name of the region
+       | ``starting_state`` (str): name of the starting
+       |   state of the region
        | ``outer`` (Factory): The statechart which will be
        |   using this region.
        | ``final_event`` (Event): The event used to finalize 
        |   the region.
-       | ``instrumented=True`` (Bool): Need if you want to
+       | ``instrumented=True`` (bool): Need if you want to
        |   view the spy instrumention
 
     **Returns**:
@@ -240,11 +242,13 @@ class Region(HsmWithQueues):
     '''
     super().__init__()
     self.name = name
-    self.regions = []
+    self.starting_state = starting_state
     self.outer = outer
     self.final_event = final_event
-    self.final = False
     self.instrumented = instrumented
+
+    self.final = False
+    self.regions = []
 
   def post_p_final_to_other_if_ready(self):
     ready = False if self.regions is None and len(self.regions) < 1 else True
@@ -286,18 +290,13 @@ class InstrumentedFactory(Factory):
 
 class XmlChart(InstrumentedFactory):
   def __init__(self, name, live_trace=None, live_spy=None):
-    '''Example Of 
-
-    longer description
-
-    **Note**:
-       Do this not that recommendation
+    '''Example of othogonal regions described in the CSXML
+       standard
 
     **Args**:
        | ``name`` (type1): 
        | ``live_trace=None``: enable live_trace feature?
        | ``live_spy=None``: enable live_spy feature?
-
 
     **Returns**:
        (type): 
@@ -316,18 +315,22 @@ class XmlChart(InstrumentedFactory):
     super().__init__(name, live_trace=live_trace, live_spy=live_spy)
 
     self.p_regions = []
-    self.s1_region = Region(
-      's1_r',
-      outer=self,
-      final_event=Event(signal=signals.p_final),
+    self.p_regions.append(
+      Region(
+        name='s1_r',
+        starting_state=s1_hidden_region,
+        outer=self,
+        final_event=Event(signal=signals.p_final),
+      )
     )
-    self.p_regions.append(self.s1_region)
-    self.s2_region = Region(
-      's2_r',
-      outer=self,
-      final_event=Event(signal=signals.p_final),
+    self.p_regions.append(
+      Region(
+        name='s2_r',
+        starting_state=s2_hidden_region,
+        outer=self,
+        final_event=Event(signal=signals.p_final),
+      )
     )
-    self.p_regions.append(self.s2_region)
     for region in self.p_regions:
       for _region in self.p_regions:
         region.regions.append(_region)
@@ -342,8 +345,6 @@ class XmlChart(InstrumentedFactory):
     self.p = self.create(state="p"). \
       catch(signal=signals.ENTRY_SIGNAL,
         handler=self.p_entry_signal). \
-      catch(signal=signals.enter_regions,
-        handler=self.p_enter_regions). \
       catch(signal=signals.e1,
         handler=self.p_dispatcher). \
       catch(signal=signals.e2,
@@ -366,8 +367,8 @@ class XmlChart(InstrumentedFactory):
       nest(self.some_other_state, parent=self.outer_state)
 
   def start_at(self, state):
-    self.s1_region.start_at(s1_hidden_region)
-    self.s2_region.start_at(s2_hidden_region)
+    for region in self.p_regions:
+      region.start_at(region.starting_state)
     super().start_at(state)
 
   def outer_state_entry_signal(self, e):
@@ -380,11 +381,7 @@ class XmlChart(InstrumentedFactory):
 
   def p_entry_signal(self, e):
     status = return_status.HANDLED
-    self.post_lifo(Event(signal=signals.enter_regions))
-    return status
-
-  def p_enter_regions(self, e):
-    status = self.p_dispatcher(Event(signal=signals.start_p))
+    status = self.p_dispatcher(Event(signal=signals.to_p))
     return status
 
   def p_dispatcher(self, e):

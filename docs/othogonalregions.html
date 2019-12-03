@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Othogonal Regions With Miros &#8212; miros 2.0 documentation</title>
+    <title>Orthogonal Regions &#8212; miros 2.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -17,6 +17,8 @@
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Distributed Battery Charging" href="batterychargingexample.html" />
+    <link rel="prev" title="Using and Unwinding a Factory" href="towardsthefactoryexample.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -33,22 +35,78 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="othogonal-regions-with-miros">
-<span id="othogonalregions-othogonal-regions-with-miros"></span><h1>Othogonal Regions With Miros<a class="headerlink" href="#othogonal-regions-with-miros" title="Permalink to this headline">¶</a></h1>
-<p>The CSXML standard describes an orthogonal region statechart like this:</p>
+  <p id="othogonalregions-othogonal-regions-with-miros"><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/xml_chart.py">example</a></p>
+<div class="section" id="orthogonal-regions">
+<h1>Orthogonal Regions<a class="headerlink" href="#orthogonal-regions" title="Permalink to this headline">¶</a></h1>
+<p>It goes without saying that we need to comprehend our designs.  We must know
+what we are building, and we must find a abstractions which make it possible to
+discuss what we are doing with others.</p>
+<p>But as your designs get more complicated you will experience <strong>state space
+explosion</strong>:  The number of states that are needed to make your system work, mix
+together combinatorially so that it becomes impractical to comprehend all paths
+of possible behavior.</p>
+<p>Another way of describing the problem is that the state space gets so large that
+you can’t comprehend it using your chosen design abstraction.  This is
+especially true if you are using a finite statemachine as your main design tool.
+You can hold off the effects of <strong>state space explosion</strong> by switching to a
+hierarchical state machine approach; common behaviors are mapped into outer
+states making a design more comprehensible, but this can only take you so far.
+At some point you must chunk your design into concurrent pieces which interact.
+Each piece being something you can comprehend and trust to work on its own.</p>
+<p>David Harel’s original statechart paper addressed state space explosion by
+inventing the notion of the <strong>orthogonal region</strong>.  Orthogonal regions describe
+concurrency <em>within</em> an HSM.</p>
+<p>The orthogonal region abstraction was not supported in Miro Samek’s statechart
+algorithm for performance reasons.  Instead he offered up <a class="reference internal" href="patterns.html#patterns-orthogonal-component"><span class="std std-ref">orthogonal
+components</span></a>; HSMs acting as variables within
+other HSMs.</p>
+<p>In this example I will show you what an orthogonal region is and why you would
+use it. Then we will map the orthogonal region behavior into a python program
+using the existing miros features.  We will be using the <a class="reference internal" href="patterns.html#patterns-orthogonal-component"><span class="std std-ref">orthogonal
+components</span></a> mixed with a Factory to satisfy a
+behavioral description written as part of the <a class="reference external" href="https://www.w3.org/TR/scxml/">SCXML standard</a>.</p>
+<p>Packing a design into a suitable theory is a strategic effort.  Every good
+strategy needs supporting tactics and in this case we need to provide our
+engineers with the means to see what their code does once it is written.  So our
+example will be instrumented.</p>
+<hr class="docutils" />
+<p>The SCXML standard describes an orthogonal region statechart similar to this:</p>
 <a class="reference external image-reference" href="_static/xml_chart_1.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_1.svg" src="_images/xml_chart_1.svg" /></div>
 </a>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The parallel CSXML parallel regions document is full of mistakes, but written
-well enough to describe how orthogonal regions should behave.</p>
+<p>Click the above diagram to see a larger version.</p>
+<p class="last">The parallel <a class="reference external" href="https://www.w3.org/TR/scxml/#CoreIntroduction">CSXML parallel regions document</a> is full of mistakes, but
+written well enough to describe how orthogonal regions should behave.</p>
 </div>
-<p>If a <code class="docutils literal notranslate"><span class="pre">to_p</span></code> event is received while in the <code class="docutils literal notranslate"><span class="pre">outState</span></code> or any of its childs
-states, a transition will occur into the <code class="docutils literal notranslate"><span class="pre">p</span></code> orthogonal region.  Instead of
-one active state, the statechart will have two active states.  The <code class="docutils literal notranslate"><span class="pre">S1</span> <span class="pre">Region</span></code>
-will initialize itself to the <code class="docutils literal notranslate"><span class="pre">S11</span></code> state and the <code class="docutils literal notranslate"><span class="pre">S2</span> <span class="pre">Region</span></code> will
-initialize itself to <code class="docutils literal notranslate"><span class="pre">S21</span></code>.  So both <code class="docutils literal notranslate"><span class="pre">S11</span></code> and <code class="docutils literal notranslate"><span class="pre">S21</span></code> will be active at the
-same time.</p>
+<p>Let’s break the above UML diagram away from its supporting <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/xml_chart.xml">xml</a>:</p>
+<a class="reference external image-reference" href="_static/xml_chart_2.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_2.svg" src="_images/xml_chart_2.svg" /></div>
+</a>
+<p>The dotted line describes two orthogonal regions within the <code class="docutils literal notranslate"><span class="pre">p</span></code> state which
+will both become active when the <code class="docutils literal notranslate"><span class="pre">p</span></code> state is entered.  This means that
+<code class="docutils literal notranslate"><span class="pre">S11</span></code> and <code class="docutils literal notranslate"><span class="pre">S21</span></code> will both become active states.  In the case that the
+statechart immediately receives a <code class="docutils literal notranslate"><span class="pre">to_outer</span></code> event while in the <code class="docutils literal notranslate"><span class="pre">p</span></code> state,
+the exit behavior in both orthogonal regions will be followed until the <code class="docutils literal notranslate"><span class="pre">p</span></code>
+state is exited: <code class="docutils literal notranslate"><span class="pre">S11</span></code> exit code will run and the <code class="docutils literal notranslate"><span class="pre">S21</span></code> exit code will run.</p>
+<p>The power of the orthogonal region comes from it’s multiplicative feature.  The
+number of state combinations within <code class="docutils literal notranslate"><span class="pre">p</span></code> is the product of the number of states
+in each region: <code class="docutils literal notranslate"><span class="pre">3*3</span> <span class="pre">=</span> <span class="pre">9</span></code> (counting the final pseudostates).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This multiplicative property holds true for any concurrency
+mechanism, whether it be concurrent statecharts or with the orthogonal
+component pattern.</p>
+</div>
+<p>The benefit of how David Harel describes things is how nicely it can be drawn
+onto a diagram.  To have concurrency (with it’s multiplicative ability to
+compact design complexity) in part of the design while having it go away in
+another part of the design is a beautiful form of compression.</p>
+<p>If you take the time to read the <a class="reference external" href="https://www.w3.org/TR/scxml/#CoreIntroduction">expected behavior for orthogonal region in the
+CSXML standard</a> you will see
+that a “final” event can be defined when all of the regions within <code class="docutils literal notranslate"><span class="pre">p</span></code> have
+entered their final state (the circle with the black dot).  The diagram’s
+<code class="docutils literal notranslate"><span class="pre">p_final</span></code> arrow describes what should happen when both the <code class="docutils literal notranslate"><span class="pre">S1</span></code> and <code class="docutils literal notranslate"><span class="pre">S2</span></code>
+regions have finished.</p>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
 
@@ -64,6 +122,10 @@ same time.</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="examples.html">Examples</a><ul>
+      <li>Previous: <a href="towardsthefactoryexample.html" title="previous chapter">Using and Unwinding a Factory</a></li>
+      <li>Next: <a href="batterychargingexample.html" title="next chapter">Distributed Battery Charging</a></li>
+  </ul></li>
   </ul></li>
 </ul>
 </div>
