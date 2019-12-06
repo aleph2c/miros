@@ -52,7 +52,7 @@ def instrumented(fn):
   return _pspy_on
 
 @instrumented
-def s1_hidden_region(p, e):
+def s1_hidden_region(r, e):
   '''A hidden state which permits the exit feature of the
      s1_region to work.
 
@@ -69,69 +69,71 @@ def s1_hidden_region(p, e):
   '''
   status = return_status.UNHANDLED
   if(e.signal == signals.to_p):
-    status = p.trans(s1_region)
+    status = r.trans(s1_region)
   else:
-    p.temp.fun = p.top
+    r.temp.fun = r.top
     status = return_status.SUPER
   return status
 
 @instrumented
-def s1_region(p, e):
+def s1_region(r, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.INIT_SIGNAL):
-    status = p.trans(s11)
+    status = r.trans(s11)
   elif(e.signal == signals.region_exit):
-    status = p.trans(s1_hidden_region)
+    status = r.trans(s1_hidden_region)
   else:
-    p.temp.fun = s1_hidden_region
+    r.temp.fun = s1_hidden_region
     status = return_status.SUPER
   return status
 
 @instrumented
-def s11(p, e):
+def s11(r, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.e4):
-    status = p.trans(s12)
+    status = r.trans(s12)
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   else:
-    p.temp.fun = s1_region
+    r.temp.fun = s1_region
     status = return_status.SUPER
   return status
 
 @instrumented
-def s12(p, e):
+def s12(r, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.INIT_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.e1):
-    status = p.trans(s1_region_final)
+    status = r.trans(s1_region_final)
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   else:
-    p.temp.fun = s1_region
+    r.temp.fun = s1_region
     status = return_status.SUPER
   return status
 
 @instrumented
-def s1_region_final(p, e):
+def s1_region_final(r, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    p.final = True
-    p.post_p_final_to_other_if_ready()
+    r.final = True
+    r.post_p_final_to_outer_if_ready()
+  elif(e.signal == signals.ENTRY_SIGNAL):
+    r.final = False
   else:
-    p.temp.fun = s1_region
+    r.temp.fun = s1_region
     status = return_status.SUPER
   return status
 
 @instrumented
-def s2_hidden_region(p, e):
+def s2_hidden_region(r, e):
   '''A hidden state which permits the exit feature of the
      s2_region to work.
 
@@ -148,64 +150,66 @@ def s2_hidden_region(p, e):
   '''
   status = return_status.UNHANDLED
   if(e.signal == signals.to_p):
-    status = p.trans(s2_region)
+    status = r.trans(s2_region)
   else:
-    p.temp.fun = p.top
+    r.temp.fun = r.top
     status = return_status.SUPER
   return status
 
 @instrumented
-def s2_region(p, e):
+def s2_region(r, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.INIT_SIGNAL):
-    status = p.trans(s21)
+    status = r.trans(s21)
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.region_exit):
-    status = p.trans(s2_hidden_region)
+    status = r.trans(s2_hidden_region)
   else:
-    p.temp.fun = s2_hidden_region
+    r.temp.fun = s2_hidden_region
     status = return_status.SUPER
   return status
 
 @instrumented
-def s21(p, e):
+def s21(r, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.e1):
-    status = p.trans(s22)
+    status = r.trans(s22)
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   else:
-    p.temp.fun = s2_region
+    r.temp.fun = s2_region
     status = return_status.SUPER
   return status
 
 @instrumented
-def s22(p, e):
+def s22(r, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.e2):
-    status = p.trans(s2_region_final)
+    status = r.trans(s2_region_final)
   elif(e.signal == signals.EXIT_SIGNAL):
     status = return_status.HANDLED
   else:
-    p.temp.fun = s2_region
+    r.temp.fun = s2_region
     status = return_status.SUPER
   return status
 
 @instrumented
-def s2_region_final(p, e):
+def s2_region_final(r, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    p.final = True
-    p.post_p_final_to_other_if_ready()
+    r.final = True
+    r.post_p_final_to_outer_if_ready()
+  elif(e.signal == signals.ENTRY_SIGNAL):
+    r.final = False
   else:
-    p.temp.fun = s2_region
+    r.temp.fun = s2_region
     status = return_status.SUPER
   return status
 
@@ -250,7 +254,7 @@ class Region(HsmWithQueues):
     self.final = False
     self.regions = []
 
-  def post_p_final_to_other_if_ready(self):
+  def post_p_final_to_outer_if_ready(self):
     ready = False if self.regions is None and len(self.regions) < 1 else True
     for region in self.regions:
       ready &= True if region.final else False
@@ -307,9 +311,7 @@ class XmlChart(InstrumentedFactory):
        
         example = XmlChart(
           'parallel', live_spy=True, live_trace=True
-        )
-        example.start_at(example.outer_state)
-        example.start_at()
+        ).start()
 
     '''
     super().__init__(name, live_trace=live_trace, live_spy=live_spy)
@@ -353,11 +355,13 @@ class XmlChart(InstrumentedFactory):
         handler=self.p_dispatcher). \
       catch(signal=signals.p_final,
         handler=self.p_p_final). \
+      catch(signal=signals.EXIT_SIGNAL,
+        handler=self.p_exit_signal). \
       catch(signal=signals.to_outer,
         handler=self.p_to_outer). \
       to_method()
 
-    self.some_other_state = self.create(state="someOtherState"). \
+    self.some_other_state = self.create(state="some_other_state"). \
       catch(signal=signals.ENTRY_SIGNAL,
         handler=self.some_other_state_entry_signal). \
       to_method()
@@ -366,26 +370,29 @@ class XmlChart(InstrumentedFactory):
       nest(self.p, parent=self.outer_state). \
       nest(self.some_other_state, parent=self.outer_state)
 
-  def start_at(self, state):
+  def start(self):
     for region in self.p_regions:
       region.start_at(region.starting_state)
-    super().start_at(state)
+    super().start_at(self.outer_state)
+    return self
 
   def outer_state_entry_signal(self, e):
     status = return_status.HANDLED
     return status
 
   def outer_state_to_p(self, e):
+    self.live_spy_callback("to_p:outer_state")
     status = self.trans(self.p)
     return status
 
   def p_entry_signal(self, e):
     status = return_status.HANDLED
-    status = self.p_dispatcher(Event(signal=signals.to_p))
+    self.p_dispatcher(Event(signal=signals.to_p))
     return status
 
   def p_dispatcher(self, e):
     status = return_status.HANDLED
+    self.live_spy_callback("{}:p".format(e.signal_name))
     [region.post_fifo(e) for region in self.p_regions]
     [region.complete_circuit() for region in self.p_regions]
     return status
@@ -394,9 +401,13 @@ class XmlChart(InstrumentedFactory):
     status = self.trans(self.some_other_state)
     return status
 
+  def p_exit_signal(self, e):
+    status = return_status.HANDLED
+    self.p_dispatcher(Event(signal=signals.region_exit))
+    return status
+
   def p_to_outer(self, e):
     self.live_spy_callback("to_outer:p")
-    self.p_dispatcher(Event(signal=signals.region_exit))
     status = self.trans(self.outer_state)
     return status
 
@@ -405,8 +416,12 @@ class XmlChart(InstrumentedFactory):
     return status
 
 if __name__ == '__main__':
-  example = XmlChart('parallel', live_spy=True, live_trace=True)
-  example.start_at(example.outer_state)
+
+  example = XmlChart(
+    'parallel', 
+    live_spy=True
+  ).start()
+
   example.post_fifo(Event(signal=signals.to_p))
   example.post_fifo(Event(signal=signals.e4))
   example.post_fifo(Event(signal=signals.e1))
@@ -416,3 +431,5 @@ if __name__ == '__main__':
   example.post_fifo(Event(signal=signals.e1))
   example.post_fifo(Event(signal=signals.e2))
   time.sleep(0.10)
+
+code

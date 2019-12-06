@@ -38,37 +38,39 @@
   <p id="othogonalregions-othogonal-regions-with-miros"><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/xml_chart.py">example</a></p>
 <div class="section" id="orthogonal-regions">
 <h1>Orthogonal Regions<a class="headerlink" href="#orthogonal-regions" title="Permalink to this headline">¶</a></h1>
-<p>It goes without saying that we need to comprehend our designs.  We must know
-what we are building, and we must find a abstractions which make it possible to
-discuss what we are doing with others.</p>
-<p>But as your designs get more complicated you will experience <strong>state space
-explosion</strong>:  The number of states that are needed to make your system work, mix
-together combinatorially so that it becomes impractical to comprehend all paths
-of possible behavior.</p>
-<p>Another way of describing the problem is that the state space gets so large that
-you can’t comprehend it using your chosen design abstraction.  This is
-especially true if you are using a finite statemachine as your main design tool.
-You can hold off the effects of <strong>state space explosion</strong> by switching to a
-hierarchical state machine approach; common behaviors are mapped into outer
-states making a design more comprehensible, but this can only take you so far.
-At some point you must chunk your design into concurrent pieces which interact.
-Each piece being something you can comprehend and trust to work on its own.</p>
+<p>As your products scale and your designs get more complicated you may experience
+<strong>state space explosion</strong>.  The number of states that are needed to make your
+system combinatorially mix so that it becomes impractical to test all paths of
+possible behaviour.</p>
+<p><strong>State space explosion</strong> also describes a situation where you can no longer
+<em>comprehend</em> your design because it has become too complicated. Your chosen
+design abstraction has been outpaced by the size of your problem, and you can’t
+compress the picture of your system into a small enough diagram to understand
+it.</p>
+<p>This scale-to-bafflement rate is dependent upon your choice of abstraction.  It
+will happen quickly if you use finite state machines as your primary design
+tool.  You can hold it off a bit longer by switching to a hierarchical state
+machine design approach; common behaviours are mapped into outer states, making
+a design more understandable, but this can only take you so far.  At some point,
+you must chunk your design into concurrent pieces that interact.  Each piece
+being something you can comprehend and trust to work on its own.</p>
+<p>Concurrent state machines mix combinatorially, giving you an abstraction which
+scales without needing pages and pages to draw your design.  Concurrent
+statecharts give you <strong>state space compression</strong>.</p>
 <p>David Harel’s original statechart paper addressed state space explosion by
-inventing the notion of the <strong>orthogonal region</strong>.  Orthogonal regions describe
-concurrency <em>within</em> an HSM.</p>
-<p>The orthogonal region abstraction was not supported in Miro Samek’s statechart
-algorithm for performance reasons.  Instead he offered up <a class="reference internal" href="patterns.html#patterns-orthogonal-component"><span class="std std-ref">orthogonal
-components</span></a>; HSMs acting as variables within
-other HSMs.</p>
-<p>In this example I will show you what an orthogonal region is and why you would
-use it. Then we will map the orthogonal region behavior into a python program
-using the existing miros features.  We will be using the <a class="reference internal" href="patterns.html#patterns-orthogonal-component"><span class="std std-ref">orthogonal
-components</span></a> mixed with a Factory to satisfy a
-behavioral description written as part of the <a class="reference external" href="https://www.w3.org/TR/scxml/">SCXML standard</a>.</p>
+inventing the <strong>orthogonal region</strong>.  Orthogonal regions describe concurrency
+<em>within</em> an HSM.</p>
+<p>But the orthogonal region abstraction was not supported in Miro Samek’s
+statechart algorithm (the algorithm used by this library) for performance
+reasons.  Instead he offered up <a class="reference internal" href="patterns.html#patterns-orthogonal-component"><span class="std std-ref">orthogonal components</span></a>; HSMs acting as variables within other HSMs.</p>
+<p>In this example, I will show you what an orthogonal region is and why you would
+use it. Then we will map the orthogonal region behaviour into a Python program
+using existing miros features.  We will be using the <a class="reference internal" href="patterns.html#patterns-orthogonal-component"><span class="std std-ref">orthogonal components</span></a> mixed with a Factory to satisfy an “orthogonal
+regions” behavioural description written as part of the <a class="reference external" href="https://www.w3.org/TR/scxml/">SCXML standard</a>.</p>
 <p>Packing a design into a suitable theory is a strategic effort.  Every good
-strategy needs supporting tactics and in this case we need to provide our
-engineers with the means to see what their code does once it is written.  So our
-example will be instrumented.</p>
+strategy needs supporting tactics, and in this case, we need to provide our
+engineers with the tactical means to see what their code does once it is
+written:  Our example will be instrumented.</p>
 <hr class="docutils" />
 <p>The SCXML standard describes an orthogonal region statechart similar to this:</p>
 <a class="reference external image-reference" href="_static/xml_chart_1.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_1.svg" src="_images/xml_chart_1.svg" /></div>
@@ -79,35 +81,1006 @@ example will be instrumented.</p>
 <p class="last">The parallel <a class="reference external" href="https://www.w3.org/TR/scxml/#CoreIntroduction">CSXML parallel regions document</a> is full of mistakes, but
 written well enough to describe how orthogonal regions should behave.</p>
 </div>
-<p>Let’s break the above UML diagram away from its supporting <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/xml_chart.xml">xml</a>:</p>
+<p>Let’s break the above UML diagram away from its supporting <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/xml_chart.xml">XML</a>:</p>
 <a class="reference external image-reference" href="_static/xml_chart_2.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_2.svg" src="_images/xml_chart_2.svg" /></div>
 </a>
 <p>The dotted line describes two orthogonal regions within the <code class="docutils literal notranslate"><span class="pre">p</span></code> state which
-will both become active when the <code class="docutils literal notranslate"><span class="pre">p</span></code> state is entered.  This means that
-<code class="docutils literal notranslate"><span class="pre">S11</span></code> and <code class="docutils literal notranslate"><span class="pre">S21</span></code> will both become active states.  In the case that the
-statechart immediately receives a <code class="docutils literal notranslate"><span class="pre">to_outer</span></code> event while in the <code class="docutils literal notranslate"><span class="pre">p</span></code> state,
-the exit behavior in both orthogonal regions will be followed until the <code class="docutils literal notranslate"><span class="pre">p</span></code>
-state is exited: <code class="docutils literal notranslate"><span class="pre">S11</span></code> exit code will run and the <code class="docutils literal notranslate"><span class="pre">S21</span></code> exit code will run.</p>
-<p>The power of the orthogonal region comes from it’s multiplicative feature.  The
+will both become active when the <code class="docutils literal notranslate"><span class="pre">p</span></code> state is entered.  This means that when
+the <code class="docutils literal notranslate"><span class="pre">p</span></code> state is entered, the init events will ensure that both <code class="docutils literal notranslate"><span class="pre">S11</span></code> and
+<code class="docutils literal notranslate"><span class="pre">S21</span></code> will <em>both</em> become active states.  In the case that the statechart
+receives a <code class="docutils literal notranslate"><span class="pre">to_outer</span></code> event while in the <code class="docutils literal notranslate"><span class="pre">p</span></code> state, the exit behaviour in
+both orthogonal regions will be followed until the <code class="docutils literal notranslate"><span class="pre">p</span></code> state is exited:
+<code class="docutils literal notranslate"><span class="pre">S11</span></code> exit code will run, the <code class="docutils literal notranslate"><span class="pre">S1</span> <span class="pre">Region</span></code> exit code will run, then the
+<code class="docutils literal notranslate"><span class="pre">S21</span></code> exit code will run and the <code class="docutils literal notranslate"><span class="pre">S2</span> <span class="pre">Region</span></code> exit code will run.</p>
+<p>The power of the orthogonal region comes from its multiplicative feature.  The
 number of state combinations within <code class="docutils literal notranslate"><span class="pre">p</span></code> is the product of the number of states
 in each region: <code class="docutils literal notranslate"><span class="pre">3*3</span> <span class="pre">=</span> <span class="pre">9</span></code> (counting the final pseudostates).</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This multiplicative property holds true for any concurrency
-mechanism, whether it be concurrent statecharts or with the orthogonal
-component pattern.</p>
+<p class="last">This multiplicative property holds true for any concurrency mechanism,
+whether it be concurrent statecharts (with publish/subscribe) or with the
+orthogonal component pattern.</p>
 </div>
-<p>The benefit of how David Harel describes things is how nicely it can be drawn
-onto a diagram.  To have concurrency (with it’s multiplicative ability to
-compact design complexity) in part of the design while having it go away in
-another part of the design is a beautiful form of compression.</p>
-<p>If you take the time to read the <a class="reference external" href="https://www.w3.org/TR/scxml/#CoreIntroduction">expected behavior for orthogonal region in the
-CSXML standard</a> you will see
-that a “final” event can be defined when all of the regions within <code class="docutils literal notranslate"><span class="pre">p</span></code> have
-entered their final state (the circle with the black dot).  The diagram’s
+<p>David Harel’s way of drawing concurrency fits nicely onto a diagram.  Moreover,
+to have concurrency (with its multiplicative ability to compact design
+complexity) in part of the design while having it go away in another part of the
+design is a beautiful form of <strong>state space compression</strong>.</p>
+<p>If you take the time to read the <a class="reference external" href="https://www.w3.org/TR/scxml/#CoreIntroduction">expected behaviour for orthogonal regions in
+the CSXML standard</a> you will
+see that a “final” event can be defined when all of the regions within <code class="docutils literal notranslate"><span class="pre">p</span></code>
+have entered their final state (the circle with the black dot).  The diagram’s
 <code class="docutils literal notranslate"><span class="pre">p_final</span></code> arrow describes what should happen when both the <code class="docutils literal notranslate"><span class="pre">S1</span></code> and <code class="docutils literal notranslate"><span class="pre">S2</span></code>
 regions have finished.</p>
+<div class="section" id="constructing-orthogonal-regions-with-miros">
+<span id="othogonalregions-using-orthogonal-regions-with-miros"></span><h2>Constructing Orthogonal Regions with Miros<a class="headerlink" href="#constructing-orthogonal-regions-with-miros" title="Permalink to this headline">¶</a></h2>
+<p>We will write some Python code which maps the miros feature set onto this design
+such that its behaviours match those described in the SCXML standard.</p>
+<a class="reference external image-reference" href="_static/xml_chart_2.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_2.svg" src="_images/xml_chart_2.svg" /></div>
+</a>
+<p>We will verify that our design works by:</p>
+<ul class="simple">
+<li>starting the statechart and confirming it has moved into the <code class="docutils literal notranslate"><span class="pre">outer_state</span></code></li>
+<li>posting a <code class="docutils literal notranslate"><span class="pre">to_p</span></code> event and confirm that both <code class="docutils literal notranslate"><span class="pre">S11</span></code> and <code class="docutils literal notranslate"><span class="pre">S21</span></code>
+are eventually entered.</li>
+<li>posting an <code class="docutils literal notranslate"><span class="pre">e4</span></code> and confirming that <code class="docutils literal notranslate"><span class="pre">S11</span></code> transitions into <code class="docutils literal notranslate"><span class="pre">S12</span></code> but that the
+other active region remains in the <code class="docutils literal notranslate"><span class="pre">S21</span></code> state.</li>
+<li>posting an <code class="docutils literal notranslate"><span class="pre">e1</span></code> and confirming that <code class="docutils literal notranslate"><span class="pre">S12</span></code> transitions into the S1 Region final
+state and that <code class="docutils literal notranslate"><span class="pre">S12</span></code> transitions into <code class="docutils literal notranslate"><span class="pre">S22</span></code> in the S2 Region.</li>
+<li>posting a <code class="docutils literal notranslate"><span class="pre">to_outer</span></code> and confirming that the two active states collapse into
+one active state, and that all of the expected exit conditions are run;  In
+Region S1, the S1 region exit condition is run and in Region S2, the exit
+condition for <code class="docutils literal notranslate"><span class="pre">S22</span></code> is run then the exit condition for Region S2 is run.
+After the <code class="docutils literal notranslate"><span class="pre">p</span></code> region has been exited, the statechart will ultimately land in
+the <code class="docutils literal notranslate"><span class="pre">outer_state</span></code>.</li>
+<li>re-posting <code class="docutils literal notranslate"><span class="pre">e4</span></code> and then <code class="docutils literal notranslate"><span class="pre">e1</span></code> with the same expected behaviour listed above.</li>
+<li>posting an <code class="docutils literal notranslate"><span class="pre">e2</span></code> event which while S1 Region is in its final state and the S2
+region is in it’s <code class="docutils literal notranslate"><span class="pre">S22</span></code> state.  This <code class="docutils literal notranslate"><span class="pre">e2</span></code> event will cause the S2 Region
+to enter its final state too.  Since both final states have been entered, the
+chart should post a <code class="docutils literal notranslate"><span class="pre">p_final</span></code> to itself.  This will cause the exit
+conditions of the S1 Region and S2 Region to trigger, the two active states
+will collapse into one.  The <code class="docutils literal notranslate"><span class="pre">p_final</span></code> event will cause a transition into
+the <code class="docutils literal notranslate"><span class="pre">some_other_state</span></code> who’s entry condition should trigger.</li>
+</ul>
+<p>We would like the statechart to describe its behaviour in a log file, so that we can
+confirm it is working.</p>
+<p>The design should be sub-classable in the case that we want to change its
+behaviour.</p>
+<p>As far as I know there is no UML shorthand for two final states in a orthogonal
+region conspiring to post an event to itself, so our design diagram will
+explicitly describe this behaviour in code.</p>
+</div>
+<div class="section" id="high-level-strategy-to-build-orthogonal-regions-with-miros">
+<span id="othogonalregions-high-level-strategy-to-build-orthogonal-regions-with-miros"></span><h2>High Level Strategy to Build Orthogonal Regions with miros<a class="headerlink" href="#high-level-strategy-to-build-orthogonal-regions-with-miros" title="Permalink to this headline">¶</a></h2>
+<a class="reference external image-reference" href="_static/xml_chart_2.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_2.svg" src="_images/xml_chart_2.svg" /></div>
+</a>
+<p>The statechart will have one thread, and the orthogonal regions described within
+<code class="docutils literal notranslate"><span class="pre">p</span></code> will be driven by this thread using the orthogonal component pattern.
+Each region will be an object derived from the <code class="docutils literal notranslate"><span class="pre">HsmWithQueues</span></code> class, which
+provides all of the HSM dynamics and access to the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> and
+<code class="docutils literal notranslate"><span class="pre">complete_circuit</span></code> methods.  While in the <code class="docutils literal notranslate"><span class="pre">p</span></code> state, the outer statechart
+will dispatch <code class="docutils literal notranslate"><span class="pre">e1</span></code>, <code class="docutils literal notranslate"><span class="pre">e2</span></code> and <code class="docutils literal notranslate"><span class="pre">e4</span></code> by posting into the queues of the S1
+Region and the S2 Region.</p>
+<p>Each Region will be given an <code class="docutils literal notranslate"><span class="pre">outer</span></code> and a <code class="docutils literal notranslate"><span class="pre">regions</span></code> attribute.  The
+<code class="docutils literal notranslate"><span class="pre">outer</span></code> attribute will be a reference to the outer statechart running the
+thread, which will be an object derived from the Factory class.  Using this
+<code class="docutils literal notranslate"><span class="pre">outer</span></code> attribute, either region can post an event back into its outer
+statechartThis will be needed for the <code class="docutils literal notranslate"><span class="pre">p_final</span></code> signal to work.  The
+<code class="docutils literal notranslate"><span class="pre">regions</span></code> attribute will contain references to the other regions sharing the
+same orthogonal region area of the chart.  Information about the other region’s
+final state will be needed to determine if it is time to post the <code class="docutils literal notranslate"><span class="pre">p_final</span></code>
+event into the <code class="docutils literal notranslate"><span class="pre">outer</span></code> statechart.  The <code class="docutils literal notranslate"><span class="pre">outer</span></code> attribute will also be used
+by a region to channel its instrumentation stream back into the main
+statechart’s instrumentation stream.</p>
+<p>Two hidden states will be constructed, one for each region.  This is needed so
+that the regions can exit without re-triggering their <code class="docutils literal notranslate"><span class="pre">init</span></code> signals.  For
+instance if Region S2 was in <code class="docutils literal notranslate"><span class="pre">S22</span></code> when outer chart received a <code class="docutils literal notranslate"><span class="pre">to_outer</span></code>
+event, we would expect this region to run its <code class="docutils literal notranslate"><span class="pre">S22</span></code> exit condition, then run
+the Region S2 exit condition then <em>stop</em>.  However, if we only caused a
+transition into the Region S2 state, the region’s init signal would re-fire and
+the region would enter the <code class="docutils literal notranslate"><span class="pre">S21</span></code> state.  This is not what we want, so we
+invent a hidden outer state for the region.  To get the desired exit behaviours
+resulting from the <code class="docutils literal notranslate"><span class="pre">to_outer</span></code> event we trigger a second, hidden-event which
+will cause a transition into the hidden outer state for the region.  By doing
+this the exit conditions for a region will work as expected.</p>
+<p>To make the instrumentation legible, we will wrap some code around the
+<code class="docutils literal notranslate"><span class="pre">spy_on</span></code> decorator used to instrument the S1 and S2 regions. This code will
+route a region’s spy instrumentation into the main statechart’s spy instrumentation
+stream.  Since we are doing this we can remove any references to hidden outer
+states to avoid cluttering up our spy stream.  The instrumentation will be written
+to a log file by registering a spy function handler with the main state chart.</p>
+<p>The code used to start the chart, and it’s regions will be written as a method
+of the main statechart.  Each of the regions will be pre-started in their hidden
+states to keep the code needed to enter the <code class="docutils literal notranslate"><span class="pre">p</span></code> state as simple as possible.
+By pulling the start code out of the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method of the main chart, we
+can subclass the main chart without starting its thread when <code class="docutils literal notranslate"><span class="pre">super</span></code> is called
+within the subclass’ <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method.</p>
+</div>
+<div class="section" id="orthogonal-regions-using-orthogonal-components">
+<span id="othogonalregions-miros-design"></span><h2>Orthogonal Regions Using Orthogonal Components<a class="headerlink" href="#orthogonal-regions-using-orthogonal-components" title="Permalink to this headline">¶</a></h2>
+<p>The behaviour described with this diagram:</p>
+<a class="reference external image-reference" href="_static/xml_chart_2.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_2.svg" src="_images/xml_chart_2.svg" /></div>
+</a>
+<p>Can be manifested this way using miros:</p>
+<a class="reference external image-reference" href="_static/xml_chart_3.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_3.svg" src="_images/xml_chart_3.svg" /></div>
+</a>
+<p>If you would like to compare the diagram to the code, the code listing is
+available <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/xml_chart.py">here.</a>.</p>
+<p>To run the code:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 ./examples/xml_chart.py
+</pre></div>
+</div>
+<p>This will generate an instrumentation stream in <code class="docutils literal notranslate"><span class="pre">xml_chart.log</span></code>.</p>
+<p>To view the instrumentation as the code is running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tail -f ./examaples/xml_chart.log.
+</pre></div>
+</div>
+<p>Now I will do a walk through of the code starting from the orthogonal regions
+then I will talk about the XMLChart (right to left on the diagram).</p>
+<div class="section" id="orthogonal-components-as-regions">
+<span id="othogonalregions-orthogonal-components-as-regions"></span><h3>Orthogonal Components As Regions<a class="headerlink" href="#orthogonal-components-as-regions" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Regions</span></code> class will be derived from the <code class="docutils literal notranslate"><span class="pre">HsmWithQueues</span></code> class.</p>
+<a class="reference external image-reference" href="_static/xml_chart_4.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_4.svg" src="_images/xml_chart_4.svg" /></div>
+</a>
+<p>The two region orthogonal components will be constructed in the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method of the
+<code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> like so:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="k">class</span> <span class="nc">XmlChart</span><span class="p">(</span><span class="n">InstrumentedFactory</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+   <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="n">live_trace</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="n">live_spy</span><span class="p">)</span>
+
+<span class="hll">   <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class="hll">   <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span class="hll">     <span class="n">Region</span><span class="p">(</span>
+</span><span class="hll">       <span class="n">name</span><span class="o">=</span><span class="s1">&#39;s1_r&#39;</span><span class="p">,</span>
+</span><span class="hll">       <span class="n">starting_state</span><span class="o">=</span><span class="n">s1_hidden_region</span><span class="p">,</span>
+</span><span class="hll">       <span class="n">outer</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+</span><span class="hll">       <span class="n">final_event</span><span class="o">=</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">p_final</span><span class="p">),</span>
+</span><span class="hll">     <span class="p">)</span>
+</span><span class="hll">   <span class="p">)</span>
+</span><span class="hll">   <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span class="hll">     <span class="n">Region</span><span class="p">(</span>
+</span><span class="hll">       <span class="n">name</span><span class="o">=</span><span class="s1">&#39;s2_r&#39;</span><span class="p">,</span>
+</span><span class="hll">       <span class="n">starting_state</span><span class="o">=</span><span class="n">s2_hidden_region</span><span class="p">,</span>
+</span><span class="hll">       <span class="n">outer</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+</span><span class="hll">       <span class="n">final_event</span><span class="o">=</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">p_final</span><span class="p">),</span>
+</span><span class="hll">     <span class="p">)</span>
+</span><span class="hll">   <span class="p">)</span>
+</span><span class="hll">   <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="p">:</span>
+</span><span class="hll">     <span class="k">for</span> <span class="n">_region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="p">:</span>
+</span><span class="hll">       <span class="n">region</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_region</span><span class="p">)</span>
+</span>   <span class="c1"># ...</span>
+</pre></div>
+</div>
+<p>A region’s state machine will be defined in the flat method style and will be
+instrumented with the <code class="docutils literal notranslate"><span class="pre">&#64;instrumented</span></code> decorator which will be described
+shortly.</p>
+<a class="reference external image-reference" href="_static/xml_chart_5.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_5.svg" src="_images/xml_chart_5.svg" /></div>
+</a>
+<p>Here is the S1 Region’s HSM code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@instrumented</span>
+<span class="k">def</span> <span class="nf">s1_hidden_region</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39;A hidden state which permits the exit feature of the</span>
+<span class="sd">     s1_region to work.</span>
+
+<span class="sd">    **Note**:</span>
+<span class="sd">       This will not appear in the spy instrumentation</span>
+
+<span class="sd">    **Args**:</span>
+<span class="sd">       | ``p`` (HsmWithQueues): Hsm with queues with no thread</span>
+<span class="sd">       | ``e`` (Event): event</span>
+
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">       (type): return_status</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">to_p</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s1_region</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">top</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@instrumented</span>
+<span class="k">def</span> <span class="nf">s1_region</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s11</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">region_exit</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s1_hidden_region</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">s1_hidden_region</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@instrumented</span>
+<span class="k">def</span> <span class="nf">s11</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">e4</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s12</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">s1_region</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@instrumented</span>
+<span class="k">def</span> <span class="nf">s12</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">e1</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s1_region_final</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">s1_region</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@instrumented</span>
+<span class="k">def</span> <span class="nf">s1_region_final</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">final</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">post_p_final_to_outer_if_ready</span><span class="p">()</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">final</span> <span class="o">=</span> <span class="bp">False</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">s1_region</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>The S2 Region state machine will be very similar to the above listing.</p>
+<p>To start the regions, code will be added to the <code class="docutils literal notranslate"><span class="pre">start</span></code> method of the
+<code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> class such that the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> can be instantiated, <em>then</em> started like
+this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">example</span> <span class="o">=</span> <span class="n">XmlChart</span><span class="p">(</span>
+  <span class="s1">&#39;parallel&#39;</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span>
+<span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> <code class="docutils literal notranslate"><span class="pre">start</span></code> method will look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="p">:</span>
+    <span class="n">region</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">starting_state</span><span class="p">)</span>
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+  <span class="k">return</span> <span class="bp">self</span>
+</pre></div>
+</div>
+<p>The reason that the <code class="docutils literal notranslate"><span class="pre">start_at</span></code> methods are broken out of the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> call
+is to make the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> subclassable.  It is important to tease apart the
+class definition from code that starts a thread, otherwise the <code class="docutils literal notranslate"><span class="pre">super</span></code> keyword
+can become <a class="reference internal" href="recipes.html#recipes-inheritance-and-starting-factories"><span class="std std-ref">very dangerous later on</span></a>.
+We don’t want to call the <code class="docutils literal notranslate"><span class="pre">start_at</span></code> method from within the main function,
+since we are trying to data-hide how the state machine works.</p>
+<p>As previously mentioned, we pre-start the orthogonal regions into their hidden
+states before they are needed to keep the <code class="docutils literal notranslate"><span class="pre">p</span></code> entry state code simple within
+the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> state machine.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Regions</span></code> class contains a name, a starting state so that a subclass
+can change how it is used, a final_event so that the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> class can
+tell it’s components what event to fire when they are done.   It has an
+instrumented attribute which can be set to False once we know the chart works
+and we want to speed up the code and a <code class="docutils literal notranslate"><span class="pre">final</span></code> bool used to track if the
+component is in its final state.  The regions list will contain a list to all
+regions within <code class="docutils literal notranslate"><span class="pre">p</span></code>, including a reference to itself.</p>
+<a class="reference external image-reference" href="_static/xml_chart_4.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_4.svg" src="_images/xml_chart_4.svg" /></div>
+</a>
+<p>Here is the <code class="docutils literal notranslate"><span class="pre">Region</span></code> class code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Region</span><span class="p">(</span><span class="n">HsmWithQueues</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">starting_state</span><span class="p">,</span> <span class="n">outer</span><span class="p">,</span> <span class="n">final_event</span><span class="p">,</span> <span class="n">instrumented</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Region management for othogonal regions</span>
+
+<span class="sd">    **Args**:</span>
+<span class="sd">       | ``name`` (str): name of the region</span>
+<span class="sd">       | ``starting_state`` (str): name of the starting</span>
+<span class="sd">       |   state of the region</span>
+<span class="sd">       | ``outer`` (Factory): The statechart which will be</span>
+<span class="sd">       |   using this region.</span>
+<span class="sd">       | ``final_event`` (Event): The event used to finalize</span>
+<span class="sd">       |   the region.</span>
+<span class="sd">       | ``instrumented=True`` (bool): Need if you want to</span>
+<span class="sd">       |   view the spy instrumention</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">       (Region): a region in the statechart</span>
+
+<span class="sd">    **Example(s)**:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">      self.s1_region = Region(</span>
+<span class="sd">        &#39;s1_r&#39;,</span>
+<span class="sd">        outer=self,</span>
+<span class="sd">        final_event=Event(signal=signals.p_final),</span>
+<span class="sd">      )</span>
+<span class="sd">      self.p_regions.append(self.s1_region)</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">starting_state</span> <span class="o">=</span> <span class="n">starting_state</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">outer</span> <span class="o">=</span> <span class="n">outer</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">final_event</span> <span class="o">=</span> <span class="n">final_event</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">instrumented</span> <span class="o">=</span> <span class="n">instrumented</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">final</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="o">=</span> <span class="p">[]</span>
+
+  <span class="k">def</span> <span class="nf">post_p_final_to_outer_if_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">ready</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="bp">True</span>
+    <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">:</span>
+      <span class="n">ready</span> <span class="o">&amp;=</span> <span class="bp">True</span> <span class="k">if</span> <span class="n">region</span><span class="o">.</span><span class="n">final</span> <span class="k">else</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="n">ready</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">outer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_event</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">post_p_final_to_outer_if_ready</span></code> worker function, iterates through all of
+the regions and if they are all in a final state will post the final_event,
+<code class="docutils literal notranslate"><span class="pre">p_final</span></code> provided by an argument to the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> function.  It is within
+this worker function that we see how a region references other regions and uses
+its reference to the outer statechart to post events to it.</p>
+</div>
+<div class="section" id="the-instrumentedfactory">
+<span id="othogonalregions-the-instrumentedfactory"></span><h3>The InstrumentedFactory<a class="headerlink" href="#the-instrumentedfactory" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> subclasses from the <code class="docutils literal notranslate"><span class="pre">InstrumentedFactory</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">InstrumentedFactory</span></code> instruments a miros factory class.  It creates an
+<code class="docutils literal notranslate"><span class="pre">xml_chart.log</span></code> file then registers a spy and trace callback handler for the
+statechart to use.</p>
+</div>
+<div class="section" id="main-statechart-as-xmlchart">
+<span id="othogonalregions-main-statechart-as-xmlchart"></span><h3>Main Statechart as XMLChart<a class="headerlink" href="#main-statechart-as-xmlchart" title="Permalink to this headline">¶</a></h3>
+<p>We call our main chart the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> because we are deriving it’s behaviour
+from the SCXML specification.  It doesn’t actually consume or produce any XML.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> has two <code class="docutils literal notranslate"><span class="pre">Region</span></code> orthogonal components which it defines in
+its <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method.</p>
+<a class="reference external image-reference" href="_static/xml_chart_6.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_6.svg" src="_images/xml_chart_6.svg" /></div>
+</a>
+<p>Here is the XMLChart written as Python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">XmlChart</span><span class="p">(</span><span class="n">InstrumentedFactory</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Example of othogonal regions described in the CSXML</span>
+<span class="sd">       standard</span>
+
+<span class="sd">    **Args**:</span>
+<span class="sd">       | ``name`` (type1):</span>
+<span class="sd">       | ``live_trace=None``: enable live_trace feature?</span>
+<span class="sd">       | ``live_spy=None``: enable live_spy feature?</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">       (type):</span>
+
+<span class="sd">    **Example(s)**:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        example = XmlChart(</span>
+<span class="sd">          &#39;parallel&#39;, live_spy=True, live_trace=True</span>
+<span class="sd">        ).start()</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="n">live_trace</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="n">live_spy</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+      <span class="n">Region</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;s1_r&#39;</span><span class="p">,</span>
+        <span class="n">starting_state</span><span class="o">=</span><span class="n">s1_hidden_region</span><span class="p">,</span>
+        <span class="n">outer</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">final_event</span><span class="o">=</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">p_final</span><span class="p">),</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+      <span class="n">Region</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;s2_r&#39;</span><span class="p">,</span>
+        <span class="n">starting_state</span><span class="o">=</span><span class="n">s2_hidden_region</span><span class="p">,</span>
+        <span class="n">outer</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">final_event</span><span class="o">=</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">p_final</span><span class="p">),</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">_region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="p">:</span>
+        <span class="n">region</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_region</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;outer_state&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_p</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_to_p</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;p&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">e1</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p_dispatcher</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">e2</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p_dispatcher</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">e4</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p_dispatcher</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">p_final</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p_p_final</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p_exit_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_outer</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p_to_outer</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">some_other_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;some_other_state&quot;</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
+        <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">some_other_state_entry_signal</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">to_method</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">some_other_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="p">:</span>
+      <span class="n">region</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">starting_state</span><span class="p">)</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span>
+
+  <span class="k">def</span> <span class="nf">outer_state_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">outer_state_to_p</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">p_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">p_dispatcher</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_p</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">p_dispatcher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">    <span class="p">[</span><span class="n">region</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="p">]</span>
+</span><span class="hll">    <span class="p">[</span><span class="n">region</span><span class="o">.</span><span class="n">complete_circuit</span><span class="p">()</span> <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="p">]</span>
+</span>    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">p_p_final</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">some_other_state</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">p_exit_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">p_dispatcher</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">region_exit</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">p_to_outer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy_callback</span><span class="p">(</span><span class="s2">&quot;to_outer:p&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="k">def</span> <span class="nf">some_other_state_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+    <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>I have highlighted the two lines that will post events to the two orthogonal regions, then drive
+those events through their respective HSMs.</p>
+<p>Now that we see how the three HSMs are initialized and how they work, let’s compare them
+to the orthogonal regions design presented at the beginning of this essay:</p>
+<a class="reference external image-reference" href="_static/xml_chart_7.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_7.svg" src="_images/xml_chart_7.svg" /></div>
+</a>
+<p>We can mentally verify that the bottom design matches the top design by:</p>
+<ul class="simple">
+<li>starting the statechart and confirming it has moved into the <code class="docutils literal notranslate"><span class="pre">outer_state</span></code></li>
+<li>posting a <code class="docutils literal notranslate"><span class="pre">to_p</span></code> event and confirm that both <code class="docutils literal notranslate"><span class="pre">S11</span></code> and <code class="docutils literal notranslate"><span class="pre">S21</span></code>
+are eventually entered.</li>
+<li>posting an <code class="docutils literal notranslate"><span class="pre">e4</span></code> and confirming that <code class="docutils literal notranslate"><span class="pre">S11</span></code> transitions into <code class="docutils literal notranslate"><span class="pre">S12</span></code> but that the
+other active region remains in the <code class="docutils literal notranslate"><span class="pre">S21</span></code> state.</li>
+<li>posting an <code class="docutils literal notranslate"><span class="pre">e1</span></code> and confirming that <code class="docutils literal notranslate"><span class="pre">S12</span></code> transitions into the S1 Region final
+state and that <code class="docutils literal notranslate"><span class="pre">S12</span></code> transitions into <code class="docutils literal notranslate"><span class="pre">S22</span></code> in the S2 Region.</li>
+<li>posting a <code class="docutils literal notranslate"><span class="pre">to_outer</span></code> and confirming that the two active states collapse into
+one active state, and that all of the expected exit conditions are run;  In
+Region S1, the S1 region exit condition is run and in Region S2, the exit
+condition for <code class="docutils literal notranslate"><span class="pre">S22</span></code> is run then the exit condition for Region S2 is run.
+After the <code class="docutils literal notranslate"><span class="pre">p</span></code> region has been exited, the statechart will ultimately land in
+the <code class="docutils literal notranslate"><span class="pre">outer_state</span></code>.</li>
+<li>re-posting <code class="docutils literal notranslate"><span class="pre">e4</span></code> and then <code class="docutils literal notranslate"><span class="pre">e1</span></code> with the same expected behaviour listed above.</li>
+<li>posting an <code class="docutils literal notranslate"><span class="pre">e2</span></code> event which while S1 Region is in its final state and the S2
+region is in it’s <code class="docutils literal notranslate"><span class="pre">S22</span></code> state.  This <code class="docutils literal notranslate"><span class="pre">e2</span></code> event will cause the S2 Region
+to enter its final state too.  Since both final states have been entered, the
+chart should post a <code class="docutils literal notranslate"><span class="pre">p_final</span></code> to itself.  This will cause the exit
+conditions of the S1 Region and S2 Region to trigger, the two active states
+will collapse into one.  The <code class="docutils literal notranslate"><span class="pre">p_final</span></code> event will cause a transition into
+the <code class="docutils literal notranslate"><span class="pre">some_other_state</span></code> who’s entry condition should trigger.</li>
+</ul>
+</div>
+<div class="section" id="instrumentation-hacking-the-spy-on-decorator">
+<span id="othogonalregions-instrumentation"></span><h3>Instrumentation: Hacking the spy_on Decorator<a class="headerlink" href="#instrumentation-hacking-the-spy-on-decorator" title="Permalink to this headline">¶</a></h3>
+<p>We are mashing together a <code class="docutils literal notranslate"><span class="pre">Factory</span></code> and two <code class="docutils literal notranslate"><span class="pre">HsmWithQueues</span></code> derived-objects.
+All of these objects can leave bread crumbs (spy streams) about what they have
+done and when they did it.  We want these spy streams to be merged into one file
+as all three objects are run together.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">InstrumentedFactory</span></code> defines a <code class="docutils literal notranslate"><span class="pre">spy_callback</span></code>, which will be used by
+the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> to write its spy stream into a log file.  Our goal is to have
+each region write its spy stream to this same log file.  Each region has a
+reference back to the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> object, and the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> is derived from
+the <code class="docutils literal notranslate"><span class="pre">InstrumentedFactory</span></code> which means each region has a reference to the
+<code class="docutils literal notranslate"><span class="pre">spy_callback</span></code>, which was defined by the <code class="docutils literal notranslate"><span class="pre">InstrumentedFactory</span></code>.  So we
+should be able to grab information out of a region’s spy stream, adjust it, then
+send it into the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> spy stream as that information is being generated.
+This way, the order of events will be preserved and we can retroactively confirm
+our miros version of orthogonal regions is working as we would expect it to
+work.</p>
+<p>State methods used by an <code class="docutils literal notranslate"><span class="pre">HsmWithQueues</span></code> derived object (our regions) can be
+instrumented by decorating them with the <code class="docutils literal notranslate"><span class="pre">spy_on</span></code> decorator provided by the
+miros library.  The <code class="docutils literal notranslate"><span class="pre">spy_on</span></code> decorator is just a function wrapper.  So why
+don’t we wrap this wrapper with another wrapper, and force it to write its spy
+information back into its outer chart like so:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># ..</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+
+<span class="k">def</span> <span class="nf">instrumented</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+  <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+  <span class="k">def</span> <span class="nf">_pspy_on</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">instrumented</span><span class="p">:</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">spy_on</span><span class="p">(</span><span class="n">fn</span><span class="p">)(</span><span class="n">chart</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">rtc</span><span class="o">.</span><span class="n">spy</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;hidden_region&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="p">:</span>
+          <span class="n">chart</span><span class="o">.</span><span class="n">outer</span><span class="o">.</span><span class="n">live_spy_callback</span><span class="p">(</span>
+            <span class="s2">&quot;{}::{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">line</span><span class="p">))</span>
+      <span class="n">chart</span><span class="o">.</span><span class="n">rtc</span><span class="o">.</span><span class="n">spy</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">e</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">args</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span>
+  <span class="k">return</span> <span class="n">_pspy_on</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above decorator accepts a function as an argument, then returns a new
+function that uses the original function within it.  This decorator will be used
+to wrap flat-state functions used by our regions.</p>
+<p>In our case, we wrap the original function with a <code class="docutils literal notranslate"><span class="pre">spy_on</span></code> call so that its
+instrumentation data structures are filled (line 8).  Then we iterate over this
+instrumentation information and send it to the <code class="docutils literal notranslate"><span class="pre">live_spy_callback</span></code> that we
+registered by the <code class="docutils literal notranslate"><span class="pre">InstrumentedFactory</span></code> (lines 9-13).  The hidden states are
+added to make exit features work in our version of the orthogonal regions, but
+we don’t want to see anything about this in our spy stream, so we filter it out
+with a regular expression (line 9-11).  When we are finished using the spy
+information, we clear the list holding the instrumentation so that we don’t
+write it out the next time this decorator is called (line 14).</p>
+<p>Once we know our chart is working, we can improve its performance by turning off
+its instrumentation (line 7 and lines 15-17).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The miros library will only instrument decorators with a <code class="docutils literal notranslate"><span class="pre">spy_on</span></code> as part of
+their name, for this reason the <code class="docutils literal notranslate"><span class="pre">_pspy_on</span></code> inner function is called this.
+This “feature” was added so that user defined decorators can be placed around
+state functions (line 6, line 19).</p>
+</div>
+<p>Now that we have a new decorator that can route the instrumentation information
+from our flat state methods back to our main statechart we can use them like
+this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ..</span>
+
+<span class="hll"><span class="nd">@instrumented</span>
+</span><span class="k">def</span> <span class="nf">s1_region</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s11</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">region_exit</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s1_hidden_region</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">s1_hidden_region</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="hll"><span class="nd">@instrumented</span>
+</span><span class="k">def</span> <span class="nf">s11</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">e4</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s12</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">s1_region</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="c1"># ..</span>
+</pre></div>
+</div>
+<p>Any flat method decorated with the <code class="docutils literal notranslate"><span class="pre">&#64;instrumented</span></code> will route it’s
+instrumentation information back into our main chart, and it will appear in the
+<code class="docutils literal notranslate"><span class="pre">xml_chart.log</span></code> in the correct sequence.  Well, almost…</p>
+<p>The instrumentation stream coming from the orthogonal components will arrive in
+the log file before the event, which initiates from the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code>.  This is
+because the instrumentation code for a <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> runs after an event has been
+processed.   The <code class="docutils literal notranslate"><span class="pre">&#64;instrumented</span></code> decorate doesn’t wait; it just writes what it
+sees immediately into the <code class="docutils literal notranslate"><span class="pre">live_spy_callback</span></code>.</p>
+<p>Having the region events write themselves to the log before the event which
+triggered them in the first place, will make the log file a bit confusing to
+read.</p>
+<p>To make it easier to read, you will use the <code class="docutils literal notranslate"><span class="pre">scribble</span></code> feature, and pound a
+note into the spy stream before a region is run, like so:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">p_dispatcher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll">  <span class="bp">self</span><span class="o">.</span><span class="n">live_spy_callback</span><span class="p">(</span><span class="s2">&quot;{}:p&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal_name</span><span class="p">))</span>
+</span>  <span class="p">[</span><span class="n">region</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="p">]</span>
+  <span class="p">[</span><span class="n">region</span><span class="o">.</span><span class="n">complete_circuit</span><span class="p">()</span> <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="p">]</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>Let’s build and run the chart and look at resulting log file:</p>
+<a class="reference external image-reference" href="_static/.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_7.svg" src="_images/xml_chart_7.svg" /></div>
+</a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+  <span class="c1"># lines 1-7 in log file</span>
+  <span class="n">example</span> <span class="o">=</span> <span class="n">XmlChart</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;parallel&#39;</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span>
+  <span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+  <span class="c1"># lines 8-26 in log file</span>
+  <span class="n">example</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_p</span><span class="p">))</span>
+
+  <span class="c1"># lines 27-38 in log file</span>
+  <span class="n">example</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">e4</span><span class="p">))</span>
+
+  <span class="c1"># lines 39-54</span>
+  <span class="n">example</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">e1</span><span class="p">))</span>
+
+  <span class="c1"># lines 55-73</span>
+  <span class="n">example</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_outer</span><span class="p">))</span>
+
+  <span class="c1"># lines 74-92</span>
+  <span class="n">example</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">to_p</span><span class="p">))</span>
+
+  <span class="c1"># lines 93-104</span>
+  <span class="n">example</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">e4</span><span class="p">))</span>
+
+  <span class="c1"># lines 105-120</span>
+  <span class="n">example</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">e1</span><span class="p">))</span>
+
+  <span class="c1"># lines 121-151, and causes chart to post p_final to itself</span>
+  <span class="n">example</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">e2</span><span class="p">))</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="hll"> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">431</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">START</span>
+</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">432</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">START</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">433</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">START</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">433</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">433</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">434</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">434</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="hll"> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">435</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">to_p</span><span class="p">:</span><span class="n">outer_state</span>
+</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">435</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">to_p</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">436</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s1_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">436</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s1_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">436</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s1_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">437</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s11</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">437</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s11</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">437</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s11</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">438</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s2_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">438</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s2_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">438</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s2_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">439</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s21</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">439</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s21</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">439</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s21</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">440</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">to_p</span><span class="p">:</span><span class="n">outer_state</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">440</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">440</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">440</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">440</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">7</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="hll"> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">440</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e4</span><span class="p">:</span><span class="n">p</span>
+</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">441</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">e4</span><span class="p">:</span><span class="n">s11</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">441</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s12</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">441</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s11</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">442</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s11</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">442</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s12</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">442</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s12</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">443</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">e4</span><span class="p">:</span><span class="n">s21</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">443</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">e4</span><span class="p">:</span><span class="n">s2_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">443</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e4</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">444</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e4</span><span class="p">:</span><span class="n">p</span><span class="p">:</span><span class="n">HOOK</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">444</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">6</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="hll"> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">444</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e1</span><span class="p">:</span><span class="n">p</span>
+</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">444</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">e1</span><span class="p">:</span><span class="n">s12</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">444</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s1_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">445</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s12</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">445</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s12</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">445</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s1_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">446</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s1_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">446</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">e1</span><span class="p">:</span><span class="n">s21</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">446</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s22</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">447</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s21</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">447</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s21</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">447</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s22</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">447</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s22</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">448</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e1</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">448</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e1</span><span class="p">:</span><span class="n">p</span><span class="p">:</span><span class="n">HOOK</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">448</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">5</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="hll"> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">448</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">to_outer</span><span class="p">:</span><span class="n">p</span>
+</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">449</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">region_exit</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">449</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">region_exit</span><span class="p">:</span><span class="n">s1_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">449</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">region_exit</span><span class="p">:</span><span class="n">s1_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">450</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s1_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">450</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s1_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">450</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s1_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">451</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">region_exit</span><span class="p">:</span><span class="n">s22</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">451</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">region_exit</span><span class="p">:</span><span class="n">s2_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">452</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s22</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">452</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s22</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">452</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s2_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">453</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s2_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">453</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">to_outer</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">453</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">453</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">454</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">454</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">outer_state</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">454</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">4</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="hll"> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">454</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">to_p</span><span class="p">:</span><span class="n">outer_state</span>
+</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">454</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">to_p</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">455</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s1_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">455</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s1_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">455</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s1_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">456</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s11</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">456</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s11</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">456</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s11</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">457</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s2_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">457</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s2_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">457</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s2_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">458</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s21</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">458</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s21</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">458</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s21</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">459</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">to_p</span><span class="p">:</span><span class="n">outer_state</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">459</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">459</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">459</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">459</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">3</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="hll"> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">459</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e4</span><span class="p">:</span><span class="n">p</span>
+</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">460</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">e4</span><span class="p">:</span><span class="n">s11</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">460</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s12</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">460</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s11</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">461</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s11</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">461</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s12</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">461</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s12</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">462</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">e4</span><span class="p">:</span><span class="n">s21</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">462</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">e4</span><span class="p">:</span><span class="n">s2_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">462</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e4</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">463</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e4</span><span class="p">:</span><span class="n">p</span><span class="p">:</span><span class="n">HOOK</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">463</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">2</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="hll"> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">463</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e1</span><span class="p">:</span><span class="n">p</span>
+</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">463</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">e1</span><span class="p">:</span><span class="n">s12</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">464</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s1_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">464</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s12</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">464</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s12</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">464</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s1_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">465</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s1_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">465</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">e1</span><span class="p">:</span><span class="n">s21</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">465</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s22</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">466</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s21</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">466</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s21</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">466</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s22</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">467</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s22</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">467</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e1</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">467</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e1</span><span class="p">:</span><span class="n">p</span><span class="p">:</span><span class="n">HOOK</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">467</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">1</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+<span class="hll"> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">467</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e2</span><span class="p">:</span><span class="n">p</span>
+</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">468</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">e2</span><span class="p">:</span><span class="n">s1_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">468</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">e2</span><span class="p">:</span><span class="n">s1_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">468</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">e2</span><span class="p">:</span><span class="n">s22</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">469</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s2_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">469</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s22</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">469</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s22</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">470</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">s2_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">470</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">s2_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">470</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e2</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">470</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">POST_FIFO</span><span class="p">:</span><span class="n">p_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">470</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">e2</span><span class="p">:</span><span class="n">p</span><span class="p">:</span><span class="n">HOOK</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">471</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">1</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">471</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">region_exit</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">472</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">region_exit</span><span class="p">:</span><span class="n">s1_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">472</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">region_exit</span><span class="p">:</span><span class="n">s1_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">472</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s1_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">473</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s1_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">473</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s1_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s1_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">473</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">region_exit</span><span class="p">:</span><span class="n">s2_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">474</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">region_exit</span><span class="p">:</span><span class="n">s2_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">474</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s2_region_final</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">474</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">s2_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">475</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">s2_r</span><span class="p">::</span><span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">s2_region</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">475</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">p_final</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">476</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">some_other_state</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">476</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">SEARCH_FOR_SUPER_SIGNAL</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">476</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">EXIT_SIGNAL</span><span class="p">:</span><span class="n">p</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">476</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">ENTRY_SIGNAL</span><span class="p">:</span><span class="n">some_other_state</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">476</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="n">INIT_SIGNAL</span><span class="p">:</span><span class="n">some_other_state</span>
+ <span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">06</span> <span class="mi">09</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">476</span> <span class="n">DEBUG</span><span class="p">:</span><span class="n">S</span><span class="p">:</span> <span class="p">[</span><span class="n">parallel</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">Queued</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span> <span class="n">Deferred</span><span class="p">:(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
+</div>
+</div>
 </div>
 
 
@@ -118,7 +1091,23 @@ regions have finished.</p>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
   <img class="logo_a" src="_static/miros_a.svg" width="250" alt="Logo" >
-</a></p><div class="relations">
+</a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Orthogonal Regions</a><ul>
+<li><a class="reference internal" href="#constructing-orthogonal-regions-with-miros">Constructing Orthogonal Regions with Miros</a></li>
+<li><a class="reference internal" href="#high-level-strategy-to-build-orthogonal-regions-with-miros">High Level Strategy to Build Orthogonal Regions with miros</a></li>
+<li><a class="reference internal" href="#orthogonal-regions-using-orthogonal-components">Orthogonal Regions Using Orthogonal Components</a><ul>
+<li><a class="reference internal" href="#orthogonal-components-as-regions">Orthogonal Components As Regions</a></li>
+<li><a class="reference internal" href="#the-instrumentedfactory">The InstrumentedFactory</a></li>
+<li><a class="reference internal" href="#main-statechart-as-xmlchart">Main Statechart as XMLChart</a></li>
+<li><a class="reference internal" href="#instrumentation-hacking-the-spy-on-decorator">Instrumentation: Hacking the spy_on Decorator</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
