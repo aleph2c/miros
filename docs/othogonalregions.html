@@ -38,10 +38,10 @@
   <p id="othogonalregions-othogonal-regions-with-miros"><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/xml_chart.py">example</a></p>
 <div class="section" id="orthogonal-regions">
 <h1>Orthogonal Regions<a class="headerlink" href="#orthogonal-regions" title="Permalink to this headline">¶</a></h1>
-<p>As your products scale and your designs get more complicated you may experience
-<strong>state space explosion</strong>.  The number of states that are needed to make your
-system combinatorially mix so that it becomes impractical to test all paths of
-possible behaviour.</p>
+<p>As your products scale and your designs get more complicated you will experience
+<a class="reference external" href="https://www.coursera.org/lecture/system-validation-software-protocols/guidelines-to-avoid-the-state-space-explosion-problem-O5jEd">State space explosion</a>.
+The number of states that are needed to make your system combinatorially mix so
+that it becomes impractical to test all paths of possible behaviour.</p>
 <p><strong>State space explosion</strong> also describes a situation where you can no longer
 <em>comprehend</em> your design because it has become too complicated. Your chosen
 design abstraction has been outpaced by the size of your problem, and you can’t
@@ -50,27 +50,23 @@ it.</p>
 <p>This scale-to-bafflement rate is dependent upon your choice of abstraction.  It
 will happen quickly if you use finite state machines as your primary design
 tool.  You can hold it off a bit longer by switching to a hierarchical state
-machine design approach; common behaviours are mapped into outer states, making
-a design more understandable, but this can only take you so far.  At some point,
-you must chunk your design into concurrent pieces that interact.  Each piece
-being something you can comprehend and trust to work on its own.</p>
+machine design approach; common behaviours are mapped into outer states, but
+this can only take you so far.  At some point, you must chunk your design into
+concurrent pieces that interact.</p>
 <p>Concurrent state machines mix combinatorially, giving you an abstraction which
-scales without needing pages and pages to draw your design.  Concurrent
+scales without needing pages and pages to draw out your idea.  Concurrent
 statecharts give you <strong>state space compression</strong>.</p>
 <p>David Harel’s original statechart paper addressed state space explosion by
-inventing the <strong>orthogonal region</strong>.  Orthogonal regions describe concurrency
-<em>within</em> an HSM.</p>
+inventing the <strong>orthogonal region</strong>.  Orthogonal regions pictorially describe
+concurrency <em>within</em> an HSM.</p>
 <p>But the orthogonal region abstraction was not supported in Miro Samek’s
-statechart algorithm (the algorithm used by this library) for performance
+statechart algorithm (used by this library), for performance
 reasons.  Instead he offered up <a class="reference internal" href="patterns.html#patterns-orthogonal-component"><span class="std std-ref">orthogonal components</span></a>; HSMs acting as variables within other HSMs.</p>
 <p>In this example, I will show you what an orthogonal region is and why you would
 use it. Then we will map the orthogonal region behaviour into a Python program
 using existing miros features.  We will be using the <a class="reference internal" href="patterns.html#patterns-orthogonal-component"><span class="std std-ref">orthogonal components</span></a> mixed with a Factory to satisfy an “orthogonal
 regions” behavioural description written as part of the <a class="reference external" href="https://www.w3.org/TR/scxml/">SCXML standard</a>.</p>
-<p>Packing a design into a suitable theory is a strategic effort.  Every good
-strategy needs supporting tactics, and in this case, we need to provide our
-engineers with the tactical means to see what their code does once it is
-written:  Our example will be instrumented.</p>
+<p>Our example will be instrumented so we can see it working as it runs.</p>
 <hr class="docutils" />
 <p>The SCXML standard describes an orthogonal region statechart similar to this:</p>
 <a class="reference external image-reference" href="_static/xml_chart_1.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_1.svg" src="_images/xml_chart_1.svg" /></div>
@@ -92,11 +88,27 @@ receives a <code class="docutils literal notranslate"><span class="pre">to_outer
 both orthogonal regions will be followed until the <code class="docutils literal notranslate"><span class="pre">p</span></code> state is exited:
 <code class="docutils literal notranslate"><span class="pre">S11</span></code> exit code will run, the <code class="docutils literal notranslate"><span class="pre">S1</span> <span class="pre">Region</span></code> exit code will run, then the
 <code class="docutils literal notranslate"><span class="pre">S21</span></code> exit code will run and the <code class="docutils literal notranslate"><span class="pre">S2</span> <span class="pre">Region</span></code> exit code will run.</p>
-<p>The power of the orthogonal region comes from its multiplicative feature.  The
-number of state combinations within <code class="docutils literal notranslate"><span class="pre">p</span></code> is the product of the number of states
-in each region: <code class="docutils literal notranslate"><span class="pre">3*3</span> <span class="pre">=</span> <span class="pre">9</span></code> (counting the final pseudostates).</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
+<p class="last">David Harel’s statechart paper does not describe regions as having entry and
+exit conditions.  If you do not want to support such a thing (because they may
+not appear in a standard), don’t add them to your design.</p>
+</div>
+<p>The power of the orthogonal region comes from its multiplicative feature.  The
+number of state combinations within <code class="docutils literal notranslate"><span class="pre">p</span></code> is the product of the number of states
+in each region: <code class="docutils literal notranslate"><span class="pre">3*3</span> <span class="pre">=</span> <span class="pre">9</span></code> (counting the final pseudostates):</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The Active State combinations within <code class="docutils literal notranslate"><span class="pre">p</span></code> are:</p>
+<p>(S11, S21)
+(S11, S22)
+(S11, S2_final)
+(S12, S21)
+(S12, S22)
+(S12, S2_final)
+(S1_final, S21)
+(S1_final, S22)
+(S1_final, S2_final)</p>
 <p class="last">This multiplicative property holds true for any concurrency mechanism,
 whether it be concurrent statecharts (with publish/subscribe) or with the
 orthogonal component pattern.</p>
@@ -250,9 +262,19 @@ then I will talk about the XMLChart (right to left on the diagram).</p>
 </span>   <span class="c1"># ...</span>
 </pre></div>
 </div>
+<p>Each region will have to have a reference to it’s outer state chart and a
+reference to all regions.  You can see this in the UML diagram as white-diamond
+arrows (Aggregation arrows in UML-speak).  The white diamond arrow describes a
+“has a” relationship:  A region “has many” other regions and “has an” outer
+state chart.  These relationships are established in the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> code of
+the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> which constructs each region object (see the above listing).</p>
+<p>The reference to the other regions is needed to determine if all regions are in
+their final state.  If they are, then <code class="docutils literal notranslate"><span class="pre">p_final</span></code> event must be placed in the
+outer statechart’s event queue.  To do this a reference to the outer statechart
+is required.</p>
 <p>A region’s state machine will be defined in the flat method style and will be
-instrumented with the <code class="docutils literal notranslate"><span class="pre">&#64;instrumented</span></code> decorator which will be described
-shortly.</p>
+instrumented with the <code class="docutils literal notranslate"><span class="pre">&#64;instrumented</span></code> decorator which will be <a class="reference internal" href="#othogonalregions-instrumentation"><span class="std std-ref">described
+shortly</span></a>.</p>
 <a class="reference external image-reference" href="_static/xml_chart_5.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_5.svg" src="_images/xml_chart_5.svg" /></div>
 </a>
 <p>Here is the S1 Region’s HSM code:</p>
@@ -351,6 +373,7 @@ this:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
   <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="p">:</span>
     <span class="n">region</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">starting_state</span><span class="p">)</span>
+
   <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
   <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
@@ -433,9 +456,43 @@ its reference to the outer statechart to post events to it.</p>
 <div class="section" id="the-instrumentedfactory">
 <span id="othogonalregions-the-instrumentedfactory"></span><h3>The InstrumentedFactory<a class="headerlink" href="#the-instrumentedfactory" title="Permalink to this headline">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> subclasses from the <code class="docutils literal notranslate"><span class="pre">InstrumentedFactory</span></code>.</p>
+<a class="reference external image-reference" href="_static/xml_chart_8.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_8.svg" src="_images/xml_chart_8.svg" /></div>
+</a>
 <p>The <code class="docutils literal notranslate"><span class="pre">InstrumentedFactory</span></code> instruments a miros factory class.  It creates an
 <code class="docutils literal notranslate"><span class="pre">xml_chart.log</span></code> file then registers a spy and trace callback handler for the
 statechart to use.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">InstrumentedFactory</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span> <span class="o">=</span> <span class="s1">&#39;xml_chart.log&#39;</span> <span class="k">if</span> <span class="n">log_file</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">log_file</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">clear_log</span><span class="p">()</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+      <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+      <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">,</span>
+      <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">register_live_spy_callback</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spy_callback</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">register_live_trace_callback</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace_callback</span><span class="p">))</span>
+
+  <span class="k">def</span> <span class="nf">trace_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;trace without datetimestamp&#39;&#39;&#39;</span>
+    <span class="n">trace_without_datetime</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\[.+\]) (\[.+\].+)&#39;</span><span class="p">,</span> <span class="n">trace</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;T: &quot;</span> <span class="o">+</span> <span class="n">trace_without_datetime</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spy</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;spy with machine name pre-pending&#39;&#39;&#39;</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">spy</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
+
+  <span class="k">def</span> <span class="nf">clear_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+      <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="main-statechart-as-xmlchart">
 <span id="othogonalregions-main-statechart-as-xmlchart"></span><h3>Main Statechart as XMLChart<a class="headerlink" href="#main-statechart-as-xmlchart" title="Permalink to this headline">¶</a></h3>
@@ -605,11 +662,12 @@ the <code class="docutils literal notranslate"><span class="pre">some_other_stat
 All of these objects can leave bread crumbs (spy streams) about what they have
 done and when they did it.  We want these spy streams to be merged into one file
 as all three objects are run together.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">InstrumentedFactory</span></code> defines a <code class="docutils literal notranslate"><span class="pre">spy_callback</span></code>, which will be used by
-the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> to write its spy stream into a log file.  Our goal is to have
-each region write its spy stream to this same log file.  Each region has a
-reference back to the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> object, and the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> is derived from
-the <code class="docutils literal notranslate"><span class="pre">InstrumentedFactory</span></code> which means each region has a reference to the
+<p>The <a class="reference internal" href="#othogonalregions-the-instrumentedfactory"><span class="std std-ref">InstrumentedFactory</span></a>
+defines a <code class="docutils literal notranslate"><span class="pre">spy_callback</span></code>, which will be used by the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> to write its
+spy stream into a log file.  Our goal is to have each region write its spy
+stream to this same log file.  Each region has a reference back to the
+<code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> object, and the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> is derived from the
+<code class="docutils literal notranslate"><span class="pre">InstrumentedFactory</span></code> which means each region has a reference to the
 <code class="docutils literal notranslate"><span class="pre">spy_callback</span></code>, which was defined by the <code class="docutils literal notranslate"><span class="pre">InstrumentedFactory</span></code>.  So we
 should be able to grab information out of a region’s spy stream, adjust it, then
 send it into the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> spy stream as that information is being generated.
@@ -738,7 +796,7 @@ note into the spy stream before a region is run, like so:</p>
   <span class="k">return</span> <span class="n">status</span>
 </pre></div>
 </div>
-<p>Let’s build and run the chart and look at resulting log file:</p>
+<p>Let’s build and run the chart, then look at the resulting log file:</p>
 <a class="reference external image-reference" href="_static/.pdf"><div align="center" class="align-center"><img alt="_images/xml_chart_7.svg" src="_images/xml_chart_7.svg" /></div>
 </a>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>

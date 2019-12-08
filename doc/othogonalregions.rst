@@ -1,14 +1,15 @@
 .. _othogonalregions-othogonal-regions-with-miros:
 
-
 `example <https://github.com/aleph2c/miros/blob/master/examples/xml_chart.py>`_
 
 Orthogonal Regions
 ==================
-As your products scale and your designs get more complicated you may experience
-**state space explosion**.  The number of states that are needed to make your
-system combinatorially mix so that it becomes impractical to test all paths of
-possible behaviour.
+
+As your products scale and your designs get more complicated you will experience
+`State space explosion
+<https://www.coursera.org/lecture/system-validation-software-protocols/guidelines-to-avoid-the-state-space-explosion-problem-O5jEd>`_.
+The number of states that are needed to make your system combinatorially mix so
+that it becomes impractical to test all paths of possible behaviour.
 
 **State space explosion** also describes a situation where you can no longer
 *comprehend* your design because it has become too complicated. Your chosen
@@ -19,21 +20,20 @@ it.
 This scale-to-bafflement rate is dependent upon your choice of abstraction.  It
 will happen quickly if you use finite state machines as your primary design
 tool.  You can hold it off a bit longer by switching to a hierarchical state
-machine design approach; common behaviours are mapped into outer states, making
-a design more understandable, but this can only take you so far.  At some point,
-you must chunk your design into concurrent pieces that interact.  Each piece
-being something you can comprehend and trust to work on its own.
+machine design approach; common behaviours are mapped into outer states, but
+this can only take you so far.  At some point, you must chunk your design into
+concurrent pieces that interact.
 
 Concurrent state machines mix combinatorially, giving you an abstraction which
-scales without needing pages and pages to draw your design.  Concurrent
+scales without needing pages and pages to draw out your idea.  Concurrent
 statecharts give you **state space compression**.
 
 David Harel's original statechart paper addressed state space explosion by
-inventing the **orthogonal region**.  Orthogonal regions describe concurrency
-*within* an HSM.
+inventing the **orthogonal region**.  Orthogonal regions pictorially describe
+concurrency *within* an HSM.
 
 But the orthogonal region abstraction was not supported in Miro Samek's
-statechart algorithm (the algorithm used by this library) for performance
+statechart algorithm (used by this library), for performance
 reasons.  Instead he offered up :ref:`orthogonal components
 <patterns-orthogonal-component>`; HSMs acting as variables within other HSMs.
 
@@ -44,10 +44,7 @@ using existing miros features.  We will be using the :ref:`orthogonal components
 regions" behavioural description written as part of the `SCXML standard
 <https://www.w3.org/TR/scxml/>`_.
 
-Packing a design into a suitable theory is a strategic effort.  Every good
-strategy needs supporting tactics, and in this case, we need to provide our
-engineers with the tactical means to see what their code does once it is
-written:  Our example will be instrumented.
+Our example will be instrumented so we can see it working as it runs.
 
 ----
 
@@ -82,15 +79,33 @@ both orthogonal regions will be followed until the ``p`` state is exited:
 ``S11`` exit code will run, the ``S1 Region`` exit code will run, then the
 ``S21`` exit code will run and the ``S2 Region`` exit code will run.
 
+.. note::
+
+  David Harel's statechart paper does not describe regions as having entry and
+  exit conditions.  If you do not want to support such a thing (because they may
+  not appear in a standard), don't add them to your design.
+
 The power of the orthogonal region comes from its multiplicative feature.  The
 number of state combinations within ``p`` is the product of the number of states
-in each region: ``3*3 = 9`` (counting the final pseudostates).  
+in each region: ``3*3 = 9`` (counting the final pseudostates):
 
 .. note::
 
-   This multiplicative property holds true for any concurrency mechanism,
-   whether it be concurrent statecharts (with publish/subscribe) or with the
-   orthogonal component pattern.
+  The Active State combinations within ``p`` are:
+
+  (S11, S21)
+  (S11, S22)
+  (S11, S2_final)
+  (S12, S21)
+  (S12, S22)
+  (S12, S2_final)
+  (S1_final, S21)
+  (S1_final, S22)
+  (S1_final, S2_final)
+
+  This multiplicative property holds true for any concurrency mechanism,
+  whether it be concurrent statecharts (with publish/subscribe) or with the
+  orthogonal component pattern.
 
 David Harel's way of drawing concurrency fits nicely onto a diagram.  Moreover,
 to have concurrency (with its multiplicative ability to compact design
@@ -285,9 +300,21 @@ The two region orthogonal components will be constructed in the ``__init__`` met
          region.regions.append(_region)
      # ...
 
+Each region will have to have a reference to it's outer state chart and a
+reference to all regions.  You can see this in the UML diagram as white-diamond
+arrows (Aggregation arrows in UML-speak).  The white diamond arrow describes a
+"has a" relationship:  A region "has many" other regions and "has an" outer
+state chart.  These relationships are established in the ``__init__`` code of
+the ``XMLChart`` which constructs each region object (see the above listing).
+
+The reference to the other regions is needed to determine if all regions are in
+their final state.  If they are, then ``p_final`` event must be placed in the
+outer statechart's event queue.  To do this a reference to the outer statechart
+is required.
+
 A region's state machine will be defined in the flat method style and will be
-instrumented with the ``@instrumented`` decorator which will be described
-shortly.
+instrumented with the ``@instrumented`` decorator which will be :ref:`described
+shortly <othogonalregions-instrumentation>`.
 
 .. image:: _static/xml_chart_5.svg
     :target: _static/xml_chart_5.pdf
@@ -397,6 +424,7 @@ The ``XMLChart`` ``start`` method will look like this:
   def start(self):
     for region in self.p_regions:
       region.start_at(region.starting_state)
+
     super().start_at(self.outer_state)
     return self
 
@@ -489,9 +517,46 @@ The InstrumentedFactory
 
 The ``XMLChart`` subclasses from the ``InstrumentedFactory``.
 
+.. image:: _static/xml_chart_8.svg
+    :target: _static/xml_chart_8.pdf
+    :align: center
+
 The ``InstrumentedFactory`` instruments a miros factory class.  It creates an
 ``xml_chart.log`` file then registers a spy and trace callback handler for the
 statechart to use.
+
+.. code-block:: python
+  
+   class InstrumentedFactory(Factory):
+     def __init__(self, name, *, log_file=None, live_trace=None, live_spy=None):
+       super().__init__(name)
+       self.live_trace = False if live_trace == None else live_trace
+       self.live_spy = False if live_spy == None else live_spy
+       self.log_file = 'xml_chart.log' if log_file == None else log_file
+
+       self.clear_log()
+
+       logging.basicConfig(
+         format='%(asctime)s %(levelname)s:%(message)s',
+         filename=self.log_file,
+         level=logging.DEBUG)
+
+       self.register_live_spy_callback(partial(self.spy_callback))
+       self.register_live_trace_callback(partial(self.trace_callback))
+
+     def trace_callback(self, trace):
+       '''trace without datetimestamp'''
+       trace_without_datetime = re.search(r'(\[.+\]) (\[.+\].+)', trace).group(2)
+       logging.debug("T: " + trace_without_datetime)
+
+     def spy_callback(self, spy):
+       '''spy with machine name pre-pending'''
+       print(spy)
+       logging.debug("S: [{}] {}".format(self.name, spy))
+
+     def clear_log(self):
+       with open(self.log_file, "w") as fp:
+         fp.write("")
 
 .. _othogonalregions-main-statechart-as-xmlchart:
 
@@ -678,11 +743,12 @@ All of these objects can leave bread crumbs (spy streams) about what they have
 done and when they did it.  We want these spy streams to be merged into one file
 as all three objects are run together.
 
-The ``InstrumentedFactory`` defines a ``spy_callback``, which will be used by
-the ``XMLChart`` to write its spy stream into a log file.  Our goal is to have
-each region write its spy stream to this same log file.  Each region has a
-reference back to the ``XMLChart`` object, and the ``XMLChart`` is derived from
-the ``InstrumentedFactory`` which means each region has a reference to the
+The :ref:`InstrumentedFactory <othogonalregions-the-instrumentedfactory>`
+defines a ``spy_callback``, which will be used by the ``XMLChart`` to write its
+spy stream into a log file.  Our goal is to have each region write its spy
+stream to this same log file.  Each region has a reference back to the
+``XMLChart`` object, and the ``XMLChart`` is derived from the
+``InstrumentedFactory`` which means each region has a reference to the
 ``spy_callback``, which was defined by the ``InstrumentedFactory``.  So we
 should be able to grab information out of a region's spy stream, adjust it, then
 send it into the ``XMLChart`` spy stream as that information is being generated.
@@ -811,7 +877,7 @@ note into the spy stream before a region is run, like so:
     return status
 
 
-Let's build and run the chart and look at resulting log file:
+Let's build and run the chart, then look at the resulting log file:
 
 .. image:: _static/xml_chart_7.svg
     :target: _static/.pdf

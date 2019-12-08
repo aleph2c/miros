@@ -17,6 +17,7 @@ Patterns
   * :ref:`reminder<patterns-reminder>`
   * :ref:`deferred event<patterns-deferred-event>`
   * :ref:`orthogonal component<patterns-orthogonal-component>`
+  * :ref:`orthogonal regions<patterns-orthogonal-regions>`
   * :ref:`transition to history<patterns-transition-to-history>`
   * :ref:`multichart race<patterns-multichart-race>`
   * :ref:`multichart pend<patterns-multichart-pend>`
@@ -1391,8 +1392,14 @@ The two different areas in the above chart separated by the dotted line are
 independent of one another but are both turned on when the truck state is
 initiated.
 
-This part of the :term:`Harel Formalism<Harel Formalism>` is **not supported** by the
-Miro Samek event processing algorithm.
+This part of the :term:`Harel Formalism<Harel Formalism>` is **not directly
+supported** by the Miro Samek event processing algorithm.
+
+.. note::
+
+  If you would like to see how to map the orthogonal region pattern onto the
+  miros-supported orthgonal component pattern, see the :ref:`orthogonal regions
+  example <othogonalregions-othogonal-regions-with-miros>`.
 
 If you would like such a structure in your machine, you could use an
 **orthogonal component instead**.  An orthogonal component is just a statechart
@@ -1411,8 +1418,6 @@ Imagine we are asked to build some software for the general fusion reactor:
     then repeated, while the heat from the reaction is captured in the liquid
     metal and used to generate electricity via a steam turbine." -- General
     Fusion
-
-Now that is an ambitious project.
 
 Let's say we have to write the firing mechanism to cause all of the pistons to
 initiate the pressure wave.
@@ -2476,6 +2481,22 @@ used in this example:
   # pp(fusion_reactor.pistons[0].spy())
   # pp(fusion_reactor.pistons[1].spy())
   print(fusion_reactor.pistons[1].trace())
+
+
+.. _patterns-orthogonal-regions:
+
+Orthogonal Regions
+^^^^^^^^^^^^^^^^^^
+
+Orthogonal regions describe HSM concurrency *within* the same statechart.
+
+.. image:: _static/xml_chart_2.svg
+    :target: _static/xml_chart_2.pdf
+    :align: center
+
+See the :ref:`orthogonal regions example
+<othogonalregions-othogonal-regions-with-miros>` for instructions on how to
+build orthogonal regions using miros.
 
 .. _patterns-transition-to-history:
 
