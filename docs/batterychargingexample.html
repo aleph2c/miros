@@ -18,7 +18,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Cellular Automata" href="cellular_automata.html" />
-    <link rel="prev" title="Using and Unwinding a Factory" href="towardsthefactoryexample.html" />
+    <link rel="prev" title="Orthogonal Regions" href="othogonalregions.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -2658,81 +2658,6 @@ how to graph its output:</li>
 <a class="reference external image-reference" href="_static/charger_test_results_1.pdf"><div align="center" class="align-center"><img alt="_images/charger_test_results_1.svg" src="_images/charger_test_results_1.svg" /></div>
 </a>
 <hr class="docutils" />
-<p>“So what is deficit charging?”`</p>
-<p><span class="new-spec">A deficit is a description of an amount that is too small to do the
-job.  So it follows that “deficit charging” describes when you only partially
-charge a battery before you use them again.  If you do this to a battery, its
-plates “sulfate”.  If you run your system in a way which “sulfates” on every
-discharge, you will destroy your batteries in short order.</span></p>
-<p><span class="new-spec">Our charger won’t be able to measure the battery’s state-of-charge
-directly from our device.  Instead we will be charging the battery based on some
-rules of thumb (heuristics), and if we get these wrong we will significantly
-reduce how long a battery stays useful before becoming very heavy and toxic
-garbage.</span></p>
-<p><span class="new-spec">The charging heuristics are based on parameters.  By having
-parameter’s the charger can work for all sorts of different batteries because we
-don’t know what kind of battery our customer will buy.  Our customer’s don’t
-want to become renewable energy experts, they just want to pay someone to set up
-and install equipment that will give them power when they need it.  So they let
-their system installers configure the charger’s parameters for them.  If the
-installers don’t configure the charger correctly, they speed up how fast their
-batteries will be used up.</span></p>
-<p><span class="new-spec">Last time I checked, the batteries cost about one third the
-overall amount of a renewable energy installation, and our customers will be in
-remote locations, so replacing batteries will be both expensive in terms of
-materiel cost, transportation and labour.</span></p>
-<p><span class="new-spec">Here is the rub, the system installers are often the same people who
-sell batteries.  So it is the installers who stand to benifit if the system is
-not setup properly.</span></p>
-<p>“I have known installers, they want to do a good job.”</p>
-<p><span class="new-spec">Yes, most of them do, but we would like to remove this moral hazard
-anyway.  Our customers have a very vocal community, they will call us into
-account if they think our equipment is faulty, and if we blame the shortening of
-battery life on our installers, our customers will side with the experts they
-know over the experts they don’t know.  It will become our fault.</span></p>
-<p>“It would be our fault, we should eat the system’s complexity on behalf of our
-customers, and we should remove the moral hazard with our design.  Why can’t we
-just add a battery-state-of-charge monitor into our system?”</p>
-<p><span class="new-spec">They are very expensive, and we have the equalization feature, so if
-a customer is willing to equalize their batteries once a month, they can
-increase their battery’s lifespan.</span></p>
-<p>“Well, we can have a central database with battery settings, when a new charger
-wakes up it calls home to configure itself, so that neither the installer or the
-customer has to worry about it.”</p>
-<p><span class="new-spec">A lot of our customers are off-grid for a reason, they don’t want
-their equipment calling home and reporting to some remote database.</span>  He pauses,
-then says <span class="new-spec">But some of
-our customer’s don’t care. We can collect data from them so that future
-systems can auto-configure themselves.</span></p>
-<p>“You are thinking about an AI aren’t you?”</p>
-<p><span class="new-spec">I guess so.  If we measure all of the current information going into
-and leaving the battery, its temperature and its voltage we could build some
-powerful regression algorithms on our end. We could dynamically update the
-charger’s battery settings, and even notify our customers when their battery’s
-are nearing end-of-life.  But to do this we are going to need a lot of data.</span></p>
-<p>“That sounds like a Tesla.  I’m in.”</p>
-<p>“If we do this we could train AI on the servers then send out a tuned-up
-Python neural network in each charger via a software upgrade.”</p>
-<p>“Before the charger starts, it could spend some time electrically probing it’s
-battery, build up a physics model which matches it, then dial in the battery’s
-charging parameters against the battery’s physics model.  This model could be
-sent back to our servers, and we could audit the charger’s work using a higher
-power computing platform.”</p>
-<p><span class="new-spec">Why bother with a physics model?  Why not just build a regressor that
-gives you the battery settings directly?</span></p>
-<p>“Decoupling.  If we let the AI build a physics model, we can change our charging
-algorithm and the settings that we use without having to throw everything out.”</p>
-<p>“Also, for debugging; neural networks are black boxes.  So if we use it to build
-something we understand, it won’t be a black box anymore; if it constructs
-curves that don’t make sense we can turn it off and fall back to sensible
-settings.”</p>
-<p>“If we build a battery physics inside of the charger, then our charger could
-charge any kind of battery type.  It could detect different chemistries, it
-wouldn’t just charge lead acids anymore.”</p>
-<p><span class="new-spec">Well I think we agree on one thing, to do this we will need a lot of
-data, and the data has to be useful.</span></p>
-<p>“Yeah, but this is road map stuff, version 5, we need to think about our system
-right now.”</p>
 <p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
 </div>
@@ -2766,7 +2691,7 @@ right now.”</p>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="examples.html">Examples</a><ul>
-      <li>Previous: <a href="towardsthefactoryexample.html" title="previous chapter">Using and Unwinding a Factory</a></li>
+      <li>Previous: <a href="othogonalregions.html" title="previous chapter">Orthogonal Regions</a></li>
       <li>Next: <a href="cellular_automata.html" title="next chapter">Cellular Automata</a></li>
   </ul></li>
   </ul></li>

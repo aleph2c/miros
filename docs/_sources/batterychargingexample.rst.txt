@@ -3186,103 +3186,104 @@ Spec 8: Current Derating in Constant Voltage Modes
 
 ----
 
-"So what is deficit charging?"`
+..
+   "So what is deficit charging?"`
 
-:new_spec:`A deficit is a description of an amount that is too small to do the
-job.  So it follows that "deficit charging" describes when you only partially
-charge a battery before you use them again.  If you do this to a battery, its
-plates "sulfate".  If you run your system in a way which "sulfates" on every
-discharge, you will destroy your batteries in short order.`
+   :new_spec:`A deficit is a description of an amount that is too small to do the
+   job.  So it follows that "deficit charging" describes when you only partially
+   charge a battery before you use them again.  If you do this to a battery, its
+   plates "sulfate".  If you run your system in a way which "sulfates" on every
+   discharge, you will destroy your batteries in short order.`
 
-:new_spec:`Our charger won't be able to measure the battery's state-of-charge
-directly from our device.  Instead we will be charging the battery based on some
-rules of thumb (heuristics), and if we get these wrong we will significantly
-reduce how long a battery stays useful before becoming very heavy and toxic
-garbage.`
+   :new_spec:`Our charger won't be able to measure the battery's state-of-charge
+   directly from our device.  Instead we will be charging the battery based on some
+   rules of thumb (heuristics), and if we get these wrong we will significantly
+   reduce how long a battery stays useful before becoming very heavy and toxic
+   garbage.`
 
-:new_spec:`The charging heuristics are based on parameters.  By having
-parameter's the charger can work for all sorts of different batteries because we
-don't know what kind of battery our customer will buy.  Our customer's don't
-want to become renewable energy experts, they just want to pay someone to set up
-and install equipment that will give them power when they need it.  So they let
-their system installers configure the charger's parameters for them.  If the
-installers don't configure the charger correctly, they speed up how fast their
-batteries will be used up.`
+   :new_spec:`The charging heuristics are based on parameters.  By having
+   parameter's the charger can work for all sorts of different batteries because we
+   don't know what kind of battery our customer will buy.  Our customer's don't
+   want to become renewable energy experts, they just want to pay someone to set up
+   and install equipment that will give them power when they need it.  So they let
+   their system installers configure the charger's parameters for them.  If the
+   installers don't configure the charger correctly, they speed up how fast their
+   batteries will be used up.`
 
-:new_spec:`Last time I checked, the batteries cost about one third the
-overall amount of a renewable energy installation, and our customers will be in
-remote locations, so replacing batteries will be both expensive in terms of
-materiel cost, transportation and labour.`
+   :new_spec:`Last time I checked, the batteries cost about one third the
+   overall amount of a renewable energy installation, and our customers will be in
+   remote locations, so replacing batteries will be both expensive in terms of
+   materiel cost, transportation and labour.`
 
-:new_spec:`Here is the rub, the system installers are often the same people who
-sell batteries.  So it is the installers who stand to benifit if the system is
-not setup properly.`
+   :new_spec:`Here is the rub, the system installers are often the same people who
+   sell batteries.  So it is the installers who stand to benifit if the system is
+   not setup properly.`
 
-"I have known installers, they want to do a good job."
+   "I have known installers, they want to do a good job."
 
-:new_spec:`Yes, most of them do, but we would like to remove this moral hazard
-anyway.  Our customers have a very vocal community, they will call us into
-account if they think our equipment is faulty, and if we blame the shortening of
-battery life on our installers, our customers will side with the experts they
-know over the experts they don't know.  It will become our fault.`
+   :new_spec:`Yes, most of them do, but we would like to remove this moral hazard
+   anyway.  Our customers have a very vocal community, they will call us into
+   account if they think our equipment is faulty, and if we blame the shortening of
+   battery life on our installers, our customers will side with the experts they
+   know over the experts they don't know.  It will become our fault.`
 
-"It would be our fault, we should eat the system's complexity on behalf of our
-customers, and we should remove the moral hazard with our design.  Why can't we
-just add a battery-state-of-charge monitor into our system?"
+   "It would be our fault, we should eat the system's complexity on behalf of our
+   customers, and we should remove the moral hazard with our design.  Why can't we
+   just add a battery-state-of-charge monitor into our system?"
 
-:new_spec:`They are very expensive, and we have the equalization feature, so if
-a customer is willing to equalize their batteries once a month, they can
-increase their battery's lifespan.`
+   :new_spec:`They are very expensive, and we have the equalization feature, so if
+   a customer is willing to equalize their batteries once a month, they can
+   increase their battery's lifespan.`
 
-"Well, we can have a central database with battery settings, when a new charger
-wakes up it calls home to configure itself, so that neither the installer or the
-customer has to worry about it."
+   "Well, we can have a central database with battery settings, when a new charger
+   wakes up it calls home to configure itself, so that neither the installer or the
+   customer has to worry about it."
 
-:new_spec:`A lot of our customers are off-grid for a reason, they don't want
-their equipment calling home and reporting to some remote database.`  He pauses,
-then says :new_spec:`But some of
-our customer's don't care. We can collect data from them so that future
-systems can auto-configure themselves.`
+   :new_spec:`A lot of our customers are off-grid for a reason, they don't want
+   their equipment calling home and reporting to some remote database.`  He pauses,
+   then says :new_spec:`But some of
+   our customer's don't care. We can collect data from them so that future
+   systems can auto-configure themselves.`
 
-"You are thinking about an AI aren't you?"
+   "You are thinking about an AI aren't you?"
 
-:new_spec:`I guess so.  If we measure all of the current information going into
-and leaving the battery, its temperature and its voltage we could build some
-powerful regression algorithms on our end. We could dynamically update the
-charger's battery settings, and even notify our customers when their battery's
-are nearing end-of-life.  But to do this we are going to need a lot of data.`
+   :new_spec:`I guess so.  If we measure all of the current information going into
+   and leaving the battery, its temperature and its voltage we could build some
+   powerful regression algorithms on our end. We could dynamically update the
+   charger's battery settings, and even notify our customers when their battery's
+   are nearing end-of-life.  But to do this we are going to need a lot of data.`
 
-"That sounds like a Tesla.  I'm in."
+   "That sounds like a Tesla.  I'm in."
 
-"If we do this we could train AI on the servers then send out a tuned-up
-Python neural network in each charger via a software upgrade."
+   "If we do this we could train AI on the servers then send out a tuned-up
+   Python neural network in each charger via a software upgrade."
 
-"Before the charger starts, it could spend some time electrically probing it's
-battery, build up a physics model which matches it, then dial in the battery's
-charging parameters against the battery's physics model.  This model could be
-sent back to our servers, and we could audit the charger's work using a higher
-power computing platform."
+   "Before the charger starts, it could spend some time electrically probing it's
+   battery, build up a physics model which matches it, then dial in the battery's
+   charging parameters against the battery's physics model.  This model could be
+   sent back to our servers, and we could audit the charger's work using a higher
+   power computing platform."
 
-:new_spec:`Why bother with a physics model?  Why not just build a regressor that
-gives you the battery settings directly?`
+   :new_spec:`Why bother with a physics model?  Why not just build a regressor that
+   gives you the battery settings directly?`
 
-"Decoupling.  If we let the AI build a physics model, we can change our charging
-algorithm and the settings that we use without having to throw everything out."
+   "Decoupling.  If we let the AI build a physics model, we can change our charging
+   algorithm and the settings that we use without having to throw everything out."
 
-"Also, for debugging; neural networks are black boxes.  So if we use it to build
-something we understand, it won't be a black box anymore; if it constructs
-curves that don't make sense we can turn it off and fall back to sensible
-settings."
+   "Also, for debugging; neural networks are black boxes.  So if we use it to build
+   something we understand, it won't be a black box anymore; if it constructs
+   curves that don't make sense we can turn it off and fall back to sensible
+   settings."
 
-"If we build a battery physics inside of the charger, then our charger could
-charge any kind of battery type.  It could detect different chemistries, it
-wouldn't just charge lead acids anymore."
+   "If we build a battery physics inside of the charger, then our charger could
+   charge any kind of battery type.  It could detect different chemistries, it
+   wouldn't just charge lead acids anymore."
 
-:new_spec:`Well I think we agree on one thing, to do this we will need a lot of
-data, and the data has to be useful.`
+   :new_spec:`Well I think we agree on one thing, to do this we will need a lot of
+   data, and the data has to be useful.`
 
-"Yeah, but this is road map stuff, version 5, we need to think about our system
-right now."
+   "Yeah, but this is road map stuff, version 5, we need to think about our system
+   right now."
 
 :ref:`back to examples <examples>`
 
