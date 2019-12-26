@@ -2,16 +2,18 @@
 import uuid
 import time
 
+from pprint import pprint
+from functools import wraps
+from threading import Thread
+from queue import PriorityQueue, Queue
 from collections import deque, namedtuple
-from pprint      import pprint
-from threading   import Thread
-from queue       import PriorityQueue, Queue
-from threading   import Event as ThreadEvent
-from miros.hsm   import state_method_template
-from functools   import wraps
+from threading import Event as ThreadEvent
+from miros.hsm import state_method_template
+
 
 # from this package
-from miros.hsm   import HsmWithQueues
+from miros.hsm import HsmWithQueues
+from miros.hsm import return_status
 from miros.event import signals, Signal
 from miros.event import Event as HsmEvent
 from miros.singleton import SingletonDecorator
@@ -23,8 +25,13 @@ def pp(item):
 
 
 # Add to different signals to signal if they aren't there already
-Signal().append("stop_fabric")
-Signal().append("stop_active_object")
+Signal().append("STOP_FABRIC_SIGNAL")  # named like any other internal signal
+Signal().append("STOP_ACTIVE_OBJECT_SIGNAL") # "
+Signal().append("SUBSCRIBE_META_SIGNAL")
+Signal().append("PUBLISH_META_SIGNAL")
+
+PublishEvent = namedtuple('PublishEvent', ['event', 'priority'])
+SubscribeEvent = namedtuple('SubscribeEvent', ['event_or_signal', 'queue_type'])
 
 class SourceThreadEvent(ThreadEvent):
   pass
@@ -167,7 +174,7 @@ class ActiveFabricSource():
     def stop_thread(thread_obj, queue):
       if thread_obj is not None:
         if thread_obj.is_alive() is True:
-          stop_fe = FabricEvent(HsmEvent(signal=signals.stop_fabric), priority=1)
+          stop_fe = FabricEvent(HsmEvent(signal=signals.STOP_FABRIC_SIGNAL), priority=1)
           # The tasks are pending on items in their queue, wake them up with a
           # queue item, so that they can see that they need to stop running by
           # looking at their fabric_task_event thread-event
@@ -290,6 +297,7 @@ class ActiveFabricSource():
       assert(active_object_input_queue.pop().signal_name == 'A')
 
     '''
+    # this in an internal function to subscribe
     def _subscribe(internal_queue, signal):
       if type(signal) == HsmEvent:
         signal_name = signal.signal_name
@@ -301,7 +309,7 @@ class ActiveFabricSource():
         # make a list of queue ids in queue_ids
         queue_ids = map(lambda x: id(x), registry)
         if id(queue) in queue_ids:
-          q_index           = registry.index(queue)
+          q_index = registry.index(queue)
           registry[q_index] = queue
         else:
           registry.append(queue)
@@ -317,6 +325,22 @@ class ActiveFabricSource():
     else:
       signal_name = _subscribe(self.fifo_subscriptions, event_or_signal)
     return signal_name
+
+  def subscribed(self, event_or_signal, queue_type):
+    if type(event_or_signal) == HsmEvent:
+      signal_name = event_or_signal.signal_name
+    elif type(event_or_signal) == int:
+      signal_name = signals.name_for_signal(event_or_signal)
+
+    if queue_type == 'fifo':
+      internal_queue = self.fifo_subscriptions
+    elif queue_type == 'lifo':
+      internal_queue = self.lifo_subscriptions
+    else:
+      raise(LookupError)
+
+    result = True if signal_name in internal_queue else False
+    return result
 
   def publish(self, event, priority=None):
     '''publish an event with a given priority to all subscribed queues
@@ -480,6 +504,23 @@ class ActiveObject(HsmWithQueues):
       ]
     )
 
+  def top(self, *args):
+    '''top most state given to all HSMs; treat it as an outside function'''
+    chart, event = args[0], args[1]
+    if event.signal == signals.SUBSCRIBE_META_SIGNAL:
+      self._subscribe(
+        event.payload.event_or_signal,
+        event.payload.queue_type)
+      status = return_status.HANDLED
+    elif event.signal == signals.PUBLISH_META_SIGNAL:
+      self._publish(
+        event.payload.event,
+        event.payload.priority)
+      status = return_status.HANDLED
+    else:
+      status = super().top(*args)
+    return status
+
   def __thread_running(self):
     if self.thread is None:
       result = False
@@ -487,13 +528,7 @@ class ActiveObject(HsmWithQueues):
       result = True if self.thread.is_alive() else False
     return result
 
-  def start_thread_if_not_running(fn):
-    '''start the active object thread if it is not currently running'''
-    def _start_thread_if_not_running(self, *args, **kwargs):
-      if self.__thread_running() is False:
-        self.__start()
-      return fn(self, *args, **kwargs)
-    return _start_thread_if_not_running
+
 
   def append_subscribe_to_spy(fn):
     '''instrument the full spy with our subscription request'''
@@ -504,35 +539,82 @@ class ActiveObject(HsmWithQueues):
       elif type(e_or_s) == int:
         signal_name = signals.name_for_signal(e_or_s)
       if self.instrumented:
-        self.full.spy.append("SUBSCRIBING TO:({}, TYPE:{})".format(signal_name, queue_type))
+        self.scribble("SUBSCRIBING TO:({}, TYPE:{})".format(signal_name, queue_type))
         return fn(self, e_or_s, queue_type)
     return _append_subscribe_to_spy
 
-  @start_thread_if_not_running
-  @append_subscribe_to_spy
   def subscribe(self, event_or_signal, queue_type=None):
+
     if queue_type is None:
       queue_type = 'fifo'
+
+    # If the thread has been started
+    if self.__thread_running():
+      # If we have already subscribed to this event, just return
+      # otherwise we have not subscribed to this event before
+      # and our supporting thread is running, so call the _subscribe
+      # method directly
+      if not self.subscribed(event_or_signal, queue_type):
+        self._subscribe(event_or_signal, queue_type)
+      return
+
+    # The task isn't running yet: start_at is still running or we are
+    # subscribing to events on an active object that hasn't been started yet.
+    # Place our subscriptions into a queue so that when the thread starts
+    # these subscriptions will be dealt with then.
+    payload = SubscribeEvent(
+      event_or_signal=event_or_signal,
+      queue_type=queue_type)
+    self.post_lifo(HsmEvent(signal=signals.SUBSCRIBE_META_SIGNAL, payload=payload))
+
+  def subscribed(self, event_or_signal, queue_type):
+    result = False if self.__thread_running() is False \
+      else self.fabric.subscribed(event_or_signal, queue_type)
+    return result
+
+  #@start_thread_if_not_running
+  @append_subscribe_to_spy
+  def _subscribe(self, event_or_signal, queue_type):
     self.fabric.subscribe(self.queue, event_or_signal, queue_type)
 
   def append_publish_to_spy(fn):
     '''instrument the rtc spy with our publish event'''
     @wraps(fn)
-    def _append_publish_to_spy(self, e, priority=1000):
+    def _append_publish_to_spy(self, e, priority):
       if self.instrumented:
         self.rtc.spy.append("PUBLISH:({}, PRIORITY:{})".format(e.signal_name, priority))
         return fn(self, e, priority)
     return _append_publish_to_spy
 
-  @append_publish_to_spy
-  @start_thread_if_not_running
   def publish(self, event, priority=None):
+
+    if priority is None:
+      priority = 1000
+
+    # If the thread has been started, short-circuit the posting of an event; the
+    # task is running, just call _publish
+    if self.__thread_running():
+      self._publish(event, priority)
+      return 
+
+    # The task isn't running yet: start_at is still running, or we are
+    # dispatching a publish request to the statechart before it has been
+    # started.  Place what we want to publish into a queue so that it can be
+    # dealt with when the task managing that queue is started.
+    payload = PublishEvent(
+      event=event,
+      priority=priority)
+    self.post_lifo(
+      HsmEvent(signal=signals.PUBLISH_META_SIGNAL, payload=payload))
+
+  @append_publish_to_spy
+  #@start_thread_if_not_running
+  def _publish(self, event, priority=None):
     '''publish an event at a given priority to the active fabric'''
     if priority is None:
       priority = 1000
     self.fabric.publish(event, priority)
 
-  @start_thread_if_not_running
   def post_fifo(self, e, period=None, times=None, deferred=None):
     '''post an event, or events to the fifo queue
 
@@ -566,7 +648,6 @@ class ActiveObject(HsmWithQueues):
       thread_id = self.__post_event(e, times, period, deferred, queue_type='fifo')
     return thread_id
 
-  @start_thread_if_not_running
   def post_lifo(self, e, period=None, times=None, deferred=None):
     '''post an event, or events to the lifo queue
 
@@ -601,23 +682,11 @@ class ActiveObject(HsmWithQueues):
       thread_id = self.__post_event(e, times, period, deferred, queue_type='lifo')
     return thread_id
 
-  def make_unique_name_based_on_start_at_function(fn):
-    '''
-    If the user has not specified a name for their active object, we assign one
-    based on the starting function and the first 5 characters created from a
-    uuid5 using the starting state name.
-
-    '''
-    def _make_unique_name_based_on_start_at_function(self, initial_state):
-      if self.name is None:
-        function_name = initial_state(self, HsmEvent(signal=signals.REFLECTION_SIGNAL))
-        self.name = str(uuid.uuid5(uuid.NAMESPACE_DNS, function_name))[0:5]
-      fn(self, initial_state)
-    return _make_unique_name_based_on_start_at_function
-
-  @make_unique_name_based_on_start_at_function
   def start_at(self, initial_state):
     '''start the active object at a given state and begin its task'''
+    if self.name is None:
+      function_name = initial_state(self, HsmEvent(signal=signals.REFLECTION_SIGNAL))
+      self.name = str(uuid.uuid5(uuid.NAMESPACE_DNS, function_name))[0:5]
     super().start_at(initial_state)
     self.__start()
 
@@ -665,7 +734,7 @@ class ActiveObject(HsmWithQueues):
 
     # post an item to wake up the task so it can see it's event has been cleared
     # this will cause it to exit its forever-loop and exit
-    self.queue.append(HsmEvent(signal=signals.stop_active_object))
+    self.queue.append(HsmEvent(signal=signals.STOP_ACTIVE_OBJECT_SIGNAL))
     try:
       # If stop is being called outside of this active object, wait for this
       # thread to stop
@@ -690,7 +759,7 @@ class ActiveObject(HsmWithQueues):
     HsmEvent (threading.Event) object.
 
     This threading method waits on the locking-deque.  If the signal is not a
-    stop_active_object signal it calls the hsm next_rtc method, which will pop
+    STOP_ACTIVE_OBJECT_SIGNAL signal it calls the hsm next_rtc method, which will pop
     the leftmost item out of the deque part of the locking-deque and dispatch it
     into the hsm.
     '''
@@ -698,7 +767,7 @@ class ActiveObject(HsmWithQueues):
       queue.wait()  # wait for an event
       if fabric_task_event.is_set():
         if len(self.queue) >= 1:
-          if self.queue.deque[0].signal != signals.stop_active_object:
+          if self.queue.deque[0].signal != signals.STOP_ACTIVE_OBJECT_SIGNAL:
             self.next_rtc()
           else:
             task_event.clear()
@@ -970,7 +1039,6 @@ class ActiveObject(HsmWithQueues):
         self.posted_events_queue.pop()
       else:
         self.posted_events_queue.rotate(1)
-
 
 class Factory(ActiveObject):
 

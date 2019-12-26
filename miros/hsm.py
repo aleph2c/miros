@@ -253,7 +253,6 @@ def spy_on_start(fn):
       # fn is start_at
       return fn(self, initial_state)
 
-    self.init_rtc()
 
     self.rtc.spy.append("START")
     sr = SpyTuple(
@@ -1071,6 +1070,10 @@ class InstrumentedHsmEventProcessor(HsmEventProcessor):
 
     # used to build spy
     self.full.spy = deque(maxlen=HsmEventProcessor.SPY_RING_BUFFER_SIZE)
+
+    # initialize this before start to give the ability to post items before 
+    # the statechart is started
+    self.init_rtc()
 
     # used to build trace
     self.full.trace = deque(maxlen=HsmEventProcessor.TRC_RING_BUFFER_SIZE)

@@ -175,57 +175,78 @@ def test_publish_subscribe(fabric_fixture):
   time.sleep(0.2)
   c1.post_fifo(Event(signal=signals.CC))
   time.sleep(0.1)
-  assert(c1.spy_full() ==
-     [
-         'SUBSCRIBING TO:(BB, TYPE:fifo)',
-         'SUBSCRIBING TO:(CC, TYPE:fifo)',
-         'START',
-         'SEARCH_FOR_SUPER_SIGNAL:c2_s2',
-         'SEARCH_FOR_SUPER_SIGNAL:c2_s1',
-         'ENTRY_SIGNAL:c2_s1',
-         'ENTRY_SIGNAL:c2_s2',
-         'INIT_SIGNAL:c2_s2',
-         '<- Queued:(0) Deferred:(0)',
-         'BB:c2_s2',
-         'BB:c2_s1',
-         'EXIT_SIGNAL:c2_s2',
-         'SEARCH_FOR_SUPER_SIGNAL:c2_s2',
-         'EXIT_SIGNAL:c2_s1',
-         'ENTRY_SIGNAL:c2_s1',
-         'INIT_SIGNAL:c2_s1',
-         '<- Queued:(0) Deferred:(0)',
-         'CC:c2_s1',
-         '<- Queued:(0) Deferred:(0)'
-     ]
+  assert(c1.spy_full() == \
+      ['POST_LIFO:SUBSCRIBE_META_SIGNAL',
+        'POST_LIFO:SUBSCRIBE_META_SIGNAL',
+        'START',
+        'SEARCH_FOR_SUPER_SIGNAL:c2_s2',
+        'SEARCH_FOR_SUPER_SIGNAL:c2_s1',
+        'ENTRY_SIGNAL:c2_s1',
+        'ENTRY_SIGNAL:c2_s2',
+        'INIT_SIGNAL:c2_s2',
+        '<- Queued:(2) Deferred:(0)',
+        'SUBSCRIBE_META_SIGNAL:c2_s2',
+        'SUBSCRIBE_META_SIGNAL:c2_s1',
+        'SUBSCRIBING TO:(CC, TYPE:fifo)',
+        '<- Queued:(1) Deferred:(0)',
+        'SUBSCRIBE_META_SIGNAL:c2_s2',
+        'SUBSCRIBE_META_SIGNAL:c2_s1',
+        'SUBSCRIBING TO:(BB, TYPE:fifo)',
+        '<- Queued:(0) Deferred:(0)',
+        'BB:c2_s2',
+        'BB:c2_s1',
+        'EXIT_SIGNAL:c2_s2',
+        'SEARCH_FOR_SUPER_SIGNAL:c2_s2',
+        'EXIT_SIGNAL:c2_s1',
+        'ENTRY_SIGNAL:c2_s1',
+        'INIT_SIGNAL:c2_s1',
+        '<- Queued:(0) Deferred:(0)',
+        'CC:c2_s1',
+        '<- Queued:(0) Deferred:(0)']
+
   )
 
-  assert(b.spy_full() ==
-    ['START',
-     'SEARCH_FOR_SUPER_SIGNAL:b1_s2',
-     'SEARCH_FOR_SUPER_SIGNAL:b1_s1',
-     'ENTRY_SIGNAL:b1_s1',
-     'ENTRY_SIGNAL:b1_s2',
-     'INIT_SIGNAL:b1_s2',
-     'PUBLISH:(BB, PRIORITY:1000)',
-     '<- Queued:(0) Deferred:(0)']
+  assert(b.spy_full() == 
+      ['START',
+        'SEARCH_FOR_SUPER_SIGNAL:b1_s2',
+        'SEARCH_FOR_SUPER_SIGNAL:b1_s1',
+        'ENTRY_SIGNAL:b1_s1',
+        'ENTRY_SIGNAL:b1_s2',
+        'INIT_SIGNAL:b1_s2',
+        'POST_LIFO:PUBLISH_META_SIGNAL',
+        '<- Queued:(1) Deferred:(0)',
+        'PUBLISH_META_SIGNAL:b1_s2',
+        'PUBLISH_META_SIGNAL:b1_s1',
+        'PUBLISH:(BB, PRIORITY:1000)',
+        '<- Queued:(0) Deferred:(0)']
+
   )
 
-  assert(c2.spy_full() ==
-    ['SUBSCRIBING TO:(BB, TYPE:fifo)',
-     'SUBSCRIBING TO:(CC, TYPE:fifo)',
-     'START',
-     'SEARCH_FOR_SUPER_SIGNAL:c2_s2',
-     'SEARCH_FOR_SUPER_SIGNAL:c2_s1',
-     'ENTRY_SIGNAL:c2_s1',
-     'ENTRY_SIGNAL:c2_s2',
-     'INIT_SIGNAL:c2_s2',
-     '<- Queued:(0) Deferred:(0)',
-     'BB:c2_s2',
-     'BB:c2_s1',
-     'EXIT_SIGNAL:c2_s2',
-     'SEARCH_FOR_SUPER_SIGNAL:c2_s2',
-     'EXIT_SIGNAL:c2_s1',
-     'ENTRY_SIGNAL:c2_s1',
-     'INIT_SIGNAL:c2_s1',
-     '<- Queued:(0) Deferred:(0)']
+  assert(c2.spy_full() == 
+      ['POST_LIFO:SUBSCRIBE_META_SIGNAL',
+        'POST_LIFO:SUBSCRIBE_META_SIGNAL',
+        'START',
+        'SEARCH_FOR_SUPER_SIGNAL:c2_s2',
+        'SEARCH_FOR_SUPER_SIGNAL:c2_s1',
+        'ENTRY_SIGNAL:c2_s1',
+        'ENTRY_SIGNAL:c2_s2',
+        'INIT_SIGNAL:c2_s2',
+        '<- Queued:(2) Deferred:(0)',
+        'SUBSCRIBE_META_SIGNAL:c2_s2',
+        'SUBSCRIBE_META_SIGNAL:c2_s1',
+        'SUBSCRIBING TO:(CC, TYPE:fifo)',
+        '<- Queued:(1) Deferred:(0)',
+        'SUBSCRIBE_META_SIGNAL:c2_s2',
+        'SUBSCRIBE_META_SIGNAL:c2_s1',
+        'SUBSCRIBING TO:(BB, TYPE:fifo)',
+        '<- Queued:(0) Deferred:(0)',
+        'BB:c2_s2',
+        'BB:c2_s1',
+        'EXIT_SIGNAL:c2_s2',
+        'SEARCH_FOR_SUPER_SIGNAL:c2_s2',
+        'EXIT_SIGNAL:c2_s1',
+        'ENTRY_SIGNAL:c2_s1',
+        'INIT_SIGNAL:c2_s1',
+        '<- Queued:(0) Deferred:(0)']
+
   )

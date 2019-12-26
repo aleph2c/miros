@@ -1,0 +1,164 @@
+*post_fifo during start_at*
+= Observer ([[local:C:/Vim8.1/.vim/ooda.pdf|diagram]]) = 
+== Evidence ([[evidence.post_fifo_in_start_at|evidence]]) ==
+
+  *What defines Success?:* ([[subgoals.post_fifo_in_start_at|subgoals]])
+    Having the spy output behave as you would expect it to while posting,
+    subscribing and publishing events from within the chart while the system is
+    turning on.
+   
+    Reporting on the subscription and publication of events into the spy stream
+    of the new design.
+
+  *What is the problem?*
+    When a chart posts to itself during the start_at procedure, the spy output
+    was a mess.  This is because the start_thread_if_not_running decorator
+    turned on the thread while the start_at routine was still trying to
+    initialize the chart.  Two different series of calls were being made to the
+    same statechart, breaking the rtc agreement that needs to exist for them to
+    work properly.
+    
+    The start_thread_if_not_running decorator was pulled off of the post_lifo
+    and the post_fifo calls, and these methods worked as expected. But
+    the same decorators were placed on the subscribe and publish methods
+    of the Active Object.
+    
+    The start_thread_if_not_running decorator created a race condition, and it
+    needed to be removed.  But the problem it was solving: performing task
+    related stuff before a task is created, needed to be solved.
+    
+    Since we have a set of queues and a thread which will start after the
+    initialization is completed, the subscriptions, posting and publishing
+    requests could be put in this queue instead of making calls directly to code
+    which requires a supporting task to be running.
+    
+    I would the the top state of the active object to handle the publish and
+    subscribe events, but there is something very weird about how python calls
+    this top call.
+    
+
+  *Discoveries:* ([[notes.post_fifo_in_start_at|notes]])
+  
+    The active object has a start_at, which runs before the thread is started.
+    Once it is started, the thread it turned on.
+    
+    The posted_events_queue is empty when the active object's __start method is
+    called, indicating the the event has neither been posted, or it has been
+    acted upon already.
+    
+    This break point is being hit twice, which is confusing, I don't understand
+    why it is being hit a second time.
+    
+    The second time the break point is hit, the posted_events_queue doesn't
+    exist.
+    
+    The call stack says that both break points are originating from the same
+    location in the test file.
+    
+    ActiveObject start_at:
+      611 of active object (wrapper for start_at on line 619)
+      619 of active object
+      1194 of hsm in _print_spy_if_live (HsmWithQueues)
+      1222 print_trace_after_at_start_if_live 1222 (HsmWithQueues)
+      308 append_queue_reflection_after_start 307 (hanging in hsm global space)
+      1276 start_at (HsmWithQueues)
+      285 trace_on_start (hanging in hsm global space)
+      238 spy_on_start (hanging in hsm global space) 
+      1084 init_rtc (InstrumentedHsmEventProcessor)
+      1090 start_at (InstrumentedHsmEventProcessor)
+      343 start_at (HsmEventProcessor)
+      366 init (HsmEventProcessor) 
+      161 spy_on (hanging in hsm global space)
+      54 Start (test file)
+      161 spy_on
+      54 Start
+      59 post_fifo (test file)
+      494 _start_thread_if_not_running (ActiveObject)
+      660 __start ActiveObject 
+      483 __thread_running ActiveObject 
+      640 start_thread ActiveObject
+      
+      
+= Orient =
+  *Symptoms:* [[symptoms.post_fifo_in_start_at|symptoms]]
+
+== Questions ==
+  *Questions for post_fifo during start_at: >= 5*
+    What is it doing?
+    Can you think of anyway to speed up your feedback cycle?
+    Do you have enough information?
+    Is your information organized?
+    Can you reproduce the problem?
+    Can you simplify your test?
+    Do you have something to baseline from?
+    What recently changed?
+    What don't you know that you need to know?
+  
+  *Assumptions*
+
+= Decide =
+  [[#Questions]]
+  *Research Needed For?:*
+    
+
+  [[#Questions]]
+  *Idea/Hypotheses for post_fifo during start_at: >=5*
+  * [X] The tests are failing before you have begun your work. [false]
+  * [X] The tests will pass but other problems will exist if the
+        start_thread_if_not_running decorator is removed. [true]
+  * [X] The posted item is put in a queue which needs to be transfered to the
+        thread after it has been started by the active object's start_at
+        method.[false -- the queue data is transfered once the thread is started]
+  * [X] The start_thread_if_not_running decorator is creating is starting a
+        thread too soon.  The thread starts, causing the event to be posted
+        against the chart before the start_at code, running from the main thread
+        has finished running. [true]
+  * [X] The tests will fail once the start_thread_if_not_running decorator is
+        removed. [true]
+  * [X] If publish or subscribe happens before the thread is started, mixed with
+        a call to the post_fifo or post_lifo, you will have another bug. [true]
+  * [X] Overload the top function in the activeobject, have it manage the
+        publish and subscribe calls just like you would handle any other event
+        in any other statechart
+  * [X] The publish subscribe calls, when made before the thread start should
+        create a meta signal, or a signal which holds another signal.  The inner
+        signals only being acted upon when the thread starts.
+  * [X] All meta signals should follow the internal signal naming convention 
+  * [X] All meta signals should be dispatching using the post_lifo technique, to
+        push themselves to the front of the queue, this is because they are part
+        of the structure of the statechart, and their framing needs to be in
+        place before the more traditional behavior occurs within the chart.
+  * [X] Processing meta signals is OK when a thread is just starting, but
+        wasteful and noise-making (confusing) in the instrumentation if the thread is
+        running already.  Adjust the publish/subscribe functions to call the
+        thread features directly if the thread is running... only post the meta
+        signals if the thread isn't running.
+  * [X] Ensure that the spy stream tells the story about what is going on.
+  * [X] The subscribe call should only be made into the thread machinary if the
+        event/signal has not been subscribed to (with the same queuing strategy)
+        before.
+  * [X] Adjust the hsm design to initialize the rtc instrumentation code within
+        the __init__ call of the InstrumentedHsmEventProcessor.  If you don't do
+        this you will cause errors on startup with the new meta signaling
+        technique
+  * [X] Rename other internal active object signals in the internal signal
+        naming scheme (this is used inside of the active object and it should
+        not break anyone's code)      
+  * [X] Add tests to check this behavior
+  * [X] Look for other things like this bug in the system.  Confirm you start
+        the thread in only one location.
+  * [X] Fix old tests
+  * [ ] Read release plan
+  * [ ] Create release notes
+  * [ ] Release new version of miros
+  * [ ] Read through documents and update with new way of doing things.  Make
+        reference to this version of miros [4.2.0].
+      
+
+  *Chosen Research-Goal/Hypothesis*
+        
+== Plan ([[plan.post_fifo_in_start_at|plan]]) ==
+
+= Act =
+  
+
