@@ -3814,6 +3814,142 @@ Here is how to publish an event with a specific priority:
    If two events have the same priority the queue will behave like a first in
    first out queue.
 
+.. _recipes-catching-signals-based-on-patterns-and-tokens:
+
+Catching Signals Based on Patterns and Tokens
+---------------------------------------------
+
+If you would like to structure your statecharts to catch signal names based on
+patterns, or to catch all external signal names reminiscent of Ruby's
+`method_missing
+<https://www.leighhalliday.com/ruby-metaprogramming-method-missing>`_, or a
+glob's ``*`` pattern, you can do so with miros.
+
+This kind of thing is simple to do, just sub-class the ``ActiveObject``, write
+your matching methods within it and slightly change the structure of your state
+functions to use your new methods.
+
+For instance, the `SCXML standard <https://www.w3.org/TR/scxml/>`_ requires that
+a statechart should be able to catch all external signals, like a ``*`` glob,
+and, it requires that signal catching logic should be able to catch any word
+within a ``.``-tokenized list.  So ``timeout`` should be caught and handled
+when a signal named ``timeout.token1.token2`` is received by a statechart.
+
+.. note::
+
+  You don't have to stop with the SCXML standard.  You could match your signal
+  names based on regular expressions, or build up your own signal language
+  grammar and express it within your statecharts.
+
+These signal matching requirements could be met with the following code (this
+example is based on an adaptation of test `403 of the SCXML standard
+<https://www.w3.org/Voice/2013/scxml-irp/403/test403a.txml>`_):
+
+.. code-block:: python
+  :emphasize-lines: 2, 12-26, 34, 58, 60-64
+  :linenos:
+
+  # lru_cache can be used to autocache calls (speeds them up)
+  from functools import lru_cache
+
+  # import required items from the miros library
+  from miros import Event
+  from miros import spy_on
+  from miros import signals
+  from miros import ActiveObject
+  from miros import return_status
+  # ..
+
+  # create the "token_match" method which we can use in our
+  # state functions
+  class MatchableSignalsChart(ActiveObject):
+
+    @lru_cache(maxsize=32)
+    def tockenize(self, signal_name):
+      return set(signal_name.split("."))
+
+    @lru_cache(maxsize=32)
+    def token_match(self, resident, other):
+      other_set = self.tockenize(other)
+      resident_set = self.tockenize(resident)
+      result = True if len(resident_set.intersect(other_set)) >= 1 \
+        else False
+      return result
+
+   # In a state function you can match like a "*" glob or a specific token of a
+   # signal delimited by "."s. 
+   @spy_on
+   def s0(self, e):
+      status = return_status.UNHANDLED
+      if(e.signal == signals.ENTRY_SIGNAL):
+        self.post_fifo(Event(signal="timeout.token1.token2"),
+          times=1,
+          period=1.0,
+          deferred=True)
+        status = return_status.HANDLED
+      elif(e.signal == signals.INIT_SIGNAL):
+        status = self.trans(s01)
+      elif(self.token_match(e.signal_name, 'timeout')):
+        status = self.trans(_fail)
+      elif(self.token_match(e.signal_name, "event1")):
+        status = self.trans(_fail)
+      elif(self.token_match(e.signal_name, "event2")):
+        status = self.trans(_pass)
+      else:
+        self.temp.fun = self.top
+        status = return_status.SUPER
+      return status
+
+    @spy_on
+    def s01(self, e):
+      status = return_status.UNHANDLED
+      if(e.signal == signals.ENTRY_SIGNAL):
+        self.post_fifo(Event(signals="token3.event1.token4"))
+        status = return_status.HANDLED
+      elif(self.token_match(e.signal_name, "event1")):
+        status = self.trans(s02)
+      elif(signals.is_inner_signal(e.signal)):
+        self.temp.fun = s0
+        status = return_status.SUPER
+      else:  # "*" catch any other other external signal
+        status = self.trans(_fail)
+      return status
+
+    # ..
+    # other state functions
+    # ..
+
+    if __name__ == "__main__"
+      ao = MatchableSignalsChart("example")
+      ao.start_at(s0)
+      ao.post_fifo(Event(signals=signals.event4))
+        
+I have highlighted the interesting parts of the example.
+
+On line 2 ``lru_cache`` is imported from the standard library.  This decorator
+allows functions to auto-cache their results.  To begin with the cache is empty.
+When the function is called the first time, it calculates the result, then caches
+the input/output pair.  The next time that input is seen, it will just look up
+the result in its cache rather than running the function.  
+
+The ``lru_cache`` decorator is used on the ``tokenize`` and ``token_match``
+methods of the ``MatchableSignalsChart`` subclass of the ``ActiveObject``.  The
+``tokenize`` method returns a set of tokens from a signal_name delimited by a
+``.`` character.  The ``token_match`` method returns true if there is an
+intersection of tokens in two strings.  You can see how this method is called on
+line 58.
+
+An example of how to build a tokenized signal can be seen on line 34.
+
+Lines 60 through 64 show how to implement a "*", catch-all kind of signal
+handler.  The ``elif`` clause catching internal signals on line 60, allow the
+event processor to search the function using its internal signals.  Any external
+signals which aren't already managed between line 53 and 62 is caught by the
+``else`` clause on line 63.  In this way it is the catch-all part of the state
+function.  In this cause any external signal that does not match the ``event1``
+token will cause a transition into the ``_fail`` state.
+
+
 .. _recipes-avoiding-bugs-which-travel-through-time:
 
 Avoiding Bugs Which Travel Through Time
