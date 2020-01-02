@@ -157,6 +157,7 @@ def test_start_stop_c(fabric_fixture):
   pp(ao1.spy_full())
 
 
+@pytest.mark.snipe
 @pytest.mark.aos
 def test_publish_subscribe(fabric_fixture):
   c1 = ActiveObject("c1")

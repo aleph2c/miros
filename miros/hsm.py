@@ -1177,7 +1177,7 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
     self.live_spy_callback   = self.__class__.live_spy_callback_default
     self.live_trace_callback = self.__class__.live_trace_callback_default
 
-    self.last_live_trace_datetime = len(self.full.trace)
+    self.last_live_trace_datetime = stdlib_datetime.now()
 
   @staticmethod
   def live_spy_callback_default(spy_line):
@@ -1230,9 +1230,10 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       result = fn(self, initial_state)
       if self.instrumented and self.live_trace:
         strace = ""
-        tr = self.full.trace[-1]
-        strace  += self.trace_tuple_to_formatted_string(tr)
-        self.live_trace_callback(strace)
+        if len(self.full.trace) != 0:
+          tr = self.full.trace[-1]
+          strace  += self.trace_tuple_to_formatted_string(tr)
+          self.live_trace_callback(strace)
       if tr is not None:
         self.last_live_trace_datetime = tr.datetime
       return result
@@ -1255,12 +1256,14 @@ class HsmWithQueues(InstrumentedHsmEventProcessor):
       tr = None
       # fn is next_rtc/start_at
       result = fn(self)
-      if(self.instrumented and self.live_trace):
-        tr = self.full.trace[-1]
-        if tr.datetime != self.last_live_trace_datetime:
-          strace = "\n"
-          strace += self.trace_tuple_to_formatted_string(tr)
-          self.live_trace_callback(strace)
+      if(self.instrumented and self.live_trace ):
+        if len(self.full.trace) != 0:
+          tr = self.full.trace[-1]
+          if tr.datetime is not None:
+            if tr.datetime != self.last_live_trace_datetime:
+              strace = "\n"
+              strace += self.trace_tuple_to_formatted_string(tr)
+              self.live_trace_callback(strace)
       if tr is not None:
         self.last_live_trace_datetime = tr.datetime
       return result

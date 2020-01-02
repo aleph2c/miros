@@ -11,16 +11,16 @@ class ToasterOven(ActiveObject):
     super().__init__(name)
 
   def light_on(self):
-    print("light_on")
+    self.print("light_on")
 
   def light_off(self):
-    print("light_on")
+    self.print("light_on")
 
   def heater_on(self):
-    print("heater_on")
+    self.print("heater_on")
 
   def heater_off(self):
-    print("heater_off")
+    self.print("heater_off")
 
 @spy_on
 def door_closed(oven, e):
@@ -59,7 +59,7 @@ def heating(oven, e):
 def baking(oven, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    print("baking")
+    oven.print("baking")
     status = return_status.HANDLED
   else:
     oven.temp.fun = heating
@@ -70,7 +70,7 @@ def baking(oven, e):
 def toasting(oven, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    print("toasting")
+    oven.print("toasting")
     status = return_status.HANDLED
   else:
     oven.temp.fun = heating
@@ -81,7 +81,7 @@ def toasting(oven, e):
 def off(oven, e):
   status = return_status.UNHANDLED
   if(e.signal == signals.ENTRY_SIGNAL):
-    print("off")
+    oven.print("off")
     status = return_status.HANDLED
   else:
     oven.temp.fun = door_closed

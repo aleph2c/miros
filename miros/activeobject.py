@@ -1,4 +1,5 @@
 # from standard library
+import sys
 import uuid
 import time
 
@@ -23,19 +24,13 @@ from miros.thread_safe_attributes import MetaThreadSafeAttributes
 def pp(item):
   pprint(item)
 
-
 # Add to different signals to signal if they aren't there already
-Signal().append("STOP_FABRIC_SIGNAL")  # named like any other internal signal
-Signal().append("STOP_ACTIVE_OBJECT_SIGNAL") # "
-Signal().append("SUBSCRIBE_META_SIGNAL")
-Signal().append("PUBLISH_META_SIGNAL")
 
 PublishEvent = namedtuple('PublishEvent', ['event', 'priority'])
 SubscribeEvent = namedtuple('SubscribeEvent', ['event_or_signal', 'queue_type'])
 
 class SourceThreadEvent(ThreadEvent):
   pass
-
 
 # The FiberThreadEvent is a singleton.  We want to be able to call
 # `FiberThreadEvent()` and get the same ThreadEvent (threading.Event) object in
@@ -54,6 +49,61 @@ class FabricEvent():
   def __eq__(self, other):
     return self.priority == other.priority
 
+Instrumention = namedtuple('Instrumention', ['fn', 'content'])
+
+def _print(content):
+  print(content)
+  sys.stdout.flush()
+
+class InstrumenationWriterClass():
+
+  def __init__(self):
+    super().__init__()
+    self._event = FiberThreadEvent()
+    self._queue = Queue()
+    self._thread = None
+
+  def start(self):
+    self._event.set()
+
+    def thread_runner(self):
+      while self._event.is_set():
+        # i is an Instrumentation namedtuple
+        i = self._queue.get()
+        fn = i.fn
+        content = i.content
+
+        fn(content)
+        self._queue.task_done()
+
+    self._thread = Thread(
+      target=thread_runner,
+      args=(self,),
+      daemon=True
+    )
+    self._thread.start()
+
+  def _print(self, fn, content):
+    self._queue.put(
+      Instrumention(
+        fn=fn,
+        content=content
+      )
+    )
+
+  def is_alive(self):
+    if self._thread is None:
+      result = False
+    else:
+      result = self._thread.is_alive()
+    return result
+
+  def stop(self):
+    self._event.clear()
+    self._queue.put(None)
+    self._thread.join()
+
+InstrumentionWriter = SingletonDecorator(InstrumenationWriterClass)
 
 class ActiveFabricSource():
   '''A (pub-sub) event dispatcher for active objects.
@@ -481,6 +531,9 @@ class ActiveObject(HsmWithQueues):
     # post directly into our locking_deque object, and as a result, provide the
     # 'get' method of this object to unlock our task.
     self.fabric = ActiveFabric()
+    # for writing live instrumentation
+    self.writer = InstrumentionWriter()
+
     self.thread = None
     self.name   = name
 
@@ -503,6 +556,15 @@ class ActiveObject(HsmWithQueues):
         'uuid',
       ]
     )
+
+    self.register_live_spy_callback(
+      self.__class__.live_spy_callback_default)
+
+    self.register_live_trace_callback(
+      self.__class__.live_trace_callback_default)
+
+    self.last_live_trace_datetime = len(self.full.trace)
+
 
   def top(self, *args):
     '''top most state given to all HSMs; treat it as an outside function'''
@@ -527,8 +589,6 @@ class ActiveObject(HsmWithQueues):
     else:
       result = True if self.thread.is_alive() else False
     return result
-
-
 
   def append_subscribe_to_spy(fn):
     '''instrument the full spy with our subscription request'''
@@ -715,6 +775,9 @@ class ActiveObject(HsmWithQueues):
       # objects can talk to each other.
       if self.fabric.is_alive() is False:
         self.fabric.start()
+
+      if not self.writer.is_alive():
+        self.writer.start()
 
       self.fabric_task_event = FiberThreadEvent()
 
@@ -1039,6 +1102,30 @@ class ActiveObject(HsmWithQueues):
         self.posted_events_queue.pop()
       else:
         self.posted_events_queue.rotate(1)
+
+  def register_live_spy_callback(self, live_spy_callback):
+    # enclose the live_spy_callback
+    def _live_spy_callback(line):
+      self.writer._print(fn=live_spy_callback, content=line)
+    self.live_spy_callback = _live_spy_callback
+
+  def register_live_trace_callback(self, live_trace_callback):
+    # enclose the live_trace_callback
+    def _live_trace_callback(line):
+      self.writer._print(fn=live_trace_callback, content=line)
+    self.live_trace_callback = _live_trace_callback
+
+  @staticmethod
+  def live_spy_callback_default(spy_line):
+    print(spy_line)
+
+  @staticmethod
+  def live_trace_callback_default(trace_line):
+    print(trace_line.replace("\n", ""))
+
+  def print(self, content):
+    self.writer._print(fn=_print, content=content)
+
 
 class Factory(ActiveObject):
 

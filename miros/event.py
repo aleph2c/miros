@@ -100,12 +100,18 @@ class SignalSource(OrderedDictWithParams):
   '''
   def __init__(self, *args, **kwargs):
 
-    self['ENTRY_SIGNAL']            = 1
-    self['EXIT_SIGNAL']             = 2
-    self['INIT_SIGNAL']             = 3
-    self['REFLECTION_SIGNAL']       = 4
-    self['EMPTY_SIGNAL']            = 5
-    self['SEARCH_FOR_SUPER_SIGNAL'] = 6
+    self['ENTRY_SIGNAL']              = 1
+    self['EXIT_SIGNAL']               = 2
+    self['INIT_SIGNAL']               = 3
+    self['REFLECTION_SIGNAL']         = 4
+    self['EMPTY_SIGNAL']              = 5
+    self['SEARCH_FOR_SUPER_SIGNAL']   = 6
+    self['STOP_FABRIC_SIGNAL']        = 7
+    self['STOP_ACTIVE_OBJECT_SIGNAL'] = 8
+    self['SUBSCRIBE_META_SIGNAL']     = 9
+    self['PUBLISH_META_SIGNAL']       = 10
+
+    self.highest_inner_signal = len(self)
 
   def append(self, string):
     if string in self:
@@ -116,7 +122,8 @@ class SignalSource(OrderedDictWithParams):
   def is_inner_signal(self, other):
     def is_number_an_internal_signal(number):
       result = False
-      if number in list(self.values())[0:self.SEARCH_FOR_SUPER_SIGNAL]:
+      #if number in list(self.values())[0:self.SEARCH_FOR_SUPER_SIGNAL]:
+      if number in list(self.values())[0:self.highest_inner_signal]:
         result = True
       return result
 

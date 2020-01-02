@@ -285,7 +285,7 @@ class InstrumentedFactory(Factory):
 
   def spy_callback(self, spy):
     '''spy with machine name pre-pending'''
-    print(spy)
+    self.print(spy)
     logging.debug("S: [{}] {}".format(self.name, spy))
 
   def clear_log(self):
@@ -432,4 +432,3 @@ if __name__ == '__main__':
   example.post_fifo(Event(signal=signals.e2))
   time.sleep(0.10)
 
-code

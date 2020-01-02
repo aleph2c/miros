@@ -1,0 +1,39 @@
+Thread-safe live instrumentation streams, thread-safe print and signal catching glob support.
+
+Added four new internal signals: ``STOP_FABRIC_SIGNAL``,
+``STOP_ACTIVE_OBJECT_SIGNAL``, ``SUBSCRIBE_META_SIGNAL``,
+``PUBLISH_META_SIGNAL``.  These signals used to be created by the active object,
+but they have been moved into the ``event.py`` class, so that signal catching
+globs can be supported by miros.
+
+Writes to Python ``print`` are not thread safe.  Before this release the default
+behavior of ``live_spy`` and ``live_trace`` wrote out to python's ``print``
+function directly.  This live instrumentation could cause an io-block and a
+resulting run time error. I fixed this threading issue by changing the miros
+active objects to write their live stream messages through a dedicated
+instrumentation thread.  This thread ensures that only one thing gets to print
+at a time.  Also, the active object now provides a thread safe version of
+``print`` which uses the instrumentation thread.
+
+Miros provides the user with a way to over-write how their live ``trace`` and
+live ``spy`` streams are written.  The thread managing the live stream watches a
+queue, which contains 0 or more ``Instrumentation`` named tuples.  An
+``Instrumentation`` named tuple has a ``fn`` and a ``content`` element.  The
+``fn`` describes the way the ``content`` is intended to be printed, so that the
+``register_live_spy_callback`` and ``register_live_trace_callback`` features
+will continue to work.  The user can change "how" their instrumentation stream
+will be represented, but the function-they-provide-to-do-this-with: ``fn``, must
+be protected within a thread.
+
+Since there can be many active objects which all want to print their live
+instrumentation information at the same time, but only one instrumentation
+thread handler, I made the class which provides the instrumentation threading a
+singleton.  The class which provides the instrumentation threading is called
+``InstrumentationWriterClass, `` and it is turned into the singleton
+``InstrumentationWriter`` by the ``SingletonDectorator`` class.  When an active
+object is being constructed it creates an ``InstrumentationWriter``.  If a
+previously build active object has already done this, a reference to the
+previously created ``InstrumentedWriter`` is returned.  Then the instrumentation
+writing thread is started if it hasn't been started already.
+
+

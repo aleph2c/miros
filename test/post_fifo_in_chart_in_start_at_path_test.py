@@ -175,7 +175,7 @@ def test_build_a_small_chart():
 [Scxml] <- Queued:(2) Deferred:(0)
 [Scxml] SUBSCRIBE_META_SIGNAL:Start
 [Scxml] SUBSCRIBING TO:(Whatever1, TYPE:fifo)
-[Scxml] <- Queued:(3) Deferred:(0)
+[Scxml] <- Queued:(1) Deferred:(0)
 [Scxml] SCXML_INIT_SIGNAL:Start
 [Scxml] SEARCH_FOR_SUPER_SIGNAL:Work
 [Scxml] SEARCH_FOR_SUPER_SIGNAL:Start
@@ -183,7 +183,7 @@ def test_build_a_small_chart():
 [Scxml] ENTRY_SIGNAL:Work
 [Scxml] Hello from 'work'
 [Scxml] INIT_SIGNAL:Work
-[Scxml] <- Queued:(2) Deferred:(0)
+[Scxml] <- Queued:(0) Deferred:(0)
 [Scxml] anything:Work
 [Scxml] <- Queued:(1) Deferred:(0)
 [Scxml] to_start:Work

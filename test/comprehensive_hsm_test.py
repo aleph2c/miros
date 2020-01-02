@@ -522,7 +522,7 @@ def trace_driver(chart, event, trace_target):
       try:
         assert(target == result[0])
       except:
-        #print(chart.trace())
+        print(chart.trace())
         assert(target == result[0])
 
 def helper_test_chart_is_working(chart, name, start_at):
@@ -2580,22 +2580,29 @@ def test_group_14(name="test_group_14"):
     chart.live_trace = True
     return (chart, ss2)
 
+  print("A")
   # chart must work
   chart, start_at = get_chart()
   helper_test_chart_is_working(chart, name, start_at)
 
+  print("B")
   # spy_on_decorators: yes
   # instrumented: yes
   chart, start_at = get_chart()
   assert(chart.instrumented == True)
   chart.start_at(start_at)
+
+  print("C")
   # instrumented will turn off after start_at
   time.sleep(0.01)
   chart, start_at = get_chart()
+
   helper_test_spy_on(chart, start_at)
+  print("C1")
   chart, start_at = get_chart()
   helper_test_trace_on(chart, name, start_at)
 
+  print("D")
   # live_spy: no
   chart, start_at = get_chart()
   helper_test_live_spy_off(chart, start_at)
