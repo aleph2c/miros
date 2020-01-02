@@ -3829,11 +3829,12 @@ This kind of thing is simple to do, just sub-class the ``ActiveObject``, write
 your matching methods within it and slightly change the structure of your state
 functions to use your new methods.
 
-For instance, the `SCXML standard <https://www.w3.org/TR/scxml/>`_ requires that
-a statechart should be able to catch all external signals, like a ``*`` glob,
-and, it requires that signal catching logic should be able to catch any word
-within a ``.``-tokenized list.  So ``timeout`` should be caught and handled
-when a signal named ``timeout.token1.token2`` is received by a statechart.
+You can find an example of this feature's need in the `SCXML standard
+<https://www.w3.org/TR/scxml/>`_.  The SCXML standard requires that a statechart
+should be able to catch all external signals, like a ``*`` glob, and it
+requires that signal catching logic should be able to catch any word within a
+``.``-tokenized list.  For instance, an event handler specified to catch
+``timeout`` would react to a signal called ``timeout.token1.token2``.
 
 .. note::
 
@@ -3841,7 +3842,7 @@ when a signal named ``timeout.token1.token2`` is received by a statechart.
   names based on regular expressions, or build up your own signal language
   grammar and express it within your statecharts.
 
-These signal matching requirements could be met with the following code (this
+These signal matching requirements are met with the following code (this
 example is based on an adaptation of test `403 of the SCXML standard
 <https://www.w3.org/Voice/2013/scxml-irp/403/test403a.txml>`_):
 
@@ -3928,9 +3929,10 @@ I have highlighted the interesting parts of the example.
 
 On line 2 ``lru_cache`` is imported from the standard library.  This decorator
 allows functions to auto-cache their results.  To begin with the cache is empty.
-When the function is called the first time, it calculates the result, then caches
-the input/output pair.  The next time that input is seen, it will just look up
-the result in its cache rather than running the function.  
+When the function is called the first time, it calculates the result, then
+caches the input/output pair.  The next time that input is seen, it will just
+looks up output from the cache.  So ``lru_cache`` can radically speed up calls
+to the function it is decorating.
 
 The ``lru_cache`` decorator is used on the ``tokenize`` and ``token_match``
 methods of the ``MatchableSignalsChart`` subclass of the ``ActiveObject``.  The
@@ -3945,9 +3947,9 @@ Lines 60 through 64 show how to implement a "*", catch-all kind of signal
 handler.  The ``elif`` clause catching internal signals on line 60, allow the
 event processor to search the function using its internal signals.  Any external
 signals which aren't already managed between line 53 and 62 is caught by the
-``else`` clause on line 63.  In this way it is the catch-all part of the state
-function.  In this cause any external signal that does not match the ``event1``
-token will cause a transition into the ``_fail`` state.
+``else`` clause on line 63.  In this way the ``else`` clause acts as the
+catch-all (``*``), part of the state function;  any external signal that does
+not match the ``event1`` token will cause a transition into the ``_fail`` state.
 
 
 .. _recipes-avoiding-bugs-which-travel-through-time:
@@ -4949,6 +4951,35 @@ prepare themselves for garbage collection.
 
 Seeing What is Going On
 ^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _recipes-thread-safe-printing-and-instrumentation:
+
+Thread-Safe Printing and Instrumentation
+----------------------------------------
+
+Anytime you create and start an ``ActiveObject`` you create a thread.  The
+``print`` function in python is not thread safe, but the ``ActiveObject``
+provides a thread-safe ``print`` method.  You can call it like this:
+
+.. code-block:: python
+  :emphasize-lines: 6
+  
+  @spy_on
+  def some_state(self, e):
+    status = return_state.UNHANDLED
+    if(e.signal == signals.ENTRY_SIGNAL):
+      # thread safe print
+      self.print('writing that we are entering some_state')
+      status = return_status.HANDLED
+    else:
+      self.temp = self.top
+      status = return_status.SUPER
+    return status
+
+As of miros ``4.2.1`` the ``live_trace`` and ``live_spy`` features are run
+through-thread safe versions of print.  If you over-write their mechanisms using
+the ``register_live_spy_callback`` or ``register_live_trace_callback``
+interface, whatever function you provide will behave in a thread safe manner.
 
 .. _recipes-determining-the-current-state:
 
