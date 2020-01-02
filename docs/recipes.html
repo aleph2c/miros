@@ -433,6 +433,16 @@ hello from inner_state
 <p>So far we have been talking about signals that are included within the
 miros library: INIT_SIGNAL, ENTRY_SIGNAL.</p>
 <p>Let’s adjust our design to use another internal signal, EXIT_SIGNAL.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If you use miros to build active objects, you are making a multithreaded
+system.  Python’s <code class="docutils literal notranslate"><span class="pre">print</span></code> function is not thread safe, which means if two or
+more of your active objects try to print something at the exact same time, a
+run time error could occur.</p>
+<p class="last">As of miros <code class="docutils literal notranslate"><span class="pre">4.2.1</span></code> miros provides a thread safe <code class="docutils literal notranslate"><span class="pre">print</span></code> function.  To
+access it in this example you could write <code class="docutils literal notranslate"><span class="pre">self.print(&quot;hello</span> <span class="pre">from</span>
+<span class="pre">inner_state&quot;)</span></code> instead of <code class="docutils literal notranslate"><span class="pre">print(&quot;hello</span> <span class="pre">from</span> <span class="pre">inner_state&quot;)</span></code>.</p>
+</div>
 </div>
 <div class="section" id="exit-conditions">
 <span id="recipes-exit-conditions"></span><h3><a class="toc-backref" href="#id96">Exit Conditions</a><a class="headerlink" href="#exit-conditions" title="Permalink to this headline">¶</a></h3>
@@ -5448,7 +5458,7 @@ a trace output as the target for a regression test, you would:</p>
 <li>Run your program and print your trace to the output.</li>
 <li>Copy this trace as the target behavior of your test.</li>
 <li>Run this trace target and the future output of the statechart trace through
-the <a class="reference internal" href="reflection.html#stripped-example"><span class="std std-ref">stripped context manager</span></a> to remove the date
+the <a class="reference internal" href="#stripped-example"><span class="std std-ref">stripped context manager</span></a> to remove the date
 timestamp information.</li>
 <li>Compare your target with the results.</li>
 </ol>
@@ -5728,7 +5738,7 @@ specification.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2019, Scott Volk.
+      &copy;2020, Scott Volk.
       
       |
       <a href="_sources/recipes.rst.txt"

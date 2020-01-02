@@ -249,11 +249,43 @@ queue_type=’lifo’)</dd>
 </dd></dl>
 
 <dl class="method">
-<dt id="activeobject.ActiveObject.make_unique_name_based_on_start_at_function">
-<code class="descname">make_unique_name_based_on_start_at_function</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#activeobject.ActiveObject.make_unique_name_based_on_start_at_function" title="Permalink to this definition">¶</a></dt>
-<dd><p>If the user has not specified a name for their active object, we assign one
-based on the starting function and the first 5 characters created from a
-uuid5 using the starting state name.</p>
+<dt id="activeobject.ActiveObject.post_fifo">
+<code class="descname">post_fifo</code><span class="sig-paren">(</span><em>e</em>, <em>period=None</em>, <em>times=None</em>, <em>deferred=None</em><span class="sig-paren">)</span><a class="headerlink" href="#activeobject.ActiveObject.post_fifo" title="Permalink to this definition">¶</a></dt>
+<dd><p>post an event, or events to the fifo queue</p>
+<dl class="docutils">
+<dt>Example of posting a single event into the fifo queue:</dt>
+<dd>ao.post_fifo(Event(signal=signals.A))</dd>
+<dt>Example create a short lived thread to post a one-shot event in one second:</dt>
+<dd><p class="first">thread_id = ao.post_fifo(Event(signal=signals.A), period=1.0, time=1, deferred=True)</p>
+<p class="last"># to cancel this one shot
+ao.cancel_event(thread_id)</p>
+</dd>
+<dt>Example to create a heart beat of 0.7 seconds starting in 0.7 seconds:</dt>
+<dd><p class="first">thread_id = ao.post_fifo(Event(signal=signals.A), period=0.7, deferred=True)</p>
+<p class="last"># to kill this thread:
+ao.cancel_event(thread_id)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="activeobject.ActiveObject.post_lifo">
+<code class="descname">post_lifo</code><span class="sig-paren">(</span><em>e</em>, <em>period=None</em>, <em>times=None</em>, <em>deferred=None</em><span class="sig-paren">)</span><a class="headerlink" href="#activeobject.ActiveObject.post_lifo" title="Permalink to this definition">¶</a></dt>
+<dd><p>post an event, or events to the lifo queue</p>
+<dl class="docutils">
+<dt>Example of posting a single event into the lifo queue:</dt>
+<dd>ao.post_lifo(Event(signal=signals.A))</dd>
+<dt>Example create a short lived thread to post a one-shot event in one second:</dt>
+<dd><p class="first">thread_id = ao.post_lifo(Event(signal=signals.A), period=1.0, time=1, deferred=True)</p>
+<p class="last"># to cancel this one shot
+ao.cancel_event(thread_id)</p>
+</dd>
+<dt>Example to create a heart beat of 0.7 seconds starting in 0.7 seconds:</dt>
+<dd><p class="first">thread_id = ao.post_lifo(Event(signal=signals.A), period=0.7, deferred=True)</p>
+<p class="last"># to kill this thread:
+ao.cancel_event(thread_id)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -265,21 +297,27 @@ stopped the threading function will run.  If the active fabric has been
 stopped, it will stop this thread as well by clearing the task_event
 HsmEvent (threading.Event) object.</p>
 <p>This threading method waits on the locking-deque.  If the signal is not a
-stop_active_object signal it calls the hsm next_rtc method, which will pop
+STOP_ACTIVE_OBJECT_SIGNAL signal it calls the hsm next_rtc method, which will pop
 the leftmost item out of the deque part of the locking-deque and dispatch it
 into the hsm.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="activeobject.ActiveObject.start_thread_if_not_running">
-<code class="descname">start_thread_if_not_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#activeobject.ActiveObject.start_thread_if_not_running" title="Permalink to this definition">¶</a></dt>
-<dd><p>start the active object thread if it is not currently running</p>
+<dt id="activeobject.ActiveObject.start_at">
+<code class="descname">start_at</code><span class="sig-paren">(</span><em>initial_state</em><span class="sig-paren">)</span><a class="headerlink" href="#activeobject.ActiveObject.start_at" title="Permalink to this definition">¶</a></dt>
+<dd><p>start the active object at a given state and begin its task</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="activeobject.ActiveObject.stop">
 <code class="descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#activeobject.ActiveObject.stop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stops the active object, can cancels all of its pending events</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="activeobject.ActiveObject.top">
+<code class="descname">top</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#activeobject.ActiveObject.top" title="Permalink to this definition">¶</a></dt>
+<dd><p>top most state given to all HSMs; treat it as an outside function</p>
 </dd></dl>
 
 <dl class="method">
@@ -352,7 +390,7 @@ print(chart.trace())</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2019, Scott Volk.
+      &copy;2020, Scott Volk.
       
       |
       <a href="_sources/activeobject.rst.txt"

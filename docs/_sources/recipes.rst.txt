@@ -327,6 +327,17 @@ miros library: INIT_SIGNAL, ENTRY_SIGNAL.
 
 Let's adjust our design to use another internal signal, EXIT_SIGNAL.
 
+.. note::
+
+  If you use miros to build active objects, you are making a multithreaded
+  system.  Python's ``print`` function is not thread safe, which means if two or
+  more of your active objects try to print something at the exact same time, a
+  run time error could occur.
+
+  As of miros ``4.2.1`` miros provides a thread safe ``print`` function.  To
+  access it in this example you could write ``self.print("hello from
+  inner_state")`` instead of ``print("hello from inner_state")``.
+
 .. _recipes-exit-conditions:
 
 
