@@ -412,6 +412,7 @@ class XmlChart(InstrumentedFactory):
     return status
 
   def some_other_state_entry_signal(self, e):
+    import pdb; pdb.set_trace()
     status = return_status.HANDLED
     return status
 
@@ -430,5 +431,5 @@ if __name__ == '__main__':
   example.post_fifo(Event(signal=signals.e4))
   example.post_fifo(Event(signal=signals.e1))
   example.post_fifo(Event(signal=signals.e2))
-  time.sleep(0.10)
+  time.sleep(100.10)
 

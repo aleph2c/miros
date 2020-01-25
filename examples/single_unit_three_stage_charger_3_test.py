@@ -25,7 +25,7 @@ from single_unit_three_stage_charger_3 import BatterySpecificationSettings
 
 Seconds = namedtuple('Seconds', ['sec'])
 
-class TestOutputCsv:
+class XTestOutputCsv:
 
   def __init__(self, test_csv_output_file=None):
 
@@ -106,7 +106,7 @@ class ElectricalInterfaceMock(ElectricalInterface):
     self._charger_state = None
 
     self.time_compression_scalar = time_compression_scalar
-    self.test_output_csv = TestOutputCsv()
+    self.test_output_csv = XTestOutputCsv()
 
     #self.test_csv_output_file = "charger_test_results.csv"
     #self.fieldnames = ['time', 'current', 'voltage', 'soc', 'state']

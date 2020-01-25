@@ -436,7 +436,7 @@ class HsmEventProcessor():
     his book titled, "Practical Statecharts in C/C++: Event Driven Programming
     for Embedded Systems."  If you need to add features or functions add them as
     wrappers in inherited classes.  Try not to change this code too much since
-    it is beautifully documentated within the sited book.
+    it is beautifully documented within the sited book.
 
     Args:
       e (Event): The event to be dispatched to the hsm object
@@ -448,7 +448,7 @@ class HsmEventProcessor():
       chart = HsmEventProcessor()
       signals.append("A")
       chart.start_at(dispatch_graph_a1_s1)
-      chart.dispatch(Event(signal=signals.A)
+      chart.dispatch(Event(signal=signals.A))
 
     Raises:
       HsmTopologyException: if a state function handler is malformed
