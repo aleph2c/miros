@@ -1,0 +1,788 @@
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Reflection | miros</title>
+    <link rel="shortcut icon" href="_static/favicon.ico">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css">
+    <link rel="stylesheet" href="_static/theme.css" type="text/css">
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/css/miros_docs.css" />
+      
+    
+    
+
+    
+    <script type="text/javascript" src="_static/theme.js" defer></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    
+    <script src="_static/jquery.js"></script>
+    
+    <script src="_static/underscore.js"></script>
+    
+    <script src="_static/doctools.js"></script>
+    
+    <script src="_static/language_data.js"></script>
+    
+    
+
+    
+      
+      
+    <link rel="index" title="Index" href="genindex.html">
+      
+      
+    <link rel="search" title="Search" href="search.html">
+      
+      
+      
+    <link rel="next" title="Patterns" href="patterns.html">
+      
+      
+    <link rel="prev" title="Recipes" href="recipes.html">
+      
+    
+
+    
+
+    
+
+    
+  </head>
+
+  <body>
+    <header class="main-header">
+      <div class="navbar">
+        <div id="js-sidebar-mask" class="sidebar-mask"></div>
+        <div id="js-sidebar-menu-button" class="sidebar-menu-button">
+          <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg>
+        </div>
+        <a href="index.html" class="site-link">
+          
+          miros
+          
+        </a>
+        <div class="navbar-links">
+          <a href="installation.html" class="navbar-link">Docs</a>
+          
+          <a href="https://github.com/aleph2c/miros" class="navbar-link">GitHub</a><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="external-link-icon"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+          
+        </div>
+      </div>
+    </header>
+
+    <main class="main-wrapper">
+      
+      <div id="js-main-sidebar" class="main-sidebar">
+        
+        <div class="sidebar-content sidebar-content--divider sidebar-navbar-links">
+          <a href="https://github.com/aleph2c/miros" class="sidebar-navbar-link">GitHub</a>
+          <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="external-link-icon"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+        </div>
+        
+        
+        <div class="sidebar-content sidebar-logo">
+    <a href="index.html">
+      <img class="logo" src="_static/miros_logo.svg" alt="miros" >
+    </a>
+</div>
+        
+        
+
+<h2 class="sidebar-heading">Contents</h2>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zero_to_one.html">Tutorial: Zero To One</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reading_diagrams.html">Diagrams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reflection</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#thoughts-on-reflection">Thoughts On Reflection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-state-am-i-in">What State Am I In?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-signals-do-i-have">What Signals Do I Have?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-high-level-description-of-the-behavior">A High Level Description of The Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#an-extremely-detailed-view-of-the-behavior">An Extremely Detailed View of the Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-test-your-design-using-reflection">How to Test Your Design Using Reflection</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#testing-with-the-trace-output">Testing with the Trace Output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testing-with-the-spy-output">Testing with the Spy Output</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#live-output-from-your-chart">Live Output From Your Chart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-explain-your-design-to-others">How to Explain your Design to Others</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="patterns.html">Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+</ul>
+
+        
+        
+<h2 class="sidebar-heading">Useful Links</h2>
+
+<ul>
+  <li><a href="https://github.com/aleph2c/py-activeobject">miros on github</a></li>
+  <li><a href="https://github.com/aleph2c/sequence">sequence on github</a></li>
+  <li><a href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a></li>
+  <li><a href="http://www.umlet.com">UMLet Download</a></li>
+  <li><a href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">formalism explained</a></li>
+</ul>
+
+
+<h2 class="sidebar-heading">For Embedded</h2>
+
+<ul>
+  <li><a href="https://state-machine.com/">Quantum Leaps for Embedded</a></li>
+  <li><a href="https://github.com/QuantumLeaps/">Quantum Leaps On Github</a></li>
+</ul>
+
+
+<h2 class="sidebar-heading">Statechart Videos</h2>
+
+<ul>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-what-are-they-1-of-4-90488.html">Part 1 (What)</a></li>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-why-use-them-2-of-4-90489.html">Part 2 (Why)</a></li>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-what-are-they-1-of-4-90488.html">Part 3 (Mealy/Moore)</a></li>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-harel-state-machines-4-of-4-90491.html">Part 4 (Harel Statecharts)</a></li>
+  <li><a href="https://barrgroup.com/Embedded-Systems/How-To/Introduction-Hierarchical-State-Machines">Introduction to HSMs</a></li>
+</ul>
+        
+        
+
+<div id="searchbox" style="display: none" role="search">
+  <h2 id="searchlabel" class="sidebar-heading">Quick search</h2>
+  <div class="searchformwrapper sidebar-content">
+    <form class="search" action="search.html" method="get">
+      <input class="sidebar-search sidebar-search--input" type="text" name="q" aria-labelledby="searchlabel"><input class="sidebar-search sidebar-search--btn" type="submit" value="Go">
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+        
+      </div>
+      
+
+      
+      <div class="main-content main-content--sidebar">
+      
+        
+          
+  <div class="toctree-wrapper compound" id="reflection">
+</div>
+<div class="section" id="id1">
+<h1>Reflection<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="#reflection-what-state-am-i-in"><span class="std std-ref">What State Am I In?</span></a></p></li>
+<li><p><a class="reference internal" href="#reflection-a-high-level-description-of-the-behavior"><span class="std std-ref">What happened? Summarized.</span></a></p></li>
+<li><p><span class="xref std std-ref">What happened? Detailed.</span></p></li>
+<li><p><a class="reference internal" href="#reflection-live-output-from-your-chart"><span class="std std-ref">What is happening now?</span></a></p></li>
+<li><p><a class="reference internal" href="#reflection-how-to-test-using-reflection"><span class="std std-ref">How can I test this behavior?</span></a></p></li>
+<li><p><a class="reference internal" href="#reflection-how-to-explain-your-design-to-others"><span class="std std-ref">How can I explain this to others?</span></a></p></li>
+<li><p><a class="reference internal" href="towardsthefactoryexample.html#towardsthefactoryexample-unwinding-a-factory-state-method"><span class="std std-ref">How do I unwind a factory?</span></a></p></li>
+</ul>
+<div class="section" id="thoughts-on-reflection">
+<span id="reflection-thoughts-on-reflection"></span><h2>Thoughts On Reflection<a class="headerlink" href="#thoughts-on-reflection" title="Permalink to this headline">#</a></h2>
+<p>The <cite>miros</cite> framework has several different mechanisms to view how your design
+behaves.  This is extremely important, since with the compacting of complexity
+into behavioral maps it is very easy to lose track of what your system actually
+does.  In fact, it is inevitable that for any moderately ambitious design, you
+will not be able to track the entirety of its behavior in your head.  With any
+addition of state or event management there is an exponential increase in the
+number of possible stories your chart can tell.  This is the power and the
+curse of a statechart.</p>
+<p>The state of your chart might change as it responds to an event, so you might
+want to <a class="reference internal" href="#reflection-what-state-am-i-in"><span class="std std-ref">reflect upon the current state</span></a>.</p>
+<p>You might want to view <a class="reference internal" href="#reflection-a-high-level-description-of-the-behavior"><span class="std std-ref">what events caused what state transitions from a
+high level</span></a>.</p>
+<p><span class="xref std std-ref">You may need to view the state dynamics in fine detail.</span>.</p>
+<p><a class="reference internal" href="#reflection-live-output-from-your-chart"><span class="std std-ref">If you have a number of charts running in parallel, you may want to see how
+they interact in a live manner.</span></a></p>
+<p>The tools needed to view these dynamics are embedded into the <cite>miros</cite> framework.</p>
+<p>Another issue that is faced is how to explain your design to someone else.  A
+statechart diagram is not helpful when you are talking to a customer or someone
+within your team who is not versed in Harel formalism.  For this reason, it is
+good to talk about a specific behavior, not all of the behaviors at once.  A
+statechart diagram might make sense to you but it can psychologically shutdown
+a teammate.  <cite>miros</cite> <span class="xref std std-ref">provides a way to translate how your chart responds
+to a particular event into a different type of diagram, a sequence
+diagram</span>.  Anyone can understand a
+sequence diagram.  By referencing something that is easy to understand you can
+reduce the transaction costs in your organization; everyone should be able to
+participate in the conversation.</p>
+<p>With the smallest adjustment of a statechart, all of your sequence diagrams can
+become moot.  For this reason the sequence diagrams can be generated
+programatically from the trace output.  This means that you don’t have to waste
+expensive engineering time on documentation that will be thrown away as you
+build out your system.  This is also important because your engineers won’t
+become reluctant to change a design to avoid hours and hours of grinding work.</p>
+<p>I would recommend that if you use statecharts, you avoid using non-text based
+documentation systems.  If you use Word to make pretty diagrams, the steps to
+manually change your documents will amplify cost through your organization.
+Whereas if you use markdown, LaTeX, HTML, anything that can quickly be
+constructed without a lot of user intervention, it is easy and cheap to change
+your design descriptions.  If you want to buy a Microsoft product, buy Visio,
+since you can make beautiful diagrams with links.  It makes sense to put a lot
+of time and attention into the map.  To save money, you can use <a class="reference external" href="http://www.umlet.com">umlet</a>
+instead.</p>
+<p>Suppose you are a documentation genius.  This doesn’t mean that anyone wants to
+read your work.  With the <cite>miros</cite> reflection features an engineer can run an
+experiment to see how the system actually behaves, rather than digging into
+dreary specifications.  The chart will quickly become the specification, this
+is the point of Harel formalism.  The specification documents can be thought of
+as temporary work orders that adjust the global specification, the chart
+itself.</p>
+<p>As your system gets bigger and more complicated, it is very important to lock
+it down with tests.  But the more specific the test, the more tightly coupled
+it is to your design.  Any change will break it.  To fix things an engineer
+could isolate the test, reflect upon the behavior, determine if it is correct
+by carefully thinking about it, then overwrite the test with a copy of the
+reflection.  <a class="reference internal" href="#reflection-how-to-test-using-reflection"><span class="std std-ref">It has to be very easy and cheap to isolate and update your tests</span></a>,
+otherwise your organization will lose this discipline and you will lose control
+of your design.</p>
+</div>
+<div class="section" id="what-state-am-i-in">
+<span id="reflection-what-state-am-i-in"></span><h2>What State Am I In?<a class="headerlink" href="#what-state-am-i-in" title="Permalink to this headline">#</a></h2>
+<p>To see what state your chart is in:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll">  <span class="c1"># state name as a string</span>
+</span><span class="hll">  <span class="n">chart</span><span class="o">.</span><span class="n">state_name</span>
+</span>
+  <span class="c1"># state as a function</span>
+  <span class="n">chart</span><span class="o">.</span><span class="n">state_fn</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This will only work if you have wrapped your statemethod with a <code class="docutils literal notranslate"><span class="pre">&#64;spy_on</span></code>
+decorator or if you have constructed your statechart with the Factory class.</p>
+</div>
+</div>
+<div class="section" id="what-signals-do-i-have">
+<span id="reflection-what-signals-do-i-have"></span><span id="reflection-a-high-level-description-of-the-behavior"></span><h2>What Signals Do I Have?<a class="headerlink" href="#what-signals-do-i-have" title="Permalink to this headline">#</a></h2>
+<p>A signal is the name that can be given to an event.  To get access to your
+signals:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+</pre></div>
+</div>
+<p>The signals object is provided by a singleton of the SignalSource class, which
+is just an OrderedDictionary with a <code class="docutils literal notranslate"><span class="pre">__getattr__</span></code> method to make the syntax
+easier to use.</p>
+<p><cite>This basically means that you can think of the signals object as being a dict
+that is shared across your whole program.</cite></p>
+<p>To see your signals, you just reflect upon it like you would with any other
+Python dictionary:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># To see your signal names:</span>
+<span class="n">signal_names</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+<span class="c1"># To see your signal numbers:</span>
+<span class="n">signal_numbers</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+
+<span class="c1"># To output your names and number:</span>
+<span class="k">for</span> <span class="n">signal_name</span><span class="p">,</span> <span class="n">signal_number</span> <span class="ow">in</span> <span class="n">signals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">signal_name</span><span class="p">,</span> <span class="n">signal_number</span><span class="p">)</span>
+
+<span class="c1"># same output with some formatting</span>
+<span class="n">max_name_len</span>   <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">signals</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">))</span>
+<span class="n">max_number_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="nb">int</span><span class="p">)))</span>
+<span class="k">for</span> <span class="n">signal_name</span><span class="p">,</span> <span class="n">signal_number</span> <span class="ow">in</span> <span class="n">signals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{1: &lt;{0}} {2:{3}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_name_len</span><span class="p">,</span>
+                                   <span class="n">signal_name</span><span class="p">,</span>
+                                   <span class="n">signal_number</span><span class="p">,</span>
+                                   <span class="n">max_number_len</span><span class="p">))</span>  <span class="c1"># output below -&gt;</span>
+  <span class="c1"># ENTRY_SIGNAL            1</span>
+  <span class="c1"># EXIT_SIGNAL             2</span>
+  <span class="c1"># INIT_SIGNAL             3</span>
+  <span class="c1"># REFLECTION_SIGNAL       4</span>
+  <span class="c1"># SEARCH_FOR_SUPER_SIGNAL 5</span>
+  <span class="c1"># ..</span>
+</pre></div>
+</div>
+<p>To compare a received event against a signal, compare the signal numbers:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_example_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANLDED</span>
+<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span>    <span class="c1"># do something</span>
+</pre></div>
+</div>
+<p>It you wanted to read an event’s signals name as a string, you would call the
+<code class="docutils literal notranslate"><span class="pre">signal_name</span></code> method of the Event class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_example_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANLDED</span>
+<span class="hll">  <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal_name</span><span class="p">)</span> <span class="c1"># &quot;ENTRY_SIGNAL&quot;</span>
+</span></pre></div>
+</div>
+<p>If you have a signal number and you want to determine its name:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">signal_name</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">name_for_signal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># ENTRY_SIGNAL</span>
+<span class="n">signal_name</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">name_for_signal</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">)</span> <span class="c1"># ENTRY_SIGNAL</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-high-level-description-of-the-behavior">
+<h2>A High Level Description of The Behavior<a class="headerlink" href="#a-high-level-description-of-the-behavior" title="Permalink to this headline">#</a></h2>
+<p>If you would like to see what your active object was doing from a <strong>very high
+level</strong>, you can look at its <cite>trace</cite> instrumentation.  The trace will only
+create a log item if a state transition has occurred. Each line in the <cite>trace</cite>
+will contain:</p>
+<ol class="arabic simple">
+<li><p>A datetime stamp between square brackets</p></li>
+<li><p>The active object name, between square brackets</p></li>
+<li><p>The event that caused the transition, its signal number and its payload</p></li>
+<li><p>The starting state</p></li>
+<li><p>The ending state</p></li>
+</ol>
+<p>If you haven’t named your active object, a unique identifier is given to it,
+and the first 5 characters of this unique identifier will be used in the trace.
+The reason that an identifier is given to it is so that the trace outputs, from
+multiple active objects, can be distinguished from one another.</p>
+<p>Suppose you have built the tazor active object described in the <span class="xref std std-ref">second
+example</span>. Suppose you named this active object <cite>tazor</cite>:
+To see the trace you would type:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tazor</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This would output the following trace:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:28.268873<span class="o">]</span> <span class="o">[</span>75c8c<span class="o">]</span> e-&gt;start_at<span class="o">()</span> top-&gt;arming
+</span><span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:26.312241<span class="o">]</span> <span class="o">[</span>75c8c<span class="o">]</span> e-&gt;BATTERY_CHARGE<span class="o">()</span> arming-&gt;armed
+<span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:26.312241<span class="o">]</span> <span class="o">[</span>75c8c<span class="o">]</span> e-&gt;BATTERY_CHARGE<span class="o">()</span> armed-&gt;armed
+<span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:26.312241<span class="o">]</span> <span class="o">[</span>75c8c<span class="o">]</span> e-&gt;BATTERY_CHARGE<span class="o">()</span> armed-&gt;armed
+</pre></div>
+</div>
+<p>Notice that on line one, the signal is called <cite>start_at</cite>.  There is no signal
+called <cite>start_at</cite>, here the trace is actually using the method name <cite>start_at</cite>
+to indicate how the chart was started.</p>
+<p>A trace can be used with the <cite>sequence</cite> project to generate a sequence diagram,
+more about that is described <span class="xref std std-ref">here.</span></p>
+</div>
+<div class="section" id="an-extremely-detailed-view-of-the-behavior">
+<h2>An Extremely Detailed View of the Behavior<a class="headerlink" href="#an-extremely-detailed-view-of-the-behavior" title="Permalink to this headline">#</a></h2>
+<p>If you need a <strong>very detailed description</strong> of your system’s behavior you will want
+to use the <cite>spy</cite> instrumentation.  The spy outputs:</p>
+<ol class="arabic simple">
+<li><p>All of the internal activity that is run by the event processor</p></li>
+<li><p>How your chart reacts to the events it has received</p></li>
+<li><p>Information about what happened between each of the rtc activities.</p></li>
+<li><p>If a signal was hooked by a state</p></li>
+<li><p>If and when a signal was <a class="reference internal" href="recipes.html#recipes-deferring-an-event"><span class="std std-ref">deferred</span></a></p></li>
+<li><p>If and when a signal was <a class="reference internal" href="recipes.html#recipes-deferring-an-event"><span class="std std-ref">recalled</span></a></p></li>
+<li><p>The number of events awaiting immediate processing after a specific rtc activity.</p></li>
+<li><p>The number of events which have had their processing deferred.</p></li>
+</ol>
+<p>If you don’t understand what these terms mean, read the
+<a class="reference internal" href="postingexample.html#examples-simple-posting-example"><span class="std std-ref">simple posting example</span></a>, since it
+introduces all of these ideas.</p>
+<p>To access the full spy:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># import a pretty printer (like print)</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">pp</span>
+
+<span class="c1"># .. state charts and other code here</span>
+
+<span class="c1"># Assuming your active object is called `ao`</span>
+<span class="c1"># we use the pretty printer to write the</span>
+<span class="c1"># full spy log to the terminal</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>This might output:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:outer&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:outer&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:middle&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:middle&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;A:middle&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:inner&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;POST_DEFERRED:B&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:inner&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(1)&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;A:inner&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;A:middle&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;EXIT_SIGNAL:inner&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:inner&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;POST_DEFERRED:B&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:inner&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(2)&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;A:inner&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;A:middle&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;EXIT_SIGNAL:inner&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:inner&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;POST_DEFERRED:B&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:inner&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(3)&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;D:inner&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;D:middle&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;D:outer&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;POST_FIFO:B&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;D:outer:HOOK&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(2)&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;B:inner&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;B:middle&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;B:outer&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;EXIT_SIGNAL:inner&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;EXIT_SIGNAL:middle&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;EXIT_SIGNAL:outer&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:outer&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;POST_FIFO:B&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;RECALL:B&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:outer&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(1)&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;B:outer&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;EXIT_SIGNAL:outer&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:outer&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;POST_FIFO:B&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;RECALL:B&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:outer&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(0)&#39;</span><span class="p">,</span>
+</span> <span class="s1">&#39;B:outer&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;EXIT_SIGNAL:outer&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ENTRY_SIGNAL:outer&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;INIT_SIGNAL:outer&#39;</span><span class="p">,</span>
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
+</span></pre></div>
+</div>
+<p>If you would like to understand in detail how to read this log, and how it
+might have occurred, reference <a class="reference internal" href="postingexample.html#examples-simple-posting-example"><span class="std std-ref">the example from which it
+came</span></a>.</p>
+<p>The spy log is a ring buffer that contains 500 spots.  This is so your system
+can run forever without using an infinite amount of memory.  Once the internal
+spy log has run out of room, it will shift out the old data and write the new
+data at the tail end of its log.</p>
+</div>
+<div class="section" id="how-to-test-your-design-using-reflection">
+<span id="reflection-how-to-test-using-reflection"></span><h2>How to Test Your Design Using Reflection<a class="headerlink" href="#how-to-test-your-design-using-reflection" title="Permalink to this headline">#</a></h2>
+<div class="section" id="testing-with-the-trace-output">
+<span id="reflection-testing-with-the-trace-output"></span><h3>Testing with the Trace Output<a class="headerlink" href="#testing-with-the-trace-output" title="Permalink to this headline">#</a></h3>
+<p>If you would like to sketch out the high level behavior of your statechart using
+a trace output as the target for a regression test, you would:</p>
+<ol class="arabic simple">
+<li><p>Run your program and print your trace to the output.</p></li>
+<li><p>Copy this trace as the target behavior of your test.</p></li>
+<li><p>Run this trace target and the future output of the statechart trace through
+the <a class="reference internal" href="#stripped-example"><span class="std std-ref">stripped context manager</span></a> to remove the date
+timestamp information.</p></li>
+<li><p>Compare your target with the results.</p></li>
+</ol>
+<p>This should become clear with an example.</p>
+<p>Consider a statechart that outputted the following at the point when you were
+working on it.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="m">2017</span>-11-05 <span class="m">21</span>:31:56.098526<span class="o">]</span> <span class="o">[</span>tazor<span class="o">]</span> e-&gt;start_at<span class="o">()</span> top-&gt;arming
+<span class="o">[</span><span class="m">2017</span>-11-05 <span class="m">21</span>:31:56.200047<span class="o">]</span> <span class="o">[</span>tazor<span class="o">]</span> e-&gt;BATTERY_CHARGE<span class="o">()</span> arming-&gt;armed
+<span class="o">[</span><span class="m">2017</span>-11-05 <span class="m">21</span>:31:56.300974<span class="o">]</span> <span class="o">[</span>tazor<span class="o">]</span> e-&gt;BATTERY_CHARGE<span class="o">()</span> armed-&gt;armed
+<span class="o">[</span><span class="m">2017</span>-11-05 <span class="m">21</span>:31:56.401682<span class="o">]</span> <span class="o">[</span>tazor<span class="o">]</span> e-&gt;BATTERY_CHARGE<span class="o">()</span> armed-&gt;armed
+</pre></div>
+</div>
+<p>You might have gotten this output with the following code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>It does a decent job describing what we want, but it has timestamps.  With the
+<cite>stripped</cite> context manager we can turn the above into something that would look
+like this:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>tazor<span class="o">]</span> e-&gt;start_at<span class="o">()</span> top-&gt;arming
+<span class="o">[</span>tazor<span class="o">]</span> e-&gt;BATTERY_CHARGE<span class="o">()</span> arming-&gt;armed
+<span class="o">[</span>tazor<span class="o">]</span> e-&gt;BATTERY_CHARGE<span class="o">()</span> armed-&gt;armed
+<span class="o">[</span>tazor<span class="o">]</span> e-&gt;BATTERY_CHARGE<span class="o">()</span> armed-&gt;armed
+</pre></div>
+</div>
+<p>That is something that shouldn’t change over time, it looks like something we
+could use as a test specification.  The only problem is that when we run the
+code in the future and generate a new trace we get a trace with a pre-pended
+date timestamp.  We can get around this issue like this:</p>
+<div class="highlight-python notranslate" id="stripped-example"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">stripped</span>
+
+<span class="n">target</span> <span class="o">=</span> \
+<span class="sd">&#39;&#39;&#39;[2017-11-05 21:31:56.098526] [tazor] e-&gt;start_at() top-&gt;arming</span>
+<span class="sd">   [2017-11-05 21:31:56.200047] [tazor] e-&gt;BATTERY_CHARGE() arming-&gt;armed</span>
+<span class="sd">   [2017-11-05 21:31:56.300974] [tazor] e-&gt;BATTERY_CHARGE() armed-&gt;armed</span>
+<span class="sd">   [2017-11-05 21:31:56.401682] [tazor] e-&gt;BATTERY_CHARGE() armed-&gt;armed</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="k">with</span> <span class="n">stripped</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="k">as</span> <span class="n">stripped_target</span><span class="p">,</span> \
+     <span class="n">stripped</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="k">as</span> <span class="n">stripped_trace_result</span><span class="p">:</span>
+
+  <span class="k">for</span> <span class="n">target</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">stripped_target</span><span class="p">,</span> <span class="n">stripped_trace_result</span><span class="p">):</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">target</span> <span class="o">==</span> <span class="n">result</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>On line <strong>1</strong> we import the stripped context manager.</p>
+<p>On lines <strong>3-7</strong> we define the target as just being the trace that we copied
+when we were first designing our statechart.</p>
+<p>On line <strong>9</strong>, we map this target to the <code class="docutils literal notranslate"><span class="pre">stripped_target</span></code> which contains the
+same string with the date timestamps removed.</p>
+<p>On line <strong>10</strong>, we use the same stripped context manager to strip our tazor active
+object’s trace output of its date timestamp information and place the result
+into the <code class="docutils literal notranslate"><span class="pre">stripped_trace_result</span></code> variable.</p>
+<p>Lines <strong>12-13</strong> are for testing each line of our output against our target.</p>
+<p>If our design changes, it is easy to update the test, we just copy the new
+trace of of new design into the target string and everything should be peachy.</p>
+</div>
+<div class="section" id="testing-with-the-spy-output">
+<span id="reflection-testing-with-the-spy-output"></span><h3>Testing with the Spy Output<a class="headerlink" href="#testing-with-the-spy-output" title="Permalink to this headline">#</a></h3>
+<p>A trace does not tell the full story about what your system is doing.  For
+instance it is blind to hooks, deferred events and many other things that might
+happen in the dynamics of your active object.  If you need to look at the
+<cite>exact</cite> behavior of your system, you can:</p>
+<ol class="arabic simple">
+<li><p>Run your program and print your spy to the output.</p></li>
+<li><p>Copy the spy as your target behavior.</p></li>
+<li><p>Compare the target with the results.</p></li>
+</ol>
+<p>Here is an example:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># pp(tazor.spy())</span>
+</span><span class="hll"><span class="c1"># import pdb.set_trace()</span>
+</span><span class="hll"><span class="k">assert</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">spy</span><span class="p">()</span> <span class="o">==</span>
+</span>  <span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:arming&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;ENTRY_SIGNAL:tazor_operating&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;ENTRY_SIGNAL:arming&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;INIT_SIGNAL:arming&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;BATTERY_CHARGE:arming&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:armed&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;ENTRY_SIGNAL:armed&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;POST_DEFERRED:CAPACITOR_CHARGE&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;INIT_SIGNAL:armed&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;&lt;- Queued:(0) Deferred:(1)&#39;</span><span class="p">])</span>
+</pre></div>
+</td></tr></table></div>
+<p>On line <strong>1</strong> we have a commented pretty print command ready to go for when we
+need to rebuild our test specification.  When the test fails in the future,
+which it will because this is a tightly coupled test, we will uncomment lines
+<strong>1-2</strong> then re-run the test.</p>
+<p>This will drop us into a debugging session just after our next spy output has
+been printed to the screen.  At this point we would carefully determine if it
+actually describes the new behavior we are looking for. If it wasn’t, we would
+fix the issue, otherwise we over-write lines <strong>4-16</strong> with this new
+specification.</p>
+<p>We would re-comment lines <strong>1-2</strong> and re-run our tests.</p>
+</div>
+</div>
+<div class="section" id="live-output-from-your-chart">
+<span id="reflection-live-output-from-your-chart"></span><h2>Live Output From Your Chart<a class="headerlink" href="#live-output-from-your-chart" title="Permalink to this headline">#</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ao1</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="n">ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>  <span class="c1"># ao1 will output its trace live to the terminal</span>
+<span class="n">ao1</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>    <span class="c1"># ao1 will output its spy live to the terminal</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-explain-your-design-to-others">
+<span id="reflection-how-to-explain-your-design-to-others"></span><h2>How to Explain your Design to Others<a class="headerlink" href="#how-to-explain-your-design-to-others" title="Permalink to this headline">#</a></h2>
+<p>To create effective, yet inexpensive documentation, you can <a class="reference internal" href="#reflection-a-high-level-description-of-the-behavior"><span class="std std-ref">first obtain
+a trace of your system</span></a>,
+then use it to generate a sequence diagram, with <a class="reference external" href="https://github.com/aleph2c/sequence">sequence</a>.</p>
+<p>Without a lot of effort, you can configure your text editor to write these
+pictures for you.  When I select this in my editor:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:28.268873<span class="o">]</span> <span class="o">[</span>75c8c<span class="o">]</span> e-&gt;start_at<span class="o">()</span> top-&gt;arming
+<span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:26.312241<span class="o">]</span> <span class="o">[</span>75c8c<span class="o">]</span> e-&gt;BC<span class="o">()</span> arming-&gt;armed
+<span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:26.312241<span class="o">]</span> <span class="o">[</span>75c8c<span class="o">]</span> e-&gt;BC<span class="o">()</span> armed-&gt;armed
+<span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:26.312241<span class="o">]</span> <span class="o">[</span>75c8c<span class="o">]</span> e-&gt;BC<span class="o">()</span> armed-&gt;armed
+</pre></div>
+</div>
+<p>Then press &lt;ctrl-T&gt;, it becomes this:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span> Chart: 75c8c <span class="o">]</span> <span class="o">(</span>?<span class="o">)</span>
+     top        arming        armed
+      +-tart_at<span class="o">()</span>-&gt;<span class="p">|</span>            <span class="p">|</span>
+      <span class="p">|</span>    <span class="o">(</span>?<span class="o">)</span>     <span class="p">|</span>            <span class="p">|</span>
+      <span class="p">|</span>            +---BC<span class="o">()</span>----&gt;<span class="p">|</span>
+      <span class="p">|</span>            <span class="p">|</span>    <span class="o">(</span>?<span class="o">)</span>     <span class="p">|</span>
+      <span class="p">|</span>            <span class="p">|</span>            +
+      <span class="p">|</span>            <span class="p">|</span>             <span class="se">\ </span><span class="o">(</span>?<span class="o">)</span>
+      <span class="p">|</span>            <span class="p">|</span>             BC<span class="o">()</span>
+      <span class="p">|</span>            <span class="p">|</span>             /
+      <span class="p">|</span>            <span class="p">|</span>            &lt;
+</pre></div>
+</div>
+<p>Then I would manually replace the question marks with numbers, so that
+I could explained each event by referencing its number.  Since my diagram is in
+ASCII, I could place it in my code comments.</p>
+<p><a class="reference external" href="https://github.com/aleph2c/sequence">sequence</a> also works with interleaving trace outputs that would come from two
+different interacting active objects:</p>
+<p>Suppose you got this from your terminal while testing two different
+statecharts:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:28.268873<span class="o">]</span> <span class="o">[</span>75c8c<span class="o">]</span> e-&gt;start_at<span class="o">()</span> top-&gt;arming
+<span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:28.268873<span class="o">]</span> <span class="o">[</span>95a8c<span class="o">]</span> e-&gt;start_at<span class="o">()</span> top-&gt;arming
+<span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:26.312241<span class="o">]</span> <span class="o">[</span>75c8c<span class="o">]</span> e-&gt;BC<span class="o">()</span> arming-&gt;armed
+<span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:26.312241<span class="o">]</span> <span class="o">[</span>95a8c<span class="o">]</span> e-&gt;OTHER<span class="o">()</span> arming-&gt;armed
+<span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:26.312241<span class="o">]</span> <span class="o">[</span>75c8c<span class="o">]</span> e-&gt;BC<span class="o">()</span> armed-&gt;armed
+<span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:26.312241<span class="o">]</span> <span class="o">[</span>75c8c<span class="o">]</span> e-&gt;BC<span class="o">()</span> armed-&gt;armed
+<span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:26.312241<span class="o">]</span> <span class="o">[</span>95a8c<span class="o">]</span> e-&gt;BC<span class="o">()</span> armed-&gt;armed
+<span class="o">[</span><span class="m">2017</span>-11-06 <span class="m">08</span>:34:26.312241<span class="o">]</span> <span class="o">[</span>95a8c<span class="o">]</span> e-&gt;BC<span class="o">()</span> armed-&gt;armed
+</pre></div>
+</div>
+<p>By running it through <a class="reference external" href="https://github.com/aleph2c/sequence">sequence</a> we would see:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span> Chart: 75c8c <span class="o">]</span> <span class="o">(</span>?<span class="o">)</span>
+     top        arming        armed
+      +-tart_at<span class="o">()</span>-&gt;<span class="p">|</span>            <span class="p">|</span>
+      <span class="p">|</span>    <span class="o">(</span>?<span class="o">)</span>     <span class="p">|</span>            <span class="p">|</span>
+      <span class="p">|</span>            +---BC<span class="o">()</span>----&gt;<span class="p">|</span>
+      <span class="p">|</span>            <span class="p">|</span>    <span class="o">(</span>?<span class="o">)</span>     <span class="p">|</span>
+      <span class="p">|</span>            <span class="p">|</span>            +
+      <span class="p">|</span>            <span class="p">|</span>             <span class="se">\ </span><span class="o">(</span>?<span class="o">)</span>
+      <span class="p">|</span>            <span class="p">|</span>             BC<span class="o">()</span>
+      <span class="p">|</span>            <span class="p">|</span>             /
+      <span class="p">|</span>            <span class="p">|</span>            &lt;
+
+<span class="o">[</span> Chart: 95a8c <span class="o">]</span> <span class="o">(</span>?<span class="o">)</span>
+     top        arming        armed
+      +-tart_at<span class="o">()</span>-&gt;<span class="p">|</span>            <span class="p">|</span>
+      <span class="p">|</span>    <span class="o">(</span>?<span class="o">)</span>     <span class="p">|</span>            <span class="p">|</span>
+<span class="hll">      <span class="p">|</span>            +--OTHER<span class="o">()</span>--&gt;<span class="p">|</span>
+</span>      <span class="p">|</span>            <span class="p">|</span>    <span class="o">(</span>?<span class="o">)</span>     <span class="p">|</span>
+      <span class="p">|</span>            <span class="p">|</span>            +
+      <span class="p">|</span>            <span class="p">|</span>             <span class="se">\ </span><span class="o">(</span>?<span class="o">)</span>
+      <span class="p">|</span>            <span class="p">|</span>             BC<span class="o">()</span>
+      <span class="p">|</span>            <span class="p">|</span>             /
+      <span class="p">|</span>            <span class="p">|</span>            &lt;
+</pre></div>
+</div>
+<p>Now I’ll write some fake documentation to make a point, notice how I update the
+numbers in the diagram:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span> Chart: Unit <span class="m">1</span> <span class="o">]</span>
+     top        arming        armed
+      +start_at<span class="o">()</span>-&gt;<span class="p">|</span>            <span class="p">|</span>
+      <span class="p">|</span>    <span class="o">(</span><span class="m">1</span><span class="o">)</span>     <span class="p">|</span>            <span class="p">|</span>
+      <span class="p">|</span>            +---BC<span class="o">()</span>----&gt;<span class="p">|</span>
+      <span class="p">|</span>            <span class="p">|</span>    <span class="o">(</span><span class="m">3</span><span class="o">)</span>     <span class="p">|</span>
+      <span class="p">|</span>            <span class="p">|</span>            +
+      <span class="p">|</span>            <span class="p">|</span>             <span class="se">\ </span><span class="o">(</span><span class="m">5</span><span class="o">)</span>
+      <span class="p">|</span>            <span class="p">|</span>             BC<span class="o">()</span>
+      <span class="p">|</span>            <span class="p">|</span>             /
+      <span class="p">|</span>            <span class="p">|</span>            &lt;
+
+<span class="o">[</span> Chart: Unit <span class="m">2</span> <span class="o">]</span>
+     top        arming        armed
+      +start_at<span class="o">()</span>-&gt;<span class="p">|</span>            <span class="p">|</span>
+      <span class="p">|</span>    <span class="o">(</span><span class="m">2</span><span class="o">)</span>     <span class="p">|</span>            <span class="p">|</span>
+<span class="hll">      <span class="p">|</span>            +--OTHER<span class="o">()</span>--&gt;<span class="p">|</span>
+</span>      <span class="p">|</span>            <span class="p">|</span>    <span class="o">(</span><span class="m">4</span><span class="o">)</span>     <span class="p">|</span>
+      <span class="p">|</span>            <span class="p">|</span>            +
+      <span class="p">|</span>            <span class="p">|</span>             <span class="se">\ </span><span class="o">(</span><span class="m">6</span><span class="o">)</span>
+      <span class="p">|</span>            <span class="p">|</span>             BC<span class="o">()</span>
+      <span class="p">|</span>            <span class="p">|</span>             /
+      <span class="p">|</span>            <span class="p">|</span>            &lt;
+</pre></div>
+</div>
+<p>You can gang two tazors together to act as one tazor.  The first arming event
+in your tazor network will also arm all of the other tazors, consider the
+diagram above to see this interaction.</p>
+<ol class="arabic simple">
+<li><p>Tazor labeled ‘Unit 1’ turns on in the <cite>arming</cite> state.</p></li>
+<li><p>Tazor labeled ‘Unit 2’ turns on in the <cite>arming</cite> state.</p></li>
+<li><p>Unit 1 begins a battery charge (BC) which will send a broadcast message to
+all other tazors in the network.</p></li>
+<li><p>Unit 2 detects another tazor is beginning a battery charge, so it too begins
+its battery charge (OTHER)</p></li>
+</ol>
+<p>…. and so on</p>
+<p>If I changed the above design, it would be simple to adjust these diagrams and
+their description.  Sequence diagrams are great for explaining small things,
+but they do break the <a class="reference external" href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself">DRY</a> principle.  You are effectively replicating your
+data by having these descriptions in your documentation.  The source <cite>image</cite> is
+your state chart diagram.  Give it a lot of attention, since it is actually
+your specification.  The sequence diagrams are little throw away things, that
+can be used to assist in telling a very specific story about how your system
+behaves.</p>
+<p>I’m probably not following the UML standard and I don’t care.  The utility of
+the sequence diagram picture is in its simplicity.</p>
+<p>I know that you can represent loops and object destructor’s using these
+diagrams, but why bother?  It is easier to write a loop in the code than it is
+in a picture, so why not copy and paste the code onto the sequence diagram if
+you need to explain a loop?</p>
+<p>If you would like to create sequence diagrams that are UML compliant, the
+<a class="reference external" href="http://www.umlet.com">umlet</a> program supports these features.</p>
+</div>
+</div>
+
+
+        
+        <div class="main-content__right-sidebar">
+          <h2 class="sidebar-heading">On this page:</h2>
+        </div>
+      </div>
+    </main>
+
+    <div class="footer-wrapper">
+      
+      <footer class="main-footer main-footer--sidebar">
+      
+        <div class="relational-links">
+          <div>
+            
+            ← <a class="relational-link" href="recipes.html" title="previous chapter">Recipes</a>
+            
+          </div>
+          <div>
+            
+             <a class="relational-link" href="patterns.html" title="next chapter">Patterns</a> →
+            
+          </div>
+        </div>
+        
+        <div class="copyright">
+          © Copyright <span class="js-year"></span>,
+          
+          <a href="https://github.com/aleph2c" class="copyright_link">Scott Volk</a>.
+          
+        </div>
+        
+        
+        <div class="last-updated">
+          <span class="prefix">Last updated:</span>
+          <span class="time">Jun 24, 2020 8:20 PM</span>
+        </div>
+        
+        
+        <div class="created-with">
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 2.4.0 with <span class="theme">13ds_theme_one</span>.
+        </div>
+        
+      </footer>
+    </div>
+  </body>
+</html>

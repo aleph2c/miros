@@ -1,0 +1,955 @@
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Using and Unwinding a Factory | miros</title>
+    <link rel="shortcut icon" href="_static/favicon.ico">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css">
+    <link rel="stylesheet" href="_static/theme.css" type="text/css">
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/css/miros_docs.css" />
+      
+    
+    
+
+    
+    <script type="text/javascript" src="_static/theme.js" defer></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    
+    <script src="_static/jquery.js"></script>
+    
+    <script src="_static/underscore.js"></script>
+    
+    <script src="_static/doctools.js"></script>
+    
+    <script src="_static/language_data.js"></script>
+    
+    
+
+    
+      
+      
+    <link rel="index" title="Index" href="genindex.html">
+      
+      
+    <link rel="search" title="Search" href="search.html">
+      
+      
+      
+    <link rel="next" title="Orthogonal Regions" href="othogonalregions.html">
+      
+      
+    <link rel="prev" title="Interacting Statecharts (Same Machine)" href="interactingcharts.html">
+      
+    
+
+    
+
+    
+
+    
+  </head>
+
+  <body>
+    <header class="main-header">
+      <div class="navbar">
+        <div id="js-sidebar-mask" class="sidebar-mask"></div>
+        <div id="js-sidebar-menu-button" class="sidebar-menu-button">
+          <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg>
+        </div>
+        <a href="index.html" class="site-link">
+          
+          miros
+          
+        </a>
+        <div class="navbar-links">
+          <a href="installation.html" class="navbar-link">Docs</a>
+          
+          <a href="https://github.com/aleph2c/miros" class="navbar-link">GitHub</a><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="external-link-icon"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+          
+        </div>
+      </div>
+    </header>
+
+    <main class="main-wrapper">
+      
+      <div id="js-main-sidebar" class="main-sidebar">
+        
+        <div class="sidebar-content sidebar-content--divider sidebar-navbar-links">
+          <a href="https://github.com/aleph2c/miros" class="sidebar-navbar-link">GitHub</a>
+          <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="external-link-icon"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+        </div>
+        
+        
+        <div class="sidebar-content sidebar-logo">
+    <a href="index.html">
+      <img class="logo" src="_static/miros_logo.svg" alt="miros" >
+    </a>
+</div>
+        
+        
+
+<h2 class="sidebar-heading">Contents</h2>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zero_to_one.html">Tutorial: Zero To One</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reading_diagrams.html">Diagrams</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="comprehensive.html">Comprehensive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="comprehensive.html#comprehensive-with-instrumentation">Comprehensive with Instrumentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="thread_safe_attributes.html">Thread Safe Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scribbleexample.html">Hacking to Learn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interactingcharts.html">Interacting Statecharts (Same Machine)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Using and Unwinding a Factory</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example-summary">Example Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#why-a-factory">Why a Factory?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#standard-approach-to-writing-state-methods">Standard Approach to Writing State Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#registering-callbacks-to-specific-events">Registering Callbacks to Specific Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-a-statechart-using-templates">Creating a Statechart Using Templates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-the-factory-class">Using the Factory Class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#unwinding-a-factory-state-method">Unwinding a Factory State Method</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="othogonalregions.html">Orthogonal Regions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="batterychargingexample.html">Distributed Battery Charging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cellular_automata.html">Cellular Automata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i_mongol_example.html">Mongol Horse Archer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reflection.html">Reflection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="patterns.html">Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+</ul>
+
+        
+        
+<h2 class="sidebar-heading">Useful Links</h2>
+
+<ul>
+  <li><a href="https://github.com/aleph2c/py-activeobject">miros on github</a></li>
+  <li><a href="https://github.com/aleph2c/sequence">sequence on github</a></li>
+  <li><a href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a></li>
+  <li><a href="http://www.umlet.com">UMLet Download</a></li>
+  <li><a href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">formalism explained</a></li>
+</ul>
+
+
+<h2 class="sidebar-heading">For Embedded</h2>
+
+<ul>
+  <li><a href="https://state-machine.com/">Quantum Leaps for Embedded</a></li>
+  <li><a href="https://github.com/QuantumLeaps/">Quantum Leaps On Github</a></li>
+</ul>
+
+
+<h2 class="sidebar-heading">Statechart Videos</h2>
+
+<ul>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-what-are-they-1-of-4-90488.html">Part 1 (What)</a></li>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-why-use-them-2-of-4-90489.html">Part 2 (Why)</a></li>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-what-are-they-1-of-4-90488.html">Part 3 (Mealy/Moore)</a></li>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-harel-state-machines-4-of-4-90491.html">Part 4 (Harel Statecharts)</a></li>
+  <li><a href="https://barrgroup.com/Embedded-Systems/How-To/Introduction-Hierarchical-State-Machines">Introduction to HSMs</a></li>
+</ul>
+        
+        
+
+<div id="searchbox" style="display: none" role="search">
+  <h2 id="searchlabel" class="sidebar-heading">Quick search</h2>
+  <div class="searchformwrapper sidebar-content">
+    <form class="search" action="search.html" method="get">
+      <input class="sidebar-search sidebar-search--input" type="text" name="q" aria-labelledby="searchlabel"><input class="sidebar-search sidebar-search--btn" type="submit" value="Go">
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+        
+      </div>
+      
+
+      
+      <div class="main-content main-content--sidebar">
+      
+        
+          
+  <blockquote class="epigraph">
+<div><p>You know you are working with clean code when each routine you read turns out to
+be pretty much what you expected. You can call it beautiful code when the code
+also makes it look like the language was made for the problem.</p>
+<p class="attribution">—Ward Cunningham</p>
+</div></blockquote>
+<div class="section" id="using-and-unwinding-a-factory">
+<span id="towardsthefactoryexample-towards-a-factory"></span><h1>Using and Unwinding a Factory<a class="headerlink" href="#using-and-unwinding-a-factory" title="Permalink to this headline">#</a></h1>
+<a class="reference external image-reference" href="_static/factory1.pdf"><img alt="_images/factory1.svg" class="noscale-center" src="_images/factory1.svg" /></a>
+<div class="section" id="example-summary">
+<span id="towardsthefactoryexample-example-summary"></span><h2>Example Summary<a class="headerlink" href="#example-summary" title="Permalink to this headline">#</a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#towardsthefactoryexample-standard-approach"><span class="std std-ref">Standard Approach to Writing State Methods</span></a></p></li>
+<li><p><a class="reference internal" href="#towardsthefactoryexample-registering-callbacks-to-specific-events"><span class="std std-ref">Registering Callbacks to Specific Events</span></a></p></li>
+<li><p><a class="reference internal" href="#towardsthefactoryexample-registering-a-parent-to-a-state-method"><span class="std std-ref">Creating a Statechart Using Templates</span></a></p></li>
+<li><p><a class="reference internal" href="#towardsthefactoryexample-using-the-factory-class"><span class="std std-ref">Creating a Statechart Using A Factory</span></a></p></li>
+<li><p><a class="reference internal" href="#towardsthefactoryexample-unwinding-a-factory-state-method"><span class="std std-ref">Unwinding a Factory State Method</span></a></p></li>
+</ol>
+<p id="towardsthefactoryexample-why-you-would-want-a-factory">In this example I will walk you through how to hand-code a simple state method
+then show how that same method could be written for you automatically.  Then I
+will show how to re-flatten a statechart, so that you can copy this code back
+into your design to make it easier to debug. (Like looking at preprocessor
+results in c).</p>
+</div>
+<div class="section" id="why-a-factory">
+<h2>Why a Factory?<a class="headerlink" href="#why-a-factory" title="Permalink to this headline">#</a></h2>
+<p>The event processor uses the organization of your state methods, who their
+parents are and how they relate to each other as if they defined a complicated
+data structure.  These state methods contain your application code too, but
+they <cite>are</cite> the nodes of your graph; they define the topology of your
+statechart.</p>
+<p>When you send an event which will cause a transition across multiple states with
+complicated entry/exit/init event triggering to provide the Harel Formalism,
+you don’t have to worry about how it is implemented, you just need to ensure
+that you have framed in your state methods with enough structure that the event
+processing algorithm can discover the graph and build out the expected behavior.</p>
+<p>This provides the illusion that you are using a completely different type of
+programming language, but it’s still all Python.  Your state methods are just
+being called over and over again with different arguments.</p>
+<p>Miro Samek describes this as “an inversion of control”.  By using his event
+processing algorithm, you are packing the management complexity of the
+topological search into the bottom part of your software system.  By pushing
+this to the bottom, you can focus on writing concise descriptions of how your
+system should behave without concerning yourself with how to implement this
+behavior, the algorithm solves that problem.  You just need to build the map.</p>
+<p>But to do this, the event processor expects all of your state methods to have a
+specific shape.  Their method signatures have to look a certain way and their
+if-else structures have to be framed-in just right, otherwise the event
+processor will get lost while it’s searching for the correct behavior.</p>
+<p>Wouldn’t it be nice if the library wrote the methods for you too?  Well it can,
+you can use a factory to create state method nodes, then link in event
+callbacks and assign parents at run time.  The benefit of such an approach is
+that you can avoid the strangeness of a state method.  It will become harder
+for a maintenance developer to accidentally break your statechart by making
+something that looks like an innocuous change.  The factory hides the
+topological structure of your state methods behind another layer of
+indirection.</p>
+<p>However, if you use this library to write your state methods for you, you are
+placing yet another layer of abstraction between you and your design.  A bug
+might be even harder to find than it was before.  The nice thing about the
+state methods is that they are easy to understand, they are flat, and you can
+literally see the code and break within it for debugging.  The cognitive
+difficulty experienced while trouble shooting a flat state method is much less
+than it would be for something that is auto-generated.</p>
+</div>
+<div class="section" id="standard-approach-to-writing-state-methods">
+<span id="towardsthefactoryexample-standard-approach"></span><h2>Standard Approach to Writing State Methods<a class="headerlink" href="#standard-approach-to-writing-state-methods" title="Permalink to this headline">#</a></h2>
+<a class="reference external image-reference" href="_static/factory1.pdf"><img alt="_images/factory1.svg" class="noscale-center" src="_images/factory1.svg" /></a>
+<p>To create the above diagram we would define three state methods, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">c1</span></code>
+and <code class="docutils literal notranslate"><span class="pre">c2</span></code> and an active object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">c</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">c1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">c</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">c2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">c</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+<span class="hll"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span> <span class="c1"># give your active object a moment to respond</span>
+</span><span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>An active object has its own thread, so when you want to communicate to it by
+posting an event, you have to give it the briefest opportunity to react.
+This delay is highlighted in the above code.</p>
+<p>When the above code is run, it would output this to your terminal:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:c2&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:c&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:c&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:c2&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:c2&#39;</span>,
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
+</span> <span class="s1">&#39;A:c2&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:c1&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:c2&#39;</span>,
+ <span class="s1">&#39;EXIT_SIGNAL:c2&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:c1&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:c1&#39;</span>,
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
+</span></pre></div>
+</div>
+<p>We see from the spy log that we had two run to completion events with no
+surprises.  Notice that the event processor tried to call the state functions
+with the <code class="docutils literal notranslate"><span class="pre">ENTRY_SIGNAL</span></code>, <code class="docutils literal notranslate"><span class="pre">INIT_SIGNAL</span></code> and <code class="docutils literal notranslate"><span class="pre">EXIT_SIGNAL</span></code> as it should
+have, even though our state methods did not handle these events.  The handlers
+for these events were left out of the state method examples to keep the code
+compact.  This demonstrates that the event processor assumes that a missing
+handler for <code class="docutils literal notranslate"><span class="pre">entry</span></code>, <code class="docutils literal notranslate"><span class="pre">init</span></code> and <code class="docutils literal notranslate"><span class="pre">exit</span></code> signals are handled by a state
+method.</p>
+</div>
+<div class="section" id="registering-callbacks-to-specific-events">
+<span id="towardsthefactoryexample-registering-callbacks-to-specific-events"></span><h2>Registering Callbacks to Specific Events<a class="headerlink" href="#registering-callbacks-to-specific-events" title="Permalink to this headline">#</a></h2>
+<p>To build our state method code generation we need to create something that is
+common to all state methods.  The state method does two different things, it
+responds to events and it returns parent information.</p>
+<p>To break this down even more, we can say that it does four things.  It asks two
+questions and answers two questions.  It asks “How should I respond to the
+events that I care about?” and “Who is my parent?”.</p>
+<p>Then it answers these questions with information specific to that state method.
+To make something common across all state methods we can ask the questions but
+we can’t answer them.  The answers will have to be injected into the state
+methods after they have been created.</p>
+<p>To be more specific a general state method could look something like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">general_state_method</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+
+<span class="hll">  <span class="c1"># How should I respond to the events that I care about?</span>
+</span><span class="hll">  <span class="k">with</span> <span class="n">chart</span><span class="o">.</span><span class="n">signal_callback</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">general_state_method</span><span class="p">)</span> <span class="k">as</span> <span class="n">fn</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span>
+<span class="hll">  <span class="c1"># Who is my parent?</span>
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">status</span> <span class="o">==</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span><span class="p">):</span>
+</span><span class="hll">    <span class="k">with</span> <span class="n">chart</span><span class="o">.</span><span class="n">parent_callback</span><span class="p">()</span> <span class="k">as</span> <span class="n">parent</span><span class="p">:</span>
+</span><span class="hll">      <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">parent</span>
+</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>We see that the chart argument provides different context managers,
+<code class="docutils literal notranslate"><span class="pre">signal_callback</span></code> and <code class="docutils literal notranslate"><span class="pre">parent_callback</span></code>.  It is within these context
+managers that the answers are made.</p>
+<p>To inject the information into the chart
+object so that these context managers have something to answer with we can use the
+<code class="docutils literal notranslate"><span class="pre">register_signal_callback</span></code> and the <code class="docutils literal notranslate"><span class="pre">register_parent</span></code> of the active object.</p>
+<p>Things should become a bit clearer with an example, reconsider our previous design:</p>
+<a class="reference external image-reference" href="_static/factory3.pdf"><img alt="_images/factory3.svg" class="noscale-center" src="_images/factory3.svg" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">tc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+
+<span class="hll">  <span class="k">with</span> <span class="n">chart</span><span class="o">.</span><span class="n">signal_callback</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">tc</span><span class="p">)</span> <span class="k">as</span> <span class="n">fn</span><span class="p">:</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">status</span> <span class="o">==</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">chart</span><span class="o">.</span><span class="n">parent_callback</span><span class="p">()</span> <span class="k">as</span> <span class="n">parent</span><span class="p">:</span>
+      <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">parent</span>
+
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">tc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+
+<span class="hll">  <span class="k">with</span> <span class="n">chart</span><span class="o">.</span><span class="n">signal_callback</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">tc1</span><span class="p">)</span> <span class="k">as</span> <span class="n">fn</span><span class="p">:</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">status</span> <span class="o">==</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">chart</span><span class="o">.</span><span class="n">parent_callback</span><span class="p">()</span> <span class="k">as</span> <span class="n">parent</span><span class="p">:</span>
+      <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">parent</span>
+
+  <span class="k">return</span> <span class="n">status</span>
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">tc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+
+<span class="hll">  <span class="k">with</span> <span class="n">chart</span><span class="o">.</span><span class="n">signal_callback</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">tc2</span><span class="p">)</span> <span class="k">as</span> <span class="n">fn</span><span class="p">:</span>
+</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">status</span> <span class="o">==</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">chart</span><span class="o">.</span><span class="n">parent_callback</span><span class="p">()</span> <span class="k">as</span> <span class="n">parent</span><span class="p">:</span>
+      <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">parent</span>
+
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>To distinguish these state methods from the previous ones we pre-pend their names
+with <cite>t</cite> which stands for template.</p>
+<p>These state methods almost look identical, the highlighted lines spell out how
+they are different;  the <code class="docutils literal notranslate"><span class="pre">signal_callback</span></code> context manager is using the state
+method’s name to get its information.  Other than that it hardly seems worth
+writing out the code three times.</p>
+<p>Now we have to give it the information required to perform the actions we want,
+first we define some callback methods, then we describe how we want our state
+methods to call them.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="k">def</span> <span class="nf">trans_to_tc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">tc</span><span class="p">)</span>
+</span><span class="hll">
+</span><span class="hll"><span class="k">def</span> <span class="nf">trans_to_tc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">tc1</span><span class="p">)</span>
+</span><span class="hll">
+</span><span class="hll"><span class="k">def</span> <span class="nf">trans_to_tc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">tc2</span><span class="p">)</span>
+</span><span class="hll">
+</span><span class="hll"><span class="k">def</span> <span class="nf">do_nothing</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span>
+<span class="hll"><span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+</span>
+<span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">,</span> <span class="n">trans_to_tc</span><span class="p">)</span>
+</span><span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span> <span class="n">do_nothing</span><span class="p">)</span>
+</span><span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>  <span class="n">do_nothing</span><span class="p">)</span>
+</span><span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>  <span class="n">trans_to_tc1</span><span class="p">)</span>
+</span><span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">tc</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">top</span><span class="p">)</span>
+</span><span class="hll">
+</span><span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc1</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">trans_to_tc2</span><span class="p">)</span>
+</span><span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc1</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span> <span class="n">do_nothing</span><span class="p">)</span>
+</span><span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc1</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>  <span class="n">do_nothing</span><span class="p">)</span>
+</span><span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc1</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>  <span class="n">do_nothing</span><span class="p">)</span>
+</span><span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">tc1</span><span class="p">,</span> <span class="n">tc</span><span class="p">)</span>
+</span><span class="hll">
+</span><span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc2</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">trans_to_tc1</span><span class="p">)</span>
+</span><span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc2</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span> <span class="n">do_nothing</span><span class="p">)</span>
+</span><span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc2</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">,</span>  <span class="n">do_nothing</span><span class="p">)</span>
+</span><span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">tc2</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>  <span class="n">do_nothing</span><span class="p">)</span>
+</span><span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">tc2</span><span class="p">,</span> <span class="n">tc</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>In the first highlighted block we create four different callback methods.  They
+have the same method signature as a state method and they work exactly as they
+would if they were defined within a state method.</p>
+<p>The second block is just an instantiation of an active object, it has the event
+processor and it also provides a means to register callback methods for events
+and to register a parent state.</p>
+<p>The next block shows how are three state methods are given their information.
+For instance, the event <code class="docutils literal notranslate"><span class="pre">BB</span></code> will cause state <code class="docutils literal notranslate"><span class="pre">tc</span></code> to transition to itself.</p>
+<p>If we run this code like we did in our previous example we would expect to it
+behave the same:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">tc2</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>  <span class="c1"># give your active object a moment to respond</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>If we ran this code, we would see:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:tc2&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:tc&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:tc&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:tc2&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:tc2&#39;</span>,
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
+</span> <span class="s1">&#39;A:tc2&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:tc1&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:tc2&#39;</span>,
+ <span class="s1">&#39;EXIT_SIGNAL:tc2&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:tc1&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:tc1&#39;</span>,
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
+</span></pre></div>
+</div>
+</div>
+<div class="section" id="creating-a-statechart-using-templates">
+<span id="towardsthefactoryexample-registering-a-parent-to-a-state-method"></span><h2>Creating a Statechart Using Templates<a class="headerlink" href="#creating-a-statechart-using-templates" title="Permalink to this headline">#</a></h2>
+<p>We pretty much wrote the same method three times in a row in our <a class="reference internal" href="#towardsthefactoryexample-registering-callbacks-to-specific-events"><span class="std std-ref">last
+example</span></a>.
+Wouldn’t it be nice if something could write the thing for us?</p>
+<p>This is exactly what the <code class="docutils literal notranslate"><span class="pre">miros.hsm.state_method_template</span></code> does.</p>
+<p>It writes the template code within another function, then copies it so that
+this function result is unique in memory, then it renames it and then decorates
+it with some instrumentation.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+
+<span class="k">def</span> <span class="nf">state_method_template</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="nf">base_state_method</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+
+    <span class="k">with</span> <span class="n">chart</span><span class="o">.</span><span class="n">signal_callback</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">as</span> <span class="n">fn</span><span class="p">:</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">status</span> <span class="o">==</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span><span class="p">):</span>
+      <span class="k">with</span> <span class="n">chart</span><span class="o">.</span><span class="n">parent_callback</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">as</span> <span class="n">parent</span><span class="p">:</span>
+        <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">parent</span>
+
+    <span class="k">return</span> <span class="n">status</span>
+
+  <span class="n">resulting_function</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">base_state_method</span><span class="p">)</span>
+  <span class="n">resulting_function</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="n">name</span>
+  <span class="n">resulting_function</span> <span class="o">=</span> <span class="n">spy_on</span><span class="p">(</span><span class="n">resulting_function</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">resulting_function</span>
+</pre></div>
+</div>
+<p>With this method we can automatically write our state methods then register
+event callbacks and parent states.</p>
+<p>Let’s re-create our example, this time using this <code class="docutils literal notranslate"><span class="pre">state_method_template</span></code>
+method:</p>
+<a class="reference external image-reference" href="_static/factory4.pdf"><img alt="_images/factory4.svg" class="noscale-center" src="_images/factory4.svg" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># create the specific behavior we want in our state chart</span>
+<span class="k">def</span> <span class="nf">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">trans_to_fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc2</span><span class="p">)</span>
+
+<span class="c1"># create the states</span>
+<span class="n">fc</span>  <span class="o">=</span> <span class="n">state_method_template</span><span class="p">(</span><span class="s1">&#39;fc&#39;</span><span class="p">)</span>
+<span class="n">fc1</span> <span class="o">=</span> <span class="n">state_method_template</span><span class="p">(</span><span class="s1">&#39;fc1&#39;</span><span class="p">)</span>
+<span class="n">fc2</span> <span class="o">=</span> <span class="n">state_method_template</span><span class="p">(</span><span class="s1">&#39;fc2&#39;</span><span class="p">)</span>
+
+<span class="c1"># build an active object, which has an event processor</span>
+<span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+
+<span class="c1"># write the design information into the fc state</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">,</span> <span class="n">trans_to_fc</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>  <span class="n">trans_to_fc1</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">top</span><span class="p">)</span>
+
+<span class="c1"># write the design information into the fc1 state</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">,</span> <span class="n">trans_to_fc</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc1</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">trans_to_fc2</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">fc1</span><span class="p">,</span> <span class="n">fc</span><span class="p">)</span>
+
+<span class="c1"># write the design information into the fc2 state</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc2</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">trans_to_fc1</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">fc2</span><span class="p">,</span> <span class="n">fc</span><span class="p">)</span>
+
+<span class="c1"># start up the active object and watch what is does</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">fc2</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>This is a much more compact version of our map.  I removed the registration of
+signals that weren’t being used by the design, but more importantly I used the
+<code class="docutils literal notranslate"><span class="pre">state_method_template</span></code> to create the state methods that could have
+information added to them with the active object registration methods.</p>
+<p>The output from this program is:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc2&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:fc&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:fc2&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:fc2&#39;</span>,
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
+</span> <span class="s1">&#39;A:fc2&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc1&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc2&#39;</span>,
+ <span class="s1">&#39;EXIT_SIGNAL:fc2&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:fc1&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:fc1&#39;</span>,
+<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
+</span></pre></div>
+</div>
+<p>Which is the expected behavior.</p>
+</div>
+<div class="section" id="using-the-factory-class">
+<span id="towardsthefactoryexample-using-the-factory-class"></span><h2>Using the Factory Class<a class="headerlink" href="#using-the-factory-class" title="Permalink to this headline">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">active_object</span></code> module’s Factory class provides a syntax which is similar to
+the previous miros version.  It has the <code class="docutils literal notranslate"><span class="pre">create</span></code>, <code class="docutils literal notranslate"><span class="pre">catch</span></code> and <code class="docutils literal notranslate"><span class="pre">nest</span></code>
+methods, but it also extends the other API with <code class="docutils literal notranslate"><span class="pre">to_method</span></code> and <code class="docutils literal notranslate"><span class="pre">to_code</span></code>.</p>
+<p>The Factory class wraps the <code class="docutils literal notranslate"><span class="pre">register_signal_callback</span></code> and
+<code class="docutils literal notranslate"><span class="pre">register_parent</span></code> described in the <a class="reference internal" href="#towardsthefactoryexample-registering-a-parent-to-a-state-method"><span class="std std-ref">previous
+section</span></a>
+making syntax that is a bit more concise.</p>
+<a class="reference external image-reference" href="_static/factory5.pdf"><img alt="_images/factory5.svg" class="noscale-center" src="_images/factory5.svg" /></a>
+<p>Here is how you could implement this statechart with the <code class="docutils literal notranslate"><span class="pre">Factory</span></code> class:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+
+<span class="c1"># create the specific behavior we want in our state chart</span>
+<span class="k">def</span> <span class="nf">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">trans_to_fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc2</span><span class="p">)</span>
+
+<span class="hll"><span class="n">chart</span> <span class="o">=</span> <span class="n">Factory</span><span class="p">(</span><span class="s1">&#39;factory_class_example&#39;</span><span class="p">)</span>
+</span>
+<span class="n">fc</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fc&#39;</span><span class="p">)</span><span class="o">.</span>                             \
+  <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fc</span><span class="p">)</span><span class="o">.</span>            \
+  <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fc1</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">to_method</span><span class="p">()</span>
+
+<span class="n">fc1</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fc1&#39;</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fc2</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">to_method</span><span class="p">()</span>
+
+<span class="n">fc2</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fc2&#39;</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fc1</span><span class="p">)</span><span class="o">.</span> \
+  <span class="n">to_method</span><span class="p">()</span>
+
+<span class="n">chart</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span>  <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="n">fc1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">fc</span><span class="p">)</span><span class="o">.</span> \
+      <span class="n">nest</span><span class="p">(</span><span class="n">fc2</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">fc</span><span class="p">)</span>
+
+<span class="n">chart</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+</pre></div>
+</td></tr></table></div>
+<p>If we ran the above code we would see the expected behavior:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:fc&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:fc&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc1&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:fc1&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:fc1&#39;</span>,
+ <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
+ <span class="s1">&#39;A:fc1&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc2&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc1&#39;</span>,
+ <span class="s1">&#39;EXIT_SIGNAL:fc1&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:fc2&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:fc2&#39;</span>,
+ <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="unwinding-a-factory-state-method">
+<span id="towardsthefactoryexample-unwinding-a-factory-state-method"></span><h2>Unwinding a Factory State Method<a class="headerlink" href="#unwinding-a-factory-state-method" title="Permalink to this headline">#</a></h2>
+<p>State methods made from factories are hard to debug because you can’t actually
+see their code.  If you find that you have an issue with such a state method, you
+can unwind it into flat code using the <code class="docutils literal notranslate"><span class="pre">to_code</span></code> method.  This method outputs a
+string that you can use as a hand written state method.</p>
+<p>In the following example, I’ll show how we can ‘unwind’ a design.</p>
+<a class="reference external image-reference" href="_static/factory4.pdf"><img alt="_images/factory4.svg" class="noscale-center" src="_images/factory4.svg" /></a>
+<p>First we repeat the work of the last section:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># create the specific behavior we want in our state chart</span>
+<span class="k">def</span> <span class="nf">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">trans_to_fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc2</span><span class="p">)</span>
+
+<span class="c1"># create the states</span>
+<span class="n">fc</span>  <span class="o">=</span> <span class="n">state_method_template</span><span class="p">(</span><span class="s1">&#39;fc&#39;</span><span class="p">)</span>
+<span class="n">fc1</span> <span class="o">=</span> <span class="n">state_method_template</span><span class="p">(</span><span class="s1">&#39;fc1&#39;</span><span class="p">)</span>
+<span class="n">fc2</span> <span class="o">=</span> <span class="n">state_method_template</span><span class="p">(</span><span class="s1">&#39;fc2&#39;</span><span class="p">)</span>
+
+<span class="c1"># build an active object, which has an event processor</span>
+<span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+
+<span class="c1"># write the design information into the fc state</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">,</span> <span class="n">trans_to_fc</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>  <span class="n">trans_to_fc1</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">top</span><span class="p">)</span>
+
+<span class="c1"># write the design information into the fc1 state</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">,</span> <span class="n">trans_to_fc</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc1</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">trans_to_fc2</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">fc1</span><span class="p">,</span> <span class="n">fc</span><span class="p">)</span>
+
+<span class="c1"># write the design information into the fc2 state</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_signal_callback</span><span class="p">(</span><span class="n">fc2</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">trans_to_fc1</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">fc2</span><span class="p">,</span> <span class="n">fc</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">fc</span></code>, <code class="docutils literal notranslate"><span class="pre">fc1</span></code> and <code class="docutils literal notranslate"><span class="pre">fc2</span></code> objects contain state methods that were
+generated by the framework and their code is hidden within the <code class="docutils literal notranslate"><span class="pre">ao</span></code> object.</p>
+<p>Now suppose something were to go wrong with this design?  An application
+developer would have to know that there are at least four different places to
+look within the miros framework to understand their state method: the
+registration functions, the context managers and in the actual template
+generation function.  That would be a lot to keep in their head while they were
+also trying to wrestle with their own design problem.</p>
+<p>Instead, they could use the <code class="docutils literal notranslate"><span class="pre">to_code</span></code> method, copy the result and write it
+back into the design as flat state methods.  In this way they could focus their
+entire attention on their own issue.  Here is how they could do it:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">to_code</span><span class="p">(</span><span class="n">fc</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">to_code</span><span class="p">(</span><span class="n">fc1</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">to_code</span><span class="p">(</span><span class="n">fc2</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>This would output the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">fc</span>
+  <span class="k">return</span> <span class="n">status</span>
+
+
+<span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">fc</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>They could copy these methods and re-write their original code as this, making
+sure that the comment out all of the factory code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># create the specific behavior we want in our state chart</span>
+<span class="k">def</span> <span class="nf">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">trans_to_fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc2</span><span class="p">)</span>
+
+<span class="hll"><span class="nd">@spy_on</span>
+</span><span class="hll"><span class="k">def</span> <span class="nf">fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span>
+
+<span class="hll"><span class="nd">@spy_on</span>
+</span><span class="hll"><span class="k">def</span> <span class="nf">fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">fc</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span>
+
+<span class="hll"><span class="nd">@spy_on</span>
+</span><span class="hll"><span class="k">def</span> <span class="nf">fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">fc</span>
+</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
+</span>
+<span class="hll"><span class="c1"># create the states</span>
+</span><span class="hll"><span class="c1"># fc  = state_method_template(&#39;fc&#39;)</span>
+</span><span class="hll"><span class="c1"># fc1 = state_method_template(&#39;fc1&#39;)</span>
+</span><span class="hll"><span class="c1"># fc2 = state_method_template(&#39;fc2&#39;)</span>
+</span>
+<span class="c1"># build an active object, which has an event processor</span>
+<span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+
+<span class="hll"><span class="c1"># write the design information into the fc state</span>
+</span><span class="hll"><span class="c1"># ao.register_signal_callback(fc, signals.BB, trans_to_fc)</span>
+</span><span class="hll"><span class="c1"># ao.register_signal_callback(fc, signals.INIT_SIGNAL,  trans_to_fc1)</span>
+</span><span class="hll"><span class="c1"># ao.register_parent(fc, ao.top)</span>
+</span>
+<span class="hll"><span class="c1"># write the design information into the fc1 state</span>
+</span><span class="hll"><span class="c1"># ao.register_signal_callback(fc, signals.BB, trans_to_fc)</span>
+</span><span class="hll"><span class="c1"># ao.register_signal_callback(fc1, signals.A, trans_to_fc2)</span>
+</span><span class="hll"><span class="c1"># ao.register_parent(fc1, fc)</span>
+</span>
+<span class="hll"><span class="c1"># write the design information into the fc2 state</span>
+</span><span class="hll"><span class="c1"># ao.register_signal_callback(fc2, signals.A, trans_to_fc1)</span>
+</span><span class="hll"><span class="c1"># ao.register_parent(fc2, fc)</span>
+</span>
+<span class="c1"># start up the active object and watch what it does</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">fc2</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>The highlighted sections identify all of the changes to the design.  New
+flattened state methods were added and the old factory code was commented out.
+If we run this code, we see that it behaves properly:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc2&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:fc&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:fc2&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:fc2&#39;</span>,
+ <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
+ <span class="s1">&#39;A:fc2&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc1&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:fc2&#39;</span>,
+ <span class="s1">&#39;EXIT_SIGNAL:fc2&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:fc1&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:fc1&#39;</span>,
+ <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Metaprogramming is easy on the person who first writes the code and very hard
+on those that have to maintain or extend the design.  Like anything else,
+whether it should be done or not is dependent upon the engineering trade offs.</p>
+</div>
+</div>
+
+
+        
+        <div class="main-content__right-sidebar">
+          <h2 class="sidebar-heading">On this page:</h2>
+        </div>
+      </div>
+    </main>
+
+    <div class="footer-wrapper">
+      
+      <footer class="main-footer main-footer--sidebar">
+      
+        <div class="relational-links">
+          <div>
+            
+            ← <a class="relational-link" href="interactingcharts.html" title="previous chapter">Interacting Statecharts (Same Machine)</a>
+            
+          </div>
+          <div>
+            
+             <a class="relational-link" href="othogonalregions.html" title="next chapter">Orthogonal Regions</a> →
+            
+          </div>
+        </div>
+        
+        <div class="copyright">
+          © Copyright <span class="js-year"></span>,
+          
+          <a href="https://github.com/aleph2c" class="copyright_link">Scott Volk</a>.
+          
+        </div>
+        
+        
+        <div class="last-updated">
+          <span class="prefix">Last updated:</span>
+          <span class="time">Jun 24, 2020 8:20 PM</span>
+        </div>
+        
+        
+        <div class="created-with">
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 2.4.0 with <span class="theme">13ds_theme_one</span>.
+        </div>
+        
+      </footer>
+    </div>
+  </body>
+</html>

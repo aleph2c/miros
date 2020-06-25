@@ -1,0 +1,17 @@
+{#
+    13ds_theme_one/searchbox.html
+    -----------------------------
+
+    Sidebar template: quick search box.
+#}
+{% if pagename != "search" and builder != "singlehtml" %}
+<div id="searchbox" style="display: none" role="search">
+  <h2 id="searchlabel" class="sidebar-heading">{{ _('Quick search') }}</h2>
+  <div class="searchformwrapper sidebar-content">
+    <form class="search" action="{{ pathto('search') }}" method="get">
+      <input class="sidebar-search sidebar-search--input" type="text" name="q" aria-labelledby="searchlabel"><input class="sidebar-search sidebar-search--btn" type="submit" value="{{ _('Go') }}">
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+{% endif %}
