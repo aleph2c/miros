@@ -1,10 +1,10 @@
 .. _zero_to_one-zero-to-one:
 
 .. role:: dead_spec
-  :class: dead_spec
+  :class: text-strikethrough
 
 .. role:: new_spec
-  :class: new_spec
+  :class: text-hightlight
 
 .. epigraph::
 

@@ -7,13 +7,10 @@
 Reflection
 ==========
 
-* :ref:`reflection-what-state-am-i-in?`
-* :ref:`What happened? Summarized.<reflection-a-high-level-description-of-the-behavior>`
-* :ref:`What happened? Detailed. <reflection-an-extremely-detailed-view>`
-* :ref:`What is happening now?<reflection-live-output-from-your-chart>`
-* :ref:`How can I test this behavior?<reflection-how-to-test-using-reflection>`
-* :ref:`How can I explain this to others?<reflection-how-to-explain-your-design-to-others>`
-* :ref:`How do I unwind a factory?<towardsthefactoryexample-unwinding-a-factory-state-method>`
+.. contents:: Sections:
+   :local:
+   :depth: 1
+   :backlinks: none
 
 .. _reflection-thoughts-on-reflection:
 

@@ -1702,7 +1702,7 @@ Here is some code which interlocks with the above design diagram:
 If you were to run this code you would see a spy output very similar to the
 first example:
 
-.. code-block:: shell
+.. code-block:: pytb
   :emphasize-lines: 15
 
   START

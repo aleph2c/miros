@@ -751,18 +751,18 @@ with a picture.</p>
 </pre></div>
 </div>
 <p>If you run this code you will see something like this:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>hello from outer_state
-init
-hello from inner_state
-[2019-07-22 13:13:59.860092] [ao] e-&gt;start_at() top-&gt;inner_state
-run some code, but don&#39;t transition
-resetting the chart
-exiting inner_state
-exiting outer_state
-hello from outer_state
-init
-hello from inner_state
-[2019-07-22 13:13:59.861465] [ao] e-&gt;Reset() inner_state-&gt;inner_state
+<div class="highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="x">hello from outer_state</span>
+<span class="x">init</span>
+<span class="x">hello from inner_state</span>
+<span class="x">[2019-07-22 13:13:59.860092] [ao] e-&gt;start_at() top-&gt;inner_state</span>
+<span class="x">run some code, but don&#39;t transition</span>
+<span class="x">resetting the chart</span>
+<span class="x">exiting inner_state</span>
+<span class="x">exiting outer_state</span>
+<span class="x">hello from outer_state</span>
+<span class="x">init</span>
+<span class="x">hello from inner_state</span>
+<span class="x">[2019-07-22 13:13:59.861465] [ao] e-&gt;Reset() inner_state-&gt;inner_state</span>
 </pre></div>
 </div>
 <p>We see that the “<code class="docutils literal notranslate"><span class="pre">run</span> <span class="pre">some</span> <span class="pre">code,</span> <span class="pre">but</span> <span class="pre">don't</span> <span class="pre">transition</span></code>” print output occurred
@@ -841,79 +841,79 @@ these features:</p>
 </pre></div>
 </div>
 <p>If we run it we will see (I have highlighted the scribble statements):</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span> START
- SEARCH_FOR_SUPER_SIGNAL:outer_state
- ENTRY_SIGNAL:outer_state
-<span class="hll"> hello from outer_state
-</span> INIT_SIGNAL:outer_state
-<span class="hll"> init
-</span> SEARCH_FOR_SUPER_SIGNAL:inner_state
- ENTRY_SIGNAL:inner_state
-<span class="hll"> hello from inner_state
-</span> INIT_SIGNAL:inner_state
- &lt;- Queued:(0) Deferred:(0)
- Hook:inner_state
- Hook:outer_state
-<span class="hll"> run some code, but don&#39;t transition
-</span> Hook:outer_state:HOOK
- &lt;- Queued:(1) Deferred:(0)
- Reset:inner_state
- Reset:outer_state
-<span class="hll"> resetting the chart
-</span> EXIT_SIGNAL:inner_state
-<span class="hll"> exiting inner_state
-</span> SEARCH_FOR_SUPER_SIGNAL:inner_state
- EXIT_SIGNAL:outer_state
-<span class="hll"> exiting outer_state
-</span> ENTRY_SIGNAL:outer_state
-<span class="hll"> hello from outer_state
-</span> INIT_SIGNAL:outer_state
-<span class="hll"> init
-</span> SEARCH_FOR_SUPER_SIGNAL:inner_state
- ENTRY_SIGNAL:inner_state
-<span class="hll"> hello from inner_state
-</span> INIT_SIGNAL:inner_state
- &lt;- Queued:(0) Deferred:(0)
+<div class="highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="x"> START</span>
+<span class="x"> SEARCH_FOR_SUPER_SIGNAL:outer_state</span>
+<span class="x"> ENTRY_SIGNAL:outer_state</span>
+<span class="hll"><span class="x"> hello from outer_state</span>
+</span><span class="x"> INIT_SIGNAL:outer_state</span>
+<span class="hll"><span class="x"> init</span>
+</span><span class="x"> SEARCH_FOR_SUPER_SIGNAL:inner_state</span>
+<span class="x"> ENTRY_SIGNAL:inner_state</span>
+<span class="hll"><span class="x"> hello from inner_state</span>
+</span><span class="x"> INIT_SIGNAL:inner_state</span>
+<span class="x"> &lt;- Queued:(0) Deferred:(0)</span>
+<span class="x"> Hook:inner_state</span>
+<span class="x"> Hook:outer_state</span>
+<span class="hll"><span class="x"> run some code, but don&#39;t transition</span>
+</span><span class="x"> Hook:outer_state:HOOK</span>
+<span class="x"> &lt;- Queued:(1) Deferred:(0)</span>
+<span class="x"> Reset:inner_state</span>
+<span class="x"> Reset:outer_state</span>
+<span class="hll"><span class="x"> resetting the chart</span>
+</span><span class="x"> EXIT_SIGNAL:inner_state</span>
+<span class="hll"><span class="x"> exiting inner_state</span>
+</span><span class="x"> SEARCH_FOR_SUPER_SIGNAL:inner_state</span>
+<span class="x"> EXIT_SIGNAL:outer_state</span>
+<span class="hll"><span class="x"> exiting outer_state</span>
+</span><span class="x"> ENTRY_SIGNAL:outer_state</span>
+<span class="hll"><span class="x"> hello from outer_state</span>
+</span><span class="x"> INIT_SIGNAL:outer_state</span>
+<span class="hll"><span class="x"> init</span>
+</span><span class="x"> SEARCH_FOR_SUPER_SIGNAL:inner_state</span>
+<span class="x"> ENTRY_SIGNAL:inner_state</span>
+<span class="hll"><span class="x"> hello from inner_state</span>
+</span><span class="x"> INIT_SIGNAL:inner_state</span>
+<span class="x"> &lt;- Queued:(0) Deferred:(0)</span>
 </pre></div>
 </div>
 <p>You can interleave the trace information into the spy information
 by turning on both the <code class="docutils literal notranslate"><span class="pre">live_spy</span></code> and the <code class="docutils literal notranslate"><span class="pre">live_trace</span></code>.  This would result in
 this output:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>[2019-07-26 06:29:33.774768] [ao] e-&gt;start_at() top-&gt;inner_state
-START
-SEARCH_FOR_SUPER_SIGNAL:outer_state
-ENTRY_SIGNAL:outer_state
-hello from outer_state
-INIT_SIGNAL:outer_state
-init
-SEARCH_FOR_SUPER_SIGNAL:inner_state
-ENTRY_SIGNAL:inner_state
-hello from inner_state
-INIT_SIGNAL:inner_state
-&lt;- Queued:(0) Deferred:(0)
-Hook:inner_state
-Hook:outer_state
-run some code, but don&#39;t transition
-Hook:outer_state:HOOK
-&lt;- Queued:(1) Deferred:(0)
-[2019-07-26 06:29:33.776462] [ao] e-&gt;Reset() inner_state-&gt;inner_state
-Reset:inner_state
-Reset:outer_state
-resetting the chart
-EXIT_SIGNAL:inner_state
-exiting inner_state
-SEARCH_FOR_SUPER_SIGNAL:inner_state
-EXIT_SIGNAL:outer_state
-exiting outer_state
-ENTRY_SIGNAL:outer_state
-hello from outer_state
-INIT_SIGNAL:outer_state
-init
-SEARCH_FOR_SUPER_SIGNAL:inner_state
-ENTRY_SIGNAL:inner_state
-hello from inner_state
-INIT_SIGNAL:inner_state
-&lt;- Queued:(0) Deferred:(0)
+<div class="highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="x">[2019-07-26 06:29:33.774768] [ao] e-&gt;start_at() top-&gt;inner_state</span>
+<span class="x">START</span>
+<span class="x">SEARCH_FOR_SUPER_SIGNAL:outer_state</span>
+<span class="x">ENTRY_SIGNAL:outer_state</span>
+<span class="x">hello from outer_state</span>
+<span class="x">INIT_SIGNAL:outer_state</span>
+<span class="x">init</span>
+<span class="x">SEARCH_FOR_SUPER_SIGNAL:inner_state</span>
+<span class="x">ENTRY_SIGNAL:inner_state</span>
+<span class="x">hello from inner_state</span>
+<span class="x">INIT_SIGNAL:inner_state</span>
+<span class="x">&lt;- Queued:(0) Deferred:(0)</span>
+<span class="x">Hook:inner_state</span>
+<span class="x">Hook:outer_state</span>
+<span class="x">run some code, but don&#39;t transition</span>
+<span class="x">Hook:outer_state:HOOK</span>
+<span class="x">&lt;- Queued:(1) Deferred:(0)</span>
+<span class="x">[2019-07-26 06:29:33.776462] [ao] e-&gt;Reset() inner_state-&gt;inner_state</span>
+<span class="x">Reset:inner_state</span>
+<span class="x">Reset:outer_state</span>
+<span class="x">resetting the chart</span>
+<span class="x">EXIT_SIGNAL:inner_state</span>
+<span class="x">exiting inner_state</span>
+<span class="x">SEARCH_FOR_SUPER_SIGNAL:inner_state</span>
+<span class="x">EXIT_SIGNAL:outer_state</span>
+<span class="x">exiting outer_state</span>
+<span class="x">ENTRY_SIGNAL:outer_state</span>
+<span class="x">hello from outer_state</span>
+<span class="x">INIT_SIGNAL:outer_state</span>
+<span class="x">init</span>
+<span class="x">SEARCH_FOR_SUPER_SIGNAL:inner_state</span>
+<span class="x">ENTRY_SIGNAL:inner_state</span>
+<span class="x">hello from inner_state</span>
+<span class="x">INIT_SIGNAL:inner_state</span>
+<span class="x">&lt;- Queued:(0) Deferred:(0)</span>
 </pre></div>
 </div>
 <p>This kind of feedback will become more and more important to you as you build
@@ -2948,8 +2948,8 @@ from your state method call:</p>
 <code class="docutils literal notranslate"><span class="pre">HsmTopologyException</span></code> will be issued.  Init signals should only be used to
 run code with no transitions or to transition deeper into your statechart.
 If you absolutely need to leave a state after entering  you can post an
-<a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial event</span></a> into the fifo/lifo.  This will
-cause this signal to be caught on the next <a class="reference internal" href="glossary.html#term-run-to-completion"><span class="xref std std-term">rtc</span></a>
+<a class="reference internal" href="glossary.html#term-Artificial-Event"><span class="xref std std-term">artificial event</span></a> into the fifo/lifo.  This will
+cause this signal to be caught on the next <a class="reference internal" href="glossary.html#term-Run-To-Completion"><span class="xref std std-term">rtc</span></a>
 process and your statechart will behave as you want it to (though, you should
 probably re-visit your design).</p>
 </div>
@@ -5964,12 +5964,12 @@ specification.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jun 24, 2020 8:20 PM</span>
+          <span class="time">Jul 02, 2020 12:46 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 2.4.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

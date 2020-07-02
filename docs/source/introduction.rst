@@ -303,9 +303,6 @@ technology you want. I use `UMLet`_, but if you find something better, email me
 about it.
 
 
-.. literalinclude:: ../../miros/hsm.py
-   :pyobject: HsmEventProcessor.dispatch
-
 .. _QP framework: http://www.state-machine.com/
 .. _Dr. Miro Samek: https://www.linkedin.com/in/samek
 .. _UMLet: http://www.umlet.com

@@ -177,12 +177,12 @@
           
   <div class="section" id="module-miros.hsm">
 <span id="hsm"></span><h1>Hsm<a class="headerlink" href="#module-miros.hsm" title="Permalink to this headline">#</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="miros.hsm.HsmEventProcessor">
 <em class="property">class </em><code class="sig-prename descclassname">miros.hsm.</code><code class="sig-name descname">HsmEventProcessor</code><a class="headerlink" href="#miros.hsm.HsmEventProcessor" title="Permalink to this definition">#</a></dt>
-<dd><dl class="method">
+<dd><dl class="py method">
 <dt id="miros.hsm.HsmEventProcessor.augment">
-<code class="sig-name descname">augment</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.augment" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname">augment</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.augment" title="Permalink to this definition">#</a></dt>
 <dd><p>Used to add attributes to an hsm object</p>
 <dl>
 <dt>Args:</dt><dd><p>kwargs[‘other’](Mandatory other object): An another object for which you would
@@ -207,9 +207,9 @@ assert(networker.inverter == inverter ) # will be true</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="miros.hsm.HsmEventProcessor.child_state">
-<code class="sig-name descname">child_state</code><span class="sig-paren">(</span><em class="sig-param">fn_parent_state_handler</em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.child_state" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname">child_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fn_parent_state_handler</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.child_state" title="Permalink to this definition">#</a></dt>
 <dd><p>finds the child state of a given parent</p>
 <p>This method will only return a child state of a given handler, if the system
 is in a substate of the state being called:</p>
@@ -242,9 +242,9 @@ is in a substate of the state being called:</p>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="miros.hsm.HsmEventProcessor.dispatch">
-<code class="sig-name descname">dispatch</code><span class="sig-paren">(</span><em class="sig-param">e</em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.dispatch" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname">dispatch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">e</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.dispatch" title="Permalink to this definition">#</a></dt>
 <dd><p>dispatches an event to a HSM.</p>
 <p>Processing an event represents one run-to-completion (RTC) step.  This code
 is largely based on the same processor which was written by Miro Samek in
@@ -349,7 +349,7 @@ also has them described as diagrams in the comments.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="miros.hsm.HsmEventProcessor.init">
 <code class="sig-name descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.init" title="Permalink to this definition">#</a></dt>
 <dd><p>triggers the top-most initial transition into a HSM</p>
@@ -366,35 +366,35 @@ the chart, they can not climb out.  If they do, this search routine will
 fail.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="miros.hsm.HsmEventProcessor.is_in">
-<code class="sig-name descname">is_in</code><span class="sig-paren">(</span><em class="sig-param">fn_state_handler</em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.is_in" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname">is_in</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fn_state_handler</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.is_in" title="Permalink to this definition">#</a></dt>
 <dd><p>tests if a hsm is in a given state</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="miros.hsm.HsmEventProcessor.start_at">
-<code class="sig-name descname">start_at</code><span class="sig-paren">(</span><em class="sig-param">initial_state</em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.start_at" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname">start_at</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">initial_state</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.start_at" title="Permalink to this definition">#</a></dt>
 <dd><p>hsm = HsmEventProcessor()
 # build it
 hsm.start(starting_state_function)</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="miros.hsm.HsmEventProcessor.top">
-<code class="sig-name descname">top</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.top" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname">top</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.top" title="Permalink to this definition">#</a></dt>
 <dd><p>top most state given to all HSM; treat it as an outside function</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="miros.hsm.HsmEventProcessor.trans">
-<code class="sig-name descname">trans</code><span class="sig-paren">(</span><em class="sig-param">fn</em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.trans" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname">trans</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.trans" title="Permalink to this definition">#</a></dt>
 <dd><p>sets a new function target and returns that transition required by engine</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="miros.hsm.HsmEventProcessor.trans_">
-<code class="sig-name descname">trans_</code><span class="sig-paren">(</span><em class="sig-param">tpath</em>, <em class="sig-param">max_index</em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.trans_" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname">trans_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tpath</span></em>, <em class="sig-param"><span class="n">max_index</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.hsm.HsmEventProcessor.trans_" title="Permalink to this definition">#</a></dt>
 <dd><p>execute a transition sequence in a hsm</p>
 <p>A helper function for the <code class="docutils literal notranslate"><span class="pre">`dispatch`</span></code>.  It navigates through the possible
 supported topologies, navigating the chart just up to the point of entering
@@ -500,12 +500,12 @@ attention back to S and T and how they relate to a diagram.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jun 25, 2020 10:37 AM</span>
+          <span class="time">Jul 02, 2020 12:46 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 2.4.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

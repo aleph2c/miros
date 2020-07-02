@@ -208,7 +208,7 @@ by a practitioner in your language(s) and work through it.  You will level up.</
 <p>In chapter 5 of “Practical UML STATECHARTS in C/C++” I was leveled up by Miro
 Samek.  He describes 5 statechart patterns and made the bold claim that
 <strong>statecharts are a pattern of patterns</strong>.  I completely agree with him.  So here
-is my translation of his work into this library.  I’ll start each <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> with
+is my translation of his work into this library.  I’ll start each <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a> with
 quotes from his book, then write about it within the context of this work.</p>
 <div class="contents local topic" id="in-this-section">
 <p class="topic-title">In This Section:</p>
@@ -239,9 +239,9 @@ default behavior, the client simply ignores the event and lets the
 superstate handle it (the [child state] inherits behavior from the
 superstate) <a class="footnote-reference brackets" href="#id6" id="id2">5</a></p>
 </div></blockquote>
-<p>To understand the ultimate hook <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a>, you first have to
+<p>To understand the ultimate hook <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a>, you first have to
 understand what a hook is.  It is just some code in an <code class="docutils literal notranslate"><span class="pre">if-elif</span></code> clause.   A
-hook is just some code that catches an event, runs your <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client
+hook is just some code that catches an event, runs your <a class="reference internal" href="glossary.html#term-Client-Code"><span class="xref std std-term">client
 code</span></a> and then returns something which tells the event processor to
 stop searching.  <strong>A hook doesn’t cause a state transition</strong>.  It is a way to
 get the event processor’s search algorithm to do work for you without changing
@@ -250,7 +250,7 @@ state.</p>
 event it needs to <span class="xref std std-ref">search your
 statechart</span>.  If it finds
 that it needs to do a transition, it will enlist the heavy-duty parts of it’s
-algorithm to make sure that the <a class="reference internal" href="glossary.html#term-harel-formalism"><span class="xref std std-term">Harel Formalism</span></a>
+algorithm to make sure that the <a class="reference internal" href="glossary.html#term-Harel-Formalism"><span class="xref std std-term">Harel Formalism</span></a>
 occurs.  The hook has nothing to do with this, because it short circuits the
 search before it does a transition, but not before it gets this search algorithm
 to do some useful work.</p>
@@ -258,7 +258,7 @@ to do some useful work.</p>
 event, runs your code, then returns the <code class="docutils literal notranslate"><span class="pre">return_status.HANDLED</span></code> back to the
 event processor, no state transition will occur.  This is how you make a hook.
 You make sure that part of your if-elif clause catches the event signal, runs
-your <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client code</span></a> and returns the <code class="docutils literal notranslate"><span class="pre">return_state.HANDLED</span></code>
+your <a class="reference internal" href="glossary.html#term-Client-Code"><span class="xref std std-term">client code</span></a> and returns the <code class="docutils literal notranslate"><span class="pre">return_state.HANDLED</span></code>
 value.</p>
 <a class="reference external image-reference" href="_static/ultimate_hook1.pdf"><img alt="_images/ultimate_hook1.svg" class="noscale-center" src="_images/ultimate_hook1.svg" /></a>
 <p>Here is a simple example which demonstrates a hook.  In this example we will
@@ -290,7 +290,7 @@ signal name of BEHAVIOR_NAME to your statechart:</p>
 </pre></div>
 </div>
 <p>The highlighted code describes the hook.  We see that when the BEHAVIOR_NAME
-signal is caught by this state method it runs your <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client code</span></a> then returns <code class="docutils literal notranslate"><span class="pre">return_status.HANDLED</span></code>.</p>
+signal is caught by this state method it runs your <a class="reference internal" href="glossary.html#term-Client-Code"><span class="xref std std-term">client code</span></a> then returns <code class="docutils literal notranslate"><span class="pre">return_status.HANDLED</span></code>.</p>
 <p>The <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a> output would look like this:</p>
 <div class="highlight-shell notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
@@ -311,12 +311,12 @@ signal is caught by this state method it runs your <a class="reference internal"
  <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
 </pre></div>
 </td></tr></table></div>
-<p>Lines 1-5 describe the first <a class="reference internal" href="glossary.html#term-run-to-completion"><span class="xref std std-term">rtc</span></a> event which occurs
+<p>Lines 1-5 describe the first <a class="reference internal" href="glossary.html#term-Run-To-Completion"><span class="xref std std-term">rtc</span></a> event which occurs
 when we start the statechart.  Lines 5-9 of the
 <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a> log actually describe the hook behavior.  The
 event processor ran, searching the statechart starting at the outer_state
 method to see if it knew how to process the BEHAVIOR_NAME signal and it did:
-the <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client code</span></a> just
+the <a class="reference internal" href="glossary.html#term-Client-Code"><span class="xref std std-term">client code</span></a> just
 <a class="reference internal" href="recipes.html#recipes-scribble-on-the-spy"><span class="std std-ref">scribbled</span></a> something into our
 <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a> log so we can see what happened.  On line 7
 we see the result of this in the <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a> log.
@@ -420,7 +420,7 @@ object there.</p>
 </pre></div>
 </td></tr></table></div>
 <p>Ok, no surprises.  The inner_state hooked the BEHAVIOR_NAME signal and
-ran some <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client code</span></a>.</p>
+ran some <a class="reference internal" href="glossary.html#term-Client-Code"><span class="xref std std-term">client code</span></a>.</p>
 <a class="reference external image-reference" href="_static/ultimate_hook3.pdf"><img alt="_images/ultimate_hook3.svg" class="noscale-center" src="_images/ultimate_hook3.svg" /></a>
 <p>Now let’s remove the handling of the BEHAVIOR_NAME from our
 inner state and see what happens when we start the active object in the
@@ -531,17 +531,17 @@ handle the BEHAVIOR_NAME signal.  Now we run the code and look at the
 do with the event containing the BEHAVIOR_NAME signal.</p>
 <p>It called the inner_state with the event (8), it wasn’t handled, so it
 called the parent outer_state with the same event (9) and we see on
-line (10) that the outer_state <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client code</span></a> was run.  Finally, on line (11)
+line (10) that the outer_state <a class="reference internal" href="glossary.html#term-Client-Code"><span class="xref std std-term">client code</span></a> was run.  Finally, on line (11)
 the spy instrumentation tells us that it detected a hooked event.  When you see
 this in the log it means there was no state transition.</p>
 <p>So, the outer_state hook code caught an event that was sent to the
-inner_state.  The <a class="reference internal" href="glossary.html#term-harel-formalism"><span class="xref std std-term">Harel Formalism</span></a> followed by the
+inner_state.  The <a class="reference internal" href="glossary.html#term-Harel-Formalism"><span class="xref std std-term">Harel Formalism</span></a> followed by the
 event processor determines that when it has an event, it will search outward
-from the current state, to the next <a class="reference internal" href="glossary.html#term-parent-state"><span class="xref std std-term">parent state</span></a>, then the next parent state
+from the current state, to the next <a class="reference internal" href="glossary.html#term-Parent-State"><span class="xref std std-term">parent state</span></a>, then the next parent state
 over and over until your event is handled or, it reaches the top most state of
-your <a class="reference internal" href="glossary.html#term-hierarchical-state-machine"><span class="xref std std-term">HSM</span></a>. This means that any inner state
+your <a class="reference internal" href="glossary.html#term-Hierarchical-State-Machine"><span class="xref std std-term">HSM</span></a>. This means that any inner state
 method will automatically inherit the hook code of any outer state.  The outer
-most state contains the ultimate hook; this is why the <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> is called what
+most state contains the ultimate hook; this is why the <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a> is called what
 it is.</p>
 <a class="reference external image-reference" href="_static/ultimate_hook4.pdf"><img alt="_images/ultimate_hook4.svg" class="noscale-center" src="_images/ultimate_hook4.svg" /></a>
 <div class="admonition note">
@@ -554,7 +554,7 @@ this feature and clutter up your diagram.</p>
 <p>You can overwrite the behavior of the outer state hooks simply by explicitly
 handling the signal in an inner state.  These ideas are very similar to
 inheritance and overloading in object oriented programming.</p>
-<p>As a designer you would write default <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client code</span></a> behavior
+<p>As a designer you would write default <a class="reference internal" href="glossary.html#term-Client-Code"><span class="xref std std-term">client code</span></a> behavior
 in the outer states of charts, and all of your inner states would get this
 behavior for free.  If they needed to overwrite this behavior they would
 specifically handle the event in their state methods.</p>
@@ -645,7 +645,7 @@ Pay special attention to what they return.  If they do not return
 the generic state’s hook function was run while the statechart remained in the
 specific state.</p>
 <p>On lines 14 and 15 we see the specific behavior for the <code class="docutils literal notranslate"><span class="pre">a</span></code> signal.  The
-statechart ran the <a class="reference internal" href="glossary.html#term-client-code"><span class="xref std std-term">client code</span></a> in the specific state then
+statechart ran the <a class="reference internal" href="glossary.html#term-Client-Code"><span class="xref std std-term">client code</span></a> in the specific state then
 stopped processing the signal.</p>
 </div>
 <div class="section" id="reminder">
@@ -673,9 +673,9 @@ processing are not quite independent.” <a class="footnote-reference brackets" 
 connecting them, remind yourself of this <span class="xref std std-ref">reminder
 pattern</span>.</p>
 </div>
-<p>The reminder <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> uses the <a class="reference internal" href="#patterns-ultimate-hook"><span class="std std-ref">ultimate hook</span></a>
-<a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> mixed with <a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial event</span></a> injection.  It’s
-an <a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial event</span></a> because it is invented by the
+<p>The reminder <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a> uses the <a class="reference internal" href="#patterns-ultimate-hook"><span class="std std-ref">ultimate hook</span></a>
+<a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a> mixed with <a class="reference internal" href="glossary.html#term-Artificial-Event"><span class="xref std std-term">artificial event</span></a> injection.  It’s
+an <a class="reference internal" href="glossary.html#term-Artificial-Event"><span class="xref std std-term">artificial event</span></a> because it is invented by the
 statechart and injected to itself rather than being invented and injected by an
 outside caller.</p>
 <p>I’ll try to explain this idea by showing a bad, but working design, show how it
@@ -791,7 +791,7 @@ didn’t know about this and continue.</p>
 <span class="n">pp</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>I have highlighted the <a class="reference internal" href="glossary.html#term-illegal-transition"><span class="xref std std-term">illegal transitions</span></a>.</p>
+<p>I have highlighted the <a class="reference internal" href="glossary.html#term-Illegal-Transition"><span class="xref std std-term">illegal transitions</span></a>.</p>
 <p>If we run the code we will see:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>miros.hsm.HsmTopologyException:
   impossible chart topology <span class="k">for</span> HsmEventProcessor.init,
@@ -800,13 +800,13 @@ didn’t know about this and continue.</p>
 </div>
 <p>So, how do we make this software work?  When you see this
 <span class="xref std std-term">HsmToplogyException</span>, it’s probably time to
-consider another way to design your <a class="reference internal" href="glossary.html#term-statechart"><span class="xref std std-term">statechart</span></a>.  We will
+consider another way to design your <a class="reference internal" href="glossary.html#term-Statechart"><span class="xref std std-term">statechart</span></a>.  We will
 get to that shortly, but for now let’s find a way to force this software to
 work the way we want it to.</p>
 <p>Instead of making the INIT_SIGNAL transition outside of the state, we could
 invent a new signal, post it to ourselves and pretend like it came from outside
 of the active object.  Then our chart could react to it like it would to any
-other event.  This kind of thing is called an <a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial
+other event.  This kind of thing is called an <a class="reference internal" href="glossary.html#term-Artificial-Event"><span class="xref std std-term">artificial
 event</span></a>.  Here is the code that would create an artificial
 PROCESS event:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># If &#39;PROCESS&#39; signal wasn&#39;t invented before invent it now</span>
@@ -816,9 +816,9 @@ PROCESS event:</p>
 </div>
 <p>Now that we know how to do that let’s redesign our statechart:</p>
 <a class="reference external image-reference" href="_static/reminder2.pdf"><img alt="_images/reminder2.svg" class="noscale-center" src="_images/reminder2.svg" /></a>
-<p>This introduces a new <a class="reference internal" href="glossary.html#term-pseudostate"><span class="xref std std-term">glyph</span></a> called the final state:</p>
+<p>This introduces a new <a class="reference internal" href="glossary.html#term-Pseudostate"><span class="xref std std-term">glyph</span></a> called the final state:</p>
 <a class="reference external image-reference" href="_static/reminder3.pdf"><img alt="_images/reminder3.svg" class="noscale-left" src="_images/reminder3.svg" /></a>
-<p>When you see this <a class="reference internal" href="glossary.html#term-pseudostate"><span class="xref std std-term">glyph</span></a> on a diagram it means, stop running.  So:</p>
+<p>When you see this <a class="reference internal" href="glossary.html#term-Pseudostate"><span class="xref std std-term">glyph</span></a> on a diagram it means, stop running.  So:</p>
 <a class="reference external image-reference" href="_static/reminder4.pdf"><img alt="_images/reminder4.svg" class="noscale-center" src="_images/reminder4.svg" /></a>
 <p>Would look like this as code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">processing_init</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -851,7 +851,7 @@ input.</p></li>
 polling mode.</p></li>
 </ul>
 <a class="reference external image-reference" href="_static/reminder2.pdf"><img alt="_images/reminder2.svg" class="noscale-center" src="_images/reminder2.svg" /></a>
-<p>Here is the code for this design with highlights for the <a class="reference internal" href="glossary.html#term-artificial-event"><span class="xref std std-term">artificial
+<p>Here is the code for this design with highlights for the <a class="reference internal" href="glossary.html#term-Artificial-Event"><span class="xref std std-term">artificial
 events</span></a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">pp</span>
@@ -1018,7 +1018,7 @@ comments in the spy log are the thoughts I would have while viewing it.</p>
 <p>But the polling and the processing state are strongly coupled to the TIME_OUT
 signal.  Our design of having the TIME_OUT start the system in the polling and
 end up in the processing/busy state cost us a lot of CPU time.</p>
-<p>Lets introduce the reminder <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> with a new design:</p>
+<p>Lets introduce the reminder <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a> with a new design:</p>
 <a class="reference external image-reference" href="_static/reminder6.pdf" id="patterns-reminder-here"><img alt="_images/reminder6.svg" class="noscale-center" src="_images/reminder6.svg" /></a>
 <p>Let’s discuss this diagram.</p>
 <p>We use INIT_SIGNAL events to climb into the idle state.</p>
@@ -1026,7 +1026,7 @@ end up in the processing/busy state cost us a lot of CPU time.</p>
 state within the statechart.  This ultimate hook counts up each time it sees a
 TIME_OUT and once this count hits 3 it posts an artificial event with the
 signal DATA_READY.</p>
-<p>Once the <a class="reference internal" href="glossary.html#term-run-to-completion"><span class="xref std std-term">RTC</span></a> process is completed, idle will catch
+<p>Once the <a class="reference internal" href="glossary.html#term-Run-To-Completion"><span class="xref std std-term">RTC</span></a> process is completed, idle will catch
 the DATA_READY signal and transition into busy.  The busy state catches the
 TIME_OUT event which means that it will not escape to the ultimate hook in
 polling.  Instead it uses it to count up a busy_count and when it hits 2 it
@@ -1198,12 +1198,12 @@ an inconveniently timed request would be difficult to program.</p>
 process new requests, we just defer the event, then re-inject the event into
 our statechart when its timing is more convenient.</p>
 <a class="reference external image-reference" href="_static/deferred1.pdf"><img alt="_images/deferred1.svg" class="noscale-center" src="_images/deferred1.svg" /></a>
-<p>Here is an example of a chart using the deferred event <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a>.</p>
+<p>Here is an example of a chart using the deferred event <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a>.</p>
 <p>To begin with the chart climbs into the idle state.  Upon receiving its first
 NEW_REQUEST it transitions into the receiving state.  After a second of
 processing it transitions into the authorizing state.  After the authorizing
 state processes for 2 seconds it transitions back to the idle state.</p>
-<p>The reminder <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> occurs when a NEW_REQUEST event is seen while the system
+<p>The reminder <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a> occurs when a NEW_REQUEST event is seen while the system
 is either in receiving or authorizing.  This NEW_REQUEST event is ignored by
 these states and caught by the hook in processing.  The processing state places
 this NEW_REQUEST event into the deferred queue then passes the program’s
@@ -1397,7 +1397,7 @@ COMPLETED events should be about 2 seconds apart.  From the inspection of lines
 .
 </pre></div>
 </td></tr></table></div>
-<p>The deferred event <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> states that we will react to the recalled events
+<p>The deferred event <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a> states that we will react to the recalled events
 immediately and we can see this behavior on lines 4-5 and 8-9</p>
 <div class="highlight-shell notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
@@ -1530,7 +1530,7 @@ formalism needs to capture requirements like “[The] gearbox change of state is
 <strong>orthogonal regions</strong>.  They represent two separate state machines that act
 independent of one another but are both turned on when the truck state is
 initiated.</p>
-<p>This part of the <a class="reference internal" href="glossary.html#term-harel-formalism"><span class="xref std std-term">Harel Formalism</span></a> is <strong>not directly
+<p>This part of the <a class="reference internal" href="glossary.html#term-Harel-Formalism"><span class="xref std std-term">Harel Formalism</span></a> is <strong>not directly
 supported</strong> by the Miro Samek event processing algorithm.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1559,9 +1559,9 @@ initiate the pressure wave.</p>
   <iframe src="https://www.youtube.com/embed/zf8QIJ2VgqU" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
 </div><p>Imagine that each piston has two transducers that measure the relevant
 conditions of the molten lead-lithium near its position on the sphere.  The
-first <a class="reference internal" href="glossary.html#term-transducer"><span class="xref std std-term">transducer</span></a> provides a composite reading that
+first <a class="reference internal" href="glossary.html#term-Transducer"><span class="xref std std-term">transducer</span></a> provides a composite reading that
 abstracts away a lot of the physics; it provides numbers between 0 and 100.
-The second <a class="reference internal" href="glossary.html#term-transducer"><span class="xref std std-term">transducer</span></a> measures the temperature; it’s range
+The second <a class="reference internal" href="glossary.html#term-Transducer"><span class="xref std std-term">transducer</span></a> measures the temperature; it’s range
 is 0 to 9000 degrees Celsius.  A piston can only fire after 1 second has passed
 since the last firing event and once it passes this time threshold it would
 like to fire as soon as possible so that the fusion reactor can output the
@@ -1727,16 +1727,16 @@ reactor_on state machine and each of the piston objects will use the same
 piston_active state machine.</p>
 <p>The Piston class will be a subclass of HsmWithQueues, which means it will not
 have it’s own thread.  Threads are only constructed in the ActiveObject class
-or any of it’s descendants.  The orthogonal component <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a>
-will allow a single thread to be shared between many different <a class="reference internal" href="glossary.html#term-state-machine"><span class="xref std std-term">state
+or any of it’s descendants.  The orthogonal component <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a>
+will allow a single thread to be shared between many different <a class="reference internal" href="glossary.html#term-State-Machine"><span class="xref std std-term">state
 machines</span></a>.  This will be described in more detail shortly.</p>
 <p>The Piston objects will each contain their own <span class="xref std std-term">event dispatcher</span>, their own event queues; but they will all reference the same
-piston_manager <a class="reference internal" href="glossary.html#term-state-machine"><span class="xref std std-term">state machine</span></a>.</p>
+piston_manager <a class="reference internal" href="glossary.html#term-State-Machine"><span class="xref std std-term">state machine</span></a>.</p>
 <p>We are going to use the <span class="xref std std-ref">polyamorous
 nature</span> of state methods to
 implement the 255 pistons.  Instead of having a separate piston_active
-<a class="reference internal" href="glossary.html#term-hierarchical-state-machine"><span class="xref std std-term">HSMs</span></a> defined for each of the 255 active objects we will instead define
-just one <a class="reference internal" href="glossary.html#term-hsm"><span class="xref std std-term">HSM</span></a> and share it between all of them. (saving on memory)</p>
+<a class="reference internal" href="glossary.html#term-Hierarchical-State-Machine"><span class="xref std std-term">HSMs</span></a> defined for each of the 255 active objects we will instead define
+just one <a class="reference internal" href="glossary.html#term-HSM"><span class="xref std std-term">HSM</span></a> and share it between all of them. (saving on memory)</p>
 <a class="reference external image-reference" href="_static/orthogonal_region4.pdf"><img alt="_images/orthogonal_region4.svg" class="noscale-center" src="_images/orthogonal_region4.svg" /></a>
 <p>Let’s start writing the code.  Here is the Piston Class:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Piston</span><span class="p">(</span><span class="n">HsmWithQueues</span><span class="p">):</span>
@@ -1757,7 +1757,7 @@ just one <a class="reference internal" href="glossary.html#term-hsm"><span class
 </pre></div>
 </div>
 <p>The highlights were made to show that it is easy to inject different types of
-functions to generate the <a class="reference internal" href="glossary.html#term-transducer"><span class="xref std std-term">transducer</span></a> readings and the
+functions to generate the <a class="reference internal" href="glossary.html#term-Transducer"><span class="xref std std-term">transducer</span></a> readings and the
 piston-ready criterion.</p>
 <p>Now let’s write the piston state machine:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is the piston&#39;s HSM, it will be shared by all pistons</span>
@@ -1833,22 +1833,22 @@ piston-ready criterion.</p>
 </div>
 <p>The first thing we notice about this code, is that it uses the <span class="xref std std-ref">flat way
 of writing</span> state methods.</p>
-<p>This is because we want this <a class="reference internal" href="glossary.html#term-hsm"><span class="xref std std-term">HSM</span></a> to be shared between multiple
-Piston objects.  A <a class="reference internal" href="glossary.html#term-state-machine"><span class="xref std std-term">state machine</span></a> build up using a
-<a class="reference internal" href="glossary.html#term-factory"><span class="xref std std-term">factory</span></a> cannot be shared; it belongs to the thing that built
-it.  This is in contrast with <a class="reference internal" href="glossary.html#term-flat-state-method"><span class="xref std std-term">flat state methods</span></a>,
+<p>This is because we want this <a class="reference internal" href="glossary.html#term-HSM"><span class="xref std std-term">HSM</span></a> to be shared between multiple
+Piston objects.  A <a class="reference internal" href="glossary.html#term-State-Machine"><span class="xref std std-term">state machine</span></a> build up using a
+<a class="reference internal" href="glossary.html#term-Factory"><span class="xref std std-term">factory</span></a> cannot be shared; it belongs to the thing that built
+it.  This is in contrast with <a class="reference internal" href="glossary.html#term-Flat-State-Method"><span class="xref std std-term">flat state methods</span></a>,
 they are defined outside of the event processors that will use them.  So they
 can be used over and over again if they describe behavior that wants to be
 shared.</p>
 <p>In our system we are going to have 255 pistons that all want the same type of
 behavior.  The internal variables for tracking counts and if that piston is
 armed will be kept within the piston objects, not in the HSM that it is using
-to define it’s operational state.  Never store your <a class="reference internal" href="glossary.html#term-extended-state-variables"><span class="xref std std-term">extended state
-variables</span></a> in a <a class="reference internal" href="glossary.html#term-flat-state-method"><span class="xref std std-term">flat state method</span></a>.</p>
+to define it’s operational state.  Never store your <a class="reference internal" href="glossary.html#term-Extended-State-Variables"><span class="xref std std-term">extended state
+variables</span></a> in a <a class="reference internal" href="glossary.html#term-Flat-State-Method"><span class="xref std std-term">flat state method</span></a>.</p>
 <p>The highlighted code marks the location of the TIME_OUT and FIRE
-<a class="reference internal" href="glossary.html#term-signal"><span class="xref std std-term">signals</span></a>.  This signal will be injected into this state machine
+<a class="reference internal" href="glossary.html#term-Signal"><span class="xref std std-term">signals</span></a>.  This signal will be injected into this state machine
 using the <code class="docutils literal notranslate"><span class="pre">dispatch</span></code> method of the FusionReactor object (this is the essence
-of the orthogonal component <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a>).  We will talk more about
+of the orthogonal component <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a>).  We will talk more about
 that shortly.</p>
 <p>We want to build 255 pistons with a tunable <code class="docutils literal notranslate"><span class="pre">is_this_piston_ready</span></code> method.
 Furthermore, we want to be able to switch out our fake transducer readings with
@@ -1886,7 +1886,7 @@ and temperature transducers.  For now, it will let us test and tune our design.<
 that it belongs to:</p>
 <a class="reference external image-reference" href="_static/orthogonal_region5.pdf"><img alt="_images/orthogonal_region5.svg" class="noscale-center" src="_images/orthogonal_region5.svg" /></a>
 <p>From a high level, the FusionReactor is a subclass of the
-<a class="reference internal" href="glossary.html#term-factory"><span class="xref std std-term">Factory</span></a> which means it has a thread and it can use the factory
+<a class="reference internal" href="glossary.html#term-Factory"><span class="xref std std-term">Factory</span></a> which means it has a thread and it can use the factory
 syntax to build up its HSM.  Since there will be only one reactor with 255
 pistons, we have it build the 255 pistons when it enters the reactor_on state.
 The pistons are stored in an <span class="xref std std-term">extended state variable</span> in the reactor object.  This adds convenient syntax for accessing an
@@ -1894,7 +1894,7 @@ individual piston, or for iterating over all of them.</p>
 <p>After constructing it’s pistons the reactor will climb into the
 pending_on_pistons state.  This state captures the TIME_OUT event and iterates
 through all of the pistons, injecting each of them with the TIME_OUT
-<a class="reference internal" href="glossary.html#term-event"><span class="xref std std-term">event</span></a>.  To see how a fusion piston deals with a TIME_OUT we will
+<a class="reference internal" href="glossary.html#term-Event"><span class="xref std std-term">event</span></a>.  To see how a fusion piston deals with a TIME_OUT we will
 look at it’s state chart:</p>
 <a class="reference external image-reference" href="_static/orthogonal_region4.pdf"><img alt="_images/orthogonal_region4.svg" class="noscale-center" src="_images/orthogonal_region4.svg" /></a>
 <p>So what happens with the first TIME_OUT event?  We see from inspection that
@@ -1926,27 +1926,27 @@ Now that we understand how they work let’s look at the fusion reactor again:</
 <a class="reference external image-reference" href="_static/orthogonal_region5.pdf"><img alt="_images/orthogonal_region5.svg" class="noscale-center" src="_images/orthogonal_region5.svg" /></a>
 <p>We were talking about the pending_on_pistons TIME_OUT event handler prior to
 looking at the piston behavior.</p>
-<p>The orthogonal component <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> allows one active object to
+<p>The orthogonal component <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a> allows one active object to
 manually dispatch events into another.  This is done with the <code class="docutils literal notranslate"><span class="pre">dispatch</span></code>
 method.  Up until now we have dispatched events to our statecharts using the
 <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> and <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> methods.  These methods write their events into
 a queue, which in turn wakes up a thread then causes that active object’s
-<a class="reference internal" href="glossary.html#term-hsm"><span class="xref std std-term">HSM</span></a> to run to completion.</p>
+<a class="reference internal" href="glossary.html#term-HSM"><span class="xref std std-term">HSM</span></a> to run to completion.</p>
 <p>The piston objects do not have their own threads, they share a thread with the
 fusion_reactor object.  To pump an event into a piston object’s HSM we call
 it’s <code class="docutils literal notranslate"><span class="pre">dispatch</span></code> method with the event.  This will cause it to link to it’s
-<a class="reference internal" href="glossary.html#term-hsm"><span class="xref std std-term">HSM</span></a>, <a class="reference internal" href="glossary.html#term-run-to-completion"><span class="xref std std-term">run it to completion</span></a> then return
+<a class="reference internal" href="glossary.html#term-HSM"><span class="xref std std-term">HSM</span></a>, <a class="reference internal" href="glossary.html#term-Run-To-Completion"><span class="xref std std-term">run it to completion</span></a> then return
 control back to the fusion_reactor statechart.</p>
 <p>The fusion_reactor thread can be thought of as a large gear, who’s rotational
 energy is coming from it’s thread.  The pistons are little gears that are being
 powered by connecting with the large gear.</p>
 <p>Getting back to our example we see that the pending_on_pistons states will only
-post a FIRE <a class="reference internal" href="glossary.html#term-event"><span class="xref std std-term">event</span></a> when all of its pistons are ready.  The FIRE
+post a FIRE <a class="reference internal" href="glossary.html#term-Event"><span class="xref std std-term">event</span></a> when all of its pistons are ready.  The FIRE
 event will cause a transition into the fusion_and_heat_transfer state, who’s
 entry condition will pump a FIRE event into all of the pistons.  This will
 cause each of the pistons to contract and the fusion reaction will be
 initiated.  A small star will shine into the liquid metal.</p>
-<p>The fusion_and_heat_transfer state uses the reminder <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> to wait for 1
+<p>The fusion_and_heat_transfer state uses the reminder <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a> to wait for 1
 second prior to transitioning back into the pending_on_pistons state.  Also
 notice the TIME_OUT event is pumped into each of the piston state machines
 by the TIME_OUT ultimate hook in the reactor_on class.   This will allow each
@@ -2160,7 +2160,7 @@ top           relaxing   pending_optimal_conditions ready         triggered
 <ol class="arabic simple">
 <li><p>This trace is describing a single piston in the fusion reactor.  This
 piston’s HSM is driven from the fusion_reactor thread (using the orthogonal
-component statechart <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a>).  The TIME_OUT and FIRE events are actually
+component statechart <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a>).  The TIME_OUT and FIRE events are actually
 fed into this HSM from the fusion_reactor.  The piston can arm itself,
 but it can not fire without a command provided by the fusion_reactor.</p></li>
 <li><p>When the piston starts, it disarms by setting its armed attribute to False
@@ -2184,7 +2184,7 @@ pistons are armed (in their ready states).  This will cause the transition
 into the contract state which will slam the piston, beginning the pressure
 wave and initiate nuclear fusion.</p></li>
 </ol>
-<p>If you would like to skip to the next <a class="reference internal" href="glossary.html#term-pattern"><span class="xref std std-term">pattern</span></a> click
+<p>If you would like to skip to the next <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a> click
 <a class="reference internal" href="#patterns-transition-to-history"><span class="std std-ref">here</span></a>.  Here is the full code listing
 used in this example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make Something that can generate numbers for us</span>
@@ -2874,12 +2874,12 @@ back into the off state, the design works.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jun 24, 2020 8:20 PM</span>
+          <span class="time">Jul 02, 2020 12:46 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 2.4.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

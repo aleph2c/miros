@@ -263,19 +263,19 @@ using ssh:</p>
 <p>To exit this connection, just type <code class="docutils literal notranslate"><span class="pre">exit</span></code>.</p>
 <p>Now that I can login to this computer using ssh, Ansible can perform automatic
 deployments for me.</p>
-<p>Ansible uses a set of <a class="reference internal" href="glossary.html#term-yaml"><span class="xref std std-term">yml</span></a> files to hold instructions on how to deploy
+<p>Ansible uses a set of <a class="reference internal" href="glossary.html#term-YAML"><span class="xref std std-term">yml</span></a> files to hold instructions on how to deploy
 something.  These files are pretty straightforward to read and are mostly self
 documenting.</p>
 <p>Since I only want to deploy RabbitMQ, I have written just one Ansible
-<a class="reference internal" href="glossary.html#term-yaml"><span class="xref std std-term">yml</span></a> file to do this job.  But a RabbitMQ server is configured
+<a class="reference internal" href="glossary.html#term-YAML"><span class="xref std std-term">yml</span></a> file to do this job.  But a RabbitMQ server is configured
 with two different configuration files, one that holds the environment
 variables and the other that is an Erlang data structure.  To keep
-configurations <a class="reference internal" href="glossary.html#term-dry"><span class="xref std std-term">DRY</span></a>, Ansible allows you to define
-<a class="reference internal" href="glossary.html#term-jinja2"><span class="xref std std-term">jinja2</span></a> template files (j2 extension) to be filled in
-with the variables defined in your deployment <a class="reference internal" href="glossary.html#term-yaml"><span class="xref std std-term">yml</span></a> file.</p>
+configurations <a class="reference internal" href="glossary.html#term-DRY"><span class="xref std std-term">DRY</span></a>, Ansible allows you to define
+<a class="reference internal" href="glossary.html#term-JINJA2"><span class="xref std std-term">jinja2</span></a> template files (j2 extension) to be filled in
+with the variables defined in your deployment <a class="reference internal" href="glossary.html#term-YAML"><span class="xref std std-term">yml</span></a> file.</p>
 <p>When your run Ansible, it will reference your template files, change the parts
-that you have marked up with <a class="reference internal" href="glossary.html#term-jinja2"><span class="xref std std-term">jinja2 syntax</span></a> with the variables
-defined in your <a class="reference internal" href="glossary.html#term-yaml"><span class="xref std std-term">yml</span></a> file, then place these newly constructed
+that you have marked up with <a class="reference internal" href="glossary.html#term-JINJA2"><span class="xref std std-term">jinja2 syntax</span></a> with the variables
+defined in your <a class="reference internal" href="glossary.html#term-YAML"><span class="xref std std-term">yml</span></a> file, then place these newly constructed
 configuration files in the directory where they need to be with the correct
 permissions.</p>
 <p>So to deploy a networkable RabbitMQ setup, I have created three files which will
@@ -442,12 +442,12 @@ messages are not encrypted.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jun 24, 2020 8:20 PM</span>
+          <span class="time">Jul 02, 2020 12:46 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 2.4.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

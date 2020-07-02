@@ -792,15 +792,15 @@ terminal output on the raspberry pi:</p>
 </div>
 <p>Comparing this to our <span class="xref std std-ref">producer design</span> we see that it is
 the expected spy and trace.  If we ran our trace through sequence we would see:</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>[ Chart: producer_192.168.1.72 ]
-     top          c1
-      +start_at()-&gt;|
-      |    (1)     |
-      |            +
-      |             \ (2)
-      |             B()
-      |             /
-      |            &lt;
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="k">[ Chart: producer_192.168.1.72 ]</span>
+     <span class="na">top          c1</span>
+      <span class="na">+start_at()-&gt;|</span>
+      <span class="na">|    (1)     |</span>
+      <span class="na">|            +</span>
+      <span class="na">|             \ (2)</span>
+      <span class="na">|             B()</span>
+      <span class="na">|             /</span>
+      <span class="na">|            &lt;</span>
 </pre></div>
 </div>
 <p>To summarize, we are expecting this trace and spy information to be passed as
@@ -2104,46 +2104,46 @@ what happens.</p>
 37
 38
 39
-40</pre></div></td><td class="code"><div class="highlight"><pre><span></span> [x] Trace: [2018-01-10 18:23:35.647035] [rabbit_producer_192.168.1.72] e-&gt;start_at() top-&gt;c1
- [x] Spy: START
- [x] Spy: SEARCH_FOR_SUPER_SIGNAL:producer_outer
- [x] Spy: ENTRY_SIGNAL:producer_outer
- [x] Spy: INIT_SIGNAL:producer_outer
- [x] Spy: SEARCH_FOR_SUPER_SIGNAL:c1
- [x] Spy: ENTRY_SIGNAL:c1
- [x] Spy: INIT_SIGNAL:c1
- [x] Spy: &lt;- Queued:(0) Deferred:(0)
- [x] Trace: [2018-01-10 18:23:35.932470] [rabbit_producer_192.168.1.72] e-&gt;B() c1-&gt;c1
- [x] Spy: B:c1
- [x] Spy: B:producer_outer
- [x] Spy: EXIT_SIGNAL:c1
- [x] Spy: EXIT_SIGNAL:producer_outer
- [x] Spy: ENTRY_SIGNAL:producer_outer
- [x] Spy: INIT_SIGNAL:producer_outer
- [x] Spy: SEARCH_FOR_SUPER_SIGNAL:c1
- [x] Spy: ENTRY_SIGNAL:c1
- [x] Spy: INIT_SIGNAL:c1
- [x] Spy: &lt;- Queued:(0) Deferred:(0)
-[&#39;START&#39;,
- &#39;SEARCH_FOR_SUPER_SIGNAL:producer_outer&#39;,
- &#39;ENTRY_SIGNAL:producer_outer&#39;,
- &#39;INIT_SIGNAL:producer_outer&#39;,
- &#39;SEARCH_FOR_SUPER_SIGNAL:c1&#39;,
- &#39;ENTRY_SIGNAL:c1&#39;,
- &#39;INIT_SIGNAL:c1&#39;,
- &#39;&lt;- Queued:(0) Deferred:(0)&#39;,
- &#39;B:c1&#39;,
- &#39;B:producer_outer&#39;,
- &#39;EXIT_SIGNAL:c1&#39;,
- &#39;EXIT_SIGNAL:producer_outer&#39;,
- &#39;ENTRY_SIGNAL:producer_outer&#39;,
- &#39;INIT_SIGNAL:producer_outer&#39;,
- &#39;SEARCH_FOR_SUPER_SIGNAL:c1&#39;,
- &#39;ENTRY_SIGNAL:c1&#39;,
- &#39;INIT_SIGNAL:c1&#39;,
- &#39;&lt;- Queued:(0) Deferred:(0)&#39;]
-[2018-01-10 18:23:35.647035] [rabbit_producer_192.168.1.72] e-&gt;start_at() top-&gt;c1
-[2018-01-10 18:23:35.932470] [rabbit_producer_192.168.1.72] e-&gt;B() c1-&gt;c1
+40</pre></div></td><td class="code"><div class="highlight"><pre><span></span> <span class="p">[</span>x<span class="p">]</span> Trace<span class="o">:</span> <span class="p">[</span><span class="m">2018-01-10</span> <span class="m">18</span><span class="o">:</span><span class="m">23</span><span class="o">:</span><span class="m">35.647035</span><span class="p">]</span> <span class="p">[</span>rabbit_producer_192.168.1.72<span class="p">]</span> e<span class="o">-&gt;</span>start_at<span class="p">()</span> top<span class="o">-&gt;</span>c1
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> START
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> SEARCH_FOR_SUPER_SIGNAL<span class="o">:</span>producer_outer
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> ENTRY_SIGNAL<span class="o">:</span>producer_outer
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> INIT_SIGNAL<span class="o">:</span>producer_outer
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> SEARCH_FOR_SUPER_SIGNAL<span class="o">:</span>c1
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> ENTRY_SIGNAL<span class="o">:</span>c1
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> INIT_SIGNAL<span class="o">:</span>c1
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> <span class="o">&lt;-</span> Queued<span class="o">:</span><span class="p">(</span><span class="m">0</span><span class="p">)</span> Deferred<span class="o">:</span><span class="p">(</span><span class="m">0</span><span class="p">)</span>
+ <span class="p">[</span>x<span class="p">]</span> Trace<span class="o">:</span> <span class="p">[</span><span class="m">2018-01-10</span> <span class="m">18</span><span class="o">:</span><span class="m">23</span><span class="o">:</span><span class="m">35.932470</span><span class="p">]</span> <span class="p">[</span>rabbit_producer_192.168.1.72<span class="p">]</span> e<span class="o">-&gt;</span>B<span class="p">()</span> c1<span class="o">-&gt;</span>c1
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> B<span class="o">:</span>c1
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> B<span class="o">:</span>producer_outer
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> EXIT_SIGNAL<span class="o">:</span>c1
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> EXIT_SIGNAL<span class="o">:</span>producer_outer
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> ENTRY_SIGNAL<span class="o">:</span>producer_outer
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> INIT_SIGNAL<span class="o">:</span>producer_outer
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> SEARCH_FOR_SUPER_SIGNAL<span class="o">:</span>c1
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> ENTRY_SIGNAL<span class="o">:</span>c1
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> INIT_SIGNAL<span class="o">:</span>c1
+ <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> <span class="o">&lt;-</span> Queued<span class="o">:</span><span class="p">(</span><span class="m">0</span><span class="p">)</span> Deferred<span class="o">:</span><span class="p">(</span><span class="m">0</span><span class="p">)</span>
+<span class="p">[</span><span class="s">&#39;START&#39;</span><span class="p">,</span>
+ <span class="s">&#39;SEARCH_FOR_SUPER_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
+ <span class="s">&#39;ENTRY_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
+ <span class="s">&#39;INIT_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
+ <span class="s">&#39;SEARCH_FOR_SUPER_SIGNAL:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;ENTRY_SIGNAL:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;INIT_SIGNAL:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span>
+ <span class="s">&#39;B:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;B:producer_outer&#39;</span><span class="p">,</span>
+ <span class="s">&#39;EXIT_SIGNAL:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;EXIT_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
+ <span class="s">&#39;ENTRY_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
+ <span class="s">&#39;INIT_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
+ <span class="s">&#39;SEARCH_FOR_SUPER_SIGNAL:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;ENTRY_SIGNAL:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;INIT_SIGNAL:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="m">2018-01-10</span> <span class="m">18</span><span class="o">:</span><span class="m">23</span><span class="o">:</span><span class="m">35.647035</span><span class="p">]</span> <span class="p">[</span>rabbit_producer_192.168.1.72<span class="p">]</span> e<span class="o">-&gt;</span>start_at<span class="p">()</span> top<span class="o">-&gt;</span>c1
+<span class="p">[</span><span class="m">2018-01-10</span> <span class="m">18</span><span class="o">:</span><span class="m">23</span><span class="o">:</span><span class="m">35.932470</span><span class="p">]</span> <span class="p">[</span>rabbit_producer_192.168.1.72<span class="p">]</span> e<span class="o">-&gt;</span>B<span class="p">()</span> c1<span class="o">-&gt;</span>c1
 </pre></div>
 </td></tr></table></div>
 <p>So we see that the decryption worked and the live spy and traced messages were
@@ -2190,12 +2190,12 @@ within another.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jun 24, 2020 8:20 PM</span>
+          <span class="time">Jul 02, 2020 12:46 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 2.4.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

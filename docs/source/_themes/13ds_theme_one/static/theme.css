@@ -1,4 +1,4 @@
-@import "fontawesome-all.css";
+@import 'fontawesome-all.css';
 
 /**
  * theme.css
@@ -158,6 +158,14 @@ blockquote {
 
 .line-block {
   margin: 1.25rem 0 0 0;
+}
+
+.text-hightlight {
+  background: rgb(255,248,208);
+}
+
+.text-strikethrough {
+  text-decoration: line-through;
 }
 
 /* -- Links --------------------------------------------------------------- */
@@ -473,7 +481,6 @@ table.docutils li p:first-child {
 /* -- Layout -------------------------------------------------------------- */
 
 .main-header {
-  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 1;
@@ -485,12 +492,12 @@ table.docutils li p:first-child {
   border-bottom: solid 1px rgb(230,230,230);
   display: flex;
   justify-content: space-between;
-  padding: 1rem 1.8rem;
+  padding: 1rem 1.8rem 1.1rem 1.8rem;
 }
 
 .navbar .logo {
-  height: 1.3rem;
-  margin-bottom: -.2rem;
+  height: 1.5rem;
+  margin-bottom: -.3rem;
 }
 
 .main-sidebar {
@@ -503,7 +510,7 @@ table.docutils li p:first-child {
   overflow-y: auto;
   padding-top: 2.8rem;
   position: fixed;
-  top: 3.6rem;
+  top: 3.73rem;
   transition: transform .3s ease, width .2s;
   /* should match margin-left on .main-content--sidebar,.main-footer--sidebar */
   width: 25rem;
@@ -858,11 +865,11 @@ form.search {
   /* use with any light pygments theme like autumn */
   /* background: rgba(27,31,51,.05); */
   /* use with any dark pygments theme like paraiso-dark */
-  background: rgba(40,44,52);
+  background: rgb(40,44,52);
   border-radius: 4px;
+  font-size: .95rem;
   line-height: 1.3rem;
   margin-top: 1.25rem;
-  font-size: .95rem;
 }
 
 .admonition .highlight,
@@ -900,7 +907,7 @@ form.search {
   color: rgba(150,150,150);
 }
 
-div[class^="highlight-"] {
+div[class^='highlight-'] {
   position: relative;
 }
 
@@ -986,9 +993,6 @@ div[class^="highlight-"] {
   color: rgb(44,62,80);
 }
 
-.admonition.seealso {
-}
-
 .admonition-title {
   font-size: 1rem;
   font-weight: 700;
@@ -999,7 +1003,7 @@ div[class^="highlight-"] {
 .admonition-title::before {
   -webkit-font-smoothing: antialiased;
   display: inline-block;
-  font-family: "Font Awesome 5 Free";
+  font-family: 'Font Awesome 5 Free';
   font-size: .85rem;
   font-style: normal;
   font-variant: normal;
@@ -1011,35 +1015,35 @@ div[class^="highlight-"] {
 
 .admonition.attention .admonition-title::before,
 .admonition.important .admonition-title::before {
-  content: "\f06a";
+  content: '\f06a';
   font-weight: 900;
 }
 
 .admonition.caution .admonition-title::before,
 .admonition.warning .admonition-title::before {
-  content: "\f071";
+  content: '\f071';
   font-weight: 900;
 }
 
 .admonition.danger .admonition-title::before,
 .admonition.error .admonition-title::before {
-  content: "\f06a";
+  content: '\f06a';
   font-weight: 900;
 }
 
 .admonition.hint .admonition-title::before,
 .admonition.tip .admonition-title::before {
-  content: "\f0eb";
+  content: '\f0eb';
   font-weight: 400;
 }
 
 .admonition.note .admonition-title::before {
-  content: "\f044";
+  content: '\f044';
   font-weight: 900;
 }
 
 .admonition.seealso .admonition-title::before {
-  content: "\f06e";
+  content: '\f06e';
   font-weight: 900;
 }
 
@@ -1102,7 +1106,7 @@ dl.citation dd {
 
 :target::before {
   /* To shift fragment links so they're visible below fixed header */
-  content: "";
+  content: '';
   display: block;
   height: 3.5rem; /* fixed header height */
   margin-top: -3.5rem; /* negative fixed header height */

@@ -1,6 +1,6 @@
 
 .. role:: new_spec
-  :class: new_spec
+  :class: text-hightlight
 
 .. epigraph::
 

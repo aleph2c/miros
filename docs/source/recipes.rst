@@ -566,7 +566,7 @@ Here is the code, with the hook highlighted
 
 If you run this code you will see something like this:
 
-.. code-block:: shell
+.. code-block:: pytb
 
    hello from outer_state
    init
@@ -670,7 +670,7 @@ Here is the code:
 
 If we run it we will see (I have highlighted the scribble statements):
 
-.. code-block:: shell
+.. code-block:: pytb
   :emphasize-lines: 4, 6, 9, 14, 19, 21, 24, 26, 28, 31
 
    START
@@ -711,7 +711,7 @@ You can interleave the trace information into the spy information
 by turning on both the ``live_spy`` and the ``live_trace``.  This would result in
 this output:
 
-.. code-block:: shell
+.. code-block:: pytb
 
    [2019-07-26 06:29:33.774768] [ao] e->start_at() top->inner_state
    START
