@@ -2546,6 +2546,7 @@ def test_group_13(name="test_group_13"):
   helper_live_trace_off(chart, start_at)
   assert(chart.live_trace == False)
 
+@pytest.mark.snipe
 @pytest.mark.comprehensive
 @pytest.mark.test_group_14
 @pytest.mark.spy_on_decorator
