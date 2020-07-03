@@ -1,0 +1,19 @@
+{#
+    13ds_theme_one/relations.html
+    -----------------------------
+
+    Sidebar template: relational links.
+#}
+
+{% if prev %}
+<h2 class="sidebar-heading">Previous Topic</h2>
+<div class="sidebar-content">
+ <a class="sidebar-relation" href="{{ prev.link|e }}" title="{{ _('previous chapter') }}">{{ prev.title }}</a>
+</div>
+{% endif %}
+{% if next %}
+<h2 class="sidebar-heading">Next Topic</h2>
+<div class="sidebar-content">
+  <a class="sidebar-relation" href="{{ next.link|e }}" title="{{ _('next chapter') }}">{{ next.title }}</a>
+</div>
+{% endif %}

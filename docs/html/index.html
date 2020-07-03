@@ -1,0 +1,496 @@
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="A Python statechart library" name="description" />
+<meta content="python, statecharts" name="keywords" />
+<meta content="Scott Volk" name="author" />
+<meta content="Scott Volk, 13 Down Software" name="copyright" />
+<meta content="index, follow" name="robots" />
+
+    <title>Python Statecharts | miros</title>
+    <link rel="shortcut icon" href="_static/favicon.ico">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css">
+    <link rel="stylesheet" href="_static/theme.css" type="text/css">
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/css/miros_docs.css" />
+      
+    
+    
+
+    
+    <script type="text/javascript" src="_static/theme.js" defer></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    
+    <script src="_static/jquery.js"></script>
+    
+    <script src="_static/underscore.js"></script>
+    
+    <script src="_static/doctools.js"></script>
+    
+    <script src="_static/language_data.js"></script>
+    
+    
+
+    
+      
+      
+    <link rel="index" title="Index" href="genindex.html">
+      
+      
+    <link rel="search" title="Search" href="search.html">
+      
+      
+      
+    <link rel="next" title="Installation" href="installation.html">
+      
+      
+    
+
+    
+
+    
+
+    
+  </head>
+
+  <body>
+    <header class="main-header">
+      <div class="navbar">
+        <div id="js-sidebar-mask" class="sidebar-mask"></div>
+        <div id="js-sidebar-menu-button" class="sidebar-menu-button">
+          <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg>
+        </div>
+        <a href="#" class="site-link">
+          
+          miros
+          
+        </a>
+        <div class="navbar-links">
+          <a href="installation.html" class="navbar-link">Docs</a>
+          
+          <a href="https://github.com/aleph2c/miros" class="navbar-link">GitHub</a><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="external-link-icon"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+          
+        </div>
+      </div>
+    </header>
+
+    <main class="main-wrapper">
+      
+      <div id="js-main-sidebar" class="main-sidebar">
+        
+        <div class="sidebar-content sidebar-content--divider sidebar-navbar-links">
+          <a href="https://github.com/aleph2c/miros" class="sidebar-navbar-link">GitHub</a>
+          <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="external-link-icon"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+        </div>
+        
+        
+        <div class="sidebar-content sidebar-logo">
+    <a href="#">
+      <img class="logo" src="_static/miros_logo.svg" alt="miros" >
+    </a>
+</div>
+        
+        
+
+<h2 class="sidebar-heading">Contents</h2>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zero_to_one.html">Tutorial: Zero To One</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reading_diagrams.html">Diagrams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reflection.html">Reflection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="patterns.html">Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+</ul>
+
+        
+        
+<h2 class="sidebar-heading">Useful Links</h2>
+
+<ul>
+  <li><a href="https://github.com/aleph2c/py-activeobject">miros on github</a></li>
+  <li><a href="https://github.com/aleph2c/sequence">sequence on github</a></li>
+  <li><a href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a></li>
+  <li><a href="http://www.umlet.com">UMLet Download</a></li>
+  <li><a href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">formalism explained</a></li>
+</ul>
+
+
+<h2 class="sidebar-heading">For Embedded</h2>
+
+<ul>
+  <li><a href="https://state-machine.com/">Quantum Leaps for Embedded</a></li>
+  <li><a href="https://github.com/QuantumLeaps/">Quantum Leaps On Github</a></li>
+</ul>
+
+
+<h2 class="sidebar-heading">Statechart Videos</h2>
+
+<ul>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-what-are-they-1-of-4-90488.html">Part 1 (What)</a></li>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-why-use-them-2-of-4-90489.html">Part 2 (Why)</a></li>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-what-are-they-1-of-4-90488.html">Part 3 (Mealy/Moore)</a></li>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-harel-state-machines-4-of-4-90491.html">Part 4 (Harel Statecharts)</a></li>
+  <li><a href="https://barrgroup.com/Embedded-Systems/How-To/Introduction-Hierarchical-State-Machines">Introduction to HSMs</a></li>
+</ul>
+        
+        
+
+<div id="searchbox" style="display: none" role="search">
+  <h2 id="searchlabel" class="sidebar-heading">Quick search</h2>
+  <div class="searchformwrapper sidebar-content">
+    <form class="search" action="search.html" method="get">
+      <input class="sidebar-search sidebar-search--input" type="text" name="q" aria-labelledby="searchlabel"><input class="sidebar-search sidebar-search--btn" type="submit" value="Go">
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+        
+      </div>
+      
+
+      
+      <div class="main-content main-content--sidebar">
+      
+        
+          
+  <div class="section" id="python-statecharts">
+<h1>Python Statecharts<a class="headerlink" href="#python-statecharts" title="Permalink to this headline">#</a></h1>
+<p>Miros is a statechart library written in Python.  A statechart is a
+<a class="reference external" href="https://en.wikipedia.org/wiki/UML_state_machine">hierarchical state machine (HSM)</a>, running within its own
+thread.  If you program using statecharts, you will have the ability to
+<a class="reference internal" href="quickstart.html#quick-start"><span class="std std-ref">quickly translate your design goals into robust, understandable, working
+code</span></a>.</p>
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">#</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#about-this-documentation">About this Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#history-and-context">History and Context</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#a-networked-sprinkler">A Networked Sprinkler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#figuring-out-what-information-will-be-passed-around">Figuring out what Information will be Passed Around</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#openweathermapcitydetails">OpenWeatherMapCityDetails</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#cityweather">CityWeather</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#sprinkler">Sprinkler</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="zero_to_one.html">Tutorial: Zero To One</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="zero_to_one.html#story">Story</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zero_to_one.html#a-simple-example-toaster-oven">A Simple Example: Toaster Oven</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="zero_to_one.html#iteration-1-setup">Iteration 1: setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zero_to_one.html#iteration-2-basic-oven">Iteration 2: basic oven</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zero_to_one.html#iteration-3-history">Iteration 3: history</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zero_to_one.html#iteration-4-hook-testing-and-hardware-abstraction">Iteration 4: hook, testing and hardware abstraction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zero_to_one.html#iteration-5-time-and-one-shots">Iteration 5: time and one-shots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zero_to_one.html#iteration-6-multi-shot-events-and-payloads">Iteration 6: Multi-Shot events and Payloads</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reading_diagrams.html">Diagrams</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#history-and-context">History and Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#install-drawing-software">Install drawing software</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#the-most-important-rule-in-uml">The Most Important Rule in UML</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#classes">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#inheritance-and-miros">Inheritance and miros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#events">Events</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#event-processor-attachment-points">Event Processor Attachment Points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#states">States</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#deep-history-icon">Deep History Icon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#if-else-structures">If-Else Structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#extending-arrows">Extending Arrows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#terminate-icon">Terminate Icon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#final-icon">Final Icon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#fall-through">Fall Through</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#publish-and-subscribe-coloured-dots">Publish and Subscribe Coloured Dots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#high-level-federation-diagrams">High Level Federation Diagrams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#medium-level-construction-and-pub-sub-diagrams">Medium Level Construction and Pub/Sub Diagrams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#detailed-statechart-diagrams">Detailed Statechart Diagrams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#sequence-diagrams">Sequence Diagrams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#payloads">Payloads</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reading_diagrams.html#a-warning-about-diagramming">A Warning about Diagramming</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="comprehensive.html">Comprehensive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="comprehensive.html#comprehensive-with-instrumentation">Comprehensive with Instrumentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="thread_safe_attributes.html">Thread Safe Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scribbleexample.html">Hacking to Learn</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#a-picture-and-a-question">A Picture and a Question</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#a-partial-answer">A Partial Answer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#a-better-answer">A Better Answer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#our-first-working-hypothesis">Our First Working Hypothesis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#code-make-a-picture">Code, Make a Picture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#code-required-imports">Code, Required Imports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#code-frame-in-the-states">Code, Frame in the States</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#code-add-common-internal-state-code">Code, Add Common Internal State Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#code-add-hiearchy">Code, Add Hiearchy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#code-add-the-t-and-init-events">Code, Add the T and Init events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#code-see-if-anything-runs">Code, See if anything Runs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#code-add-the-guard-and-t-function">Code, Add the guard and t function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#code-add-the-other-functions">Code, Add the other functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#challenging-our-hypothesis">Challenging Our Hypothesis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scribbleexample.html#learning-for-my-mistake">Learning for my Mistake</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="interactingcharts.html">Interacting Statecharts (Same Machine)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="interactingcharts.html#a-simple-example">A Simple Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="towardsthefactoryexample.html">Using and Unwinding a Factory</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="towardsthefactoryexample.html#example-summary">Example Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="towardsthefactoryexample.html#why-a-factory">Why a Factory?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="towardsthefactoryexample.html#standard-approach-to-writing-state-methods">Standard Approach to Writing State Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="towardsthefactoryexample.html#registering-callbacks-to-specific-events">Registering Callbacks to Specific Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="towardsthefactoryexample.html#creating-a-statechart-using-templates">Creating a Statechart Using Templates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="towardsthefactoryexample.html#using-the-factory-class">Using the Factory Class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="towardsthefactoryexample.html#unwinding-a-factory-state-method">Unwinding a Factory State Method</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="othogonalregions.html">Orthogonal Regions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="othogonalregions.html#constructing-orthogonal-regions-with-miros">Constructing Orthogonal Regions with Miros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="othogonalregions.html#high-level-strategy-to-build-orthogonal-regions-with-miros">High Level Strategy to Build Orthogonal Regions with miros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="othogonalregions.html#orthogonal-regions-using-orthogonal-components">Orthogonal Regions Using Orthogonal Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="batterychargingexample.html">Distributed Battery Charging</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="batterychargingexample.html#high-level-introduction-to-how-batteries-and-chargers-work">High Level Introduction to how Batteries and Chargers Work</a></li>
+<li class="toctree-l3"><a class="reference internal" href="batterychargingexample.html#spec-1-control-systems">Spec 1: Control Systems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="batterychargingexample.html#spec-2-battery-parameters">Spec 2: Battery Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="batterychargingexample.html#spec-3-electrical-charging-profile">Spec 3: Electrical Charging Profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="batterychargingexample.html#spec-4-charger-behavioral-design">Spec 4: Charger Behavioral Design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="batterychargingexample.html#spec-5-high-level-verification-goals">Spec 5: High Level Verification Goals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="batterychargingexample.html#spec-6-battery-simulator">Spec 6: Battery Simulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="batterychargingexample.html#spec-7-testing-with-physics-simulation">Spec 7: Testing with Physics Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="batterychargingexample.html#spec-8-current-derating-in-constant-voltage-modes">Spec 8: Current Derating in Constant Voltage Modes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cellular_automata.html">Cellular Automata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i_mongol_example.html">Mongol Horse Archer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="i_mongol_example.html#some-historical-context">Some Historical Context</a></li>
+<li class="toctree-l3"><a class="reference internal" href="i_mongol_example.html#deceit-in-detail">Deceit in Detail</a></li>
+<li class="toctree-l3"><a class="reference internal" href="i_mongol_example.html#modelling-the-mongol-mind">Modelling the Mongol Mind</a></li>
+<li class="toctree-l3"><a class="reference internal" href="i_mongol_example.html#technical-overview">Technical Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="i_mongol_example.html#designing-the-mongol-in-its-tactic">Designing the Mongol in its Tactic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="i_mongol_example.html#the-first-horseman">The First Horseman</a></li>
+<li class="toctree-l3"><a class="reference internal" href="i_mongol_example.html#networking-our-horse-archers">Networking our Horse Archers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="i_mongol_example.html#attaching-the-mongol-to-the-mesh">Attaching the Mongol to the Mesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="i_mongol_example.html#building-a-mongol-unit">Building a Mongol Unit</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#demonstration-of-capabilities">Demonstration of Capabilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#state-abstraction-in-miros">State Abstraction in Miros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#minimal-viable-states">Minimal Viable States</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#attachment-points-and-a-working-state-machine">Attachment Points and a Working State Machine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#feedback-about-behavior-through-instrumentation">Feedback about Behavior through Instrumentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#entry-conditions-and-handled-events">Entry Conditions and Handled Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#exit-conditions">Exit Conditions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#inventing-your-own-signals-external-events">Inventing your own Signals: External events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#hooks">Hooks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#comprehensive-instrumentation-with-the-live-spy-and-scribble">Comprehensive Instrumentation with the live_spy and scribble</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#attaching-more-than-one-activeobject-to-an-hsm">Attaching More than one ActiveObject to an HSM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#making-the-live-instrumentation-use-the-python-logger">Making the Live Instrumentation use the Python Logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#making-a-statechart-from-a-class">Making a Statechart from a class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#communication-between-statecharts">Communication between Statecharts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#overload-a-state-in-a-subclass">Overload a State in a Subclass</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#one-shots-multi-shots-and-heartbeats">One-Shots, Multi-Shots and Heartbeats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#creating-thread-safe-class-attributes">Creating thread-safe class Attributes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#states">States</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#state-function-recipes">State Function Recipes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#state-method-recipes">State Method Recipes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#events-and-signals">Events And Signals</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#creating-an-event">Creating an Event</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#creating-a-signal">Creating a Signal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#posting-events">Posting Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#posting-an-event-to-the-fifo">Posting an Event to the Fifo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#posting-an-event-to-the-lifo">Posting an Event to the LIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#create-a-guard">Create a Guard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#creating-a-one-shot-event">Creating a One-Shot Event</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#creating-a-multishot-event">Creating a Multishot Event</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#canceling-a-specific-event-source">Canceling a Specific Event Source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#canceling-event-source-by-signal-name">Canceling Event Source By Signal Name</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#deferring-and-recalling-an-event">Deferring and Recalling an Event</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#adding-a-payload-to-an-event">Adding a Payload to an Event</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#determining-if-an-event-has-a-payload">Determining if an Event Has a Payload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#subscribing-to-an-event-posted-by-another-active-object">Subscribing to an Event Posted by Another Active Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#publishing-events-to-other-active-objects">Publishing events to other Active Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#catching-signals-based-on-patterns-and-tokens">Catching Signals Based on Patterns and Tokens</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#avoiding-bugs-which-travel-through-time">Avoiding Bugs Which Travel Through Time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#avoiding-double-time-heart-beat-bugs">Avoiding double time heart beat bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#avoiding-heart-beat-bleed-bugs">Avoiding Heart-Beat-Bleed Bugs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#activeobjects">ActiveObjects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#starting-an-activeobject">Starting an ActiveObject</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#stopping-an-activeobject">Stopping an ActiveObject</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#augmentng-your-activeobject">Augmentng your ActiveObject</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#sharing-attributes-between-threads-activeobjects">Sharing Attributes between Threads (ActiveObjects)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#factories">Factories</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#creating-a-statechart-inside-of-a-class">Creating a Statechart Inside of a Class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#inheritance-and-starting-factories">Inheritance and Starting (Factories)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#sharing-attributes-between-threads-factories">Sharing Attributes between Threads (Factories)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#multiple-statecharts">Multiple Statecharts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#building-and-destroying-workers">Building and Destroying Workers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#seeing-what-is-going-on">Seeing What is Going On</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#thread-safe-printing-and-instrumentation">Thread-Safe Printing and Instrumentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#determining-the-current-state">Determining the Current State</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#seeing-what-signals-you-have-in-your-system">Seeing what Signals You Have In Your System</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#using-the-trace">Using the Trace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#using-the-spy">Using the Spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#add-timing-information-to-the-spy">Add Timing Information to the Spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#tracing-live">Tracing Live</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#spying-live">Spying Live</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#scribble-on-the-spy">Scribble On the Spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#flatting-a-state-method">Flatting a State Method</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#describing-your-work">Describing your Work</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#drawing-a-statechart">Drawing a StateChart</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#drawing-a-sequence-diagram">Drawing a Sequence Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#testing">Testing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#using-a-trace-as-a-test-target">Using a Trace As a Test Target</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#using-a-spy-as-a-test-target">Using a Spy as a Test Target</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reflection.html">Reflection</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reflection.html#thoughts-on-reflection">Thoughts On Reflection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reflection.html#what-state-am-i-in">What State Am I In?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reflection.html#what-signals-do-i-have">What Signals Do I Have?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reflection.html#a-high-level-description-of-the-behavior">A High Level Description of The Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reflection.html#an-extremely-detailed-view-of-the-behavior">An Extremely Detailed View of the Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reflection.html#how-to-test-your-design-using-reflection">How to Test Your Design Using Reflection</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reflection.html#testing-with-the-trace-output">Testing with the Trace Output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reflection.html#testing-with-the-spy-output">Testing with the Spy Output</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reflection.html#live-output-from-your-chart">Live Output From Your Chart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reflection.html#how-to-explain-your-design-to-others">How to Explain your Design to Others</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="patterns.html">Patterns</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="patterns.html#ultimate-hook">Ultimate Hook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="patterns.html#reminder">Reminder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="patterns.html#deferred-event">Deferred Event</a></li>
+<li class="toctree-l2"><a class="reference internal" href="patterns.html#orthogonal-component">Orthogonal Component</a></li>
+<li class="toctree-l2"><a class="reference internal" href="patterns.html#orthogonal-regions">Orthogonal Regions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="patterns.html#transition-to-history">Transition To History</a></li>
+<li class="toctree-l2"><a class="reference internal" href="patterns.html#multichart-race">Multichart Race</a></li>
+<li class="toctree-l2"><a class="reference internal" href="patterns.html#multichart-pend">Multichart Pend</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hsm.html">Hsm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="event.html">Events</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="event.html#event-module">Event Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="event.html#returnstatussource">ReturnStatusSource</a></li>
+<li class="toctree-l3"><a class="reference internal" href="event.html#signalsource">SignalSource</a></li>
+<li class="toctree-l3"><a class="reference internal" href="event.html#signal">Signal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="event.html#event">Event</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="activeobject.html">Active Object</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="activeobject.html#active-fabric">Active Fabric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="activeobject.html#id1">Active Object</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+        
+        <div class="main-content__right-sidebar">
+          <h2 class="sidebar-heading">On this page:</h2>
+        </div>
+      </div>
+    </main>
+
+    <div class="footer-wrapper">
+      
+      <footer class="main-footer main-footer--sidebar">
+      
+        <div class="relational-links">
+          <div>
+            
+          </div>
+          <div>
+            
+             <a class="relational-link" href="installation.html" title="next chapter">Installation</a> →
+            
+          </div>
+        </div>
+        
+        <div class="copyright">
+          © Copyright <span class="js-year"></span>,
+          
+          <a href="https://github.com/aleph2c" class="copyright_link">Scott Volk</a>.
+          
+        </div>
+        
+        
+        <div class="last-updated">
+          <span class="prefix">Last updated:</span>
+          <span class="time">Jul 02, 2020 12:46 PM</span>
+        </div>
+        
+        
+        <div class="created-with">
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.1 with <span class="theme">13ds_theme_one</span>.
+        </div>
+        
+      </footer>
+    </div>
+  </body>
+</html>

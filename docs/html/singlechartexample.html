@@ -1,0 +1,718 @@
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Active Object Example | miros</title>
+    <link rel="shortcut icon" href="_static/favicon.ico">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css">
+    <link rel="stylesheet" href="_static/theme.css" type="text/css">
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/css/miros_docs.css" />
+      
+    
+    
+
+    
+    <script type="text/javascript" src="_static/theme.js" defer></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    
+    <script src="_static/jquery.js"></script>
+    
+    <script src="_static/underscore.js"></script>
+    
+    <script src="_static/doctools.js"></script>
+    
+    <script src="_static/language_data.js"></script>
+    
+    
+
+    
+      
+      
+    <link rel="index" title="Index" href="genindex.html">
+      
+      
+    <link rel="search" title="Search" href="search.html">
+      
+      
+      
+      
+    
+
+    
+
+    
+
+    
+  </head>
+
+  <body>
+    <header class="main-header">
+      <div class="navbar">
+        <div id="js-sidebar-mask" class="sidebar-mask"></div>
+        <div id="js-sidebar-menu-button" class="sidebar-menu-button">
+          <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg>
+        </div>
+        <a href="index.html" class="site-link">
+          
+          miros
+          
+        </a>
+        <div class="navbar-links">
+          <a href="installation.html" class="navbar-link">Docs</a>
+          
+          <a href="https://github.com/aleph2c/miros" class="navbar-link">GitHub</a><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="external-link-icon"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+          
+        </div>
+      </div>
+    </header>
+
+    <main class="main-wrapper">
+      
+      <div id="js-main-sidebar" class="main-sidebar">
+        
+        <div class="sidebar-content sidebar-content--divider sidebar-navbar-links">
+          <a href="https://github.com/aleph2c/miros" class="sidebar-navbar-link">GitHub</a>
+          <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="external-link-icon"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+        </div>
+        
+        
+        <div class="sidebar-content sidebar-logo">
+    <a href="index.html">
+      <img class="logo" src="_static/miros_logo.svg" alt="miros" >
+    </a>
+</div>
+        
+        
+
+<h2 class="sidebar-heading">Contents</h2>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zero_to_one.html">Tutorial: Zero To One</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reading_diagrams.html">Diagrams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reflection.html">Reflection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="patterns.html">Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+</ul>
+
+        
+        
+<h2 class="sidebar-heading">Useful Links</h2>
+
+<ul>
+  <li><a href="https://github.com/aleph2c/py-activeobject">miros on github</a></li>
+  <li><a href="https://github.com/aleph2c/sequence">sequence on github</a></li>
+  <li><a href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a></li>
+  <li><a href="http://www.umlet.com">UMLet Download</a></li>
+  <li><a href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">formalism explained</a></li>
+</ul>
+
+
+<h2 class="sidebar-heading">For Embedded</h2>
+
+<ul>
+  <li><a href="https://state-machine.com/">Quantum Leaps for Embedded</a></li>
+  <li><a href="https://github.com/QuantumLeaps/">Quantum Leaps On Github</a></li>
+</ul>
+
+
+<h2 class="sidebar-heading">Statechart Videos</h2>
+
+<ul>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-what-are-they-1-of-4-90488.html">Part 1 (What)</a></li>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-why-use-them-2-of-4-90489.html">Part 2 (Why)</a></li>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-what-are-they-1-of-4-90488.html">Part 3 (Mealy/Moore)</a></li>
+  <li><a href="https://www.mathworks.com/videos/understanding-state-machines-harel-state-machines-4-of-4-90491.html">Part 4 (Harel Statecharts)</a></li>
+  <li><a href="https://barrgroup.com/Embedded-Systems/How-To/Introduction-Hierarchical-State-Machines">Introduction to HSMs</a></li>
+</ul>
+        
+        
+
+<div id="searchbox" style="display: none" role="search">
+  <h2 id="searchlabel" class="sidebar-heading">Quick search</h2>
+  <div class="searchformwrapper sidebar-content">
+    <form class="search" action="search.html" method="get">
+      <input class="sidebar-search sidebar-search--input" type="text" name="q" aria-labelledby="searchlabel"><input class="sidebar-search sidebar-search--btn" type="submit" value="Go">
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+        
+      </div>
+      
+
+      
+      <div class="main-content main-content--sidebar">
+      
+        
+          
+  <blockquote>
+<div><p><em>In an era ruled by materialism and unstable geopolitics, art must be restored to the center of public education</em></p>
+<p class="attribution">—Camille Paglia</p>
+</div></blockquote>
+<div class="section" id="active-object-example">
+<span id="examples-active-object-example"></span><h1>Active Object Example<a class="headerlink" href="#active-object-example" title="Permalink to this headline">#</a></h1>
+<a class="reference external image-reference" href="_static/simple_example_1.pdf"><img alt="_images/simple_example_1.svg" class="scale-to-fit" src="_images/simple_example_1.svg" /></a>
+<p>In this example we will show how to build the statechart structure described
+above using an <cite>ActiveObject</cite>.  We will then learn how to create some events
+and present them to the chart so we can see how it reacts.</p>
+<p>If you are new to statecharts and if you haven’t heard of an active object
+before, I would recommend that you draw the above design on a piece of paper,
+and scribble on it as we move through the example.</p>
+<p>The code blocks in this section are specific to this library, but the
+principals apply to any other system using the active object design pattern.</p>
+<p>The above diagram describes the structure of how we would like our code to
+react to events.  Think of it as a plan of plans, and the <cite>ActiveObject</cite> will
+help you build such a structure.</p>
+<p>What is missing from the picture is the action itself; what events are
+happening and when.  The <cite>ActiveObject</cite> allows you to control this action and
+watch what happens, in that it provides the facilities to reflect upon the
+action that the statechart took as a response to your programmed stimulation.</p>
+<p>This reaction could be a change of state, or just a running of custom code upon
+a signal.  By “custom code”, I mean code that is not needed to describe the
+reactive structure itself. For instance, the inner state has <code class="docutils literal notranslate"><span class="pre">print(&quot;hello</span>
+<span class="pre">world&quot;)</span></code> linked to its response to an entry event.</p>
+<p>Before we print our <cite>hello world</cite>, we need to build up the statechart
+structure, then we send events to the chart.</p>
+<p>Let’s begin by building the structure.</p>
+<p>First we import some items from the miros library:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
+
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span>
+<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+</pre></div>
+</div>
+<p>Now we write our state methods.  Each of these methods will represent a specific
+state in our diagram.</p>
+<p>Let start by writing the <cite>outer</cite> state method.  This method will represent the
+rectangle labeled <cite>outer</cite> in the above diagram.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">outer</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># outer state custom entry-code here</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># outer state custom exit-code here</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">WaitComplete</span><span class="p">):</span>
+    <span class="c1"># WaitComplete signal code here</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">middle</span><span class="p">)</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ResetChart</span><span class="p">):</span>
+    <span class="c1"># ResetChart signal code here</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
+
+  <span class="k">else</span><span class="p">:</span>
+    <span class="c1"># This signal wasn&#39;t managed, pass a</span>
+    <span class="c1"># reference to the # method that is</span>
+    <span class="n">outside</span> <span class="n">of</span> <span class="n">us</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> \
+      <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>We see that our method is basically a big if-else structure, which reads the
+signal attribute of the <cite>e</cite> (Event) variable and decides what to do about it. We
+see that this state reacts to the <cite>WaitComplete</cite> by calling the <code class="docutils literal notranslate"><span class="pre">trans</span></code> method
+with the <cite>middle</cite> state as an argument.  This will represent the arrow labeled
+<cite>WaitComplete</cite> on the above diagram connecting the <cite>outer</cite> state with the
+<cite>middle</cite> state.</p>
+<p>Likewise, we see that this method calls <code class="docutils literal notranslate"><span class="pre">trans</span></code> with the <cite>outer</cite> method as an
+argument when it receives an event with the signal named <cite>ResetChart</cite>.  This
+represents the arrow which loops from-and-to the <cite>outer</cite> rectangle in the above
+diagram.</p>
+<p>You can pack a lot of complexity into an <cite>ActiveObject</cite>.  They are very dynamic
+and as a result they can be very difficult to debug.  For this reason the miros
+library allows you to instrument your state methods so that you can see how they
+have responded to the different types of events you send at them.</p>
+<p>This instrumentation is done with the <code class="docutils literal notranslate"><span class="pre">&#64;spy_on</span></code> decorator.  This adds a
+special kind of logging to the method, more will be said about this as our
+example continues.</p>
+<p>Now lets write the middle state:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># middle entry code here</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># middle exit code here</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># middle init code here</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> \
+      <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">outer</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>Now lets write the inner state:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
+<span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+    <span class="c1"># inner exit code here</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> \
+      <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">middle</span>
+  <span class="k">return</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>Now that our states are defined, we create an <cite>active object</cite> and tell it where
+to start in our diagram:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The call to the <code class="docutils literal notranslate"><span class="pre">start_at</span></code> active object method will create two different
+<abbr title="threads that stop when the main program stops running">daemonic threads</abbr>,
+one is for managing the active object itself and the other is for managing the
+<cite>ActiveFabric</cite>.  The active fabric is just a process that dispatches methods
+between all of the active objects in your system.  Then <code class="docutils literal notranslate"><span class="pre">start_at</span></code> causes the
+active object to change state by climbing into the statechart to the state which
+was provided as an argument; <cite>outer</cite>.</p>
+<p>We can see what happened by reading some of the results of our instrumentation,
+through the <cite>spy</cite> api:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
+  <span class="c1"># [&#39;START&#39;,</span>
+  <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:outer&#39;,</span>
+  <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:top&#39;,</span>
+  <span class="c1">#  &#39;ENTRY_SIGNAL:top&#39;,</span>
+  <span class="c1">#  &#39;ENTRY_SIGNAL:outer&#39;,</span>
+  <span class="c1">#  &#39;INIT_SIGNAL:outer&#39;,</span>
+  <span class="c1">#  &#39;&lt;- Queued:(0) Deferred:(0)&#39;]</span>
+</pre></div>
+</div>
+<p>Here we see something about the interplay between the active object and the
+states which it interacts with.  Before it can climb into the <cite>outer</cite> state, it
+needs to <cite>search</cite> the chart so it can know what to do.  Once it knows what to
+do, it takes action by sending a series of signals at our state methods:  It
+sends the entry signal to <cite>top</cite> (and internal state method), then the entry
+signal to the <cite>outer</cite> state, then the <cite>init</cite> signal (the big black dot in our
+picture) to the <cite>outer</cite> state.</p>
+<p>The spy api is very detailed.  If you would like to just see a summary of what
+happened you can use the <cite>trace</cite> instrumentation instead.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+  <span class="c1"># 09:53:38.941445 [01352] None: top-&gt;outer</span>
+</pre></div>
+</div>
+<p>The <cite>trace</cite> is different from our <cite>spy</cite> in that it does not show all of the
+activity resulting from our internal event processing, but instead just shows
+information about state transitions and the signal which caused the transition
+to occur.  In this case there was <abbr title="the transition was caused by a start_at">no signal</abbr> so the <cite>trace</cite> displays <code class="docutils literal notranslate"><span class="pre">None</span></code> for the signal name.  The <cite>trace</cite>
+does give us some new information though: it outputs a timestamp of when the
+transition took place.</p>
+<p>Now that our state is in <code class="docutils literal notranslate"><span class="pre">outer</span></code> state, we can send an event at it.  After
+the statechart reacts we can see what happened by viewing our instrumentation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># clear our spy and trace logs</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">clear_trace</span><span class="p">()</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">clear_spy</span><span class="p">()</span>
+
+<span class="c1"># Send an event with signal &#39;WaitComplete&#39; so we can</span>
+<span class="c1"># watch the reaction</span>
+<span class="n">event_wait_complete</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">WaitComplete</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_wait_complete</span><span class="p">)</span> <span class="c1">#=&gt; &quot;hello world&quot;</span>
+
+<span class="c1"># Look at the reaction of our statechart in greater detail</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
+  <span class="c1"># [&#39;WaitComplete:outer&#39;,</span>
+  <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+  <span class="c1">#  &#39;ENTRY_SIGNAL:middle&#39;,</span>
+  <span class="c1">#  &#39;INIT_SIGNAL:middle&#39;,</span>
+  <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+  <span class="c1">#  &#39;ENTRY_SIGNAL:inner&#39;,</span>
+  <span class="c1">#  &#39;INIT_SIGNAL:inner&#39;,</span>
+  <span class="c1">#  &#39;&lt;- Queued:(0) Deferred:(0)&#39;]</span>
+
+<span class="c1"># Look at the reaction of our chart with less detail</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="c1">#=&gt;</span>
+  <span class="c1"># 10:34:47.344218 [01352] W: outer-&gt;inner</span>
+</pre></div>
+</div>
+<p>From the trace output we see that we were in the <cite>outer</cite> state and an event with
+the <cite>WaitComplete</cite> signal caused us to transition into the <cite>inner</cite> state.  This
+is true, but it doesn’t really describe what happened.</p>
+<p>If we want the full story we need to look at the results of our spy.  We see
+that the system was in the <cite>outer</cite> state and it reacted to an event with the
+signal <cite>WaitComplete</cite>.  It saw that it needed to transition into the <cite>middle</cite>
+state, so it issued an event with the <cite>entry</cite> signal to the middle state.  If
+you had code linked to this event in the <cite>middle</cite> state method it would have
+been run.  Once it is in the <cite>middle</cite> state it sees that there is an <cite>init</cite>
+handler, so it fires another event with the signal <cite>init</cite> which causes a
+transition into the <cite>inner</cite> state.  Since the <cite>inner</cite> state required entry, the
+event processor created an event with the <cite>entry</cite> signal and sent it to the
+<cite>inner</cite> state.  Any entry code within the <cite>inner</cite> state event handler would have
+been run at this point and time.  Finally, the event processor issued an other
+<cite>init</cite> event to the inner state.  The inner state does not handle this event, so
+it is ignored and our system settles into the <cite>inner</cite> state.  It will remain
+here until it has to react to events provided by the user.</p>
+<p>As mentioned previously, their are two different threads running in the
+background since we created our <cite>active object</cite>.  They are both pending on
+queues.  The number of items in the active object queue can be seen in our <cite>spy</cite>
+instrumentation.  We see that at the end of this reaction to the event with the
+<cite>WaitComplete</cite> signal, there was nothing in the queue so the <cite>active object</cite>
+thread had nothing to do.  It is just waiting.</p>
+<p>Lets stop both threads, and place a number of events into the queue managed by the
+active object.</p>
+<div class="highlight-python notranslate" id="label"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="c1"># stop the threads</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+<span class="c1"># clear the spy and the trace</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">clear_spy</span><span class="p">()</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">clear_trace</span><span class="p">()</span>
+
+<span class="c1"># post a number of events and see what happens</span>
+<span class="n">event_wait_complete</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">WaitComplete</span><span class="p">)</span>
+<span class="n">event_reset_chart</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ResetChart</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_wait_complete</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_reset_chart</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_wait_complete</span><span class="p">)</span>
+<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_reset_chart</span><span class="p">)</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We would expect that nothing should happens since the task which is pending on
+an event has been shut down.  Let’s look at the results, first with the trace:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">)</span>
+ <span class="c1"># 11:35:20.469870 [01352] WaitComplete: inner-&gt;inner</span>
+ <span class="c1"># 11:35:20.470871 [01352] ResetChart: inner-&gt;outer</span>
+ <span class="c1"># 11:35:20.470871 [01352] WaitComplete: outer-&gt;inner</span>
+ <span class="c1"># 11:35:20.470871 [01352] ResetChart: inner-&gt;outer</span>
+</pre></div>
+</div>
+<p>It seems that our active object woke up even though we killed the thread.  This
+is true, because the active object has a phoenix thread; if it has been killed,
+and something has been placed in the queue it will resurrect itself and get back
+to work.</p>
+<p>We see from the high level state summary that all 4 post of our events caused
+state transitions in our statechart.</p>
+<p>To begin with we were in the <cite>inner</cite> state and the <cite>WaitComplete</cite> signal was
+received.  If we look at the diagram we see that the <cite>inner</cite> state does not
+handle this signal so it passes control to the <cite>middle</cite> state.  The <cite>middle</cite>
+state does not handle the <cite>WaitComplete</cite> either so it passes control to the
+<cite>outer</cite> state.  The <cite>outer</cite> state knows what to do with the <cite>WaitComplete</cite>
+signal, it must transition to the <cite>middle</cite> state.</p>
+<p>This is what is meant by behavioral inheritance.  All of the child states of the
+<cite>outer</cite> state will all behave the same as the <cite>outer</cite> state does the
+<cite>WaitComplete</cite> event; they inherit the behavior of the <cite>outer</cite> state.</p>
+<p>Now lets get back to the story.  The middle state has an <cite>init</cite> signal, the big
+black dot, which requires a transition to the <cite>inner</cite> state, so it does this.
+Ultimately the statechart rests in the <cite>inner</cite> state just in time for the active
+object thread to send the next event at it, the event containing the
+<cite>ResetChart</cite> signal.</p>
+<p>The <cite>trace</cite> output summarizes the last paragraph as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 11:35:20.469870 [01352] WaitComplete: inner-&gt;inner</span>
+</pre></div>
+</div>
+<p>The <cite>inner</cite> state doesn’t know what to do with the <cite>ResetChart</cite> signal, so it
+passes control to the <cite>middle</cite> state.  The <cite>middle</cite> state doesn’t know what do
+to with it so it passes control out to the <cite>outer</cite> state.  It sees that it knows
+what to do, which is to leave and re-enter itself.  More will be said about this
+in a bit when we look at the spy.  Skipping some details, we see that when it is
+completed, the statechart rests in the <cite>outer</cite> state, because it does not
+respond to the <cite>init</cite> signal (it does not have a black dot).  Then the active
+object dispatches a <cite>WaitComplete</cite> signal to the <cite>outer</cite> state.</p>
+<p>The <cite>trace</cite> output summarizes the last paragraph as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 11:35:20.470871 [01352] ResetChart: inner-&gt;outer</span>
+</pre></div>
+</div>
+<p>The <cite>outer</cite> state knows what to do with this, it needs to transition to the <cite>middle</cite>
+state, which in turn will transition into the <cite>inner</cite> state.  At this point the
+chart rests, just in time to be sent an event with the <cite>ResetChart</cite> signal.
+Which repeats a behavior we have already described.</p>
+<p>The <cite>trace</cite> output summarizes the last paragraph as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 11:35:20.470871 [01352] WaitComplete: outer-&gt;inner</span>
+<span class="c1"># 11:35:20.469870 [01352] WaitComplete: inner-&gt;inner</span>
+</pre></div>
+</div>
+<p>If that isn’t enough detail for you, let’s look at what the active object is
+actually doing by viewing the spy instrumentation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
+  <span class="c1">#[&#39;WaitComplete:inner&#39;,</span>
+  <span class="c1"># &#39;WaitComplete:middle&#39;,</span>
+  <span class="c1"># &#39;WaitComplete:outer&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;ENTRY_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;INIT_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;ENTRY_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;INIT_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;&lt;- Queued:(3) Deferred:(0)&#39;,</span>
+  <span class="c1"># &#39;ResetChart:inner&#39;,</span>
+  <span class="c1"># &#39;ResetChart:middle&#39;,</span>
+  <span class="c1"># &#39;ResetChart:outer&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:outer&#39;,</span>
+  <span class="c1"># &#39;ENTRY_SIGNAL:outer&#39;,</span>
+  <span class="c1"># &#39;INIT_SIGNAL:outer&#39;,</span>
+  <span class="c1"># &#39;&lt;- Queued:(2) Deferred:(0)&#39;,</span>
+  <span class="c1"># &#39;WaitComplete:outer&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;ENTRY_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;INIT_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;ENTRY_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;INIT_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;&lt;- Queued:(1) Deferred:(0)&#39;,</span>
+  <span class="c1"># &#39;ResetChart:inner&#39;,</span>
+  <span class="c1"># &#39;ResetChart:middle&#39;,</span>
+  <span class="c1"># &#39;ResetChart:outer&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
+  <span class="c1"># &#39;EXIT_SIGNAL:outer&#39;,</span>
+  <span class="c1"># &#39;ENTRY_SIGNAL:outer&#39;,</span>
+  <span class="c1"># &#39;INIT_SIGNAL:outer&#39;,</span>
+  <span class="c1"># &#39;&lt;- Queued:(0) Deferred:(0)&#39;]</span>
+</pre></div>
+</div>
+<p>When you scan such output with your eyes, you can split it into
+behavioral chunks, based on the <code class="docutils literal notranslate"><span class="pre">&lt;-</span> <span class="pre">Queued:(n)</span> <span class="pre">Deferred:(m)</span></code> lines.  The <cite>n</cite>
+stands for the number of events that are waiting to be processed by the active
+object when it is completed processing the one it is currently working on.  The
+<cite>m</cite> stands for the number of events that have been squirreled away by the
+statechart as a part of a design pattern that is not used in this example.</p>
+<p>The information between the <code class="docutils literal notranslate"><span class="pre">&lt;-</span> <span class="pre">Queued:(n)</span> <span class="pre">Deferred:(m)</span></code> statements represent
+what the active objects event processor actually did with the previous event,
+and how the chart reacted to it.  This phase of operation is called a <cite>run to
+completion</cite>: rtc.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Thou shalt NOT interrupt a statechart part way through its</span>
+<span class="c1"># reaction to an old event, with a new event.</span>
+</pre></div>
+</div>
+<p>Don’t worry about this rule, the active object takes care of it for you.  This
+is why it has queues.  Any new event is just placed in the queue until the
+previous reaction is completed.  Only then will the active object force the
+statechart to react to it.</p>
+<p>So, lets use the <code class="docutils literal notranslate"><span class="pre">&lt;-</span> <span class="pre">Queued:</span> <span class="pre">(n)</span> <span class="pre">Deferred:(m)</span></code> statements to break out the
+first rtc reaction of our statechart:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="s1">&#39;WaitComplete:inner&#39;</span>,
+ <span class="s1">&#39;WaitComplete:middle&#39;</span>,
+ <span class="s1">&#39;WaitComplete:outer&#39;</span>,
+ <span class="s1">&#39;EXIT_SIGNAL:inner&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span>,
+ <span class="s1">&#39;EXIT_SIGNAL:middle&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:middle&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:middle&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:inner&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:inner&#39;</span>,
+ <span class="s1">&#39;&lt;- Queued:(3) Deferred:(0)&#39;</span>,
+</pre></div>
+</div>
+<p>The statechart was in the state <cite>inner</cite>, it received the event with the signal
+name <cite>WaitComplete</cite>.  At the end of the spy log we see that the <cite>Queued</cite> item
+has 3 items in it.  This makes sense since we sent 4 events to the statechart,
+and this part of the spy represents how the first event was processed.</p>
+<p>Before we break down this spy log in detail, lets look back at the <code class="docutils literal notranslate"><span class="pre">Queued:(n)</span>
+<span class="pre">Deferred:(m)</span></code> items that followed in the log:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>... the 1st rtc <span class="o">(</span>1st event processed<span class="o">)</span>
+<span class="s1">&#39;&lt;- Queued:(3) Deferred:(0)&#39;</span><span class="o">]</span>
+
+... the 2nd rtc <span class="o">(</span>2nd event processed<span class="o">)</span>
+<span class="s1">&#39;&lt;- Queued:(2) Deferred:(0)&#39;</span><span class="o">]</span>
+
+... the 3nd rtc <span class="o">(</span>3th event processed<span class="o">)</span>
+<span class="s1">&#39;&lt;- Queued:(1) Deferred:(0)&#39;</span><span class="o">]</span>
+
+... the 4nd rtc <span class="o">(</span>4th event processed<span class="o">)</span>
+<span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
+
+.. the queue is empty so our active object threads <span class="nb">wait</span>
+</pre></div>
+</div>
+<p>Now that we know how to break a large spy log into behavioral chunks, lets look
+at the first chunk in detail and compare it to the trace output which was used
+for tracking the same response.  Remember that that this represents the
+statechart’s reaction to the event with the <cite>WaitComplete</cite> signal while it was
+in the <cite>inner</cite> state.</p>
+<p>Since the trace is easy to understand, we will look at it first:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="m">11</span>:35:20.469870 <span class="o">[</span><span class="m">01352</span><span class="o">]</span> WaitComplete: inner-&gt;inner
+</pre></div>
+</div>
+<p>The trace says “we were in the <cite>inner</cite> state, then we got a signal named
+<cite>WaitComplete</cite> and then we transitioned back into the <cite>inner</cite> state”.  This
+does not even begin to tell the story, to get a better idea of what actually
+happened, we look at the result of the spy instrumentation for the same
+reaction:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="s1">&#39;WaitComplete:inner&#39;</span>,
+ <span class="s1">&#39;WaitComplete:middle&#39;</span>,
+ <span class="s1">&#39;WaitComplete:outer&#39;</span>,
+ <span class="s1">&#39;EXIT_SIGNAL:inner&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span>,
+ <span class="s1">&#39;EXIT_SIGNAL:middle&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:middle&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:middle&#39;</span>,
+ <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span>,
+ <span class="s1">&#39;ENTRY_SIGNAL:inner&#39;</span>,
+ <span class="s1">&#39;INIT_SIGNAL:inner&#39;</span>,
+ <span class="s1">&#39;&lt;- Queued:(3) Deferred:(0)&#39;</span>,
+</pre></div>
+</div>
+<p>Let’s break it down into parts and try to make sense of how the <cite>inner</cite> state
+reacted to the <cite>WaitComplete</cite> event.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="s1">&#39;WaitComplete:inner&#39;</span>,
+ <span class="s1">&#39;WaitComplete:middle&#39;</span>,
+ <span class="s1">&#39;WaitComplete:outer&#39;</span>,
+ <span class="s1">&#39;EXIT_SIGNAL:inner&#39;</span>,
+</pre></div>
+</div>
+<p>The spy says, <cite>inner</cite> reacted to <cite>WaitComplete</cite>, it didn’t know how to handle
+this signal so it passed it out to its parent state, <cite>middle</cite>.  The <cite>middle</cite>
+state didn’t know how to handle <cite>WaitComplete</cite> either, so it passed it out to
+its parent state, <cite>outer</cite>.  The <cite>outer</cite> state knew how to handle this event,
+because there is something else happening on the next line of the spy log.</p>
+<p>This was the search phase of the <cite>ActiveObject</cite> event processor; it is looking
+at the statechart, querying each of its states with various events to
+determine what to do.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;EXIT_SIGNAL:inner&#39;</span>,  <span class="c1"># repeated from above</span>
+<span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span>,
+<span class="s1">&#39;EXIT_SIGNAL:middle&#39;</span>,
+<span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;</span>,
+</pre></div>
+</div>
+<p>Let’s rewind our output a bit, starting at the <code class="docutils literal notranslate"><span class="pre">EXIT_SIGNAL:inner</span></code> in our
+log.  Now that the event processor knows what to do it must determine how to do
+it.</p>
+<p>To get from the <cite>inner</cite> state to the <cite>outer</cite> state, the statechart needs to
+exit the inner state, then exit the middle state.  When a state is exited, the
+<cite>EXIT_SIGNAL</cite> event is sent to that state, this is what we see in this part of
+the spy log.  We see these <cite>EXIT_SIGNAL</cite> events happening in the states where
+they are needed, and we see some <cite>SEARCH_FOR_SUPER_SIGNAL</cite> events being sent at
+the various states, so that the event processor can figure out what to do next.
+If you are just debugging your design, you can ignore these
+<cite>SEARCH_FOR_SUPER_SIGNAL</cite> items in your spy log, but if you are debugging the
+event processor itself, these lines are very important.</p>
+<p>At this point, we are at the tail end of the <cite>WaitComplete</cite> arrow in our
+diagram.  The tip of the arrow is asking us to enter the <cite>middle</cite> state. Lets
+look at that part of the story:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;</span>,
+<span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;</span>,
+<span class="s1">&#39;ENTRY_SIGNAL:middle&#39;</span>,
+</pre></div>
+</div>
+<p>At this point it needed to move from the <cite>outer</cite> state into the <cite>inner</cite> state,
+but to do that it first had to figure out how to get there.  This is why we see
+the <cite>SEARCH_FOR_SUPER_SIGNAL</cite> events here.  Once it determines how what it
+wants it does it.  It enters the <cite>middle</cite> state by sending the <cite>ENTRY_SIGNAL</cite>
+event to the middle state.</p>
+<p>We are now in the <cite>middle</cite> state.</p>
+<p>On our diagram we see that in the <cite>middle</cite> state rectangle, there is a big
+black dot with the arrow attached to it.  Anytime you see a black dot in a
+state it means that there is some initialization code that it needs to run.</p>
+<p>The arrow attached to this dot represents what this initialization code would
+like to do, it would like us to run its initialization code, then, leave the
+<cite>middle</cite> state and go to the <cite>inner</cite> state.</p>
+<p>Here we see that the statechart did just that, it ran the <cite>INIT_SIGNAL</cite> event
+in the <cite>middle</cite> state, searched then ran the <cite>ENTRY_SIGNAL</cite> event in the
+<cite>inner</cite> state.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;INIT_SIGNAL:middle&#39;</span>,
+<span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span>,
+<span class="s1">&#39;ENTRY_SIGNAL:inner&#39;</span>,
+</pre></div>
+</div>
+<p>Now that the statechart has found itself in the <cite>inner</cite> state, it needs to run
+the <cite>inner</cite> states initialization code.  When we look at the diagram we don’t
+see any big black dots in the inner state so we would expect the chart to come
+to rest here.  It does, the run to completion event is exhausted and it outputs
+how many events are waiting for our <cite>ActiveObject</cite> thread’s attention:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># &#39;INIT_SIGNAL:inner&#39;,</span>
+<span class="c1"># &#39;&lt;- Queued:(3) Deferred:(0)&#39;,</span>
+</pre></div>
+</div>
+<p>We see that three events were waiting in the Queue, which means that the
+<cite>ActiveObject</cite> thread will pull the next item, run to completion, then do it
+again and again.</p>
+<p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
+</div>
+
+
+        
+        <div class="main-content__right-sidebar">
+          <h2 class="sidebar-heading">On this page:</h2>
+        </div>
+      </div>
+    </main>
+
+    <div class="footer-wrapper">
+      
+      <footer class="main-footer main-footer--sidebar">
+      
+        <div class="relational-links">
+          <div>
+            
+          </div>
+          <div>
+            
+          </div>
+        </div>
+        
+        <div class="copyright">
+          © Copyright <span class="js-year"></span>,
+          
+          <a href="https://github.com/aleph2c" class="copyright_link">Scott Volk</a>.
+          
+        </div>
+        
+        
+        <div class="last-updated">
+          <span class="prefix">Last updated:</span>
+          <span class="time">Jul 02, 2020 12:46 PM</span>
+        </div>
+        
+        
+        <div class="created-with">
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.1 with <span class="theme">13ds_theme_one</span>.
+        </div>
+        
+      </footer>
+    </div>
+  </body>
+</html>

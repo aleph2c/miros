@@ -1,0 +1,15 @@
+{#
+    13ds_theme_one/sourcelink.html
+    -----------------------------
+
+    Sidebar template: "show source" link.
+#}
+
+{% if show_source and has_source and sourcename %}
+<div role="note" aria-label="source link">
+  <h2 class="sidebar-heading">Page Source</h2>
+  <div class="sidebar-content">
+    <a class="sidebar-relation" href="{{ pathto('_sources/' + sourcename, true)|e }}" rel="nofollow">Show reStructuredText</a>
+  </div>
+</div>
+{% endif %}
