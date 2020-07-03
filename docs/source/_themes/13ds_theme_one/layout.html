@@ -1,0 +1,179 @@
+{#
+    13ds_theme_one/layout.html
+    --------------------------
+
+    Master layout template for the 3ds_theme_one theme.
+#}
+
+{# Variables #}
+
+{% set render_sidebar = (not theme_nosidebar|tobool) and (sidebars != []) %}
+{% set url_root = pathto('', 1) %}
+
+
+<!DOCTYPE html>
+<html {% if language is not none %} lang="{{ language }}"{% endif %}>
+  <head>
+    <meta charset="{{ encoding }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{ metatags }}
+
+    {%- block htmltitle %}
+    <title>{{ title|striptags|e }} | {{ shorttitle }}</title>
+    {%- endblock %}
+
+    {%- if favicon %}
+    <link rel="shortcut icon" href="{{ pathto('_static/' + favicon, 1) }}">
+    {%- endif %}
+
+    {% block css %}
+    <link rel="stylesheet" href="{{ pathto('_static/pygments.css', 1) }}" type="text/css">
+    <link rel="stylesheet" href="{{ pathto('_static/' + style, 1) }}" type="text/css">
+    {% for css in css_files %}
+      {% if css|attr("filename") %}
+    {{ css_tag(css) }}
+      {% else %}
+    <link rel="stylesheet" href="{{ pathto(css, 1) }}" type="text/css" />
+      {% endif %}
+    {% endfor %}
+    {% endblock %}
+
+    {% block scripts %}
+    <script type="text/javascript" src="{{ pathto('_static/theme.js', 1) }}" defer></script>
+    <script id="documentation_options" data-url_root="{{ pathto('', 1) }}" src="{{ pathto('_static/documentation_options.js', 1) }}"></script>
+    {% for script in script_files %}
+    {{ js_tag(script) }}
+    {% endfor %}
+    {% endblock %}
+
+    {% block linktags %}
+      {% if hasdoc('about') %}
+    <link rel="author" title="{{ _('About these documents') }}" href="{{ pathto('about') }}" />
+      {% endif %}
+      {% if hasdoc('genindex') %}
+    <link rel="index" title="{{ _('Index') }}" href="{{ pathto('genindex') }}">
+      {% endif %}
+      {% if hasdoc('search') %}
+    <link rel="search" title="{{ _('Search') }}" href="{{ pathto('search') }}">
+      {% endif %}
+      {% if hasdoc('copyright') %}
+    <link rel="copyright" title="{{ _('Copyright') }}" href="{{ pathto('copyright') }}">
+      {% endif %}
+      {% if next %}
+    <link rel="next" title="{{ next.title|striptags|e }}" href="{{ next.link|e }}">
+      {% endif %}
+      {% if prev %}
+    <link rel="prev" title="{{ prev.title|striptags|e }}" href="{{ prev.link|e }}">
+      {% endif %}
+    {% endblock %}
+
+    {% if pageurl %}
+    <link rel="canonical" href="{{ pageurl }}" />
+    {% endif %}
+
+    {% if use_opensearch %}
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="{% trans docstitle=docstitle|e %}Search within {{ docstitle }}{% endtrans %}"
+          href="{{ pathto('_static/opensearch.xml', 1) }}"/>
+    {% endif %}
+
+    {% block extrahead %}{% endblock %}
+  </head>
+
+  <body>
+    <header class="main-header">
+      <div class="navbar">
+        <div id="js-sidebar-mask" class="sidebar-mask"></div>
+        <div id="js-sidebar-menu-button" class="sidebar-menu-button">
+          {% include "menu-icon.html" %}
+        </div>
+        <a href="{{ pathto(master_doc) }}" class="site-link">
+          {% if theme_navbar_logo %}
+          <img class="logo" src="{{ pathto('_static/' + logo, 1) }}" alt="{{ project|e }}">
+          {% else %}
+          {{ project|e }}
+          {% endif %}
+        </a>
+        <div class="navbar-links">
+          <a href="{{ pathto(theme_docs_start) }}" class="navbar-link">Docs</a>
+          {% if github_url %}
+          <a href="{{ github_url }}" class="navbar-link">GitHub</a>{% include "link-icon.html" %}
+          {% endif %}
+        </div>
+      </div>
+    </header>
+
+    <main class="main-wrapper">
+      {% if render_sidebar %}
+      <div id="js-main-sidebar" class="main-sidebar">
+        {% if github_url %}
+        <div class="sidebar-content sidebar-content--divider sidebar-navbar-links">
+          <a href="{{ github_url }}" class="sidebar-navbar-link">GitHub</a>
+          {% include "link-icon.html" %}
+        </div>
+        {% endif %}
+        {% for sidebartemplate in sidebars %}
+        {% include sidebartemplate %}
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if render_sidebar %}
+      <div class="main-content main-content--sidebar">
+      {% else %}
+      <div class="main-content main-content--nosidebar">
+      {% endif %}
+        {% block document %}
+          {% block body %}
+            {# rst content goes here #}
+          {% endblock %}
+        {% endblock %}
+        <div class="main-content__right-sidebar">
+          <h2 class="sidebar-heading">On this page:</h2>
+        </div>
+      </div>
+    </main>
+
+    <div class="footer-wrapper">
+      {% if render_sidebar %}
+      <footer class="main-footer main-footer--sidebar">
+      {% else %}
+      <footer class="main-footer main-footer--nosidebar">
+      {% endif %}
+        <div class="relational-links">
+          <div>
+            {% if prev %}
+            ← <a class="relational-link" href="{{ prev.link|e }}" title="{{ _('previous chapter') }}">{{ prev.title }}</a>
+            {% endif %}
+          </div>
+          <div>
+            {% if next %}
+             <a class="relational-link" href="{{ next.link|e }}" title="{{ _('next chapter') }}">{{ next.title }}</a> →
+            {% endif %}
+          </div>
+        </div>
+        {% if show_copyright %}
+        <div class="copyright">
+          © Copyright <span class="js-year"></span>,
+          {% if copyright_link %}
+          <a href="{{ copyright_link }}" class="copyright_link">{{ copyright }}</a>.
+          {% else %}
+          {{ copyright }}.
+          {% endif %}
+        </div>
+        {% endif %}
+        {% if last_updated %}
+        <div class="last-updated">
+          <span class="prefix">Last updated:</span>
+          <span class="time">{{ last_updated }}</span>
+        </div>
+        {% endif %}
+        {% if show_sphinx %}
+        <div class="created-with">
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> {{ sphinx_version }} with <span class="theme">13ds_theme_one</span>.
+        </div>
+        {% endif %}
+      </footer>
+    </div>
+  </body>
+</html>
