@@ -48,10 +48,18 @@ window.addEventListener('load', function() {
 }, false);
 
 window.addEventListener('click', function(e) {
-  console.log(e.target);
+  // console.log(e.target);
   if (e.target.matches('#js-sidebar-menu-button') ||
       e.target.matches('#js-sidebar-mask') ||
       e.target.matches('#js-main-sidebar li a')) {
+    toggleSidebar();
+  }
+}, false);
+
+window.addEventListener('touchstart', function(e) {
+  // console.log(e.target);
+  if (e.target.matches('#js-sidebar-menu-button') ||
+      e.target.matches('#js-sidebar-mask')) {
     toggleSidebar();
   }
 }, false);
