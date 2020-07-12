@@ -18,4 +18,5 @@ Examples
    cellular_automata
    i_mongol_example
 
+
 More examples can be found in the :ref:`patterns section<patterns>`.

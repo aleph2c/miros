@@ -1,0 +1,57 @@
+session_name: miros
+windows:
+- focus: 'true'
+  layout: b79c,237x74,0,0{125x74,0,0[125x37,0,0,1,125x36,0,38,2],111x74,126,0,3}
+  options:
+    automatic-rename: 'off'
+  panes:
+  - shell_command:
+    - cd /mnt/c/github/miros
+    - deactivate
+    - . ./venv/bin/activate
+    - clear
+  - focus: 'true'
+    shell_command:
+    - cd /mnt/c/github/miros
+    - deactivate
+    - . ./venv/bin/activate
+    - clear
+  - shell_command:
+    - cd /mnt/c/github/miros
+    - deactivate
+    - . ./venv/bin/activate
+    - clear
+  window_name: experiment
+- options:
+    automatic-rename: 'off'
+  panes:
+  - shell_command:
+    - miros
+    - clear
+    - while inotifywait -e modify ./miros/*.py ./test/*.py; do pytest -s; done
+  - shell_command:
+    - miros
+    - deactivate
+    - . ./venv/bin/activate
+    - cd ./docs/
+    - clear
+    - while inotifywait -e modify ./source/*.rst ./source/_static/*.uxf; do make html; done
+  start_directory: /mnt/c/github/miros
+  window_name: automation
+- options:
+    automatic-rename: 'off'
+  panes:
+  - shell_command:
+    - cd /mnt/c/github/miros/
+    - deactivate
+    - . ./venv/bin/activate
+    - clear
+    - vim tmuxp.yaml
+  - shell_command:
+    - deactivate
+    - . ./venv/bin/activate
+    - clear
+    - miros
+    - clear
+  start_directory: /mnt/c/github/miros/
+  window_name: extra
