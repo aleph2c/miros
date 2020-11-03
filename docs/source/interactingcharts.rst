@@ -23,7 +23,7 @@ information published by another active object, it would subscribe to that
 event.  That's it.
 
 Everything is managed in the background with threads and queues.  There are no
-shared variables.  It is up to you not to busy weight within your state methods
+shared variables.  It is up to you not to busy wait within your state methods
 or callback methods.
 
 Here is a very simple example:
