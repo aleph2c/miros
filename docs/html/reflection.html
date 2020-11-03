@@ -189,7 +189,7 @@
 <div class="section" id="id1">
 <h1>Reflection<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h1>
 <div class="contents local topic" id="sections">
-<p class="topic-title first">Sections:</p>
+<p class="topic-title">Sections:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#thoughts-on-reflection" id="id2">Thoughts On Reflection</a></p></li>
 <li><p><a class="reference internal" href="#what-state-am-i-in" id="id3">What State Am I In?</a></p></li>
@@ -299,13 +299,13 @@ Python dictionary:</p>
 
 <span class="c1"># To output your names and number:</span>
 <span class="k">for</span> <span class="n">signal_name</span><span class="p">,</span> <span class="n">signal_number</span> <span class="ow">in</span> <span class="n">signals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">signal_name</span><span class="p">,</span> <span class="n">signal_number</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">signal_name</span><span class="p">,</span> <span class="n">signal_number</span><span class="p">)</span>
 
 <span class="c1"># same output with some formatting</span>
 <span class="n">max_name_len</span>   <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">signals</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">))</span>
 <span class="n">max_number_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="nb">int</span><span class="p">)))</span>
 <span class="k">for</span> <span class="n">signal_name</span><span class="p">,</span> <span class="n">signal_number</span> <span class="ow">in</span> <span class="n">signals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{1: &lt;{0}} {2:{3}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_name_len</span><span class="p">,</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;{1: &lt;</span><span class="si">{0}</span><span class="s2">} {2:</span><span class="si">{3}</span><span class="s2">}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_name_len</span><span class="p">,</span>
                                    <span class="n">signal_name</span><span class="p">,</span>
                                    <span class="n">signal_number</span><span class="p">,</span>
                                    <span class="n">max_number_len</span><span class="p">))</span>  <span class="c1"># output below -&gt;</span>
@@ -328,7 +328,7 @@ Python dictionary:</p>
 <code class="docutils literal notranslate"><span class="pre">signal_name</span></code> method of the Event class:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_example_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANLDED</span>
-<span class="hll">  <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal_name</span><span class="p">)</span> <span class="c1"># &quot;ENTRY_SIGNAL&quot;</span>
+<span class="hll">  <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal_name</span><span class="p">)</span> <span class="c1"># &quot;ENTRY_SIGNAL&quot;</span>
 </span></pre></div>
 </div>
 <p>If you have a signal number and you want to determine its name:</p>
@@ -495,7 +495,7 @@ working on it.</p>
 </pre></div>
 </div>
 <p>You might have gotten this output with the following code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
 </pre></div>
 </div>
 <p>It does a decent job describing what we want, but it has timestamps.  With the
@@ -610,8 +610,8 @@ specification.</p>
 <div class="section" id="live-output-from-your-chart">
 <span id="reflection-live-output-from-your-chart"></span><h2>Live Output From Your Chart<a class="headerlink" href="#live-output-from-your-chart" title="Permalink to this headline">#</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ao1</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
-<span class="n">ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>  <span class="c1"># ao1 will output its trace live to the terminal</span>
-<span class="n">ao1</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>    <span class="c1"># ao1 will output its spy live to the terminal</span>
+<span class="n">ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># ao1 will output its trace live to the terminal</span>
+<span class="n">ao1</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">True</span>    <span class="c1"># ao1 will output its spy live to the terminal</span>
 </pre></div>
 </div>
 </div>
@@ -778,12 +778,12 @@ you need to explain a loop?</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jul 14, 2020 6:45 AM</span>
+          <span class="time">Nov 03, 2020 8:22 AM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.2 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

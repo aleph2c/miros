@@ -380,7 +380,7 @@ then I will talk about the XMLChart (right to left on the diagram).</p>
 <p>The two region orthogonal components will be constructed in the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method of the
 <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> like so:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="k">class</span> <span class="nc">XmlChart</span><span class="p">(</span><span class="n">InstrumentedFactory</span><span class="p">):</span>
-   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="n">live_trace</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="n">live_spy</span><span class="p">)</span>
 
 <span class="hll">   <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span> <span class="o">=</span> <span class="p">[]</span>
@@ -493,10 +493,10 @@ shortly</span></a>.</p>
 <span class="k">def</span> <span class="nf">s1_region_final</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="n">r</span><span class="o">.</span><span class="n">final</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">final</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">r</span><span class="o">.</span><span class="n">post_p_final_to_outer_if_ready</span><span class="p">()</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="n">r</span><span class="o">.</span><span class="n">final</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">final</span> <span class="o">=</span> <span class="kc">False</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">r</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">s1_region</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
@@ -508,7 +508,7 @@ shortly</span></a>.</p>
 <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> class such that the <code class="docutils literal notranslate"><span class="pre">XMLChart</span></code> can be instantiated, <em>then</em> started like
 this:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">example</span> <span class="o">=</span> <span class="n">XmlChart</span><span class="p">(</span>
-  <span class="s1">&#39;parallel&#39;</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span>
+  <span class="s1">&#39;parallel&#39;</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -542,7 +542,7 @@ regions within <code class="docutils literal notranslate"><span class="pre">p</s
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Region</span><span class="p">(</span><span class="n">HsmWithQueues</span><span class="p">):</span>
 
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-    <span class="n">name</span><span class="p">,</span> <span class="n">starting_state</span><span class="p">,</span> <span class="n">outer</span><span class="p">,</span> <span class="n">final_event</span><span class="p">,</span> <span class="n">instrumented</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">starting_state</span><span class="p">,</span> <span class="n">outer</span><span class="p">,</span> <span class="n">final_event</span><span class="p">,</span> <span class="n">instrumented</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Region management for othogonal regions</span>
 
 <span class="sd">    **Args**:</span>
@@ -578,13 +578,13 @@ regions within <code class="docutils literal notranslate"><span class="pre">p</s
     <span class="bp">self</span><span class="o">.</span><span class="n">final_event</span> <span class="o">=</span> <span class="n">final_event</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">instrumented</span> <span class="o">=</span> <span class="n">instrumented</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">final</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">final</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="o">=</span> <span class="p">[]</span>
 
   <span class="k">def</span> <span class="nf">post_p_final_to_outer_if_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">ready</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="bp">True</span>
+    <span class="n">ready</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="kc">True</span>
     <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">:</span>
-      <span class="n">ready</span> <span class="o">&amp;=</span> <span class="bp">True</span> <span class="k">if</span> <span class="n">region</span><span class="o">.</span><span class="n">final</span> <span class="k">else</span> <span class="bp">False</span>
+      <span class="n">ready</span> <span class="o">&amp;=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">region</span><span class="o">.</span><span class="n">final</span> <span class="k">else</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">ready</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">outer</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_event</span><span class="p">)</span>
 </pre></div>
@@ -603,16 +603,16 @@ its reference to the outer statechart to post events to it.</p>
 <code class="docutils literal notranslate"><span class="pre">xml_chart.log</span></code> file then registers a spy and trace callback handler for the
 statechart to use.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">InstrumentedFactory</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span> <span class="o">=</span> <span class="s1">&#39;xml_chart.log&#39;</span> <span class="k">if</span> <span class="n">log_file</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">log_file</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span> <span class="o">=</span> <span class="s1">&#39;xml_chart.log&#39;</span> <span class="k">if</span> <span class="n">log_file</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">log_file</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">clear_log</span><span class="p">()</span>
 
     <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
-      <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+      <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
       <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">,</span>
       <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
@@ -626,8 +626,8 @@ statechart to use.</p>
 
   <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spy</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;spy with machine name pre-pending&#39;&#39;&#39;</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">spy</span><span class="p">)</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">spy</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [</span><span class="si">{}</span><span class="s2">] </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
 
   <span class="k">def</span> <span class="nf">clear_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
@@ -644,7 +644,7 @@ its <code class="docutils literal notranslate"><span class="pre">__init__</span>
 <a class="reference external image-reference" href="_static/xml_chart_6.pdf"><img alt="_images/xml_chart_6.svg" class="scale-to-fit" src="_images/xml_chart_6.svg" /></a>
 <p>Here is the XMLChart written as Python:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">XmlChart</span><span class="p">(</span><span class="n">InstrumentedFactory</span><span class="p">):</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Example of othogonal regions described in the CSXML</span>
 <span class="sd">       standard</span>
 
@@ -717,7 +717,7 @@ its <code class="docutils literal notranslate"><span class="pre">__init__</span>
         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">some_other_state_entry_signal</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">to_method</span><span class="p">()</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">some_other_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
 
@@ -848,7 +848,7 @@ information back into its outer chart like so:</p>
         <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;hidden_region&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="p">:</span>
           <span class="n">chart</span><span class="o">.</span><span class="n">outer</span><span class="o">.</span><span class="n">live_spy_callback</span><span class="p">(</span>
-            <span class="s2">&quot;{}::{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">line</span><span class="p">))</span>
+            <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">::</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">line</span><span class="p">))</span>
       <span class="n">chart</span><span class="o">.</span><span class="n">rtc</span><span class="o">.</span><span class="n">spy</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="n">e</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">args</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -929,7 +929,7 @@ read.</p>
 note into the spy stream before a region is run, like so:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">p_dispatcher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-<span class="hll">  <span class="bp">self</span><span class="o">.</span><span class="n">live_spy_callback</span><span class="p">(</span><span class="s2">&quot;{}:p&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal_name</span><span class="p">))</span>
+<span class="hll">  <span class="bp">self</span><span class="o">.</span><span class="n">live_spy_callback</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:p&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal_name</span><span class="p">))</span>
 </span>  <span class="p">[</span><span class="n">region</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="p">]</span>
   <span class="p">[</span><span class="n">region</span><span class="o">.</span><span class="n">complete_circuit</span><span class="p">()</span> <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_regions</span><span class="p">]</span>
   <span class="k">return</span> <span class="n">status</span>
@@ -942,7 +942,7 @@ note into the spy stream before a region is run, like so:</p>
   <span class="c1"># lines 1-7 in log file</span>
   <span class="n">example</span> <span class="o">=</span> <span class="n">XmlChart</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s1">&#39;parallel&#39;</span><span class="p">,</span>
-    <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span>
   <span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
   <span class="c1"># lines 8-26</span>
@@ -1314,12 +1314,12 @@ note into the spy stream before a region is run, like so:</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jul 16, 2020 8:46 AM</span>
+          <span class="time">Nov 03, 2020 8:22 AM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.2 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

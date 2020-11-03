@@ -245,7 +245,7 @@ the <code class="docutils literal notranslate"><span class="pre">outer</span></c
     <span class="n">ao</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;flash B!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;flash B!&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">top</span>
@@ -343,7 +343,7 @@ framework, the code will look about the same there as it does here.</p>
       <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">),</span>
                       <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
                       <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-                      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                      <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># We mark up the ao with this id, so that</span>
     <span class="c1"># this state function can be used by many different aos</span>
     <span class="n">ao</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="n">multi_shot_thread</span><span class="p">,</span>
@@ -380,7 +380,7 @@ the exit condition of this state method.  Now lets jump back to how the
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">),</span>
                 <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
                 <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-                <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Here we see that it will be posting an Event with the signal name <strong>A</strong> to our
@@ -472,7 +472,7 @@ to implement it.</p>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
 <span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;charging with B&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;charging with B&quot;</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>  <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">middle</span>
@@ -523,7 +523,7 @@ reflecting upon its behavior.</p>
 <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">D</span><span class="p">))</span>
 <span class="hll"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 </span>
-<span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
 <p>On line <strong>1</strong> we create an active object.  On line <strong>2</strong> we start it in the
@@ -735,7 +735,7 @@ was to add a new signal from re-arming our tazor (READY).</p>
 <span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">READY</span><span class="p">):</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">arming</span><span class="p">)</span>
 </span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">CAPACITOR_CHARGE</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;zapping&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;zapping&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">tazor_operating</span><span class="p">)</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">top</span>
@@ -749,7 +749,7 @@ was to add a new signal from re-arming our tazor (READY).</p>
       <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BATTERY_CHARGE</span><span class="p">),</span>
                       <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
                       <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-                      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                      <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># We mark up the ao with this id, so that</span>
     <span class="c1"># state function can be used by many different aos</span>
     <span class="n">ao</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="n">multi_shot_thread</span><span class="p">,</span>
@@ -778,7 +778,7 @@ was to add a new signal from re-arming our tazor (READY).</p>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;charging tazor&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;charging tazor&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">arming</span>
@@ -796,7 +796,7 @@ starting it in the arming state:</p>
 <p>Now let’s pull the trigger:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tazor</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">TRIGGER_PULLED</span><span class="p">))</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># if you don&#39;t wait it won&#39;t look like it is working</span>
-<span class="hll"><span class="k">print</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+<span class="hll"><span class="nb">print</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
 </span></pre></div>
 </div>
 <p>The highlighted code above shows that we used the trace to output a high level
@@ -978,12 +978,12 @@ in turn causes two more state transitions.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jul 14, 2020 6:45 AM</span>
+          <span class="time">Nov 03, 2020 8:22 AM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.2 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

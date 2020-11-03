@@ -785,7 +785,7 @@ pip install miros
 <span class="k">def</span> <span class="nf">some_state_to_prove_this_works</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
@@ -794,7 +794,7 @@ pip install miros
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
-  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">some_state_to_prove_this_works</span><span class="p">)</span>
 
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
@@ -933,7 +933,7 @@ that it can be called later:</p>
 
 <span class="c1"># this will be our callback</span>
 <span class="k">def</span> <span class="nf">print_msg</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">call_something_later</span><span class="p">(</span><span class="n">callback</span><span class="p">):</span>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -996,7 +996,7 @@ type of items it can return.</p>
 9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="hll"><span class="k">def</span> <span class="nf">some_state_to_prove_this_works</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 </span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 </span>  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
 <span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>  <span class="k">else</span><span class="p">:</span>
     <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
@@ -1101,7 +1101,7 @@ and <strong>S</strong> move around the HSM.</p>
 </span><span class="k">def</span> <span class="nf">some_state_to_prove_this_works</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
@@ -1138,7 +1138,7 @@ is returned to the event processor, letting it know to stop processing the
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_state_to_prove_this_works</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 <span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>  <span class="k">else</span><span class="p">:</span>
     <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>
@@ -1207,7 +1207,7 @@ working within this callback (if you care).</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_state_to_prove_this_works</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 <span class="hll">  <span class="k">else</span><span class="p">:</span>
 </span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">top</span>  <span class="c1"># no outer state</span>
@@ -1246,7 +1246,7 @@ argument given to the callback function</p></li>
 statechart’s thread is started with a <code class="docutils literal notranslate"><span class="pre">start_at</span></code> method call:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
-  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">some_state_to_prove_this_works</span><span class="p">)</span>
 
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
@@ -1294,7 +1294,7 @@ statechart.  It does this by creating a new thread, then running the oven’s
 event processor in that thread.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
-  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">some_state_to_prove_this_works</span><span class="p">)</span>
 
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
@@ -1327,7 +1327,7 @@ called.</p>
 5
 6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
-  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">some_state_to_prove_this_works</span><span class="p">)</span>
 
 <span class="hll">  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
@@ -1461,16 +1461,16 @@ transition between these states.</p>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">light_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;light_on&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;light_on&quot;</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">light_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;light_off&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;light_off&quot;</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">heater_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;heater_on&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;heater_on&quot;</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">heater_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;heater_off&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;heater_off&quot;</span><span class="p">)</span>
 
 <span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">door_closed</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -1509,7 +1509,7 @@ transition between these states.</p>
 <span class="k">def</span> <span class="nf">baking</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;baking&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;baking&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>
@@ -1520,7 +1520,7 @@ transition between these states.</p>
 <span class="k">def</span> <span class="nf">toasting</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;toasting&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;toasting&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>
@@ -1531,7 +1531,7 @@ transition between these states.</p>
 <span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
@@ -1540,7 +1540,7 @@ transition between these states.</p>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
-  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
   <span class="c1"># toast something</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
@@ -1860,7 +1860,7 @@ Spike and Tara along, again, you use the <code class="docutils literal notransla
 <p>We post the events at the bottom part of our file:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
-  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="hll">  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
 </span>  <span class="c1"># toast something</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
@@ -1880,7 +1880,7 @@ graph, searches it and determines how to get <code class="docutils literal notra
 thread’s first in first out queue.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
-  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
   <span class="c1"># toast something</span>
 <span class="hll">  <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
@@ -2103,7 +2103,7 @@ entry condition:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 <span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>  <span class="k">else</span><span class="p">:</span>
     <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
@@ -2121,7 +2121,7 @@ the event processor that it doesn’t handle this condition by returning
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
@@ -2191,7 +2191,7 @@ triggered:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 <span class="hll">  <span class="k">else</span><span class="p">:</span>
 </span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
@@ -2242,7 +2242,7 @@ triggered:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 <span class="hll">  <span class="k">else</span><span class="p">:</span>
 </span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">door_closed</span>
@@ -2281,7 +2281,7 @@ tell the event processor it handled the event.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">baking</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 <span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;baking&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;baking&quot;</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>  <span class="k">else</span><span class="p">:</span>
     <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>
@@ -2424,7 +2424,7 @@ are two events pending in the queue, due to our code calling the <code class="do
 method with a “Baking” and “Off” event.</p>
 <p>To turn on a live spy, replace the live_trace call with the live_spy call in
 your code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oven</span><span class="o">.</span><span class="n">list_spy</span> <span class="o">=</span> <span class="bp">True</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oven</span><span class="o">.</span><span class="n">list_spy</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -2498,8 +2498,8 @@ live instrumentation:</p>
 11
 12</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
-<span class="hll">  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
-</span><span class="hll">  <span class="n">oven</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="hll">  <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span class="hll">  <span class="n">oven</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">True</span>
 </span>  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
   <span class="c1"># toast something</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
@@ -2593,7 +2593,7 @@ practice.</p>
 <p>We preform these actions:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
-    <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
     <span class="c1"># toast something</span>
     <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
@@ -2842,7 +2842,7 @@ like it did before.</span></p></li>
  <span class="k">class</span> <span class="nc">ToasterOven</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-<span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="kc">None</span>
 </span>
    <span class="k">def</span> <span class="nf">light_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;light_on&quot;</span><span class="p">)</span>
@@ -2968,7 +2968,7 @@ like it did before.</span></p></li>
 turn on the trace, toast something, open the door, then close the door again,
 then ship the product. HeeHaw.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
-<span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
 
 <span class="c1"># toast something</span>
@@ -3040,8 +3040,8 @@ working.  Not even close. We will get serious about testing in the next iteratio
 through all of its state transitions.  Then we can look at the
 instrumentation’s output to see if it worked as expected.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
-<span class="n">oven</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>  <span class="c1"># I&#39;ll add this to interleave the trace</span>
+<span class="n">oven</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># I&#39;ll add this to interleave the trace</span>
 
 <span class="c1"># Start the oven in the Off state</span>
 <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
@@ -3767,7 +3767,7 @@ buzzer which will get the attention of anyone nearby</span></p></li>
 <span class="hll"><span class="k">class</span> <span class="nc">ToasterOvenMock</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
 </span><span class="hll">  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 </span><span class="hll">    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="bp">None</span>
+</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span class="hll">
 </span><span class="hll">  <span class="k">def</span> <span class="nf">light_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;light_on&quot;</span><span class="p">)</span>
@@ -3787,7 +3787,7 @@ buzzer which will get the attention of anyone nearby</span></p></li>
 <span class="hll"><span class="k">class</span> <span class="nc">ToasterOven</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
 </span><span class="hll">  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 </span><span class="hll">    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="bp">None</span>
+</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span class="hll">
 </span><span class="hll">  <span class="k">def</span> <span class="nf">light_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span class="hll">    <span class="c1"># call to your hardware&#39;s light_on driver</span>
@@ -3813,7 +3813,7 @@ buzzer which will get the attention of anyone nearby</span></p></li>
 </span><span class="hll"><span class="k">def</span> <span class="nf">common_features</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 </span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 </span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">buzz</span><span class="p">()</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span><span class="hll">  <span class="k">else</span><span class="p">:</span>
@@ -4081,28 +4081,28 @@ things a lot.</p>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>  <span class="c1"># let the oven thread catch up to main</span>
 
 <span class="c1"># What state?</span>
-<span class="k">print</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
 
 <span class="c1"># Trigger the buzzer</span>
 <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">))</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
 
 <span class="c1"># What state?</span>
-<span class="k">print</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
 
 <span class="c1"># Toast something</span>
 <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
 
 <span class="c1"># What state?</span>
-<span class="k">print</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
 
 <span class="c1"># Trigger the buzzer</span>
 <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">))</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
 
 <span class="c1"># What state?</span>
-<span class="k">print</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>off
@@ -4119,7 +4119,7 @@ toasting
 by looking at the top left corner of its rectangle in the diagram:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># short hand for what we see in the</span>
 <span class="n">Buzz</span> <span class="o">/</span>
-  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">buzz</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -4151,7 +4151,7 @@ by looking at the top left corner of its rectangle in the diagram:</p>
 <span class="k">def</span> <span class="nf">common_features</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>       <span class="c1"># g</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>  <span class="c1"># !</span>
 <span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">):</span>     <span class="c1"># s</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>                   <span class="c1"># f</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>                   <span class="c1"># f</span>
 </span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">buzz</span><span class="p">()</span>                     <span class="c1"># f</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>  <span class="c1"># !</span>
 </span>  <span class="k">else</span><span class="p">:</span>                             <span class="c1"># !</span>
@@ -4273,7 +4273,7 @@ oven object, then returns <code class="docutils literal notranslate"><span class
 <span class="k">def</span> <span class="nf">common_features</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 <span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">buzz</span><span class="p">()</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>  <span class="k">else</span><span class="p">:</span>
@@ -4409,7 +4409,7 @@ caught by line 7 and the status is set to <code class="docutils literal notransl
 <span class="k">def</span> <span class="nf">common_features</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 <span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">):</span>
-</span>    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
+</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
     <span class="n">oven</span><span class="o">.</span><span class="n">buzz</span><span class="p">()</span>
 <span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>  <span class="k">else</span><span class="p">:</span>
@@ -5174,17 +5174,17 @@ buzzer which will get the attention of anyone nearby.</span></p></li>
 <span class="hll">  <span class="n">TOAST_TIME_IN_SEC</span> <span class="o">=</span> <span class="mi">10</span>
 </span><span class="hll">  <span class="n">BAKE_TIME_IN_SEC</span> <span class="o">=</span> <span class="mi">20</span>
 </span>
-<span class="hll">  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">toast_time_in_sec</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bake_time_in_sec</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<span class="hll">  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">toast_time_in_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bake_time_in_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-<span class="hll">    <span class="k">if</span> <span class="n">toast_time_in_sec</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+<span class="hll">    <span class="k">if</span> <span class="n">toast_time_in_sec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 </span><span class="hll">      <span class="n">toast_time_in_sec</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="o">.</span><span class="n">TOAST_TIME_IN_SEC</span>
-</span><span class="hll">    <span class="k">if</span> <span class="n">bake_time_in_sec</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+</span><span class="hll">    <span class="k">if</span> <span class="n">bake_time_in_sec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 </span><span class="hll">      <span class="n">bake_time_in_sec</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="o">.</span><span class="n">BAKE_TIME_IN_SEC</span>
 </span>
 <span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">toast_time_in_sec</span> <span class="o">=</span> <span class="n">toast_time_in_sec</span>
 </span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">bake_time_in_sec</span> <span class="o">=</span> <span class="n">bake_time_in_sec</span>
-</span>    <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="bp">None</span>
+</span>    <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="kc">None</span>
 
   <span class="k">def</span> <span class="nf">light_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="c1"># call to your hardware&#39;s light_on driver</span>
@@ -5207,7 +5207,7 @@ buzzer which will get the attention of anyone nearby.</span></p></li>
     <span class="k">pass</span>
 
 <span class="k">class</span> <span class="nc">ToasterOvenMock</span><span class="p">(</span><span class="n">ToasterOven</span><span class="p">):</span>
-<span class="hll">  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">toast_time_in_sec</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bake_time_in_sec</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<span class="hll">  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">toast_time_in_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bake_time_in_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span class="hll">    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">toast_time_in_sec</span><span class="p">,</span> <span class="n">bake_time_in_sec</span><span class="p">)</span>
 </span>
 <span class="hll">  <span class="nd">@staticmethod</span>
@@ -5228,7 +5228,7 @@ buzzer which will get the attention of anyone nearby.</span></p></li>
 </span><span class="hll"><span class="sd">      # =&gt; [2019-02-04 06:37:04.542346] example</span>
 </span><span class="hll">
 </span><span class="hll"><span class="sd">    &#39;&#39;&#39;</span>
-</span><span class="hll">    <span class="k">return</span> <span class="s2">&quot;[{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">string</span><span class="p">)</span>
+</span><span class="hll">    <span class="k">return</span> <span class="s2">&quot;[</span><span class="si">{}</span><span class="s2">] </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">string</span><span class="p">)</span>
 </span>
 <span class="hll">  <span class="nd">@staticmethod</span>
 </span><span class="hll">  <span class="k">def</span> <span class="nf">get_100ms_from_timestamp</span><span class="p">(</span><span class="n">timestamp_string</span><span class="p">):</span>
@@ -5249,15 +5249,15 @@ buzzer which will get the attention of anyone nearby.</span></p></li>
 </span><span class="hll"><span class="sd">      ToasterOven.prepend_trace_timestamp(get_my_ms) # =&gt; 542</span>
 </span><span class="hll">
 </span><span class="hll"><span class="sd">    &#39;&#39;&#39;</span>
-</span><span class="hll">    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\[.+\.([0-9]{3}).+\]&#39;</span><span class="p">)</span>
+</span><span class="hll">    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\[.+\.([0-9]</span><span class="si">{3}</span><span class="s1">).+\]&#39;</span><span class="p">)</span>
 </span><span class="hll">    <span class="k">try</span><span class="p">:</span>
 </span><span class="hll">      <span class="n">result</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">timestamp_string</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </span><span class="hll">    <span class="k">except</span><span class="p">:</span>
-</span><span class="hll">      <span class="n">result</span> <span class="o">=</span> <span class="bp">None</span>
+</span><span class="hll">      <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span class="hll">    <span class="k">return</span> <span class="n">result</span>
 </span>
 <span class="hll">  <span class="nd">@staticmethod</span>
-</span><span class="hll">  <span class="k">def</span> <span class="nf">time_difference</span><span class="p">(</span><span class="n">time_1_string</span><span class="p">,</span> <span class="n">time_2_string</span><span class="p">,</span> <span class="n">modulo_base</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span><span class="hll">  <span class="k">def</span> <span class="nf">time_difference</span><span class="p">(</span><span class="n">time_1_string</span><span class="p">,</span> <span class="n">time_2_string</span><span class="p">,</span> <span class="n">modulo_base</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span class="hll">    <span class="sd">&#39;&#39;&#39;Return the time difference between to ms readings of a timestamp</span>
 </span><span class="hll">
 </span><span class="hll"><span class="sd">    **Args**:</span>
@@ -5282,7 +5282,7 @@ buzzer which will get the attention of anyone nearby.</span></p></li>
 </span><span class="hll"><span class="sd">      ToasterOvenMock.time_difference(&#39;010&#39;, &#39;790&#39;) #=&gt; 200</span>
 </span><span class="hll">
 </span><span class="hll"><span class="sd">    &#39;&#39;&#39;</span>
-</span><span class="hll">    <span class="k">if</span> <span class="n">modulo_base</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+</span><span class="hll">    <span class="k">if</span> <span class="n">modulo_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 </span><span class="hll">      <span class="n">modulo_base</span> <span class="o">=</span> <span class="mi">1000</span>
 </span><span class="hll">    <span class="n">time_1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_1_string</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">time_2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_2_string</span><span class="p">)</span>
@@ -5313,7 +5313,7 @@ buzzer which will get the attention of anyone nearby.</span></p></li>
 </span><span class="hll"><span class="sd">      # =&gt; &#39;[2019-02-09 10:50:07.785844] [oven] e-&gt;Toasting() off-&gt;toasting&#39;</span>
 </span><span class="hll">
 </span><span class="hll"><span class="sd">    &#39;&#39;&#39;</span>
-</span><span class="hll">    <span class="n">result</span> <span class="o">=</span> <span class="bp">None</span>
+</span><span class="hll">    <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span class="hll">    <span class="n">i_list</span> <span class="o">=</span> <span class="n">spy_or_trace</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">spy_or_trace</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span> <span class="k">else</span> <span class="n">spy_or_trace</span>
 </span><span class="hll">    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
 </span><span class="hll">    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">i_list</span><span class="p">:</span>
@@ -5412,7 +5412,7 @@ buzzer which will get the attention of anyone nearby.</span></p></li>
 </span><span class="hll">      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">),</span>
 </span><span class="hll">      <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 </span><span class="hll">      <span class="n">period</span><span class="o">=</span><span class="n">oven</span><span class="o">.</span><span class="n">bake_time_in_sec</span><span class="p">,</span>
-</span><span class="hll">      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span>
+</span><span class="hll">      <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span>
 </span><span class="hll">    <span class="p">)</span>
 </span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
@@ -5434,7 +5434,7 @@ buzzer which will get the attention of anyone nearby.</span></p></li>
 </span><span class="hll">      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">),</span>
 </span><span class="hll">      <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 </span><span class="hll">      <span class="n">period</span><span class="o">=</span><span class="n">oven</span><span class="o">.</span><span class="n">toast_time_in_sec</span><span class="p">,</span>
-</span><span class="hll">      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span>
+</span><span class="hll">      <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span>
 </span><span class="hll">    <span class="p">)</span>
 </span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
@@ -5697,7 +5697,7 @@ buzzer which will get the attention of anyone nearby.</span></p></li>
 </span><span class="hll">  <span class="k">try</span><span class="p">:</span>
 </span><span class="hll">    <span class="k">assert</span><span class="p">(</span><span class="mi">100</span> <span class="o">&lt;=</span> <span class="n">delay_in_ms</span> <span class="o">&lt;=</span> <span class="mi">105</span><span class="p">)</span>
 </span><span class="hll">  <span class="k">except</span><span class="p">:</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="n">delay_in_ms</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="n">delay_in_ms</span><span class="p">)</span>
 </span>
 <span class="hll"><span class="k">def</span> <span class="nf">test_baking_buzz_one_shot_timing</span><span class="p">():</span>
 </span><span class="hll">  <span class="c1"># set bake time to 200 ms</span>
@@ -5719,7 +5719,7 @@ buzzer which will get the attention of anyone nearby.</span></p></li>
 </span><span class="hll">  <span class="k">try</span><span class="p">:</span>
 </span><span class="hll">    <span class="k">assert</span><span class="p">(</span><span class="mi">200</span> <span class="o">&lt;=</span> <span class="n">delay_in_ms</span> <span class="o">&lt;=</span> <span class="mi">205</span><span class="p">)</span>
 </span><span class="hll">  <span class="k">except</span><span class="p">:</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="n">delay_in_ms</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="n">delay_in_ms</span><span class="p">)</span>
 </span></pre></div>
 </td></tr></table></div>
 <p>Calling our test helper functions to prove our design works:</p>
@@ -5844,7 +5844,7 @@ sent to the statechart in 10 seconds:</p>
   <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signal</span><span class="o">.</span><span class="n">Buzz</span><span class="p">),</span>
   <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
   <span class="n">period</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
-  <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>An event which is issued by a one shot looks just like any other event that has
@@ -6577,27 +6577,27 @@ hardware timing:</p>
 </span><span class="hll">  <span class="n">DONE_BUZZ_PERIOD_SEC</span> <span class="o">=</span> <span class="mf">0.5</span>
 </span>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span>
-    <span class="n">toast_time_in_sec</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-    <span class="n">bake_time_in_sec</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-<span class="hll">    <span class="n">get_ready_sec</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-</span><span class="hll">    <span class="n">done_buzz_period_sec</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">toast_time_in_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">bake_time_in_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="hll">    <span class="n">get_ready_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span class="hll">    <span class="n">done_buzz_period_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">toast_time_in_sec</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">toast_time_in_sec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
       <span class="n">toast_time_in_sec</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="o">.</span><span class="n">TOAST_TIME_IN_SEC</span>
-    <span class="k">if</span> <span class="n">bake_time_in_sec</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">bake_time_in_sec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
       <span class="n">bake_time_in_sec</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="o">.</span><span class="n">BAKE_TIME_IN_SEC</span>
-<span class="hll">    <span class="k">if</span> <span class="n">get_ready_sec</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+<span class="hll">    <span class="k">if</span> <span class="n">get_ready_sec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 </span><span class="hll">      <span class="n">get_ready_sec</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="o">.</span><span class="n">PRE_TIME_SEC</span>
-</span><span class="hll">    <span class="k">if</span> <span class="n">done_buzz_period_sec</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+</span><span class="hll">    <span class="k">if</span> <span class="n">done_buzz_period_sec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 </span><span class="hll">      <span class="n">done_buzz_period_sec</span> <span class="o">=</span> <span class="n">ToasterOven</span><span class="o">.</span><span class="n">DONE_BUZZ_PERIOD_SEC</span>
 </span>
     <span class="bp">self</span><span class="o">.</span><span class="n">toast_time_in_sec</span> <span class="o">=</span> <span class="n">toast_time_in_sec</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">bake_time_in_sec</span> <span class="o">=</span> <span class="n">bake_time_in_sec</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">get_ready_sec</span> <span class="o">=</span> <span class="n">get_ready_sec</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">done_buzz_period_sec</span> <span class="o">=</span> <span class="n">done_buzz_period_sec</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="kc">None</span>
 
   <span class="k">def</span> <span class="nf">light_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="c1"># call to your hardware&#39;s light_on driver</span>
@@ -6637,23 +6637,23 @@ hardware timing:</p>
 </span><span class="hll">      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Get_Ready</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">BuzzSpec</span><span class="p">(</span><span class="n">buzz_times</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
 </span><span class="hll">      <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 </span><span class="hll">      <span class="n">period</span><span class="o">=</span><span class="n">get_ready_sec</span><span class="p">,</span>
-</span><span class="hll">      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class="hll">      <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span class="hll">
 </span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span>
 </span><span class="hll">      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Done</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">BuzzSpec</span><span class="p">(</span><span class="n">buzz_times</span><span class="o">=</span><span class="mi">2</span><span class="p">)),</span>
 </span><span class="hll">      <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 </span><span class="hll">      <span class="n">period</span><span class="o">=</span><span class="n">time_in_sec</span><span class="p">,</span>
-</span><span class="hll">      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class="hll">      <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span>
 
 <span class="k">class</span> <span class="nc">ToasterOvenMock</span><span class="p">(</span><span class="n">ToasterOven</span><span class="p">):</span>
 
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
     <span class="n">name</span><span class="p">,</span>
-    <span class="n">toast_time_in_sec</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-    <span class="n">bake_time_in_sec</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-    <span class="n">get_ready_sec</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-    <span class="n">done_buzz_period_sec</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">toast_time_in_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">bake_time_in_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">get_ready_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">done_buzz_period_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span>
       <span class="n">toast_time_in_sec</span><span class="p">,</span>
@@ -6679,7 +6679,7 @@ hardware timing:</p>
 <span class="sd">      # =&gt; [2019-02-04 06:37:04.542346] example</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">return</span> <span class="s2">&quot;[{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">string</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;[</span><span class="si">{}</span><span class="s2">] </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">string</span><span class="p">)</span>
 
   <span class="nd">@staticmethod</span>
   <span class="k">def</span> <span class="nf">get_100ms_from_timestamp</span><span class="p">(</span><span class="n">timestamp_string</span><span class="p">):</span>
@@ -6700,15 +6700,15 @@ hardware timing:</p>
 <span class="sd">      ToasterOven.prepend_trace_timestamp(get_my_ms) # =&gt; 542</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\[.+\.([0-9]{3}).+\]&#39;</span><span class="p">)</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\[.+\.([0-9]</span><span class="si">{3}</span><span class="s1">).+\]&#39;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
       <span class="n">result</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">timestamp_string</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>
-      <span class="n">result</span> <span class="o">=</span> <span class="bp">None</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="n">result</span>
 
   <span class="nd">@staticmethod</span>
-  <span class="k">def</span> <span class="nf">time_difference</span><span class="p">(</span><span class="n">time_1_string</span><span class="p">,</span> <span class="n">time_2_string</span><span class="p">,</span> <span class="n">modulo_base</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">time_difference</span><span class="p">(</span><span class="n">time_1_string</span><span class="p">,</span> <span class="n">time_2_string</span><span class="p">,</span> <span class="n">modulo_base</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Return the time difference between to ms readings of a timestamp</span>
 
 <span class="sd">    **Args**:</span>
@@ -6733,7 +6733,7 @@ hardware timing:</p>
 <span class="sd">      ToasterOvenMock.time_difference(&#39;010&#39;, &#39;790&#39;) #=&gt; 200</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">if</span> <span class="n">modulo_base</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">modulo_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
       <span class="n">modulo_base</span> <span class="o">=</span> <span class="mi">1000</span>
     <span class="n">time_1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_1_string</span><span class="p">)</span>
     <span class="n">time_2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_2_string</span><span class="p">)</span>
@@ -6764,7 +6764,7 @@ hardware timing:</p>
 <span class="sd">      # =&gt; &#39;[2019-02-09 10:50:07.785844] [oven] e-&gt;Toasting() off-&gt;toasting&#39;</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">i_list</span> <span class="o">=</span> <span class="n">spy_or_trace</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">spy_or_trace</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span> <span class="k">else</span> <span class="n">spy_or_trace</span>
     <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">i_list</span><span class="p">:</span>
@@ -6805,9 +6805,9 @@ hardware timing:</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;heater_off&quot;</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">buzz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
       <span class="n">output</span> <span class="o">=</span> <span class="n">ToasterOvenMock</span><span class="o">.</span><span class="n">prepend_trace_timestamp</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
-      <span class="k">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+      <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
 
 
@@ -6853,13 +6853,13 @@ hardware timing:</p>
 </span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">),</span>
 </span><span class="hll">      <span class="n">times</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">buzz_times</span><span class="p">,</span>
 </span><span class="hll">      <span class="n">period</span><span class="o">=</span><span class="n">oven</span><span class="o">.</span><span class="n">done_buzz_period_sec</span><span class="p">,</span>
-</span><span class="hll">      <span class="n">deferred</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</span><span class="hll">      <span class="n">deferred</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Done</span><span class="p">):</span>
 </span><span class="hll">    <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">),</span>
 </span><span class="hll">      <span class="n">times</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">buzz_times</span><span class="p">,</span>
 </span><span class="hll">      <span class="n">period</span><span class="o">=</span><span class="n">oven</span><span class="o">.</span><span class="n">done_buzz_period_sec</span><span class="p">,</span>
-</span><span class="hll">      <span class="n">deferred</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</span><span class="hll">      <span class="n">deferred</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">oven</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
 </span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
     <span class="n">oven</span><span class="o">.</span><span class="n">heater_off</span><span class="p">()</span>
@@ -6935,7 +6935,7 @@ hardware timing:</p>
     <span class="n">get_ready_sec</span><span class="o">=</span><span class="mf">0.10</span><span class="p">,</span>
     <span class="n">done_buzz_period_sec</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
 
-  <span class="n">oven</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">True</span>
 
   <span class="c1"># start our oven in the door_closed state</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">door_closed</span><span class="p">)</span>
@@ -6993,7 +6993,7 @@ To avoid a long feedback cycle we will test in milliseconds.</p>
   <span class="n">bake_time_in_sec</span><span class="o">=</span><span class="n">bake_time</span><span class="p">,</span>
 <span class="hll">  <span class="n">get_ready_sec</span><span class="o">=</span><span class="n">get_ready_sec</span><span class="p">,</span>
 </span><span class="hll">  <span class="n">done_buzz_period_sec</span><span class="o">=</span><span class="n">done_buzz_period_sec</span><span class="p">)</span>
-</span><span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+</span><span class="n">oven</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
 <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Toasting</span><span class="p">))</span>
 </pre></div>
@@ -7336,8 +7336,8 @@ diagram:</p>
 </span><span class="hll">        <span class="k">assert</span><span class="p">(</span><span class="n">bottom_bound</span> <span class="o">&lt;=</span> <span class="nb">float</span><span class="p">(</span><span class="n">buzz_time</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">top_bound</span><span class="p">)</span>
 </span><span class="hll">      <span class="k">except</span><span class="p">:</span>
 </span><span class="hll">        <span class="c1"># if you land here try increasing your tolerance</span>
-</span><span class="hll">        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;FAILED: testing {} {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">test_type</span><span class="p">,</span> <span class="n">desc</span><span class="p">))</span>
-</span><span class="hll">        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{} &lt;= {} &lt;= {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bottom_bound</span><span class="p">,</span> <span class="n">buzz_time</span><span class="p">,</span> <span class="n">top_bound</span><span class="p">))</span>
+</span><span class="hll">        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;FAILED: testing </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">test_type</span><span class="p">,</span> <span class="n">desc</span><span class="p">))</span>
+</span><span class="hll">        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> &lt;= </span><span class="si">{}</span><span class="s2"> &lt;= </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bottom_bound</span><span class="p">,</span> <span class="n">buzz_time</span><span class="p">,</span> <span class="n">top_bound</span><span class="p">))</span>
 </span><span class="hll">
 </span><span class="hll">  <span class="n">toasting_buzz_test_spec</span> <span class="o">=</span> <span class="n">make_test_spec</span><span class="p">(</span><span class="n">toast_time</span><span class="p">,</span> <span class="n">get_ready_sec</span><span class="p">,</span> <span class="n">done_buzz_period_sec</span><span class="p">)</span>
 </span><span class="hll">
@@ -7651,12 +7651,12 @@ immediately after being started.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jul 14, 2020 6:45 AM</span>
+          <span class="time">Nov 03, 2020 8:22 AM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.2 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

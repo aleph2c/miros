@@ -472,8 +472,8 @@ to the logs emitted by our statechart:</p>
 </span>
 <span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">register_live_spy_callback</span><span class="p">(</span><span class="n">broadcast_spy</span><span class="p">)</span>
 </span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">register_live_trace_callback</span><span class="p">(</span><span class="n">broadcast_trace</span><span class="p">)</span>
-</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span>   <span class="o">=</span> <span class="bp">True</span>
-</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span>   <span class="o">=</span> <span class="kc">True</span>
+</span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
 </span></pre></div>
 </td></tr></table></div>
 <p>The newly added code is highlighted.</p>
@@ -674,8 +674,8 @@ The newly added code is highlighted:</p>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">register_live_spy_callback</span><span class="p">(</span><span class="n">broadcast_spy</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">register_live_trace_callback</span><span class="p">(</span><span class="n">broadcast_trace</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span>   <span class="o">=</span> <span class="bp">True</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span>   <span class="o">=</span> <span class="kc">True</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
 
 
 <span class="hll"><span class="c1">#  +-------- producer_outer ---------+</span>
@@ -726,7 +726,7 @@ The newly added code is highlighted:</p>
 </span><span class="hll">  <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">c2_A</span><span class="p">)</span><span class="o">.</span> \
 </span><span class="hll">  <span class="n">to_method</span><span class="p">()</span>
 </span>
-<span class="hll"><span class="n">chart</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="n">producer_outer</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+<span class="hll"><span class="n">chart</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="n">producer_outer</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
 </span><span class="hll">  <span class="n">nest</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">producer_outer</span><span class="p">)</span><span class="o">.</span> \
 </span><span class="hll">  <span class="n">nest</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">producer_outer</span><span class="p">)</span>
 </span></pre></div>
@@ -753,7 +753,7 @@ it in the producer_outer state, wait, then send a <code class="docutils literal 
 </span><span class="hll"><span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">))</span>
 </span><span class="hll"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 </span><span class="hll"><span class="n">pp</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
-</span><span class="hll"><span class="k">print</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+</span><span class="hll"><span class="nb">print</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
 </span></pre></div>
 </div>
 </div>
@@ -767,27 +767,27 @@ it in the producer_outer state, wait, then send a <code class="docutils literal 
 </div>
 <p>The code to build our designed producer is complete.  Now let’s see its
 terminal output on the raspberry pi:</p>
-<div class="highlight-guess notranslate" id="producer-output"><div class="highlight"><pre><span></span>[&#39;START&#39;,
- &#39;SEARCH_FOR_SUPER_SIGNAL:producer_outer&#39;,
- &#39;ENTRY_SIGNAL:producer_outer&#39;,
- &#39;INIT_SIGNAL:producer_outer&#39;,
- &#39;SEARCH_FOR_SUPER_SIGNAL:c1&#39;,
- &#39;ENTRY_SIGNAL:c1&#39;,
- &#39;INIT_SIGNAL:c1&#39;,
- &#39;&lt;- Queued:(0) Deferred:(0)&#39;,
- &#39;B:c1&#39;,
- &#39;B:producer_outer&#39;,
- &#39;EXIT_SIGNAL:c1&#39;,
- &#39;EXIT_SIGNAL:producer_outer&#39;,
- &#39;ENTRY_SIGNAL:producer_outer&#39;,
- &#39;INIT_SIGNAL:producer_outer&#39;,
- &#39;SEARCH_FOR_SUPER_SIGNAL:c1&#39;,
- &#39;ENTRY_SIGNAL:c1&#39;,
- &#39;INIT_SIGNAL:c1&#39;,
- &#39;&lt;- Queued:(0) Deferred:(0)&#39;]
+<div class="highlight-guess notranslate" id="producer-output"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s">&#39;START&#39;</span><span class="p">,</span>
+ <span class="s">&#39;SEARCH_FOR_SUPER_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
+ <span class="s">&#39;ENTRY_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
+ <span class="s">&#39;INIT_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
+ <span class="s">&#39;SEARCH_FOR_SUPER_SIGNAL:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;ENTRY_SIGNAL:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;INIT_SIGNAL:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span>
+ <span class="s">&#39;B:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;B:producer_outer&#39;</span><span class="p">,</span>
+ <span class="s">&#39;EXIT_SIGNAL:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;EXIT_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
+ <span class="s">&#39;ENTRY_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
+ <span class="s">&#39;INIT_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
+ <span class="s">&#39;SEARCH_FOR_SUPER_SIGNAL:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;ENTRY_SIGNAL:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;INIT_SIGNAL:c1&#39;</span><span class="p">,</span>
+ <span class="s">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
 
-[2018-01-10 13:14:26.739622] [producer_192.168.1.72] e-&gt;start_at() top-&gt;c1
-[2018-01-10 13:14:27.024377] [producer_192.168.1.72] e-&gt;B() c1-&gt;c1
+<span class="p">[</span><span class="mi">2018</span><span class="o">-</span><span class="mo">01</span><span class="o">-</span><span class="mi">10</span> <span class="mi">13</span><span class="o">:</span><span class="mi">14</span><span class="o">:</span><span class="mf">26.739622</span><span class="p">]</span> <span class="p">[</span><span class="n">producer_192</span><span class="mf">.168.1.72</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">start_at</span><span class="p">()</span> <span class="n">top</span><span class="o">-&gt;</span><span class="n">c1</span>
+<span class="p">[</span><span class="mi">2018</span><span class="o">-</span><span class="mo">01</span><span class="o">-</span><span class="mi">10</span> <span class="mi">13</span><span class="o">:</span><span class="mi">14</span><span class="o">:</span><span class="mf">27.024377</span><span class="p">]</span> <span class="p">[</span><span class="n">producer_192</span><span class="mf">.168.1.72</span><span class="p">]</span> <span class="n">e</span><span class="o">-&gt;</span><span class="n">B</span><span class="p">()</span> <span class="n">c1</span><span class="o">-&gt;</span><span class="n">c1</span>
 </pre></div>
 </div>
 <p>Comparing this to our <span class="xref std std-ref">producer design</span> we see that it is
@@ -1082,8 +1082,8 @@ obtained from the get_ip static method of the LocalConsumer class.</p>
 </span><span class="hll">
 </span><span class="hll">    <span class="c1"># create new queues, and ensure they destroy themselves when we disconnect</span>
 </span><span class="hll">    <span class="c1"># from them</span>
-</span><span class="hll">    <span class="n">spy_result</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</span><span class="hll">    <span class="n">trace_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class="hll">    <span class="n">spy_result</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span class="hll">    <span class="n">trace_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span class="hll">
 </span><span class="hll">    <span class="c1"># queue names are random, so we need to get their names</span>
 </span><span class="hll">    <span class="n">spy_queue_name</span>   <span class="o">=</span> <span class="n">spy_result</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">queue</span>
@@ -1261,8 +1261,8 @@ statechart object.</p>
 
     <span class="c1"># create new queues, and ensure they destroy themselves when we disconnect</span>
     <span class="c1"># from them</span>
-    <span class="n">spy_result</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">trace_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">spy_result</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">trace_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># queue names are random, so we need to get their names</span>
     <span class="n">spy_queue_name</span>   <span class="o">=</span> <span class="n">spy_result</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">queue</span>
@@ -1462,8 +1462,8 @@ information, like print it to the terminal of my windows box.</p>
 
     <span class="c1"># create new queues, and ensure they destroy themselves when we disconnect</span>
     <span class="c1"># from them</span>
-    <span class="n">spy_result</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">trace_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">spy_result</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">trace_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># queue names are random, so we need to get their names</span>
     <span class="n">spy_queue_name</span>   <span class="o">=</span> <span class="n">spy_result</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">queue</span>
@@ -1483,22 +1483,22 @@ information, like print it to the terminal of my windows box.</p>
 </span><span class="hll">      <span class="sd">&#39;&#39;&#39;create a spy_callback function received messages in the queue&#39;&#39;&#39;</span>
 </span><span class="hll">      <span class="n">foreign_spy_item</span> <span class="o">=</span> <span class="n">body</span>
 </span><span class="hll">      <span class="bp">self</span><span class="o">.</span><span class="n">foreign_hsm</span><span class="o">.</span><span class="n">append_to_spy</span><span class="p">(</span><span class="n">foreign_spy_item</span><span class="p">)</span>
-</span><span class="hll">      <span class="k">print</span><span class="p">(</span><span class="s2">&quot; [x] Spy: {!s}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">foreign_spy_item</span><span class="p">))</span>
+</span><span class="hll">      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; [x] Spy: </span><span class="si">{!s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">foreign_spy_item</span><span class="p">))</span>
 </span>
 <span class="hll">    <span class="k">def</span> <span class="nf">trace_callback</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
 </span><span class="hll">      <span class="sd">&#39;&#39;&#39;create a trace_callback function received messages in the queue&#39;&#39;&#39;</span>
 </span><span class="hll">      <span class="n">foreign_trace_item</span> <span class="o">=</span> <span class="n">body</span>
 </span><span class="hll">      <span class="bp">self</span><span class="o">.</span><span class="n">foreign_hsm</span><span class="o">.</span><span class="n">append_to_trace</span><span class="p">(</span><span class="n">foreign_trace_item</span><span class="p">)</span>
-</span><span class="hll">      <span class="k">print</span><span class="p">(</span><span class="s2">&quot; [x] Trace: {!s}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">foreign_trace_item</span><span class="p">))</span>
+</span><span class="hll">      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; [x] Trace: </span><span class="si">{!s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">foreign_trace_item</span><span class="p">))</span>
 </span>
 <span class="hll">    <span class="c1"># register the spy_callback and trace_callback with a queue</span>
 </span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span><span class="n">spy_callback</span><span class="p">,</span>
 </span><span class="hll">        <span class="n">queue</span><span class="o">=</span><span class="n">spy_queue_name</span><span class="p">,</span>
-</span><span class="hll">        <span class="n">no_ack</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class="hll">        <span class="n">no_ack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span>
 <span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span><span class="n">trace_callback</span><span class="p">,</span>
 </span><span class="hll">        <span class="n">queue</span><span class="o">=</span><span class="n">trace_queue_name</span><span class="p">,</span>
-</span><span class="hll">        <span class="n">no_ack</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class="hll">        <span class="n">no_ack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span>
 <span class="nd">@staticmethod</span>
 <span class="k">def</span> <span class="nf">get_ip</span><span class="p">():</span>
@@ -1702,8 +1702,8 @@ callback function with a static decrypt method.</p>
 
     <span class="c1"># create new queues, and ensure they destroy themselves when we disconnect</span>
     <span class="c1"># from them</span>
-    <span class="n">spy_result</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">trace_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">spy_result</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">trace_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># queue names are random, so we need to get their names</span>
     <span class="n">spy_queue_name</span>   <span class="o">=</span> <span class="n">spy_result</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">queue</span>
@@ -1718,23 +1718,23 @@ callback function with a static decrypt method.</p>
     <span class="c1"># make a ForeignHsm to track activity on another machine</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">foreign_hsm</span> <span class="o">=</span> <span class="n">ForeignHsm</span><span class="p">()</span>
 
-<span class="hll">    <span class="nd">@LocalConsumer.decrypt</span>
+<span class="hll">    <span class="nd">@LocalConsumer</span><span class="o">.</span><span class="n">decrypt</span>
 </span>    <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
       <span class="sd">&#39;&#39;&#39;create a spy_callback function received messages in the queue&#39;&#39;&#39;</span>
       <span class="n">foreign_spy_item</span> <span class="o">=</span> <span class="n">body</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">foreign_hsm</span><span class="o">.</span><span class="n">append_to_spy</span><span class="p">(</span><span class="n">foreign_spy_item</span><span class="p">)</span>
-      <span class="k">print</span><span class="p">(</span><span class="s2">&quot; [x] Spy: {!s}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">foreign_spy_item</span><span class="p">))</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; [x] Spy: </span><span class="si">{!s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">foreign_spy_item</span><span class="p">))</span>
 
-<span class="hll">    <span class="nd">@LocalConsumer.decrypt</span>
+<span class="hll">    <span class="nd">@LocalConsumer</span><span class="o">.</span><span class="n">decrypt</span>
 </span>    <span class="k">def</span> <span class="nf">trace_callback</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
       <span class="sd">&#39;&#39;&#39;create a trace_callback function received messages in the queue&#39;&#39;&#39;</span>
       <span class="n">foreign_trace_item</span> <span class="o">=</span> <span class="n">body</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">foreign_hsm</span><span class="o">.</span><span class="n">append_to_trace</span><span class="p">(</span><span class="n">foreign_trace_item</span><span class="p">)</span>
-      <span class="k">print</span><span class="p">(</span><span class="s2">&quot; [x] Trace: {!s}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">foreign_trace_item</span><span class="p">))</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; [x] Trace: </span><span class="si">{!s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">foreign_trace_item</span><span class="p">))</span>
 
     <span class="c1"># register the spy_callback and trace_callback with a queue</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span><span class="n">spy_callback</span><span class="p">,</span>   <span class="n">queue</span><span class="o">=</span><span class="n">spy_queue_name</span><span class="p">,</span>   <span class="n">no_ack</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span><span class="n">trace_callback</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="n">trace_queue_name</span><span class="p">,</span> <span class="n">no_ack</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span><span class="n">spy_callback</span><span class="p">,</span>   <span class="n">queue</span><span class="o">=</span><span class="n">spy_queue_name</span><span class="p">,</span>   <span class="n">no_ack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span><span class="n">trace_callback</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="n">trace_queue_name</span><span class="p">,</span> <span class="n">no_ack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">start_consuming</span><span class="p">()</span>
@@ -1975,8 +1975,8 @@ soon to quit.</p>
 
     <span class="c1"># create new queues, and ensure they destroy themselves when we disconnect</span>
     <span class="c1"># from them</span>
-    <span class="n">spy_result</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">trace_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">spy_result</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">trace_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">exclusive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># queue names are random, so we need to get their names</span>
     <span class="n">spy_queue_name</span>   <span class="o">=</span> <span class="n">spy_result</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">queue</span>
@@ -1991,26 +1991,26 @@ soon to quit.</p>
     <span class="c1"># make a ForeignHsm to track activity on another machine</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">foreign_hsm</span> <span class="o">=</span> <span class="n">ForeignHsm</span><span class="p">()</span>
 
-    <span class="nd">@LocalConsumer.decrypt</span>
+    <span class="nd">@LocalConsumer</span><span class="o">.</span><span class="n">decrypt</span>
     <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
       <span class="sd">&#39;&#39;&#39;create a spy_callback function received messages in the queue&#39;&#39;&#39;</span>
       <span class="n">foreign_spy_item</span> <span class="o">=</span> <span class="n">body</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">foreign_hsm</span><span class="o">.</span><span class="n">append_to_spy</span><span class="p">(</span><span class="n">foreign_spy_item</span><span class="p">)</span>
-      <span class="k">print</span><span class="p">(</span><span class="s2">&quot; [x] Spy: {!s}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">foreign_spy_item</span><span class="p">))</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; [x] Spy: </span><span class="si">{!s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">foreign_spy_item</span><span class="p">))</span>
 
-    <span class="nd">@LocalConsumer.decrypt</span>
+    <span class="nd">@LocalConsumer</span><span class="o">.</span><span class="n">decrypt</span>
     <span class="k">def</span> <span class="nf">trace_callback</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
       <span class="sd">&#39;&#39;&#39;create a trace_callback function received messages in the queue&#39;&#39;&#39;</span>
       <span class="n">foreign_trace_item</span> <span class="o">=</span> <span class="n">body</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">foreign_hsm</span><span class="o">.</span><span class="n">append_to_trace</span><span class="p">(</span><span class="n">foreign_trace_item</span><span class="p">)</span>
-      <span class="k">print</span><span class="p">(</span><span class="s2">&quot; [x] Trace: {!s}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">foreign_trace_item</span><span class="p">))</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; [x] Trace: </span><span class="si">{!s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">foreign_trace_item</span><span class="p">))</span>
 
 <span class="hll">    <span class="k">def</span> <span class="nf">timeout_callback</span><span class="p">():</span>
 </span><span class="hll">      <span class="sd">&#39;&#39;&#39;callback for outputting the foreign trace and exiting the program&#39;&#39;&#39;</span>
 </span><span class="hll">      <span class="n">spy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">foreign_hsm</span><span class="o">.</span><span class="n">spy</span><span class="p">()</span>
 </span><span class="hll">      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spy</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">0</span><span class="p">:</span>
 </span><span class="hll">        <span class="n">pp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">foreign_hsm</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
-</span><span class="hll">        <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">foreign_hsm</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+</span><span class="hll">        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">foreign_hsm</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
 </span><span class="hll">      <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
 </span><span class="hll">      <span class="c1"># stop processing or reconnect this callback to a timer</span>
 </span><span class="hll">      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">30</span><span class="p">:</span>
@@ -2024,8 +2024,8 @@ soon to quit.</p>
 </span><span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">add_timeout</span><span class="p">(</span><span class="n">deadline</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">callback_method</span><span class="o">=</span><span class="n">timeout_callback</span><span class="p">)</span>
 </span>
     <span class="c1"># register the spy_callback and trace_callback with a queue</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span><span class="n">spy_callback</span><span class="p">,</span>   <span class="n">queue</span><span class="o">=</span><span class="n">spy_queue_name</span><span class="p">,</span>   <span class="n">no_ack</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span><span class="n">trace_callback</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="n">trace_queue_name</span><span class="p">,</span> <span class="n">no_ack</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span><span class="n">spy_callback</span><span class="p">,</span>   <span class="n">queue</span><span class="o">=</span><span class="n">spy_queue_name</span><span class="p">,</span>   <span class="n">no_ack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span><span class="n">trace_callback</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="n">trace_queue_name</span><span class="p">,</span> <span class="n">no_ack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">start_consuming</span><span class="p">()</span>
@@ -2104,46 +2104,46 @@ what happens.</p>
 37
 38
 39
-40</pre></div></td><td class="code"><div class="highlight"><pre><span></span> <span class="p">[</span>x<span class="p">]</span> Trace<span class="o">:</span> <span class="p">[</span><span class="m">2018-01-10</span> <span class="m">18</span><span class="o">:</span><span class="m">23</span><span class="o">:</span><span class="m">35.647035</span><span class="p">]</span> <span class="p">[</span>rabbit_producer_192.168.1.72<span class="p">]</span> e<span class="o">-&gt;</span>start_at<span class="p">()</span> top<span class="o">-&gt;</span>c1
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> START
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> SEARCH_FOR_SUPER_SIGNAL<span class="o">:</span>producer_outer
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> ENTRY_SIGNAL<span class="o">:</span>producer_outer
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> INIT_SIGNAL<span class="o">:</span>producer_outer
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> SEARCH_FOR_SUPER_SIGNAL<span class="o">:</span>c1
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> ENTRY_SIGNAL<span class="o">:</span>c1
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> INIT_SIGNAL<span class="o">:</span>c1
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> <span class="o">&lt;-</span> Queued<span class="o">:</span><span class="p">(</span><span class="m">0</span><span class="p">)</span> Deferred<span class="o">:</span><span class="p">(</span><span class="m">0</span><span class="p">)</span>
- <span class="p">[</span>x<span class="p">]</span> Trace<span class="o">:</span> <span class="p">[</span><span class="m">2018-01-10</span> <span class="m">18</span><span class="o">:</span><span class="m">23</span><span class="o">:</span><span class="m">35.932470</span><span class="p">]</span> <span class="p">[</span>rabbit_producer_192.168.1.72<span class="p">]</span> e<span class="o">-&gt;</span>B<span class="p">()</span> c1<span class="o">-&gt;</span>c1
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> B<span class="o">:</span>c1
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> B<span class="o">:</span>producer_outer
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> EXIT_SIGNAL<span class="o">:</span>c1
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> EXIT_SIGNAL<span class="o">:</span>producer_outer
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> ENTRY_SIGNAL<span class="o">:</span>producer_outer
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> INIT_SIGNAL<span class="o">:</span>producer_outer
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> SEARCH_FOR_SUPER_SIGNAL<span class="o">:</span>c1
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> ENTRY_SIGNAL<span class="o">:</span>c1
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> INIT_SIGNAL<span class="o">:</span>c1
- <span class="p">[</span>x<span class="p">]</span> Spy<span class="o">:</span> <span class="o">&lt;-</span> Queued<span class="o">:</span><span class="p">(</span><span class="m">0</span><span class="p">)</span> Deferred<span class="o">:</span><span class="p">(</span><span class="m">0</span><span class="p">)</span>
-<span class="p">[</span><span class="s">&#39;START&#39;</span><span class="p">,</span>
- <span class="s">&#39;SEARCH_FOR_SUPER_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
- <span class="s">&#39;ENTRY_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
- <span class="s">&#39;INIT_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
- <span class="s">&#39;SEARCH_FOR_SUPER_SIGNAL:c1&#39;</span><span class="p">,</span>
- <span class="s">&#39;ENTRY_SIGNAL:c1&#39;</span><span class="p">,</span>
- <span class="s">&#39;INIT_SIGNAL:c1&#39;</span><span class="p">,</span>
- <span class="s">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">,</span>
- <span class="s">&#39;B:c1&#39;</span><span class="p">,</span>
- <span class="s">&#39;B:producer_outer&#39;</span><span class="p">,</span>
- <span class="s">&#39;EXIT_SIGNAL:c1&#39;</span><span class="p">,</span>
- <span class="s">&#39;EXIT_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
- <span class="s">&#39;ENTRY_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
- <span class="s">&#39;INIT_SIGNAL:producer_outer&#39;</span><span class="p">,</span>
- <span class="s">&#39;SEARCH_FOR_SUPER_SIGNAL:c1&#39;</span><span class="p">,</span>
- <span class="s">&#39;ENTRY_SIGNAL:c1&#39;</span><span class="p">,</span>
- <span class="s">&#39;INIT_SIGNAL:c1&#39;</span><span class="p">,</span>
- <span class="s">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="p">]</span>
-<span class="p">[</span><span class="m">2018-01-10</span> <span class="m">18</span><span class="o">:</span><span class="m">23</span><span class="o">:</span><span class="m">35.647035</span><span class="p">]</span> <span class="p">[</span>rabbit_producer_192.168.1.72<span class="p">]</span> e<span class="o">-&gt;</span>start_at<span class="p">()</span> top<span class="o">-&gt;</span>c1
-<span class="p">[</span><span class="m">2018-01-10</span> <span class="m">18</span><span class="o">:</span><span class="m">23</span><span class="o">:</span><span class="m">35.932470</span><span class="p">]</span> <span class="p">[</span>rabbit_producer_192.168.1.72<span class="p">]</span> e<span class="o">-&gt;</span>B<span class="p">()</span> c1<span class="o">-&gt;</span>c1
+40</pre></div></td><td class="code"><div class="highlight"><pre><span></span> [x] Trace: [2018-01-10 18:23:35.647035] [rabbit_producer_192.168.1.72] e-&gt;start_at() top-&gt;c1
+ [x] Spy: START
+ [x] Spy: SEARCH_FOR_SUPER_SIGNAL:producer_outer
+ [x] Spy: ENTRY_SIGNAL:producer_outer
+ [x] Spy: INIT_SIGNAL:producer_outer
+ [x] Spy: SEARCH_FOR_SUPER_SIGNAL:c1
+ [x] Spy: ENTRY_SIGNAL:c1
+ [x] Spy: INIT_SIGNAL:c1
+ [x] Spy: &lt;- Queued:(0) Deferred:(0)
+ [x] Trace: [2018-01-10 18:23:35.932470] [rabbit_producer_192.168.1.72] e-&gt;B() c1-&gt;c1
+ [x] Spy: B:c1
+ [x] Spy: B:producer_outer
+ [x] Spy: EXIT_SIGNAL:c1
+ [x] Spy: EXIT_SIGNAL:producer_outer
+ [x] Spy: ENTRY_SIGNAL:producer_outer
+ [x] Spy: INIT_SIGNAL:producer_outer
+ [x] Spy: SEARCH_FOR_SUPER_SIGNAL:c1
+ [x] Spy: ENTRY_SIGNAL:c1
+ [x] Spy: INIT_SIGNAL:c1
+ [x] Spy: &lt;- Queued:(0) Deferred:(0)
+[&#39;START&#39;,
+ &#39;SEARCH_FOR_SUPER_SIGNAL:producer_outer&#39;,
+ &#39;ENTRY_SIGNAL:producer_outer&#39;,
+ &#39;INIT_SIGNAL:producer_outer&#39;,
+ &#39;SEARCH_FOR_SUPER_SIGNAL:c1&#39;,
+ &#39;ENTRY_SIGNAL:c1&#39;,
+ &#39;INIT_SIGNAL:c1&#39;,
+ &#39;&lt;- Queued:(0) Deferred:(0)&#39;,
+ &#39;B:c1&#39;,
+ &#39;B:producer_outer&#39;,
+ &#39;EXIT_SIGNAL:c1&#39;,
+ &#39;EXIT_SIGNAL:producer_outer&#39;,
+ &#39;ENTRY_SIGNAL:producer_outer&#39;,
+ &#39;INIT_SIGNAL:producer_outer&#39;,
+ &#39;SEARCH_FOR_SUPER_SIGNAL:c1&#39;,
+ &#39;ENTRY_SIGNAL:c1&#39;,
+ &#39;INIT_SIGNAL:c1&#39;,
+ &#39;&lt;- Queued:(0) Deferred:(0)&#39;]
+[2018-01-10 18:23:35.647035] [rabbit_producer_192.168.1.72] e-&gt;start_at() top-&gt;c1
+[2018-01-10 18:23:35.932470] [rabbit_producer_192.168.1.72] e-&gt;B() c1-&gt;c1
 </pre></div>
 </td></tr></table></div>
 <p>So we see that the decryption worked and the live spy and traced messages were
@@ -2190,12 +2190,12 @@ within another.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jul 14, 2020 6:45 AM</span>
+          <span class="time">Nov 03, 2020 8:22 AM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.2 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

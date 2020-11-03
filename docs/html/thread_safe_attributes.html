@@ -332,7 +332,7 @@ highlighted):</p>
     <span class="sd">&#39;&#39;&#39;running in th1 thread&#39;&#39;&#39;</span>
     <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
 <span class="hll">      <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span class="hll">      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
+</span><span class="hll">      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
 </span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">GetLock2</span><span class="p">():</span>
@@ -345,7 +345,7 @@ highlighted):</p>
     <span class="sd">&#39;&#39;&#39;running in th1 thread&#39;&#39;&#39;</span>
     <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
 <span class="hll">      <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">-=</span> <span class="mi">1</span>
-</span><span class="hll">      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
+</span><span class="hll">      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
 </span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">ThreadKiller</span><span class="p">():</span>
@@ -520,7 +520,7 @@ highlighted):</p>
 <span class="hll">      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlock</span><span class="p">:</span>
 </span><span class="hll">        <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">+=</span> <span class="mi">1</span>
 </span><span class="hll">      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlock</span><span class="p">:</span>
-</span><span class="hll">        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
+</span><span class="hll">        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
 </span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">GetLock2</span><span class="p">():</span>
@@ -535,7 +535,7 @@ highlighted):</p>
 <span class="hll">      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">_rlock</span><span class="p">:</span>
 </span><span class="hll">        <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">-=</span> <span class="mi">1</span>
 </span><span class="hll">      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">_rlock</span><span class="p">:</span>
-</span><span class="hll">        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
+</span><span class="hll">        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
 </span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">ThreadKiller</span><span class="p">():</span>
@@ -666,7 +666,7 @@ race conditions are highlighted):</p>
     <span class="sd">&#39;&#39;&#39;running within th1 thread&#39;&#39;&#39;</span>
     <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
 <span class="hll">      <span class="bp">self</span><span class="o">.</span><span class="n">thread_race_attr_1</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span class="hll">      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_race_attr_1</span><span class="p">)</span>
+</span><span class="hll">      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_race_attr_1</span><span class="p">)</span>
 </span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">GetLock2</span><span class="p">():</span>
@@ -679,7 +679,7 @@ race conditions are highlighted):</p>
     <span class="sd">&#39;&#39;&#39;running within th2 thread&#39;&#39;&#39;</span>
     <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
 <span class="hll">      <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_race_attr_1</span> <span class="o">-=</span> <span class="mi">1</span>
-</span><span class="hll">      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_race_attr_1</span><span class="p">)</span>
+</span><span class="hll">      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_race_attr_1</span><span class="p">)</span>
 </span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">ThreadKiller</span><span class="p">():</span>
@@ -831,7 +831,7 @@ protect your own code (highlighting how to get the lock):</p>
       <span class="k">with</span> <span class="n">_lock</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">0.35</span>
         <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.45</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">**</span> <span class="mf">1.2</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
       <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">GetLock2</span><span class="p">():</span>
@@ -847,7 +847,7 @@ protect your own code (highlighting how to get the lock):</p>
       <span class="k">with</span> <span class="n">_lock</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">0.30</span>
         <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">a</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.45</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">a</span> <span class="o">**</span> <span class="mf">1.2</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
       <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">ThreadKiller</span><span class="p">():</span>
@@ -909,7 +909,7 @@ are placed on the stack during a thread’s context switch.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># code which doesn&#39;t require an explicit lock</span>
 <span class="n">temp</span> <span class="o">=</span> <span class="mf">0.30</span>
 <span class="n">b</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.45</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">temp</span> <span class="o">**</span> <span class="mf">1.2</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;thr2: &quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;thr2: &quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
 <span class="c1"># this code will be implicitly locked by ThreadSafeAttributes</span>
 <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">temp</span>
 </pre></div>
@@ -958,12 +958,12 @@ syntactically inconsistent way.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jul 14, 2020 6:45 AM</span>
+          <span class="time">Nov 03, 2020 8:22 AM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.2 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

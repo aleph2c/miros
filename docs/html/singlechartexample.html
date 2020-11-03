@@ -279,7 +279,7 @@ example continues.</p>
 <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
@@ -307,7 +307,7 @@ active object to change state by climbing into the statechart to the state which
 was provided as an argument; <cite>outer</cite>.</p>
 <p>We can see what happened by reading some of the results of our instrumentation,
 through the <cite>spy</cite> api:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
   <span class="c1"># [&#39;START&#39;,</span>
   <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:outer&#39;,</span>
   <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:top&#39;,</span>
@@ -326,7 +326,7 @@ signal to the <cite>outer</cite> state, then the <cite>init</cite> signal (the b
 picture) to the <cite>outer</cite> state.</p>
 <p>The spy api is very detailed.  If you would like to just see a summary of what
 happened you can use the <cite>trace</cite> instrumentation instead.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
   <span class="c1"># 09:53:38.941445 [01352] None: top-&gt;outer</span>
 </pre></div>
 </div>
@@ -348,7 +348,7 @@ the statechart reacts we can see what happened by viewing our instrumentation:</
 <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">event_wait_complete</span><span class="p">)</span> <span class="c1">#=&gt; &quot;hello world&quot;</span>
 
 <span class="c1"># Look at the reaction of our statechart in greater detail</span>
-<span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
   <span class="c1"># [&#39;WaitComplete:outer&#39;,</span>
   <span class="c1">#  &#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;,</span>
   <span class="c1">#  &#39;ENTRY_SIGNAL:middle&#39;,</span>
@@ -359,7 +359,7 @@ the statechart reacts we can see what happened by viewing our instrumentation:</
   <span class="c1">#  &#39;&lt;- Queued:(0) Deferred:(0)&#39;]</span>
 
 <span class="c1"># Look at the reaction of our chart with less detail</span>
-<span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="c1">#=&gt;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="c1">#=&gt;</span>
   <span class="c1"># 10:34:47.344218 [01352] W: outer-&gt;inner</span>
 </pre></div>
 </div>
@@ -408,7 +408,7 @@ active object.</p>
 </div>
 <p>We would expect that nothing should happens since the task which is pending on
 an event has been shut down.  Let’s look at the results, first with the trace:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">)</span>
  <span class="c1"># 11:35:20.469870 [01352] WaitComplete: inner-&gt;inner</span>
  <span class="c1"># 11:35:20.470871 [01352] ResetChart: inner-&gt;outer</span>
  <span class="c1"># 11:35:20.470871 [01352] WaitComplete: outer-&gt;inner</span>
@@ -462,7 +462,7 @@ Which repeats a behavior we have already described.</p>
 </div>
 <p>If that isn’t enough detail for you, let’s look at what the active object is
 actually doing by viewing the spy instrumentation:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">())</span>
   <span class="c1">#[&#39;WaitComplete:inner&#39;,</span>
   <span class="c1"># &#39;WaitComplete:middle&#39;,</span>
   <span class="c1"># &#39;WaitComplete:outer&#39;,</span>
@@ -704,12 +704,12 @@ again and again.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jul 14, 2020 6:45 AM</span>
+          <span class="time">Nov 03, 2020 8:22 AM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.2 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

@@ -532,7 +532,7 @@ attribute names are.”</p>
 
  <span class="k">class</span> <span class="nc">ChargerParameters</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="bp">None</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="kc">None</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">c_control</span> <span class="o">=</span> <span class="n">CurrentControlSystem</span><span class="p">()</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">v_control</span> <span class="o">=</span> <span class="n">VoltageControlSystem</span><span class="p">()</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">battery_spec</span> <span class="o">=</span> <span class="n">BatterySpecificSettings</span><span class="p">()</span>
@@ -786,8 +786,8 @@ want to keep them in a database.</p>
     <span class="s1">&#39;control&#39;</span><span class="p">,</span>
   <span class="p">]</span>
 
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">charger_params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-      <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pulse_sec</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">charger_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+      <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pulse_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Three stage battery charger feature management</span>
 
 <span class="sd">    This class will manage the data and the behavior of our three stage</span>
@@ -832,7 +832,7 @@ want to keep them in a database.</p>
 <span class="sd">        live_trace=True)</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">pulse_sec</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="k">if</span> <span class="n">pulse_sec</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">pulse_sec</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pulse_sec</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="k">if</span> <span class="n">pulse_sec</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">pulse_sec</span>
     <span class="n">c_control</span> <span class="o">=</span> <span class="n">charger_params</span><span class="o">.</span><span class="n">c_control</span>
     <span class="n">v_control</span> <span class="o">=</span> <span class="n">charger_params</span><span class="o">.</span><span class="n">v_control</span>
     <span class="n">battery_spec</span> <span class="o">=</span> <span class="n">charger_params</span><span class="o">.</span><span class="n">battery_spec</span>
@@ -911,7 +911,7 @@ want to keep them in a database.</p>
         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">equalize_tick</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">to_method</span><span class="p">()</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">charging</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">charging</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_current_control</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_voltage_control</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charging</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bulk</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_current_control</span><span class="p">)</span><span class="o">.</span> \
@@ -925,7 +925,7 @@ want to keep them in a database.</p>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">sec</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Pulse</span><span class="p">),</span>
-      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+      <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
       <span class="n">period</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pulse_sec</span><span class="p">,</span>
       <span class="n">times</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">status</span>
@@ -1056,28 +1056,28 @@ the trace and spy to write to a log file called <em>single_unit_three_stage_char
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LoggedBehavior</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
     <span class="n">name</span><span class="p">,</span>
-    <span class="n">log_file</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-    <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-    <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">log_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> \
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="kc">None</span> \
       <span class="k">else</span> <span class="n">live_trace</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> \
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="kc">None</span> \
       <span class="k">else</span> <span class="n">live_spy</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span> <span class="o">=</span> <span class="s1">&#39;single_unit_three_stage_charger.log&#39;</span> \
-      <span class="k">if</span> <span class="n">log_file</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">log_file</span>
+      <span class="k">if</span> <span class="n">log_file</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">log_file</span>
 
     <span class="c1"># clear our old log file</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
       <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
     <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
-      <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+      <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
       <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">,</span>
       <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
@@ -1095,7 +1095,7 @@ the trace and spy to write to a log file called <em>single_unit_three_stage_char
 
   <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spy</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;spy with machine name pre-pending&#39;&#39;&#39;</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [</span><span class="si">{}</span><span class="s2">] </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>To see the behavior of the chart we need to setup a data model, then create
@@ -1143,8 +1143,8 @@ the statechart.  We will do this at the bottom of the file so it’s easy to tes
   <span class="n">three_stage_charger</span> <span class="o">=</span> <span class="n">Charger</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s1">&#39;charger&#39;</span><span class="p">,</span>
     <span class="n">charger_params</span><span class="o">=</span><span class="n">charger_params</span><span class="p">,</span>
-    <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-    <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
   <span class="p">)</span>
 
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
@@ -1446,8 +1446,8 @@ file:</p>
 </div>
 <p>Then using something like the following code you plot your data and the
 functional approximation of the data:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
 
 <span class="n">data_ocv_soc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span>
@@ -1470,7 +1470,7 @@ functional approximation of the data:</p>
 <span class="p">}</span>
 
 <span class="c1"># plot the data and the approximation function</span>
-<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
   <span class="n">data_ocv_soc</span><span class="p">[</span><span class="s1">&#39;state_of_charge&#39;</span><span class="p">],</span>
   <span class="n">data_ocv_soc</span><span class="p">[</span><span class="s1">&#39;open_circuit_voltage&#39;</span><span class="p">],</span>
@@ -1584,7 +1584,7 @@ frame, to build data sets which can be run almost instantaneously later.”</p>
  <span class="n">battery_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_soc.csv&#39;</span><span class="p">,</span>
  <span class="n">initial_soc_per</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
  <span class="n">name</span><span class="o">=</span><span class="s2">&quot;battery_example&quot;</span><span class="p">,</span>
- <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+ <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>“Here we would have a battery that’s rated at 100 Amp hours, with an internal
@@ -1671,16 +1671,16 @@ percent. What charge current do you want?”</p>
 
 <span class="k">while</span> <span class="n">battery</span><span class="o">.</span><span class="n">soc_per</span> <span class="o">&lt;</span> <span class="mf">80.0</span><span class="p">:</span>
   <span class="n">battery</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signal</span><span class="o">.</span><span class="n">amps</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">Amps</span><span class="p">(</span><span class="mf">30.0</span><span class="p">)))</span>
-  <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
   <span class="n">abs_volts</span> <span class="o">=</span> <span class="n">battery</span><span class="o">.</span><span class="n">last_terminal_voltage</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
   <span class="n">battery</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">volts</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">Volts</span><span class="p">(</span><span class="n">abs_volts</span><span class="p">))</span>
-  <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>“Let’s watch it work:”</p>
@@ -1741,7 +1741,7 @@ would speed things up:”</p>
      <span class="n">name</span><span class="o">=</span><span class="s2">&quot;lead_acid_battery_100Ah&quot;</span><span class="p">,</span>
      <span class="n">soc_vrs_ocv_profile_csv</span><span class="o">=</span><span class="s1">&#39;soc_ocv.csv&#39;</span><span class="p">,</span>
      <span class="n">ocv_vrs_r_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_internal_resistance.csv&#39;</span><span class="p">,</span>
-     <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span>
+     <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span>
    <span class="p">)</span>
 
    <span class="n">hours</span> <span class="o">=</span> <span class="mi">1</span>
@@ -1753,11 +1753,11 @@ would speed things up:”</p>
    <span class="k">for</span> <span class="n">moment</span> <span class="ow">in</span> <span class="n">time_series</span><span class="p">:</span>
      <span class="k">if</span> <span class="n">battery</span><span class="o">.</span><span class="n">soc_per</span> <span class="o">&lt;</span> <span class="mf">80.0</span><span class="p">:</span>
        <span class="n">battery</span><span class="o">.</span><span class="n">amps_into_terminals</span><span class="p">(</span><span class="mf">33.0</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
-       <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+       <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
        <span class="n">abs_volts</span> <span class="o">=</span> <span class="n">battery</span><span class="o">.</span><span class="n">last_terminal_voltage</span>
      <span class="k">else</span><span class="p">:</span>
        <span class="n">battery</span><span class="o">.</span><span class="n">volts_across_terminals</span><span class="p">(</span><span class="n">abs_volts</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
-       <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+       <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>“This code will get us around our Python time-slippage issue.  See how I
@@ -1840,7 +1840,7 @@ different battery types.</p></li>
   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;lead_acid_battery_100Ah&quot;</span><span class="p">,</span>
   <span class="n">soc_vrs_ocv_profile_csv</span><span class="o">=</span><span class="s1">&#39;soc_ocv.csv&#39;</span><span class="p">,</span>
   <span class="n">ocv_vrs_r_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_internal_resistance.csv&#39;</span><span class="p">,</span>
-  <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 
 <span class="n">hours</span> <span class="o">=</span> <span class="mi">1</span>
@@ -1851,11 +1851,11 @@ different battery types.</p></li>
 <span class="k">for</span> <span class="n">moment</span> <span class="ow">in</span> <span class="n">time_series</span><span class="p">:</span>
   <span class="k">if</span> <span class="n">battery</span><span class="o">.</span><span class="n">soc_per</span> <span class="o">&lt;</span> <span class="mf">80.0</span><span class="p">:</span>
     <span class="n">battery</span><span class="o">.</span><span class="n">amps_into_terminals</span><span class="p">(</span><span class="mf">33.0</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
     <span class="n">abs_volts</span> <span class="o">=</span> <span class="n">battery</span><span class="o">.</span><span class="n">last_terminal_voltage</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">battery</span><span class="o">.</span><span class="n">volts_across_terminals</span><span class="p">(</span><span class="n">abs_volts</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -2056,8 +2056,8 @@ would look something like this:”</p>
   <span class="n">battery_soc_vrs_ocv_profile_csv</span><span class="o">=</span><span class="s1">&#39;soc_ocv.csv&#39;</span><span class="p">,</span>
   <span class="n">battery_ocv_vrs_r_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_internal_resistance.csv&#39;</span><span class="p">,</span>
   <span class="n">time_compression_scalar</span><span class="o">=</span><span class="n">time_compression_scalar</span><span class="p">,</span>
-  <span class="n">live_trace</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-  <span class="n">live_spy</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+  <span class="n">live_spy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">real_delay_needed_sec</span><span class="p">)</span>
 <span class="n">ct</span><span class="o">.</span><span class="n">electrical_interface_mock</span><span class="o">.</span><span class="n">post_lifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">stop</span><span class="p">))</span>
@@ -2150,7 +2150,7 @@ and its <a class="reference external" href="https://github.com/aleph2c/miros/blo
   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;lead_acid_battery_100Ah&quot;</span><span class="p">,</span>
   <span class="n">soc_vrs_ocv_profile_csv</span><span class="o">=</span><span class="s1">&#39;soc_ocv.csv&#39;</span><span class="p">,</span>
   <span class="n">ocv_vrs_r_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_internal_resistance.csv&#39;</span><span class="p">,</span>
-  <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 
 <span class="n">hours</span> <span class="o">=</span> <span class="mi">1</span>
@@ -2161,11 +2161,11 @@ and its <a class="reference external" href="https://github.com/aleph2c/miros/blo
 <span class="k">for</span> <span class="n">moment</span> <span class="ow">in</span> <span class="n">time_series</span><span class="p">:</span>
   <span class="k">if</span> <span class="n">battery</span><span class="o">.</span><span class="n">soc_per</span> <span class="o">&lt;</span> <span class="mf">80.0</span><span class="p">:</span>
     <span class="n">battery</span><span class="o">.</span><span class="n">amps_into_terminals</span><span class="p">(</span><span class="mf">33.0</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
     <span class="n">abs_volts</span> <span class="o">=</span> <span class="n">battery</span><span class="o">.</span><span class="n">last_terminal_voltage</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">battery</span><span class="o">.</span><span class="n">volts_across_terminals</span><span class="p">(</span><span class="n">abs_volts</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -2205,8 +2205,8 @@ how to graph its output:</span></p>
   <span class="n">battery_soc_vrs_ocv_profile_csv</span><span class="o">=</span><span class="s1">&#39;soc_ocv.csv&#39;</span><span class="p">,</span>
   <span class="n">battery_ocv_vrs_r_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_internal_resistance.csv&#39;</span><span class="p">,</span>
   <span class="n">time_compression_scalar</span><span class="o">=</span><span class="n">time_compression_scalar</span><span class="p">,</span>
-  <span class="n">live_trace</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-  <span class="n">live_spy</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+  <span class="n">live_spy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">real_delay_needed_sec</span><span class="p">)</span>
 <span class="n">ct</span><span class="o">.</span><span class="n">electrical_interface_mock</span><span class="o">.</span><span class="n">post_lifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">stop</span><span class="p">))</span>
@@ -2244,8 +2244,8 @@ bar so that its about 50 percent closer to the right.</span></p>
   <span class="n">battery_soc_vrs_ocv_profile_csv</span><span class="o">=</span><span class="s1">&#39;soc_ocv.csv&#39;</span><span class="p">,</span>
   <span class="n">battery_ocv_vrs_r_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_internal_resistance.csv&#39;</span><span class="p">,</span>
   <span class="n">time_compression_scalar</span><span class="o">=</span><span class="n">time_compression_scalar</span><span class="p">,</span>
-  <span class="n">live_trace</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-  <span class="n">live_spy</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+  <span class="n">live_spy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">real_delay_needed_sec</span><span class="p">)</span>
 <span class="n">ct</span><span class="o">.</span><span class="n">electrical_interface_mock</span><span class="o">.</span><span class="n">post_lifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">stop</span><span class="p">))</span>
@@ -2513,7 +2513,7 @@ battery you are mimicing.</p>
   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;lead_acid_battery_100Ah&quot;</span><span class="p">,</span>
   <span class="n">soc_vrs_ocv_profile_csv</span><span class="o">=</span><span class="s1">&#39;soc_ocv.csv&#39;</span><span class="p">,</span>
   <span class="n">ocv_vrs_r_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_internal_resistance.csv&#39;</span><span class="p">,</span>
-  <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 
 <span class="n">hours</span> <span class="o">=</span> <span class="mi">1</span>
@@ -2524,11 +2524,11 @@ battery you are mimicing.</p>
 <span class="k">for</span> <span class="n">moment</span> <span class="ow">in</span> <span class="n">time_series</span><span class="p">:</span>
   <span class="k">if</span> <span class="n">battery</span><span class="o">.</span><span class="n">soc_per</span> <span class="o">&lt;</span> <span class="mf">80.0</span><span class="p">:</span>
     <span class="n">battery</span><span class="o">.</span><span class="n">amps_into_terminals</span><span class="p">(</span><span class="mf">33.0</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
     <span class="n">abs_volts</span> <span class="o">=</span> <span class="n">battery</span><span class="o">.</span><span class="n">last_terminal_voltage</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">battery</span><span class="o">.</span><span class="n">volts_across_terminals</span><span class="p">(</span><span class="n">abs_volts</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">battery</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -2577,8 +2577,8 @@ how to graph its output:</p>
   <span class="n">battery_soc_vrs_ocv_profile_csv</span><span class="o">=</span><span class="s1">&#39;soc_ocv.csv&#39;</span><span class="p">,</span>
   <span class="n">battery_ocv_vrs_r_profile_csv</span><span class="o">=</span><span class="s1">&#39;ocv_internal_resistance.csv&#39;</span><span class="p">,</span>
   <span class="n">time_compression_scalar</span><span class="o">=</span><span class="n">time_compression_scalar</span><span class="p">,</span>
-  <span class="n">live_trace</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-  <span class="n">live_spy</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+  <span class="n">live_trace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+  <span class="n">live_spy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">real_delay_needed_sec</span><span class="p">)</span>
 <span class="n">ct</span><span class="o">.</span><span class="n">electrical_interface_mock</span><span class="o">.</span><span class="n">post_lifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">stop</span><span class="p">))</span>
@@ -2624,12 +2624,12 @@ how to graph its output:</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jul 16, 2020 8:46 AM</span>
+          <span class="time">Nov 03, 2020 8:22 AM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.2 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

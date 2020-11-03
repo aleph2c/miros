@@ -267,7 +267,7 @@
 <p>These sections contain examples that can be referenced as you are
 building up your own statechart programs.</p>
 <div class="contents local topic" id="sections">
-<p class="topic-title first">Sections:</p>
+<p class="topic-title">Sections:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#demonstration-of-capabilities" id="id8">Demonstration of Capabilities</a></p></li>
 <li><p><a class="reference internal" href="#states" id="id9">States</a></p></li>
@@ -286,7 +286,7 @@ building up your own statechart programs.</p>
 and more of its features into a simple program.  This program will be arbitrary,
 it serves no purpose other than to show how to do some common things.</p>
 <div class="contents local topic" id="in-this-section">
-<p class="topic-title first">In This Section:</p>
+<p class="topic-title">In This Section:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#state-abstraction-in-miros" id="id17">State Abstraction in Miros</a></p></li>
 <li><p><a class="reference internal" href="#minimal-viable-states" id="id18">Minimal Viable States</a></p></li>
@@ -469,7 +469,7 @@ use it to decorate our state functions:</p>
 
  <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
    <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s1">&#39;ao&#39;</span><span class="p">)</span>
-<span class="hll">   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>  <span class="c1"># so we can see what is happening</span>
+<span class="hll">   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># so we can see what is happening</span>
 </span>   <span class="c1"># Create a thread and start our state machine</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
    <span class="c1"># Run our main program so that the state machine&#39;s thread</span>
@@ -513,10 +513,10 @@ will stop trying to figure out what to do with it.</p>
    <span class="c1"># the event process automatically sends</span>
    <span class="c1"># an event named ENTRY_SIGNAL when a state is entered</span>
 <span class="hll">   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello from outer_state&quot;</span><span class="p">)</span>
+</span><span class="hll">     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello from outer_state&quot;</span><span class="p">)</span>
 </span><span class="hll">     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;init&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;init&quot;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner_state</span><span class="p">)</span>
    <span class="k">else</span><span class="p">:</span>
      <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
@@ -529,7 +529,7 @@ will stop trying to figure out what to do with it.</p>
    <span class="c1"># the event process automatically sends</span>
    <span class="c1"># an event named ENTRY_SIGNAL when a state is entered</span>
 <span class="hll">   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello from inner_state&quot;</span><span class="p">)</span>
+</span><span class="hll">     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello from inner_state&quot;</span><span class="p">)</span>
 </span><span class="hll">     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>   <span class="k">else</span><span class="p">:</span>
      <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer_state</span>
@@ -538,7 +538,7 @@ will stop trying to figure out what to do with it.</p>
 
  <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
    <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s1">&#39;ao&#39;</span><span class="p">)</span>
-   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
 </pre></div>
@@ -599,16 +599,16 @@ the code that will do this:</p>
  <span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello from outer_state&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello from outer_state&quot;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;init&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;init&quot;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner_state</span><span class="p">)</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;resetting the chart&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;resetting the chart&quot;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;exiting outer_state&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;exiting outer_state&quot;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">else</span><span class="p">:</span>
      <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
@@ -619,10 +619,10 @@ the code that will do this:</p>
  <span class="k">def</span> <span class="nf">inner_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello from inner_state&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello from inner_state&quot;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;exiting inner_state&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;exiting inner_state&quot;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">else</span><span class="p">:</span>
      <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer_state</span>
@@ -631,7 +631,7 @@ the code that will do this:</p>
 
  <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
    <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s2">&quot;ao&quot;</span><span class="p">)</span>
-   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
 <span class="hll">   <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
 </span>   <span class="c1"># let the thread catch up before we exit main</span>
@@ -707,19 +707,19 @@ with a picture.</p>
  <span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello from outer_state&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello from outer_state&quot;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;init&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;init&quot;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner_state</span><span class="p">)</span>
 <span class="hll">   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">):</span>
-</span><span class="hll">     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;run some code, but don&#39;t transition&quot;</span><span class="p">)</span>
+</span><span class="hll">     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;run some code, but don&#39;t transition&quot;</span><span class="p">)</span>
 </span><span class="hll">     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;resetting the chart&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;resetting the chart&quot;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;exiting outer_state&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;exiting outer_state&quot;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">else</span><span class="p">:</span>
      <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
@@ -730,10 +730,10 @@ with a picture.</p>
  <span class="k">def</span> <span class="nf">inner_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello from inner_state&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello from inner_state&quot;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;exiting inner_state&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;exiting inner_state&quot;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">else</span><span class="p">:</span>
      <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer_state</span>
@@ -742,7 +742,7 @@ with a picture.</p>
 
  <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
    <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s2">&quot;ao&quot;</span><span class="p">)</span>
-   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">))</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
@@ -832,7 +832,7 @@ these features:</p>
 
  <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
    <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s2">&quot;ao&quot;</span><span class="p">)</span>
-<span class="hll">   <span class="n">ao</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="hll">   <span class="n">ao</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">True</span>
 </span>   <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">))</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
@@ -955,19 +955,19 @@ point.</p>
 <span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{}: hello from outer_state&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: hello from outer_state&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{}: init&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: init&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner_state</span><span class="p">)</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{}: run some code, but don&#39;t transition&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: run some code, but don&#39;t transition&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{}: resetting the chart&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: resetting the chart&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{}: exiting outer_state&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: exiting outer_state&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
@@ -978,10 +978,10 @@ point.</p>
 <span class="k">def</span> <span class="nf">inner_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{}: hello from inner_state&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: hello from inner_state&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{}: exiting inner_state&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: exiting inner_state&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer_state</span>
@@ -990,13 +990,13 @@ point.</p>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
   <span class="n">ao1</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s2">&quot;ao1&quot;</span><span class="p">)</span>
-  <span class="n">ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
   <span class="n">ao1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
   <span class="n">ao1</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">))</span>
   <span class="n">ao1</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
 
   <span class="n">ao2</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s2">&quot;ao2&quot;</span><span class="p">)</span>
-  <span class="n">ao2</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">ao2</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
   <span class="n">ao2</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">inner_state</span><span class="p">)</span>
   <span class="n">ao2</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">))</span>
   <span class="n">ao2</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
@@ -1102,13 +1102,13 @@ the <code class="docutils literal notranslate"><span class="pre">outer_state</sp
 
 <span class="k">class</span> <span class="nc">ActiveObjectInstrumentToLog</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
 
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
       <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;simple_state_9.log&#39;</span>
 
     <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
-      <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+      <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
       <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
       <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
@@ -1141,17 +1141,17 @@ the <code class="docutils literal notranslate"><span class="pre">outer_state</sp
 
   <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spy</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;spy with machine name pre-pended&#39;&#39;&#39;</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [</span><span class="si">{}</span><span class="s2">] </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
 
   <span class="n">ao1</span> <span class="o">=</span> <span class="n">ActiveObjectInstrumentToLog</span><span class="p">(</span><span class="s2">&quot;ao1&quot;</span><span class="p">)</span>
-  <span class="n">ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
-  <span class="n">ao1</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
+  <span class="n">ao1</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">True</span>
 
   <span class="n">ao2</span> <span class="o">=</span> <span class="n">ActiveObjectInstrumentToLog</span><span class="p">(</span><span class="s2">&quot;ao2&quot;</span><span class="p">)</span>
-  <span class="n">ao2</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
-  <span class="n">ao2</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">ao2</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
+  <span class="n">ao2</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">True</span>
 
   <span class="n">ao1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
   <span class="n">ao1</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">))</span>
@@ -1291,21 +1291,21 @@ diagram to remind myself that I’m thinking this way.</p>
 
 <span class="k">class</span> <span class="nc">FactoryInstrumentationToLog</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
 
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-      <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+      <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> \
-      <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+      <span class="kc">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_trace</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> \
-      <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+      <span class="kc">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_spy</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span> <span class="o">=</span> \
-      <span class="s1">&#39;simple_state_10.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
+      <span class="s1">&#39;simple_state_10.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
 
     <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
-      <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+      <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
       <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span><span class="p">,</span>
       <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
@@ -1332,7 +1332,7 @@ diagram to remind myself that I’m thinking this way.</p>
         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_exit_signal</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">to_method</span><span class="p">()</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">trace_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
@@ -1342,7 +1342,7 @@ diagram to remind myself that I’m thinking this way.</p>
 
   <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spy</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;spy with machine name pre-pended&#39;&#39;&#39;</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [</span><span class="si">{}</span><span class="s2">] </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
 
   <span class="nd">@staticmethod</span>
   <span class="k">def</span> <span class="nf">outer_state_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -1389,14 +1389,14 @@ diagram to remind myself that I’m thinking this way.</p>
 
   <span class="n">f1</span> <span class="o">=</span> <span class="n">FactoryInstrumentationToLog</span><span class="p">(</span>
     <span class="s2">&quot;f1&quot;</span><span class="p">,</span>
-    <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-    <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span>
   <span class="p">)</span>
 
   <span class="n">f2</span> <span class="o">=</span> <span class="n">FactoryInstrumentationToLog</span><span class="p">(</span>
     <span class="s2">&quot;f2&quot;</span><span class="p">,</span>
-    <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-    <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span>
   <span class="p">)</span>
 
   <span class="n">f1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
@@ -1439,21 +1439,21 @@ was added in miros 4.1.2):</p>
 
 <span class="k">class</span> <span class="nc">FactoryInstrumentationToLog</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
 
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-      <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+      <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> \
-      <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+      <span class="kc">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_trace</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> \
-      <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+      <span class="kc">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_spy</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span> <span class="o">=</span> \
-      <span class="s1">&#39;simple_state_11.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
+      <span class="s1">&#39;simple_state_11.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
 
     <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
-      <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+      <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
       <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span><span class="p">,</span>
       <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
@@ -1480,7 +1480,7 @@ was added in miros 4.1.2):</p>
         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_exit_signal</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">to_method</span><span class="p">()</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">trace_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
@@ -1490,7 +1490,7 @@ was added in miros 4.1.2):</p>
 
   <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spy</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;spy with machine name pre-pended&#39;&#39;&#39;</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [</span><span class="si">{}</span><span class="s2">] </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
 
   <span class="k">def</span> <span class="nf">outer_state_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;hello from outer_state&quot;</span><span class="p">)</span>
@@ -1530,14 +1530,14 @@ was added in miros 4.1.2):</p>
 
   <span class="n">f1</span> <span class="o">=</span> <span class="n">FactoryInstrumentationToLog</span><span class="p">(</span>
     <span class="s2">&quot;f1&quot;</span><span class="p">,</span>
-    <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-    <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span>
   <span class="p">)</span>
 
   <span class="n">f2</span> <span class="o">=</span> <span class="n">FactoryInstrumentationToLog</span><span class="p">(</span>
     <span class="s2">&quot;f2&quot;</span><span class="p">,</span>
-    <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-    <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span>
+    <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span>
   <span class="p">)</span>
 
   <span class="n">f1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
@@ -1722,25 +1722,25 @@ event to one statechart, which will cause both charts to act.</p>
 
  <span class="k">class</span> <span class="nc">FactoryInstrumentationToLog</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
 
-   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-       <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+       <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
      <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> \
-       <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+       <span class="kc">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_trace</span>
      <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> \
-       <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+       <span class="kc">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_spy</span>
 
      <span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span> <span class="o">=</span> \
-       <span class="s1">&#39;simple_state_12.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
+       <span class="s1">&#39;simple_state_12.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
 
      <span class="c1"># clear our log every time we run this program</span>
      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
      <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
-       <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+       <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
        <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span><span class="p">,</span>
        <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
@@ -1771,7 +1771,7 @@ event to one statechart, which will cause both charts to act.</p>
          <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_exit_signal</span><span class="p">)</span><span class="o">.</span> \
        <span class="n">to_method</span><span class="p">()</span>
 
-     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
        <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
 
    <span class="k">def</span> <span class="nf">trace_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
@@ -1781,7 +1781,7 @@ event to one statechart, which will cause both charts to act.</p>
 
    <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spy</span><span class="p">):</span>
      <span class="sd">&#39;&#39;&#39;spy with machine name pre-pended&#39;&#39;&#39;</span>
-     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
+     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [</span><span class="si">{}</span><span class="s2">] </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
 
    <span class="k">def</span> <span class="nf">outer_state_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 <span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BROADCAST</span><span class="p">))</span>
@@ -1832,14 +1832,14 @@ event to one statechart, which will cause both charts to act.</p>
 
    <span class="n">f1</span> <span class="o">=</span> <span class="n">FactoryInstrumentationToLog</span><span class="p">(</span>
      <span class="s2">&quot;f1&quot;</span><span class="p">,</span>
-     <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-     <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span>
+     <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+     <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span>
    <span class="p">)</span>
 
    <span class="n">f2</span> <span class="o">=</span> <span class="n">FactoryInstrumentationToLog</span><span class="p">(</span>
      <span class="s2">&quot;f2&quot;</span><span class="p">,</span>
-     <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-     <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span>
+     <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+     <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span>
    <span class="p">)</span>
 
    <span class="n">f1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
@@ -1909,25 +1909,25 @@ statechart-by-difference part of the design:</p>
 
  <span class="k">class</span> <span class="nc">F1</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
 
-   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-       <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+       <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
      <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> \
-       <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+       <span class="kc">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_trace</span>
      <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> \
-       <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+       <span class="kc">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_spy</span>
 
      <span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span> <span class="o">=</span> \
-       <span class="s1">&#39;simple_state_13.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
+       <span class="s1">&#39;simple_state_13.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
 
      <span class="c1"># clear our log every time we run this program</span>
      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
      <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
-       <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+       <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
        <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span><span class="p">,</span>
        <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
@@ -1958,7 +1958,7 @@ statechart-by-difference part of the design:</p>
          <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_exit_signal</span><span class="p">)</span><span class="o">.</span> \
        <span class="n">to_method</span><span class="p">()</span>
 
-     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
        <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
 
    <span class="k">def</span> <span class="nf">trace_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
@@ -1968,7 +1968,7 @@ statechart-by-difference part of the design:</p>
 
    <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spy</span><span class="p">):</span>
      <span class="sd">&#39;&#39;&#39;spy with machine name pre-pended&#39;&#39;&#39;</span>
-     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
+     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [</span><span class="si">{}</span><span class="s2">] </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
 
    <span class="k">def</span> <span class="nf">outer_state_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
      <span class="bp">self</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BROADCAST</span><span class="p">))</span>
@@ -2033,14 +2033,14 @@ statechart-by-difference part of the design:</p>
 
    <span class="n">f1</span> <span class="o">=</span> <span class="n">F1</span><span class="p">(</span>
      <span class="s2">&quot;f1&quot;</span><span class="p">,</span>
-     <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-     <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span>
+     <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+     <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span>
    <span class="p">)</span>
 
    <span class="n">f2</span> <span class="o">=</span> <span class="n">F2</span><span class="p">(</span>
      <span class="s2">&quot;f2&quot;</span><span class="p">,</span>
-     <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-     <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span>
+     <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+     <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span>
    <span class="p">)</span>
 
    <span class="n">f1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
@@ -2112,27 +2112,27 @@ from the previous example has been highlighted.</p>
 
  <span class="k">class</span> <span class="nc">F1</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
 
-   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-       <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+       <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
      <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> \
-       <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+       <span class="kc">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_trace</span>
      <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> \
-       <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+       <span class="kc">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_spy</span>
 
 <span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="o">=</span> <span class="mi">0</span>
 </span>
      <span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span> <span class="o">=</span> \
-       <span class="s1">&#39;simple_state_14.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
+       <span class="s1">&#39;simple_state_14.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
 
      <span class="c1"># clear our log every time we run this program</span>
      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
      <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
-       <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+       <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
        <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span><span class="p">,</span>
        <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
@@ -2172,7 +2172,7 @@ from the previous example has been highlighted.</p>
          <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_exit_signal</span><span class="p">)</span><span class="o">.</span> \
        <span class="n">to_method</span><span class="p">()</span>
 
-     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
 <span class="hll">       <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">middle_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span><span class="o">.</span> \
 </span><span class="hll">       <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middle_state</span><span class="p">)</span>
 </span>
@@ -2183,7 +2183,7 @@ from the previous example has been highlighted.</p>
 
    <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spy</span><span class="p">):</span>
      <span class="sd">&#39;&#39;&#39;spy with machine name pre-pended&#39;&#39;&#39;</span>
-     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
+     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [</span><span class="si">{}</span><span class="s2">] </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
 
    <span class="k">def</span> <span class="nf">outer_state_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
      <span class="bp">self</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BROADCAST</span><span class="p">))</span>
@@ -2226,7 +2226,7 @@ from the previous example has been highlighted.</p>
 </span><span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Ready</span><span class="p">),</span>
 </span><span class="hll">       <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 </span><span class="hll">       <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-</span><span class="hll">       <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class="hll">       <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span class="hll">     <span class="k">return</span> <span class="n">status</span>
 </span>
 <span class="hll">   <span class="k">def</span> <span class="nf">middle_state_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -2242,7 +2242,7 @@ from the previous example has been highlighted.</p>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 <span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="o">+=</span> <span class="mi">1</span>
 </span><span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span>
-</span><span class="hll">       <span class="s2">&quot;hello from inner_state {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span><span class="p">))</span>
+</span><span class="hll">       <span class="s2">&quot;hello from inner_state </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span><span class="p">))</span>
 </span>     <span class="k">return</span> <span class="n">status</span>
 
    <span class="k">def</span> <span class="nf">inner_state_exit_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -2268,14 +2268,14 @@ from the previous example has been highlighted.</p>
 
    <span class="n">f1</span> <span class="o">=</span> <span class="n">F1</span><span class="p">(</span>
      <span class="s2">&quot;f1&quot;</span><span class="p">,</span>
-     <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-     <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+     <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+     <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
    <span class="p">)</span>
 
    <span class="n">f2</span> <span class="o">=</span> <span class="n">F2</span><span class="p">(</span>
      <span class="s2">&quot;f2&quot;</span><span class="p">,</span>
-     <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-     <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+     <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+     <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
    <span class="p">)</span>
 
    <span class="n">f1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
@@ -2284,7 +2284,7 @@ from the previous example has been highlighted.</p>
 </span><span class="hll">     <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">),</span>
 </span><span class="hll">     <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 </span><span class="hll">     <span class="n">period</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
-</span><span class="hll">     <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span>
+</span><span class="hll">     <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span>
 </span><span class="hll">     <span class="p">)</span>
 </span>
    <span class="n">f2</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">f2</span><span class="o">.</span><span class="n">inner_state</span><span class="p">)</span>
@@ -2402,25 +2402,25 @@ lock the non-atomic <code class="docutils literal notranslate"><span class="pre"
 
 <span class="hll">   <span class="n">_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;times_in_inner&#39;</span><span class="p">]</span>
 </span>
-   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-       <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+       <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
      <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> \
-       <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+       <span class="kc">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_trace</span>
      <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> \
-       <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+       <span class="kc">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_spy</span>
 
      <span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span> <span class="o">=</span> \
-       <span class="s1">&#39;simple_state_15.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
+       <span class="s1">&#39;simple_state_15.log&#39;</span> <span class="k">if</span> <span class="n">log_file_name</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">log_file_name</span>
 
      <span class="c1"># clear our log every time we run this program</span>
      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
      <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
-       <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+       <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
        <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file_name</span><span class="p">,</span>
        <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
@@ -2460,7 +2460,7 @@ lock the non-atomic <code class="docutils literal notranslate"><span class="pre"
          <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_exit_signal</span><span class="p">)</span><span class="o">.</span> \
        <span class="n">to_method</span><span class="p">()</span>
 
-     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
        <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">middle_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span><span class="o">.</span> \
        <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middle_state</span><span class="p">)</span>
 
@@ -2471,7 +2471,7 @@ lock the non-atomic <code class="docutils literal notranslate"><span class="pre"
 
    <span class="k">def</span> <span class="nf">spy_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spy</span><span class="p">):</span>
      <span class="sd">&#39;&#39;&#39;spy with machine name pre-pended&#39;&#39;&#39;</span>
-     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [{}] {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
+     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;S: [</span><span class="si">{}</span><span class="s2">] </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">spy</span><span class="p">))</span>
 
    <span class="k">def</span> <span class="nf">outer_state_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
      <span class="bp">self</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BROADCAST</span><span class="p">))</span>
@@ -2514,7 +2514,7 @@ lock the non-atomic <code class="docutils literal notranslate"><span class="pre"
      <span class="bp">self</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Ready</span><span class="p">),</span>
        <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
        <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-       <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+       <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
      <span class="k">return</span> <span class="n">status</span>
 
    <span class="k">def</span> <span class="nf">middle_state_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -2530,7 +2530,7 @@ lock the non-atomic <code class="docutils literal notranslate"><span class="pre"
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 <span class="hll">     <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="o">+=</span> <span class="mi">1</span>
 </span>     <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span>
-       <span class="s2">&quot;hello from inner_state {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span><span class="p">))</span>
+       <span class="s2">&quot;hello from inner_state </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span><span class="p">))</span>
      <span class="k">return</span> <span class="n">status</span>
 
    <span class="k">def</span> <span class="nf">inner_state_exit_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -2556,14 +2556,14 @@ lock the non-atomic <code class="docutils literal notranslate"><span class="pre"
 
    <span class="n">f1</span> <span class="o">=</span> <span class="n">F1</span><span class="p">(</span>
      <span class="s2">&quot;f1&quot;</span><span class="p">,</span>
-     <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-     <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+     <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+     <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
    <span class="p">)</span>
 
    <span class="n">f2</span> <span class="o">=</span> <span class="n">F2</span><span class="p">(</span>
      <span class="s2">&quot;f2&quot;</span><span class="p">,</span>
-     <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-     <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+     <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+     <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
    <span class="p">)</span>
 
    <span class="n">f1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
@@ -2572,7 +2572,7 @@ lock the non-atomic <code class="docutils literal notranslate"><span class="pre"
      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">),</span>
      <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
      <span class="n">period</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
-     <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span>
+     <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span>
      <span class="p">)</span>
 
    <span class="n">f2</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">f2</span><span class="o">.</span><span class="n">inner_state</span><span class="p">)</span>
@@ -2584,8 +2584,8 @@ lock the non-atomic <code class="docutils literal notranslate"><span class="pre"
    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">4.00</span><span class="p">)</span>
 
    <span class="c1"># read information from other threads</span>
-<span class="hll">   <span class="k">print</span><span class="p">(</span><span class="s2">&quot;f1 was in its inner state {} times&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">times_in_inner</span><span class="p">))</span>
-</span><span class="hll">   <span class="k">print</span><span class="p">(</span><span class="s2">&quot;f2 was in its inner state {} times&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f2</span><span class="o">.</span><span class="n">times_in_inner</span><span class="p">))</span>
+<span class="hll">   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;f1 was in its inner state </span><span class="si">{}</span><span class="s2"> times&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">times_in_inner</span><span class="p">))</span>
+</span><span class="hll">   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;f2 was in its inner state </span><span class="si">{}</span><span class="s2"> times&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f2</span><span class="o">.</span><span class="n">times_in_inner</span><span class="p">))</span>
 </span></pre></div>
 </div>
 <p>So where is the lock?</p>
@@ -2610,8 +2610,8 @@ output only shows how that property was initialized.</p>
                                     <span class="c1"># times_in_inner property, with its</span>
                                     <span class="c1"># protecting lock</span>
 
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-      <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+      <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="c1"># ...</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -2619,7 +2619,7 @@ output only shows how that property was initialized.</p>
     <span class="c1"># ..</span>
     <span class="c1"># Inside of the state thread small operations on the times_in_inner</span>
     <span class="c1"># attribute can use used in a thread safe way</span>
-    <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span><span class="p">)</span>  <span class="c1"># safe</span>
+    <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span><span class="p">)</span>  <span class="c1"># safe</span>
     <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span>     <span class="c1"># safe</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="o">=</span> <span class="mi">1</span>     <span class="c1"># safe</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">times_in_inner</span> <span class="o">+=</span> <span class="mi">1</span>    <span class="c1"># safe</span>
@@ -2660,7 +2660,7 @@ running on different machines.  To see how to do this, look at the
 <div class="section" id="states">
 <span id="recipes-states"></span><h2>States<a class="headerlink" href="#states" title="Permalink to this headline">#</a></h2>
 <div class="contents local topic" id="id2">
-<p class="topic-title first">In This Section:</p>
+<p class="topic-title">In This Section:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#state-function-recipes" id="id33">State Function Recipes</a></p>
 <ul>
@@ -2831,7 +2831,7 @@ method with the event that you want to trickle outward in your diagram.</p>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">):</span>
-<span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;saw signal B, but letting it trickle through to my parent&quot;</span><span class="p">)</span>
+<span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;saw signal B, but letting it trickle through to my parent&quot;</span><span class="p">)</span>
 </span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">trans</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
@@ -2876,7 +2876,7 @@ inside of your state method’s boundary.</p>
 <span class="k">def</span> <span class="nf">c1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 <span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Running my entry application code here&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running my entry application code here&quot;</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
@@ -2903,7 +2903,7 @@ transition into this state from one of its child states.</p>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 <span class="hll">  <span class="c1"># BIG BLACK DOT ON DIAGRAM</span>
 </span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Running my init application code here&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running my init application code here&quot;</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
@@ -2931,7 +2931,7 @@ from your state method call:</p>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 <span class="hll">  <span class="c1"># BIG BLACK DOT ON DIAGRAM</span>
 </span><span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Running my init application code here&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running my init application code here&quot;</span><span class="p">)</span>
 </span><span class="hll">    <span class="c1"># now transition into the c2 state</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
 </span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
@@ -2968,7 +2968,7 @@ outside of of your state method’s boundary.</p>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 <span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Running my exit application code here&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running my exit application code here&quot;</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>  <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
@@ -2992,7 +2992,7 @@ event with the signal name <code class="docutils literal notranslate"><span clas
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 
 <span class="hll">  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">MY_HOOK</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;running the code defined in c1&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;running the code defined in c1&quot;</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
@@ -3059,7 +3059,7 @@ do not return <code class="docutils literal notranslate"><span class="pre">HANDL
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">outer</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 <span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BUBBLED</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hooked by the outer state&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hooked by the outer state&quot;</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>  <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
@@ -3069,7 +3069,7 @@ do not return <code class="docutils literal notranslate"><span class="pre">HANDL
 <span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 <span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 </span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BUBBLED</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;processed in middle&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;processed in middle&quot;</span><span class="p">)</span>
 </span>  <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer</span>
@@ -3078,7 +3078,7 @@ do not return <code class="docutils literal notranslate"><span class="pre">HANDL
 <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 <span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 </span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BUBBLED</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;processed in inner&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;processed in inner&quot;</span><span class="p">)</span>
 </span>  <span class="k">else</span><span class="p">:</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer</span>
@@ -3110,8 +3110,8 @@ interface of the <code class="docutils literal notranslate"><span class="pre">mi
 <p>Your outer_state state method code (highlighted) would look like this:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="k">class</span> <span class="nc">FactoryInstrumentationToLog</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
 
-   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-       <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+       <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
      <span class="c1"># ..</span>
@@ -3170,7 +3170,7 @@ handlers per state.</p>
 <p>If we were to add the hierarchy information for the following design:</p>
 <a class="reference external image-reference" href="_static/state_recipe_10.pdf"><img alt="_images/state_recipe_10.svg" class="scale-to-fit" src="_images/state_recipe_10.svg" /></a>
 <p>The code would look like this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
   <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -3204,8 +3204,8 @@ this way:</p>
 
  <span class="k">class</span> <span class="nc">FactoryInstrumentationToLog</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
 
-   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-       <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+       <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
      <span class="c1"># ...</span>
      <span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;outer_state&quot;</span><span class="p">)</span><span class="o">.</span> \
 <span class="hll">       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
@@ -3244,8 +3244,8 @@ this way:</p>
 <p>We would create the outer_state and its Hook handlers this way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="k">class</span> <span class="nc">FactoryInstrumentationToLog</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
 
-   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-       <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">log_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+       <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
      <span class="c1"># ..</span>
@@ -3271,7 +3271,7 @@ this way:</p>
 <div class="section" id="events-and-signals">
 <span id="recipes-events-and-signals"></span><h2>Events And Signals<a class="headerlink" href="#events-and-signals" title="Permalink to this headline">#</a></h2>
 <div class="contents local topic" id="id3">
-<p class="topic-title first">In This Section:</p>
+<p class="topic-title">In This Section:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#creating-an-event" id="id51">Creating an Event</a></p></li>
 <li><p><a class="reference internal" href="#creating-a-signal" id="id52">Creating a Signal</a></p></li>
@@ -3439,7 +3439,7 @@ the <code class="docutils literal notranslate"><span class="pre">fifo</span></co
         <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">delay_one_second</span><span class="p">),</span>
         <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-        <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span>
+        <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span>
       <span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
 
@@ -3488,7 +3488,7 @@ created them.</p>
       <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">),</span>
                       <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
                       <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-                      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                      <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># We mark up the ao with this id, so that</span>
     <span class="c1"># state function can be used by many different aos</span>
     <span class="n">ao</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="n">multi_shot_thread</span><span class="p">,</span>
@@ -3546,7 +3546,7 @@ passed to the state method as the first argument.</p>
       <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">),</span>
                       <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
                       <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-                      <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                      <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># We graffiti the provided chart object with this id</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="n">multi_shot_thread</span><span class="p">,</span>
                   <span class="n">name</span><span class="o">=</span><span class="s1">&#39;multi_shot_thread&#39;</span><span class="p">)</span>
@@ -3597,7 +3597,7 @@ Active Object:</p>
     <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">three_pulse</span><span class="p">),</span>
                     <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
                     <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-                    <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                    <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
 
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
@@ -3692,8 +3692,8 @@ even if you aren’t intending to share them between statecharts.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">e1</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">YOUR_SIGNAL_NAME</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="s2">&quot;My Payload&quot;</span><span class="p">)</span>
 <span class="n">e2</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">YOUR_SIGNAL_NAME</span><span class="p">)</span>
 
-<span class="k">assert</span><span class="p">(</span><span class="n">e1</span><span class="o">.</span><span class="n">has_payload</span><span class="p">()</span> <span class="o">==</span> <span class="bp">True</span><span class="p">)</span>
-<span class="k">assert</span><span class="p">(</span><span class="n">e2</span><span class="o">.</span><span class="n">has_payload</span><span class="p">()</span> <span class="o">==</span> <span class="bp">False</span><span class="p">)</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">e1</span><span class="o">.</span><span class="n">has_payload</span><span class="p">()</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">e2</span><span class="o">.</span><span class="n">has_payload</span><span class="p">()</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -3906,8 +3906,8 @@ example is based on an adaptation of test <a class="reference external" href="ht
 </span><span class="hll">  <span class="k">def</span> <span class="nf">token_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resident</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 </span><span class="hll">    <span class="n">other_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tockenize</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 </span><span class="hll">    <span class="n">resident_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tockenize</span><span class="p">(</span><span class="n">resident</span><span class="p">)</span>
-</span><span class="hll">    <span class="n">result</span> <span class="o">=</span> <span class="bp">True</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">resident_set</span><span class="o">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">other_set</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">1</span> \
-</span><span class="hll">      <span class="k">else</span> <span class="bp">False</span>
+</span><span class="hll">    <span class="n">result</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">resident_set</span><span class="o">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">other_set</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">1</span> \
+</span><span class="hll">      <span class="k">else</span> <span class="kc">False</span>
 </span><span class="hll">    <span class="k">return</span> <span class="n">result</span>
 </span>
  <span class="c1"># In a state function you can match like a &quot;*&quot; glob or a specific token of a</span>
@@ -3919,7 +3919,7 @@ example is based on an adaptation of test <a class="reference external" href="ht
 <span class="hll">      <span class="bp">self</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="s2">&quot;timeout.token1.token2&quot;</span><span class="p">),</span>
 </span>        <span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-        <span class="n">deferred</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
       <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
     <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
       <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">s01</span><span class="p">)</span>
@@ -4026,7 +4026,7 @@ exit condition.</p>
 your state functions using the <code class="docutils literal notranslate"><span class="pre">start_at</span></code> method.  Together, the
 <code class="docutils literal notranslate"><span class="pre">ActiveObject</span></code> and the state functions work as a statechart.</p>
 <div class="contents local topic" id="id5">
-<p class="topic-title first">In This Section:</p>
+<p class="topic-title">In This Section:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#starting-an-activeobject" id="id70">Starting an ActiveObject</a></p></li>
 <li><p><a class="reference internal" href="#stopping-an-activeobject" id="id71">Stopping an ActiveObject</a></p></li>
@@ -4055,7 +4055,7 @@ method will turn on this infrastructure as well.</p>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;c1 entered&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;c1 entered&quot;</span><span class="p">)</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">):</span>
@@ -4079,7 +4079,7 @@ method will turn on this infrastructure as well.</p>
 <span class="k">def</span> <span class="nf">c2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;c2 entered&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;c2 entered&quot;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
@@ -4090,19 +4090,19 @@ method will turn on this infrastructure as well.</p>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s1">&#39;start_example&#39;</span><span class="p">)</span>
-  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;calling: start_at(c2)&quot;</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;calling: start_at(c2)&quot;</span><span class="p">)</span>
 <span class="hll">  <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
 </span>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="c1"># print what happened from the start_at call</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="c1"># print what happened from the start_at call</span>
   <span class="n">ao</span><span class="o">.</span><span class="n">clear_trace</span><span class="p">()</span>  <span class="c1"># clear our instrumentation</span>
 
-  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;sending B, then A, then A:&quot;</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sending B, then A, then A:&quot;</span><span class="p">)</span>
   <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">))</span>
   <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
   <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="c1"># print what happened</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="c1"># print what happened</span>
 </pre></div>
 </div>
 <p>When we run this code we will see this result:</p>
@@ -4246,12 +4246,12 @@ your derived <code class="docutils literal notranslate"><span class="pre">Active
  <span class="k">def</span> <span class="nf">c</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-<span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="bp">False</span>
-</span><span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">thread_safe_attr_2</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">thread_safe_attr_2</span> <span class="o">=</span> <span class="kc">False</span>
 </span>   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">):</span>
-<span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="kc">True</span>
 </span>     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
    <span class="k">else</span><span class="p">:</span>
      <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
@@ -4262,12 +4262,12 @@ your derived <code class="docutils literal notranslate"><span class="pre">Active
  <span class="k">def</span> <span class="nf">c1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-<span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="kc">True</span>
 </span>     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-<span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="kc">False</span>
 </span>     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">else</span><span class="p">:</span>
      <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">c</span>
@@ -4278,12 +4278,12 @@ your derived <code class="docutils literal notranslate"><span class="pre">Active
  <span class="k">def</span> <span class="nf">c2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-<span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">thread_safe_attr_2</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">thread_safe_attr_2</span> <span class="o">=</span> <span class="kc">True</span>
 </span>     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-<span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">thread_safe_attr_2</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="hll">     <span class="n">chart</span><span class="o">.</span><span class="n">thread_safe_attr_2</span> <span class="o">=</span> <span class="kc">False</span>
 </span>     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">else</span><span class="p">:</span>
      <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">c</span>
@@ -4295,11 +4295,11 @@ your derived <code class="docutils literal notranslate"><span class="pre">Active
     <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
     <span class="c1"># Change the ActiveObject&#39;s attributes while it is starting its thread</span>
     <span class="c1"># and starting its statemachine</span>
-<span class="hll">    <span class="n">ao</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="bp">True</span>
-</span><span class="hll">    <span class="n">ao</span><span class="o">.</span><span class="n">thread_safe_attr_2</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="hll">    <span class="n">ao</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span class="hll">    <span class="n">ao</span><span class="o">.</span><span class="n">thread_safe_attr_2</span> <span class="o">=</span> <span class="kc">False</span>
 </span>    <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
     <span class="c1"># Main thread can access attribute used by the ActiveObject&#39;s thread</span>
-<span class="hll">    <span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">thread_safe_attr_2</span><span class="p">)</span>
+<span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">thread_safe_attr_2</span><span class="p">)</span>
 </span></pre></div>
 </td></tr></table></div>
 </div>
@@ -4310,7 +4310,7 @@ your derived <code class="docutils literal notranslate"><span class="pre">Active
 The <code class="docutils literal notranslate"><span class="pre">miros.Factory</span></code> lets you build state methods, state handlers and start the
 chart in whichever state you need.</p>
 <div class="contents local topic" id="id6">
-<p class="topic-title first">In This Section:</p>
+<p class="topic-title">In This Section:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#creating-a-statechart-inside-of-a-class" id="id74">Creating a Statechart Inside of a Class</a></p></li>
 <li><p><a class="reference internal" href="#inheritance-and-starting-factories" id="id75">Inheritance and Starting (Factories)</a></p></li>
@@ -4475,14 +4475,14 @@ asynchronous aspects of the program):</p>
 
 <span class="k">class</span> <span class="nc">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
   <span class="n">Default_Name</span> <span class="o">=</span> <span class="s1">&#39;default_name&#39;</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="c1"># call the Factory ctor</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-      <span class="n">ClassWithStatechartInIt</span><span class="o">.</span><span class="n">Default_Name</span> <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">name</span>
+      <span class="n">ClassWithStatechartInIt</span><span class="o">.</span><span class="n">Default_Name</span> <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">name</span>
     <span class="p">)</span>
     <span class="c1"># determine how this object will be instrumented</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_trace</span>
 
     <span class="c1"># define our states and their statehandlers</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;common_behaviors&quot;</span><span class="p">)</span><span class="o">.</span> \
@@ -4516,7 +4516,7 @@ asynchronous aspects of the program):</p>
       <span class="n">to_method</span><span class="p">()</span>
 
     <span class="c1"># nest our states within other states</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span><span class="o">.</span> \
         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span><span class="o">.</span> \
         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b11</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b1</span><span class="p">)</span>
@@ -4577,13 +4577,13 @@ asynchronous aspects of the program):</p>
 </span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
 </span>
   <span class="k">def</span> <span class="nf">worker1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;worker1 called&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;worker1 called&#39;</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">worker2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;worker2 called&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;worker2 called&#39;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-  <span class="n">chart</span> <span class="o">=</span> <span class="n">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;chart&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+  <span class="n">chart</span> <span class="o">=</span> <span class="n">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;chart&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
   <span class="n">chart</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">reset</span><span class="p">))</span>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
@@ -4794,14 +4794,14 @@ parallel and see what happens.</p>
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
 
 <span class="k">class</span> <span class="nc">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
     <span class="c1"># call the Factory ctor</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="c1"># determine how this object will be instrumented</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_trace</span>
 
     <span class="c1"># define our states and their statehandlers</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;common_behaviors&quot;</span><span class="p">)</span><span class="o">.</span> \
@@ -4845,7 +4845,7 @@ parallel and see what happens.</p>
       <span class="n">to_method</span><span class="p">()</span>
 
     <span class="c1"># nest our states within other states</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span><span class="o">.</span> \
         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">common_behaviors</span><span class="p">)</span><span class="o">.</span> \
         <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b11</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b1</span><span class="p">)</span>
@@ -4930,15 +4930,15 @@ parallel and see what happens.</p>
 </span><span class="hll">    <span class="k">return</span> <span class="n">status</span>
 </span>
   <span class="k">def</span> <span class="nf">worker1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;{} worker1 called&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> worker1 called&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
 
   <span class="k">def</span> <span class="nf">worker2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;{} worker2 called&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> worker2 called&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-  <span class="n">chart1</span> <span class="o">=</span> <span class="n">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;chart1&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-  <span class="n">chart2</span> <span class="o">=</span> <span class="n">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;chart2&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-  <span class="n">chart3</span> <span class="o">=</span> <span class="n">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;chart3&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+  <span class="n">chart1</span> <span class="o">=</span> <span class="n">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;chart1&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+  <span class="n">chart2</span> <span class="o">=</span> <span class="n">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;chart2&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+  <span class="n">chart3</span> <span class="o">=</span> <span class="n">ClassWithStatechartInIt</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;chart3&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
   <span class="c1"># send a reset event to chart1</span>
   <span class="n">chart1</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">reset</span><span class="p">))</span>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
@@ -5043,7 +5043,7 @@ actions you have taken on your factory-derived class.</p>
    <span class="c1"># heart beat will be running twice as fast and along with other weird</span>
    <span class="c1"># multithreading race bugs.</span>
    <span class="n">charger_child</span> <span class="o">=</span> <span class="n">ChargerChild</span><span class="p">(</span>
-     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;charger&quot;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">False</span>
+     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;charger&quot;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">False</span>
    <span class="p">)</span>
 </pre></div>
 </div>
@@ -5076,7 +5076,7 @@ code, (which defeats one of the reasons to use a Factory in the first place).</p
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
 
    <span class="n">charger_child</span> <span class="o">=</span> <span class="n">ChargerChild</span><span class="p">(</span>
-     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;charger&quot;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">False</span>
+     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;charger&quot;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">False</span>
    <span class="p">)</span>
    <span class="c1"># Create a thread and start the object in the &lt;state_name&gt; state</span>
    <span class="c1"># (but I don&#39;t want to have to know how the charger_child object works.</span>
@@ -5121,7 +5121,7 @@ inheritance without accidently starting parent renegade threads.</p>
    <span class="c1"># is hidden within the obj, so as a client I don&#39;t have to know how its</span>
    <span class="c1"># inner state machine works.</span>
    <span class="n">charger_child</span> <span class="o">=</span> <span class="n">ChargerChild</span><span class="p">(</span>
-     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;charger&quot;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">False</span>
+     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;charger&quot;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">False</span>
    <span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -5149,10 +5149,10 @@ See below:</p>
 
   <span class="n">_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;thread_safe_attr_1&#39;</span><span class="p">,</span> <span class="s1">&#39;thread_safe_attr_2&#39;</span><span class="p">]</span>
 
-<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
   <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-  <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="bp">True</span>  <span class="c1"># .. you can access this from main or other</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># .. you can access this from main or other</span>
                                   <span class="c1"># threads in the same way</span>
 
   <span class="c1"># ... define states, link them to their signals</span>
@@ -5169,7 +5169,7 @@ See below:</p>
                                         <span class="c1"># because `start_at` called within</span>
                                         <span class="c1"># the `__init__` method.</span>
 
-  <span class="k">print</span><span class="p">(</span><span class="n">statechart</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>  <span class="c1"># you can access the attribute which</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">statechart</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>  <span class="c1"># you can access the attribute which</span>
                                         <span class="c1"># is being used by the statechart&#39;s</span>
                                         <span class="c1"># thread, since it&#39;s wrapped</span>
                                         <span class="c1"># by a thread-safe datastructure</span>
@@ -5220,7 +5220,7 @@ prepare themselves for garbage collection.</p>
 <div class="section" id="seeing-what-is-going-on">
 <span id="recipes-seeing-what-is"></span><h2>Seeing What is Going On<a class="headerlink" href="#seeing-what-is-going-on" title="Permalink to this headline">#</a></h2>
 <div class="contents local topic" id="id7">
-<p class="topic-title first">In This Section:</p>
+<p class="topic-title">In This Section:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#thread-safe-printing-and-instrumentation" id="id77">Thread-Safe Printing and Instrumentation</a></p></li>
 <li><p><a class="reference internal" href="#determining-the-current-state" id="id78">Determining the Current State</a></p></li>
@@ -5244,7 +5244,7 @@ provides a thread-safe <code class="docutils literal notranslate"><span class="p
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_state</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
     <span class="c1"># thread safe print</span>
-<span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="k">print</span><span class="p">(</span><span class="s1">&#39;writing that we are entering some_state&#39;</span><span class="p">)</span>
+<span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;writing that we are entering some_state&#39;</span><span class="p">)</span>
 </span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">top</span>
@@ -5295,13 +5295,13 @@ Python dictionary:</p>
 
 <span class="c1"># To output your names and number:</span>
 <span class="k">for</span> <span class="n">signal_name</span><span class="p">,</span> <span class="n">signal_number</span> <span class="ow">in</span> <span class="n">signals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">signal_name</span><span class="p">,</span> <span class="n">signal_number</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">signal_name</span><span class="p">,</span> <span class="n">signal_number</span><span class="p">)</span>
 
 <span class="c1"># same output with some formatting</span>
 <span class="n">max_name_len</span>   <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">signals</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">))</span>
 <span class="n">max_number_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="nb">int</span><span class="p">)))</span>
 <span class="k">for</span> <span class="n">signal_name</span><span class="p">,</span> <span class="n">signal_number</span> <span class="ow">in</span> <span class="n">signals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{1: &lt;{0}} {2:{3}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_name_len</span><span class="p">,</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;{1: &lt;</span><span class="si">{0}</span><span class="s2">} {2:</span><span class="si">{3}</span><span class="s2">}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_name_len</span><span class="p">,</span>
                                    <span class="n">signal_name</span><span class="p">,</span>
                                    <span class="n">signal_number</span><span class="p">,</span>
                                    <span class="n">max_number_len</span><span class="p">))</span>  <span class="c1"># output below -&gt;</span>
@@ -5324,7 +5324,7 @@ Python dictionary:</p>
 <code class="docutils literal notranslate"><span class="pre">signal_name</span></code> method of the Event class:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_example_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANLDED</span>
-<span class="hll">  <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal_name</span><span class="p">)</span> <span class="c1"># &quot;ENTRY_SIGNAL&quot;</span>
+<span class="hll">  <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal_name</span><span class="p">)</span> <span class="c1"># &quot;ENTRY_SIGNAL&quot;</span>
 </span></pre></div>
 </div>
 <p>If you have a signal number and you want to determine its name:</p>
@@ -5475,8 +5475,8 @@ with time so that you can compare it with the trace output:</p>
 <span class="c1"># .</span>
 <span class="c1"># .</span>
 <span class="c1"># In your state method or callback code write:</span>
-<span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;{} at {}&quot;</span><span class="o">.</span> \
-    <span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal_name</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%M:%S:</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)))</span>
+<span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> at </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span> \
+    <span class="nb">format</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal_name</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%M:%S:</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)))</span>
 </pre></div>
 </div>
 </div>
@@ -5489,12 +5489,12 @@ output its trace information to the terminal while it reacts to events:</p>
 <p>To turn on/off the live trace:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ao1</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
 <span class="c1"># turn on the live trace</span>
-<span class="hll"><span class="n">ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="hll"><span class="n">ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
 </span><span class="c1"># your code and state interactions here</span>
 <span class="c1"># live trace information will be displayed on the terminal</span>
 
 <span class="c1"># turn off the live trace</span>
-<span class="hll"><span class="n">ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="hll"><span class="n">ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">False</span>
 </span></pre></div>
 </div>
 </div>
@@ -5507,12 +5507,12 @@ output its spy information to the terminal while it reacts to events:</p>
 <p>To turn on/off the live spy:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ao1</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
 <span class="c1"># turn on the live spy</span>
-<span class="hll"><span class="n">ao1</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="hll"><span class="n">ao1</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">True</span>
 </span><span class="c1"># your code and state interactions here</span>
 <span class="c1"># live spy information will be displayed on the terminal</span>
 
 <span class="c1"># turn off the live spy</span>
-<span class="hll"><span class="n">ao1</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="hll"><span class="n">ao1</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">False</span>
 </span></pre></div>
 </div>
 </div>
@@ -5569,7 +5569,7 @@ and you would like to see its code as if it where written by hand, use the
 <span class="n">ao</span><span class="o">.</span><span class="n">register_parent</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">top</span><span class="p">)</span>
 
 <span class="c1"># to see how fc would be written as a flat method:</span>
-<span class="hll"><span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">to_code</span><span class="p">(</span><span class="n">fc</span><span class="p">))</span> <span class="c1"># -&gt;</span>
+<span class="hll"><span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">to_code</span><span class="p">(</span><span class="n">fc</span><span class="p">))</span> <span class="c1"># -&gt;</span>
 </span>  <span class="c1"># @spy_on</span>
   <span class="c1"># def fc(chart, e):</span>
   <span class="c1">#   status = return_status.UNHANDLED</span>
@@ -5801,7 +5801,7 @@ a trace output as the target for a regression test, you would:</p>
 <li><p>Run your program and print your trace to the output.</p></li>
 <li><p>Copy this trace as the target behavior of your test.</p></li>
 <li><p>Run this trace target and the future output of the statechart trace through
-the <a class="reference internal" href="#stripped-example"><span class="std std-ref">stripped context manager</span></a> to remove the date
+the <a class="reference internal" href="reflection.html#stripped-example"><span class="std std-ref">stripped context manager</span></a> to remove the date
 timestamp information.</p></li>
 <li><p>Compare your target with the results.</p></li>
 </ol>
@@ -5815,7 +5815,7 @@ working on it.</p>
 </pre></div>
 </div>
 <p>You might have gotten this output with the following code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
 </pre></div>
 </div>
 <p>It does a decent job describing what we want, but it has timestamps.  With the
@@ -5964,12 +5964,12 @@ specification.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jul 16, 2020 8:46 AM</span>
+          <span class="time">Nov 03, 2020 8:22 AM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.2 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

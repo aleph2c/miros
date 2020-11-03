@@ -417,11 +417,11 @@ could look like this:</p>
 
  <span class="k">def</span> <span class="nf">guard</span><span class="p">():</span>
    <span class="sd">&#39;&#39;&#39;should we let an event pass?&#39;&#39;&#39;</span>
-   <span class="k">return</span> <span class="bp">True</span>
+   <span class="k">return</span> <span class="kc">True</span>
 
  <span class="k">def</span> <span class="nf">action</span><span class="p">():</span>
    <span class="sd">&#39;&#39;&#39;some code to run when the event occurs (on the arrow)&#39;&#39;&#39;</span>
-   <span class="k">print</span><span class="p">(</span><span class="s1">&#39;some action&#39;</span><span class="p">)</span>
+   <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;some action&#39;</span><span class="p">)</span>
 
  <span class="nd">@spy_on</span>
  <span class="k">def</span> <span class="nf">source_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -451,7 +451,7 @@ could look like this:</p>
 
    <span class="c1"># event arrow example</span>
    <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s1">&#39;eae&#39;</span><span class="p">)</span>
-   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">source_state</span><span class="p">)</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">SIGNAL_NAME</span><span class="p">,</span>
      <span class="n">payload</span><span class="o">=</span><span class="n">OptionalPayload</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">)))</span>
@@ -487,10 +487,10 @@ could look like this:</p>
  <span class="n">OptionalPayload</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;OptionalPayload&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
 
  <span class="k">def</span> <span class="nf">guard</span><span class="p">():</span>
-   <span class="k">return</span> <span class="bp">True</span>
+   <span class="k">return</span> <span class="kc">True</span>
 
  <span class="k">def</span> <span class="nf">action</span><span class="p">():</span>
-   <span class="k">print</span><span class="p">(</span><span class="s1">&#39;hook code was run {}&#39;</span><span class="p">)</span>
+   <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;hook code was run </span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">)</span>
 
  <span class="nd">@spy_on</span>
  <span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -513,12 +513,12 @@ could look like this:</p>
  <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
    <span class="c1"># simple hook example</span>
    <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;she&quot;</span><span class="p">)</span>
-   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">SIGNAL_NAME</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">OptionalPayload</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">)))</span>
    <span class="c1"># starting another thread, let it run for a moment before we shut down</span>
    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
-   <span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
+   <span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This will produce the following trace:</p>
@@ -553,7 +553,7 @@ could look like:</p>
  <span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">SIGNAL_NAME</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;this code should never run&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;this code should never run&quot;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">else</span><span class="p">:</span>
      <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
@@ -578,12 +578,12 @@ could look like:</p>
  <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
    <span class="c1"># simple hook example 2</span>
    <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;she2&quot;</span><span class="p">)</span>
-   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">a11</span><span class="p">)</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">SIGNAL_NAME</span><span class="p">))</span>
    <span class="c1"># starting another thread, let it run for a moment before we shut down</span>
    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
-   <span class="k">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
+   <span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>When run the above code will produce the following:</p>
@@ -621,10 +621,10 @@ that would map to the above diagram:</p>
  <span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 <span class="hll">   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;&#39;a&#39; entered&quot;</span><span class="p">)</span>
+</span><span class="hll">     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;a&#39; entered&quot;</span><span class="p">)</span>
 </span><span class="hll">     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span><span class="hll">   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;&#39;a&#39; exited&quot;</span><span class="p">)</span>
+</span><span class="hll">     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;a&#39; exited&quot;</span><span class="p">)</span>
 </span><span class="hll">     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span><span class="hll">   <span class="c1"># need to add an external signal so we can cause exits</span>
 </span><span class="hll">   <span class="c1"># for our demo</span>
@@ -635,7 +635,7 @@ that would map to the above diagram:</p>
 </span><span class="hll">     <span class="n">print_string</span> <span class="o">+=</span> <span class="s2">&quot;and we have settled into &#39;a&#39;, &quot;</span>
 </span><span class="hll">     <span class="n">print_string</span> <span class="o">+=</span> <span class="s2">&quot;the INIT_SIGNAL wants us to &quot;</span>
 </span><span class="hll">     <span class="n">print_string</span> <span class="o">+=</span> <span class="s2">&quot;transition into &#39;a1&#39;&quot;</span>
-</span><span class="hll">     <span class="k">print</span><span class="p">(</span><span class="n">print_string</span><span class="p">)</span>
+</span><span class="hll">     <span class="nb">print</span><span class="p">(</span><span class="n">print_string</span><span class="p">)</span>
 </span><span class="hll">     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
 </span>   <span class="k">else</span><span class="p">:</span>
      <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
@@ -645,10 +645,10 @@ that would map to the above diagram:</p>
  <span class="nd">@spy_on</span>
  <span class="k">def</span> <span class="nf">a1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 <span class="hll">   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;&#39;a1&#39; entered&quot;</span><span class="p">)</span>
+</span><span class="hll">     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;a1&#39; entered&quot;</span><span class="p">)</span>
 </span><span class="hll">     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span><span class="hll">   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;&#39;a1&#39; exited&quot;</span><span class="p">)</span>
+</span><span class="hll">     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;a1&#39; exited&quot;</span><span class="p">)</span>
 </span><span class="hll">     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>   <span class="k">else</span><span class="p">:</span>
      <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">a</span>
@@ -658,7 +658,7 @@ that would map to the above diagram:</p>
  <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
    <span class="c1"># simple hook example 2</span>
    <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;she2&quot;</span><span class="p">)</span>
-   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">SIGNAL_NAME</span><span class="p">))</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
@@ -732,24 +732,24 @@ in Python:</p>
 <span class="sd">        | ``name`` (string): the name to show up in the trace</span>
 <span class="sd">     &#39;&#39;&#39;</span>
      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">None</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">None</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="kc">None</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="kc">None</span>
 
    <span class="k">def</span> <span class="nf">method_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;method 1 called&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;method 1 called&quot;</span><span class="p">)</span>
 
    <span class="k">def</span> <span class="nf">method_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;method 2 called&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;method 2 called&quot;</span><span class="p">)</span>
 
  <span class="nd">@spy_on</span>
  <span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-     <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">True</span>
-     <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">True</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="kc">True</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="kc">True</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;hook&#39;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;hook&#39;</span><span class="p">)</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner_state_1</span><span class="p">)</span>
@@ -778,14 +778,14 @@ in Python:</p>
  <span class="k">def</span> <span class="nf">inner_state_2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-     <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">True</span>
-     <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">True</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="kc">True</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="kc">True</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner_state_1</span><span class="p">)</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-     <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">False</span>
-     <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">False</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="kc">False</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="kc">False</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">else</span><span class="p">:</span>
      <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer_state</span>
@@ -794,7 +794,7 @@ in Python:</p>
 
  <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
    <span class="n">subclassed_ao</span> <span class="o">=</span> <span class="n">Class1UsedToSolveProblem</span><span class="p">(</span><span class="s1">&#39;subclassed_ao&#39;</span><span class="p">)</span>
-   <span class="n">subclassed_ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+   <span class="n">subclassed_ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="hll">   <span class="c1"># this is the attachement point where the event processor</span>
 </span><span class="hll">   <span class="c1"># is linking to the statemachine defined above as a set of</span>
 </span><span class="hll">   <span class="c1"># functions which reference each other</span>
@@ -846,14 +846,14 @@ this</a>:</p>
 <span class="sd">       | ``name`` (string): the name to show up in the trace</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="kc">None</span>
 
   <span class="k">def</span> <span class="nf">method_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;method 1 called&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;method 1 called&quot;</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">method_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;method 2 called&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;method 2 called&quot;</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">Class2UsedToSolveProblem</span><span class="p">(</span><span class="n">Class1UsedToSolveProblem</span><span class="p">):</span>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
@@ -867,20 +867,20 @@ this</a>:</p>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">method_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;method 1(overloaded) called&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;method 1(overloaded) called&quot;</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">method_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;method 2(overloaded) called&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;method 2(overloaded) called&quot;</span><span class="p">)</span>
 
 <span class="nd">@spy_on</span>
 <span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;hook&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;hook&#39;</span><span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner_state_1</span><span class="p">)</span>
@@ -909,14 +909,14 @@ this</a>:</p>
 <span class="k">def</span> <span class="nf">inner_state_2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner_state_1</span><span class="p">)</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">False</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer_state</span>
@@ -925,7 +925,7 @@ this</a>:</p>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">subclassed_ao1</span> <span class="o">=</span> <span class="n">Class1UsedToSolveProblem</span><span class="p">(</span><span class="s1">&#39;subclassed_ao1&#39;</span><span class="p">)</span>
-  <span class="n">subclassed_ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">subclassed_ao1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="hll">  <span class="c1"># this is the attachement point to the first object</span>
 </span><span class="hll">  <span class="n">subclassed_ao1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
 </span>  <span class="n">subclassed_ao1</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">))</span>
@@ -936,7 +936,7 @@ this</a>:</p>
   <span class="c1"># threads, so we will delay so we don&#39;t end up with a confusing trace</span>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
   <span class="n">subsubclassed_ao2</span> <span class="o">=</span> <span class="n">Class2UsedToSolveProblem</span><span class="p">(</span><span class="s1">&#39;subsubclassed_ao2&#39;</span><span class="p">)</span>
-  <span class="n">subsubclassed_ao2</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">subsubclassed_ao2</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="hll">  <span class="c1"># this is the attachement point to the second object</span>
 </span><span class="hll">  <span class="c1"># (it uses the same statemachine as the first object)</span>
 </span><span class="hll">  <span class="n">subsubclassed_ao2</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
@@ -985,7 +985,7 @@ within the <code class="docutils literal notranslate"><span class="pre">ClassWit
 <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
 
 <span class="k">class</span> <span class="nc">ClassWithEmbeddedChart</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;demonstration of a miros hierarchical statemachine within a class.</span>
 
 <span class="sd">    **Args**:</span>
@@ -994,7 +994,7 @@ within the <code class="docutils literal notranslate"><span class="pre">ClassWit
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="k">else</span> <span class="bp">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="k">else</span> <span class="kc">False</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;outer_state&quot;</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">,</span>
         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state_entry_signal</span><span class="p">)</span><span class="o">.</span> \
@@ -1022,7 +1022,7 @@ within the <code class="docutils literal notranslate"><span class="pre">ClassWit
         <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_2_exit_signal</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">to_method</span><span class="p">()</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+    <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span><span class="o">.</span> \
       <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state_2</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
 
@@ -1032,8 +1032,8 @@ within the <code class="docutils literal notranslate"><span class="pre">ClassWit
   <span class="nd">@staticmethod</span>
   <span class="k">def</span> <span class="nf">outer_state_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">False</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="n">status</span>
 
   <span class="nd">@staticmethod</span>
@@ -1044,7 +1044,7 @@ within the <code class="docutils literal notranslate"><span class="pre">ClassWit
   <span class="nd">@staticmethod</span>
   <span class="k">def</span> <span class="nf">outer_state_hook</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hook&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hook&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">status</span>
 
   <span class="nd">@staticmethod</span>
@@ -1067,8 +1067,8 @@ within the <code class="docutils literal notranslate"><span class="pre">ClassWit
   <span class="nd">@staticmethod</span>
   <span class="k">def</span> <span class="nf">inner_state_2_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-    <span class="n">chart_attribute_1</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">chart_attribute_2</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">chart_attribute_1</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">chart_attribute_2</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">return</span> <span class="n">status</span>
 
   <span class="nd">@staticmethod</span>
@@ -1079,18 +1079,18 @@ within the <code class="docutils literal notranslate"><span class="pre">ClassWit
   <span class="nd">@staticmethod</span>
   <span class="k">def</span> <span class="nf">inner_state_2_exit_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-    <span class="n">chart_attribute_1</span> <span class="o">=</span> <span class="bp">False</span>
-    <span class="n">chart_attribute_2</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">chart_attribute_1</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">chart_attribute_2</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="n">status</span>
 
   <span class="k">def</span> <span class="nf">method_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;calling method_1&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;calling method_1&quot;</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">method_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;calling method_2&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;calling method_2&quot;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-  <span class="n">cwec</span> <span class="o">=</span> <span class="n">ClassWithEmbeddedChart</span><span class="p">(</span><span class="s1">&#39;cwec&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">cwec</span> <span class="o">=</span> <span class="n">ClassWithEmbeddedChart</span><span class="p">(</span><span class="s1">&#39;cwec&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
   <span class="n">cwec</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">))</span>
   <span class="n">cwec</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Hook</span><span class="p">))</span>
   <span class="n">cwec</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
@@ -1150,8 +1150,8 @@ functions.</p>
     <span class="c1"># we are reacting to the entry event on the diagram</span>
     <span class="c1"># we only change variables on the first argument of our function, like</span>
     <span class="c1"># we would if it was named &#39;self&#39; in a typical Python method</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">False</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># this state wants to tell the event processor this event was handled</span>
     <span class="c1"># do not percolate outward in the graph (it wouldn&#39;t anyway for internal</span>
@@ -1181,7 +1181,7 @@ functions.</p>
     <span class="c1"># This is what we want to happen if the Hook event is sent to the state</span>
     <span class="c1"># chart while it is in this state, or the inner_state_1 or the</span>
     <span class="c1"># inner_state_2</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;hook&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hook&quot;</span><span class="p">)</span>
     <span class="c1"># This is the code that makes the handing of this event a hook,</span>
     <span class="c1"># or an event which causes  code to run without causing a</span>
     <span class="c1"># state transition.  Here we tell the event processor to stop searching.</span>
@@ -1224,14 +1224,14 @@ functions.</p>
 <span class="k">def</span> <span class="nf">inner_state_2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
   <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner_state_1</span><span class="p">)</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="bp">False</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_1</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">chart</span><span class="o">.</span><span class="n">attribute_2</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer_state</span>
@@ -1296,7 +1296,7 @@ ActiveObject.  Here is some code that the above diagram could model:</p>
 <code class="docutils literal notranslate"><span class="pre">start_at</span></code> method to attach our ActiveObject to the off state:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
    <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s1">&#39;simple_fsm_2&#39;</span><span class="p">)</span>
-   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="hll">   <span class="c1"># attach the ActiveObject&#39;s event processor to the state machine</span>
 </span>   <span class="c1"># and start its thread</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
@@ -1416,13 +1416,13 @@ the <a class="reference internal" href="recipes.html#recipes-using-the-spy"><spa
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s1">&#39;some_state&#39;</span><span class="p">)</span>
-  <span class="n">ao</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">ao</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">True</span>
   <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">some_state</span><span class="p">)</span>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-  <span class="k">assert</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span> <span class="o">==</span> <span class="bp">True</span><span class="p">)</span>
+  <span class="k">assert</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)</span>
 <span class="hll">  <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Destroy_This_Chart</span><span class="p">))</span>
 </span>  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-  <span class="k">assert</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span> <span class="o">==</span> <span class="bp">False</span><span class="p">)</span>
+  <span class="k">assert</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>If we were to run this code we would see:</p>
@@ -1461,7 +1461,7 @@ state machine:</p>
  <span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
    <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-     <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
    <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
      <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span><span class="p">:</span>
@@ -1470,7 +1470,7 @@ state machine:</p>
 <span class="hll">       <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;run code, but don&#39;t transition out of outer_state&quot;</span><span class="p">)</span>
 </span><span class="hll">       <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span>   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Retry</span><span class="p">):</span>
-     <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="k">else</span> <span class="bp">True</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="k">else</span> <span class="kc">True</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
    <span class="k">else</span><span class="p">:</span>
      <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
@@ -1492,8 +1492,8 @@ state machine:</p>
 feature, so we have to turn on the spy instrumentation to see it:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
    <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s1">&#39;final_icon&#39;</span><span class="p">)</span>
-   <span class="n">ao</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;condition&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
-<span class="hll">   <span class="n">ao</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">True</span>
+   <span class="n">ao</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;condition&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="hll">   <span class="n">ao</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">True</span>
 </span>   <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer_state</span><span class="p">)</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retry</span><span class="p">))</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retry</span><span class="p">))</span>
@@ -1537,13 +1537,13 @@ wrapped within a class:</p>
  <span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">return_status</span>
 
  <span class="k">class</span> <span class="nc">InstrumentedFactory</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
-   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_spy</span>
 
  <span class="k">class</span> <span class="nc">FinalIconExample</span><span class="p">(</span><span class="n">InstrumentedFactory</span><span class="p">):</span>
-   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
      <span class="sd">&#39;&#39;&#39;statechart demonstration the final icon</span>
 
 <span class="sd">     **Args**:</span>
@@ -1574,14 +1574,14 @@ wrapped within a class:</p>
      <span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;inner_state&quot;</span><span class="p">)</span><span class="o">.</span> \
        <span class="n">to_method</span><span class="p">()</span>
 
-     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
           <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
 
      <span class="bp">self</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
 
    <span class="nd">@staticmethod</span>
    <span class="k">def</span> <span class="nf">outer_state_entry_signal</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-     <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
      <span class="k">return</span> <span class="n">status</span>
 
@@ -1596,12 +1596,12 @@ wrapped within a class:</p>
 
    <span class="nd">@staticmethod</span>
    <span class="k">def</span> <span class="nf">outer_state_retry</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-     <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="k">else</span> <span class="bp">True</span>
+     <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">chart</span><span class="o">.</span><span class="n">condition</span> <span class="k">else</span> <span class="kc">True</span>
      <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">outer_state</span><span class="p">)</span>
      <span class="k">return</span> <span class="n">status</span>
 
  <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-   <span class="n">ao</span> <span class="o">=</span> <span class="n">FinalIconExample</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;final_icon&#39;</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+   <span class="n">ao</span> <span class="o">=</span> <span class="n">FinalIconExample</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;final_icon&#39;</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retry</span><span class="p">))</span>
    <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Retry</span><span class="p">))</span>
    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
@@ -1668,9 +1668,9 @@ some useful features.</p>
   <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">a2</span><span class="p">)</span>
   <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Bubbling</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span>
-      <span class="s2">&quot;finally hooked by a0, but state remains as {}&quot;</span><span class="o">.</span>
-      <span class="n">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">state_name</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span>
+      <span class="s2">&quot;finally hooked by a0, but state remains as </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span>
+      <span class="nb">format</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">state_name</span><span class="p">))</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
@@ -1681,7 +1681,7 @@ some useful features.</p>
 <span class="k">def</span> <span class="nf">a1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 <span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 </span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Bubbling</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;caught and released by a1&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;caught and released by a1&quot;</span><span class="p">)</span>
 </span>  <span class="k">else</span><span class="p">:</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">a0</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
@@ -1691,7 +1691,7 @@ some useful features.</p>
 <span class="k">def</span> <span class="nf">a2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 <span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
 </span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">Bubbling</span><span class="p">):</span>
-</span><span class="hll">    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;caught and released by a2&quot;</span><span class="p">)</span>
+</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;caught and released by a2&quot;</span><span class="p">)</span>
 </span>  <span class="k">else</span><span class="p">:</span>
     <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">a1</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
@@ -1699,7 +1699,7 @@ some useful features.</p>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
   <span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">(</span><span class="s1">&#39;fall_through&#39;</span><span class="p">)</span>
-  <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">ao</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
   <span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
   <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Bubbling</span><span class="p">))</span>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
@@ -1763,10 +1763,10 @@ highlighter marks.</p>
  <span class="k">class</span> <span class="nc">Chart1</span><span class="p">(</span><span class="n">ActiveObject</span><span class="p">):</span>
    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
 
    <span class="k">def</span> <span class="nf">print_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;x: {}, y: {}, z: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">))</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;x: </span><span class="si">{}</span><span class="s2">, y: </span><span class="si">{}</span><span class="s2">, z: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">))</span>
 
  <span class="nd">@spy_on</span>
  <span class="k">def</span> <span class="nf">c_1_outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -1803,11 +1803,11 @@ highlighter marks.</p>
 
  <span class="k">class</span> <span class="nc">Chart2</span><span class="p">(</span><span class="n">Chart1</span><span class="p">,</span> <span class="n">Factory</span><span class="p">):</span>
 
-   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">live_spy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
      <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_spy</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">live_trace</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">live_spy</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_spy</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">live_trace</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">live_trace</span>
 
      <span class="bp">self</span><span class="o">.</span><span class="n">c_2_outer_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;c_2_outer_state&quot;</span><span class="p">)</span><span class="o">.</span> \
        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span>
@@ -1821,7 +1821,7 @@ highlighter marks.</p>
          <span class="n">handler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">c_2_outer_state_entry_signal</span><span class="p">)</span><span class="o">.</span> \
        <span class="n">to_method</span><span class="p">()</span>
 
-     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c_2_outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="o">.</span> \
+     <span class="bp">self</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c_2_outer_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
           <span class="n">nest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c_2_inner_state</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">c_2_outer_state</span><span class="p">)</span>
 
      <span class="bp">self</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c_2_inner_state</span><span class="p">)</span>
@@ -1852,11 +1852,11 @@ highlighter marks.</p>
    <span class="c1"># set its live trace attribute</span>
    <span class="c1"># then start it in the correct state</span>
    <span class="n">c_1</span> <span class="o">=</span> <span class="n">Chart1</span><span class="p">(</span><span class="s1">&#39;c_1&#39;</span><span class="p">)</span>
-   <span class="n">c_1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="bp">True</span>
+   <span class="n">c_1</span><span class="o">.</span><span class="n">live_trace</span> <span class="o">=</span> <span class="kc">True</span>
    <span class="n">c_1</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">c_1_outer_state</span><span class="p">)</span>
 
    <span class="c1"># Chart2 starts itself in the correct state</span>
-   <span class="n">c_2</span> <span class="o">=</span> <span class="n">Chart2</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;c_2&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+   <span class="n">c_2</span> <span class="o">=</span> <span class="n">Chart2</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;c_2&#39;</span><span class="p">,</span> <span class="n">live_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
    <span class="n">c_2</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
    <span class="n">c_2</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Reset</span><span class="p">))</span>
    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
@@ -2139,12 +2139,12 @@ people on your team understand what you mean.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Jul 14, 2020 11:49 AM</span>
+          <span class="time">Nov 03, 2020 8:22 AM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.1.2 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>
