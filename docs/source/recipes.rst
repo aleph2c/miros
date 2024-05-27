@@ -2617,7 +2617,7 @@ If you have gotten this far, you have a good handle on how to use this library
 and all of its features.  But you can take it to another level though.  Your
 statecharts can send encrypted messages to one another and act in concert while
 running on different machines.  To see how to do this, look at the
-`miros-rabbitmq <https://aleph2c.github.io/miros-rabbitmq/index.html>`_ library.
+`miros-rabbitmq <https://aleph2c.github.io/miros-rabbitmq/html/index.html>`_ library.
 
 
 .. _recipes-states:
@@ -2707,8 +2707,6 @@ If your state method didn't include handling for the ``ENTRY_SIGNAL``,
 ``INIT_SIGNAL`` or ``EXIT_SIGNAL``, the event processor will just assume it did
 and returned return_state.HANDLED.
 
-To see factory boiler plate go, see :ref:`this <recipes-creating-a-state-method-from-a-factory>`
-
 .. _recipes-describing-your-parent-state-function:
 
 Describing your Parent State Function
@@ -2747,18 +2745,13 @@ first argument provided to your state method:
       chart.temp.fun = chart.top
     return status.
 
-To read more about why you structure your state methods this way, read :ref:`this.<recipes-what-a-state-does-and-how-to-structure-it>`
-
-To see how to define a parent state with a factory, read :ref:`this<recipes-factory-5>`
-
 .. _recipes-passing-events-to-the-parent-state-function:
 
 Passing events to the Parent State Function
 """""""""""""""""""""""""""""""""""""""""""
 
 The easiest way to pass an event outward in your statechart is not to handle it
-in your ``if-elif`` clauses and let your ``else``
-:ref:`clause<recipes-describe-a-parent-state>` handle it.
+in your ``if-elif`` clauses and let your ``else`` clause handle it.
 
 .. code-block:: python
 
@@ -2903,9 +2896,8 @@ transition into this state from one of its child states.
   statechart will not behave properly.
 
 The ``INIT_SIGNAL`` handler is often used as the place where your state can
-immediately transition into another state.  To do this, just use the
-:ref:`trans <recipes-transition-to-another-state>` method and return its result
-from your state method call:
+immediately transition into another state.  To do this, just use the ``trans``
+method and return its result from your state method call:
 
 .. code-block:: python
   :emphasize-lines: 6-10
@@ -3054,9 +3046,8 @@ the state that originally experienced the event.
 Catch and Release in a State function
 """""""""""""""""""""""""""""""""""""
 
-The catch and release recipe is similar to the
-:ref:`hook<recipes-create-a-hook>` recipe in that you are using the search phase
-of the event processor algorithm to run your code.
+The catch and release recipe is similar to the hook recipe in that you are using
+the search phase of the event processor algorithm to run your code.
 
 Instead of hooking the code with an ``HANDLED`` response, your state method
 returns an ``UNHANDLED`` status.  This causes the event processor, to query it
@@ -3476,8 +3467,8 @@ There will be situations where you only would like an event to cause a
 transition between two states if a condition is true.  This is called a guard,
 in UML it looks like this:
 
-.. image:: _static/guard.svg
-    :target: _static/guard.pdf
+.. image:: _static/guard2.svg
+    :target: _static/guard2.pdf
     :class: noscale-left
 
 The logic between the square brackets must be true for this event to work.  In
@@ -4251,8 +4242,12 @@ To create one or more thread safe attribute, you add them to the list defined
       print(ao.thread_safe_attr_2)
 
 
+.. _recipes__factories:
+
 Factories
 ^^^^^^^^^
+
+
 You can build a statechart within a class by using the ``miros.Factory`` class.
 The ``miros.Factory`` lets you build state methods, state handlers and start the
 chart in whichever state you need.
@@ -4278,12 +4273,12 @@ of programming this way:
 * effortlessly provides multi-threading without its dangers
 * complicated ``else`` clauses in state callback handlers are avoided
 * it is trivial for main to inject asynchronous information
-* it is not hard for main to :ref:`extract asynchronous information<recipes-getting-information-from-your-statecchart>`
+* it is not hard for main to extract asynchronous information
 * it is easy to build lots of these different kinds of objects and have them work as a federation. (systems programming)
 * it is easy to document federations (systems design)
-* it is not hard to network your federations with other federations across the internet (`systems of systems: miros-rabbitmq <https://aleph2c.github.io/miros-rabbitmq/index.html>`_)
+* it is not hard to network your federations with other federations across the internet (`systems of systems: miros-rabbitmq <https://aleph2c.github.io/miros-rabbitmq/html/index.html>`_)
 
-To program this way we use the :ref:`Factory <recipes-creating-a-state-method-from-a-factory>` class from miros.
+To program this way we use the :ref:`Factory <recipes__factories>` class from miros.
 
 Here is a simple example of a statechart within an object:
 

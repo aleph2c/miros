@@ -11,13 +11,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
     <title>Glossary | miros</title>
     <link rel="shortcut icon" href="_static/favicon.ico">
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css">
     <link rel="stylesheet" href="_static/theme.css" type="text/css">
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/theme.css" />
+      
     
       
     <link rel="stylesheet" type="text/css" href="_static/css/miros_docs.css" />
@@ -29,13 +38,15 @@
     <script type="text/javascript" src="_static/theme.js" defer></script>
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    
     <script src="_static/jquery.js"></script>
     
     <script src="_static/underscore.js"></script>
     
-    <script src="_static/doctools.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     
-    <script src="_static/language_data.js"></script>
+    <script src="_static/doctools.js"></script>
     
     
 
@@ -125,7 +136,7 @@
 <ul>
   <li><a href="https://github.com/aleph2c/py-activeobject">miros on github</a></li>
   <li><a href="https://github.com/aleph2c/sequence">sequence on github</a></li>
-  <li><a href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a></li>
+  <li><a href="https://aleph2c.github.io/miros-rabbitmq/html/index.html">miros-rabbitmq plugin</a></li>
   <li><a href="http://www.umlet.com">UMLet Download</a></li>
   <li><a href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">formalism explained</a></li>
 </ul>
@@ -170,10 +181,10 @@
       
         
           
-  <div class="section" id="glossary">
-<span id="glossary-glossary"></span><h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">#</a></h1>
+  <section id="glossary">
+<span id="glossary-glossary"></span><h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this heading">#</a></h1>
 <dl class="glossary">
-<dt id="term-Active-Fabric">Active Fabric</dt><dd><p>A singleton class shared by all <a class="reference internal" href="#term-Active-Object"><span class="xref std std-term">active objects</span></a>.
+<dt id="term-Active-Fabric">Active Fabric<a class="headerlink" href="#term-Active-Fabric" title="Permalink to this term">#</a></dt><dd><p>A singleton class shared by all <a class="reference internal" href="#term-Active-Object"><span class="xref std std-term">active objects</span></a>.
 Through it active objects can <a class="reference internal" href="#term-Publish"><span class="xref std std-term">publish</span></a> and
 <a class="reference internal" href="#term-Subscribe"><span class="xref std std-term">subscribe</span></a> to events created by other active objects.
 It contains two seperate threads (fifo/lifo) each tied to their own
@@ -185,7 +196,7 @@ will post the event into its deque using the post_fifo method.  If it
 subscribed using a lifo subscription it will post into its deque using
 the post_lifo method.</p>
 </dd>
-<dt id="term-Active-Object">Active Object</dt><dd><p>Contains an <a class="reference internal" href="#term-Event-Processor"><span class="xref std std-term">event processor</span></a>, a queue and a
+<dt id="term-Active-Object">Active Object<a class="headerlink" href="#term-Active-Object" title="Permalink to this term">#</a></dt><dd><p>Contains an <a class="reference internal" href="#term-Event-Processor"><span class="xref std std-term">event processor</span></a>, a queue and a
 thread which wakes up when an event is placed in its queue.  Upon waking,
 it calls the <a class="reference internal" href="#term-Event-Processor"><span class="xref std std-term">event processor</span></a> with the
 <a class="reference internal" href="#term-Event"><span class="xref std std-term">event</span></a> and the <a class="reference internal" href="#term-State-Method"><span class="xref std std-term">state methods</span></a> which
@@ -197,7 +208,7 @@ before it is created by the active object.  The active fabric is the
 software which allows all active objects to communicate with all other
 active objects.</p>
 </dd>
-<dt id="term-Artificial-Event">Artificial Event</dt><dd><p>An artificial event is an event which is made within your active object
+<dt id="term-Artificial-Event">Artificial Event<a class="headerlink" href="#term-Artificial-Event" title="Permalink to this term">#</a></dt><dd><p>An artificial event is an event which is made within your active object
 and posted to itself.  An example of an artificial event would be a
 <a class="reference internal" href="#term-One-Shot"><span class="xref std std-term">one shot</span></a>.  It is called <cite>artificial</cite> because it is not
 an event that came from outside of the active object in an asynchronous
@@ -205,29 +216,29 @@ way.</p>
 <p>The <span class="xref std std-ref">reminder pattern</span> also uses artificial
 events.</p>
 </dd>
-<dt id="term-Catch-and-Release">Catch and Release</dt><dd><p>Describes a pattern where an event is caught by a state method, used as
+<dt id="term-Catch-and-Release">Catch and Release<a class="headerlink" href="#term-Catch-and-Release" title="Permalink to this term">#</a></dt><dd><p>Describes a pattern where an event is caught by a state method, used as
 stimulation to run client code and then re-released as if that state
 didn’t know how to process the event.</p>
 </dd>
-<dt id="term-Child-State">Child State</dt><dd><p>A child state is a relative term. For a state to be a child state of
+<dt id="term-Child-State">Child State<a class="headerlink" href="#term-Child-State" title="Permalink to this term">#</a></dt><dd><p>A child state is a relative term. For a state to be a child state of
 another state it must be within that other state’s boundary.</p>
 </dd>
-<dt id="term-Client-Code">Client Code</dt><dd><p>Any code that you anchor onto your statechart.  It’s the code that
+<dt id="term-Client-Code">Client Code<a class="headerlink" href="#term-Client-Code" title="Permalink to this term">#</a></dt><dd><p>Any code that you anchor onto your statechart.  It’s the code that
 actually solves your business problem.  It is different the the
 statechart code in that it does not describe the structure of the
 hierarchical state machine.</p>
 </dd>
-<dt id="term-Defer">Defer</dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">defer</span></code> method is a way to place an event into a secondary queue
+<dt id="term-Defer">Defer<a class="headerlink" href="#term-Defer" title="Permalink to this term">#</a></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">defer</span></code> method is a way to place an event into a secondary queue
 that is ignored by the active object until the momenent the <code class="docutils literal notranslate"><span class="pre">recall</span></code>
 method is called.  At this point the event is placed into the active
 object’s queue as if an outside caller used its <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code> method.</p>
 <p>The number of elements contained with the deferred queue can be seen
 using the spy instrumentation.</p>
 </dd>
-<dt id="term-DRY">DRY</dt><dd><p>“Do Not Repeat Yourself”: A software best-practice for reducing the
+<dt id="term-DRY">DRY<a class="headerlink" href="#term-DRY" title="Permalink to this term">#</a></dt><dd><p>“Do Not Repeat Yourself”: A software best-practice for reducing the
 maintence cost of your software system.</p>
 </dd>
-<dt id="term-Event">Event</dt><dd><p>Any action in the world that your program cares about.  It can be
+<dt id="term-Event">Event<a class="headerlink" href="#term-Event" title="Permalink to this term">#</a></dt><dd><p>Any action in the world that your program cares about.  It can be
 triggered by a user, an instrument or internally by an <a class="reference internal" href="#term-Artificial-Event"><span class="xref std std-term">artificial
 event</span></a>.  Your program will notice, then react to this
 event by running a subset of your design to manifest the behavior
@@ -239,16 +250,16 @@ payload, which can be any data object describable by Python.</p>
 but it must be created with a <a class="reference internal" href="#term-Signal"><span class="xref std std-term">signal</span></a>.  An event is always the second
 argument of your <a class="reference internal" href="#term-State-Method"><span class="xref std std-term">state method</span></a>.</p>
 </dd>
-<dt id="term-Event-Processor">Event Processor</dt><dd><p>The event processor is the code the creates the <a class="reference internal" href="#term-Harel-Formalism"><span class="xref std std-term">Harel
+<dt id="term-Event-Processor">Event Processor<a class="headerlink" href="#term-Event-Processor" title="Permalink to this term">#</a></dt><dd><p>The event processor is the code the creates the <a class="reference internal" href="#term-Harel-Formalism"><span class="xref std std-term">Harel
 Formalism</span></a>.  It was ported from the work of Miro Samek.
 The library is named miros in honour of his contribution.</p>
 </dd>
-<dt id="term-Extended-State-Variables">Extended State Variables</dt><dd><p>This is a variable that can be used by a <a class="reference internal" href="#term-State-Machine"><span class="xref std std-term">state machine</span></a>.  They are often used in guard conditions.  In the miros
+<dt id="term-Extended-State-Variables">Extended State Variables<a class="headerlink" href="#term-Extended-State-Variables" title="Permalink to this term">#</a></dt><dd><p>This is a variable that can be used by a <a class="reference internal" href="#term-State-Machine"><span class="xref std std-term">state machine</span></a>.  They are often used in guard conditions.  In the miros
 library the object containing the <a class="reference internal" href="#term-Event-Processor"><span class="xref std std-term">event processor</span></a>, which are passed into the <a class="reference internal" href="#term-State-Method"><span class="xref std std-term">state methods</span></a> contain the extended state variables.</p>
 <p><a class="reference external" href="https://en.wikipedia.org/wiki/UML_state_machine#Extended_states">Extended state</a> variables are used to increase the complexity of a state
 machine without having to add explicit states</p>
 </dd>
-<dt id="term-Factory">Factory</dt><dd><p>The Factory class inherits from the <a class="reference internal" href="#term-Active-Object"><span class="xref std std-term">active object</span></a>
+<dt id="term-Factory">Factory<a class="headerlink" href="#term-Factory" title="Permalink to this term">#</a></dt><dd><p>The Factory class inherits from the <a class="reference internal" href="#term-Active-Object"><span class="xref std std-term">active object</span></a>
 class and thereby gains all of its abilities and relationship with the
 Active Fabric.  In addition to this it can be used to manufacture state
 methods and nest them within one another.  It also has a reflection
@@ -258,12 +269,12 @@ state methods would look like if they were hand crafted.</p>
 and unwinding a factory
 example</span></a>.</p>
 </dd>
-<dt id="term-Fifo">Fifo</dt><dd><p>First in first out.  Things line up as you image they should.</p>
+<dt id="term-Fifo">Fifo<a class="headerlink" href="#term-Fifo" title="Permalink to this term">#</a></dt><dd><p>First in first out.  Things line up as you image they should.</p>
 </dd>
-<dt id="term-Final-State">Final State</dt><dd><p>A <a class="reference internal" href="#term-Pseudostate"><span class="xref std std-term">pseudostate</span></a> which indicates that an arrow should
+<dt id="term-Final-State">Final State<a class="headerlink" href="#term-Final-State" title="Permalink to this term">#</a></dt><dd><p>A <a class="reference internal" href="#term-Pseudostate"><span class="xref std std-term">pseudostate</span></a> which indicates that an arrow should
 stop processing.</p>
 <img alt="_images/reminder3.svg" class="noscale-left" src="_images/reminder3.svg" /></dd>
-<dt id="term-Flat-State-Method">Flat State Method</dt><dd><p>A set of <span class="xref std std-ref">state methods</span>
+<dt id="term-Flat-State-Method">Flat State Method<a class="headerlink" href="#term-Flat-State-Method" title="Permalink to this term">#</a></dt><dd><p>A set of <span class="xref std std-ref">state methods</span>
 which use if-elif-else structures to define how they react to various
 events based on the <a class="reference internal" href="#term-Event"><span class="xref std std-term">event</span></a> <a class="reference internal" href="#term-Signal"><span class="xref std std-term">signal</span></a> name.
 The else clause of a flat state method must return the parent state
@@ -275,9 +286,9 @@ factory.  The <a class="reference internal" href="recipes.html#recipes-flatting-
 be used on a factory state method to turn it back into a flat state
 method.</p>
 </dd>
-<dt id="term-FSM">FSM</dt><dd><p>Finite State Machine: a <a class="reference internal" href="#term-State-Machine"><span class="xref std std-term">state machine</span></a> without hierarchy.</p>
+<dt id="term-FSM">FSM<a class="headerlink" href="#term-FSM" title="Permalink to this term">#</a></dt><dd><p>Finite State Machine: a <a class="reference internal" href="#term-State-Machine"><span class="xref std std-term">state machine</span></a> without hierarchy.</p>
 </dd>
-<dt id="term-Harel-Formalism">Harel Formalism</dt><dd><p>The Harel Formalism is a set of rules for describing how events should be
+<dt id="term-Harel-Formalism">Harel Formalism<a class="headerlink" href="#term-Harel-Formalism" title="Permalink to this term">#</a></dt><dd><p>The Harel Formalism is a set of rules for describing how events should be
 processed by active objects.  They describe when <a class="reference internal" href="#term-Internal-Event"><span class="xref std std-term">internal
 events</span></a> should be send to state methods.  For instance an
 ENTRY_SIGNAL event should be sent to a state method when its boundary is
@@ -289,23 +300,23 @@ how to manage an event it is passed outward to its parent state.  If
 none of the states within a state machine know how to manage an event,
 it is ignored.</p>
 </dd>
-<dt id="term-Hierarchical-State-Machine">Hierarchical State Machine</dt><dd><p>HSM: a state machine where states can exist within other states.  An outer
+<dt id="term-Hierarchical-State-Machine">Hierarchical State Machine<a class="headerlink" href="#term-Hierarchical-State-Machine" title="Permalink to this term">#</a></dt><dd><p>HSM: a state machine where states can exist within other states.  An outer
 state is called a parent state and an inner state is called a child state.
 In an HSM all child states share the behavior of the parents states unless
 this behavior is over-written by the designer.  Software written using HSM
 follow the <a class="reference internal" href="#term-Harel-Formalism"><span class="xref std std-term">harel formalism</span></a></p>
 </dd>
-<dt id="term-HSM">HSM</dt><dd><p>Hierarchical State Machine: a state machine where states can exit within
+<dt id="term-HSM">HSM<a class="headerlink" href="#term-HSM" title="Permalink to this term">#</a></dt><dd><p>Hierarchical State Machine: a state machine where states can exit within
 other states.  An outer state is called a parent state and an inner state
 is called a child state.  In an HSM all child states share the behavior of
 the parents states unless this behavior is over-written by the designer.</p>
 </dd>
-<dt id="term-HsmTopologyException">HsmTopologyException</dt><dd><p>An exception which is raised by the event processor when an INIT_SIGNAL
+<dt id="term-HsmTopologyException">HsmTopologyException<a class="headerlink" href="#term-HsmTopologyException" title="Permalink to this term">#</a></dt><dd><p>An exception which is raised by the event processor when an INIT_SIGNAL
 event tries to leave the current state.  This exception is often raise
 when the chart is designed incorrectly or when the nest method of the
 factory hasn’t ordered the states properly.</p>
 </dd>
-<dt id="term-Illegal-Transition">Illegal Transition</dt><dd><p>A transition that can not be serviced by the Miro Samek <a class="reference internal" href="#term-Event-Processor"><span class="xref std std-term">event
+<dt id="term-Illegal-Transition">Illegal Transition<a class="headerlink" href="#term-Illegal-Transition" title="Permalink to this term">#</a></dt><dd><p>A transition that can not be serviced by the Miro Samek <a class="reference internal" href="#term-Event-Processor"><span class="xref std std-term">event
 processor</span></a>.  An example of an illegal transition would
 occur then an INIT_SIGNAL event tries to leave its current state rather
 than by drilling further into the statechart.  An illegal transition will
@@ -315,32 +326,32 @@ This pattern uses a hook on the outer state of a statechart to provide a
 behavior accessible to all child states.  To learn more about it read
 <a class="reference internal" href="patterns.html#patterns-reminder"><span class="std std-ref">this</span></a>.</p>
 </dd>
-<dt id="term-Initialization-Event">Initialization Event</dt><dd><p>The initialization (init) event, is an <a class="reference internal" href="#term-Internal-Event"><span class="xref std std-term">internal event</span></a> with signal called INIT_SIGNAL.  It is injected into your state
+<dt id="term-Initialization-Event">Initialization Event<a class="headerlink" href="#term-Initialization-Event" title="Permalink to this term">#</a></dt><dd><p>The initialization (init) event, is an <a class="reference internal" href="#term-Internal-Event"><span class="xref std std-term">internal event</span></a> with signal called INIT_SIGNAL.  It is injected into your state
 method when the event processor has settled upon this state after either
 starting within it or finishing a state transition from a called to
 <code class="docutils literal notranslate"><span class="pre">trans</span></code>.  In UML the init event looks like a big black dot and an arrow
 and it can point to another state, or have some code written directly on
 it.</p>
 </dd>
-<dt id="term-Internal-Event">Internal Event</dt><dd><p>An internal event is an event that is created by the event processor and
+<dt id="term-Internal-Event">Internal Event<a class="headerlink" href="#term-Internal-Event" title="Permalink to this term">#</a></dt><dd><p>An internal event is an event that is created by the event processor and
 sent to your active object to manifest the <a class="reference internal" href="#term-Harel-Formalism"><span class="xref std std-term">Harel Formalism</span></a>.  It is different from other events in that you don’t have to
 explicitly invent it when you are creating your design.</p>
 </dd>
-<dt id="term-JINJA2">JINJA2</dt><dd><p><a class="reference external" href="http://jinja.pocoo.org/">Jinja</a> is a templating language written by Armin Ronacher.</p>
+<dt id="term-JINJA2">JINJA2<a class="headerlink" href="#term-JINJA2" title="Permalink to this term">#</a></dt><dd><p><a class="reference external" href="http://jinja.pocoo.org/">Jinja</a> is a templating language written by Armin Ronacher.</p>
 </dd>
-<dt id="term-Lifo">Lifo</dt><dd><p>Last in first out.  An item gets to barge to the front of a line.</p>
+<dt id="term-Lifo">Lifo<a class="headerlink" href="#term-Lifo" title="Permalink to this term">#</a></dt><dd><p>Last in first out.  An item gets to barge to the front of a line.</p>
 </dd>
-<dt id="term-Mealy-State-Machine">Mealy State Machine</dt><dd><p>A state machine which provides program output on the transition between
+<dt id="term-Mealy-State-Machine">Mealy State Machine<a class="headerlink" href="#term-Mealy-State-Machine" title="Permalink to this term">#</a></dt><dd><p>A state machine which provides program output on the transition between
 states.  Because of this, the path taken by the state machine become’s
 its own unmanaged state.  To program using the Mealy style you would
 write functions onto your state transitions.</p>
 </dd>
-<dt id="term-Moore-State-Machine">Moore State Machine</dt><dd><p>A state machine which provides program output within the state.  This is
+<dt id="term-Moore-State-Machine">Moore State Machine<a class="headerlink" href="#term-Moore-State-Machine" title="Permalink to this term">#</a></dt><dd><p>A state machine which provides program output within the state.  This is
 different from the Mealy approach, in that the transitions do not output
 information from the program.  The program outputs happen within the
 states themselves.</p>
 </dd>
-<dt id="term-Multi-Shot">Multi Shot</dt><dd><p>A multi shot is sent from a <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> call by setting the <code class="docutils literal notranslate"><span class="pre">times</span></code>
+<dt id="term-Multi-Shot">Multi Shot<a class="headerlink" href="#term-Multi-Shot" title="Permalink to this term">#</a></dt><dd><p>A multi shot is sent from a <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> call by setting the <code class="docutils literal notranslate"><span class="pre">times</span></code>
 argument to how every many events you would like to post (0 for
 infinite).  If you would like to delay the event, set the <code class="docutils literal notranslate"><span class="pre">deferred</span></code>
 argument to True.  The <code class="docutils literal notranslate"><span class="pre">period</span></code> argument is in units of seconds and
@@ -348,7 +359,7 @@ its value will determine the time delay prior to the event being
 presented to the active object’s queue if you have deferred the event.
 It also represents the period of your multishot.</p>
 </dd>
-<dt id="term-One-Shot">One Shot</dt><dd><p>A one shot is a delay event.  It can be created using the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code>
+<dt id="term-One-Shot">One Shot<a class="headerlink" href="#term-One-Shot" title="Permalink to this term">#</a></dt><dd><p>A one shot is a delay event.  It can be created using the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code>
 or <code class="docutils literal notranslate"><span class="pre">post_lifo</span></code> call by setting the <code class="docutils literal notranslate"><span class="pre">times</span></code> argument to 1 and the
 <code class="docutils literal notranslate"><span class="pre">deferred</span></code> argument to True.  The <code class="docutils literal notranslate"><span class="pre">period</span></code> argument is in units of
 seconds and its value will determine the time delay prior to the event
@@ -357,7 +368,7 @@ being presented to the active object’s queue.</p>
 event.  If your statechart needs to settle for a while before it
 continues to the next state consider using a one shot.</p>
 </dd>
-<dt id="term-Orthogonal-Region">Orthogonal Region</dt><dd><p>A concept taken from the original Harel paper.  To understand what is meant
+<dt id="term-Orthogonal-Region">Orthogonal Region<a class="headerlink" href="#term-Orthogonal-Region" title="Permalink to this term">#</a></dt><dd><p>A concept taken from the original Harel paper.  To understand what is meant
 by an orthogonal region imagine two statecharts sitting beside one
 another with a bunch of arrows between them. Loosely speaking if your to
 draw a circle around these two statecharts and their arrows, you would be
@@ -378,21 +389,21 @@ run a lot slower than it needs to.</p>
 <p>If you find yourself doing this, consider refacting your code using the
 <span class="xref std std-ref">reminder pattern</span>.</p>
 </dd>
-<dt id="term-Parent-State">Parent State</dt><dd><p>A parent state is a relative term.  For a state to have a parent state it
+<dt id="term-Parent-State">Parent State<a class="headerlink" href="#term-Parent-State" title="Permalink to this term">#</a></dt><dd><p>A parent state is a relative term.  For a state to have a parent state it
 must be incircled by that parent state in a Hierarchical State Machine.</p>
 </dd>
-<dt id="term-Pattern">Pattern</dt><dd><p>A statechart pattern is an example of how to structure a map with some of
+<dt id="term-Pattern">Pattern<a class="headerlink" href="#term-Pattern" title="Permalink to this term">#</a></dt><dd><p>A statechart pattern is an example of how to structure a map with some of
 the features provided by this library to solve a class of problems.</p>
 <p>The idea of a pattern was originally invented by the architect
 Christopher Alexander.</p>
 </dd>
-<dt id="term-Payload">Payload</dt><dd><p>A data object that has been injected into an Event.  It is intended to be
+<dt id="term-Payload">Payload<a class="headerlink" href="#term-Payload" title="Permalink to this term">#</a></dt><dd><p>A data object that has been injected into an Event.  It is intended to be
 used by the consumer of the event.</p>
 </dd>
-<dt id="term-Pseudostate">Pseudostate</dt><dd><p>Awkward UML language describing icons or glyphs that aren’t transitions
+<dt id="term-Pseudostate">Pseudostate<a class="headerlink" href="#term-Pseudostate" title="Permalink to this term">#</a></dt><dd><p>Awkward UML language describing icons or glyphs that aren’t transitions
 or states.</p>
 </dd>
-<dt id="term-Publish">Publish</dt><dd><p>An active object can publish an event anytime by using the <code class="docutils literal notranslate"><span class="pre">publish</span></code>
+<dt id="term-Publish">Publish<a class="headerlink" href="#term-Publish" title="Permalink to this term">#</a></dt><dd><p>An active object can publish an event anytime by using the <code class="docutils literal notranslate"><span class="pre">publish</span></code>
 method.  This will pass the event to the active fabric which will search
 and determine if any other active objects have
 <a class="reference internal" href="#term-Subscribe"><span class="xref std std-term">subscribed</span></a> to the <a class="reference internal" href="#term-Event"><span class="xref std std-term">event</span></a>.  If they have
@@ -400,19 +411,19 @@ it will post this event into their internal queue so that it will be
 consumed during a future <a class="reference internal" href="#term-Run-To-Completion"><span class="xref std std-term">run to completion</span></a>
 process.</p>
 </dd>
-<dt id="term-Recall">Recall</dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">recall</span></code> method is to pop the oldest item from the deferred queue
+<dt id="term-Recall">Recall<a class="headerlink" href="#term-Recall" title="Permalink to this term">#</a></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">recall</span></code> method is to pop the oldest item from the deferred queue
 and place those items into the working queue of the current active
 object.</p>
 </dd>
-<dt id="term-Reminder-Pattern">Reminder Pattern</dt><dd><p>A pattern used to remidy designs which have <span class="xref std std-term">orthogonal
+<dt id="term-Reminder-Pattern">Reminder Pattern<a class="headerlink" href="#term-Reminder-Pattern" title="Permalink to this term">#</a></dt><dd><p>A pattern used to remidy designs which have <span class="xref std std-term">orthogonal
 regions</span>.  An <span class="xref std std-term">ultimate hook</span> is used to inject an <a class="reference internal" href="#term-Artificial-Event"><span class="xref std std-term">artificial event</span></a>
 into the statechart.  To learn more about it read
 <a class="reference internal" href="patterns.html#patterns-reminder"><span class="std std-ref">this</span></a>.  To see an example click
 <span class="xref std std-ref">here</span>.</p>
 </dd>
-<dt id="term-RTC">RTC</dt><dd><p><a class="reference internal" href="#term-Run-To-Completion"><span class="xref std std-term">Run To Completion</span></a></p>
+<dt id="term-RTC">RTC<a class="headerlink" href="#term-RTC" title="Permalink to this term">#</a></dt><dd><p><a class="reference internal" href="#term-Run-To-Completion"><span class="xref std std-term">Run To Completion</span></a></p>
 </dd>
-<dt id="term-Run-To-Completion">Run To Completion</dt><dd><p>A run to completion process begins when a statechart receives an event.
+<dt id="term-Run-To-Completion">Run To Completion<a class="headerlink" href="#term-Run-To-Completion" title="Permalink to this term">#</a></dt><dd><p>A run to completion process begins when a statechart receives an event.
 It searches its local graph and makes a determination if it needs to
 respond, if so it will transition from the local state to the target
 state while adhering to the <a class="reference internal" href="#term-Harel-Formalism"><span class="xref std std-term">Harel Formalism</span></a>,
@@ -426,12 +437,12 @@ process.  If an event is received it is placed in the queue and it will
 not be considered by the event processor until its RTC step is
 completed.</p>
 </dd>
-<dt id="term-Sequence">Sequence</dt><dd><p><a class="reference external" href="https://github.com/aleph2c/sequence">Sequence</a> is a tool that consumes trace log strings and
+<dt id="term-Sequence">Sequence<a class="headerlink" href="#term-Sequence" title="Permalink to this term">#</a></dt><dd><p><a class="reference external" href="https://github.com/aleph2c/sequence">Sequence</a> is a tool that consumes trace log strings and
 produces ASCII sequence diagrams.  If the spy log contains the output of
 many different active objects, the sequence tool will create as many
 sequence diagrams as there are active objects in the trace.</p>
 </dd>
-<dt id="term-Signal">Signal</dt><dd><p>A signal is a common set of enumerations that apply to all sets of
+<dt id="term-Signal">Signal<a class="headerlink" href="#term-Signal" title="Permalink to this term">#</a></dt><dd><p>A signal is a common set of enumerations that apply to all sets of
 <a class="reference internal" href="#term-Event"><span class="xref std std-term">events</span></a> within the system.  They are used to catagorize
 events into pools of commmon meaning that can be used by your state
 methods to take action upon.  There are external signals (which you
@@ -439,7 +450,7 @@ define as a user) and internal signals like INIT_SIGNAL, ENTRY_SIGNAL,
 EXIT_SIGNAL .. which are used internally by the event processor
 algorithm.</p>
 </dd>
-<dt id="term-Spy">Spy</dt><dd><p>The spy is one of the two instrumentation techniques used by the miros
+<dt id="term-Spy">Spy<a class="headerlink" href="#term-Spy" title="Permalink to this term">#</a></dt><dd><p>The spy is one of the two instrumentation techniques used by the miros
 library.  It shows every detail that the event processor is doing while
 it is searching and running an RTC event.  You can add information into
 the spy log by using the <code class="docutils literal notranslate"><span class="pre">scribble</span></code> method.  You can view this
@@ -447,30 +458,30 @@ log live as it is running by using the live spy.  Or you can look to see
 what the log contains by running the <code class="docutils literal notranslate"><span class="pre">spy</span></code> method.  The spy log has a
 ring buffer containing 500 spots.</p>
 </dd>
-<dt id="term-State">State</dt><dd><p>Defines the current operating condition of a program.  A program will have
+<dt id="term-State">State<a class="headerlink" href="#term-State" title="Permalink to this term">#</a></dt><dd><p>Defines the current operating condition of a program.  A program will have
 more than one state and collectively these states are called a state machine.</p>
 </dd>
-<dt id="term-State-Machine">State Machine</dt><dd><p>A program which uses <a class="reference internal" href="#term-State"><span class="xref std std-term">states</span></a> and <a class="reference internal" href="#term-Event"><span class="xref std std-term">events</span></a> to
+<dt id="term-State-Machine">State Machine<a class="headerlink" href="#term-State-Machine" title="Permalink to this term">#</a></dt><dd><p>A program which uses <a class="reference internal" href="#term-State"><span class="xref std std-term">states</span></a> and <a class="reference internal" href="#term-Event"><span class="xref std std-term">events</span></a> to
 determine how it should react to information coming to it in an
 asynchronous manner.</p>
 </dd>
-<dt id="term-State-Method">State Method</dt><dd><p>The code used to describe a <a class="reference internal" href="#term-State"><span class="xref std std-term">state</span></a>.  They can be hand coded,
+<dt id="term-State-Method">State Method<a class="headerlink" href="#term-State-Method" title="Permalink to this term">#</a></dt><dd><p>The code used to describe a <a class="reference internal" href="#term-State"><span class="xref std std-term">state</span></a>.  They can be hand coded,
 built using a template or described within a Factory.</p>
 </dd>
-<dt id="term-Statechart">Statechart</dt><dd><p>A statechart is a <a class="reference internal" href="#term-Hierarchical-State-Machine"><span class="xref std std-term">hierarchical state machine</span></a> with its own queue for the events it hasn’t reacted against
+<dt id="term-Statechart">Statechart<a class="headerlink" href="#term-Statechart" title="Permalink to this term">#</a></dt><dd><p>A statechart is a <a class="reference internal" href="#term-Hierarchical-State-Machine"><span class="xref std std-term">hierarchical state machine</span></a> with its own queue for the events it hasn’t reacted against
 yet and a thread in which it can run.  The word was invented by David
 Harel and it is often used as a synonym for <a class="reference internal" href="#term-Active-Object"><span class="xref std std-term">active object</span></a> or <a class="reference internal" href="#term-Factory"><span class="xref std std-term">factory</span></a> in this documentation.</p>
 </dd>
-<dt id="term-Subscribe">Subscribe</dt><dd><p>A subscription is a multi-statchart concept.  When an active object would
+<dt id="term-Subscribe">Subscribe<a class="headerlink" href="#term-Subscribe" title="Permalink to this term">#</a></dt><dd><p>A subscription is a multi-statchart concept.  When an active object would
 like to receive and respond to a message provided by another active
 object it can subscribe to the <a class="reference internal" href="#term-Signal"><span class="xref std std-term">signal</span></a> that that event
 will contain.</p>
 </dd>
-<dt id="term-Substate">Substate</dt><dd><p>A child state.</p>
+<dt id="term-Substate">Substate<a class="headerlink" href="#term-Substate" title="Permalink to this term">#</a></dt><dd><p>A child state.</p>
 </dd>
-<dt id="term-Superstate">Superstate</dt><dd><p>A parent state.</p>
+<dt id="term-Superstate">Superstate<a class="headerlink" href="#term-Superstate" title="Permalink to this term">#</a></dt><dd><p>A parent state.</p>
 </dd>
-<dt id="term-Template">Template</dt><dd><p>A template is a state method that has a structure which contains the
+<dt id="term-Template">Template<a class="headerlink" href="#term-Template" title="Permalink to this term">#</a></dt><dd><p>A template is a state method that has a structure which contains the
 <code class="docutils literal notranslate"><span class="pre">signal_callback</span></code> and <code class="docutils literal notranslate"><span class="pre">parent_callback</span></code> context managers.  You can
 use a template using the <code class="docutils literal notranslate"><span class="pre">state_method_template</span></code> and it will return a
 state method who’s name is as an input.  It will be instrumented and will
@@ -479,11 +490,11 @@ its active object with once it is formed.</p>
 <p>A state method built up this way can be turned back into a flat method by
 using the <code class="docutils literal notranslate"><span class="pre">to_code</span></code> method.</p>
 </dd>
-<dt id="term-Top-State">Top State</dt><dd><p>A top state is a state that is the parent state to all states within a
+<dt id="term-Top-State">Top State<a class="headerlink" href="#term-Top-State" title="Permalink to this term">#</a></dt><dd><p>A top state is a state that is the parent state to all states within a
 Hierarchical state machine.  It actually exists as a state method within
 the event processor.</p>
 </dd>
-<dt id="term-Trace">Trace</dt><dd><p>The trace is one of the two instrumentation techniques used by the miros
+<dt id="term-Trace">Trace<a class="headerlink" href="#term-Trace" title="Permalink to this term">#</a></dt><dd><p>The trace is one of the two instrumentation techniques used by the miros
 library.  It provides a high level view of what has happened, in that it
 show the initial stimuleous, the starting state and the ending state per
 line.  Unlike the spy it does not show the details related to how the
@@ -494,22 +505,22 @@ diagrams.</p>
 to what what the log contains using the <code class="docutils literal notranslate"><span class="pre">trace</span></code> method.  The trace log
 has a ring buffer which contains 250 spots.</p>
 </dd>
-<dt id="term-Transducer">Transducer</dt><dd><p>A measuring device which converts a physical property (temperature,
+<dt id="term-Transducer">Transducer<a class="headerlink" href="#term-Transducer" title="Permalink to this term">#</a></dt><dd><p>A measuring device which converts a physical property (temperature,
 location, acceleration .. etc) into an electrical signal or binary
 number.</p>
 </dd>
-<dt id="term-UML">UML</dt><dd><p>Universal Modeling Language.  Any drawing referenced in this library is
+<dt id="term-UML">UML<a class="headerlink" href="#term-UML" title="Permalink to this term">#</a></dt><dd><p>Universal Modeling Language.  Any drawing referenced in this library is
 intended to be used as a sketch of a design, not as a blue print or as
 the language itself.</p>
 </dd>
-<dt id="term-YAML">YAML</dt><dd><p>Yet Another Markup Language.  This is a plain text file with the
+<dt id="term-YAML">YAML<a class="headerlink" href="#term-YAML" title="Permalink to this term">#</a></dt><dd><p>Yet Another Markup Language.  This is a plain text file with the
 extension yml or yaml.  It was constructed as a reaction against XML.
 XML was too difficult to read and format, so YAML was invented to make
 configurations easy to read and edit.  (YAML files are largely hated by
 MINECRAFT admistrators.)</p>
 </dd>
 </dl>
-</div>
+</section>
 
 
         
@@ -546,12 +557,12 @@ MINECRAFT admistrators.)</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Nov 03, 2020 8:22 AM</span>
+          <span class="time">May 26, 2024 6:24 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 5.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

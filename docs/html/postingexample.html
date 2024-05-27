@@ -11,13 +11,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
     <title>Simple Posting Example | miros</title>
     <link rel="shortcut icon" href="_static/favicon.ico">
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css">
     <link rel="stylesheet" href="_static/theme.css" type="text/css">
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/theme.css" />
+      
     
       
     <link rel="stylesheet" type="text/css" href="_static/css/miros_docs.css" />
@@ -29,13 +38,15 @@
     <script type="text/javascript" src="_static/theme.js" defer></script>
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    
     <script src="_static/jquery.js"></script>
     
     <script src="_static/underscore.js"></script>
     
-    <script src="_static/doctools.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     
-    <script src="_static/language_data.js"></script>
+    <script src="_static/doctools.js"></script>
     
     
 
@@ -121,7 +132,7 @@
 <ul>
   <li><a href="https://github.com/aleph2c/py-activeobject">miros on github</a></li>
   <li><a href="https://github.com/aleph2c/sequence">sequence on github</a></li>
-  <li><a href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a></li>
+  <li><a href="https://aleph2c.github.io/miros-rabbitmq/html/index.html">miros-rabbitmq plugin</a></li>
   <li><a href="http://www.umlet.com">UMLet Download</a></li>
   <li><a href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">formalism explained</a></li>
 </ul>
@@ -166,13 +177,8 @@
       
         
           
-  <blockquote>
-<div><p><em>The individual has always had to struggle to keep from being overwhelmed by the
-tribe.  If you try it, you will be frightened.  But no price is too high to pay
-for the privilege of owning yourself</em> – Friedrich Nietzsche</p>
-</div></blockquote>
-<div class="section" id="simple-posting-example">
-<span id="examples-simple-posting-example"></span><h1>Simple Posting Example<a class="headerlink" href="#simple-posting-example" title="Permalink to this headline">#</a></h1>
+  <section id="simple-posting-example">
+<span id="examples-simple-posting-example"></span><h1>Simple Posting Example<a class="headerlink" href="#simple-posting-example" title="Permalink to this heading">#</a></h1>
 <a class="reference external image-reference" href="_static/posting_example.pdf"><img alt="_images/posting_example.svg" class="scale-to-fit" src="_images/posting_example.svg" /></a>
 <p>Here we see an active object.  To understand it, lets take the following steps:</p>
 <ol class="arabic simple">
@@ -213,45 +219,27 @@ the <code class="docutils literal notranslate"><span class="pre">outer</span></c
 <li><p>We will trigger an event and watch the chart react.</p></li>
 </ol>
 <p>The <strong>outer</strong> state method would look like this:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
-<span class="k">def</span> <span class="nf">outer</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="n">ao</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">D</span><span class="p">):</span>
-    <span class="n">ao</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;flash B!&quot;</span><span class="p">)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">top</span>
-  <span class="k">return</span> <span class="n">status</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@spy_on</span>
+<span class="linenos"> 2</span><span class="k">def</span> <span class="nf">outer</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="linenos"> 3</span>  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
+<span class="linenos"> 4</span>  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+<span class="linenos"> 5</span>    <span class="n">ao</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span>
+<span class="linenos"> 6</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="linenos"> 7</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+<span class="linenos"> 8</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="linenos"> 9</span>  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+<span class="linenos">10</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="linenos">11</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">D</span><span class="p">):</span>
+<span class="linenos">12</span>    <span class="n">ao</span><span class="o">.</span><span class="n">recall</span><span class="p">()</span>
+<span class="linenos">13</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="linenos">14</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">):</span>
+<span class="linenos">15</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;flash B!&quot;</span><span class="p">)</span>
+<span class="linenos">16</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
+<span class="linenos">17</span>  <span class="k">else</span><span class="p">:</span>
+<span class="linenos">18</span>    <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">top</span>
+<span class="linenos">19</span>  <span class="k">return</span> <span class="n">status</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>On line <strong>1</strong> we see we are using the <code class="docutils literal notranslate"><span class="pre">&#64;spy_on</span></code> decorator.  This will allow us to
 look at how the chart behaves in a log once we start sending events to
 it.</p>
@@ -310,59 +298,34 @@ structure and semantics since many in our industry have become familiar with
 them.  It will also ensure that if you port your work into the quantum
 framework, the code will look about the same there as it does here.</p>
 <p>Now let’s move on to the construction of the <em>middle</em> state:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nd">@spy_on</span>
-<span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-    <span class="n">multi_shot_thread</span> <span class="o">=</span> \
-      <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">),</span>
-                      <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                      <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-                      <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="c1"># We mark up the ao with this id, so that</span>
-    <span class="c1"># this state function can be used by many different aos</span>
-    <span class="n">ao</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="n">multi_shot_thread</span><span class="p">,</span>
-                  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;multi_shot_thread&#39;</span><span class="p">)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">ao</span><span class="o">.</span><span class="n">cancel_event</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">multi_shot_thread</span><span class="p">)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">outer</span>
-  <span class="k">return</span> <span class="n">status</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nd">@spy_on</span>
+<span class="linenos"> 2</span><span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="linenos"> 3</span>  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
+<span class="linenos"> 4</span>  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+<span class="linenos"> 5</span>    <span class="n">multi_shot_thread</span> <span class="o">=</span> \
+<span class="linenos"> 6</span>      <span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">),</span>
+<span class="linenos"> 7</span>                      <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="linenos"> 8</span>                      <span class="n">period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="linenos"> 9</span>                      <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos">10</span>    <span class="c1"># We mark up the ao with this id, so that</span>
+<span class="linenos">11</span>    <span class="c1"># this state function can be used by many different aos</span>
+<span class="linenos">12</span>    <span class="n">ao</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="n">multi_shot_thread</span><span class="p">,</span>
+<span class="linenos">13</span>                  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;multi_shot_thread&#39;</span><span class="p">)</span>
+<span class="linenos">14</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+<span class="linenos">17</span>    <span class="n">ao</span><span class="o">.</span><span class="n">cancel_event</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">multi_shot_thread</span><span class="p">)</span>
+<span class="linenos">18</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="linenos">19</span>
+<span class="linenos">20</span>  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+<span class="linenos">21</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="linenos">22</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">A</span><span class="p">):</span>
+<span class="linenos">23</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
+<span class="linenos">24</span>  <span class="k">else</span><span class="p">:</span>
+<span class="linenos">25</span>    <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">outer</span>
+<span class="linenos">26</span>  <span class="k">return</span> <span class="n">status</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>This method generally has the same structure as the outer state method.  Line
 <em>1</em> instruments the method.  Line <em>2</em> has the same method signature.  Line <em>3</em>
 uses the same way to set up are return variable.</p>
@@ -452,33 +415,21 @@ things are called, will behave as they would expect them to.  By placing the
 their cognition, focusing on the design itself rather than how they are going
 to implement it.</p>
 <p>Let’s describe the <strong>inner</strong> state as a state method:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
-<span class="hll">    <span class="n">ao</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">))</span>
-</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-<span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
-</span><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;charging with B&quot;</span><span class="p">)</span>
-</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
-</span>  <span class="k">else</span><span class="p">:</span>
-    <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">middle</span>
-  <span class="k">return</span> <span class="n">status</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="linenos"> 2</span>  <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">UNHANDLED</span>
+<span class="linenos"> 3</span>  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">ENTRY_SIGNAL</span><span class="p">):</span>
+<span class="hll"><span class="linenos"> 4</span>    <span class="n">ao</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">B</span><span class="p">))</span>
+</span><span class="linenos"> 5</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="linenos"> 6</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+<span class="linenos"> 7</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll"><span class="linenos"> 8</span>  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos"> 9</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;charging with B&quot;</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos">10</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="linenos">11</span>  <span class="k">else</span><span class="p">:</span>
+<span class="linenos">12</span>    <span class="n">status</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">SUPER</span><span class="p">,</span> <span class="n">middle</span>
+<span class="linenos">13</span>  <span class="k">return</span> <span class="n">status</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>We understand most of this code now, with the exception of line <em>4</em>.  We see
 that it happens upon entering the state and that we are deferring an
 event with the signal name <strong>B</strong>, but what does this mean?</p>
@@ -507,25 +458,17 @@ wait about 4 seconds and then send an event named <strong>D</strong>?</p>
 <p><em>Hint: I modeled the diagram on a tazor.</em></p>
 <p>Let’s see what happens using our state methods within an active object, then
 reflecting upon its behavior.</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">C</span><span class="p">))</span>
-<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">4.0</span><span class="p">)</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">D</span><span class="p">))</span>
-<span class="hll"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos">2</span><span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="linenos">3</span><span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span>
+<span class="linenos">4</span><span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">C</span><span class="p">))</span>
+<span class="linenos">5</span><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">4.0</span><span class="p">)</span>
+<span class="linenos">6</span><span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">D</span><span class="p">))</span>
+<span class="hll"><span class="linenos">7</span><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</span><span class="linenos">8</span>
+<span class="linenos">9</span><span class="nb">print</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy_full</span><span class="p">)</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>On line <strong>1</strong> we create an active object.  On line <strong>2</strong> we start it in the
 <strong>outer</strong> state method.  The active object’s event processor can now reach all
 of the state methods (even though they are defined outside of its class)
@@ -549,123 +492,66 @@ amplifier which separates the charge at a high voltage across the capacitor.
 After this capacitor is charged up, you can zap somebody; the charge is coming
 out of the capacitor in a hurry.</p>
 <p>Line <strong>9</strong> shows us the action:</p>
-<div class="highlight-shell notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="hll"><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
-</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;</span>,
- <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:outer&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:outer&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:middle&#39;</span>,
- <span class="s1">&#39;INIT_SIGNAL:middle&#39;</span>,
-<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
-</span> <span class="s1">&#39;A:middle&#39;</span>,
- <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:inner&#39;</span>,
- <span class="s1">&#39;POST_DEFERRED:B&#39;</span>,
- <span class="s1">&#39;INIT_SIGNAL:inner&#39;</span>,
-<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(1)&#39;</span>,
-</span> <span class="s1">&#39;A:inner&#39;</span>,
- <span class="s1">&#39;A:middle&#39;</span>,
- <span class="s1">&#39;EXIT_SIGNAL:inner&#39;</span>,
- <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:inner&#39;</span>,
- <span class="s1">&#39;POST_DEFERRED:B&#39;</span>,
- <span class="s1">&#39;INIT_SIGNAL:inner&#39;</span>,
-<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(2)&#39;</span>,
-</span> <span class="s1">&#39;A:inner&#39;</span>,
- <span class="s1">&#39;A:middle&#39;</span>,
- <span class="s1">&#39;EXIT_SIGNAL:inner&#39;</span>,
- <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:inner&#39;</span>,
- <span class="s1">&#39;POST_DEFERRED:B&#39;</span>,
- <span class="s1">&#39;INIT_SIGNAL:inner&#39;</span>,
-<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(3)&#39;</span>,
-</span> <span class="s1">&#39;D:inner&#39;</span>,
- <span class="s1">&#39;D:middle&#39;</span>,
- <span class="s1">&#39;D:outer&#39;</span>,
- <span class="s1">&#39;POST_FIFO:B&#39;</span>,
- <span class="s1">&#39;D:outer:HOOK&#39;</span>,
-<span class="hll"> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(2)&#39;</span>,
-</span> <span class="s1">&#39;B:inner&#39;</span>,
- <span class="s1">&#39;B:middle&#39;</span>,
- <span class="s1">&#39;B:outer&#39;</span>,
- <span class="s1">&#39;EXIT_SIGNAL:inner&#39;</span>,
- <span class="s1">&#39;EXIT_SIGNAL:middle&#39;</span>,
- <span class="s1">&#39;EXIT_SIGNAL:outer&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:outer&#39;</span>,
- <span class="s1">&#39;POST_FIFO:B&#39;</span>,
- <span class="s1">&#39;RECALL:B&#39;</span>,
- <span class="s1">&#39;INIT_SIGNAL:outer&#39;</span>,
-<span class="hll"> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(1)&#39;</span>,
-</span> <span class="s1">&#39;B:outer&#39;</span>,
- <span class="s1">&#39;EXIT_SIGNAL:outer&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:outer&#39;</span>,
- <span class="s1">&#39;POST_FIFO:B&#39;</span>,
- <span class="s1">&#39;RECALL:B&#39;</span>,
- <span class="s1">&#39;INIT_SIGNAL:outer&#39;</span>,
-<span class="hll"> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(0)&#39;</span>,
-</span> <span class="s1">&#39;B:outer&#39;</span>,
- <span class="s1">&#39;EXIT_SIGNAL:outer&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:outer&#39;</span>,
- <span class="s1">&#39;INIT_SIGNAL:outer&#39;</span>,
-<span class="hll"> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="linenos"> 1</span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
+</span><span class="linenos"> 2</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:middle&#39;</span>,
+<span class="linenos"> 3</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:outer&#39;</span>,
+<span class="linenos"> 4</span> <span class="s1">&#39;ENTRY_SIGNAL:outer&#39;</span>,
+<span class="linenos"> 5</span> <span class="s1">&#39;ENTRY_SIGNAL:middle&#39;</span>,
+<span class="linenos"> 6</span> <span class="s1">&#39;INIT_SIGNAL:middle&#39;</span>,
+<span class="hll"><span class="linenos"> 7</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
+</span><span class="linenos"> 8</span> <span class="s1">&#39;A:middle&#39;</span>,
+<span class="linenos"> 9</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span>,
+<span class="linenos">10</span> <span class="s1">&#39;ENTRY_SIGNAL:inner&#39;</span>,
+<span class="linenos">11</span> <span class="s1">&#39;POST_DEFERRED:B&#39;</span>,
+<span class="linenos">12</span> <span class="s1">&#39;INIT_SIGNAL:inner&#39;</span>,
+<span class="hll"><span class="linenos">13</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(1)&#39;</span>,
+</span><span class="linenos">14</span> <span class="s1">&#39;A:inner&#39;</span>,
+<span class="linenos">15</span> <span class="s1">&#39;A:middle&#39;</span>,
+<span class="linenos">16</span> <span class="s1">&#39;EXIT_SIGNAL:inner&#39;</span>,
+<span class="linenos">17</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span>,
+<span class="linenos">18</span> <span class="s1">&#39;ENTRY_SIGNAL:inner&#39;</span>,
+<span class="linenos">19</span> <span class="s1">&#39;POST_DEFERRED:B&#39;</span>,
+<span class="linenos">20</span> <span class="s1">&#39;INIT_SIGNAL:inner&#39;</span>,
+<span class="hll"><span class="linenos">21</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(2)&#39;</span>,
+</span><span class="linenos">22</span> <span class="s1">&#39;A:inner&#39;</span>,
+<span class="linenos">23</span> <span class="s1">&#39;A:middle&#39;</span>,
+<span class="linenos">24</span> <span class="s1">&#39;EXIT_SIGNAL:inner&#39;</span>,
+<span class="linenos">25</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner&#39;</span>,
+<span class="linenos">26</span> <span class="s1">&#39;ENTRY_SIGNAL:inner&#39;</span>,
+<span class="linenos">27</span> <span class="s1">&#39;POST_DEFERRED:B&#39;</span>,
+<span class="linenos">28</span> <span class="s1">&#39;INIT_SIGNAL:inner&#39;</span>,
+<span class="hll"><span class="linenos">29</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(3)&#39;</span>,
+</span><span class="linenos">30</span> <span class="s1">&#39;D:inner&#39;</span>,
+<span class="linenos">31</span> <span class="s1">&#39;D:middle&#39;</span>,
+<span class="linenos">32</span> <span class="s1">&#39;D:outer&#39;</span>,
+<span class="linenos">33</span> <span class="s1">&#39;POST_FIFO:B&#39;</span>,
+<span class="linenos">34</span> <span class="s1">&#39;D:outer:HOOK&#39;</span>,
+<span class="hll"><span class="linenos">35</span> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(2)&#39;</span>,
+</span><span class="linenos">36</span> <span class="s1">&#39;B:inner&#39;</span>,
+<span class="linenos">37</span> <span class="s1">&#39;B:middle&#39;</span>,
+<span class="linenos">38</span> <span class="s1">&#39;B:outer&#39;</span>,
+<span class="linenos">39</span> <span class="s1">&#39;EXIT_SIGNAL:inner&#39;</span>,
+<span class="linenos">40</span> <span class="s1">&#39;EXIT_SIGNAL:middle&#39;</span>,
+<span class="linenos">41</span> <span class="s1">&#39;EXIT_SIGNAL:outer&#39;</span>,
+<span class="linenos">42</span> <span class="s1">&#39;ENTRY_SIGNAL:outer&#39;</span>,
+<span class="linenos">43</span> <span class="s1">&#39;POST_FIFO:B&#39;</span>,
+<span class="linenos">44</span> <span class="s1">&#39;RECALL:B&#39;</span>,
+<span class="linenos">45</span> <span class="s1">&#39;INIT_SIGNAL:outer&#39;</span>,
+<span class="hll"><span class="linenos">46</span> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(1)&#39;</span>,
+</span><span class="linenos">47</span> <span class="s1">&#39;B:outer&#39;</span>,
+<span class="linenos">48</span> <span class="s1">&#39;EXIT_SIGNAL:outer&#39;</span>,
+<span class="linenos">49</span> <span class="s1">&#39;ENTRY_SIGNAL:outer&#39;</span>,
+<span class="linenos">50</span> <span class="s1">&#39;POST_FIFO:B&#39;</span>,
+<span class="linenos">51</span> <span class="s1">&#39;RECALL:B&#39;</span>,
+<span class="linenos">52</span> <span class="s1">&#39;INIT_SIGNAL:outer&#39;</span>,
+<span class="hll"><span class="linenos">53</span> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(0)&#39;</span>,
+</span><span class="linenos">54</span> <span class="s1">&#39;B:outer&#39;</span>,
+<span class="linenos">55</span> <span class="s1">&#39;EXIT_SIGNAL:outer&#39;</span>,
+<span class="linenos">56</span> <span class="s1">&#39;ENTRY_SIGNAL:outer&#39;</span>,
+<span class="linenos">57</span> <span class="s1">&#39;INIT_SIGNAL:outer&#39;</span>,
+<span class="hll"><span class="linenos">58</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
 </span></pre></div>
-</td></tr></table></div>
+</div>
 <p>I have emphasized the beginning and ends of each run to completion event.  This
 should make things easier to talk about.  So we entered our chart, waited then
 sent a single event to it, and we got all of this action.</p>
@@ -801,21 +687,15 @@ starting it in the arming state:</p>
 </div>
 <p>The highlighted code above shows that we used the trace to output a high level
 view of what happened when we pulled the trigger:</p>
-<div class="highlight-shell notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="m">19</span>:51:25.509209 <span class="o">[</span>75c8c<span class="o">]</span> None: top-&gt;arming
-<span class="m">19</span>:51:26.511506 <span class="o">[</span>75c8c<span class="o">]</span> BATTERY_CHARGE: arming-&gt;armed
-<span class="m">19</span>:51:27.512153 <span class="o">[</span>75c8c<span class="o">]</span> BATTERY_CHARGE: armed-&gt;armed
-<span class="hll"><span class="m">19</span>:51:28.512604 <span class="o">[</span>75c8c<span class="o">]</span> BATTERY_CHARGE: armed-&gt;armed
-</span><span class="hll"><span class="m">19</span>:51:29.512080 <span class="o">[</span>75c8c<span class="o">]</span> CAPACITOR_CHARGE: armed-&gt;tazor_operating
-</span><span class="m">19</span>:51:29.513081 <span class="o">[</span>75c8c<span class="o">]</span> CAPACITOR_CHARGE: tazor_operating-&gt;tazor_operating
-<span class="m">19</span>:51:29.514085 <span class="o">[</span>75c8c<span class="o">]</span> CAPACITOR_CHARGE: tazor_operating-&gt;tazor_operating
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="m">19</span>:51:25.509209 <span class="o">[</span>75c8c<span class="o">]</span> None: top-&gt;arming
+<span class="linenos">2</span><span class="m">19</span>:51:26.511506 <span class="o">[</span>75c8c<span class="o">]</span> BATTERY_CHARGE: arming-&gt;armed
+<span class="linenos">3</span><span class="m">19</span>:51:27.512153 <span class="o">[</span>75c8c<span class="o">]</span> BATTERY_CHARGE: armed-&gt;armed
+<span class="hll"><span class="linenos">4</span><span class="m">19</span>:51:28.512604 <span class="o">[</span>75c8c<span class="o">]</span> BATTERY_CHARGE: armed-&gt;armed
+</span><span class="hll"><span class="linenos">5</span><span class="m">19</span>:51:29.512080 <span class="o">[</span>75c8c<span class="o">]</span> CAPACITOR_CHARGE: armed-&gt;tazor_operating
+</span><span class="linenos">6</span><span class="m">19</span>:51:29.513081 <span class="o">[</span>75c8c<span class="o">]</span> CAPACITOR_CHARGE: tazor_operating-&gt;tazor_operating
+<span class="linenos">7</span><span class="m">19</span>:51:29.514085 <span class="o">[</span>75c8c<span class="o">]</span> CAPACITOR_CHARGE: tazor_operating-&gt;tazor_operating
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Notice that our <strong>TRIGGER_PULL</strong> signal did not show up in our trace.  We would
 expect it to occur between lines <em>4</em> and <em>5</em>.  This is because the trace only
 shows signals that cause state transition.  The <strong>TRIGGER_PULL</strong> signal was
@@ -827,125 +707,68 @@ in turn causes two more state transitions.</p>
 </pre></div>
 </div>
 <p>Which outputs the full story:</p>
-<div class="highlight-shell notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="hll"><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
-</span><span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:arming&#39;</span>,
-<span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:tazor_operating&#39;</span>,
-<span class="s1">&#39;ENTRY_SIGNAL:tazor_operating&#39;</span>,
-<span class="s1">&#39;ENTRY_SIGNAL:arming&#39;</span>,
-<span class="s1">&#39;INIT_SIGNAL:arming&#39;</span>,
-<span class="hll"><span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
-</span><span class="s1">&#39;BATTERY_CHARGE:arming&#39;</span>,
-<span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:armed&#39;</span>,
-<span class="s1">&#39;ENTRY_SIGNAL:armed&#39;</span>,
-<span class="s1">&#39;POST_DEFERRED:CAPACITOR_CHARGE&#39;</span>,
-<span class="s1">&#39;INIT_SIGNAL:armed&#39;</span>,
-<span class="hll"><span class="s1">&#39;&lt;- Queued:(0) Deferred:(1)&#39;</span>,
-</span><span class="s1">&#39;BATTERY_CHARGE:armed&#39;</span>,
-<span class="s1">&#39;BATTERY_CHARGE:arming&#39;</span>,
-<span class="s1">&#39;EXIT_SIGNAL:armed&#39;</span>,
-<span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:armed&#39;</span>,
-<span class="s1">&#39;ENTRY_SIGNAL:armed&#39;</span>,
-<span class="s1">&#39;POST_DEFERRED:CAPACITOR_CHARGE&#39;</span>,
-<span class="s1">&#39;INIT_SIGNAL:armed&#39;</span>,
-<span class="hll"><span class="s1">&#39;&lt;- Queued:(0) Deferred:(2)&#39;</span>,
-</span><span class="s1">&#39;BATTERY_CHARGE:armed&#39;</span>,
-<span class="s1">&#39;BATTERY_CHARGE:arming&#39;</span>,
-<span class="s1">&#39;EXIT_SIGNAL:armed&#39;</span>,
-<span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:armed&#39;</span>,
-<span class="s1">&#39;ENTRY_SIGNAL:armed&#39;</span>,
-<span class="s1">&#39;POST_DEFERRED:CAPACITOR_CHARGE&#39;</span>,
-<span class="s1">&#39;INIT_SIGNAL:armed&#39;</span>,
-<span class="hll"><span class="s1">&#39;&lt;- Queued:(0) Deferred:(3)&#39;</span>,
-</span><span class="s1">&#39;TRIGGER_PULLED:armed&#39;</span>,
-<span class="s1">&#39;TRIGGER_PULLED:arming&#39;</span>,
-<span class="s1">&#39;TRIGGER_PULLED:tazor_operating&#39;</span>,
-<span class="s1">&#39;POST_FIFO:CAPACITOR_CHARGE&#39;</span>,
-<span class="s1">&#39;TRIGGER_PULLED:tazor_operating:HOOK&#39;</span>,
-<span class="hll"><span class="s1">&#39;&lt;- Queued:(1) Deferred:(2)&#39;</span>,
-</span><span class="s1">&#39;CAPACITOR_CHARGE:armed&#39;</span>,
-<span class="s1">&#39;CAPACITOR_CHARGE:arming&#39;</span>,
-<span class="s1">&#39;CAPACITOR_CHARGE:tazor_operating&#39;</span>,
-<span class="s1">&#39;EXIT_SIGNAL:armed&#39;</span>,
-<span class="s1">&#39;EXIT_SIGNAL:arming&#39;</span>,
-<span class="s1">&#39;EXIT_SIGNAL:tazor_operating&#39;</span>,
-<span class="s1">&#39;ENTRY_SIGNAL:tazor_operating&#39;</span>,
-<span class="s1">&#39;POST_FIFO:CAPACITOR_CHARGE&#39;</span>,
-<span class="s1">&#39;RECALL:CAPACITOR_CHARGE&#39;</span>,
-<span class="s1">&#39;INIT_SIGNAL:tazor_operating&#39;</span>,
-<span class="hll"><span class="s1">&#39;&lt;- Queued:(1) Deferred:(1)&#39;</span>,
-</span><span class="s1">&#39;CAPACITOR_CHARGE:tazor_operating&#39;</span>,
-<span class="s1">&#39;EXIT_SIGNAL:tazor_operating&#39;</span>,
-<span class="s1">&#39;ENTRY_SIGNAL:tazor_operating&#39;</span>,
-<span class="s1">&#39;POST_FIFO:CAPACITOR_CHARGE&#39;</span>,
-<span class="s1">&#39;RECALL:CAPACITOR_CHARGE&#39;</span>,
-<span class="s1">&#39;INIT_SIGNAL:tazor_operating&#39;</span>,
-<span class="hll"><span class="s1">&#39;&lt;- Queued:(1) Deferred:(0)&#39;</span>,
-</span><span class="s1">&#39;CAPACITOR_CHARGE:tazor_operating&#39;</span>,
-<span class="s1">&#39;EXIT_SIGNAL:tazor_operating&#39;</span>,
-<span class="s1">&#39;ENTRY_SIGNAL:tazor_operating&#39;</span>,
-<span class="s1">&#39;INIT_SIGNAL:tazor_operating&#39;</span>,
-<span class="hll"><span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="linenos"> 1</span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
+</span><span class="linenos"> 2</span><span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:arming&#39;</span>,
+<span class="linenos"> 3</span><span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:tazor_operating&#39;</span>,
+<span class="linenos"> 4</span><span class="s1">&#39;ENTRY_SIGNAL:tazor_operating&#39;</span>,
+<span class="linenos"> 5</span><span class="s1">&#39;ENTRY_SIGNAL:arming&#39;</span>,
+<span class="linenos"> 6</span><span class="s1">&#39;INIT_SIGNAL:arming&#39;</span>,
+<span class="hll"><span class="linenos"> 7</span><span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
+</span><span class="linenos"> 8</span><span class="s1">&#39;BATTERY_CHARGE:arming&#39;</span>,
+<span class="linenos"> 9</span><span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:armed&#39;</span>,
+<span class="linenos">10</span><span class="s1">&#39;ENTRY_SIGNAL:armed&#39;</span>,
+<span class="linenos">11</span><span class="s1">&#39;POST_DEFERRED:CAPACITOR_CHARGE&#39;</span>,
+<span class="linenos">12</span><span class="s1">&#39;INIT_SIGNAL:armed&#39;</span>,
+<span class="hll"><span class="linenos">13</span><span class="s1">&#39;&lt;- Queued:(0) Deferred:(1)&#39;</span>,
+</span><span class="linenos">14</span><span class="s1">&#39;BATTERY_CHARGE:armed&#39;</span>,
+<span class="linenos">15</span><span class="s1">&#39;BATTERY_CHARGE:arming&#39;</span>,
+<span class="linenos">16</span><span class="s1">&#39;EXIT_SIGNAL:armed&#39;</span>,
+<span class="linenos">17</span><span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:armed&#39;</span>,
+<span class="linenos">18</span><span class="s1">&#39;ENTRY_SIGNAL:armed&#39;</span>,
+<span class="linenos">19</span><span class="s1">&#39;POST_DEFERRED:CAPACITOR_CHARGE&#39;</span>,
+<span class="linenos">20</span><span class="s1">&#39;INIT_SIGNAL:armed&#39;</span>,
+<span class="hll"><span class="linenos">21</span><span class="s1">&#39;&lt;- Queued:(0) Deferred:(2)&#39;</span>,
+</span><span class="linenos">22</span><span class="s1">&#39;BATTERY_CHARGE:armed&#39;</span>,
+<span class="linenos">23</span><span class="s1">&#39;BATTERY_CHARGE:arming&#39;</span>,
+<span class="linenos">24</span><span class="s1">&#39;EXIT_SIGNAL:armed&#39;</span>,
+<span class="linenos">25</span><span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:armed&#39;</span>,
+<span class="linenos">26</span><span class="s1">&#39;ENTRY_SIGNAL:armed&#39;</span>,
+<span class="linenos">27</span><span class="s1">&#39;POST_DEFERRED:CAPACITOR_CHARGE&#39;</span>,
+<span class="linenos">28</span><span class="s1">&#39;INIT_SIGNAL:armed&#39;</span>,
+<span class="hll"><span class="linenos">29</span><span class="s1">&#39;&lt;- Queued:(0) Deferred:(3)&#39;</span>,
+</span><span class="linenos">30</span><span class="s1">&#39;TRIGGER_PULLED:armed&#39;</span>,
+<span class="linenos">31</span><span class="s1">&#39;TRIGGER_PULLED:arming&#39;</span>,
+<span class="linenos">32</span><span class="s1">&#39;TRIGGER_PULLED:tazor_operating&#39;</span>,
+<span class="linenos">33</span><span class="s1">&#39;POST_FIFO:CAPACITOR_CHARGE&#39;</span>,
+<span class="linenos">34</span><span class="s1">&#39;TRIGGER_PULLED:tazor_operating:HOOK&#39;</span>,
+<span class="hll"><span class="linenos">35</span><span class="s1">&#39;&lt;- Queued:(1) Deferred:(2)&#39;</span>,
+</span><span class="linenos">36</span><span class="s1">&#39;CAPACITOR_CHARGE:armed&#39;</span>,
+<span class="linenos">37</span><span class="s1">&#39;CAPACITOR_CHARGE:arming&#39;</span>,
+<span class="linenos">38</span><span class="s1">&#39;CAPACITOR_CHARGE:tazor_operating&#39;</span>,
+<span class="linenos">39</span><span class="s1">&#39;EXIT_SIGNAL:armed&#39;</span>,
+<span class="linenos">40</span><span class="s1">&#39;EXIT_SIGNAL:arming&#39;</span>,
+<span class="linenos">41</span><span class="s1">&#39;EXIT_SIGNAL:tazor_operating&#39;</span>,
+<span class="linenos">42</span><span class="s1">&#39;ENTRY_SIGNAL:tazor_operating&#39;</span>,
+<span class="linenos">43</span><span class="s1">&#39;POST_FIFO:CAPACITOR_CHARGE&#39;</span>,
+<span class="linenos">44</span><span class="s1">&#39;RECALL:CAPACITOR_CHARGE&#39;</span>,
+<span class="linenos">45</span><span class="s1">&#39;INIT_SIGNAL:tazor_operating&#39;</span>,
+<span class="hll"><span class="linenos">46</span><span class="s1">&#39;&lt;- Queued:(1) Deferred:(1)&#39;</span>,
+</span><span class="linenos">47</span><span class="s1">&#39;CAPACITOR_CHARGE:tazor_operating&#39;</span>,
+<span class="linenos">48</span><span class="s1">&#39;EXIT_SIGNAL:tazor_operating&#39;</span>,
+<span class="linenos">49</span><span class="s1">&#39;ENTRY_SIGNAL:tazor_operating&#39;</span>,
+<span class="linenos">50</span><span class="s1">&#39;POST_FIFO:CAPACITOR_CHARGE&#39;</span>,
+<span class="linenos">51</span><span class="s1">&#39;RECALL:CAPACITOR_CHARGE&#39;</span>,
+<span class="linenos">52</span><span class="s1">&#39;INIT_SIGNAL:tazor_operating&#39;</span>,
+<span class="hll"><span class="linenos">53</span><span class="s1">&#39;&lt;- Queued:(1) Deferred:(0)&#39;</span>,
+</span><span class="linenos">54</span><span class="s1">&#39;CAPACITOR_CHARGE:tazor_operating&#39;</span>,
+<span class="linenos">55</span><span class="s1">&#39;EXIT_SIGNAL:tazor_operating&#39;</span>,
+<span class="linenos">56</span><span class="s1">&#39;ENTRY_SIGNAL:tazor_operating&#39;</span>,
+<span class="linenos">57</span><span class="s1">&#39;INIT_SIGNAL:tazor_operating&#39;</span>,
+<span class="hll"><span class="linenos">58</span><span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
 </span></pre></div>
-</td></tr></table></div>
-<p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
 </div>
+<p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">back to examples</span></a></p>
+</section>
 
 
         
@@ -978,12 +801,12 @@ in turn causes two more state transitions.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Nov 03, 2020 8:22 AM</span>
+          <span class="time">May 26, 2024 6:41 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 5.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

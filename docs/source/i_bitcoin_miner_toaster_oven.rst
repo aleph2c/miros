@@ -1,3 +1,4 @@
+:orphan:
 .. called from quickstart.rst
 
 .. code-block:: python

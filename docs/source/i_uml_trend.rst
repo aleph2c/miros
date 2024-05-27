@@ -1,3 +1,4 @@
+:orphan:
 .. included by introduction
 
 .. raw:: html

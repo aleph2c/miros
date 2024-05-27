@@ -1,3 +1,5 @@
+:orphan:
+
 .. _city_sprinkler-city-sprinkler:
 
 City Sprinkler

@@ -33,7 +33,7 @@ You might want to view :ref:`what events caused what state transitions from a
 high level<reflection-a-high-level-description-of-the-behavior>`.
 
 :ref:`You may need to view the state dynamics in fine detail.
-<reflection-an-extremely-detailed-view>`.
+<reflection__an_extremely_detailed_view_of_the_behavior>`.
 
 :ref:`If you have a number of charts running in parallel, you may want to see how
 they interact in a live manner.<reflection-live-output-from-your-chart>`
@@ -47,7 +47,7 @@ good to talk about a specific behavior, not all of the behaviors at once.  A
 statechart diagram might make sense to you but it can psychologically shutdown
 a teammate.  `miros` :ref:`provides a way to translate how your chart responds
 to a particular event into a different type of diagram, a sequence
-diagram<reflection-creating-a-sequence-diagram>`.  Anyone can understand a
+diagram<recipes-drawing-a-sequence-diagram>`.  Anyone can understand a
 sequence diagram.  By referencing something that is easy to understand you can
 reduce the transaction costs in your organization; everyone should be able to
 participate in the conversation.
@@ -108,6 +108,8 @@ A High Level Description of The Behavior
 ----------------------------------------
 
 .. include:: i_trace_reactive.rst
+
+.. _reflection__an_extremely_detailed_view_of_the_behavior:
 
 An Extremely Detailed View of the Behavior
 ------------------------------------------

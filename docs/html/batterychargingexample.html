@@ -11,13 +11,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
     <title>Distributed Battery Charging | miros</title>
     <link rel="shortcut icon" href="_static/favicon.ico">
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css">
     <link rel="stylesheet" href="_static/theme.css" type="text/css">
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/theme.css" />
+      
     
       
     <link rel="stylesheet" type="text/css" href="_static/css/miros_docs.css" />
@@ -29,13 +38,15 @@
     <script type="text/javascript" src="_static/theme.js" defer></script>
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    
     <script src="_static/jquery.js"></script>
     
     <script src="_static/underscore.js"></script>
     
-    <script src="_static/doctools.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     
-    <script src="_static/language_data.js"></script>
+    <script src="_static/doctools.js"></script>
     
     
 
@@ -148,7 +159,7 @@
 <ul>
   <li><a href="https://github.com/aleph2c/py-activeobject">miros on github</a></li>
   <li><a href="https://github.com/aleph2c/sequence">sequence on github</a></li>
-  <li><a href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a></li>
+  <li><a href="https://aleph2c.github.io/miros-rabbitmq/html/index.html">miros-rabbitmq plugin</a></li>
   <li><a href="http://www.umlet.com">UMLet Download</a></li>
   <li><a href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">formalism explained</a></li>
 </ul>
@@ -198,8 +209,8 @@
 manifestation of the development team’s collective understanding.</p>
 <p class="attribution">—From <a class="reference external" href="https://www.csc.gov.sg/articles/how-to-build-good-software">How to Build Good Software</a>, by Li Hongyi</p>
 </div></blockquote>
-<div class="section" id="distributed-battery-charging">
-<span id="batterychargingexample-battery-charging-example"></span><h1>Distributed Battery Charging<a class="headerlink" href="#distributed-battery-charging" title="Permalink to this headline">#</a></h1>
+<section id="distributed-battery-charging">
+<span id="batterychargingexample-battery-charging-example"></span><h1>Distributed Battery Charging<a class="headerlink" href="#distributed-battery-charging" title="Permalink to this heading">#</a></h1>
 <p>This essay describes two engineers working together to build a distributed three
 stage battery charger.  It follows them as they learn from one another and
 challenge each other’s work.  As their progress evolves against their shared
@@ -210,8 +221,8 @@ future, as an artifact to help the engineers of tomorrow (who might just be olde
 versions of themselves) make sense of their system.</p>
 <p>Before we start with the story, here is a bit of background information that
 will help provide some context.</p>
-<div class="section" id="high-level-introduction-to-how-batteries-and-chargers-work">
-<span id="batterychargingexample-high-level-summary-of-batteries-and-chargers"></span><h2>High Level Introduction to how Batteries and Chargers Work<a class="headerlink" href="#high-level-introduction-to-how-batteries-and-chargers-work" title="Permalink to this headline">#</a></h2>
+<section id="high-level-introduction-to-how-batteries-and-chargers-work">
+<span id="batterychargingexample-high-level-summary-of-batteries-and-chargers"></span><h2>High Level Introduction to how Batteries and Chargers Work<a class="headerlink" href="#high-level-introduction-to-how-batteries-and-chargers-work" title="Permalink to this heading">#</a></h2>
 <p>Lead acid batteries are very heavy.  But they are cheaper than lithium ion
 batteries and this is why they are used in a lot of off-grid electrical systems.</p>
 <a class="reference external image-reference" href="https://www.lowtechmagazine.com/2015/05/sustainability-off-grid-solar-power.html"><img alt="https://krisdedecker.typepad.com/.a/6a00e0099229e8883301bb0820445e970d-pi" class="scale-to-fit" src="https://krisdedecker.typepad.com/.a/6a00e0099229e8883301bb0820445e970d-pi" /></a>
@@ -301,12 +312,6 @@ well vented).</p>
 <p>There are arbitrary naming conventions that have been applied to these stages of
 charging:</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 28%" />
-<col style="width: 13%" />
-<col style="width: 13%" />
-<col style="width: 45%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of Stage</p></th>
 <th class="head"><p>Constant
@@ -341,10 +346,6 @@ Voltage?</p></th>
 </table>
 <p>A charger is typically called one of these:</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 29%" />
-<col style="width: 71%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of Charger</p></th>
 <th class="head"><p>Meaning</p></th>
@@ -418,9 +419,9 @@ build a single three stage battery charger.</p>
 <p>New knowledge and things said by other imagined people will be
 <span class="text-hightlight">highlighted.</span></p>
 </div>
-</div>
-<div class="section" id="spec-1-control-systems">
-<span id="batterychargingexample-spec-1-control-systems"></span><h2>Spec 1: Control Systems<a class="headerlink" href="#spec-1-control-systems" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="spec-1-control-systems">
+<span id="batterychargingexample-spec-1-control-systems"></span><h2>Spec 1: Control Systems<a class="headerlink" href="#spec-1-control-systems" title="Permalink to this heading">#</a></h2>
 <p><strong>Specification (1)</strong></p>
 <ul class="simple">
 <li><p><span class="text-hightlight">A charger has two control systems: constant current and constant voltage.</span></p></li>
@@ -456,9 +457,9 @@ together?</span></p>
 <code class="docutils literal notranslate"><span class="pre">input</span></code>, <code class="docutils literal notranslate"><span class="pre">kp</span></code>, <code class="docutils literal notranslate"><span class="pre">ki</span></code> and <code class="docutils literal notranslate"><span class="pre">kd</span></code> values will be in both of the current and
 voltage control classes.  Think of it as a drawing short hand.”</p>
 <p>He says, <span class="text-hightlight">Ok, it looks good.</span></p>
-</div>
-<div class="section" id="spec-2-battery-parameters">
-<span id="batterychargingexample-spec-2-battery-parameters"></span><h2>Spec 2: Battery Parameters<a class="headerlink" href="#spec-2-battery-parameters" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="spec-2-battery-parameters">
+<span id="batterychargingexample-spec-2-battery-parameters"></span><h2>Spec 2: Battery Parameters<a class="headerlink" href="#spec-2-battery-parameters" title="Permalink to this heading">#</a></h2>
 <p><strong>Specification (2)</strong></p>
 <ul class="simple">
 <li><p>A charger has two control systems: constant current and constant voltage.</p></li>
@@ -617,9 +618,9 @@ system’s <code class="docutils literal notranslate"><span class="pre">kp</span
 <p><span class="text-hightlight">Yeah, ok, good, this is what I wanted.</span></p>
 <p>Things seem to be coming together, so we go back and work on our spec, teasing
 apart our high level descriptions from our technical design.</p>
-</div>
-<div class="section" id="spec-3-electrical-charging-profile">
-<span id="batterychargingexample-spec-3-electrical-charging-profile"></span><h2>Spec 3: Electrical Charging Profile<a class="headerlink" href="#spec-3-electrical-charging-profile" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="spec-3-electrical-charging-profile">
+<span id="batterychargingexample-spec-3-electrical-charging-profile"></span><h2>Spec 3: Electrical Charging Profile<a class="headerlink" href="#spec-3-electrical-charging-profile" title="Permalink to this heading">#</a></h2>
 <p><strong>High level Specification (3)</strong></p>
 <ul class="simple">
 <li><p>This product will be a three stage charger with an equalization feature.</p></li>
@@ -738,9 +739,9 @@ test it before that?</span>.</p>
 to squeeze time so I can run it through all of its states quickly”.</p>
 <p>Things seem to be coming together, so we go back and work on our spec, teasing
 apart our high level descriptions from our technical design.</p>
-</div>
-<div class="section" id="spec-4-charger-behavioral-design">
-<span id="batterychargingexample-spec-4-charger-behavior-design"></span><h2>Spec 4: Charger Behavioral Design<a class="headerlink" href="#spec-4-charger-behavioral-design" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="spec-4-charger-behavioral-design">
+<span id="batterychargingexample-spec-4-charger-behavior-design"></span><h2>Spec 4: Charger Behavioral Design<a class="headerlink" href="#spec-4-charger-behavioral-design" title="Permalink to this heading">#</a></h2>
 <p><strong>High level Specification (4)</strong></p>
 <ul class="simple">
 <li><p>This product will be a three stage charger with an equalization feature.</p></li>
@@ -1215,9 +1216,9 @@ make things sound as complicated and mysterious as possible.</span></p>
 you have written needs to work, or you could burn down someone’s house eh?  No
 pressure.</span> He smiles. <span class="text-hightlight">Just add it to the spec, then make it happen.
 Oh, and try and keep your gobbledegook out of the spec, I have to read it too.</span></p>
-</div>
-<div class="section" id="spec-5-high-level-verification-goals">
-<span id="batterychargingexample-spec-5-high-level-verification-goals"></span><h2>Spec 5: High Level Verification Goals<a class="headerlink" href="#spec-5-high-level-verification-goals" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="spec-5-high-level-verification-goals">
+<span id="batterychargingexample-spec-5-high-level-verification-goals"></span><h2>Spec 5: High Level Verification Goals<a class="headerlink" href="#spec-5-high-level-verification-goals" title="Permalink to this heading">#</a></h2>
 <p><strong>High level Specification (5)</strong></p>
 <ul class="simple">
 <li><p>This product will be a three stage charger with an equalization feature.</p></li>
@@ -1785,9 +1786,9 @@ identified a bigger issue than the time-slippage issue, but it is much easier to
 fix.”</p>
 <p>Now that we have a way to simulate a battery, we will add this information to
 our specification:</p>
-</div>
-<div class="section" id="spec-6-battery-simulator">
-<span id="batterychargingexample-spec-6-battery-simulator"></span><h2>Spec 6: Battery Simulator<a class="headerlink" href="#spec-6-battery-simulator" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="spec-6-battery-simulator">
+<span id="batterychargingexample-spec-6-battery-simulator"></span><h2>Spec 6: Battery Simulator<a class="headerlink" href="#spec-6-battery-simulator" title="Permalink to this heading">#</a></h2>
 <p><strong>High level Specification (6)</strong></p>
 <ul class="simple">
 <li><p>This product will be a three stage charger with an equalization feature.</p></li>
@@ -2069,9 +2070,9 @@ run the test:</p>
 <a class="reference external image-reference" href="_static/charger_test_results.pdf"><img alt="_static/charger_test_results.svg" class="noscale-center" src="_static/charger_test_results.svg" /></a>
 <p><span class="text-hightlight">Ok, that graph makes sense to me, more so than the rest of it.  You
 should pack everything you have done into the spec.</span></p>
-</div>
-<div class="section" id="spec-7-testing-with-physics-simulation">
-<span id="batterychargingexample-spec-7-single-unit-battery-charger"></span><h2>Spec 7: Testing with Physics Simulation<a class="headerlink" href="#spec-7-testing-with-physics-simulation" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="spec-7-testing-with-physics-simulation">
+<span id="batterychargingexample-spec-7-single-unit-battery-charger"></span><h2>Spec 7: Testing with Physics Simulation<a class="headerlink" href="#spec-7-testing-with-physics-simulation" title="Permalink to this heading">#</a></h2>
 <p><strong>High level Specification (7)</strong></p>
 <ul class="simple">
 <li><p>This product will be a three stage charger with an equalization feature.</p></li>
@@ -2397,9 +2398,9 @@ we “actually” want them to look at the spec and contribute to it as they cha
 the system.</span></p>
 <p><span class="text-hightlight">Ok, so work on the spec, when you are done come back and we will look
 at deficit charging.</span></p>
-</div>
-<div class="section" id="spec-8-current-derating-in-constant-voltage-modes">
-<span id="batterychargingexample-spec-8-current-derating-in-constant-voltage-modes"></span><h2>Spec 8: Current Derating in Constant Voltage Modes<a class="headerlink" href="#spec-8-current-derating-in-constant-voltage-modes" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="spec-8-current-derating-in-constant-voltage-modes">
+<span id="batterychargingexample-spec-8-current-derating-in-constant-voltage-modes"></span><h2>Spec 8: Current Derating in Constant Voltage Modes<a class="headerlink" href="#spec-8-current-derating-in-constant-voltage-modes" title="Permalink to this heading">#</a></h2>
 <p><strong>High level Specification (8)</strong></p>
 <ul class="simple">
 <li><p>This product will be a three stage charger with an equalization feature.</p></li>
@@ -2586,8 +2587,8 @@ how to graph its output:</p>
 </pre></div>
 </div>
 <a class="reference external image-reference" href="_static/charger_test_results_1.pdf"><img alt="_static/charger_test_results_1.svg" class="noscale-center" src="_static/charger_test_results_1.svg" /></a>
-</div>
-</div>
+</section>
+</section>
 
 
         
@@ -2624,12 +2625,12 @@ how to graph its output:</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Nov 03, 2020 8:22 AM</span>
+          <span class="time">May 26, 2024 6:44 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 5.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

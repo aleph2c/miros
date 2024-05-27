@@ -546,7 +546,7 @@ To help us, they create a `Rosetta stone <https://www.dictionary.com/browse/rose
 |                                      | callback by the event processor when     |
 |                                      | **S** exits a state.                     |
 +--------------------------------------+------------------------------------------+
-| exit bouncer                         | ``ENTRY_SIGNAL`` event given to          |
+| entry bouncer                        | ``ENTRY_SIGNAL`` event given to          |
 |                                      | a callback by the event processor when   |
 |                                      | **S** enters a state.                    |
 +--------------------------------------+------------------------------------------+
@@ -1153,8 +1153,8 @@ ending state of :ref:`S <zero_to_one_rosetta>` was ``some_state_to_prove_this_wo
 
 There is no ``start_at`` event in miros.  But to keep the trace output useful, I
 write a fake ``start_at`` event as the cause of the initial transition into the
-HSM.  On the diagram, this will be :ref:`where the event processor attachment point
-touches the HSM <reading_diagrams-event-processor-connection>`.
+HSM.  On the diagram, this will be where the event processor attachment point
+touches the HSM.
 
 .. include:: i_navigation_1.rst
 
@@ -6072,7 +6072,7 @@ diagram I would update one character in its picture, and I would be done.
 
 How do you generate the ASCII sequence diagrams from the trace?
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-You can read about that :ref:`here <reading_diagrams-sequence-diagrams>`.
+You can read about that :ref:`here <reading-diagrams-sequence-diagrams>`.
 
 .. include:: i_navigation_6.rst
 

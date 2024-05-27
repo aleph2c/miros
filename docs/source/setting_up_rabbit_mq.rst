@@ -1,3 +1,4 @@
+:orphan:
 .. _setting_up_rabbit_mq-setting-up-rabbit-mq:
 
 Setting Up RabbitMQ
@@ -155,7 +156,7 @@ be used by Ansible:
 ====================================== =====================
 Purpose                                File Name and Link
 ====================================== =====================
-The deployment :term:`yml<YML>` script rabbit_install.yml_
+The deployment yml script              rabbit_install.yml_
 The rabbitmq environment configuration rabbit-env.conf.j2_
 The rabbitmq configuration             rabbitmq.config.j2_
 ====================================== =====================

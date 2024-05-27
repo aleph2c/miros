@@ -11,13 +11,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
     <title>Active Object | miros</title>
     <link rel="shortcut icon" href="_static/favicon.ico">
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css">
     <link rel="stylesheet" href="_static/theme.css" type="text/css">
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/theme.css" />
+      
     
       
     <link rel="stylesheet" type="text/css" href="_static/css/miros_docs.css" />
@@ -29,13 +38,15 @@
     <script type="text/javascript" src="_static/theme.js" defer></script>
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    
     <script src="_static/jquery.js"></script>
     
     <script src="_static/underscore.js"></script>
     
-    <script src="_static/doctools.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     
-    <script src="_static/language_data.js"></script>
+    <script src="_static/doctools.js"></script>
     
     
 
@@ -132,7 +143,7 @@
 <ul>
   <li><a href="https://github.com/aleph2c/py-activeobject">miros on github</a></li>
   <li><a href="https://github.com/aleph2c/sequence">sequence on github</a></li>
-  <li><a href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a></li>
+  <li><a href="https://aleph2c.github.io/miros-rabbitmq/html/index.html">miros-rabbitmq plugin</a></li>
   <li><a href="http://www.umlet.com">UMLet Download</a></li>
   <li><a href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">formalism explained</a></li>
 </ul>
@@ -177,13 +188,13 @@
       
         
           
-  <div class="section" id="module-miros.activeobject">
-<span id="active-object"></span><h1>Active Object<a class="headerlink" href="#module-miros.activeobject" title="Permalink to this headline">#</a></h1>
-<div class="section" id="active-fabric">
-<h2>Active Fabric<a class="headerlink" href="#active-fabric" title="Permalink to this headline">#</a></h2>
+  <section id="module-miros.activeobject">
+<span id="active-object"></span><h1>Active Object<a class="headerlink" href="#module-miros.activeobject" title="Permalink to this heading">#</a></h1>
+<section id="active-fabric">
+<h2>Active Fabric<a class="headerlink" href="#active-fabric" title="Permalink to this heading">#</a></h2>
 <dl class="py class">
-<dt id="miros.activeobject.ActiveFabricSource">
-<em class="property">class </em><code class="sig-prename descclassname">miros.activeobject.</code><code class="sig-name descname">ActiveFabricSource</code><a class="headerlink" href="#miros.activeobject.ActiveFabricSource" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveFabricSource">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">miros.activeobject.</span></span><span class="sig-name descname"><span class="pre">ActiveFabricSource</span></span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource" title="Permalink to this definition">#</a></dt>
 <dd><p>A (pub-sub) event dispatcher for active objects.</p>
 <dl>
 <dt>To create it:</dt><dd><p>af = ActiveFabric()  # it is a singleton</p>
@@ -220,33 +231,33 @@ testing)  It does this by NOT inheriting from the threading class, instead it
 uses the a more primative approach of keeping an internal object that is a thread
 which can be killed and restarted.</p>
 <dl class="py method">
-<dt id="miros.activeobject.ActiveFabricSource.clear">
-<code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource.clear" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveFabricSource.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource.clear" title="Permalink to this definition">#</a></dt>
 <dd><p>clear out all subscriptions and queues</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveFabricSource.publish">
-<code class="sig-name descname">publish</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em>, <em class="sig-param"><span class="n">priority</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource.publish" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveFabricSource.publish">
+<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource.publish" title="Permalink to this definition">#</a></dt>
 <dd><p>publish an event with a given priority to all subscribed queues</p>
 <p>Priority of 1 is the highest priority</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveFabricSource.start">
-<code class="sig-name descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource.start" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveFabricSource.start">
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource.start" title="Permalink to this definition">#</a></dt>
 <dd><p>start up the threads which manage the queues and subscription registry.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveFabricSource.stop">
-<code class="sig-name descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource.stop" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveFabricSource.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource.stop" title="Permalink to this definition">#</a></dt>
 <dd><p>stop the the threads in such a way that it can be restarted again</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveFabricSource.subscribe">
-<code class="sig-name descname">subscribe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">queue</span></em>, <em class="sig-param"><span class="n">event_or_signal</span></em>, <em class="sig-param"><span class="n">queue_type</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource.subscribe" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveFabricSource.subscribe">
+<span class="sig-name descname"><span class="pre">subscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_or_signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queue_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource.subscribe" title="Permalink to this definition">#</a></dt>
 <dd><p>subscribe a queue to an event in a ‘fifo’ or ‘lifo’ way</p>
 <dl class="simple">
 <dt>There are two different ways to subscribe to an event:</dt><dd><ol class="arabic simple">
@@ -298,16 +309,16 @@ assert(active_object_input_queue.pop().signal_name == ‘A’)</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveFabricSource.thread_runner_fifo">
-<code class="sig-name descname">thread_runner_fifo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fabric_task_event</span></em>, <em class="sig-param"><span class="n">fifo_queue</span></em>, <em class="sig-param"><span class="n">fifo_subscriptions</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource.thread_runner_fifo" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveFabricSource.thread_runner_fifo">
+<span class="sig-name descname"><span class="pre">thread_runner_fifo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fabric_task_event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fifo_queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fifo_subscriptions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource.thread_runner_fifo" title="Permalink to this definition">#</a></dt>
 <dd><p>If this was a Thread class this function would be called “run”</p>
 <p>This is the main execution code of the thread.  It watches to see if the
 HsmEvent() singleton has been cleared, if it has it exits its forever loop.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveFabricSource.thread_runner_lifo">
-<code class="sig-name descname">thread_runner_lifo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fabric_task_event</span></em>, <em class="sig-param"><span class="n">lifo_queue</span></em>, <em class="sig-param"><span class="n">lifo_subscriptions</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource.thread_runner_lifo" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveFabricSource.thread_runner_lifo">
+<span class="sig-name descname"><span class="pre">thread_runner_lifo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fabric_task_event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lifo_queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lifo_subscriptions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveFabricSource.thread_runner_lifo" title="Permalink to this definition">#</a></dt>
 <dd><p>If this was a Thread class this function would be called “run”</p>
 <p>This is the main execution code of the thread.  It watches to see if the
 HsmEvent() singleton has been cleared, if it has it exits its forever loop.</p>
@@ -316,31 +327,32 @@ HsmEvent() singleton has been cleared, if it has it exits its forever loop.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="miros.activeobject.ActiveFabric">
-<code class="sig-prename descclassname">miros.activeobject.</code><code class="sig-name descname">ActiveFabric</code><a class="headerlink" href="#miros.activeobject.ActiveFabric" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveFabric">
+<span class="sig-prename descclassname"><span class="pre">miros.activeobject.</span></span><span class="sig-name descname"><span class="pre">ActiveFabric</span></span><a class="headerlink" href="#miros.activeobject.ActiveFabric" title="Permalink to this definition">#</a></dt>
+<dd><p>alias of &lt;miros.singleton.SingletonDecorator object&gt;</p>
+</dd></dl>
 
-</div>
-<div class="section" id="id1">
-<h2>Active Object<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="id1">
+<h2>Active Object<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h2>
 <dl class="py class">
-<dt id="miros.activeobject.ActiveObject">
-<em class="property">class </em><code class="sig-prename descclassname">miros.activeobject.</code><code class="sig-name descname">ActiveObject</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">instrumented</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveObject">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">miros.activeobject.</span></span><span class="sig-name descname"><span class="pre">ActiveObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrumented</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject" title="Permalink to this definition">#</a></dt>
 <dd><dl class="py method">
-<dt id="miros.activeobject.ActiveObject.append_publish_to_spy">
-<code class="sig-name descname">append_publish_to_spy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.append_publish_to_spy" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveObject.append_publish_to_spy">
+<span class="sig-name descname"><span class="pre">append_publish_to_spy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.append_publish_to_spy" title="Permalink to this definition">#</a></dt>
 <dd><p>instrument the rtc spy with our publish event</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveObject.append_subscribe_to_spy">
-<code class="sig-name descname">append_subscribe_to_spy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.append_subscribe_to_spy" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveObject.append_subscribe_to_spy">
+<span class="sig-name descname"><span class="pre">append_subscribe_to_spy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.append_subscribe_to_spy" title="Permalink to this definition">#</a></dt>
 <dd><p>instrument the full spy with our subscription request</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveObject.cancel_event">
-<code class="sig-name descname">cancel_event</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uuid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.cancel_event" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveObject.cancel_event">
+<span class="sig-name descname"><span class="pre">cancel_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.cancel_event" title="Permalink to this definition">#</a></dt>
 <dd><p>This will cancel an event thread that was created using the __post_event api.
 The original call to the __post_event api would have returned the uuid needed
 to cancel it with this call.</p>
@@ -360,8 +372,8 @@ queue_type=’lifo’)</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveObject.cancel_events">
-<code class="sig-name descname">cancel_events</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">e</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.cancel_events" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveObject.cancel_events">
+<span class="sig-name descname"><span class="pre">cancel_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.cancel_events" title="Permalink to this definition">#</a></dt>
 <dd><p>This will cancel all events that have the same signal name as e, that were
 posted using the __post_event.</p>
 <p>This will cancel all event threads which have the same signal name as ‘e’,
@@ -387,8 +399,8 @@ queue_type=’lifo’)</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveObject.post_fifo">
-<code class="sig-name descname">post_fifo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">e</span></em>, <em class="sig-param"><span class="n">period</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">times</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">deferred</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.post_fifo" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveObject.post_fifo">
+<span class="sig-name descname"><span class="pre">post_fifo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deferred</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.post_fifo" title="Permalink to this definition">#</a></dt>
 <dd><p>post an event, or events to the fifo queue</p>
 <dl>
 <dt>Example of posting a single event into the fifo queue:</dt><dd><p>ao.post_fifo(Event(signal=signals.A))</p>
@@ -405,8 +417,8 @@ ao.cancel_event(thread_id)</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveObject.post_lifo">
-<code class="sig-name descname">post_lifo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">e</span></em>, <em class="sig-param"><span class="n">period</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">times</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">deferred</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.post_lifo" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveObject.post_lifo">
+<span class="sig-name descname"><span class="pre">post_lifo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deferred</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.post_lifo" title="Permalink to this definition">#</a></dt>
 <dd><p>post an event, or events to the lifo queue</p>
 <dl>
 <dt>Example of posting a single event into the lifo queue:</dt><dd><p>ao.post_lifo(Event(signal=signals.A))</p>
@@ -423,8 +435,8 @@ ao.cancel_event(thread_id)</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveObject.run_event">
-<code class="sig-name descname">run_event</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_event</span></em>, <em class="sig-param"><span class="n">fabric_task_event</span></em>, <em class="sig-param"><span class="n">queue</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.run_event" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveObject.run_event">
+<span class="sig-name descname"><span class="pre">run_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fabric_task_event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queue</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.run_event" title="Permalink to this definition">#</a></dt>
 <dd><p>The active object threading function.</p>
 <p>If this statechart has not been stopped and the active fabric hasn’t been
 stopped the threading function will run.  If the active fabric has been
@@ -437,26 +449,26 @@ into the hsm.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveObject.start_at">
-<code class="sig-name descname">start_at</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">initial_state</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.start_at" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveObject.start_at">
+<span class="sig-name descname"><span class="pre">start_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.start_at" title="Permalink to this definition">#</a></dt>
 <dd><p>start the active object at a given state and begin its task</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveObject.stop">
-<code class="sig-name descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.stop" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveObject.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.stop" title="Permalink to this definition">#</a></dt>
 <dd><p>Stops the active object, can cancels all of its pending events</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveObject.top">
-<code class="sig-name descname">top</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.top" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveObject.top">
+<span class="sig-name descname"><span class="pre">top</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.top" title="Permalink to this definition">#</a></dt>
 <dd><p>top most state given to all HSMs; treat it as an outside function</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="miros.activeobject.ActiveObject.trace">
-<code class="sig-name descname">trace</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.trace" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="miros.activeobject.ActiveObject.trace">
+<span class="sig-name descname"><span class="pre">trace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#miros.activeobject.ActiveObject.trace" title="Permalink to this definition">#</a></dt>
 <dd><p>Output state transition information only:</p>
 <p>Example:
 print(chart.trace())</p>
@@ -471,8 +483,8 @@ print(chart.trace())</p>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
         
@@ -507,12 +519,12 @@ print(chart.trace())</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Nov 03, 2020 8:22 AM</span>
+          <span class="time">May 26, 2024 6:24 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 5.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

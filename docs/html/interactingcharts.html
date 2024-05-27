@@ -11,13 +11,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
     <title>Interacting Statecharts (Same Machine) | miros</title>
     <link rel="shortcut icon" href="_static/favicon.ico">
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css">
     <link rel="stylesheet" href="_static/theme.css" type="text/css">
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/theme.css" />
+      
     
       
     <link rel="stylesheet" type="text/css" href="_static/css/miros_docs.css" />
@@ -29,13 +38,15 @@
     <script type="text/javascript" src="_static/theme.js" defer></script>
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    
     <script src="_static/jquery.js"></script>
     
     <script src="_static/underscore.js"></script>
     
-    <script src="_static/doctools.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     
-    <script src="_static/language_data.js"></script>
+    <script src="_static/doctools.js"></script>
     
     
 
@@ -140,7 +151,7 @@
 <ul>
   <li><a href="https://github.com/aleph2c/py-activeobject">miros on github</a></li>
   <li><a href="https://github.com/aleph2c/sequence">sequence on github</a></li>
-  <li><a href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a></li>
+  <li><a href="https://aleph2c.github.io/miros-rabbitmq/html/index.html">miros-rabbitmq plugin</a></li>
   <li><a href="http://www.umlet.com">UMLet Download</a></li>
   <li><a href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">formalism explained</a></li>
 </ul>
@@ -189,10 +200,10 @@
 <div><p>A prophet is not someone with special visions, just someone blind to most of what others see.</p>
 <p class="attribution">—Nassim Nicholas Taleb</p>
 </div></blockquote>
-<div class="section" id="interacting-statecharts-same-machine">
-<span id="interactingcharts-interacting-statecharts"></span><h1>Interacting Statecharts (Same Machine)<a class="headerlink" href="#interacting-statecharts-same-machine" title="Permalink to this headline">#</a></h1>
-<div class="section" id="a-simple-example">
-<span id="interactingcharts-a-simple-example"></span><h2>A Simple Example<a class="headerlink" href="#a-simple-example" title="Permalink to this headline">#</a></h2>
+<section id="interacting-statecharts-same-machine">
+<span id="interactingcharts-interacting-statecharts"></span><h1>Interacting Statecharts (Same Machine)<a class="headerlink" href="#interacting-statecharts-same-machine" title="Permalink to this heading">#</a></h1>
+<section id="a-simple-example">
+<span id="interactingcharts-a-simple-example"></span><h2>A Simple Example<a class="headerlink" href="#a-simple-example" title="Permalink to this heading">#</a></h2>
 <p>The Miros library makes concurrency trivial.  You build up an active object,
 provide it with a starting state (with its connected map).  Then you post
 events to it.</p>
@@ -233,69 +244,39 @@ or callback methods.</p>
 </div>
 <p>Since we are using a factory, we write up some callback functions which will be
 placed on the diagram as we build it out:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
-<span class="kn">import</span> <span class="nn">time</span>
-
-<span class="c1">#</span>
-<span class="c1">#</span>
-<span class="c1">#</span>
-<span class="c1">#  +------- fb --------------s-----+</span>
-<span class="c1">#  |  +---- fb1 -------t-------+   |</span>
-<span class="c1">#  |  | i/pub(BB)              |   l --&gt; BB</span>
-<span class="c1">#  |  |  +- fb11---------+     |   |</span>
-<span class="c1">#  |  |  |               |     |   |</span>
-<span class="c1">#  |  |  |               &lt;-b-+ &lt;-a-+</span>
-<span class="c1">#  |  |  +---------------+   +-+   |</span>
-<span class="c1">#  |  +------------------------+   |</span>
-<span class="c1">#  +-------------------------------+</span>
-<span class="c1">#</span>
-
-<span class="hll"><span class="k">def</span> <span class="nf">trans_to_fb</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-</span><span class="hll">  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fb</span><span class="p">)</span>
-</span>
-<span class="hll"><span class="k">def</span> <span class="nf">trans_to_fb1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-</span><span class="hll">  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fb1</span><span class="p">)</span>
-</span>
-<span class="hll"><span class="k">def</span> <span class="nf">trans_to_fb11</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-</span><span class="hll">  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fb11</span><span class="p">)</span>
-</span>
-<span class="hll"><span class="k">def</span> <span class="nf">publish_BB</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-</span><span class="hll">  <span class="n">chart</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">,</span>
-</span><span class="hll">    <span class="n">payload</span><span class="o">=</span><span class="s2">&quot;information from b_chart riding within the BB signal&quot;</span><span class="p">))</span>
-</span><span class="hll">  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+<span class="linenos"> 3</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="c1">#</span>
+<span class="linenos"> 6</span><span class="c1">#</span>
+<span class="linenos"> 7</span><span class="c1">#</span>
+<span class="linenos"> 8</span><span class="c1">#  +------- fb --------------s-----+</span>
+<span class="linenos"> 9</span><span class="c1">#  |  +---- fb1 -------t-------+   |</span>
+<span class="linenos">10</span><span class="c1">#  |  | i/pub(BB)              |   l --&gt; BB</span>
+<span class="linenos">11</span><span class="c1">#  |  |  +- fb11---------+     |   |</span>
+<span class="linenos">12</span><span class="c1">#  |  |  |               |     |   |</span>
+<span class="linenos">13</span><span class="c1">#  |  |  |               &lt;-b-+ &lt;-a-+</span>
+<span class="linenos">14</span><span class="c1">#  |  |  +---------------+   +-+   |</span>
+<span class="linenos">15</span><span class="c1">#  |  +------------------------+   |</span>
+<span class="linenos">16</span><span class="c1">#  +-------------------------------+</span>
+<span class="linenos">17</span><span class="c1">#</span>
+<span class="linenos">18</span>
+<span class="hll"><span class="linenos">19</span><span class="k">def</span> <span class="nf">trans_to_fb</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos">20</span>  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fb</span><span class="p">)</span>
+</span><span class="linenos">21</span>
+<span class="hll"><span class="linenos">22</span><span class="k">def</span> <span class="nf">trans_to_fb1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos">23</span>  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fb1</span><span class="p">)</span>
+</span><span class="linenos">24</span>
+<span class="hll"><span class="linenos">25</span><span class="k">def</span> <span class="nf">trans_to_fb11</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos">26</span>  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fb11</span><span class="p">)</span>
+</span><span class="linenos">27</span>
+<span class="hll"><span class="linenos">28</span><span class="k">def</span> <span class="nf">publish_BB</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos">29</span>  <span class="n">chart</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">30</span>    <span class="n">payload</span><span class="o">=</span><span class="s2">&quot;information from b_chart riding within the BB signal&quot;</span><span class="p">))</span>
+</span><span class="hll"><span class="linenos">31</span>  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 </span></pre></div>
-</td></tr></table></div>
+</div>
 <p>The highlighted code describes the callback signal methods that will be linked
 into <code class="docutils literal notranslate"><span class="pre">b_chart</span></code>.  Pay special attention to lines 29-31.  It is here that we
 will <a class="reference internal" href="recipes.html#recipes-publishing-event-to-other-active-objects"><span class="std std-ref">publish</span></a> a <code class="docutils literal notranslate"><span class="pre">BB</span></code>
@@ -354,207 +335,108 @@ receive this event with this payload.</p>
 </span></pre></div>
 </div>
 <p>Now that we have built the <code class="docutils literal notranslate"><span class="pre">b_chart</span></code> let’s build out the <code class="docutils literal notranslate"><span class="pre">c_chart</span></code>:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
-  2
-  3
-  4
-  5
-  6
-  7
-  8
-  9
- 10
- 11
- 12
- 13
- 14
- 15
- 16
- 17
- 18
- 19
- 20
- 21
- 22
- 23
- 24
- 25
- 26
- 27
- 28
- 29
- 30
- 31
- 32
- 33
- 34
- 35
- 36
- 37
- 38
- 39
- 40
- 41
- 42
- 43
- 44
- 45
- 46
- 47
- 48
- 49
- 50
- 51
- 52
- 53
- 54
- 55
- 56
- 57
- 58
- 59
- 60
- 61
- 62
- 63
- 64
- 65
- 66
- 67
- 68
- 69
- 70
- 71
- 72
- 73
- 74
- 75
- 76
- 77
- 78
- 79
- 80
- 81
- 82
- 83
- 84
- 85
- 86
- 87
- 88
- 89
- 90
- 91
- 92
- 93
- 94
- 95
- 96
- 97
- 98
- 99
-100</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
-<span class="kn">import</span> <span class="nn">time</span>
-
-<span class="c1">#</span>
-<span class="c1">#</span>
-<span class="c1">#</span>
-<span class="c1">#  +------- fb --------------s-----+</span>
-<span class="c1">#  |  +---- fb1 -------t-------+   |</span>
-<span class="c1">#  |  | i/pub(BB)              |   l --&gt; BB</span>
-<span class="c1">#  |  |  +- fb11---------+     |   |</span>
-<span class="c1">#  |  |  |               |     |   |</span>
-<span class="c1">#  |  |  |               &lt;-b-+ &lt;-a-+</span>
-<span class="c1">#  |  |  +---------------+   +-+   |</span>
-<span class="c1">#  |  +------------------------+   |</span>
-<span class="c1">#  +-------------------------------+</span>
-<span class="c1">#</span>
-
-<span class="k">def</span> <span class="nf">trans_to_fb</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fb</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">trans_to_fb1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fb1</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">trans_to_fb11</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fb11</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">publish_BB</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">chart</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span>
-    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">,</span>
-      <span class="n">payload</span><span class="o">=</span><span class="s2">&quot;information from b_chart riding within the BB signal&quot;</span><span class="p">))</span>
-  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-
-<span class="n">b_chart</span> <span class="o">=</span> <span class="n">Factory</span><span class="p">(</span><span class="s1">&#39;b_chart&#39;</span><span class="p">)</span>
-<span class="n">fb</span> <span class="o">=</span> <span class="n">b_chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fb&#39;</span><span class="p">)</span><span class="o">.</span> \
-        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fb1</span><span class="p">)</span><span class="o">.</span> \
-        <span class="n">to_method</span><span class="p">()</span>
-
-<span class="n">fb1</span> <span class="o">=</span> <span class="n">b_chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fb1&#39;</span><span class="p">)</span><span class="o">.</span> \
-        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fb11</span><span class="p">)</span><span class="o">.</span> \
-        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">publish_BB</span><span class="p">)</span><span class="o">.</span> \
-        <span class="n">to_method</span><span class="p">()</span>
-
-<span class="n">fb11</span> <span class="o">=</span> <span class="n">b_chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fb11&#39;</span><span class="p">)</span><span class="o">.</span> \
-        <span class="n">to_method</span><span class="p">()</span>
-
-<span class="n">b_chart</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="n">fb</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
-        <span class="n">nest</span><span class="p">(</span><span class="n">fb1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">fb</span><span class="p">)</span><span class="o">.</span> \
-        <span class="n">nest</span><span class="p">(</span><span class="n">fb11</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">fb1</span><span class="p">)</span>
-
-<span class="hll"><span class="k">def</span> <span class="nf">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-</span><span class="hll">  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
-</span><span class="hll">
-</span><span class="hll"><span class="k">def</span> <span class="nf">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-</span><span class="hll">  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc1</span><span class="p">)</span>
-</span><span class="hll">
-</span><span class="hll"><span class="k">def</span> <span class="nf">bb_handler</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-</span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
-</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">):</span>
-</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
-</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
-</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
-</span><span class="hll">
-</span><span class="hll"><span class="k">def</span> <span class="nf">trans_to_fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-</span><span class="hll">  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc2</span><span class="p">)</span>
-</span><span class="hll">
-</span><span class="hll"><span class="c1">#</span>
-</span><span class="hll"><span class="c1">#</span>
-</span><span class="hll"><span class="c1">#</span>
-</span><span class="hll"><span class="c1">#        +------------------ fc ---------------+</span>
-</span><span class="hll"><span class="c1">#        |   +----- fc1----+   +-----fc2-----+ |</span>
-</span><span class="hll"><span class="c1">#        | * |             |   |             | +----+</span>
-</span><span class="hll"><span class="c1">#        | | |             +-a-&gt;             | |    |</span>
-</span><span class="hll"><span class="c1">#        | +-&gt;             &lt;-a-+             | |    BB</span>
-</span><span class="hll"><span class="c1">#        |   |             |   |             | |    |</span>
-</span><span class="hll"><span class="c1">#        |   |             |   |             | &lt;----+</span>
-</span><span class="hll"><span class="c1">#        |   +-------------+   +-------------+ |</span>
-</span><span class="hll"><span class="c1">#        +-------------------------------------+</span>
-</span><span class="hll"><span class="c1">#</span>
-</span><span class="hll">
-</span><span class="hll"><span class="n">c_chart</span> <span class="o">=</span> <span class="n">Factory</span><span class="p">(</span><span class="s1">&#39;c_chart&#39;</span><span class="p">)</span>
-</span><span class="hll"><span class="n">fc</span> <span class="o">=</span> <span class="n">c_chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fc&#39;</span><span class="p">)</span><span class="o">.</span> \
-</span><span class="hll">      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fc1</span><span class="p">)</span><span class="o">.</span> \
-</span><span class="hll">      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">bb_handler</span><span class="p">)</span><span class="o">.</span> \
-</span><span class="hll">      <span class="n">to_method</span><span class="p">()</span>
-</span><span class="hll">
-</span><span class="hll"><span class="n">fc1</span> <span class="o">=</span> <span class="n">c_chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fc1&#39;</span><span class="p">)</span><span class="o">.</span> \
-</span><span class="hll">      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fc2</span><span class="p">)</span><span class="o">.</span> \
-</span><span class="hll">      <span class="n">to_method</span><span class="p">()</span>
-</span><span class="hll">
-</span><span class="hll"><span class="n">fc2</span> <span class="o">=</span> <span class="n">c_chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fc2&#39;</span><span class="p">)</span><span class="o">.</span> \
-</span><span class="hll">      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fc1</span><span class="p">)</span><span class="o">.</span> \
-</span><span class="hll">      <span class="n">to_method</span><span class="p">()</span>
-</span><span class="hll">
-</span><span class="hll"><span class="n">c_chart</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span>  <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
-</span><span class="hll">        <span class="n">nest</span><span class="p">(</span><span class="n">fc1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">fc</span><span class="p">)</span><span class="o">.</span> \
-</span><span class="hll">        <span class="n">nest</span><span class="p">(</span><span class="n">fc2</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">fc</span><span class="p">)</span>
-</span><span class="hll">
-</span><span class="hll"><span class="c1"># subscribe to BB signals sent to the active fabric</span>
-</span><span class="hll"><span class="n">c_chart</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">))</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">Factory</span>
+<span class="linenos">  2</span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+<span class="linenos">  3</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos">  4</span>
+<span class="linenos">  5</span><span class="c1">#</span>
+<span class="linenos">  6</span><span class="c1">#</span>
+<span class="linenos">  7</span><span class="c1">#</span>
+<span class="linenos">  8</span><span class="c1">#  +------- fb --------------s-----+</span>
+<span class="linenos">  9</span><span class="c1">#  |  +---- fb1 -------t-------+   |</span>
+<span class="linenos"> 10</span><span class="c1">#  |  | i/pub(BB)              |   l --&gt; BB</span>
+<span class="linenos"> 11</span><span class="c1">#  |  |  +- fb11---------+     |   |</span>
+<span class="linenos"> 12</span><span class="c1">#  |  |  |               |     |   |</span>
+<span class="linenos"> 13</span><span class="c1">#  |  |  |               &lt;-b-+ &lt;-a-+</span>
+<span class="linenos"> 14</span><span class="c1">#  |  |  +---------------+   +-+   |</span>
+<span class="linenos"> 15</span><span class="c1">#  |  +------------------------+   |</span>
+<span class="linenos"> 16</span><span class="c1">#  +-------------------------------+</span>
+<span class="linenos"> 17</span><span class="c1">#</span>
+<span class="linenos"> 18</span>
+<span class="linenos"> 19</span><span class="k">def</span> <span class="nf">trans_to_fb</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="linenos"> 20</span>  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fb</span><span class="p">)</span>
+<span class="linenos"> 21</span>
+<span class="linenos"> 22</span><span class="k">def</span> <span class="nf">trans_to_fb1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="linenos"> 23</span>  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fb1</span><span class="p">)</span>
+<span class="linenos"> 24</span>
+<span class="linenos"> 25</span><span class="k">def</span> <span class="nf">trans_to_fb11</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="linenos"> 26</span>  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fb11</span><span class="p">)</span>
+<span class="linenos"> 27</span>
+<span class="linenos"> 28</span><span class="k">def</span> <span class="nf">publish_BB</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="linenos"> 29</span>  <span class="n">chart</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span>
+<span class="linenos"> 30</span>    <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">,</span>
+<span class="linenos"> 31</span>      <span class="n">payload</span><span class="o">=</span><span class="s2">&quot;information from b_chart riding within the BB signal&quot;</span><span class="p">))</span>
+<span class="linenos"> 32</span>  <span class="k">return</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="linenos"> 33</span>
+<span class="linenos"> 34</span><span class="n">b_chart</span> <span class="o">=</span> <span class="n">Factory</span><span class="p">(</span><span class="s1">&#39;b_chart&#39;</span><span class="p">)</span>
+<span class="linenos"> 35</span><span class="n">fb</span> <span class="o">=</span> <span class="n">b_chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fb&#39;</span><span class="p">)</span><span class="o">.</span> \
+<span class="linenos"> 36</span>        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fb1</span><span class="p">)</span><span class="o">.</span> \
+<span class="linenos"> 37</span>        <span class="n">to_method</span><span class="p">()</span>
+<span class="linenos"> 38</span>
+<span class="linenos"> 39</span><span class="n">fb1</span> <span class="o">=</span> <span class="n">b_chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fb1&#39;</span><span class="p">)</span><span class="o">.</span> \
+<span class="linenos"> 40</span>        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fb11</span><span class="p">)</span><span class="o">.</span> \
+<span class="linenos"> 41</span>        <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">publish_BB</span><span class="p">)</span><span class="o">.</span> \
+<span class="linenos"> 42</span>        <span class="n">to_method</span><span class="p">()</span>
+<span class="linenos"> 43</span>
+<span class="linenos"> 44</span><span class="n">fb11</span> <span class="o">=</span> <span class="n">b_chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fb11&#39;</span><span class="p">)</span><span class="o">.</span> \
+<span class="linenos"> 45</span>        <span class="n">to_method</span><span class="p">()</span>
+<span class="linenos"> 46</span>
+<span class="linenos"> 47</span><span class="n">b_chart</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="n">fb</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
+<span class="linenos"> 48</span>        <span class="n">nest</span><span class="p">(</span><span class="n">fb1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">fb</span><span class="p">)</span><span class="o">.</span> \
+<span class="linenos"> 49</span>        <span class="n">nest</span><span class="p">(</span><span class="n">fb11</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">fb1</span><span class="p">)</span>
+<span class="linenos"> 50</span>
+<span class="hll"><span class="linenos"> 51</span><span class="k">def</span> <span class="nf">trans_to_fc</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos"> 52</span>  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos"> 53</span>
+</span><span class="hll"><span class="linenos"> 54</span><span class="k">def</span> <span class="nf">trans_to_fc1</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos"> 55</span>  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc1</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos"> 56</span>
+</span><span class="hll"><span class="linenos"> 57</span><span class="k">def</span> <span class="nf">bb_handler</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos"> 58</span>  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+</span><span class="hll"><span class="linenos"> 59</span>  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos"> 60</span>    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos"> 61</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos"> 62</span>  <span class="k">return</span> <span class="n">status</span>
+</span><span class="hll"><span class="linenos"> 63</span>
+</span><span class="hll"><span class="linenos"> 64</span><span class="k">def</span> <span class="nf">trans_to_fc2</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos"> 65</span>  <span class="k">return</span> <span class="n">chart</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">fc2</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos"> 66</span>
+</span><span class="hll"><span class="linenos"> 67</span><span class="c1">#</span>
+</span><span class="hll"><span class="linenos"> 68</span><span class="c1">#</span>
+</span><span class="hll"><span class="linenos"> 69</span><span class="c1">#</span>
+</span><span class="hll"><span class="linenos"> 70</span><span class="c1">#        +------------------ fc ---------------+</span>
+</span><span class="hll"><span class="linenos"> 71</span><span class="c1">#        |   +----- fc1----+   +-----fc2-----+ |</span>
+</span><span class="hll"><span class="linenos"> 72</span><span class="c1">#        | * |             |   |             | +----+</span>
+</span><span class="hll"><span class="linenos"> 73</span><span class="c1">#        | | |             +-a-&gt;             | |    |</span>
+</span><span class="hll"><span class="linenos"> 74</span><span class="c1">#        | +-&gt;             &lt;-a-+             | |    BB</span>
+</span><span class="hll"><span class="linenos"> 75</span><span class="c1">#        |   |             |   |             | |    |</span>
+</span><span class="hll"><span class="linenos"> 76</span><span class="c1">#        |   |             |   |             | &lt;----+</span>
+</span><span class="hll"><span class="linenos"> 77</span><span class="c1">#        |   +-------------+   +-------------+ |</span>
+</span><span class="hll"><span class="linenos"> 78</span><span class="c1">#        +-------------------------------------+</span>
+</span><span class="hll"><span class="linenos"> 79</span><span class="c1">#</span>
+</span><span class="hll"><span class="linenos"> 80</span>
+</span><span class="hll"><span class="linenos"> 81</span><span class="n">c_chart</span> <span class="o">=</span> <span class="n">Factory</span><span class="p">(</span><span class="s1">&#39;c_chart&#39;</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos"> 82</span><span class="n">fc</span> <span class="o">=</span> <span class="n">c_chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fc&#39;</span><span class="p">)</span><span class="o">.</span> \
+</span><span class="hll"><span class="linenos"> 83</span>      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">INIT_SIGNAL</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fc1</span><span class="p">)</span><span class="o">.</span> \
+</span><span class="hll"><span class="linenos"> 84</span>      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">bb_handler</span><span class="p">)</span><span class="o">.</span> \
+</span><span class="hll"><span class="linenos"> 85</span>      <span class="n">to_method</span><span class="p">()</span>
+</span><span class="hll"><span class="linenos"> 86</span>
+</span><span class="hll"><span class="linenos"> 87</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">c_chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fc1&#39;</span><span class="p">)</span><span class="o">.</span> \
+</span><span class="hll"><span class="linenos"> 88</span>      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fc2</span><span class="p">)</span><span class="o">.</span> \
+</span><span class="hll"><span class="linenos"> 89</span>      <span class="n">to_method</span><span class="p">()</span>
+</span><span class="hll"><span class="linenos"> 90</span>
+</span><span class="hll"><span class="linenos"> 91</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">c_chart</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;fc2&#39;</span><span class="p">)</span><span class="o">.</span> \
+</span><span class="hll"><span class="linenos"> 92</span>      <span class="n">catch</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="n">trans_to_fc1</span><span class="p">)</span><span class="o">.</span> \
+</span><span class="hll"><span class="linenos"> 93</span>      <span class="n">to_method</span><span class="p">()</span>
+</span><span class="hll"><span class="linenos"> 94</span>
+</span><span class="hll"><span class="linenos"> 95</span><span class="n">c_chart</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span>  <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span> \
+</span><span class="hll"><span class="linenos"> 96</span>        <span class="n">nest</span><span class="p">(</span><span class="n">fc1</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">fc</span><span class="p">)</span><span class="o">.</span> \
+</span><span class="hll"><span class="linenos"> 97</span>        <span class="n">nest</span><span class="p">(</span><span class="n">fc2</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">fc</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos"> 98</span>
+</span><span class="hll"><span class="linenos"> 99</span><span class="c1"># subscribe to BB signals sent to the active fabric</span>
+</span><span class="hll"><span class="linenos">100</span><span class="n">c_chart</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BB</span><span class="p">))</span>
 </span></pre></div>
-</td></tr></table></div>
+</div>
 <p>Pay special attention to the last line.  This is where the <code class="docutils literal notranslate"><span class="pre">c_chart</span></code> is
 <a class="reference internal" href="recipes.html#recipes-subscribing-to-an-event-posted-by-another-active-object"><span class="std std-ref">subscribing</span></a>
 to the <code class="docutils literal notranslate"><span class="pre">BB</span></code> signal.  I forgot to add this in the example and it took me a
@@ -777,16 +659,18 @@ sequence diagram:</p>
 </div>
 <p>Then I would over-write the question marks with numbers and reference those
 numbers in my documentation.</p>
-<dl class="footnote brackets">
-<dt class="label" id="id1"><span class="brackets">1</span></dt>
-<dd><p>Pierre M. Sprey <a class="reference external" href="http://pogoarchives.org/labyrinth/09-sprey-w-covers.pdf">Evaluating Weapons Sorting the Good from the Bad</a></p>
-</dd>
-<dt class="label" id="f1"><span class="brackets">2</span></dt>
-<dd><p>They are named <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> because these are the topological names given to them on page 178 of “Practical UML STATECHARTS in C/C++”</p>
-</dd>
-</dl>
-</div>
-</div>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id1" role="note">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Pierre M. Sprey <a class="reference external" href="http://pogoarchives.org/labyrinth/09-sprey-w-covers.pdf">Evaluating Weapons Sorting the Good from the Bad</a></p>
+</aside>
+<aside class="footnote brackets" id="f1" role="note">
+<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
+<p>They are named <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> because these are the topological names given to them on page 178 of “Practical UML STATECHARTS in C/C++”</p>
+</aside>
+</aside>
+</section>
+</section>
 
 
         
@@ -823,12 +707,12 @@ numbers in my documentation.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Nov 03, 2020 8:22 AM</span>
+          <span class="time">May 26, 2024 6:24 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 5.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

@@ -17,9 +17,8 @@ and the first 5 characters of this unique identifier will be used in the trace.
 The reason that an identifier is given to it is so that the trace outputs, from
 multiple active objects, can be distinguished from one another.
 
-Suppose you have built the tazor active object described in the :ref:`second
-example<examples-tazor-example>`. Suppose you named this active object `tazor`:
-To see the trace you would type:
+Suppose you have built the tazor active object described in the second example.
+Suppose you named this active object `tazor`: To see the trace you would type:
 
 .. code-block:: python
 
@@ -40,4 +39,4 @@ called `start_at`, here the trace is actually using the method name `start_at`
 to indicate how the chart was started.
 
 A trace can be used with the `sequence` project to generate a sequence diagram,
-more about that is described :ref:`here.<reflection-creating-a-sequence-diagram>`
+more about that is described :ref:`here.<recipes-drawing-a-statechart>`

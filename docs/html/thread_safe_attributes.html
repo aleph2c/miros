@@ -11,13 +11,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
     <title>Thread Safe Attributes | miros</title>
     <link rel="shortcut icon" href="_static/favicon.ico">
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css">
     <link rel="stylesheet" href="_static/theme.css" type="text/css">
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/theme.css" />
+      
     
       
     <link rel="stylesheet" type="text/css" href="_static/css/miros_docs.css" />
@@ -29,13 +38,15 @@
     <script type="text/javascript" src="_static/theme.js" defer></script>
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    
     <script src="_static/jquery.js"></script>
     
     <script src="_static/underscore.js"></script>
     
-    <script src="_static/doctools.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     
-    <script src="_static/language_data.js"></script>
+    <script src="_static/doctools.js"></script>
     
     
 
@@ -137,7 +148,7 @@
 <ul>
   <li><a href="https://github.com/aleph2c/py-activeobject">miros on github</a></li>
   <li><a href="https://github.com/aleph2c/sequence">sequence on github</a></li>
-  <li><a href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a></li>
+  <li><a href="https://aleph2c.github.io/miros-rabbitmq/html/index.html">miros-rabbitmq plugin</a></li>
   <li><a href="http://www.umlet.com">UMLet Download</a></li>
   <li><a href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">formalism explained</a></li>
 </ul>
@@ -186,8 +197,8 @@
 <div><p>The best is the enemy of the good.</p>
 <p class="attribution">—Voltaire</p>
 </div></blockquote>
-<div class="section" id="thread-safe-attributes">
-<span id="thread-safe-attributes-thread-safe-attributes"></span><h1>Thread Safe Attributes<a class="headerlink" href="#thread-safe-attributes" title="Permalink to this headline">#</a></h1>
+<section id="thread-safe-attributes">
+<span id="thread-safe-attributes-thread-safe-attributes"></span><h1>Thread Safe Attributes<a class="headerlink" href="#thread-safe-attributes" title="Permalink to this heading">#</a></h1>
 <p>If you use a miros statechart, your program is <a class="reference external" href="http://www.laurentluce.com/posts/python-threads-synchronization-locks-rlocks-semaphores-conditions-events-and-queues/">multi-threaded</a>.</p>
 <p>Sometimes, you will want to access an attribute of your statechart from another
 thread, like the main part of your program.  When you do this, you are trying to
@@ -252,133 +263,71 @@ used to get the thread lock explicitly.</p>
 <p>I will introduce these ideas gradually through a set of examples.  Let’s
 begin by looking at four interacting threads (possible race conditions are
 highlighted):</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Event</span> <span class="k">as</span> <span class="n">ThreadEvent</span>
-
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ThreadSafeAttributes</span>
-
-<span class="k">class</span> <span class="nc">GetLock1</span><span class="p">(</span><span class="n">ThreadSafeAttributes</span><span class="p">):</span>
-  <span class="n">_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;thread_safe_attr_1&#39;</span><span class="p">]</span>
-
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running in main thread&#39;&#39;&#39;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="mi">0</span>
-
-  <span class="k">def</span> <span class="nf">thread_method_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running in th1 thread&#39;&#39;&#39;</span>
-    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
-<span class="hll">      <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span class="hll">      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
-</span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
-
-<span class="k">class</span> <span class="nc">GetLock2</span><span class="p">():</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running in main thread&#39;&#39;&#39;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span> <span class="o">=</span> <span class="n">gl1</span>
-
-  <span class="k">def</span> <span class="nf">thread_method_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running in th1 thread&#39;&#39;&#39;</span>
-    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
-<span class="hll">      <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">-=</span> <span class="mi">1</span>
-</span><span class="hll">      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
-</span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
-
-<span class="k">class</span> <span class="nc">ThreadKiller</span><span class="p">():</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running in main thread&#39;&#39;&#39;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span> <span class="o">=</span> <span class="n">count_down</span>
-
-  <span class="k">def</span> <span class="nf">thread_stopper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running in killer thread&#39;&#39;&#39;</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-
-<span class="c1"># main thread:</span>
-<span class="n">evt</span> <span class="o">=</span> <span class="n">ThreadEvent</span><span class="p">()</span>
-<span class="n">evt</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-
-<span class="n">gl1</span> <span class="o">=</span> <span class="n">GetLock1</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
-<span class="n">gl2</span> <span class="o">=</span> <span class="n">GetLock2</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="o">=</span><span class="n">gl1</span><span class="p">)</span>
-<span class="n">killer</span> <span class="o">=</span> <span class="n">ThreadKiller</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-
-<span class="n">threads</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_method_1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th1&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
-<span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl2</span><span class="o">.</span><span class="n">thread_method_2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th2&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
-
-<span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span>
-  <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-
-<span class="n">thread_stopper</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">killer</span><span class="o">.</span><span class="n">thread_stopper</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;killer&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span>
-<span class="n">thread_stopper</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-<span class="n">thread_stopper</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Event</span> <span class="k">as</span> <span class="n">ThreadEvent</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ThreadSafeAttributes</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="k">class</span> <span class="nc">GetLock1</span><span class="p">(</span><span class="n">ThreadSafeAttributes</span><span class="p">):</span>
+<span class="linenos"> 8</span>  <span class="n">_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;thread_safe_attr_1&#39;</span><span class="p">]</span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+<span class="linenos">11</span>    <span class="sd">&#39;&#39;&#39;running in main thread&#39;&#39;&#39;</span>
+<span class="linenos">12</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
+<span class="linenos">13</span>    <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span>  <span class="k">def</span> <span class="nf">thread_method_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos">16</span>    <span class="sd">&#39;&#39;&#39;running in th1 thread&#39;&#39;&#39;</span>
+<span class="linenos">17</span>    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
+<span class="hll"><span class="linenos">18</span>      <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class="hll"><span class="linenos">19</span>      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
+</span><span class="linenos">20</span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
+<span class="linenos">21</span>
+<span class="linenos">22</span><span class="k">class</span> <span class="nc">GetLock2</span><span class="p">():</span>
+<span class="linenos">23</span>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="p">):</span>
+<span class="linenos">24</span>    <span class="sd">&#39;&#39;&#39;running in main thread&#39;&#39;&#39;</span>
+<span class="linenos">25</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
+<span class="linenos">26</span>    <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span> <span class="o">=</span> <span class="n">gl1</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span>  <span class="k">def</span> <span class="nf">thread_method_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos">29</span>    <span class="sd">&#39;&#39;&#39;running in th1 thread&#39;&#39;&#39;</span>
+<span class="linenos">30</span>    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
+<span class="hll"><span class="linenos">31</span>      <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">-=</span> <span class="mi">1</span>
+</span><span class="hll"><span class="linenos">32</span>      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
+</span><span class="linenos">33</span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
+<span class="linenos">34</span>
+<span class="linenos">35</span><span class="k">class</span> <span class="nc">ThreadKiller</span><span class="p">():</span>
+<span class="linenos">36</span>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="p">):</span>
+<span class="linenos">37</span>    <span class="sd">&#39;&#39;&#39;running in main thread&#39;&#39;&#39;</span>
+<span class="linenos">38</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
+<span class="linenos">39</span>    <span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span> <span class="o">=</span> <span class="n">count_down</span>
+<span class="linenos">40</span>
+<span class="linenos">41</span>  <span class="k">def</span> <span class="nf">thread_stopper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos">42</span>    <span class="sd">&#39;&#39;&#39;running in killer thread&#39;&#39;&#39;</span>
+<span class="linenos">43</span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span><span class="p">)</span>
+<span class="linenos">44</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="linenos">45</span>
+<span class="linenos">46</span><span class="c1"># main thread:</span>
+<span class="linenos">47</span><span class="n">evt</span> <span class="o">=</span> <span class="n">ThreadEvent</span><span class="p">()</span>
+<span class="linenos">48</span><span class="n">evt</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="linenos">49</span>
+<span class="linenos">50</span><span class="n">gl1</span> <span class="o">=</span> <span class="n">GetLock1</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
+<span class="linenos">51</span><span class="n">gl2</span> <span class="o">=</span> <span class="n">GetLock2</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="o">=</span><span class="n">gl1</span><span class="p">)</span>
+<span class="linenos">52</span><span class="n">killer</span> <span class="o">=</span> <span class="n">ThreadKiller</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="linenos">53</span>
+<span class="linenos">54</span><span class="n">threads</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">55</span><span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_method_1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th1&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
+<span class="linenos">56</span><span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl2</span><span class="o">.</span><span class="n">thread_method_2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th2&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
+<span class="linenos">57</span>
+<span class="linenos">58</span><span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span>
+<span class="linenos">59</span>  <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="linenos">60</span>
+<span class="linenos">61</span><span class="n">thread_stopper</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">killer</span><span class="o">.</span><span class="n">thread_stopper</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;killer&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span>
+<span class="linenos">62</span><span class="n">thread_stopper</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="linenos">63</span><span class="n">thread_stopper</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You can <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/thread_safe_attributes_1.py">download the above code here</a>.</p>
@@ -435,139 +384,74 @@ conditions if they are applied to attributes shared across threads.</p>
 <p>So our example, written without the <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> class, but with the
 same protections would look like this (shared attributes protections
 highlighted):</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">place</span> <span class="n">code</span> <span class="n">here</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">RLock</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Event</span> <span class="k">as</span> <span class="n">ThreadEvent</span>
-
-<span class="k">class</span> <span class="nc">GetLock1</span><span class="p">():</span>
-
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
-<span class="hll">    <span class="bp">self</span><span class="o">.</span><span class="n">_rlock</span> <span class="o">=</span> <span class="n">RLock</span><span class="p">()</span>
-</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="mi">0</span>
-
-  <span class="k">def</span> <span class="nf">thread_method_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within th1 thread&#39;&#39;&#39;</span>
-    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
-<span class="hll">      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlock</span><span class="p">:</span>
-</span><span class="hll">        <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span class="hll">      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlock</span><span class="p">:</span>
-</span><span class="hll">        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
-</span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
-
-<span class="k">class</span> <span class="nc">GetLock2</span><span class="p">():</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span> <span class="o">=</span> <span class="n">gl1</span>
-
-  <span class="k">def</span> <span class="nf">thread_method_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within th2 thread&#39;&#39;&#39;</span>
-    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
-<span class="hll">      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">_rlock</span><span class="p">:</span>
-</span><span class="hll">        <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">-=</span> <span class="mi">1</span>
-</span><span class="hll">      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">_rlock</span><span class="p">:</span>
-</span><span class="hll">        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
-</span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
-
-<span class="k">class</span> <span class="nc">ThreadKiller</span><span class="p">():</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span> <span class="o">=</span> <span class="n">count_down</span>
-
-  <span class="k">def</span> <span class="nf">thread_stopper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within killer thread&#39;&#39;&#39;</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-
-<span class="n">evt</span> <span class="o">=</span> <span class="n">ThreadEvent</span><span class="p">()</span>
-<span class="n">evt</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-
-<span class="n">gl1</span> <span class="o">=</span> <span class="n">GetLock1</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
-<span class="n">gl2</span> <span class="o">=</span> <span class="n">GetLock2</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="o">=</span><span class="n">gl1</span><span class="p">)</span>
-<span class="n">killer</span> <span class="o">=</span> <span class="n">ThreadKiller</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-
-<span class="n">threads</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_method_1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th1&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
-<span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl2</span><span class="o">.</span><span class="n">thread_method_2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th2&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
-
-<span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span>
-  <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-
-<span class="n">thread_stopper</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">killer</span><span class="o">.</span><span class="n">thread_stopper</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;stopper&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span>
-<span class="n">thread_stopper</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-<span class="n">thread_stopper</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="n">place</span> <span class="n">code</span> <span class="n">here</span>
+<span class="linenos"> 2</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">RLock</span>
+<span class="linenos"> 4</span><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<span class="linenos"> 5</span><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Event</span> <span class="k">as</span> <span class="n">ThreadEvent</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="k">class</span> <span class="nc">GetLock1</span><span class="p">():</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+<span class="linenos">10</span>    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
+<span class="hll"><span class="linenos">11</span>    <span class="bp">self</span><span class="o">.</span><span class="n">_rlock</span> <span class="o">=</span> <span class="n">RLock</span><span class="p">()</span>
+</span><span class="linenos">12</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
+<span class="linenos">13</span>    <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span>  <span class="k">def</span> <span class="nf">thread_method_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos">16</span>    <span class="sd">&#39;&#39;&#39;running within th1 thread&#39;&#39;&#39;</span>
+<span class="linenos">17</span>    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
+<span class="hll"><span class="linenos">18</span>      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlock</span><span class="p">:</span>
+</span><span class="hll"><span class="linenos">19</span>        <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class="hll"><span class="linenos">20</span>      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlock</span><span class="p">:</span>
+</span><span class="hll"><span class="linenos">21</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
+</span><span class="linenos">22</span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
+<span class="linenos">23</span>
+<span class="linenos">24</span><span class="k">class</span> <span class="nc">GetLock2</span><span class="p">():</span>
+<span class="linenos">25</span>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="p">):</span>
+<span class="linenos">26</span>    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
+<span class="linenos">27</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
+<span class="linenos">28</span>    <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span> <span class="o">=</span> <span class="n">gl1</span>
+<span class="linenos">29</span>
+<span class="linenos">30</span>  <span class="k">def</span> <span class="nf">thread_method_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos">31</span>    <span class="sd">&#39;&#39;&#39;running within th2 thread&#39;&#39;&#39;</span>
+<span class="linenos">32</span>    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
+<span class="hll"><span class="linenos">33</span>      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">_rlock</span><span class="p">:</span>
+</span><span class="hll"><span class="linenos">34</span>        <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span> <span class="o">-=</span> <span class="mi">1</span>
+</span><span class="hll"><span class="linenos">35</span>      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">_rlock</span><span class="p">:</span>
+</span><span class="hll"><span class="linenos">36</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_safe_attr_1</span><span class="p">)</span>
+</span><span class="linenos">37</span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span><span class="k">class</span> <span class="nc">ThreadKiller</span><span class="p">():</span>
+<span class="linenos">40</span>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="p">):</span>
+<span class="linenos">41</span>    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
+<span class="linenos">42</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
+<span class="linenos">43</span>    <span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span> <span class="o">=</span> <span class="n">count_down</span>
+<span class="linenos">44</span>
+<span class="linenos">45</span>  <span class="k">def</span> <span class="nf">thread_stopper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos">46</span>    <span class="sd">&#39;&#39;&#39;running within killer thread&#39;&#39;&#39;</span>
+<span class="linenos">47</span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span><span class="p">)</span>
+<span class="linenos">48</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="linenos">49</span>
+<span class="linenos">50</span><span class="n">evt</span> <span class="o">=</span> <span class="n">ThreadEvent</span><span class="p">()</span>
+<span class="linenos">51</span><span class="n">evt</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="linenos">52</span>
+<span class="linenos">53</span><span class="n">gl1</span> <span class="o">=</span> <span class="n">GetLock1</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
+<span class="linenos">54</span><span class="n">gl2</span> <span class="o">=</span> <span class="n">GetLock2</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="o">=</span><span class="n">gl1</span><span class="p">)</span>
+<span class="linenos">55</span><span class="n">killer</span> <span class="o">=</span> <span class="n">ThreadKiller</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="linenos">56</span>
+<span class="linenos">57</span><span class="n">threads</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">58</span><span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_method_1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th1&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
+<span class="linenos">59</span><span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl2</span><span class="o">.</span><span class="n">thread_method_2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th2&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
+<span class="linenos">60</span>
+<span class="linenos">61</span><span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span>
+<span class="linenos">62</span>  <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="linenos">63</span>
+<span class="linenos">64</span><span class="n">thread_stopper</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">killer</span><span class="o">.</span><span class="n">thread_stopper</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;stopper&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span>
+<span class="linenos">65</span><span class="n">thread_stopper</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="linenos">66</span><span class="n">thread_stopper</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You can <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/thread_safe_attributes_2.py">download the above code here</a>.</p>
@@ -593,125 +477,67 @@ see that it might be hard to reproduce precisely two identical traces of the
 program output.</p>
 <p>Ok, now for something scary, let’s look at our code without thread-locks (the
 race conditions are highlighted):</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Event</span> <span class="k">as</span> <span class="n">ThreadEvent</span>
-
-<span class="k">class</span> <span class="nc">GetLock1</span><span class="p">():</span>
-
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">thread_race_attr_1</span> <span class="o">=</span> <span class="mi">0</span>
-
-  <span class="k">def</span> <span class="nf">thread_method_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within th1 thread&#39;&#39;&#39;</span>
-    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
-<span class="hll">      <span class="bp">self</span><span class="o">.</span><span class="n">thread_race_attr_1</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span class="hll">      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_race_attr_1</span><span class="p">)</span>
-</span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
-
-<span class="k">class</span> <span class="nc">GetLock2</span><span class="p">():</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span> <span class="o">=</span> <span class="n">gl1</span>
-
-  <span class="k">def</span> <span class="nf">thread_method_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within th2 thread&#39;&#39;&#39;</span>
-    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
-<span class="hll">      <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_race_attr_1</span> <span class="o">-=</span> <span class="mi">1</span>
-</span><span class="hll">      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_race_attr_1</span><span class="p">)</span>
-</span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
-
-<span class="k">class</span> <span class="nc">ThreadKiller</span><span class="p">():</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span> <span class="o">=</span> <span class="n">count_down</span>
-
-  <span class="k">def</span> <span class="nf">thread_stopper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within killer thread&#39;&#39;&#39;</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-
-<span class="n">evt</span> <span class="o">=</span> <span class="n">ThreadEvent</span><span class="p">()</span>
-<span class="n">evt</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-
-<span class="n">gl1</span> <span class="o">=</span> <span class="n">GetLock1</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
-<span class="n">gl2</span> <span class="o">=</span> <span class="n">GetLock2</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="o">=</span><span class="n">gl1</span><span class="p">)</span>
-<span class="n">killer</span> <span class="o">=</span> <span class="n">ThreadKiller</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-
-<span class="n">threads</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_method_1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th1&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
-<span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl2</span><span class="o">.</span><span class="n">thread_method_2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th2&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
-
-<span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span>
-  <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-
-<span class="n">thread_stopper</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">killer</span><span class="o">.</span><span class="n">thread_stopper</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;stopper&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span>
-<span class="n">thread_stopper</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-<span class="n">thread_stopper</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Event</span> <span class="k">as</span> <span class="n">ThreadEvent</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="k">class</span> <span class="nc">GetLock1</span><span class="p">():</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+<span class="linenos"> 8</span>    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
+<span class="linenos"> 9</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
+<span class="linenos">10</span>    <span class="bp">self</span><span class="o">.</span><span class="n">thread_race_attr_1</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>  <span class="k">def</span> <span class="nf">thread_method_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos">13</span>    <span class="sd">&#39;&#39;&#39;running within th1 thread&#39;&#39;&#39;</span>
+<span class="linenos">14</span>    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
+<span class="hll"><span class="linenos">15</span>      <span class="bp">self</span><span class="o">.</span><span class="n">thread_race_attr_1</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class="hll"><span class="linenos">16</span>      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_race_attr_1</span><span class="p">)</span>
+</span><span class="linenos">17</span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
+<span class="linenos">18</span>
+<span class="linenos">19</span><span class="k">class</span> <span class="nc">GetLock2</span><span class="p">():</span>
+<span class="linenos">20</span>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="p">):</span>
+<span class="linenos">21</span>    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
+<span class="linenos">22</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
+<span class="linenos">23</span>    <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span> <span class="o">=</span> <span class="n">gl1</span>
+<span class="linenos">24</span>
+<span class="linenos">25</span>  <span class="k">def</span> <span class="nf">thread_method_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos">26</span>    <span class="sd">&#39;&#39;&#39;running within th2 thread&#39;&#39;&#39;</span>
+<span class="linenos">27</span>    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
+<span class="hll"><span class="linenos">28</span>      <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_race_attr_1</span> <span class="o">-=</span> <span class="mi">1</span>
+</span><span class="hll"><span class="linenos">29</span>      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_race_attr_1</span><span class="p">)</span>
+</span><span class="linenos">30</span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
+<span class="linenos">31</span>
+<span class="linenos">32</span><span class="k">class</span> <span class="nc">ThreadKiller</span><span class="p">():</span>
+<span class="linenos">33</span>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="p">):</span>
+<span class="linenos">34</span>    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
+<span class="linenos">35</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
+<span class="linenos">36</span>    <span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span> <span class="o">=</span> <span class="n">count_down</span>
+<span class="linenos">37</span>
+<span class="linenos">38</span>  <span class="k">def</span> <span class="nf">thread_stopper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos">39</span>    <span class="sd">&#39;&#39;&#39;running within killer thread&#39;&#39;&#39;</span>
+<span class="linenos">40</span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span><span class="p">)</span>
+<span class="linenos">41</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="linenos">42</span>
+<span class="linenos">43</span><span class="n">evt</span> <span class="o">=</span> <span class="n">ThreadEvent</span><span class="p">()</span>
+<span class="linenos">44</span><span class="n">evt</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="linenos">45</span>
+<span class="linenos">46</span><span class="n">gl1</span> <span class="o">=</span> <span class="n">GetLock1</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
+<span class="linenos">47</span><span class="n">gl2</span> <span class="o">=</span> <span class="n">GetLock2</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="o">=</span><span class="n">gl1</span><span class="p">)</span>
+<span class="linenos">48</span><span class="n">killer</span> <span class="o">=</span> <span class="n">ThreadKiller</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="linenos">49</span>
+<span class="linenos">50</span><span class="n">threads</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">51</span><span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_method_1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th1&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
+<span class="linenos">52</span><span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl2</span><span class="o">.</span><span class="n">thread_method_2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th2&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
+<span class="linenos">53</span>
+<span class="linenos">54</span><span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span>
+<span class="linenos">55</span>  <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="linenos">56</span>
+<span class="linenos">57</span><span class="n">thread_stopper</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">killer</span><span class="o">.</span><span class="n">thread_stopper</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;stopper&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span>
+<span class="linenos">58</span><span class="n">thread_stopper</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="linenos">59</span><span class="n">thread_stopper</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You can <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/thread_safe_attributes_3_unsafe.py">download the above code here</a>.</p>
@@ -740,147 +566,78 @@ I can’t see the need for).  I’ll change the name of <code class="docutils li
 <code class="docutils literal notranslate"><span class="pre">a</span></code>. The <code class="docutils literal notranslate"><span class="pre">ThreadSafeAttributes</span></code> class can not implicitly protect you in such
 situations, but what it can do is give you the lock and you can use it to
 protect your own code (highlighting how to get the lock):</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Event</span> <span class="k">as</span> <span class="n">ThreadEvent</span>
-
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ThreadSafeAttributes</span>
-
-<span class="k">class</span> <span class="nc">GetLock1</span><span class="p">(</span><span class="n">ThreadSafeAttributes</span><span class="p">):</span>
-  <span class="n">_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
-
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
-
-  <span class="k">def</span> <span class="nf">thread_method_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within th1 thread&#39;&#39;&#39;</span>
-<span class="hll">    <span class="n">_</span><span class="p">,</span> <span class="n">_lock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span>
-</span>    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
-      <span class="k">with</span> <span class="n">_lock</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">0.35</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.45</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">**</span> <span class="mf">1.2</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
-
-<span class="k">class</span> <span class="nc">GetLock2</span><span class="p">():</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span> <span class="o">=</span> <span class="n">gl1</span>
-
-  <span class="k">def</span> <span class="nf">thread_method_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within th2 thread&#39;&#39;&#39;</span>
-<span class="hll">    <span class="n">_</span><span class="p">,</span> <span class="n">_lock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">a</span>
-</span>    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
-      <span class="k">with</span> <span class="n">_lock</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">0.30</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">a</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.45</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">a</span> <span class="o">**</span> <span class="mf">1.2</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
-
-<span class="k">class</span> <span class="nc">ThreadKiller</span><span class="p">():</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span> <span class="o">=</span> <span class="n">count_down</span>
-
-  <span class="k">def</span> <span class="nf">thread_stopper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;running within killer thread&#39;&#39;&#39;</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-
-<span class="c1"># main thread:</span>
-<span class="n">evt</span> <span class="o">=</span> <span class="n">ThreadEvent</span><span class="p">()</span>
-<span class="n">evt</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-
-<span class="n">gl1</span> <span class="o">=</span> <span class="n">GetLock1</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
-<span class="n">gl2</span> <span class="o">=</span> <span class="n">GetLock2</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="o">=</span><span class="n">gl1</span><span class="p">)</span>
-<span class="n">killer</span> <span class="o">=</span> <span class="n">ThreadKiller</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-
-<span class="n">threads</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_method_1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th1&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
-<span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl2</span><span class="o">.</span><span class="n">thread_method_2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th2&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
-
-<span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span>
-  <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-
-<span class="n">thread_stopper</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">killer</span><span class="o">.</span><span class="n">thread_stopper</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;stopper&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span>
-<span class="n">thread_stopper</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-<span class="n">thread_stopper</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">math</span>
+<span class="linenos"> 2</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<span class="linenos"> 4</span><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Event</span> <span class="k">as</span> <span class="n">ThreadEvent</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ThreadSafeAttributes</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span><span class="k">class</span> <span class="nc">GetLock1</span><span class="p">(</span><span class="n">ThreadSafeAttributes</span><span class="p">):</span>
+<span class="linenos"> 9</span>  <span class="n">_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+<span class="linenos">12</span>    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
+<span class="linenos">13</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
+<span class="linenos">14</span>    <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span>  <span class="k">def</span> <span class="nf">thread_method_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos">17</span>    <span class="sd">&#39;&#39;&#39;running within th1 thread&#39;&#39;&#39;</span>
+<span class="hll"><span class="linenos">18</span>    <span class="n">_</span><span class="p">,</span> <span class="n">_lock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span>
+</span><span class="linenos">19</span>    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
+<span class="linenos">20</span>      <span class="k">with</span> <span class="n">_lock</span><span class="p">:</span>
+<span class="linenos">21</span>        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">0.35</span>
+<span class="linenos">22</span>        <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.45</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">**</span> <span class="mf">1.2</span>
+<span class="linenos">23</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th1: &quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="linenos">24</span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
+<span class="linenos">25</span>
+<span class="linenos">26</span><span class="k">class</span> <span class="nc">GetLock2</span><span class="p">():</span>
+<span class="linenos">27</span>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="p">):</span>
+<span class="linenos">28</span>    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
+<span class="linenos">29</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
+<span class="linenos">30</span>    <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span> <span class="o">=</span> <span class="n">gl1</span>
+<span class="linenos">31</span>
+<span class="linenos">32</span>  <span class="k">def</span> <span class="nf">thread_method_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos">33</span>    <span class="sd">&#39;&#39;&#39;running within th2 thread&#39;&#39;&#39;</span>
+<span class="hll"><span class="linenos">34</span>    <span class="n">_</span><span class="p">,</span> <span class="n">_lock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">a</span>
+</span><span class="linenos">35</span>    <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
+<span class="linenos">36</span>      <span class="k">with</span> <span class="n">_lock</span><span class="p">:</span>
+<span class="linenos">37</span>        <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="mf">0.30</span>
+<span class="linenos">38</span>        <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">a</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.45</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gl1</span><span class="o">.</span><span class="n">a</span> <span class="o">**</span> <span class="mf">1.2</span>
+<span class="linenos">39</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;th2: &quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="linenos">40</span>      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.020</span><span class="p">)</span>
+<span class="linenos">41</span>
+<span class="linenos">42</span><span class="k">class</span> <span class="nc">ThreadKiller</span><span class="p">():</span>
+<span class="linenos">43</span>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="p">):</span>
+<span class="linenos">44</span>    <span class="sd">&#39;&#39;&#39;running within main thread&#39;&#39;&#39;</span>
+<span class="linenos">45</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span>
+<span class="linenos">46</span>    <span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span> <span class="o">=</span> <span class="n">count_down</span>
+<span class="linenos">47</span>
+<span class="linenos">48</span>  <span class="k">def</span> <span class="nf">thread_stopper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos">49</span>    <span class="sd">&#39;&#39;&#39;running within killer thread&#39;&#39;&#39;</span>
+<span class="linenos">50</span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kill_time</span><span class="p">)</span>
+<span class="linenos">51</span>    <span class="bp">self</span><span class="o">.</span><span class="n">evt</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="linenos">52</span>
+<span class="linenos">53</span><span class="c1"># main thread:</span>
+<span class="linenos">54</span><span class="n">evt</span> <span class="o">=</span> <span class="n">ThreadEvent</span><span class="p">()</span>
+<span class="linenos">55</span><span class="n">evt</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="linenos">56</span>
+<span class="linenos">57</span><span class="n">gl1</span> <span class="o">=</span> <span class="n">GetLock1</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
+<span class="linenos">58</span><span class="n">gl2</span> <span class="o">=</span> <span class="n">GetLock2</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">gl1</span><span class="o">=</span><span class="n">gl1</span><span class="p">)</span>
+<span class="linenos">59</span><span class="n">killer</span> <span class="o">=</span> <span class="n">ThreadKiller</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">count_down</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="linenos">60</span>
+<span class="linenos">61</span><span class="n">threads</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">62</span><span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl1</span><span class="o">.</span><span class="n">thread_method_1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th1&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
+<span class="linenos">63</span><span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">gl2</span><span class="o">.</span><span class="n">thread_method_2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;th2&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()))</span>
+<span class="linenos">64</span>
+<span class="linenos">65</span><span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span>
+<span class="linenos">66</span>  <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="linenos">67</span>
+<span class="linenos">68</span><span class="n">thread_stopper</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">killer</span><span class="o">.</span><span class="n">thread_stopper</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;stopper&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span>
+<span class="linenos">69</span><span class="n">thread_stopper</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="linenos">70</span><span class="n">thread_stopper</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You can <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/thread_safe_attributes_4.py">download the above code here</a>.</p>
@@ -921,7 +678,7 @@ have written, the behaves differently depending on what you have written.  It
 is because of this feature it can release its lock in what looks like a
 syntactically inconsistent way.</p>
 </div>
-</div>
+</section>
 
 
         
@@ -958,12 +715,12 @@ syntactically inconsistent way.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Nov 03, 2020 8:22 AM</span>
+          <span class="time">May 26, 2024 6:33 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 5.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

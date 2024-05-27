@@ -11,13 +11,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
     <title>Setting Up RabbitMQ | miros</title>
     <link rel="shortcut icon" href="_static/favicon.ico">
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css">
     <link rel="stylesheet" href="_static/theme.css" type="text/css">
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/theme.css" />
+      
     
       
     <link rel="stylesheet" type="text/css" href="_static/css/miros_docs.css" />
@@ -29,13 +38,15 @@
     <script type="text/javascript" src="_static/theme.js" defer></script>
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    
     <script src="_static/jquery.js"></script>
     
     <script src="_static/underscore.js"></script>
     
-    <script src="_static/doctools.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     
-    <script src="_static/language_data.js"></script>
+    <script src="_static/doctools.js"></script>
     
     
 
@@ -121,7 +132,7 @@
 <ul>
   <li><a href="https://github.com/aleph2c/py-activeobject">miros on github</a></li>
   <li><a href="https://github.com/aleph2c/sequence">sequence on github</a></li>
-  <li><a href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a></li>
+  <li><a href="https://aleph2c.github.io/miros-rabbitmq/html/index.html">miros-rabbitmq plugin</a></li>
   <li><a href="http://www.umlet.com">UMLet Download</a></li>
   <li><a href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">formalism explained</a></li>
 </ul>
@@ -166,8 +177,8 @@
       
         
           
-  <div class="section" id="setting-up-rabbitmq">
-<span id="setting-up-rabbit-mq-setting-up-rabbit-mq"></span><h1>Setting Up RabbitMQ<a class="headerlink" href="#setting-up-rabbitmq" title="Permalink to this headline">#</a></h1>
+  <section id="setting-up-rabbitmq">
+<span id="setting-up-rabbit-mq-setting-up-rabbit-mq"></span><h1>Setting Up RabbitMQ<a class="headerlink" href="#setting-up-rabbitmq" title="Permalink to this heading">#</a></h1>
 <p>Before we setup RabbitMQ, I should tell you what it is.  It’s a library written
 on top of the Erlang programming language which allows you to send messages
 across the Internet, or just to different processes running on your machine.</p>
@@ -188,8 +199,8 @@ documents as a collection of open secrets; they are a consulting company after
 all. (their docs remind me of the Noam Chomsky bot that can write you pages
 and pages of gibberish).</p>
 </div>
-<div class="section" id="installing-on-linux-with-ansible">
-<span id="setting-up-rabbit-mq-installing-on-linux-with-ansible"></span><h2>Installing On Linux with Ansible<a class="headerlink" href="#installing-on-linux-with-ansible" title="Permalink to this headline">#</a></h2>
+<section id="installing-on-linux-with-ansible">
+<span id="setting-up-rabbit-mq-installing-on-linux-with-ansible"></span><h2>Installing On Linux with Ansible<a class="headerlink" href="#installing-on-linux-with-ansible" title="Permalink to this heading">#</a></h2>
 <p>To get your RabbitMQ server working over a network with Python requires at least
 ten steps, so I have automated them using Ansible.</p>
 <p>If you haven’t seen Ansible before, it is a tool for automatically deploying
@@ -214,7 +225,7 @@ hostname.</p>
 </div>
 <p>Now add the following:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">scotty</span><span class="p">]</span>
-<span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span>
+<span class="mf">127.0.0.1</span>
 </pre></div>
 </div>
 <p>Save (write-out) and exit the file.  What I have done is to link my hostname,
@@ -281,17 +292,13 @@ permissions.</p>
 <p>So to deploy a networkable RabbitMQ setup, I have created three files which will
 be used by Ansible:</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 64%" />
-<col style="width: 36%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Purpose</p></th>
 <th class="head"><p>File Name and Link</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>The deployment <span class="xref std std-term">yml</span> script</p></td>
+<tr class="row-even"><td><p>The deployment yml script</p></td>
 <td><p><a class="reference external" href="https://github.com/aleph2c/miros/blob/master/experiment/rabbit/ansible/rabbit_install.yml">rabbit_install.yml</a></p></td>
 </tr>
 <tr class="row-odd"><td><p>The rabbitmq environment configuration</p></td>
@@ -321,15 +328,15 @@ be <code class="docutils literal notranslate"><span class="pre">dobbs</span></co
 <img alt="_images/RabbitMQ.PNG" class="scale-to-fit" src="_images/RabbitMQ.PNG" />
 <p>If you have come this far you have a working RabbitMQ message broker running on
 your Linux system.</p>
-</div>
-<div class="section" id="installing-on-windows">
-<span id="setting-up-rabbit-mq-installing-on-windows"></span><h2>Installing On Windows<a class="headerlink" href="#installing-on-windows" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="installing-on-windows">
+<span id="setting-up-rabbit-mq-installing-on-windows"></span><h2>Installing On Windows<a class="headerlink" href="#installing-on-windows" title="Permalink to this heading">#</a></h2>
 <p>To install the same infrastructure on Windows follow <a class="reference external" href="https://www.rabbitmq.com/install-windows.html">these instructions</a>. Or you can reference this
 <a class="reference external" href="http://arcware.net/installing-rabbitmq-on-windows/">guy’s blog</a>.  To open the
 required ports, look at <a class="reference external" href="http://www.tomshardware.com/faq/id-3114787/open-firewall-ports-windows.html">this.</a></p>
-</div>
-<div class="section" id="learning-to-basic-messaging-patterns-and-networking-rabbitmq">
-<span id="setting-up-rabbit-mq-learning-to-basic-messaging-patterns-and-networking-rabbitmq"></span><h2>Learning to Basic Messaging Patterns and Networking RabbitMQ<a class="headerlink" href="#learning-to-basic-messaging-patterns-and-networking-rabbitmq" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="learning-to-basic-messaging-patterns-and-networking-rabbitmq">
+<span id="setting-up-rabbit-mq-learning-to-basic-messaging-patterns-and-networking-rabbitmq"></span><h2>Learning to Basic Messaging Patterns and Networking RabbitMQ<a class="headerlink" href="#learning-to-basic-messaging-patterns-and-networking-rabbitmq" title="Permalink to this heading">#</a></h2>
 <p>Ok, now what?</p>
 <p>To learn how to use it with Python, there is a great set of tutorials provided
 on the <a class="reference external" href="https://www.rabbitmq.com/getstarted.html/">RabbitMQ site</a>.</p>
@@ -339,11 +346,6 @@ working across my network.</p>
 <p>If you want to code by example, I recommend that you work through their
 tutorials, then use my code to see how to make it work across your own network:</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 22%" />
-<col style="width: 30%" />
-<col style="width: 47%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Tutorial Purpose</p></th>
 <th class="head"><p>RabbitMQ Pika Tutorial</p></th>
@@ -408,8 +410,8 @@ tutorials, then use my code to see how to make it work across your own network:<
 messages across the network using the default user name, guest.  Also, the
 messages are not encrypted.</p>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
         
@@ -442,12 +444,12 @@ messages are not encrypted.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Nov 03, 2020 8:22 AM</span>
+          <span class="time">May 26, 2024 6:41 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 5.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

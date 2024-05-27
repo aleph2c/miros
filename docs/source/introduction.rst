@@ -59,7 +59,7 @@ patterns so that you can verify your designs are working as you expect them to.
 
 Finally, if you would like to link your statecharts across a computer network
 (for IOT applications), you can use the `miros-rabbitmq
-<https://aleph2c.github.io/miros-rabbitmq/index.html>`_ plugin.
+<https://aleph2c.github.io/miros-rabbitmq/html/index.html>`_ plugin.
 
 .. _introduction-history-and-context:
 

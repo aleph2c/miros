@@ -1,7 +1,4 @@
-  *In an era ruled by materialism and unstable geopolitics, art must be restored to the center of public education*
-
-  -- Camille Paglia
-
+:orphan:
 
 .. _examples-active-object-example:
 

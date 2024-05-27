@@ -2004,11 +2004,11 @@ left this project for a while and wrote the `miros-rabbitmq plugin
 <https://aleph2c.github.io/miros-rabbitmq/index.html>`_.
 
 You can now use the `miros-rabbitmq plugin
-<https://aleph2c.github.io/miros-rabbitmq/index.html>`_ to make networkable
+<https://aleph2c.github.io/miros-rabbitmq/html/index.html>`_ to make networkable
 statecharts.  So let's network our Mongols by following these steps:
 
-* `install RabbitMQ <file:///C:/github/miros-rabbitmq/docs/installing_infrastructure.html>`_ and `miros-rabbitmq <https://aleph2c.github.io/miros-rabbitmq/installation.html>`_ on all of the computers you want to network.
-* `make a .env file in the same directory as your code <file:///C:/github/miros-rabbitmq/docs/recipes.html#managing-your-encryption-keys-and-rabbitmq-credentials-short-version>`_
+* `install RabbitMQ <https://www.rabbitmq.com/tutorials/tutorial-one-python>`_ and `miros-rabbitmq <https://aleph2c.github.io/miros-rabbitmq/html/installation.html>`_ on all of the computers you want to network.
+* `make a .env file in the same directory as your code <https://aleph2c.github.io/miros-rabbitmq/html/recipes.html#managing-your-encryption-keys-and-rabbitmq-credentials-short-version>`_
 * replace any Factory class with a NetworkedFactory class
 
 Let's talk about the directory structure that you will need for this to work:

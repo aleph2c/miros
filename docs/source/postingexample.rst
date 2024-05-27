@@ -1,3 +1,4 @@
+:orphan:
   *The individual has always had to struggle to keep from being overwhelmed by the
   tribe.  If you try it, you will be frightened.  But no price is too high to pay
   for the privilege of owning yourself* -- Friedrich Nietzsche

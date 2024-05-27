@@ -29,7 +29,7 @@ when would each of the functions, ``a``, ``b``, ``c``, ``d``, ``e``, ``g``, and 
 
 If you are unfamiliar with UML, this part of the diagram:
 
-.. image:: _static/guard.svg
+.. image:: _static/guard2.svg
     :class: noscale-left
 
 ...contains a **guard**.  Specifically, the code:
@@ -672,7 +672,7 @@ Code, Add the guard and t function
 Now lets add the guard function ``g`` and the ``t`` function into s1_state,
 this will build this part of the picture:
 
-.. image:: _static/guard.svg
+.. image:: _static/guard2.svg
     :class: noscale-left
 
 .. code-block:: python

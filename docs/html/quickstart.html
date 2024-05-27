@@ -11,13 +11,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
     <title>Quick Start | miros</title>
     <link rel="shortcut icon" href="_static/favicon.ico">
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css">
     <link rel="stylesheet" href="_static/theme.css" type="text/css">
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/theme.css" />
+      
     
       
     <link rel="stylesheet" type="text/css" href="_static/css/miros_docs.css" />
@@ -29,13 +38,15 @@
     <script type="text/javascript" src="_static/theme.js" defer></script>
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    
     <script src="_static/jquery.js"></script>
     
     <script src="_static/underscore.js"></script>
     
-    <script src="_static/doctools.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     
-    <script src="_static/language_data.js"></script>
+    <script src="_static/doctools.js"></script>
     
     
 
@@ -134,7 +145,7 @@
 <ul>
   <li><a href="https://github.com/aleph2c/py-activeobject">miros on github</a></li>
   <li><a href="https://github.com/aleph2c/sequence">sequence on github</a></li>
-  <li><a href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a></li>
+  <li><a href="https://aleph2c.github.io/miros-rabbitmq/html/index.html">miros-rabbitmq plugin</a></li>
   <li><a href="http://www.umlet.com">UMLet Download</a></li>
   <li><a href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">formalism explained</a></li>
 </ul>
@@ -183,8 +194,8 @@
 <div><p>Point of view is worth 80 IQ points</p>
 <p class="attribution">—Alan Kay</p>
 </div></blockquote>
-<div class="section" id="id1">
-<h1>Quick Start<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h1>
+<section id="id1">
+<h1>Quick Start<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h1>
 <p>If you know nothing about statecharts, I suggest you start here: <a class="reference internal" href="zero_to_one.html#zero-to-one-zero-to-one"><span class="std std-ref">zero to
 one</span></a></p>
 <p>If you haven’t seen UML diagrams before, scan the <span class="xref std std-ref">understanding diagrams</span> part of this guide to make sense of the
@@ -194,8 +205,8 @@ to C/C++ for a considerable performance gain.  Check out this project: <a class=
 codebase</a>.  It is documented here:
 <a class="reference external" href="https://sourceforge.net/projects/qpc/files/doc/PSiCC2.pdf/download">Practical UML Statecharts in C/C++, 2nd Edition</a>.</p>
 <p>In the next section, we will show how to tackle a problem using UML statecharts.</p>
-<div class="section" id="a-networked-sprinkler">
-<span id="quickstart-a-quick-example"></span><h2>A Networked Sprinkler<a class="headerlink" href="#a-networked-sprinkler" title="Permalink to this headline">#</a></h2>
+<section id="a-networked-sprinkler">
+<span id="quickstart-a-quick-example"></span><h2>A Networked Sprinkler<a class="headerlink" href="#a-networked-sprinkler" title="Permalink to this heading">#</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You can look at the <a class="reference external" href="https://github.com/aleph2c/miros/blob/master/examples/sprinkler.py">example’s code here</a>.</p>
@@ -230,9 +241,9 @@ object will interact with the Sprinkler and OpenWeatherMapCityDetails objects.
 <p>We will use three different statecharts, one per object in the above diagram.
 Having independent objects interface in a statechart is called orthogonality in
 statechart theory.</p>
-</div>
-<div class="section" id="figuring-out-what-information-will-be-passed-around">
-<span id="quickstart-figuring-out-what-information-will-be-passed-around"></span><h2>Figuring out what Information will be Passed Around<a class="headerlink" href="#figuring-out-what-information-will-be-passed-around" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="figuring-out-what-information-will-be-passed-around">
+<span id="quickstart-figuring-out-what-information-will-be-passed-around"></span><h2>Figuring out what Information will be Passed Around<a class="headerlink" href="#figuring-out-what-information-will-be-passed-around" title="Permalink to this heading">#</a></h2>
 <p>Let’s wave our hands and assume that the three active objects used in this
 designed have been built already and are working, but we want to figure out how
 they will communicate with one another.</p>
@@ -400,9 +411,9 @@ of the robotic sprinkler Python file:</p>
 </pre></div>
 </div>
 <p>Now that we have a decent understanding about what information we want to flow in our system let’s focus in on each part.</p>
-</div>
-<div class="section" id="openweathermapcitydetails">
-<span id="quickstart-openweathermapcitydetails-specifications"></span><h2>OpenWeatherMapCityDetails<a class="headerlink" href="#openweathermapcitydetails" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="openweathermapcitydetails">
+<span id="quickstart-openweathermapcitydetails-specifications"></span><h2>OpenWeatherMapCityDetails<a class="headerlink" href="#openweathermapcitydetails" title="Permalink to this heading">#</a></h2>
 <p>Let’s start by looking at the rough sketch of the <code class="docutils literal notranslate"><span class="pre">OpenWeatherMapCityDetails</span></code>
 object again:</p>
 <a class="reference external image-reference" href="_static/open_weather_map_city_details_medium.pdf"><img alt="_images/open_weather_map_city_details_medium.svg" class="noscale-center" src="_images/open_weather_map_city_details_medium.svg" /></a>
@@ -762,9 +773,9 @@ top   get_id_file_from_network read_file   idle                  conduct_query
 <p>We can see that the city_details statechart queued the REQUEST_CITY_DETAILS
 (4,6,8,10) events until after it had downloaded the <code class="docutils literal notranslate"><span class="pre">city.list.json.qz</span></code> (1).
 So it works as designed.</p>
-</div>
-<div class="section" id="cityweather">
-<span id="quickstart-citydetails-specifications"></span><h2>CityWeather<a class="headerlink" href="#cityweather" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="cityweather">
+<span id="quickstart-citydetails-specifications"></span><h2>CityWeather<a class="headerlink" href="#cityweather" title="Permalink to this heading">#</a></h2>
 <p>Let’s start by looking at the rough sketch of the <code class="docutils literal notranslate"><span class="pre">CityWeather</span></code> active object
 again:</p>
 <a class="reference external image-reference" href="_static/city_weather_details_medium.pdf"><img alt="_images/city_weather_details_medium.svg" class="noscale-center" src="_images/city_weather_details_medium.svg" /></a>
@@ -1204,9 +1215,9 @@ sequence diagrams</span></a>:</p>
 <p>The pattern described in 7 and 8 is repeated for the remaining 9-13 calls.</p>
 <p>We haven’t tested the network error handling part of our system, but I would
 say the nominal behavior is working as designed.</p>
-</div>
-<div class="section" id="sprinkler">
-<span id="quickstart-sprinkler-specifications"></span><h2>Sprinkler<a class="headerlink" href="#sprinkler" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="sprinkler">
+<span id="quickstart-sprinkler-specifications"></span><h2>Sprinkler<a class="headerlink" href="#sprinkler" title="Permalink to this heading">#</a></h2>
 <p>Let’s start by looking at the rough sketch of the <code class="docutils literal notranslate"><span class="pre">Sprinkler</span></code> active object again:</p>
 <a class="reference external image-reference" href="_static/sprinker_details_medium.pdf"><img alt="_images/sprinkler_details_medium.svg" class="noscale-center" src="_images/sprinkler_details_medium.svg" /></a>
 <p>The diagram shows us how the sprinkler gets its weather information but it
@@ -1551,8 +1562,8 @@ by at least 126 lines (16 percent).</p>
 </div>
 <div class="toctree-wrapper compound">
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
         
@@ -1589,12 +1600,12 @@ by at least 126 lines (16 percent).</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Nov 03, 2020 8:22 AM</span>
+          <span class="time">May 26, 2024 6:24 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 5.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

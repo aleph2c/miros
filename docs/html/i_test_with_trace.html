@@ -11,13 +11,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
     <title>&lt;no title&gt; | miros</title>
     <link rel="shortcut icon" href="_static/favicon.ico">
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css">
     <link rel="stylesheet" href="_static/theme.css" type="text/css">
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/theme.css" />
+      
     
       
     <link rel="stylesheet" type="text/css" href="_static/css/miros_docs.css" />
@@ -29,13 +38,15 @@
     <script type="text/javascript" src="_static/theme.js" defer></script>
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    
     <script src="_static/jquery.js"></script>
     
     <script src="_static/underscore.js"></script>
     
-    <script src="_static/doctools.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     
-    <script src="_static/language_data.js"></script>
+    <script src="_static/doctools.js"></script>
     
     
 
@@ -121,7 +132,7 @@
 <ul>
   <li><a href="https://github.com/aleph2c/py-activeobject">miros on github</a></li>
   <li><a href="https://github.com/aleph2c/sequence">sequence on github</a></li>
-  <li><a href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a></li>
+  <li><a href="https://aleph2c.github.io/miros-rabbitmq/html/index.html">miros-rabbitmq plugin</a></li>
   <li><a href="http://www.umlet.com">UMLet Download</a></li>
   <li><a href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">formalism explained</a></li>
 </ul>
@@ -172,7 +183,7 @@ a trace output as the target for a regression test, you would:</p>
 <li><p>Run your program and print your trace to the output.</p></li>
 <li><p>Copy this trace as the target behavior of your test.</p></li>
 <li><p>Run this trace target and the future output of the statechart trace through
-the <a class="reference internal" href="reflection.html#stripped-example"><span class="std std-ref">stripped context manager</span></a> to remove the date
+the <a class="reference internal" href="recipes.html#stripped-example"><span class="std std-ref">stripped context manager</span></a> to remove the date
 timestamp information.</p></li>
 <li><p>Compare your target with the results.</p></li>
 </ol>
@@ -202,33 +213,21 @@ like this:</p>
 could use as a test specification.  The only problem is that when we run the
 code in the future and generate a new trace we get a trace with a pre-pended
 date timestamp.  We can get around this issue like this:</p>
-<div class="highlight-python notranslate" id="stripped-example"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">stripped</span>
-
-<span class="n">target</span> <span class="o">=</span> \
-<span class="sd">&#39;&#39;&#39;[2017-11-05 21:31:56.098526] [tazor] e-&gt;start_at() top-&gt;arming</span>
-<span class="sd">   [2017-11-05 21:31:56.200047] [tazor] e-&gt;BATTERY_CHARGE() arming-&gt;armed</span>
-<span class="sd">   [2017-11-05 21:31:56.300974] [tazor] e-&gt;BATTERY_CHARGE() armed-&gt;armed</span>
-<span class="sd">   [2017-11-05 21:31:56.401682] [tazor] e-&gt;BATTERY_CHARGE() armed-&gt;armed</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="k">with</span> <span class="n">stripped</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="k">as</span> <span class="n">stripped_target</span><span class="p">,</span> \
-     <span class="n">stripped</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="k">as</span> <span class="n">stripped_trace_result</span><span class="p">:</span>
-
-  <span class="k">for</span> <span class="n">target</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">stripped_target</span><span class="p">,</span> <span class="n">stripped_trace_result</span><span class="p">):</span>
-    <span class="k">assert</span><span class="p">(</span><span class="n">target</span> <span class="o">==</span> <span class="n">result</span><span class="p">)</span>
+<div class="highlight-python notranslate" id="stripped-example"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">stripped</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="n">target</span> <span class="o">=</span> \
+<span class="linenos"> 4</span><span class="sd">&#39;&#39;&#39;[2017-11-05 21:31:56.098526] [tazor] e-&gt;start_at() top-&gt;arming</span>
+<span class="linenos"> 5</span><span class="sd">   [2017-11-05 21:31:56.200047] [tazor] e-&gt;BATTERY_CHARGE() arming-&gt;armed</span>
+<span class="linenos"> 6</span><span class="sd">   [2017-11-05 21:31:56.300974] [tazor] e-&gt;BATTERY_CHARGE() armed-&gt;armed</span>
+<span class="linenos"> 7</span><span class="sd">   [2017-11-05 21:31:56.401682] [tazor] e-&gt;BATTERY_CHARGE() armed-&gt;armed</span>
+<span class="linenos"> 8</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="linenos"> 9</span><span class="k">with</span> <span class="n">stripped</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="k">as</span> <span class="n">stripped_target</span><span class="p">,</span> \
+<span class="linenos">10</span>     <span class="n">stripped</span><span class="p">(</span><span class="n">tazor</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span> <span class="k">as</span> <span class="n">stripped_trace_result</span><span class="p">:</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>  <span class="k">for</span> <span class="n">target</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">stripped_target</span><span class="p">,</span> <span class="n">stripped_trace_result</span><span class="p">):</span>
+<span class="linenos">13</span>    <span class="k">assert</span><span class="p">(</span><span class="n">target</span> <span class="o">==</span> <span class="n">result</span><span class="p">)</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>On line <strong>1</strong> we import the stripped context manager.</p>
 <p>On lines <strong>3-7</strong> we define the target as just being the trace that we copied
 when we were first designing our statechart.</p>
@@ -272,12 +271,12 @@ trace of of new design into the target string and everything should be peachy.</
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Nov 03, 2020 8:22 AM</span>
+          <span class="time">May 26, 2024 6:24 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 5.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

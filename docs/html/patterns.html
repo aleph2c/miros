@@ -11,13 +11,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
     <title>Patterns | miros</title>
     <link rel="shortcut icon" href="_static/favicon.ico">
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css">
     <link rel="stylesheet" href="_static/theme.css" type="text/css">
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      
+    
+      
+    <link rel="stylesheet" type="text/css" href="_static/theme.css" />
+      
     
       
     <link rel="stylesheet" type="text/css" href="_static/css/miros_docs.css" />
@@ -29,13 +38,15 @@
     <script type="text/javascript" src="_static/theme.js" defer></script>
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    
     <script src="_static/jquery.js"></script>
     
     <script src="_static/underscore.js"></script>
     
-    <script src="_static/doctools.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     
-    <script src="_static/language_data.js"></script>
+    <script src="_static/doctools.js"></script>
     
     
 
@@ -135,7 +146,7 @@
 <ul>
   <li><a href="https://github.com/aleph2c/py-activeobject">miros on github</a></li>
   <li><a href="https://github.com/aleph2c/sequence">sequence on github</a></li>
-  <li><a href="https://aleph2c.github.io/miros-rabbitmq/index.html">miros-rabbitmq plugin</a></li>
+  <li><a href="https://aleph2c.github.io/miros-rabbitmq/html/index.html">miros-rabbitmq plugin</a></li>
   <li><a href="http://www.umlet.com">UMLet Download</a></li>
   <li><a href="http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf">formalism explained</a></li>
 </ul>
@@ -187,8 +198,8 @@ natural and unpredictable changes that inevitably arise in the life of a
 community.</p>
 <p class="attribution">—Christopher Alexander</p>
 </div></blockquote>
-<div class="section" id="patterns">
-<span id="id1"></span><h1>Patterns<a class="headerlink" href="#patterns" title="Permalink to this headline">#</a></h1>
+<section id="patterns">
+<span id="id1"></span><h1>Patterns<a class="headerlink" href="#patterns" title="Permalink to this heading">#</a></h1>
 <p>The idea of software design patterns came from the architect Christopher
 Alexander.  He wrote a book, <a class="reference external" href="https://www.patternlanguage.com/">a pattern language</a>, about how different
 approaches to architecture could be used across different scales (from the
@@ -210,7 +221,7 @@ Samek.  He describes 5 statechart patterns and made the bold claim that
 <strong>statecharts are a pattern of patterns</strong>.  I completely agree with him.  So here
 is my translation of his work into this library.  I’ll start each <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a> with
 quotes from his book, then write about it within the context of this work.</p>
-<div class="contents local topic" id="in-this-section">
+<nav class="contents local" id="in-this-section">
 <p class="topic-title">In This Section:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#ultimate-hook" id="id10">Ultimate Hook</a></p></li>
@@ -222,9 +233,9 @@ quotes from his book, then write about it within the context of this work.</p>
 <li><p><a class="reference internal" href="#multichart-race" id="id16">Multichart Race</a></p></li>
 <li><p><a class="reference internal" href="#multichart-pend" id="id17">Multichart Pend</a></p></li>
 </ul>
-</div>
-<div class="section" id="ultimate-hook">
-<span id="patterns-ultimate-hook"></span><h2>Ultimate Hook<a class="headerlink" href="#ultimate-hook" title="Permalink to this headline">#</a></h2>
+</nav>
+<section id="ultimate-hook">
+<span id="patterns-ultimate-hook"></span><h2>Ultimate Hook<a class="headerlink" href="#ultimate-hook" title="Permalink to this heading">#</a></h2>
 <p>Formal description:</p>
 <blockquote>
 <div><p>[The Ultimate Hook Pattern provides] common facilities and policies for
@@ -237,7 +248,7 @@ of automatically forwarding of all unhandled events to the [parent state]
 stimulus and can override every aspect of the behavior. To reuse the
 default behavior, the client simply ignores the event and lets the
 superstate handle it (the [child state] inherits behavior from the
-superstate) <a class="footnote-reference brackets" href="#id6" id="id2">5</a></p>
+superstate) <a class="footnote-reference brackets" href="#id6" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a></p>
 </div></blockquote>
 <p>To understand the ultimate hook <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a>, you first have to
 understand what a hook is.  It is just some code in an <code class="docutils literal notranslate"><span class="pre">if-elif</span></code> clause.   A
@@ -292,25 +303,17 @@ signal name of BEHAVIOR_NAME to your statechart:</p>
 <p>The highlighted code describes the hook.  We see that when the BEHAVIOR_NAME
 signal is caught by this state method it runs your <a class="reference internal" href="glossary.html#term-Client-Code"><span class="xref std std-term">client code</span></a> then returns <code class="docutils literal notranslate"><span class="pre">return_status.HANDLED</span></code>.</p>
 <p>The <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a> output would look like this:</p>
-<div class="highlight-shell notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
- <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:outer_state&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:outer_state&#39;</span>,
- <span class="s1">&#39;INIT_SIGNAL:outer_state&#39;</span>,
- <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
- <span class="s1">&#39;BEHAVIOR_NAME:outer_state&#39;</span>,
-<span class="hll"> <span class="s1">&#39;your outer_state code here&#39;</span>,
-</span> <span class="s1">&#39;BEHAVIOR_NAME:outer_state:HOOK&#39;</span>,
- <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
+<span class="linenos">2</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:outer_state&#39;</span>,
+<span class="linenos">3</span> <span class="s1">&#39;ENTRY_SIGNAL:outer_state&#39;</span>,
+<span class="linenos">4</span> <span class="s1">&#39;INIT_SIGNAL:outer_state&#39;</span>,
+<span class="linenos">5</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
+<span class="linenos">6</span> <span class="s1">&#39;BEHAVIOR_NAME:outer_state&#39;</span>,
+<span class="hll"><span class="linenos">7</span> <span class="s1">&#39;your outer_state code here&#39;</span>,
+</span><span class="linenos">8</span> <span class="s1">&#39;BEHAVIOR_NAME:outer_state:HOOK&#39;</span>,
+<span class="linenos">9</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Lines 1-5 describe the first <a class="reference internal" href="glossary.html#term-Run-To-Completion"><span class="xref std std-term">rtc</span></a> event which occurs
 when we start the statechart.  Lines 5-9 of the
 <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a> log actually describe the hook behavior.  The
@@ -324,209 +327,119 @@ Furthermore, no state transition occurred.</p>
 <a class="reference external image-reference" href="_static/ultimate_hook2.pdf"><img alt="_images/ultimate_hook2.svg" class="noscale-center" src="_images/ultimate_hook2.svg" /></a>
 <p>Now suppose we add another state within the outer state and start our active
 object there.</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
-
-
-<span class="nd">@spy_on</span>
-<span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">):</span>
-    <span class="c1"># your code would go here</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;your outer_state code here&quot;</span><span class="p">)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
-  <span class="k">return</span> <span class="n">status</span>
-
-<span class="hll"><span class="nd">@spy_on</span>
-</span><span class="hll"><span class="k">def</span> <span class="nf">inner_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-</span><span class="hll">  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">):</span>
-</span><span class="hll">    <span class="c1"># your code would go here</span>
-</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;your inner_state code here&quot;</span><span class="p">)</span>
-</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-</span><span class="hll">  <span class="k">else</span><span class="p">:</span>
-</span><span class="hll">    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
-</span><span class="hll">    <span class="n">status</span> <span class="o">=</span> <span class="n">outer_state</span>
-</span><span class="hll">  <span class="k">return</span> <span class="n">status</span>
-</span>
-<span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
-<span class="hll"><span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">inner_state</span><span class="p">)</span>
-</span><span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">))</span>
-<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
-<span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="linenos"> 4</span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="nd">@spy_on</span>
+<span class="linenos"> 8</span><span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="linenos"> 9</span>  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span>  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">):</span>
+<span class="linenos">12</span>    <span class="c1"># your code would go here</span>
+<span class="linenos">13</span>    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;your outer_state code here&quot;</span><span class="p">)</span>
+<span class="linenos">14</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="linenos">15</span>  <span class="k">else</span><span class="p">:</span>
+<span class="linenos">16</span>    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+<span class="linenos">17</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+<span class="linenos">18</span>  <span class="k">return</span> <span class="n">status</span>
+<span class="linenos">19</span>
+<span class="hll"><span class="linenos">20</span><span class="nd">@spy_on</span>
+</span><span class="hll"><span class="linenos">21</span><span class="k">def</span> <span class="nf">inner_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos">22</span>  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos">23</span>    <span class="c1"># your code would go here</span>
+</span><span class="hll"><span class="linenos">24</span>    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;your inner_state code here&quot;</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos">25</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="hll"><span class="linenos">26</span>  <span class="k">else</span><span class="p">:</span>
+</span><span class="hll"><span class="linenos">27</span>    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+</span><span class="hll"><span class="linenos">28</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">outer_state</span>
+</span><span class="hll"><span class="linenos">29</span>  <span class="k">return</span> <span class="n">status</span>
+</span><span class="linenos">30</span>
+<span class="linenos">31</span><span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="hll"><span class="linenos">32</span><span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">inner_state</span><span class="p">)</span>
+</span><span class="linenos">33</span><span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">))</span>
+<span class="linenos">34</span><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="linenos">35</span><span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Then look at the <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a>:</p>
-<div class="highlight-shell notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
- <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner_state&#39;</span>,
- <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:outer_state&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:outer_state&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:inner_state&#39;</span>,
- <span class="s1">&#39;INIT_SIGNAL:inner_state&#39;</span>,
- <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
- <span class="s1">&#39;BEHAVIOR_NAME:inner_state&#39;</span>,
-<span class="hll"> <span class="s1">&#39;your inner_state code here&#39;</span>,
-</span> <span class="s1">&#39;BEHAVIOR_NAME:inner_state:HOOK&#39;</span>,
- <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
+<span class="linenos"> 2</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner_state&#39;</span>,
+<span class="linenos"> 3</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:outer_state&#39;</span>,
+<span class="linenos"> 4</span> <span class="s1">&#39;ENTRY_SIGNAL:outer_state&#39;</span>,
+<span class="linenos"> 5</span> <span class="s1">&#39;ENTRY_SIGNAL:inner_state&#39;</span>,
+<span class="linenos"> 6</span> <span class="s1">&#39;INIT_SIGNAL:inner_state&#39;</span>,
+<span class="linenos"> 7</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
+<span class="linenos"> 8</span> <span class="s1">&#39;BEHAVIOR_NAME:inner_state&#39;</span>,
+<span class="hll"><span class="linenos"> 9</span> <span class="s1">&#39;your inner_state code here&#39;</span>,
+</span><span class="linenos">10</span> <span class="s1">&#39;BEHAVIOR_NAME:inner_state:HOOK&#39;</span>,
+<span class="linenos">11</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Ok, no surprises.  The inner_state hooked the BEHAVIOR_NAME signal and
 ran some <a class="reference internal" href="glossary.html#term-Client-Code"><span class="xref std std-term">client code</span></a>.</p>
 <a class="reference external image-reference" href="_static/ultimate_hook3.pdf"><img alt="_images/ultimate_hook3.svg" class="noscale-center" src="_images/ultimate_hook3.svg" /></a>
 <p>Now let’s remove the handling of the BEHAVIOR_NAME from our
 inner state and see what happens when we start the active object in the
 inner_state then send it an event with the BEHAVIOR_NAME.</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
-<span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
-
-<span class="nd">@spy_on</span>
-<span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
-
-  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">):</span>
-    <span class="c1"># your code would go here</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;your outer_state code here&quot;</span><span class="p">)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
-  <span class="k">return</span> <span class="n">status</span>
-
-<span class="nd">@spy_on</span>
-<span class="k">def</span> <span class="nf">inner_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-  <span class="c1">#if(e.signal == signals.BEHAVIOR_NAME):</span>
-  <span class="c1">#  # your code would go here</span>
-  <span class="c1">#  chart.scribble(&quot;your inner_state code here&quot;)</span>
-  <span class="c1">#  status = return_status.HANDLED</span>
-  <span class="c1">#else:</span>
-  <span class="c1">#  chart.temp.fun = outer_state</span>
-  <span class="c1">#  status = return_status.SUPER</span>
-<span class="hll">  <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer_state</span>
-</span><span class="hll">  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
-</span>  <span class="k">return</span> <span class="n">status</span>
-
-<span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">inner_state</span><span class="p">)</span>
-<span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">))</span>
-<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
-<span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">spy_on</span><span class="p">,</span> <span class="n">pp</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">ActiveObject</span>
+<span class="linenos"> 4</span><span class="kn">from</span> <span class="nn">miros</span> <span class="kn">import</span> <span class="n">signals</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">return_status</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span><span class="nd">@spy_on</span>
+<span class="linenos"> 7</span><span class="k">def</span> <span class="nf">outer_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="linenos"> 8</span>  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">UNHANDLED</span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span>  <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">):</span>
+<span class="linenos">11</span>    <span class="c1"># your code would go here</span>
+<span class="linenos">12</span>    <span class="n">chart</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;your outer_state code here&quot;</span><span class="p">)</span>
+<span class="linenos">13</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="linenos">14</span>  <span class="k">else</span><span class="p">:</span>
+<span class="linenos">15</span>    <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">top</span>
+<span class="linenos">16</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+<span class="linenos">17</span>  <span class="k">return</span> <span class="n">status</span>
+<span class="linenos">18</span>
+<span class="linenos">19</span><span class="nd">@spy_on</span>
+<span class="linenos">20</span><span class="k">def</span> <span class="nf">inner_state</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+<span class="linenos">21</span>  <span class="c1">#if(e.signal == signals.BEHAVIOR_NAME):</span>
+<span class="linenos">22</span>  <span class="c1">#  # your code would go here</span>
+<span class="linenos">23</span>  <span class="c1">#  chart.scribble(&quot;your inner_state code here&quot;)</span>
+<span class="linenos">24</span>  <span class="c1">#  status = return_status.HANDLED</span>
+<span class="linenos">25</span>  <span class="c1">#else:</span>
+<span class="linenos">26</span>  <span class="c1">#  chart.temp.fun = outer_state</span>
+<span class="linenos">27</span>  <span class="c1">#  status = return_status.SUPER</span>
+<span class="hll"><span class="linenos">28</span>  <span class="n">chart</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">outer_state</span>
+</span><span class="hll"><span class="linenos">29</span>  <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
+</span><span class="linenos">30</span>  <span class="k">return</span> <span class="n">status</span>
+<span class="linenos">31</span>
+<span class="linenos">32</span><span class="n">ao</span> <span class="o">=</span> <span class="n">ActiveObject</span><span class="p">()</span>
+<span class="linenos">33</span><span class="n">ao</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">inner_state</span><span class="p">)</span>
+<span class="linenos">34</span><span class="n">ao</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">BEHAVIOR_NAME</span><span class="p">))</span>
+<span class="linenos">35</span><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="linenos">36</span><span class="n">pp</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">spy</span><span class="p">())</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>In the highlighted code you can see that I adjusted the inner_state to run as
 if it’s <code class="docutils literal notranslate"><span class="pre">else</span></code> method clause was always active.  I did this so that it would not
 handle the BEHAVIOR_NAME signal.  Now we run the code and look at the
 <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a> output.</p>
-<div class="highlight-shell notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
- <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner_state&#39;</span>,
- <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:outer_state&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:outer_state&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:inner_state&#39;</span>,
- <span class="s1">&#39;INIT_SIGNAL:inner_state&#39;</span>,
- <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
-<span class="hll"> <span class="s1">&#39;BEHAVIOR_NAME:inner_state&#39;</span>,
-</span><span class="hll"> <span class="s1">&#39;BEHAVIOR_NAME:outer_state&#39;</span>,
-</span><span class="hll"> <span class="s1">&#39;your outer_state code here&#39;</span>,
-</span><span class="hll"> <span class="s1">&#39;BEHAVIOR_NAME:outer_state:HOOK&#39;</span>,
-</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
+<span class="linenos"> 2</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:inner_state&#39;</span>,
+<span class="linenos"> 3</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:outer_state&#39;</span>,
+<span class="linenos"> 4</span> <span class="s1">&#39;ENTRY_SIGNAL:outer_state&#39;</span>,
+<span class="linenos"> 5</span> <span class="s1">&#39;ENTRY_SIGNAL:inner_state&#39;</span>,
+<span class="linenos"> 6</span> <span class="s1">&#39;INIT_SIGNAL:inner_state&#39;</span>,
+<span class="linenos"> 7</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
+<span class="hll"><span class="linenos"> 8</span> <span class="s1">&#39;BEHAVIOR_NAME:inner_state&#39;</span>,
+</span><span class="hll"><span class="linenos"> 9</span> <span class="s1">&#39;BEHAVIOR_NAME:outer_state&#39;</span>,
+</span><span class="hll"><span class="linenos">10</span> <span class="s1">&#39;your outer_state code here&#39;</span>,
+</span><span class="hll"><span class="linenos">11</span> <span class="s1">&#39;BEHAVIOR_NAME:outer_state:HOOK&#39;</span>,
+</span><span class="linenos">12</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>The highlighted lines show how our event processor tried to determine what to
 do with the event containing the BEHAVIOR_NAME signal.</p>
 <p>It called the inner_state with the event (8), it wasn’t handled, so it
@@ -608,48 +521,33 @@ Pay special attention to what they return.  If they do not return
 <code class="docutils literal notranslate"><span class="pre">return_status.HANDLED</span></code> they will not work as hooks.</p>
 <p>We can deterime if we got the expected behavior by looking at the
 <a class="reference internal" href="recipes.html#recipes-using-the-spy"><span class="std std-ref">spy</span></a> log:</p>
-<div class="highlight-shell notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
- <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:specific&#39;</span>,
- <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:generic&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:generic&#39;</span>,
- <span class="s1">&#39;ENTRY_SIGNAL:specific&#39;</span>,
- <span class="s1">&#39;INIT_SIGNAL:specific&#39;</span>,
- <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
- <span class="s1">&#39;b:specific&#39;</span>,
- <span class="s1">&#39;b:generic&#39;</span>,
-<span class="hll"> <span class="s1">&#39;processing b generic&#39;</span>,
-</span><span class="hll"> <span class="s1">&#39;b:generic:HOOK&#39;</span>,
-</span> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(0)&#39;</span>,
- <span class="s1">&#39;a:specific&#39;</span>,
-<span class="hll"> <span class="s1">&#39;processing a specific&#39;</span>,
-</span><span class="hll"> <span class="s1">&#39;a:specific:HOOK&#39;</span>,
-</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="o">[</span><span class="s1">&#39;START&#39;</span>,
+<span class="linenos"> 2</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:specific&#39;</span>,
+<span class="linenos"> 3</span> <span class="s1">&#39;SEARCH_FOR_SUPER_SIGNAL:generic&#39;</span>,
+<span class="linenos"> 4</span> <span class="s1">&#39;ENTRY_SIGNAL:generic&#39;</span>,
+<span class="linenos"> 5</span> <span class="s1">&#39;ENTRY_SIGNAL:specific&#39;</span>,
+<span class="linenos"> 6</span> <span class="s1">&#39;INIT_SIGNAL:specific&#39;</span>,
+<span class="linenos"> 7</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span>,
+<span class="linenos"> 8</span> <span class="s1">&#39;b:specific&#39;</span>,
+<span class="linenos"> 9</span> <span class="s1">&#39;b:generic&#39;</span>,
+<span class="hll"><span class="linenos">10</span> <span class="s1">&#39;processing b generic&#39;</span>,
+</span><span class="hll"><span class="linenos">11</span> <span class="s1">&#39;b:generic:HOOK&#39;</span>,
+</span><span class="linenos">12</span> <span class="s1">&#39;&lt;- Queued:(1) Deferred:(0)&#39;</span>,
+<span class="linenos">13</span> <span class="s1">&#39;a:specific&#39;</span>,
+<span class="hll"><span class="linenos">14</span> <span class="s1">&#39;processing a specific&#39;</span>,
+</span><span class="hll"><span class="linenos">15</span> <span class="s1">&#39;a:specific:HOOK&#39;</span>,
+</span><span class="linenos">16</span> <span class="s1">&#39;&lt;- Queued:(0) Deferred:(0)&#39;</span><span class="o">]</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>On lines 10 and 11 we see the reaction to our first <code class="docutils literal notranslate"><span class="pre">b</span></code> signal.  As expected
 the generic state’s hook function was run while the statechart remained in the
 specific state.</p>
 <p>On lines 14 and 15 we see the specific behavior for the <code class="docutils literal notranslate"><span class="pre">a</span></code> signal.  The
 statechart ran the <a class="reference internal" href="glossary.html#term-Client-Code"><span class="xref std std-term">client code</span></a> in the specific state then
 stopped processing the signal.</p>
-</div>
-<div class="section" id="reminder">
-<span id="patterns-reminder"></span><h2>Reminder<a class="headerlink" href="#reminder" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="reminder">
+<span id="patterns-reminder"></span><h2>Reminder<a class="headerlink" href="#reminder" title="Permalink to this heading">#</a></h2>
 <p>Formal description:</p>
 <blockquote>
 <div><p>“Make the statechart topology more flexible by inventing an event an posting
@@ -665,7 +563,7 @@ the data. A straightforward but suboptimal solution is to organize the state
 machine into two distinct orthogonal regions (for polling and processing).
 However, orthogonal regions increase the cost of dispatching events … and
 require complex synchronization between the regions because the polling and
-processing are not quite independent.” <a class="footnote-reference brackets" href="#id7" id="id3">6</a></p>
+processing are not quite independent.” <a class="footnote-reference brackets" href="#id7" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a></p>
 </div></blockquote>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1182,11 +1080,11 @@ hidden from view.</p>
 <p>This is because the trace will only track items which cause state transitions
 and hooks do not cause state transitions.</p>
 </div>
-</div>
-<div class="section" id="deferred-event">
-<span id="patterns-deferred-event"></span><h2>Deferred Event<a class="headerlink" href="#deferred-event" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="deferred-event">
+<span id="patterns-deferred-event"></span><h2>Deferred Event<a class="headerlink" href="#deferred-event" title="Permalink to this heading">#</a></h2>
 <dl class="simple">
-<dt>Formal description:</dt><dd><p>“Simplify state machines by modifying the sequencing of events” <a class="footnote-reference brackets" href="#id8" id="id4">7</a></p>
+<dt>Formal description:</dt><dd><p>“Simplify state machines by modifying the sequencing of events” <a class="footnote-reference brackets" href="#id8" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a></p>
 </dd>
 </dl>
 <p>In reactive systems events come in <a class="reference external" href="http://barabasi.com/book/bursts">bursts</a>.  They come whenever they come
@@ -1348,80 +1246,50 @@ we intended:</p>
 <p>The received state takes about 1 second to complete, so we are expecting to see
 that the time between a NEW_REQUEST and a RECEIVED event should be about 1
 second.  From inspection on lines 2-3, 5-6, 8-9 we see this is true:</p>
-<div class="highlight-shell notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11</pre></div></td><td class="code"><div class="highlight"><pre><span></span>.
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:50.435495<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;NEW_REQUEST<span class="o">()</span> idle-&gt;receiving
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:51.451824<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;RECEIVED<span class="o">()</span> receiving-&gt;authorizing
-.
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:53.459805<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;NEW_REQUEST<span class="o">()</span> idle-&gt;receiving
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:54.461726<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;RECEIVED<span class="o">()</span> receiving-&gt;authorizing
-.
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:56.464915<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;NEW_REQUEST<span class="o">()</span> idle-&gt;receiving
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:57.466761<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;RECEIVED<span class="o">()</span> receiving-&gt;authorizing
-.
-.
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>.
+<span class="linenos"> 2</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:50.435495<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;NEW_REQUEST<span class="o">()</span> idle-&gt;receiving
+<span class="linenos"> 3</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:51.451824<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;RECEIVED<span class="o">()</span> receiving-&gt;authorizing
+<span class="linenos"> 4</span>.
+<span class="linenos"> 5</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:53.459805<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;NEW_REQUEST<span class="o">()</span> idle-&gt;receiving
+<span class="linenos"> 6</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:54.461726<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;RECEIVED<span class="o">()</span> receiving-&gt;authorizing
+<span class="linenos"> 7</span>.
+<span class="linenos"> 8</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:56.464915<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;NEW_REQUEST<span class="o">()</span> idle-&gt;receiving
+<span class="linenos"> 9</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:57.466761<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;RECEIVED<span class="o">()</span> receiving-&gt;authorizing
+<span class="linenos">10</span>.
+<span class="linenos">11</span>.
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>The authorizing state takes about 2 seconds to complete so the RECEIVED and
 COMPLETED events should be about 2 seconds apart.  From the inspection of lines
 3-4, 6-7 and 9-10 we see this is true.</p>
-<div class="highlight-shell notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11</pre></div></td><td class="code"><div class="highlight"><pre><span></span>.
-.
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:51.451824<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;RECEIVED<span class="o">()</span> receiving-&gt;authorizing
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:53.458799<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;COMPLETED<span class="o">()</span> authorizing-&gt;idle
-.
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:54.461726<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;RECEIVED<span class="o">()</span> receiving-&gt;authorizing
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:56.463891<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;COMPLETED<span class="o">()</span> authorizing-&gt;idle
-.
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:57.466761<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;RECEIVED<span class="o">()</span> receiving-&gt;authorizing
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:59.468877<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;COMPLETED<span class="o">()</span> authorizing-&gt;idle
-.
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>.
+<span class="linenos"> 2</span>.
+<span class="linenos"> 3</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:51.451824<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;RECEIVED<span class="o">()</span> receiving-&gt;authorizing
+<span class="linenos"> 4</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:53.458799<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;COMPLETED<span class="o">()</span> authorizing-&gt;idle
+<span class="linenos"> 5</span>.
+<span class="linenos"> 6</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:54.461726<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;RECEIVED<span class="o">()</span> receiving-&gt;authorizing
+<span class="linenos"> 7</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:56.463891<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;COMPLETED<span class="o">()</span> authorizing-&gt;idle
+<span class="linenos"> 8</span>.
+<span class="linenos"> 9</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:57.466761<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;RECEIVED<span class="o">()</span> receiving-&gt;authorizing
+<span class="linenos">10</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:59.468877<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;COMPLETED<span class="o">()</span> authorizing-&gt;idle
+<span class="linenos">11</span>.
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>The deferred event <a class="reference internal" href="glossary.html#term-Pattern"><span class="xref std std-term">pattern</span></a> states that we will react to the recalled events
 immediately and we can see this behavior on lines 4-5 and 8-9</p>
-<div class="highlight-shell notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11</pre></div></td><td class="code"><div class="highlight"><pre><span></span>.
-.
-.
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:53.458799<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;COMPLETED<span class="o">()</span> authorizing-&gt;idle
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:53.459805<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;NEW_REQUEST<span class="o">()</span> idle-&gt;receiving
-.
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:56.463891<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;COMPLETED<span class="o">()</span> authorizing-&gt;idle
-<span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:56.464915<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;NEW_REQUEST<span class="o">()</span> idle-&gt;receiving
-.
-.
-.
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>.
+<span class="linenos"> 2</span>.
+<span class="linenos"> 3</span>.
+<span class="linenos"> 4</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:53.458799<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;COMPLETED<span class="o">()</span> authorizing-&gt;idle
+<span class="linenos"> 5</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:53.459805<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;NEW_REQUEST<span class="o">()</span> idle-&gt;receiving
+<span class="linenos"> 6</span>.
+<span class="linenos"> 7</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:56.463891<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;COMPLETED<span class="o">()</span> authorizing-&gt;idle
+<span class="linenos"> 8</span><span class="o">[</span><span class="m">2017</span>-12-15 <span class="m">09</span>:20:56.464915<span class="o">]</span> <span class="o">[</span>deferred<span class="o">]</span> e-&gt;NEW_REQUEST<span class="o">()</span> idle-&gt;receiving
+<span class="linenos"> 9</span>.
+<span class="linenos">10</span>.
+<span class="linenos">11</span>.
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Now we have to confirm that NEW_REQUEST events were sent at random times and
 deferred by the chart.  To do this we will have to dig into the spy log.  To
 make it easier to see I will put spaces after the RTC event and I will
@@ -1514,9 +1382,9 @@ queue size of 500.</p>
 spy only takes a little effort; use the scribble method with a
 <code class="docutils literal notranslate"><span class="pre">datetime.now()</span></code> call.</p>
 </div>
-</div>
-<div class="section" id="orthogonal-component">
-<span id="patterns-orthogonal-component"></span><h2>Orthogonal Component<a class="headerlink" href="#orthogonal-component" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="orthogonal-component">
+<span id="patterns-orthogonal-component"></span><h2>Orthogonal Component<a class="headerlink" href="#orthogonal-component" title="Permalink to this heading">#</a></h2>
 <dl class="simple">
 <dt>Formal description:</dt><dd><p>“Use state machines as components.”</p>
 </dd>
@@ -1570,10 +1438,6 @@ maximum amount of power.</p>
 <p>Through a lot of trial and error it has been found a piston can fire in the
 following situations:</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 41%" />
-<col style="width: 59%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Composite Transducer Reading</p></th>
 <th class="head"><p>Temperature Transducer  [degrees Celsius]</p></th>
@@ -2535,23 +2399,23 @@ used in this example:</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">fusion_reactor</span><span class="o">.</span><span class="n">pistons</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="orthogonal-regions">
-<span id="patterns-orthogonal-regions"></span><h2>Orthogonal Regions<a class="headerlink" href="#orthogonal-regions" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="orthogonal-regions">
+<span id="patterns-orthogonal-regions"></span><h2>Orthogonal Regions<a class="headerlink" href="#orthogonal-regions" title="Permalink to this heading">#</a></h2>
 <p>Orthogonal regions describe HSM concurrency <em>within</em> the same statechart.</p>
 <a class="reference external image-reference" href="_static/xml_chart_2.pdf"><img alt="_images/xml_chart_2.svg" class="noscale-center" src="_images/xml_chart_2.svg" /></a>
 <p>See the <a class="reference internal" href="othogonalregions.html#othogonalregions-othogonal-regions-with-miros"><span class="std std-ref">orthogonal regions example</span></a> for instructions on how to
 build orthogonal regions using miros.</p>
-</div>
-<div class="section" id="transition-to-history">
-<span id="patterns-transition-to-history"></span><h2>Transition To History<a class="headerlink" href="#transition-to-history" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="transition-to-history">
+<span id="patterns-transition-to-history"></span><h2>Transition To History<a class="headerlink" href="#transition-to-history" title="Permalink to this heading">#</a></h2>
 <dl>
 <dt>Formal description:</dt><dd><p>Transition out of a composite state, but remember the most recent active
 substate so you can return to that substate later.</p>
 <p>State transitions defined in high-level composite states often deal with
 events that require immediate attention; however, after handling them, the
 system should return to the most recent substate of the given composite
-state.  <a class="footnote-reference brackets" href="#id9" id="id5">8</a></p>
+state.  <a class="footnote-reference brackets" href="#id9" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a></p>
 </dd>
 </dl>
 <p>To describe this pattern I will re-use the toaster oven example.  If you have read
@@ -2814,30 +2678,34 @@ back into the off state, the design works.</p>
      <span class="p">|</span>          <span class="p">|</span>          <span class="p">|</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="multichart-race">
-<span id="patterns-multichart-race"></span><h2>Multichart Race<a class="headerlink" href="#multichart-race" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="multichart-race">
+<span id="patterns-multichart-race"></span><h2>Multichart Race<a class="headerlink" href="#multichart-race" title="Permalink to this heading">#</a></h2>
 <p>See: <a class="reference internal" href="setting_up_rabbit_mq.html#setting-up-rabbit-mq-setting-up-rabbit-mq"><span class="std std-ref">setting up rabbit mq</span></a></p>
-</div>
-<div class="section" id="multichart-pend">
-<span id="patterns-multichart-pend"></span><h2>Multichart Pend<a class="headerlink" href="#multichart-pend" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="multichart-pend">
+<span id="patterns-multichart-pend"></span><h2>Multichart Pend<a class="headerlink" href="#multichart-pend" title="Permalink to this heading">#</a></h2>
 <p>See: <a class="reference internal" href="setting_up_rabbit_mq.html#setting-up-rabbit-mq-setting-up-rabbit-mq"><span class="std std-ref">setting up rabbit mq</span></a></p>
-<dl class="footnote brackets">
-<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id2">5</a></span></dt>
-<dd><p>p.206 Practical UML STATECHARTS in C/C++, Second Edition</p>
-</dd>
-<dt class="label" id="id7"><span class="brackets"><a class="fn-backref" href="#id3">6</a></span></dt>
-<dd><p>p.211 Practical UML STATECHARTS in C/C++, Second Edition</p>
-</dd>
-<dt class="label" id="id8"><span class="brackets"><a class="fn-backref" href="#id4">7</a></span></dt>
-<dd><p>p.219 Practical UML STATECHARTS in C/C++, Second Edition</p>
-</dd>
-<dt class="label" id="id9"><span class="brackets"><a class="fn-backref" href="#id5">8</a></span></dt>
-<dd><p>p.245 Practical UML STATECHARTS in C/C++, Second Edition</p>
-</dd>
-</dl>
-</div>
-</div>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id6" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">5</a><span class="fn-bracket">]</span></span>
+<p>p.206 Practical UML STATECHARTS in C/C++, Second Edition</p>
+</aside>
+<aside class="footnote brackets" id="id7" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">6</a><span class="fn-bracket">]</span></span>
+<p>p.211 Practical UML STATECHARTS in C/C++, Second Edition</p>
+</aside>
+<aside class="footnote brackets" id="id8" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">7</a><span class="fn-bracket">]</span></span>
+<p>p.219 Practical UML STATECHARTS in C/C++, Second Edition</p>
+</aside>
+<aside class="footnote brackets" id="id9" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">8</a><span class="fn-bracket">]</span></span>
+<p>p.245 Practical UML STATECHARTS in C/C++, Second Edition</p>
+</aside>
+</aside>
+</section>
+</section>
 
 
         
@@ -2874,12 +2742,12 @@ back into the off state, the design works.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">Nov 03, 2020 8:22 AM</span>
+          <span class="time">May 26, 2024 6:24 PM</span>
         </div>
         
         
         <div class="created-with">
-          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 3.3.0 with <span class="theme">13ds_theme_one</span>.
+          Created using <a href="http://sphinx-doc.org/" class="copyright_link">Sphinx</a> 5.1.1 with <span class="theme">13ds_theme_one</span>.
         </div>
         
       </footer>

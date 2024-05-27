@@ -1,3 +1,4 @@
+:orphan:
 .. _networked_instrumentation-spy-and-trace-across-a-network:
 
 Spy and Trace Across a Network
@@ -486,7 +487,7 @@ terminal output on the raspberry pi:
   [2018-01-10 13:14:26.739622] [producer_192.168.1.72] e->start_at() top->c1
   [2018-01-10 13:14:27.024377] [producer_192.168.1.72] e->B() c1->c1
 
-Comparing this to our :ref:`producer design<producer_design>` we see that it is
+Comparing this to our :ref:`producer design<networked_instrumentation-the-producer-design>` we see that it is
 the expected spy and trace.  If we ran our trace through sequence we would see:
 
 .. code-block:: guess
@@ -1232,7 +1233,7 @@ what happens.
 
 The consumer outputs:
 
-.. code-block:: guess
+.. code-block:: text
   :linenos:
 
    [x] Trace: [2018-01-10 18:23:35.647035] [rabbit_producer_192.168.1.72] e->start_at() top->c1
