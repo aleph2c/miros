@@ -949,7 +949,7 @@ technology you are using with your editor. `I use Ultisnips in Vim
 
 .. _where_is_the_thr:
 
-Where is the thread, event processor and queues in the diagram?**
+**Where is the thread, event processor and queues in the diagram?**
 
 
 The thread and the queues are missing from the UML diagram; but they are
@@ -2459,7 +2459,7 @@ place.  Instead, pay attention to the other things in the output:
 * The toasting state is sent the ENTRY_SIGNAL event
 * The toasting state is sent the INIT_SIGNAL
 
-Finally, we see the line describing the state of the queues.  In this case their
+Finally, we see the line describing the state of the queues.  In this case there
 are two events pending in the queue, due to our code calling the ``post_fifo``
 method with a "Baking" and "Off" event.
 
@@ -2468,7 +2468,7 @@ your code:
 
 .. code-block:: python
 
-  oven.list_spy = True
+  oven.live_spy = True
   oven.start_at(off)
 
 .. include:: i_navigation_2.rst
@@ -3686,6 +3686,8 @@ Here is a regression test for this design:
 
     def spy_on_buzz():
       oven = ToasterOvenMock(name="oven")
+      oven.start_at(door_closed)
+
       # Send the buzz event
       oven.post_fifo(Event(signal=signals.Buzz))
       time.sleep(0.01)
@@ -3861,7 +3863,7 @@ I'll answer this by first imagining that our oven has settled in the
    callback pointed to by **T** two arguments, a reference to the ToasterOven
    object which is called ``oven`` and ``e`` set to ``Event(signal=signals.Buzz)``.
 
-   The ``toaster`` callback's if-elif logical structure doesn't handle a
+   The ``toasting`` callback's if-elif logical structure doesn't handle a
    ``Buzz`` event so it passes control to its ``else`` clause.  The ``else``
    clause updates the **T** to the parent state of the ``toasting`` state:
    ``heating``.  The ``toasting`` callback returns ``return_status.SUPER``,
@@ -4483,7 +4485,7 @@ Iteration 5 code
 """"""""""""""""
 
 .. code-block:: python
-  :emphasize-lines: 12-13, 15, 18-21, 23-24, 48-49, 51-69, 71-95, 97-128, 130-161, 163-180, 249-254, 271-276
+  :emphasize-lines: 12-13, 15, 18-21, 23-24, 48-49, 51-69, 71-95, 97-128, 130-161, 163-180, 249-254, 256-260, 271-276, 278-282
   :linenos:
 
   import re
@@ -5319,7 +5321,7 @@ Iteration 6 code
 """"""""""""""""
 
 .. code-block:: python
-  :emphasize-lines: 9, 11-12, 18-19, 24, 25 ,33-36, 65-88, 294-305, 319, 335, 338, 339
+  :emphasize-lines: 9, 11-12, 18-19, 24, 25, 33-36, 40-41, 65-88, 93-104, 249-253, 294-305, 319, 322-323, 335, 338, 339, 373-378
   :linenos:
 
   import re

@@ -1043,7 +1043,7 @@ technology you are using with your editor. <a class="reference external" href="h
   <a href="zero_to_one.html#iter1-proof">proof</a></a>,
   <a href="zero_to_one.html#iter1-questions">questions</a></a>,
   <a href="zero_to_one.html#iter2">next</a>
-</div><p id="where-is-the-thr">Where is the thread, event processor and queues in the diagram?**</p>
+</div><p id="where-is-the-thr"><strong>Where is the thread, event processor and queues in the diagram?</strong></p>
 <p>The thread and the queues are missing from the UML diagram; but they are
 contained within the ActiveObject class.</p>
 <p>The event processor is shown on the picture, since I use its attachment point to
@@ -2384,12 +2384,12 @@ place.  Instead, pay attention to the other things in the output:</p>
 <li><p>The toasting state is sent the ENTRY_SIGNAL event</p></li>
 <li><p>The toasting state is sent the INIT_SIGNAL</p></li>
 </ul>
-<p>Finally, we see the line describing the state of the queues.  In this case their
+<p>Finally, we see the line describing the state of the queues.  In this case there
 are two events pending in the queue, due to our code calling the <code class="docutils literal notranslate"><span class="pre">post_fifo</span></code>
 method with a “Baking” and “Off” event.</p>
 <p>To turn on a live spy, replace the live_trace call with the live_spy call in
 your code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oven</span><span class="o">.</span><span class="n">list_spy</span> <span class="o">=</span> <span class="kc">True</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oven</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">off</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -3586,6 +3586,8 @@ things a lot.</p>
 
 <span class="k">def</span> <span class="nf">spy_on_buzz</span><span class="p">():</span>
   <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOvenMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">)</span>
+  <span class="n">oven</span><span class="o">.</span><span class="n">start_at</span><span class="p">(</span><span class="n">door_closed</span><span class="p">)</span>
+
   <span class="c1"># Send the buzz event</span>
   <span class="n">oven</span><span class="o">.</span><span class="n">post_fifo</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">))</span>
   <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
@@ -3746,7 +3748,7 @@ first place?</p>
 <p>The event processor begins its reaction to the <code class="docutils literal notranslate"><span class="pre">Buzz</span></code> event by sending the
 callback pointed to by <strong>T</strong> two arguments, a reference to the ToasterOven
 object which is called <code class="docutils literal notranslate"><span class="pre">oven</span></code> and <code class="docutils literal notranslate"><span class="pre">e</span></code> set to <code class="docutils literal notranslate"><span class="pre">Event(signal=signals.Buzz)</span></code>.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">toaster</span></code> callback’s if-elif logical structure doesn’t handle a
+<p>The <code class="docutils literal notranslate"><span class="pre">toasting</span></code> callback’s if-elif logical structure doesn’t handle a
 <code class="docutils literal notranslate"><span class="pre">Buzz</span></code> event so it passes control to its <code class="docutils literal notranslate"><span class="pre">else</span></code> clause.  The <code class="docutils literal notranslate"><span class="pre">else</span></code>
 clause updates the <strong>T</strong> to the parent state of the <code class="docutils literal notranslate"><span class="pre">toasting</span></code> state:
 <code class="docutils literal notranslate"><span class="pre">heating</span></code>.  The <code class="docutils literal notranslate"><span class="pre">toasting</span></code> callback returns <code class="docutils literal notranslate"><span class="pre">return_status.SUPER</span></code>,
@@ -4618,12 +4620,12 @@ buzzer which will get the attention of anyone nearby.</span></p></li>
 </span><span class="hll"><span class="linenos">253</span>      <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span>
 </span><span class="hll"><span class="linenos">254</span>    <span class="p">)</span>
 </span><span class="linenos">255</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-<span class="linenos">256</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-<span class="linenos">257</span>    <span class="n">oven</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span>
-<span class="linenos">258</span>      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">)</span>
-<span class="linenos">259</span>    <span class="p">)</span>
-<span class="linenos">260</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-<span class="linenos">261</span>  <span class="k">else</span><span class="p">:</span>
+<span class="hll"><span class="linenos">256</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos">257</span>    <span class="n">oven</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span>
+</span><span class="hll"><span class="linenos">258</span>      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos">259</span>    <span class="p">)</span>
+</span><span class="hll"><span class="linenos">260</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="linenos">261</span>  <span class="k">else</span><span class="p">:</span>
 <span class="linenos">262</span>    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>
 <span class="linenos">263</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
 <span class="linenos">264</span>  <span class="k">return</span> <span class="n">status</span>
@@ -4640,12 +4642,12 @@ buzzer which will get the attention of anyone nearby.</span></p></li>
 </span><span class="hll"><span class="linenos">275</span>      <span class="n">deferred</span><span class="o">=</span><span class="kc">True</span>
 </span><span class="hll"><span class="linenos">276</span>    <span class="p">)</span>
 </span><span class="linenos">277</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-<span class="linenos">278</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-<span class="linenos">279</span>    <span class="n">oven</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span>
-<span class="linenos">280</span>      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">)</span>
-<span class="linenos">281</span>    <span class="p">)</span>
-<span class="linenos">282</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
-<span class="linenos">283</span>  <span class="k">else</span><span class="p">:</span>
+<span class="hll"><span class="linenos">278</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos">279</span>    <span class="n">oven</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span>
+</span><span class="hll"><span class="linenos">280</span>      <span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Buzz</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos">281</span>    <span class="p">)</span>
+</span><span class="hll"><span class="linenos">282</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+</span><span class="linenos">283</span>  <span class="k">else</span><span class="p">:</span>
 <span class="linenos">284</span>    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>
 <span class="linenos">285</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
 <span class="linenos">286</span>  <span class="k">return</span> <span class="n">status</span>
@@ -5252,9 +5254,9 @@ hardware timing:</p>
 </span><span class="linenos"> 37</span>
 <span class="linenos"> 38</span>    <span class="bp">self</span><span class="o">.</span><span class="n">toast_time_in_sec</span> <span class="o">=</span> <span class="n">toast_time_in_sec</span>
 <span class="linenos"> 39</span>    <span class="bp">self</span><span class="o">.</span><span class="n">bake_time_in_sec</span> <span class="o">=</span> <span class="n">bake_time_in_sec</span>
-<span class="linenos"> 40</span>    <span class="bp">self</span><span class="o">.</span><span class="n">get_ready_sec</span> <span class="o">=</span> <span class="n">get_ready_sec</span>
-<span class="linenos"> 41</span>    <span class="bp">self</span><span class="o">.</span><span class="n">done_buzz_period_sec</span> <span class="o">=</span> <span class="n">done_buzz_period_sec</span>
-<span class="linenos"> 42</span>    <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="hll"><span class="linenos"> 40</span>    <span class="bp">self</span><span class="o">.</span><span class="n">get_ready_sec</span> <span class="o">=</span> <span class="n">get_ready_sec</span>
+</span><span class="hll"><span class="linenos"> 41</span>    <span class="bp">self</span><span class="o">.</span><span class="n">done_buzz_period_sec</span> <span class="o">=</span> <span class="n">done_buzz_period_sec</span>
+</span><span class="linenos"> 42</span>    <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="linenos"> 43</span>
 <span class="linenos"> 44</span>  <span class="k">def</span> <span class="nf">light_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="linenos"> 45</span>    <span class="c1"># call to your hardware&#39;s light_on driver</span>
@@ -5305,19 +5307,19 @@ hardware timing:</p>
 <span class="linenos"> 90</span>
 <span class="linenos"> 91</span><span class="k">class</span> <span class="nc">ToasterOvenMock</span><span class="p">(</span><span class="n">ToasterOven</span><span class="p">):</span>
 <span class="linenos"> 92</span>
-<span class="linenos"> 93</span>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-<span class="linenos"> 94</span>    <span class="n">name</span><span class="p">,</span>
-<span class="linenos"> 95</span>    <span class="n">toast_time_in_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="linenos"> 96</span>    <span class="n">bake_time_in_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="linenos"> 97</span>    <span class="n">get_ready_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="linenos"> 98</span>    <span class="n">done_buzz_period_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="linenos"> 99</span>
-<span class="linenos">100</span>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span>
-<span class="linenos">101</span>      <span class="n">toast_time_in_sec</span><span class="p">,</span>
-<span class="linenos">102</span>      <span class="n">bake_time_in_sec</span><span class="p">,</span>
-<span class="linenos">103</span>      <span class="n">get_ready_sec</span><span class="p">,</span>
-<span class="linenos">104</span>      <span class="n">done_buzz_period_sec</span><span class="p">)</span>
-<span class="linenos">105</span>
+<span class="hll"><span class="linenos"> 93</span>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos"> 94</span>    <span class="n">name</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos"> 95</span>    <span class="n">toast_time_in_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos"> 96</span>    <span class="n">bake_time_in_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos"> 97</span>    <span class="n">get_ready_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos"> 98</span>    <span class="n">done_buzz_period_sec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos"> 99</span>
+</span><span class="hll"><span class="linenos">100</span>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">101</span>      <span class="n">toast_time_in_sec</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">102</span>      <span class="n">bake_time_in_sec</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">103</span>      <span class="n">get_ready_sec</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">104</span>      <span class="n">done_buzz_period_sec</span><span class="p">)</span>
+</span><span class="linenos">105</span>
 <span class="linenos">106</span>  <span class="nd">@staticmethod</span>
 <span class="linenos">107</span>  <span class="k">def</span> <span class="nf">prepend_trace_timestamp</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
 <span class="linenos">108</span>    <span class="sd">&#39;&#39;&#39;Prepend the trace-style timestamp in front of a string</span>
@@ -5461,12 +5463,12 @@ hardware timing:</p>
 <span class="linenos">246</span>  <span class="k">def</span> <span class="nf">heater_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="linenos">247</span>    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;heater_off&quot;</span><span class="p">)</span>
 <span class="linenos">248</span>
-<span class="linenos">249</span>  <span class="k">def</span> <span class="nf">buzz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="linenos">250</span>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
-<span class="linenos">251</span>      <span class="n">output</span> <span class="o">=</span> <span class="n">ToasterOvenMock</span><span class="o">.</span><span class="n">prepend_trace_timestamp</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
-<span class="linenos">252</span>      <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-<span class="linenos">253</span>    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
-<span class="linenos">254</span>
+<span class="hll"><span class="linenos">249</span>  <span class="k">def</span> <span class="nf">buzz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="hll"><span class="linenos">250</span>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+</span><span class="hll"><span class="linenos">251</span>      <span class="n">output</span> <span class="o">=</span> <span class="n">ToasterOvenMock</span><span class="o">.</span><span class="n">prepend_trace_timestamp</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos">252</span>      <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos">253</span>    <span class="bp">self</span><span class="o">.</span><span class="n">scribble</span><span class="p">(</span><span class="s2">&quot;buzz&quot;</span><span class="p">)</span>
+</span><span class="linenos">254</span>
 <span class="linenos">255</span>
 <span class="linenos">256</span><span class="nd">@spy_on</span>
 <span class="linenos">257</span><span class="k">def</span> <span class="nf">common_features</span><span class="p">(</span><span class="n">oven</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
@@ -5534,9 +5536,9 @@ hardware timing:</p>
 <span class="hll"><span class="linenos">319</span>    <span class="n">oven</span><span class="o">.</span><span class="n">cook_time</span><span class="p">(</span><span class="n">oven</span><span class="o">.</span><span class="n">bake_time_in_sec</span><span class="p">)</span>
 </span><span class="linenos">320</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 <span class="linenos">321</span>  <span class="k">elif</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">signal</span> <span class="o">==</span> <span class="n">signals</span><span class="o">.</span><span class="n">EXIT_SIGNAL</span><span class="p">):</span>
-<span class="linenos">322</span>    <span class="n">oven</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Done</span><span class="p">))</span>
-<span class="linenos">323</span>    <span class="n">oven</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Get_Ready</span><span class="p">))</span>
-<span class="linenos">324</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
+<span class="hll"><span class="linenos">322</span>    <span class="n">oven</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Done</span><span class="p">))</span>
+</span><span class="hll"><span class="linenos">323</span>    <span class="n">oven</span><span class="o">.</span><span class="n">cancel_events</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="o">.</span><span class="n">Get_Ready</span><span class="p">))</span>
+</span><span class="linenos">324</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">HANDLED</span>
 <span class="linenos">325</span>  <span class="k">else</span><span class="p">:</span>
 <span class="linenos">326</span>    <span class="n">oven</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">fun</span> <span class="o">=</span> <span class="n">heating</span>
 <span class="linenos">327</span>    <span class="n">status</span> <span class="o">=</span> <span class="n">return_status</span><span class="o">.</span><span class="n">SUPER</span>
@@ -5585,13 +5587,13 @@ hardware timing:</p>
 <span class="linenos">370</span>
 <span class="linenos">371</span>  <span class="c1"># reduce our time delays so we don&#39;t have</span>
 <span class="linenos">372</span>  <span class="c1"># to wait while we are testing</span>
-<span class="linenos">373</span>  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOvenMock</span><span class="p">(</span>
-<span class="linenos">374</span>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">,</span>
-<span class="linenos">375</span>    <span class="n">toast_time_in_sec</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-<span class="linenos">376</span>    <span class="n">bake_time_in_sec</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
-<span class="linenos">377</span>    <span class="n">get_ready_sec</span><span class="o">=</span><span class="mf">0.10</span><span class="p">,</span>
-<span class="linenos">378</span>    <span class="n">done_buzz_period_sec</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
-<span class="linenos">379</span>
+<span class="hll"><span class="linenos">373</span>  <span class="n">oven</span> <span class="o">=</span> <span class="n">ToasterOvenMock</span><span class="p">(</span>
+</span><span class="hll"><span class="linenos">374</span>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;oven&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">375</span>    <span class="n">toast_time_in_sec</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">376</span>    <span class="n">bake_time_in_sec</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">377</span>    <span class="n">get_ready_sec</span><span class="o">=</span><span class="mf">0.10</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">378</span>    <span class="n">done_buzz_period_sec</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+</span><span class="linenos">379</span>
 <span class="linenos">380</span>  <span class="n">oven</span><span class="o">.</span><span class="n">live_spy</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="linenos">381</span>
 <span class="linenos">382</span>  <span class="c1"># start our oven in the door_closed state</span>
@@ -6112,7 +6114,7 @@ immediately after being started.</p>
         
         <div class="last-updated">
           <span class="prefix">Last updated:</span>
-          <span class="time">May 26, 2024 6:33 PM</span>
+          <span class="time">May 28, 2024 9:26 AM</span>
         </div>
         
         
